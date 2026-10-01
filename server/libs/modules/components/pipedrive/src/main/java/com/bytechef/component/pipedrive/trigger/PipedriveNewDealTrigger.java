@@ -47,6 +47,7 @@ public class PipedriveNewDealTrigger {
         .description("Trigger off whenever a new deal is added.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(outputSchema(DEAL_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/pipedrive_v1#new-deal")
         .webhookDisable(PipedriveNewDealTrigger::webhookDisable)
         .webhookEnable(PipedriveNewDealTrigger::webhookEnable)
         .webhookRequest(PipedriveNewDealTrigger::webhookRequest);

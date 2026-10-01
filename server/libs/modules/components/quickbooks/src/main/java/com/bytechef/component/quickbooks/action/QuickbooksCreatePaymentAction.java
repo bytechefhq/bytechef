@@ -54,6 +54,7 @@ public class QuickbooksCreatePaymentAction {
                 .description("Total amount of the transaction.")
                 .required(true))
         .output(outputSchema(PAYMENT_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/quickbooks_v1#create-payment")
         .perform(QuickbooksCreatePaymentAction::perform);
 
     private QuickbooksCreatePaymentAction() {

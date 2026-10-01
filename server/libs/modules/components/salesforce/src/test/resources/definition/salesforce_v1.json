@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new record of a specified Salesforce object.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/salesforce_v1#create-record"
+    },
     "metadata": null,
     "name": "createRecord",
     "outputDefinition": {
@@ -263,7 +266,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes an existing record of a specified Salesforce object.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/salesforce_v1#delete-record"
+    },
     "metadata": null,
     "name": "deleteRecord",
     "outputDefinition": null,
@@ -330,7 +336,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Executes a raw SOQL query to  extract data from Salesforce.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/salesforce_v1#soql-query"
+    },
     "metadata": null,
     "name": "soqlQuery",
     "outputDefinition": {
@@ -374,7 +383,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates an existing record for a specified Salesforce object.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/salesforce_v1#update-record"
+    },
     "metadata": null,
     "name": "updateRecord",
     "outputDefinition": null,
@@ -1232,7 +1244,10 @@
     "deprecated": null,
     "description": "Triggers when there is new record in Salesforce.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/salesforce_v1#new-record"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newRecord",
@@ -1286,7 +1301,10 @@
     "deprecated": null,
     "description": "Triggers when record is updated.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/salesforce_v1#updated-record"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "updatedRecord",

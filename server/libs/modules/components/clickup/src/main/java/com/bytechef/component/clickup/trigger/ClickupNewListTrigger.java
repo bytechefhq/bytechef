@@ -76,6 +76,7 @@ public class ClickupNewListTrigger {
                                     .description("The ID of the space."),
                                 string(NAME)
                                     .description("The name of the space.")))))
+        .help("", "https://docs.bytechef.io/reference/components/clickup_v1#new-list")
         .webhookEnable(ClickupNewListTrigger::webhookEnable)
         .webhookDisable(ClickupNewListTrigger::webhookDisable)
         .webhookRequest(ClickupNewListTrigger::webhookRequest);

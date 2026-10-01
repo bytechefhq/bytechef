@@ -54,6 +54,7 @@ public class NotionCreatePageAction {
                 .description("The title of the page.")
                 .required(false))
         .output(outputSchema(PAGE_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/notion_v1#create-page")
         .perform(NotionCreatePageAction::perform);
 
     private NotionCreatePageAction() {

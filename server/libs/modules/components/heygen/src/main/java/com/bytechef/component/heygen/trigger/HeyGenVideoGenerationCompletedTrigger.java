@@ -55,6 +55,7 @@ public class HeyGenVideoGenerationCompletedTrigger {
                         string("video_share_page_url"),
                         string("folder_id"),
                         string("callback_id"))))
+        .help("", "https://docs.bytechef.io/reference/components/heygen_v1#video-generation-completed")
         .webhookEnable(HeyGenVideoGenerationCompletedTrigger::webhookEnable)
         .webhookDisable(HeyGenVideoGenerationCompletedTrigger::webhookDisable)
         .webhookRequest(HeyGenVideoGenerationCompletedTrigger::webhookRequest);

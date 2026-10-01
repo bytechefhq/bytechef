@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a key from Redis.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#delete"
+    },
     "metadata": null,
     "name": "delete",
     "outputDefinition": {
@@ -102,7 +105,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets the value of a key from Redis.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#get"
+    },
     "metadata": null,
     "name": "get",
     "outputDefinition": {
@@ -194,7 +200,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Atomically increments a key by 1. Creates the key with value 1 if it does not exist.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#increment"
+    },
     "metadata": null,
     "name": "increment",
     "outputDefinition": {
@@ -323,7 +332,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns information and statistics about the Redis server.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#info"
+    },
     "metadata": null,
     "name": "info",
     "outputDefinition": {
@@ -433,7 +445,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all keys matching a pattern.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#keys"
+    },
     "metadata": null,
     "name": "keys",
     "outputDefinition": {
@@ -567,7 +582,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the length of a Redis list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#list-length"
+    },
     "metadata": null,
     "name": "listLength",
     "outputDefinition": {
@@ -653,7 +671,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Pops data from a Redis list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#pop"
+    },
     "metadata": null,
     "name": "pop",
     "outputDefinition": {
@@ -769,7 +790,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Publishes a message to a Redis channel.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#publish"
+    },
     "metadata": null,
     "name": "publish",
     "outputDefinition": {
@@ -877,7 +901,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Pushes data to a Redis list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#push"
+    },
     "metadata": null,
     "name": "push",
     "outputDefinition": {
@@ -1009,7 +1036,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sets the value of a key in Redis.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/redis_v1#set"
+    },
     "metadata": null,
     "name": "set",
     "outputDefinition": {

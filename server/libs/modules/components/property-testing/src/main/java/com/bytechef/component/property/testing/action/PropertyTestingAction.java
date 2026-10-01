@@ -206,6 +206,7 @@ public class PropertyTestingAction {
                     "Regular expression is set to: \"[^A-Za-z]\". Just letters from a text should be returned.")
                 .regex("[^A-Za-z]"))
         .output(outputSchema(object()))
+        .help("", "https://docs.bytechef.io/reference/components/property-testing_v1#testing")
         .perform(PropertyTestingAction::perform);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")

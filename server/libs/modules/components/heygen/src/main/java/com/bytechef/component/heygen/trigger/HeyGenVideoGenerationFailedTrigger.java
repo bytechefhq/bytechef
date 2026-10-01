@@ -52,6 +52,7 @@ public class HeyGenVideoGenerationFailedTrigger {
                         string("video_id"),
                         string("msg"),
                         string("callback_id"))))
+        .help("", "https://docs.bytechef.io/reference/components/heygen_v1#video-generation-failed")
         .webhookEnable(HeyGenVideoGenerationFailedTrigger::webhookEnable)
         .webhookDisable(HeyGenVideoGenerationFailedTrigger::webhookDisable)
         .webhookRequest(HeyGenVideoGenerationFailedTrigger::webhookRequest);

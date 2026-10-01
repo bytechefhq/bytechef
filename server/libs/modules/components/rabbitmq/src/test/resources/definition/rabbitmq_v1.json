@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a new RabbitMQ message.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/rabbitmq_v1#send-message"
+    },
     "metadata": null,
     "name": "sendMessage",
     "outputDefinition": null,
@@ -231,7 +234,10 @@
     "deprecated": null,
     "description": "Triggers on new RabbitMQ messages.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/rabbitmq_v1#new-message"
+    },
     "listenerDisable": { },
     "listenerEnable": { },
     "name": "newMessage",

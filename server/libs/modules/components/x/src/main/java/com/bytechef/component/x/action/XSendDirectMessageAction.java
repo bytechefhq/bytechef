@@ -72,6 +72,7 @@ public class XSendDirectMessageAction {
                                     .description("ID of the direct message conversation."),
                                 string("dm_event_id")
                                     .description("ID of the direct message event.")))))
+        .help("", "https://docs.bytechef.io/reference/components/x_v1#send-direct-message")
         .perform(XSendDirectMessageAction::perform);
 
     private XSendDirectMessageAction() {

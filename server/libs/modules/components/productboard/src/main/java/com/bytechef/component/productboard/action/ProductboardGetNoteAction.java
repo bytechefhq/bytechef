@@ -56,7 +56,8 @@ public class ProductboardGetNoteAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/productboard_v1#get-note");
 
     private ProductboardGetNoteAction() {
     }

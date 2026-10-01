@@ -129,6 +129,7 @@ public class DataStorageSetValueInListAction {
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == '%s'".formatted(ValueType.TIME))
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/data-storage_v1#set-value-in-list")
         .perform(DataStorageSetValueInListAction::perform);
 
     protected static Object perform(

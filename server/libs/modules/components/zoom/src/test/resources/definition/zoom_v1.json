@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create and submit a user's registration to a meeting.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoom_v1#add-meeting-registrant"
+    },
     "metadata": {
       "path": "/meetings/{meetingId}/registrants",
       "mimeType": "application/json",
@@ -1117,7 +1120,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a meeting.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoom_v1#create-meeting"
+    },
     "metadata": {
       "path": "/users/me/meetings",
       "mimeType": "application/json",

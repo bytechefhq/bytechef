@@ -43,6 +43,7 @@ public class WoocommerceNewCouponTrigger {
         .description("Triggers when any coupon is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(outputSchema(TRIGGER_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/woocommerce_v1#new-coupon")
         .webhookEnable(WoocommerceNewCouponTrigger::webhookEnable)
         .webhookDisable(WoocommerceNewCouponTrigger::webhookDisable)
         .webhookRequest(WoocommerceNewCouponTrigger::webhookRequest);

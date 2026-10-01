@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Initiates an outbound voice call and executes a real-time workflow synchronously during the call. The action blocks until the call completes, allowing real-time audio processing and AI conversations.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/twilio_v1#make-outbound-call"
+    },
     "metadata": null,
     "name": "makeCall",
     "outputDefinition": {
@@ -346,7 +349,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a new SMS message",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/twilio_v1#send-sms"
+    },
     "metadata": null,
     "name": "sendSMS",
     "outputDefinition": {
@@ -1770,7 +1776,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a new WhatsApp message.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/twilio_v1#send-whatsapp-message"
+    },
     "metadata": null,
     "name": "sendWhatsAppMessage",
     "outputDefinition": {
@@ -6654,7 +6663,10 @@
     "deprecated": null,
     "description": "Triggers when an inbound voice call is received. Returns TwiML that establishes a WebSocket connection for real-time audio streaming and AI conversation.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/twilio_v1#inbound-voice-call"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "inboundCall",
@@ -7013,7 +7025,10 @@
     "deprecated": null,
     "description": "Triggers when a new WhatsApp message is received.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/twilio_v1#new-whatsapp-message"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newWhatsappMessage",

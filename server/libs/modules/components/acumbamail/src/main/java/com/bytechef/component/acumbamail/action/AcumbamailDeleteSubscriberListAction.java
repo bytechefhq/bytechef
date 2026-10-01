@@ -43,6 +43,7 @@ public class AcumbamailDeleteSubscriberListAction {
                 .description("List identifier.")
                 .options((OptionsFunction<String>) AcumbamailUtils::getListsIdOptions)
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/acumbamail_v1#delete-subscriber-list")
         .perform(AcumbamailDeleteSubscriberListAction::perform);
 
     private AcumbamailDeleteSubscriberListAction() {

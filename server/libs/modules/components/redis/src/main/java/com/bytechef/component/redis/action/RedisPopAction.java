@@ -51,6 +51,7 @@ public class RedisPopAction {
             outputSchema(
                 string()
                     .description("The value popped from the list, or null if the list is empty.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#pop")
         .perform(RedisPopAction::perform);
 
     private RedisPopAction() {

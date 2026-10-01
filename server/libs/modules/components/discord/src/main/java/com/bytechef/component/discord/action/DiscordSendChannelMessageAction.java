@@ -133,7 +133,8 @@ public class DiscordSendChannelMessageAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/discord_v1#send-channel-message");
 
     private DiscordSendChannelMessageAction() {
     }

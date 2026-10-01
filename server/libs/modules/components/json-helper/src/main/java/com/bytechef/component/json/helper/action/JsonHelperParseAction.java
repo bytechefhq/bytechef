@@ -38,6 +38,7 @@ public class JsonHelperParseAction {
                 .description("The JSON string to convert to the data.")
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/json-helper_v1#convert-from-json-string")
         .perform(JsonHelperParseAction::perform);
 
     private JsonHelperParseAction() {

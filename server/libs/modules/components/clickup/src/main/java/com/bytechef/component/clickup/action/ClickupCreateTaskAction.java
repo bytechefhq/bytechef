@@ -89,7 +89,8 @@ public class ClickupCreateTaskAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/clickup_v1#create-task");
 
     private ClickupCreateTaskAction() {
     }

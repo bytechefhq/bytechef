@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new account.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/salesflare_v1#create-account"
+    },
     "metadata": {
       "path": "/accounts",
       "mimeType": "application/json",
@@ -195,7 +198,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new contacts.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/salesflare_v1#create-contacts"
+    },
     "metadata": {
       "path": "/contacts",
       "mimeType": "application/json",
@@ -596,7 +602,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new tasks.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/salesflare_v1#create-tasks"
+    },
     "metadata": {
       "path": "/tasks",
       "mimeType": "application/json",

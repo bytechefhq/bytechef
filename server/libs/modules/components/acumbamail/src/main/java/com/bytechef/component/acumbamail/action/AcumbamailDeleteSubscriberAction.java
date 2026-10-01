@@ -50,6 +50,7 @@ public class AcumbamailDeleteSubscriberAction {
                 .description("Subscriber email address.")
                 .options((OptionsFunction<String>) AcumbamailUtils::getSubscriberOptions)
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/acumbamail_v1#delete-subscriber")
         .perform(AcumbamailDeleteSubscriberAction::perform);
 
     private AcumbamailDeleteSubscriberAction() {

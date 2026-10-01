@@ -62,7 +62,8 @@ public class SalesflareCreateTasksAction {
             .description("List of created tasks.")
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/salesflare_v1#create-tasks");
 
     private SalesflareCreateTasksAction() {
     }

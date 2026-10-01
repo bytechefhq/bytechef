@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from a XLS/XLSX file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xlsx-file_v1#read-from-file"
+    },
     "metadata": null,
     "name": "read",
     "outputDefinition": {
@@ -264,7 +267,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the data to a XLS/XLSX file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xlsx-file_v1#write-to-file"
+    },
     "metadata": null,
     "name": "write",
     "outputDefinition": {

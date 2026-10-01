@@ -79,7 +79,9 @@ public class GaurusGetAccountTransactionsAction {
                 Map.of(
                     "responseType", ResponseType.JSON))),
             sampleOutput(Map.<String, Object>ofEntries(Map.entry("code", "OK"), Map.entry("message", ""),
-                Map.entry("hasMoreResults", true), Map.entry("data", "TransactionResult[]"))));
+                Map.entry("hasMoreResults", true), Map.entry("data", "TransactionResult[]"))))
+        .help("",
+            "https://docs.bytechef.io/reference/components/gaurus_v1#gets-transactions-for-provided-iban-and-query-parameters");
 
     private GaurusGetAccountTransactionsAction() {
     }

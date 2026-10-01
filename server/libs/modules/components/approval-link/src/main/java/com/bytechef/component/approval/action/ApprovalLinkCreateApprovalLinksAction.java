@@ -35,6 +35,7 @@ public class ApprovalLinkCreateApprovalLinksAction {
         .description("Creates approval/disapproval links.")
         .properties()
         .output(ApprovalLinkCreateApprovalLinksAction::output)
+        .help("", "https://docs.bytechef.io/reference/components/approval-link_v1#create-approval-links")
         .perform(ApprovalLinkCreateApprovalLinksAction::perform);
 
     protected static Object perform(

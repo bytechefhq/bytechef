@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Cancels specified event.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/calendly_v1#cancel-event"
+    },
     "metadata": {
       "path": "/scheduled_events/{eventId}/cancellation",
       "mimeType": "application/json",
@@ -809,7 +812,10 @@
     "deprecated": null,
     "description": "Triggers when an invitee cancels a scheduled event.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/calendly_v1#invitee-canceled"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "inviteeCanceled",
@@ -868,7 +874,10 @@
     "deprecated": null,
     "description": "Triggers when an invitee schedules an event.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/calendly_v1#invitee-created"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "inviteeCreated",

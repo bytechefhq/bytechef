@@ -84,6 +84,7 @@ public class QuickbooksCreateItemAction {
                 .displayCondition("%s == '%s'".formatted(TYPE, INVENTORY))
                 .required(true))
         .output(outputSchema(ITEM_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/quickbooks_v1#create-item")
         .perform(QuickbooksCreateItemAction::perform);
 
     private QuickbooksCreateItemAction() {

@@ -61,6 +61,7 @@ public class MongoDBInsertManyAction {
                         array("insertedIds")
                             .items(string())
                             .description("The identifiers of the inserted documents."))))
+        .help("", "https://docs.bytechef.io/reference/components/mongodb_v1#insert-many")
         .perform(MongoDBInsertManyAction::perform);
 
     private MongoDBInsertManyAction() {

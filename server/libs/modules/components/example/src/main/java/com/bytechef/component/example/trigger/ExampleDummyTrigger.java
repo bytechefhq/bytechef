@@ -43,6 +43,7 @@ public class ExampleDummyTrigger {
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties()
         .output(outputSchema(string()))
+        .help("", "https://docs.bytechef.io/reference/components/example_v1#updated-issue")
         .webhookEnable(ExampleDummyTrigger::webhookEnable)
         .webhookDisable(ExampleDummyTrigger::webhookDisable)
         .webhookRequest(ExampleDummyTrigger::webhookRequest)

@@ -46,6 +46,7 @@ public class VboutAddTagToContactAction {
                 .description("Tag(s) to be added.")
                 .items(string())
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/vbout_v1#add-tag-to-contact")
         .perform(VboutAddTagToContactAction::perform);
 
     private VboutAddTagToContactAction() {

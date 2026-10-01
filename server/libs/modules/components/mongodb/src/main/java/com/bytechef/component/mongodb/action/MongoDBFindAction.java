@@ -73,6 +73,7 @@ public class MongoDBFindAction {
                 array()
                     .items(object())
                     .description("The list of matching documents.")))
+        .help("", "https://docs.bytechef.io/reference/components/mongodb_v1#find")
         .perform(MongoDBFindAction::perform);
 
     private MongoDBFindAction() {

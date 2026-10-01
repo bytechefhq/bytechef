@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts the response to the webhook request.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/webhook_v1#response-to-webhook-request"
+    },
     "metadata": null,
     "name": "responseToWebhookRequest",
     "outputDefinition": {
@@ -315,7 +318,10 @@
     "deprecated": null,
     "description": "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/webhook_v1#auto-respond-with-http-200-status"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "autoRespondWithHTTP200",
@@ -353,7 +359,10 @@
     "deprecated": null,
     "description": "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/webhook_v1#validate-and-respond"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "validateAndRespond",
@@ -413,7 +422,10 @@
     "deprecated": null,
     "description": "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/webhook_v1#await-workflow-and-respond"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "awaitWorkflowAndRespond",

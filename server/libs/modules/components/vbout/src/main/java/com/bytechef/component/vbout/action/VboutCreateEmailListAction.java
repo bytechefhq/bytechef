@@ -89,6 +89,7 @@ public class VboutCreateEmailListAction {
                 .label("Confirmation Message")
                 .description("Confirmation message.")
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/vbout_v1#create-email-list")
         .perform(VboutCreateEmailListAction::perform);
 
     private VboutCreateEmailListAction() {

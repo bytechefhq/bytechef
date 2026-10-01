@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns metrics from target.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ahrefs_v1#get-metrics"
+    },
     "metadata": {
       "method": "GET",
       "path": "/site-explorer/metrics"
@@ -625,7 +628,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the content of a page.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ahrefs_v1#get-page-content"
+    },
     "metadata": {
       "method": "GET",
       "path": "/site-audit/page-content"
@@ -1011,7 +1017,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns user subscription information.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ahrefs_v1#get-subscription-information"
+    },
     "metadata": {
       "method": "GET",
       "path": "/subscription-info/limits-and-usages"

@@ -46,6 +46,7 @@ public class QuickbooksGetPaymentAction {
                 .options(QuickbooksUtils.getOptions(Entity.PAYMENT, null))
                 .required(true))
         .output(outputSchema(PAYMENT_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/quickbooks_v1#get-payment")
         .perform(QuickbooksGetPaymentAction::perform);
 
     private QuickbooksGetPaymentAction() {

@@ -79,6 +79,7 @@ public class AcceloCreateTaskAction {
                                 string("more_info"),
                                 string("status"),
                                 string("message")))))
+        .help("", "https://docs.bytechef.io/reference/components/accelo_v1#create-task")
         .perform(AcceloCreateTaskAction::perform);
 
     private AcceloCreateTaskAction() {

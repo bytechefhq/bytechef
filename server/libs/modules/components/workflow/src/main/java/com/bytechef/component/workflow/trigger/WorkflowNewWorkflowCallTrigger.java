@@ -43,5 +43,6 @@ public class WorkflowNewWorkflowCallTrigger {
                 .placeholder("Edit Inputs schema")
                 .description("The schema definition for the input data this workflow expects from callers.")
                 .controlType(JSON_SCHEMA_BUILDER))
-        .output(WorkflowResponseUtils::triggerOutput);
+        .output(WorkflowResponseUtils::triggerOutput)
+        .help("", "https://docs.bytechef.io/reference/components/workflow_v1#new-workflow-call");
 }

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a message via WhatsApp",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/whatsapp_v1#send-message"
+    },
     "metadata": null,
     "name": "sendMessage",
     "outputDefinition": {
@@ -462,7 +465,10 @@
     "deprecated": null,
     "description": "Triggers when you get a new message from certain number.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/whatsapp_v1#message-received"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "messageReceived",

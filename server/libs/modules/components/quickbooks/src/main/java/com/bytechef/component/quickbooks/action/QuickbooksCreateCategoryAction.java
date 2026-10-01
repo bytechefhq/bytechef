@@ -58,6 +58,7 @@ public class QuickbooksCreateCategoryAction {
                                 string(ACTIVE),
                                 string(FULLY_QUALIFIED_NAME),
                                 string(TYPE)))))
+        .help("", "https://docs.bytechef.io/reference/components/quickbooks_v1#create-category")
         .perform(QuickbooksCreateCategoryAction::perform);
 
     private QuickbooksCreateCategoryAction() {

@@ -48,6 +48,7 @@ public class CsvFileReadAction {
         .description("Reads data from a csv file.")
         .properties(READ_PROPERTIES)
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/csv-file_v1#read-from-file")
         .perform(CsvFileReadAction::perform);
 
     protected static List<Map<String, String>> perform(

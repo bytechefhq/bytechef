@@ -148,6 +148,7 @@ public class XeroCreateQuoteAction {
                         string(BRANDING_THEME_ID),
                         string(SUMMARY),
                         string(LINE_AMOUNT_TYPES))))
+        .help("", "https://docs.bytechef.io/reference/components/xero_v1#create-quote")
         .perform(XeroCreateQuoteAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_QUOTES_CONTEXT_FUNCTION =

@@ -46,7 +46,8 @@ public class ProductboardDeleteNoteAction {
             .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)));
+                    "type", PropertyType.PATH)))
+        .help("", "https://docs.bytechef.io/reference/components/productboard_v1#delete-note");
 
     private ProductboardDeleteNoteAction() {
     }

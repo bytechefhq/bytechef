@@ -81,6 +81,7 @@ public class XlsxFileWriteAction {
                 .defaultValue("file.xlsx")
                 .advancedOption(true))
         .output(outputSchema(fileEntry()))
+        .help("", "https://docs.bytechef.io/reference/components/xlsx-file_v1#write-to-file")
         .perform(XlsxFileWriteAction::perform);
 
     @SuppressWarnings({

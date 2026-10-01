@@ -100,6 +100,7 @@ public class ZoominfoEnrichContactAction {
                 .options((OptionsFunction<String>) ZoominfoUtils::getContactFieldOptions)
                 .required(false))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/zoominfo_v1#enrich-contact")
         .perform(ZoominfoEnrichContactAction::perform);
 
     private ZoominfoEnrichContactAction() {

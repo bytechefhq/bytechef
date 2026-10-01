@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from a csv file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/csv-file_v1#read-from-file"
+    },
     "metadata": null,
     "name": "read",
     "outputDefinition": {
@@ -286,7 +289,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the data records into a CSV file. Record values are assembled into line and separated with arbitrary character, mostly comma. CSV may or may not define header line.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/csv-file_v1#write-to-csv-file"
+    },
     "metadata": null,
     "name": "write",
     "outputDefinition": {
@@ -668,7 +674,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Appends the data records into an existing CSV file. Record values are assembled into a line and separated with a delimiter (comma by default). The existing header (if any) is preserved.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/csv-file_v1#append-to-csv-file"
+    },
     "metadata": null,
     "name": "append",
     "outputDefinition": {

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Connects to an MCP server and calls a specific tool with the provided arguments.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mcp-client_v1#call-tool"
+    },
     "metadata": null,
     "name": "callTool",
     "outputDefinition": {

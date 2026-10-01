@@ -113,6 +113,7 @@ public class DataStorageGetValueAction {
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == '%s'".formatted(ValueType.TIME)))
         .output(DataStorageGetValueAction::output)
+        .help("", "https://docs.bytechef.io/reference/components/data-storage_v1#get-value")
         .perform(DataStorageGetValueAction::perform);
 
     protected static OutputResponse output(

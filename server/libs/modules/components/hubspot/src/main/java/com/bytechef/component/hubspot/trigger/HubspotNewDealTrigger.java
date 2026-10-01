@@ -62,6 +62,7 @@ public class HubspotNewDealTrigger {
                             .description("Type of the subscription, indicating the nature of event."),
                         string("objectId")
                             .description("ID for the newly created deal."))))
+        .help("", "https://docs.bytechef.io/reference/components/hubspot_v1#new-deal")
         .webhookDisable(HubspotNewDealTrigger::webhookDisable)
         .webhookEnable(HubspotNewDealTrigger::webhookEnable)
         .webhookRequest(HubspotNewDealTrigger::webhookRequest);

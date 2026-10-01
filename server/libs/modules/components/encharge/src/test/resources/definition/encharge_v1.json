@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add tag(s) to an existing user.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/encharge_v1#add-tag"
+    },
     "metadata": {
       "path": "/tags",
       "mimeType": "application/json",
@@ -79,7 +82,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates email template.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/encharge_v1#create-email-template"
+    },
     "metadata": {
       "path": "/emails",
       "mimeType": "application/json",
@@ -846,7 +852,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new person in Encharge.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/encharge_v1#create-person"
+    },
     "metadata": {
       "path": "/people",
       "mimeType": "application/json",

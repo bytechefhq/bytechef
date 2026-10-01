@@ -50,6 +50,7 @@ public class XDeletePostAction {
                             .properties(
                                 bool("deleted")
                                     .description("Indicates whether the post has been deleted.")))))
+        .help("", "https://docs.bytechef.io/reference/components/x_v1#delete-post")
         .perform(XDeletePostAction::perform);
 
     private XDeletePostAction() {

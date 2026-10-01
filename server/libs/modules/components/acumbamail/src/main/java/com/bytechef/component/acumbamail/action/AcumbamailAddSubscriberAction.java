@@ -45,6 +45,7 @@ public class AcumbamailAddSubscriberAction {
                 .options((OptionsFunction<String>) AcumbamailUtils::getListsIdOptions)
                 .required(true))
         .output(outputSchema(integer().description("ID of the created subscriber.")))
+        .help("", "https://docs.bytechef.io/reference/components/acumbamail_v1#add-subscriber")
         .perform(AcumbamailAddSubscriberAction::perform);
 
     private AcumbamailAddSubscriberAction() {

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new account.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipeliner_v1#create-account"
+    },
     "metadata": {
       "path": "/entities/Accounts",
       "mimeType": "application/json",
@@ -358,7 +361,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipeliner_v1#create-contact"
+    },
     "metadata": {
       "path": "/entities/Contacts",
       "mimeType": "application/json",
@@ -778,7 +784,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new Task",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipeliner_v1#create-task"
+    },
     "metadata": {
       "path": "/entities/Tasks",
       "mimeType": "application/json",

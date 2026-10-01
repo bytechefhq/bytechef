@@ -61,7 +61,9 @@ public class GaurusPostExternalUsersAction {
             sampleOutput(Map.<String, Object>ofEntries(Map.entry("data",
                 List.of(Map.<String, Object>ofEntries(Map.entry("existingMails", List.of("existing@example.com")),
                     Map.entry("newMails", List.of("new@example.com"))))),
-                Map.entry("errors", List.of()))));
+                Map.entry("errors", List.of()))))
+        .help("",
+            "https://docs.bytechef.io/reference/components/gaurus_v1#creates-external-users-with-bank-consent-jobs");
 
     private GaurusPostExternalUsersAction() {
     }

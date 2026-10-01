@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Finds documents in a collection matching a filter.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mongodb_v1#find"
+    },
     "metadata": null,
     "name": "find",
     "outputDefinition": {
@@ -253,7 +256,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Inserts a single document into a collection.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mongodb_v1#insert-one"
+    },
     "metadata": null,
     "name": "insertOne",
     "outputDefinition": {
@@ -405,7 +411,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Inserts multiple documents into a collection.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mongodb_v1#insert-many"
+    },
     "metadata": null,
     "name": "insertMany",
     "outputDefinition": {
@@ -658,7 +667,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates a single document in a collection matching a filter.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mongodb_v1#update-one"
+    },
     "metadata": null,
     "name": "updateOne",
     "outputDefinition": {
@@ -930,7 +942,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates all documents in a collection matching a filter.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mongodb_v1#update-many"
+    },
     "metadata": null,
     "name": "updateMany",
     "outputDefinition": {
@@ -1202,7 +1217,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a single document from a collection matching a filter.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mongodb_v1#delete-one"
+    },
     "metadata": null,
     "name": "deleteOne",
     "outputDefinition": {
@@ -1348,7 +1366,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes all documents from a collection matching a filter.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mongodb_v1#delete-many"
+    },
     "metadata": null,
     "name": "deleteMany",
     "outputDefinition": {
@@ -1494,7 +1515,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Runs an aggregation pipeline against a collection.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mongodb_v1#aggregate"
+    },
     "metadata": null,
     "name": "aggregate",
     "outputDefinition": {
@@ -3458,7 +3482,10 @@
     "deprecated": null,
     "description": "Triggers when a new document is added to a collection.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mongodb_v1#new-document"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newDocument",

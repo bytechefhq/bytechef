@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Run this first to install Claude Code to ByteChef terminal",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/claude-code_v1#initialize-claude-code"
+    },
     "metadata": null,
     "name": "initializeClaude",
     "outputDefinition": {
@@ -98,7 +101,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds an MCP server and all its tools to Claude Code via http protocol",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/claude-code_v1#add-mcp-server"
+    },
     "metadata": null,
     "name": "addMCP",
     "outputDefinition": {
@@ -350,7 +356,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Chat with Claude with registered tools",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/claude-code_v1#chat"
+    },
     "metadata": null,
     "name": "chat",
     "outputDefinition": {

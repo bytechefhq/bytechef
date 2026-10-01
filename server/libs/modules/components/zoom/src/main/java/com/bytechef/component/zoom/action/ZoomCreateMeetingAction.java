@@ -178,7 +178,8 @@ public class ZoomCreateMeetingAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/zoom_v1#create-meeting");
 
     private ZoomCreateMeetingAction() {
     }

@@ -341,7 +341,8 @@ public class KeapCreateContactAction {
                 string("time_zone").required(false), string("website").required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/keap_v1#create-contact");
 
     private KeapCreateContactAction() {
     }

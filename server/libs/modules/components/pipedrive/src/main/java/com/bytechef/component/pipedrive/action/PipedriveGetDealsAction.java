@@ -100,7 +100,8 @@ public class PipedriveGetDealsAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/pipedrive_v1#get-deals");
 
     private PipedriveGetDealsAction() {
     }

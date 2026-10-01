@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Uploads a file to the FTP/SFTP server.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ftp_v1#upload-file"
+    },
     "metadata": null,
     "name": "uploadFile",
     "outputDefinition": {
@@ -320,7 +323,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Downloads a file from the FTP/SFTP server.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ftp_v1#download-file"
+    },
     "metadata": null,
     "name": "downloadFile",
     "outputDefinition": {
@@ -576,7 +582,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists the contents of a directory on the FTP/SFTP server.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ftp_v1#list-directory"
+    },
     "metadata": null,
     "name": "list",
     "outputDefinition": {
@@ -944,7 +953,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a file or directory from the FTP/SFTP server.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ftp_v1#delete"
+    },
     "metadata": null,
     "name": "delete",
     "outputDefinition": {
@@ -1154,7 +1166,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Renames or moves a file or directory on the FTP/SFTP server.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ftp_v1#renamemove"
+    },
     "metadata": null,
     "name": "rename",
     "outputDefinition": {

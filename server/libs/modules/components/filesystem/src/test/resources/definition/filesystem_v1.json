@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/filesystem_v1#create-temp-directory"
+    },
     "metadata": null,
     "name": "createTempDir",
     "outputDefinition": {
@@ -76,7 +79,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a directory.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/filesystem_v1#create"
+    },
     "metadata": null,
     "name": "mkdir",
     "outputDefinition": {
@@ -168,7 +174,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/filesystem_v1#get-parent-folder"
+    },
     "metadata": null,
     "name": "getFilePath",
     "outputDefinition": {
@@ -260,7 +269,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists the content of a directory for the given path.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/filesystem_v1#list"
+    },
     "metadata": null,
     "name": "ls",
     "outputDefinition": {
@@ -540,7 +552,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads all data from a specified file path and outputs it in file entry format.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/filesystem_v1#read-file"
+    },
     "metadata": null,
     "name": "readFile",
     "outputDefinition": {
@@ -796,7 +811,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Permanently removes the content of a directory.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/filesystem_v1#remove"
+    },
     "metadata": null,
     "name": "rm",
     "outputDefinition": {
@@ -892,7 +910,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/filesystem_v1#write-to-file"
+    },
     "metadata": null,
     "name": "writeFile",
     "outputDefinition": {

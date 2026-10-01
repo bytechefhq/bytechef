@@ -58,6 +58,7 @@ public class DataStorageDeleteValueFromListAction {
                     "The specified index in the list will be removed, and if it doesn't exist, the list will " +
                         "remain unaltered.")
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/data-storage_v1#delete-value-from-list")
         .perform(DataStorageDeleteValueFromListAction::perform);
 
     protected static Object perform(

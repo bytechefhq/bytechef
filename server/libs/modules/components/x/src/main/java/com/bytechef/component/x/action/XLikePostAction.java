@@ -53,6 +53,7 @@ public class XLikePostAction {
                                 bool("liked")
                                     .description(
                                         "Indicates whether the Tweet has been liked by the authenticated user.")))))
+        .help("", "https://docs.bytechef.io/reference/components/x_v1#like-post")
         .perform(XLikePostAction::perform);
 
     private XLikePostAction() {

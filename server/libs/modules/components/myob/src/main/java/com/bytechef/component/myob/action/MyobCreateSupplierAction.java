@@ -64,6 +64,7 @@ public class MyobCreateSupplierAction {
                 .defaultValue(true)
                 .required(false),
             ADDRESSES_PROPERTY)
+        .help("", "https://docs.bytechef.io/reference/components/myob_v1#create-supplier")
         .perform(MyobCreateSupplierAction::perform);
 
     private MyobCreateSupplierAction() {

@@ -84,6 +84,7 @@ public class RetableUpdateRowAction {
                         array("data")
                             .description("Row IDs.")
                             .items(integer()))))
+        .help("", "https://docs.bytechef.io/reference/components/retable_v1#update-row")
         .perform(RetableUpdateRowAction::perform);
 
     private RetableUpdateRowAction() {

@@ -74,6 +74,7 @@ public class ZoominfoSearchCompanyAction {
             outputSchema(
                 array()
                     .items(COMPANY_OUTPUT_PROPERTY)))
+        .help("", "https://docs.bytechef.io/reference/components/zoominfo_v1#search-company")
         .perform(ZoominfoSearchCompanyAction::perform);
 
     private ZoominfoSearchCompanyAction() {

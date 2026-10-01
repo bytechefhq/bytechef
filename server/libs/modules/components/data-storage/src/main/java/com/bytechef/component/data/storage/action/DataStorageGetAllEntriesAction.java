@@ -42,6 +42,7 @@ public class DataStorageGetAllEntriesAction {
                 .options(SCOPE_OPTIONS)
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/data-storage_v1#get-all-entrieskeys-and-values")
         .perform(DataStorageGetAllEntriesAction::perform);
 
     protected static Object perform(

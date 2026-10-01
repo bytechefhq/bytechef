@@ -57,6 +57,7 @@ public class CsvFileAppendAction {
                 .required(true),
             ROWS_PROPERTY)
         .output(outputSchema(fileEntry().description("File entry representing updated csv file.")))
+        .help("", "https://docs.bytechef.io/reference/components/csv-file_v1#append-to-csv-file")
         .perform(CsvFileAppendAction::perform);
 
     protected static FileEntry perform(

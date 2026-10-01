@@ -38,5 +38,6 @@ public class HttpClientPostAction {
                 HttpClientConstants.COMMON_PROPERTIES,
                 HttpClientActionUtils.options(true)))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/http-client_v1#post")
         .perform(HttpClientActionUtils.getPerform(RequestMethod.POST));
 }

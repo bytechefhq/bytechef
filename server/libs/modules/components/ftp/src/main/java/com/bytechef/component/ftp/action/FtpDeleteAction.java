@@ -62,6 +62,7 @@ public class FtpDeleteAction {
                         string(DELETED_PATH).description("The path that was deleted."),
                         bool(SUCCESS).description("Whether the deletion was successful."))),
             sampleOutput(Map.of(DELETED_PATH, "/uploads/old-file.pdf", SUCCESS, true)))
+        .help("", "https://docs.bytechef.io/reference/components/ftp_v1#delete")
         .perform(FtpDeleteAction::perform);
 
     private FtpDeleteAction() {

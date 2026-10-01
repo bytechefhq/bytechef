@@ -73,6 +73,7 @@ public class TwilioSendSMSAction {
                 .maxLength(1600)
                 .required(true))
         .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/twilio_v1#send-sms")
         .perform(TwilioSendSMSAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {

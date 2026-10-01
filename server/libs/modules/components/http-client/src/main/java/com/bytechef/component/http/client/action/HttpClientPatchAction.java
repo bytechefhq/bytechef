@@ -37,5 +37,6 @@ public class HttpClientPatchAction {
                 HttpClientConstants.COMMON_PROPERTIES,
                 HttpClientActionUtils.options(true)))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/http-client_v1#patch")
         .perform(HttpClientActionUtils.getPerform(RequestMethod.PATCH));
 }

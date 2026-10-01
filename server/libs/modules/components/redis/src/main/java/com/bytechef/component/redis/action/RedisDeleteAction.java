@@ -45,6 +45,7 @@ public class RedisDeleteAction {
             outputSchema(
                 bool()
                     .description("True if the key was deleted, false if it did not exist.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#delete")
         .perform(RedisDeleteAction::perform);
 
     private RedisDeleteAction() {

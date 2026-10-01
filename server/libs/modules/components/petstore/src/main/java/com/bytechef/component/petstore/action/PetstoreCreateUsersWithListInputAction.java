@@ -52,7 +52,9 @@ public class PetstoreCreateUsersWithListInputAction {
         .output(outputSchema(array().items(object().properties(PetstoreUserProperties.PROPERTIES))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("",
+            "https://docs.bytechef.io/reference/components/petstore_v1#creates-list-of-users-with-given-input-array");
 
     private PetstoreCreateUsersWithListInputAction() {
     }

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from a JSON file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/json-file_v1#read-from-file"
+    },
     "metadata": null,
     "name": "read",
     "outputDefinition": {
@@ -246,7 +249,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes workflow data to a JSON or JSONL file. Source Data is the object or array to serialize (typically a data pill), not a file path.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/json-file_v1#write-to-file"
+    },
     "metadata": null,
     "name": "write",
     "outputDefinition": {

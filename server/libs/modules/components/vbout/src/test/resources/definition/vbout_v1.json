@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a contact to a selected email list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vbout_v1#add-contact-to-list"
+    },
     "metadata": null,
     "name": "addContactToList",
     "outputDefinition": null,
@@ -97,7 +100,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates a contact in a selected email list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vbout_v1#update-contact"
+    },
     "metadata": null,
     "name": "updateContact",
     "outputDefinition": null,
@@ -216,7 +222,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new email campaign for specific list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vbout_v1#create-email-marketing-campaign"
+    },
     "metadata": null,
     "name": "createEmailMarketingCampaign",
     "outputDefinition": null,
@@ -506,7 +515,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds the tag to the contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vbout_v1#add-tag-to-contact"
+    },
     "metadata": null,
     "name": "addTagToContact",
     "outputDefinition": null,
@@ -588,7 +600,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new email list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vbout_v1#create-email-list"
+    },
     "metadata": null,
     "name": "createEmailList",
     "outputDefinition": null,
@@ -847,7 +862,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Post a message to one of your social media channel.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vbout_v1#create-social-media-message"
+    },
     "metadata": null,
     "name": "createSocialMediaMessage",
     "outputDefinition": null,

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Description",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/property-testing_v1#testing"
+    },
     "metadata": null,
     "name": "testingAction",
     "outputDefinition": {

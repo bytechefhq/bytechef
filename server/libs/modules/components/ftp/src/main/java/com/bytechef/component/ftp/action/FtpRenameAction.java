@@ -70,6 +70,7 @@ public class FtpRenameAction {
                     OLD_PATH, "/uploads/old-name.pdf",
                     NEW_PATH, "/archive/new-name.pdf",
                     SUCCESS, true)))
+        .help("", "https://docs.bytechef.io/reference/components/ftp_v1#renamemove")
         .perform(FtpRenameAction::perform);
 
     private FtpRenameAction() {

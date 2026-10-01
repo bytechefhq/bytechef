@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new folder in a ClickUp workspace.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/clickup_v1#create-folder"
+    },
     "metadata": {
       "path": "/space/{spaceId}/folder",
       "mimeType": "application/json",
@@ -379,7 +382,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new List in specified Folder.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/clickup_v1#create-list"
+    },
     "metadata": {
       "path": "/folder/{folderId}/list",
       "mimeType": "application/json",
@@ -905,7 +911,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new task in a ClickUp workspace and list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/clickup_v1#create-task"
+    },
     "metadata": {
       "path": "/list/{listId}/task",
       "mimeType": "application/json",
@@ -3373,7 +3382,10 @@
     "deprecated": null,
     "description": "Triggers when new list is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/clickup_v1#new-list"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newList",
@@ -3815,7 +3827,10 @@
     "deprecated": null,
     "description": "Triggers when new task is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/clickup_v1#new-task"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newTask",

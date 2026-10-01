@@ -53,7 +53,8 @@ public class HubspotGetContactAction {
         .output(outputSchema(object().properties(HubspotContactProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/hubspot_v1#get-contact");
 
     private HubspotGetContactAction() {
     }

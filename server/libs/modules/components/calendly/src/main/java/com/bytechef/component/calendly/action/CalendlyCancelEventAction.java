@@ -76,7 +76,8 @@ public class CalendlyCancelEventAction {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", ResponseType.JSON))));
+                        "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/calendly_v1#cancel-event");
 
     private CalendlyCancelEventAction() {
     }

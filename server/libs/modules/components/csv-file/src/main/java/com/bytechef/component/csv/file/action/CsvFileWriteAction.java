@@ -59,6 +59,7 @@ public class CsvFileWriteAction {
                 .defaultValue("file.csv")
                 .advancedOption(true))
         .output(outputSchema(fileEntry().description("File entry representing new csv file.")))
+        .help("", "https://docs.bytechef.io/reference/components/csv-file_v1#write-to-csv-file")
         .perform(CsvFileWriteAction::perform);
 
     protected static FileEntry perform(

@@ -47,6 +47,7 @@ public class PipedriveUpdatedOrganizationTrigger {
         .description("Trigger off whenever an existing organization is updated.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(outputSchema(ORGANIZATION_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/pipedrive_v1#updated-organization")
         .webhookDisable(PipedriveUpdatedOrganizationTrigger::webhookDisable)
         .webhookEnable(PipedriveUpdatedOrganizationTrigger::webhookEnable)
         .webhookRequest(PipedriveUpdatedOrganizationTrigger::webhookRequest);

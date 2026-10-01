@@ -45,6 +45,7 @@ public class NotionGetPageAction {
                 .options((OptionsFunction<String>) NotionUtils::getPageIdOptions)
                 .required(true))
         .output(outputSchema(PAGE_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/notion_v1#get-page")
         .perform(NotionGetPageAction::perform);
 
     private NotionGetPageAction() {

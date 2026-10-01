@@ -43,6 +43,7 @@ public class ProductboardListNotesAction {
                     .items(
                         object()
                             .properties(ProductboardExpandedNoteProperties.PROPERTIES))))
+        .help("", "https://docs.bytechef.io/reference/components/productboard_v1#list-all-notes")
         .perform(ProductboardListNotesAction::perform);
 
     private ProductboardListNotesAction() {

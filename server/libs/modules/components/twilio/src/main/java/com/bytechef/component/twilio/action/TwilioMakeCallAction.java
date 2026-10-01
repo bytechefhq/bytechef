@@ -114,6 +114,7 @@ public class TwilioMakeCallAction implements RealtimeCallAction {
                         string("status").description("Final call status (completed, failed, busy, no-answer, timeout)"),
                         integer("duration").description("Call duration in seconds"),
                         string("direction").description("Call direction (outbound-api)"))))
+        .help("", "https://docs.bytechef.io/reference/components/twilio_v1#make-outbound-call")
         .perform(TwilioMakeCallAction::perform);
 
     @Override

@@ -50,6 +50,7 @@ public class RedisPublishAction {
             outputSchema(
                 integer()
                     .description("The number of clients that received the message.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#publish")
         .perform(RedisPublishAction::perform);
 
     private RedisPublishAction() {

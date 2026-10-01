@@ -62,6 +62,7 @@ public class BashExecuteAction {
                         "The output of the executed bash commands, including any standard output or error messages " +
                             "generated during execution.")),
             sampleOutput("Sample result"))
+        .help("", "https://docs.bytechef.io/reference/components/bash_v1#execute")
         .perform(BashExecuteAction::perform);
 
     /**

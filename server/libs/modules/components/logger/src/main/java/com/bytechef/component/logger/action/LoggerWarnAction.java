@@ -33,6 +33,7 @@ public class LoggerWarnAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(WARN)
         .title("Warn")
         .properties(string(TEXT))
+        .help("", "https://docs.bytechef.io/reference/components/logger_v1#warn")
         .perform(LoggerWarnAction::perform);
 
     protected static Object perform(

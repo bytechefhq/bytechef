@@ -46,6 +46,7 @@ public class FtpDownloadFileAction {
                 .placeholder("/downloads/document.pdf")
                 .required(true))
         .output(outputSchema(fileEntry()))
+        .help("", "https://docs.bytechef.io/reference/components/ftp_v1#download-file")
         .perform(FtpDownloadFileAction::perform);
 
     private FtpDownloadFileAction() {

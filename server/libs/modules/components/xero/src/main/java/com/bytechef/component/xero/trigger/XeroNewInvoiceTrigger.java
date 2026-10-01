@@ -45,6 +45,7 @@ public class XeroNewInvoiceTrigger {
         .type(TriggerType.STATIC_WEBHOOK)
         .properties(WEBHOOK_KEY_PROPERTY)
         .output(outputSchema(INVOICE_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/xero_v1#new-invoice")
         .webhookValidate(XeroUtils::webhookValidate)
         .webhookRequest(XeroNewInvoiceTrigger::webhookRequest);
 

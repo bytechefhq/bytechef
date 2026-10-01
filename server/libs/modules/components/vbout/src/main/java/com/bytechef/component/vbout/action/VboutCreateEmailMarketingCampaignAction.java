@@ -101,6 +101,7 @@ public class VboutCreateEmailMarketingCampaignAction {
                 .items(string())
                 .options((OptionsFunction<String>) VboutUtils::getListIdOptions)
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/vbout_v1#create-email-marketing-campaign")
         .perform(VboutCreateEmailMarketingCampaignAction::perform);
 
     private VboutCreateEmailMarketingCampaignAction() {

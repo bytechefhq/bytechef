@@ -59,6 +59,7 @@ public class ProductboardNewNoteTrigger {
                                 string("target")
                                     .description(
                                         "Link to the entity whose change triggered this webhook notification.")))))
+        .help("", "https://docs.bytechef.io/reference/components/productboard_v1#new-note")
         .webhookEnable(ProductboardNewNoteTrigger::webhookEnable)
         .webhookDisable(ProductboardNewNoteTrigger::webhookDisable)
         .webhookRequest(ProductboardNewNoteTrigger::webhookRequest)

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/reckon_v1#create-contact"
+    },
     "metadata": {
       "path": "/{bookId}/contacts",
       "mimeType": "application/json",
@@ -182,7 +185,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new invoice.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/reckon_v1#create-invoice"
+    },
     "metadata": {
       "path": "/{bookId}/invoices",
       "mimeType": "application/json",
@@ -478,7 +484,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new payment.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/reckon_v1#create-payment"
+    },
     "metadata": {
       "path": "/{bookId}/payments",
       "mimeType": "application/json",
@@ -790,7 +799,10 @@
     "deprecated": null,
     "description": "Triggers when a new invoice is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/reckon_v1#new-invoice"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newInvoice",
@@ -1344,7 +1356,10 @@
     "deprecated": null,
     "description": "Triggers when a new payment is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/reckon_v1#new-payment"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newPayment",

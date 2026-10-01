@@ -103,6 +103,7 @@ public class WoocommerceCreateCouponAction {
                 .description("Maximum order amount allowed when using the coupon.")
                 .required(false))
         .output(outputSchema(COUPON_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/woocommerce_v1#create-coupon")
         .perform(WoocommerceCreateCouponAction::perform);
 
     private WoocommerceCreateCouponAction() {

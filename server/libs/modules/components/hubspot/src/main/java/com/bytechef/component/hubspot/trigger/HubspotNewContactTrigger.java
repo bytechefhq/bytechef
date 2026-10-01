@@ -62,6 +62,7 @@ public class HubspotNewContactTrigger {
                             .description("Type of the subscription, indicating the nature of event."),
                         string("objectId")
                             .description("ID for the newly created contact."))))
+        .help("", "https://docs.bytechef.io/reference/components/hubspot_v1#new-contact")
         .webhookDisable(HubspotNewContactTrigger::webhookDisable)
         .webhookEnable(HubspotNewContactTrigger::webhookEnable)
         .webhookRequest(HubspotNewContactTrigger::webhookRequest);

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Executes shell commands on a remote host over SSH and returns the output of every command. Each command runs in its own session, so a working directory or an environment variable set by one command is not visible to the next one. Chain such commands instead, for example 'cd /var/log && ls -la'.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ssh_v1#execute-commands"
+    },
     "metadata": null,
     "name": "execute",
     "outputDefinition": {

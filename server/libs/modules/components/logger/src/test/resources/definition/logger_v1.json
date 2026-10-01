@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/logger_v1#debug"
+    },
     "metadata": null,
     "name": "debug",
     "outputDefinition": null,
@@ -45,7 +48,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/logger_v1#error"
+    },
     "metadata": null,
     "name": "error",
     "outputDefinition": null,
@@ -84,7 +90,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/logger_v1#info"
+    },
     "metadata": null,
     "name": "info",
     "outputDefinition": null,
@@ -123,7 +132,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/logger_v1#warn"
+    },
     "metadata": null,
     "name": "warn",
     "outputDefinition": null,

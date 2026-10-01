@@ -7,7 +7,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends an approval request and waits for a human to approve or reject.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/approval_v1#request-approval"
+    },
     "metadata": null,
     "name": "requestApproval",
     "outputDefinition": {

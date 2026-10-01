@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new category.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/quickbooks_v1#create-category"
+    },
     "metadata": null,
     "name": "createCategory",
     "outputDefinition": {
@@ -398,7 +401,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new customer.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/quickbooks_v1#create-customer"
+    },
     "metadata": null,
     "name": "createCustomer",
     "outputDefinition": {
@@ -1076,7 +1082,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new item.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/quickbooks_v1#create-item"
+    },
     "metadata": null,
     "name": "createItem",
     "outputDefinition": {
@@ -1816,7 +1825,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new payment.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/quickbooks_v1#create-payment"
+    },
     "metadata": null,
     "name": "createPayment",
     "outputDefinition": {
@@ -2269,7 +2281,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets details about a specific customer.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/quickbooks_v1#get-customer"
+    },
     "metadata": null,
     "name": "getCustomer",
     "outputDefinition": {
@@ -2840,7 +2855,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets details about a specific invoice.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/quickbooks_v1#get-invoice"
+    },
     "metadata": null,
     "name": "getInvoice",
     "outputDefinition": {
@@ -3231,7 +3249,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets details about a specific item.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/quickbooks_v1#get-item"
+    },
     "metadata": null,
     "name": "getItem",
     "outputDefinition": {
@@ -3878,7 +3899,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets details about a specific payment.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/quickbooks_v1#get-payment"
+    },
     "metadata": null,
     "name": "getPayment",
     "outputDefinition": {

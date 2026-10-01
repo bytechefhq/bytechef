@@ -70,6 +70,7 @@ public class XmlFileReadAction {
                 .displayCondition("%s == true".formatted(IS_ARRAY))
                 .advancedOption(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/xml-file_v1#read-from-file")
         .perform(XmlFileReadAction::perform);
 
     protected static Object perform(

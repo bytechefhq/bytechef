@@ -55,7 +55,8 @@ public class ProductboardGetFeatureAction {
             .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/productboard_v1#get-feature");
 
     private ProductboardGetFeatureAction() {
     }

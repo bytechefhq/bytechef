@@ -169,6 +169,7 @@ public class DiscordSendDirectMessageAction {
                         bool("mention_everyone")
                             .description("Whether this message mentions everyone.")
                             .required(false))))
+        .help("", "https://docs.bytechef.io/reference/components/discord_v1#send-direct-message")
         .perform(DiscordSendDirectMessageAction::perform);
 
     private DiscordSendDirectMessageAction() {

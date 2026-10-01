@@ -85,6 +85,7 @@ public class WhatsAppNewIncomingMessageTrigger {
                                                 object("text")
                                                     .properties(
                                                         string("body"))))))))
+        .help("", "https://docs.bytechef.io/reference/components/whatsapp_v1#message-received")
         .webhookDisable(WhatsAppNewIncomingMessageTrigger::webhookDisable)
         .webhookEnable(WhatsAppNewIncomingMessageTrigger::webhookEnable)
         .webhookRequest(WhatsAppNewIncomingMessageTrigger::webhookRequest);

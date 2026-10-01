@@ -37,6 +37,7 @@ public class BolnaCallCompletionReportTrigger {
         .description("Triggers when a call is completed.")
         .type(TriggerType.STATIC_WEBHOOK)
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/bolna_v1#call-completion-report")
         .webhookRequest(BolnaCallCompletionReportTrigger::webhookRequest);
 
     private BolnaCallCompletionReportTrigger() {

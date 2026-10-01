@@ -48,6 +48,7 @@ public class FilesystemMkdirAction {
         .output(
             outputSchema(string().description("The full path of the created directory.")),
             sampleOutput("/sample_data"))
+        .help("", "https://docs.bytechef.io/reference/components/filesystem_v1#create")
         .perform(FilesystemMkdirAction::perform);
 
     private FilesystemMkdirAction() {

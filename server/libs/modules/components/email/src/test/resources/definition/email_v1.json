@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send an email to any address.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/email_v1#send"
+    },
     "metadata": null,
     "name": "send",
     "outputDefinition": null,
@@ -405,7 +408,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get emails from inbox.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/email_v1#get-mail"
+    },
     "metadata": null,
     "name": "get",
     "outputDefinition": {

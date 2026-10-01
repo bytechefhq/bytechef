@@ -44,6 +44,7 @@ public class RedisGetAction {
             outputSchema(
                 string()
                     .description("The value of the key, or null if the key does not exist.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#get")
         .perform(RedisGetAction::perform);
 
     private RedisGetAction() {

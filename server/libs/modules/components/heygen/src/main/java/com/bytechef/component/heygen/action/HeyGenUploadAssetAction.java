@@ -67,6 +67,7 @@ public class HeyGenUploadAssetAction {
                             .description("URL to access or download the uploaded file."),
                         string("image_key")
                             .description("Image key for image-type assets."))))
+        .help("", "https://docs.bytechef.io/reference/components/heygen_v1#upload-asset")
         .perform(HeyGenUploadAssetAction::perform);
 
     private HeyGenUploadAssetAction() {

@@ -75,6 +75,7 @@ public class RetableDeleteRowAction {
                             .properties(
                                 integer("deleted_row_count")
                                     .description("Number of rows deleted.")))))
+        .help("", "https://docs.bytechef.io/reference/components/retable_v1#delete-row")
         .perform(RetableDeleteRowAction::perform);
 
     private RetableDeleteRowAction() {

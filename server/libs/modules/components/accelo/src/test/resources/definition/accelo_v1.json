@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new company.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/accelo_v1#create-company"
+    },
     "metadata": {
       "path": "/companies",
       "mimeType": "application/json",
@@ -483,7 +486,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/accelo_v1#create-contact"
+    },
     "metadata": {
       "path": "/contacts",
       "mimeType": "application/json",
@@ -1075,7 +1081,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new task.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/accelo_v1#create-task"
+    },
     "metadata": null,
     "name": "createTask",
     "outputDefinition": {

@@ -93,6 +93,7 @@ public class WrikeCreateCommentAction {
                                             .description("ID of the parent folder or the parent task."),
                                         array("attachmentIds")
                                             .placeholder("ID of the attachments of the object."))))))
+        .help("", "https://docs.bytechef.io/reference/components/wrike_v1#create-comment")
         .perform(WrikeCreateCommentAction::perform);
 
     private WrikeCreateCommentAction() {

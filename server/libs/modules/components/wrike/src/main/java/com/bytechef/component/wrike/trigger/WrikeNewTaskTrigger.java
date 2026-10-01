@@ -61,6 +61,7 @@ public class WrikeNewTaskTrigger {
                             .description("Event type that happened."),
                         string("lastUpdatedDate")
                             .description("Date of the last update."))))
+        .help("", "https://docs.bytechef.io/reference/components/wrike_v1#new-task")
         .webhookDisable(WrikeNewTaskTrigger::webhookDisable)
         .webhookEnable(WrikeNewTaskTrigger::webhookEnable)
         .webhookRequest(WrikeNewTaskTrigger::webhookRequest);

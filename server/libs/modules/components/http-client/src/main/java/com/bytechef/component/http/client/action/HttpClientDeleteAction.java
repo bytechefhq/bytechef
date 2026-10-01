@@ -36,5 +36,6 @@ public class HttpClientDeleteAction {
                 HttpClientConstants.COMMON_PROPERTIES,
                 HttpClientActionUtils.options(false)))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/http-client_v1#delete")
         .perform(HttpClientActionUtils.getPerform(RequestMethod.DELETE));
 }

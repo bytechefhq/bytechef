@@ -48,6 +48,7 @@ public class FilesystemGetParentFolderAction {
         .output(
             outputSchema(string().description("The path of the parent folder of the file.")),
             sampleOutput("/sample_data"))
+        .help("", "https://docs.bytechef.io/reference/components/filesystem_v1#get-parent-folder")
         .perform(FilesystemGetParentFolderAction::perform);
 
     private FilesystemGetParentFolderAction() {

@@ -64,7 +64,8 @@ public class PetstoreUploadFileAction {
         .output(outputSchema(object().properties(PetstoreApiResponseProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/petstore_v1#uploads-an-image");
 
     private PetstoreUploadFileAction() {
     }

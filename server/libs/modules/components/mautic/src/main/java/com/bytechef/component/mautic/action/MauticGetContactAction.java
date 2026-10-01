@@ -93,6 +93,7 @@ public class MauticGetContactAction {
                             .description("Array of UTM Tags associated with this contact."),
                         array("doNotContact")
                             .description("Array of Do Not Contact objects."))))
+        .help("", "https://docs.bytechef.io/reference/components/mautic_v1#get-contact")
         .perform(MauticGetContactAction::perform);
 
     private MauticGetContactAction() {

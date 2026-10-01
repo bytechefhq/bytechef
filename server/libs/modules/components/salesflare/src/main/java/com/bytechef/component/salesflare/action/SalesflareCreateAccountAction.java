@@ -79,7 +79,8 @@ public class SalesflareCreateAccountAction {
                         "type", PropertyType.BODY))
                 .label("Social Profiles")
                 .description("Social profile URL")
-                .required(false));
+                .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/salesflare_v1#create-account");
 
     private SalesflareCreateAccountAction() {
     }

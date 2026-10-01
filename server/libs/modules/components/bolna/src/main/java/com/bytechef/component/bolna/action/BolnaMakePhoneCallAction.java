@@ -61,6 +61,7 @@ public class BolnaMakePhoneCallAction {
                             .description("Status of the call."),
                         string("execution_id")
                             .description("Unique execution id or call id identifier of the call."))))
+        .help("", "https://docs.bytechef.io/reference/components/bolna_v1#make-phone-call")
         .perform(BolnaMakePhoneCallAction::perform);
 
     private BolnaMakePhoneCallAction() {

@@ -142,6 +142,7 @@ public class WoocommerceCreateCustomerAction {
                         .label("Phone")
                         .description("Phone number.")))
         .output(outputSchema(CUSTOMER_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/woocommerce_v1#create-customer")
         .perform(WoocommerceCreateCustomerAction::perform);
 
     private WoocommerceCreateCustomerAction() {

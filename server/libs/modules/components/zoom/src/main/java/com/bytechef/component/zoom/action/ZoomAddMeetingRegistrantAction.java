@@ -188,7 +188,8 @@ public class ZoomAddMeetingRegistrantAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/zoom_v1#add-meeting-registrant");
 
     private ZoomAddMeetingRegistrantAction() {
     }

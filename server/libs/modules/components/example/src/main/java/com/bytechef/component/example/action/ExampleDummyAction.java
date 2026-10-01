@@ -31,6 +31,7 @@ public class ExampleDummyAction {
         .description("Description")
         .properties()
         .output(outputSchema(string()))
+        .help("", "https://docs.bytechef.io/reference/components/example_v1#title")
         .perform(ExampleDummyAction::perform);
 
     private ExampleDummyAction() {

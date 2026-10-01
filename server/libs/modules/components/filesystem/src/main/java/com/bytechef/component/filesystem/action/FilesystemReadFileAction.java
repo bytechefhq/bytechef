@@ -48,6 +48,7 @@ public class FilesystemReadFileAction {
                 .placeholder("/data/your_file.pdf")
                 .required(true))
         .output(outputSchema(fileEntry()))
+        .help("", "https://docs.bytechef.io/reference/components/filesystem_v1#read-file")
         .perform(FilesystemReadFileAction::perform);
 
     private FilesystemReadFileAction() {

@@ -92,6 +92,7 @@ public class ScheduleIntervalTrigger {
                             .description(
                                 "The timezone used for scheduling the cron expression, ensuring the trigger fires at " +
                                     "the correct local time."))))
+        .help("", "https://docs.bytechef.io/reference/components/schedule_v1#interval")
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 

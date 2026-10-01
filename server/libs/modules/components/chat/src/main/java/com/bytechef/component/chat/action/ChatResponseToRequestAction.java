@@ -49,6 +49,7 @@ public class ChatResponseToRequestAction {
                 .placeholder("Add attachment")
                 .items(fileEntry()))
         .output(ChatResponseToRequestAction::output)
+        .help("", "https://docs.bytechef.io/reference/components/chat_v1#response-to-chat-request")
         .perform(ChatResponseToRequestAction::perform);
 
     protected static OutputResponse output(

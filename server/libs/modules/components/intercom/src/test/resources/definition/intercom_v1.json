@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create new contact",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/intercom_v1#create-contact"
+    },
     "metadata": null,
     "name": "createContact",
     "outputDefinition": {
@@ -454,7 +457,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get a single Contact",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/intercom_v1#get-contact"
+    },
     "metadata": null,
     "name": "getContact",
     "outputDefinition": {
@@ -809,7 +815,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send a new message",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/intercom_v1#send-message"
+    },
     "metadata": null,
     "name": "sendMessage",
     "outputDefinition": {

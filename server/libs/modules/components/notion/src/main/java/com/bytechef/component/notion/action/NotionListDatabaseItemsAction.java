@@ -61,6 +61,7 @@ public class NotionListDatabaseItemsAction {
                 .defaultValue("descending")
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/notion_v1#list-database-items")
         .perform(NotionListDatabaseItemsAction::perform);
 
     private NotionListDatabaseItemsAction() {

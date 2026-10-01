@@ -64,6 +64,7 @@ public class PostHogCreateEventAction {
                     .properties(
                         string("status")
                             .description("The status of the request."))))
+        .help("", "https://docs.bytechef.io/reference/components/posthog_v1#create-event")
         .perform(PostHogCreateEventAction::perform);
 
     private PostHogCreateEventAction() {

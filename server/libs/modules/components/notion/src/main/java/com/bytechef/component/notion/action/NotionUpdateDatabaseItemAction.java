@@ -55,6 +55,7 @@ public class NotionUpdateDatabaseItemAction {
                 .propertiesLookupDependsOn(ID)
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/notion_v1#update-database-item")
         .perform(NotionUpdateDatabaseItemAction::perform);
 
     private NotionUpdateDatabaseItemAction() {

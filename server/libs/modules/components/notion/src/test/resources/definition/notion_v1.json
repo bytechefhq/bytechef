@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a new content block to a page.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/notion_v1#add-block-to-page"
+    },
     "metadata": null,
     "name": "addBlockToPage",
     "outputDefinition": {
@@ -992,7 +995,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new item in Notion database.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/notion_v1#create-database-item"
+    },
     "metadata": null,
     "name": "createDatabaseItem",
     "outputDefinition": {
@@ -1076,7 +1082,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new page that is a child of an existing page.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/notion_v1#create-page"
+    },
     "metadata": null,
     "name": "createPage",
     "outputDefinition": {
@@ -2679,7 +2688,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve database information by database ID.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/notion_v1#get-database"
+    },
     "metadata": null,
     "name": "getDatabase",
     "outputDefinition": {
@@ -3836,7 +3848,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve page properties using page ID. Response does not contain page content.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/notion_v1#get-page"
+    },
     "metadata": null,
     "name": "getPage",
     "outputDefinition": {
@@ -5417,7 +5432,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve the actual content of a page (represented by blocks)",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/notion_v1#get-page-or-block-children"
+    },
     "metadata": null,
     "name": "getPageOrBlockChildren",
     "outputDefinition": {
@@ -5461,7 +5479,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "List all items in a Notion database.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/notion_v1#list-database-items"
+    },
     "metadata": null,
     "name": "listDatabaseItems",
     "outputDefinition": {
@@ -5563,7 +5584,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update specific fields in a Notion database item.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/notion_v1#update-database-item"
+    },
     "metadata": null,
     "name": "updateDatabaseItem",
     "outputDefinition": {
@@ -11232,7 +11256,10 @@
     "deprecated": null,
     "description": "Triggers when a new item is added to the database.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/notion_v1#new-database-item"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newDatabaseItem",

@@ -60,6 +60,7 @@ public class XmlHelperStringifyAction {
                 .displayCondition("type == '%s'".formatted(ValueType.ARRAY.name()))
                 .required(true))
         .output(outputSchema(string().description("The XML string.")))
+        .help("", "https://docs.bytechef.io/reference/components/xml-helper_v1#convert-to-xml-string")
         .perform(XmlHelperStringifyAction::perform);
 
     protected static String perform(

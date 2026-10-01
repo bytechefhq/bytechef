@@ -145,6 +145,7 @@ public class WoocommerceCreateProductAction {
                                 .label("Name")
                                 .description("Image name."))))
         .output(outputSchema(PRODUCT_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/woocommerce_v1#create-product")
         .perform(WoocommerceCreateProductAction::perform);
 
     private WoocommerceCreateProductAction() {

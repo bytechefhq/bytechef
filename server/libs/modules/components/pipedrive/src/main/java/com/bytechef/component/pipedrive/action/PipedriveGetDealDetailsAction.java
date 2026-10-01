@@ -67,7 +67,8 @@ public class PipedriveGetDealDetailsAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/pipedrive_v1#get-details-of-deal");
 
     private PipedriveGetDealDetailsAction() {
     }

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Use GET method to retrieve information about the specified resource.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/http-client_v1#get"
+    },
     "metadata": null,
     "name": "get",
     "outputDefinition": {
@@ -419,7 +422,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The POST method submits an entity to the specified resource, often causing a change in state or side effects on the server.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/http-client_v1#post"
+    },
     "metadata": null,
     "name": "post",
     "outputDefinition": {
@@ -1494,7 +1500,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The PUT method replaces all current representations of the target resource with the request content.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/http-client_v1#put"
+    },
     "metadata": null,
     "name": "put",
     "outputDefinition": {
@@ -2569,7 +2578,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The PATCH method applies partial modifications to a resource.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/http-client_v1#patch"
+    },
     "metadata": null,
     "name": "patch",
     "outputDefinition": {
@@ -3644,7 +3656,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The DELETE method deletes the specified resource.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/http-client_v1#delete"
+    },
     "metadata": null,
     "name": "delete",
     "outputDefinition": {
@@ -4057,7 +4072,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The HEAD method asks for a response identical to a GET request, but without a response body.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/http-client_v1#head"
+    },
     "metadata": null,
     "name": "head",
     "outputDefinition": {

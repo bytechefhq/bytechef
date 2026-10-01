@@ -74,6 +74,7 @@ public class RssNewItemInFeedTrigger {
                                 array("items_changed")
                                     .description("Changed items on the feed.")
                                     .items(ITEM_OBJECT)))))
+        .help("", "https://docs.bytechef.io/reference/components/rss_v1#new-item-in-feed")
         .webhookRequest(RssNewItemInFeedTrigger::webhookRequest);
 
     private RssNewItemInFeedTrigger() {

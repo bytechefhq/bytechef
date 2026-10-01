@@ -148,7 +148,8 @@ public class KeapCreateTaskAction {
                     integer("user_id").required(false))
                 .metadata(
                     Map.of(
-                        "responseType", ResponseType.JSON))));
+                        "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/keap_v1#create-task");
 
     private KeapCreateTaskAction() {
     }

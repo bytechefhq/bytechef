@@ -38,6 +38,7 @@ public class XmlHelperParseAction {
                 .description("The XML string to convert to the data.")
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/xml-helper_v1#convert-from-xml-string")
         .perform(XmlHelperParseAction::perform);
 
     protected static Object perform(

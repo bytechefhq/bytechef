@@ -102,6 +102,7 @@ public class XeroCreateBillAction {
                 .description("Reference number of the bill.")
                 .required(false))
         .output(outputSchema(INVOICE_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/xero_v1#create-bill")
         .perform(XeroCreateBillAction::perform);
 
     private XeroCreateBillAction() {

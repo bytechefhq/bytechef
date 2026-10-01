@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new channel",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/discord_v1#create-channel"
+    },
     "metadata": {
       "path": "/guilds/{guildId}/channels",
       "mimeType": "application/json",
@@ -887,7 +890,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Post a new message to a specific #channel you choose.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/discord_v1#send-channel-message"
+    },
     "metadata": {
       "path": "/channels/{channelId}/messages",
       "mimeType": "application/json",
@@ -2444,7 +2450,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send direct message guild member.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/discord_v1#send-direct-message"
+    },
     "metadata": null,
     "name": "sendDirectMessage",
     "outputDefinition": {

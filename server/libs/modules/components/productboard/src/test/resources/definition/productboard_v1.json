@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new note.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/productboard_v1#create-note"
+    },
     "metadata": {
       "path": "/notes",
       "mimeType": "application/json",
@@ -303,7 +306,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a note.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/productboard_v1#delete-note"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/notes/{noteId}"
@@ -350,7 +356,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns detail of a specific feature.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/productboard_v1#get-feature"
+    },
     "metadata": {
       "method": "GET",
       "path": "/features/{featureId}"
@@ -1586,7 +1595,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns detail of a specific note.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/productboard_v1#get-note"
+    },
     "metadata": {
       "method": "GET",
       "path": "/notes/{noteId}"
@@ -3214,7 +3226,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates a note.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/productboard_v1#update-note"
+    },
     "metadata": {
       "path": "/notes/{noteId}",
       "mimeType": "application/json",
@@ -3663,7 +3678,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns detail of all notes order by created_at desc",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/productboard_v1#list-all-notes"
+    },
     "metadata": null,
     "name": "listNotes",
     "outputDefinition": {
@@ -5386,7 +5404,10 @@
     "deprecated": null,
     "description": "Triggers when a note is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/productboard_v1#new-note"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newNote",
@@ -5631,7 +5652,10 @@
     "deprecated": null,
     "description": "Triggers when a feature is updated.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/productboard_v1#updated-feature"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "updatedFeature",

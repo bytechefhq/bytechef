@@ -62,6 +62,7 @@ public class HubspotNewTicketTrigger {
                             .description("Type of the subscription, indicating the nature of event."),
                         string("objectId")
                             .description("ID for the newly created ticket."))))
+        .help("", "https://docs.bytechef.io/reference/components/hubspot_v1#new-ticket")
         .webhookDisable(HubspotNewTicketTrigger::webhookDisable)
         .webhookEnable(HubspotNewTicketTrigger::webhookEnable)
         .webhookRequest(HubspotNewTicketTrigger::webhookRequest);

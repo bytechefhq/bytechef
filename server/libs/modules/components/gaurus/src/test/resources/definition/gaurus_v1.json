@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gaurus_v1#deletes-an-external-user"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/external-users/{externalUserId}"
@@ -47,7 +50,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gaurus_v1#gets-accounts-for-provided-client-id"
+    },
     "metadata": {
       "method": "GET",
       "path": "/accounts"
@@ -394,7 +400,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "General rules for query parameters: <ul> <li>If lastTransactionid is provided without date parameters system <strong>will not set default values for date range</strong> (only lastTransactionId will be used for data filtering).</li> <li>Max range between dateFrom and dateTo is 7 days. If provided date range is greater, dateFrom is set to the dateTo minus 7 days.</li> <li>If dateFrom and dateTo are not provided: <ul> <li>dateFrom is set to the current date minus 7 days</li> <li>dateTo is set to the current date</li> </ul> </li> <li>If dateFrom is provided and dateTo is not provided: <ol> <li>If dateFrom is set to future date, it is set to the current date.</li> <li>dateTo is set to dateFrom plus 1 day</li> </ol> </li> <li>If dateFrom is not provided and dateTo is provided: <ol> <li>If dateTo is set to future date, it is set to the current date.</li> <li>dateFrom is set to dateTo minus 1 day</li> </ol> </li> </ul>",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gaurus_v1#gets-transactions-for-provided-iban-and-query-parameters"
+    },
     "metadata": {
       "method": "GET",
       "path": "/accounts/{iban}/transactions"
@@ -834,7 +843,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gaurus_v1#gets-external-users-for-provided-client-id"
+    },
     "metadata": {
       "method": "GET",
       "path": "/external-users"
@@ -1191,7 +1203,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gaurus_v1#creates-external-users-with-bank-consent-jobs"
+    },
     "metadata": {
       "path": "/external-users",
       "mimeType": "application/json",
@@ -1773,7 +1788,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gaurus_v1#updates-an-external-user"
+    },
     "metadata": {
       "method": "PUT",
       "path": "/external-users/{externalUserId}"

@@ -71,6 +71,7 @@ public class XCreatePostAction {
                                     .description("Unique identifier of created Tweet."),
                                 string(TEXT)
                                     .description("The content of the Tweet.")))))
+        .help("", "https://docs.bytechef.io/reference/components/x_v1#create-post")
         .perform(XCreatePostAction::perform);
 
     private XCreatePostAction() {

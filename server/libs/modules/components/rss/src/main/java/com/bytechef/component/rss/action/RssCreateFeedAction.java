@@ -79,7 +79,8 @@ public class RssCreateFeedAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/rss_v1#create-feed");
 
     private RssCreateFeedAction() {
     }

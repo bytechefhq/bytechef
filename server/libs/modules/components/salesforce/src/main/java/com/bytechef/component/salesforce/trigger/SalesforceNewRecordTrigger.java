@@ -44,6 +44,7 @@ public class SalesforceNewRecordTrigger {
                 .options((OptionsFunction<String>) SalesforceUtils::getSalesforceObjectOptions)
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/salesforce_v1#new-record")
         .poll(SalesforceNewRecordTrigger::poll);
 
     private SalesforceNewRecordTrigger() {

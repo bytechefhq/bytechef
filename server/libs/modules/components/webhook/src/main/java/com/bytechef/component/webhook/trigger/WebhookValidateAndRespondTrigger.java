@@ -49,6 +49,7 @@ public class WebhookValidateAndRespondTrigger {
                         "header value passed by the client.")
                 .required(true))
         .output(placeholder(Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of(), BODY, Map.of())))
+        .help("", "https://docs.bytechef.io/reference/components/webhook_v1#validate-and-respond")
         .webhookRequest(WebhookUtils::getWebhookResult)
         .webhookValidate(WebhookUtils::getWebhookValidate);
 }

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a comment in a folder or in a task.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wrike_v1#create-comment"
+    },
     "metadata": null,
     "name": "createComment",
     "outputDefinition": {
@@ -605,7 +608,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a folder.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wrike_v1#create-folder"
+    },
     "metadata": null,
     "name": "createFolder",
     "outputDefinition": {
@@ -1716,7 +1722,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a project.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wrike_v1#create-project"
+    },
     "metadata": null,
     "name": "createProject",
     "outputDefinition": {
@@ -3324,7 +3333,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a task.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wrike_v1#create-task"
+    },
     "metadata": null,
     "name": "createTask",
     "outputDefinition": {
@@ -10610,7 +10622,10 @@
     "deprecated": null,
     "description": "Triggers when a new task is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wrike_v1#new-task"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newTask",

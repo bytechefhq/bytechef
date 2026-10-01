@@ -77,6 +77,7 @@ public class TwilioInboundCallTrigger {
                         string("direction").description("Call direction (inbound/outbound)"),
                         string("accountSid").description("Twilio account SID"),
                         string("callStatus").description("Call status"))))
+        .help("", "https://docs.bytechef.io/reference/components/twilio_v1#inbound-voice-call")
         .webhookValidate(TwilioInboundCallTrigger::webhookValidate)
         .webhookRequest(TwilioInboundCallTrigger::webhookRequest);
 

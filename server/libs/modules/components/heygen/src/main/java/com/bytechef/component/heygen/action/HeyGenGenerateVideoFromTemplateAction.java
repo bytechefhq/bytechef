@@ -70,6 +70,7 @@ public class HeyGenGenerateVideoFromTemplateAction {
                     .properties(
                         string("video_id")
                             .description("Unique identifier of the generated video."))))
+        .help("", "https://docs.bytechef.io/reference/components/heygen_v1#generate-video-from-template")
         .perform(HeyGenGenerateVideoFromTemplateAction::perform);
 
     private HeyGenGenerateVideoFromTemplateAction() {

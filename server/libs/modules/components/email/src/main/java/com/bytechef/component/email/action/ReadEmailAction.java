@@ -107,6 +107,7 @@ public class ReadEmailAction {
                                 string(CC), string(CONTENT), string(CONTENT_TYPE), string(FROM), bool(HAS_ATTACHMENTS),
                                 string(SUBJECT)))
                     .description("The email message.")))
+        .help("", "https://docs.bytechef.io/reference/components/email_v1#get-mail")
         .perform(ReadEmailAction::perform);
 
     protected static Object perform(

@@ -46,6 +46,7 @@ public class ClaudeCodeInitializeClaude {
                         "The output of the executed bash commands, including any standard output or error messages " +
                             "generated during execution.")),
             sampleOutput("Sample result"))
+        .help("", "https://docs.bytechef.io/reference/components/claude-code_v1#initialize-claude-code")
         .perform(ClaudeCodeInitializeClaude::perform);
 
     protected static String perform(

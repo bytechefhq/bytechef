@@ -37,5 +37,6 @@ public class HttpClientGetAction {
                 HttpClientConstants.COMMON_PROPERTIES,
                 HttpClientActionUtils.options(false)))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/http-client_v1#get")
         .perform(HttpClientActionUtils.getPerform(RequestMethod.GET));
 }

@@ -76,6 +76,7 @@ public class HeyGenTranslateVideoAction {
                     .properties(
                         string("video_translate_id")
                             .description("Unique identifier of the translated video."))))
+        .help("", "https://docs.bytechef.io/reference/components/heygen_v1#translate-video")
         .perform(HeyGenTranslateVideoAction::perform);
 
     private HeyGenTranslateVideoAction() {

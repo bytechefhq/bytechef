@@ -51,6 +51,7 @@ public class CalendlyInviteeCanceledTrigger {
                     option("Organization", "organization"))
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/calendly_v1#invitee-canceled")
         .webhookDisable(CalendlyInviteeCanceledTrigger::webhookDisable)
         .webhookEnable(CalendlyInviteeCanceledTrigger::webhookEnable)
         .webhookRequest(CalendlyInviteeCanceledTrigger::webhookRequest);

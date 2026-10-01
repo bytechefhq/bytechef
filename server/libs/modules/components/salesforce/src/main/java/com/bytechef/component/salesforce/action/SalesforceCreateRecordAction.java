@@ -64,6 +64,7 @@ public class SalesforceCreateRecordAction {
             outputSchema(
                 object()
                     .properties(string(ID).description("ID of the created record."))))
+        .help("", "https://docs.bytechef.io/reference/components/salesforce_v1#create-record")
         .perform(SalesforceCreateRecordAction::perform);
 
     private SalesforceCreateRecordAction() {

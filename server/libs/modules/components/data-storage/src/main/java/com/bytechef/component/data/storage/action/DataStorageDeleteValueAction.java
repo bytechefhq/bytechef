@@ -48,6 +48,7 @@ public class DataStorageDeleteValueAction {
                         "or the user account for all the workflows the user has.")
                 .options(SCOPE_OPTIONS)
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/data-storage_v1#delete-value")
         .perform(DataStorageDeleteValueAction::perform);
 
     protected static Object perform(

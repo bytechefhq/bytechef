@@ -63,6 +63,7 @@ public class ProductboardUpdatedFeatureTrigger {
                         array("updatedAttributes")
                             .description("List of updated attributes.")
                             .items(string()))))
+        .help("", "https://docs.bytechef.io/reference/components/productboard_v1#updated-feature")
         .webhookEnable(ProductboardUpdatedFeatureTrigger::webhookEnable)
         .webhookDisable(ProductboardUpdatedFeatureTrigger::webhookDisable)
         .webhookRequest(ProductboardUpdatedFeatureTrigger::webhookRequest)

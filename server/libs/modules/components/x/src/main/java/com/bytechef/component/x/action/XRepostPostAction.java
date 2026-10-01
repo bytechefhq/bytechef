@@ -56,6 +56,7 @@ public class XRepostPostAction {
                                 bool("retweeted")
                                     .description(
                                         "Indicates whether the Tweet has been retweeted by the authenticated user.")))))
+        .help("", "https://docs.bytechef.io/reference/components/x_v1#repost-post")
         .perform(XRepostPostAction::perform);
 
     private XRepostPostAction() {
