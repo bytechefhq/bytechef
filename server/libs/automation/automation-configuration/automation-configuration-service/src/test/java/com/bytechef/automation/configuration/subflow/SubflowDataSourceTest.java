@@ -29,6 +29,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
@@ -255,6 +256,20 @@ class SubflowDataSourceTest {
             assertEquals("callable-uuid", result.getFirst()
                 .workflowUuid());
         }
+    }
+
+    @Test
+    void testGetSubWorkflowsExcludesAiAgentWorkflows() {
+        ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow.getType()).thenReturn(ProjectWorkflowType.AI_AGENT);
+
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of(projectWorkflow));
+
+        List<SubflowEntry> result =
+            subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
