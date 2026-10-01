@@ -112,7 +112,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                 .required(true),
             integer(PORT)
                 .label("Port")
-                .required(true),
+                .required(false),
             string(DATABASE)
                 .label("Database")
                 .required(true))
