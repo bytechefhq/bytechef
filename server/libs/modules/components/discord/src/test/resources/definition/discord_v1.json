@@ -8021,7 +8021,10 @@
     "deprecated": null,
     "description": "Triggers when a new message is sent in a specific channel.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/discord_v1#new-message"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newMessage",

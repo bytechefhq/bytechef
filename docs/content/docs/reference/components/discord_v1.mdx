@@ -26,7 +26,10 @@ Version: 1
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | token | Bot Token | STRING |  | true |
-| publicKey | Application Public Key | STRING | The Discord app's public key. When set, field-less approval requests use in-place Approve/Discard interaction buttons resolved through the app's Interactions Endpoint URL (&lt;public-url&gt;/discord/interactivity), verified by the Ed25519 request signature. Also set bytechef.webhook.discord.public-key to the same value. Leave empty to deliver approval links to the hosted form. | false |
+
+
+
+![anl-c-discord-md](https://static.scarf.sh/a.png?x-pxid=8dad9aeb-34e5-47b6-917f-5423fe8d2b0c)
 ## Connection Setup
 
 [Setting up OAuth2](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
@@ -322,9 +325,72 @@ Type: OBJECT
 
 
 
+## Triggers
+
+
+### New Message
+Name: newMessage
+
+`Triggers when a new message is sent in a specific channel.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| guildId | Guild ID | STRING | ID of the guild where the channel is located. | true |
+| channelId | Channel ID | STRING <details> <summary> Depends On </summary> guildId </details> | ID of the channel to monitor for new messages. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | INTEGER | Type of the message. |
+| id | STRING | ID of the message. |
+| content | STRING | Contents of the message. |
+| tts | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this was a TTS message. |
+| mentions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(username)&#125;] </details> | Users specifically mentioned in the message. |
+| mention_roles | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(name)&#125;] </details> | Roles specifically mentioned in this message. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(filename), STRING\(title), STRING\(description), STRING\(content_type), INTEGER\(size), STRING\(url), STRING\(proxy_url)&#125;] </details> | Any attached files. |
+| timestamp | STRING | When this message was sent. |
+| flags | INTEGER | Message flags combined as a bitfield. |
+| channel_id | STRING | ID of the channel the message was sent in. |
+| author | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(username)&#125; </details> | The author of this message. |
+| pinned | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this message is pinned. |
+| mention_everyone | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this message mentions everyone. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Message",
+  "name" : "newMessage",
+  "parameters" : {
+    "guildId" : "",
+    "channelId" : ""
+  },
+  "type" : "discord/v1/newMessage"
+}
+```
+
+
+
+
 
 ## What to do if your action is not listed here?
 
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+

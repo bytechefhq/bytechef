@@ -114,6 +114,7 @@ public class DiscordNewMessageTrigger {
                                 string("username").description("Username of the author.")),
                         bool("pinned").description("Whether this message is pinned."),
                         bool("mention_everyone").description("Whether this message mentions everyone."))))
+        .help("", "https://docs.bytechef.io/reference/components/discord_v1#new-message")
         .poll(DiscordNewMessageTrigger::poll);
 
     private DiscordNewMessageTrigger() {
