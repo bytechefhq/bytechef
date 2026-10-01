@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:map"))
     implementation(project(":server:libs:modules:task-dispatchers:approval"))
     implementation(project(":server:libs:modules:task-dispatchers:branch"))
+    implementation(project(":server:libs:modules:task-dispatchers:call-ai-agent"))
     implementation(project(":server:libs:modules:task-dispatchers:condition"))
     implementation(project(":server:libs:modules:task-dispatchers:each"))
     implementation(project(":server:libs:modules:task-dispatchers:fork-join"))

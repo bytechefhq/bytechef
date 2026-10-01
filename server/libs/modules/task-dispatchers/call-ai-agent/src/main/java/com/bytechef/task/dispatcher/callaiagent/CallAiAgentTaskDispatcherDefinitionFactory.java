@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,6 +49,7 @@ public class CallAiAgentTaskDispatcherDefinitionFactory implements TaskDispatche
 
     private final TaskDispatcherDefinition taskDispatcherDefinition;
 
+    @Autowired
     public CallAiAgentTaskDispatcherDefinitionFactory(
         ObjectProvider<CallableAiAgentDataSource> callableAiAgentDataSourceProvider,
         SubflowDataSource subflowDataSource) {
