@@ -16,10 +16,10 @@ interface UseDataStreamEditorResultI {
 export default function useDataStreamEditor(): UseDataStreamEditorResultI {
     const [currentStep, setCurrentStep] = useState(0);
 
-    const {rootClusterElementNodeData, setMainClusterRootComponentDefinition} = useWorkflowEditorStore(
+    const {rootClusterElementNodeData, setClusterRootComponentDefinition} = useWorkflowEditorStore(
         useShallow((state) => ({
             rootClusterElementNodeData: state.rootClusterElementNodeData,
-            setMainClusterRootComponentDefinition: state.setMainClusterRootComponentDefinition,
+            setClusterRootComponentDefinition: state.setClusterRootComponentDefinition,
         }))
     );
 
@@ -41,13 +41,12 @@ export default function useDataStreamEditor(): UseDataStreamEditorResultI {
 
     useEffect(() => {
         if (rootClusterElementDefinition && rootClusterElementNodeData?.workflowNodeName) {
-            setMainClusterRootComponentDefinition(rootClusterElementDefinition);
+            setClusterRootComponentDefinition(
+                rootClusterElementNodeData.workflowNodeName,
+                rootClusterElementDefinition
+            );
         }
-    }, [
-        rootClusterElementDefinition,
-        rootClusterElementNodeData?.workflowNodeName,
-        setMainClusterRootComponentDefinition,
-    ]);
+    }, [rootClusterElementDefinition, rootClusterElementNodeData?.workflowNodeName, setClusterRootComponentDefinition]);
 
     const configuredSteps = useMemo(() => {
         const clusterElements = rootClusterElementNodeData?.clusterElements;

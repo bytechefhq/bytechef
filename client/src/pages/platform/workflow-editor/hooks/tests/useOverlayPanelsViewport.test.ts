@@ -1,6 +1,8 @@
+import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
 import useOverlayPanelsViewport, {
     OVERLAY_PAN_DURATION,
 } from '@/pages/platform/workflow-editor/hooks/useOverlayPanelsViewport';
+import useClusterElementsViewModeStore from '@/pages/platform/workflow-editor/stores/useClusterElementsViewModeStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -62,6 +64,8 @@ describe('useOverlayPanelsViewport', () => {
         useDataPillPanelStore.setState({dataPillPanelOpen: false});
         useWorkflowEditorStore.setState({clusterElementsCanvasOpen: false});
         useWorkflowNodeDetailsPanelStore.setState({workflowNodeDetailsPanelOpen: false});
+        useClusterElementsCanvasDialogStore.setState({testingPanelOpen: false});
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'box'});
     });
 
     afterEach(() => {
@@ -124,6 +128,38 @@ describe('useOverlayPanelsViewport', () => {
 
         expect(lastViewport()[0]).toEqual({x: 0, y: 40, zoom: 1});
         expect(result.current.getViewportOffsetX()).toBe(0);
+    });
+
+    it('moves the flow left by half the agent playground width and back on close', () => {
+        const {result} = renderHook(() => useOverlayPanelsViewport({enabled: true}));
+
+        act(() => {
+            useClusterElementsCanvasDialogStore.setState({testingPanelOpen: true});
+        });
+
+        expect(lastViewport()[0]).toEqual({x: DETAILS_OFFSET, y: 40, zoom: 1});
+        expect(result.current.getViewportOffsetX()).toBe(DETAILS_OFFSET);
+
+        settleAt(DETAILS_OFFSET);
+
+        act(() => {
+            useClusterElementsCanvasDialogStore.setState({testingPanelOpen: false});
+        });
+
+        expect(lastViewport()[0]).toEqual({x: 0, y: 40, zoom: 1});
+        expect(result.current.getViewportOffsetX()).toBe(0);
+    });
+
+    it('leaves the viewport alone when the playground opens in dialog mode', () => {
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
+
+        renderHook(() => useOverlayPanelsViewport({enabled: true}));
+
+        act(() => {
+            useClusterElementsCanvasDialogStore.setState({testingPanelOpen: true});
+        });
+
+        expect(setViewportMock).not.toHaveBeenCalled();
     });
 
     it('pushes further for the data pill panel and slides back when it closes', () => {

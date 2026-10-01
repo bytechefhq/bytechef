@@ -49,11 +49,9 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const rootClusterElementId = id.split('-')[0];
     const effectiveDirection = isClusterElement ? 'TB' : layoutDirection;
 
-    const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
-
     const canPaste = useMemo(
-        () => !clusterElementsCanvasOpen && !!copiedNode && copiedWorkflowId === workflow.id,
-        [clusterElementsCanvasOpen, copiedNode, copiedWorkflowId, workflow.id]
+        () => !isClusterElement && !!copiedNode && copiedWorkflowId === workflow.id,
+        [isClusterElement, copiedNode, copiedWorkflowId, workflow.id]
     );
 
     const copiedNodeLabel = copiedNode?.label || '';

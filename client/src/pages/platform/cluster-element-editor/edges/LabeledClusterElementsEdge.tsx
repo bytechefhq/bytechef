@@ -1,4 +1,6 @@
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath} from '@xyflow/react';
+import {useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
@@ -12,10 +14,20 @@ export default function LabeledClusterElementsEdge({
     targetX,
     targetY,
 }: EdgeProps) {
-    const {nodes} = useClusterElementsDataStore(
+    const {nodes: clusterElementsCanvasNodes} = useClusterElementsDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
         }))
+    );
+    const {nodes: workflowCanvasNodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
+
+    const nodes = useMemo(
+        () => [...clusterElementsCanvasNodes, ...workflowCanvasNodes],
+        [clusterElementsCanvasNodes, workflowCanvasNodes]
     );
 
     const [edgePath] = getBezierPath({

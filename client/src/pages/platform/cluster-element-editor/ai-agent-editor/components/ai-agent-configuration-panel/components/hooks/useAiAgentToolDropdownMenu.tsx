@@ -99,6 +99,7 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
                 clusterElementType: 'tools',
                 componentName: tool.componentName,
                 name: tool.name,
+                parentClusterRootId: rootClusterElementNodeData.workflowNodeName,
                 workflowNodeName: tool.name,
             };
 
@@ -114,7 +115,6 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
 
             handleDeleteTask({
                 cancelWorkflowQueries: cancelWorkflowQueries!,
-                clusterElementsCanvasOpen: true,
                 data: toolNodeData,
                 invalidateWorkflowQueries: invalidateWorkflowQueries!,
                 queryClient,

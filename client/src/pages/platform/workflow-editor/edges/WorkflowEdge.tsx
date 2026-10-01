@@ -171,11 +171,11 @@ export default function WorkflowEdge({
     const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
     const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);
 
-    const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
+    const edgeClusterElementType = (data as Record<string, unknown>)?.clusterElementType;
 
     const canPaste = useMemo(
-        () => !clusterElementsCanvasOpen && !!copiedNode && copiedWorkflowId === workflow.id,
-        [clusterElementsCanvasOpen, copiedNode, copiedWorkflowId, workflow.id]
+        () => !edgeClusterElementType && !!copiedNode && copiedWorkflowId === workflow.id,
+        [edgeClusterElementType, copiedNode, copiedWorkflowId, workflow.id]
     );
 
     const copiedNodeLabel = copiedNode?.label || '';
