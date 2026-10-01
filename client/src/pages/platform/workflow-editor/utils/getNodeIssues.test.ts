@@ -38,6 +38,18 @@ describe('getNodeIssues', () => {
         ).toEqual([GITHUB_1_MISSING_CONNECTION, ROOT_MISSING_PROMPT]);
     });
 
+    it('returns the cluster element invalid connections of an expanded cluster root', () => {
+        const openAiInvalidConnection = createIssue('INVALID_CONNECTION', 'openAi_1');
+
+        expect(
+            getNodeIssues({
+                clusterElementRootNames: CLUSTER_ELEMENT_ROOT_NAMES,
+                issues: [...ISSUES, openAiInvalidConnection],
+                nodeName: 'aiAgent_1',
+            })
+        ).toEqual([GITHUB_1_MISSING_CONNECTION, ROOT_MISSING_PROMPT, openAiInvalidConnection]);
+    });
+
     it('returns every cluster element issue of a collapsed cluster root', () => {
         expect(
             getNodeIssues({
