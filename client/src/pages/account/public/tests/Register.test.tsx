@@ -180,6 +180,64 @@ it('should pass the email to the password reset page when the email already has 
     expect(await screen.findByText('Password reset page: test@example.com')).toBeInTheDocument();
 });
 
+it('should hide the existing account options once the email is edited', async () => {
+    mockRegisterResponse(101, 'Email is already in use!');
+
+    renderRegisterPageWithDestinations();
+
+    await submitRegistration();
+
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText('Email'), 'x');
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', {name: 'Reset password'})).not.toBeInTheDocument();
+});
+
+it('should ignore an existing account response for an email that was edited while the request was pending', async () => {
+    let resolveRegisterResponse: (response: Response) => void = () => {};
+
+    vi.spyOn(globalThis, 'fetch').mockReturnValue(
+        new Promise<Response>((resolve) => {
+            resolveRegisterResponse = resolve;
+        })
+    );
+
+    renderRegisterPageWithDestinations();
+
+    await submitRegistration();
+
+    const emailInput = screen.getByLabelText('Email');
+
+    await userEvent.clear(emailInput);
+    await userEvent.type(emailInput, 'other@example.com');
+
+    await act(async () => {
+        resolveRegisterResponse(
+            new Response(
+                JSON.stringify({
+                    detail: 'Email is already in use!',
+                    entityClass: 'User',
+                    errorKey: 101,
+                    status: 400,
+                    title: 'Error',
+                }),
+                {headers: {'Content-Type': 'application/problem+json'}, status: 400}
+            )
+        );
+    });
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    await userEvent.clear(emailInput);
+    await userEvent.type(emailInput, 'test@example.com');
+
+    await userEvent.click(within(await screen.findByRole('alert')).getByRole('link', {name: 'Log in'}));
+
+    expect(await screen.findByText('Login page: test@example.com')).toBeInTheDocument();
+});
+
 it('should navigate to the account error page for other registration errors', async () => {
     mockRegisterResponse(102, 'Login name already used!');
 
