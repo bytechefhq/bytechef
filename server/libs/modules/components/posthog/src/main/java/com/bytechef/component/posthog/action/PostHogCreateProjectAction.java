@@ -51,6 +51,7 @@ public class PostHogCreateProjectAction {
                 .label("Project Name")
                 .required(true))
         .output(outputSchema(PROJECT_OUTPUT_SCHEMA))
+        .help("", "https://docs.bytechef.io/reference/components/posthog_v1#create-project")
         .perform(PostHogCreateProjectAction::perform);
 
     private PostHogCreateProjectAction() {

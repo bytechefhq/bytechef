@@ -42,6 +42,7 @@ public class NotionGetPageOrBlockChildrenAction {
                 .label("Page or Parent Block ID")
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/notion_v1#get-page-or-block-children")
         .perform(NotionGetPageOrBlockChildrenAction::perform);
 
     private NotionGetPageOrBlockChildrenAction() {

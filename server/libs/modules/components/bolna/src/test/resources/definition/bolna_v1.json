@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Make a phone call using voice AI agent.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bolna_v1#make-phone-call"
+    },
     "metadata": null,
     "name": "makePhoneCall",
     "outputDefinition": {
@@ -570,7 +573,10 @@
     "deprecated": null,
     "description": "Triggers when a call is completed.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bolna_v1#call-completion-report"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "callCompletionReport",

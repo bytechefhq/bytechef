@@ -94,6 +94,7 @@ public class NotionGetDatabaseAction {
                         bool("is_inline"),
                         string("public_url")
                             .description("The public URL of the database."))))
+        .help("", "https://docs.bytechef.io/reference/components/notion_v1#get-database")
         .perform(NotionGetDatabaseAction::perform);
 
     private NotionGetDatabaseAction() {

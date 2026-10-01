@@ -43,6 +43,7 @@ public class XeroNewContactTrigger {
         .type(TriggerType.STATIC_WEBHOOK)
         .properties(WEBHOOK_KEY_PROPERTY)
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/xero_v1#new-contact")
         .webhookValidate(XeroUtils::webhookValidate)
         .webhookRequest(XeroNewContactTrigger::webhookRequest);
 

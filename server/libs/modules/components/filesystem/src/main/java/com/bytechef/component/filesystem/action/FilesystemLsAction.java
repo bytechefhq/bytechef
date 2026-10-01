@@ -71,6 +71,7 @@ public class FilesystemLsAction {
                                     .description("Relative path of the file."),
                                 integer("size")
                                     .description("Size of the file.")))))
+        .help("", "https://docs.bytechef.io/reference/components/filesystem_v1#list")
         .perform(FilesystemLsAction::perform);
 
     private FilesystemLsAction() {

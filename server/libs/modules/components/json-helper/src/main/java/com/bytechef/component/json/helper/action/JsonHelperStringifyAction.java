@@ -59,6 +59,7 @@ public class JsonHelperStringifyAction {
                 .displayCondition("type == '%s'".formatted(ValueType.ARRAY.name()))
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/json-helper_v1#convert-to-json-string")
         .perform(JsonHelperStringifyAction::perform);
 
     private JsonHelperStringifyAction() {

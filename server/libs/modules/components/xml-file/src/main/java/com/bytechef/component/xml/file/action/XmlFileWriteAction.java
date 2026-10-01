@@ -75,6 +75,7 @@ public class XmlFileWriteAction {
                 .defaultValue("file.xml")
                 .advancedOption(true))
         .output(outputSchema(fileEntry()))
+        .help("", "https://docs.bytechef.io/reference/components/xml-file_v1#write-to-file")
         .perform(XmlFileWriteAction::perform);
 
     protected static FileEntry perform(

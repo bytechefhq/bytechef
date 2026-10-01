@@ -53,6 +53,7 @@ public class FilesystemRmAction {
         .output(
             outputSchema(bool().description("Indicates whether the directory was removed or not.")),
             sampleOutput(true))
+        .help("", "https://docs.bytechef.io/reference/components/filesystem_v1#remove")
         .perform(FilesystemRmAction::perform);
 
     private FilesystemRmAction() {

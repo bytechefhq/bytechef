@@ -37,6 +37,7 @@ public class TwilioNewWhatsappMessageTrigger {
         .description("Triggers when a new WhatsApp message is received.")
         .type(TriggerType.STATIC_WEBHOOK)
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/twilio_v1#new-whatsapp-message")
         .webhookRequest(TwilioNewWhatsappMessageTrigger::webhookRequest);
 
     private TwilioNewWhatsappMessageTrigger() {

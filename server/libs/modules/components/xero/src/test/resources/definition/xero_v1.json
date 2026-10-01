@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates draft bill (Accounts Payable).",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xero_v1#create-bill"
+    },
     "metadata": null,
     "name": "createBill",
     "outputDefinition": {
@@ -988,7 +991,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xero_v1#create-contact"
+    },
     "metadata": null,
     "name": "createContact",
     "outputDefinition": {
@@ -2568,7 +2574,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates draft invoice (Acount Receivable).",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xero_v1#create-invoice"
+    },
     "metadata": null,
     "name": "createSalesInvoice",
     "outputDefinition": {
@@ -3544,7 +3553,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new quote draft.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xero_v1#create-quote"
+    },
     "metadata": null,
     "name": "createQuote",
     "outputDefinition": {
@@ -5069,7 +5081,10 @@
     "deprecated": null,
     "description": "Trigger off whenever a new bill is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xero_v1#new-bill"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newBill",
@@ -5808,7 +5823,10 @@
     "deprecated": null,
     "description": "Triggers when a contact is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xero_v1#new-contact"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newContact",
@@ -6903,7 +6921,10 @@
     "deprecated": null,
     "description": "Trigger off whenever a new invoice is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xero_v1#new-invoice"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newInvoice",

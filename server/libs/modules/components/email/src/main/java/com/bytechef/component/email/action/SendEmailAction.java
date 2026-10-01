@@ -107,6 +107,7 @@ public class SendEmailAction {
                 .label("Attachments")
                 .description("A list of attachments to send with the email.")
                 .items(fileEntry()))
+        .help("", "https://docs.bytechef.io/reference/components/email_v1#send")
         .perform(SendEmailAction::perform);
 
     protected static Object perform(

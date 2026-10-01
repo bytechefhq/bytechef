@@ -51,6 +51,7 @@ public class RedisKeysAction {
                 array()
                     .items(string())
                     .description("List of keys matching the pattern.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#keys")
         .perform(RedisKeysAction::perform);
 
     private RedisKeysAction() {

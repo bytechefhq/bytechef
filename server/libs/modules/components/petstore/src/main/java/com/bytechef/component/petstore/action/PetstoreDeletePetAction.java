@@ -50,7 +50,8 @@ public class PetstoreDeletePetAction {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", PropertyType.PATH)));
+                        "type", PropertyType.PATH)))
+        .help("", "https://docs.bytechef.io/reference/components/petstore_v1#deletes-a-pet");
 
     private PetstoreDeletePetAction() {
     }

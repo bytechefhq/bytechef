@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from a XML file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xml-file_v1#read-from-file"
+    },
     "metadata": null,
     "name": "read",
     "outputDefinition": {
@@ -216,7 +219,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the data to a XML file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xml-file_v1#write-to-file"
+    },
     "metadata": null,
     "name": "write",
     "outputDefinition": {

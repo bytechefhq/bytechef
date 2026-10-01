@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from the file as string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/file-storage_v1#read-from-file-as-string"
+    },
     "metadata": null,
     "name": "read",
     "outputDefinition": {
@@ -180,7 +183,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reads data from the file as byte array.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/file-storage_v1#read-from-file-as-byte-array"
+    },
     "metadata": null,
     "name": "readBytes",
     "outputDefinition": {
@@ -390,7 +396,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the data to the file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/file-storage_v1#write-to-file"
+    },
     "metadata": null,
     "name": "write",
     "outputDefinition": {
@@ -668,7 +677,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Download a file from the URL.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/file-storage_v1#download-file"
+    },
     "metadata": null,
     "name": "download",
     "outputDefinition": {

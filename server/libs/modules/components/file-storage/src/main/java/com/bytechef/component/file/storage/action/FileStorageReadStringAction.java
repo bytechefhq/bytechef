@@ -41,6 +41,7 @@ public class FileStorageReadStringAction {
                 .description("The file object which contains content of the file to read from.")
                 .required(true))
         .output(outputSchema(string().description("File content.")), sampleOutput("Sample content"))
+        .help("", "https://docs.bytechef.io/reference/components/file-storage_v1#read-from-file-as-string")
         .perform(FileStorageReadStringAction::perform);
 
     protected static String perform(

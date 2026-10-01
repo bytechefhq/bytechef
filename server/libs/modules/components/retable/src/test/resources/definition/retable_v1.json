@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete a row.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/retable_v1#delete-row"
+    },
     "metadata": null,
     "name": "deleteRow",
     "outputDefinition": {
@@ -265,7 +268,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Insert a row.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/retable_v1#insert-row"
+    },
     "metadata": null,
     "name": "insertRow",
     "outputDefinition": {
@@ -1235,7 +1241,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update a row.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/retable_v1#update-row"
+    },
     "metadata": null,
     "name": "updateRow",
     "outputDefinition": {

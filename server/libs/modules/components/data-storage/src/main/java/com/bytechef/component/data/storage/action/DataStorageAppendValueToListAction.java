@@ -128,6 +128,7 @@ public class DataStorageAppendValueToListAction {
                 .description(
                     "When set to true, and the value is a list, it will be added as a single value rather than " +
                         "concatenating the lists."))
+        .help("", "https://docs.bytechef.io/reference/components/data-storage_v1#append-value-to-list")
         .perform(DataStorageAppendValueToListAction::perform);
 
     protected static Object perform(

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts the JSON string to object/array.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/json-helper_v1#convert-from-json-string"
+    },
     "metadata": null,
     "name": "parse",
     "outputDefinition": {
@@ -50,7 +53,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the object/array to a JSON string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/json-helper_v1#convert-to-json-string"
+    },
     "metadata": null,
     "name": "stringify",
     "outputDefinition": {

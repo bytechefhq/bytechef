@@ -64,6 +64,7 @@ public class SalesforceUpdateRecordAction {
                 .label("Custom Fields")
                 .additionalProperties(bool(), integer(), string(), number())
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/salesforce_v1#update-record")
         .perform(SalesforceUpdateRecordAction::perform);
 
     private SalesforceUpdateRecordAction() {

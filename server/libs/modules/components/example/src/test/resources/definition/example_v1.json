@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Description",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/example_v1#title"
+    },
     "metadata": null,
     "name": "dummyAction",
     "outputDefinition": {
@@ -101,7 +104,10 @@
     "deprecated": null,
     "description": "Triggers when an issue is updated.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/example_v1#updated-issue"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "dummyTrigger",

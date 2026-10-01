@@ -47,7 +47,8 @@ public class GaurusGetAccountsAction {
                 Map.of(
                     "responseType", ResponseType.JSON))),
             sampleOutput(Map.<String, Object>ofEntries(Map.entry("code", "OK"), Map.entry("message", ""),
-                Map.entry("hasMoreResults", false), Map.entry("data", "AccountResult[]"))));
+                Map.entry("hasMoreResults", false), Map.entry("data", "AccountResult[]"))))
+        .help("", "https://docs.bytechef.io/reference/components/gaurus_v1#gets-accounts-for-provided-client-id");
 
     private GaurusGetAccountsAction() {
     }

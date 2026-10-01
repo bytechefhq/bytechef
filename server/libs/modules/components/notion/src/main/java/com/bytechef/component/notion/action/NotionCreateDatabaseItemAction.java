@@ -61,6 +61,7 @@ public class NotionCreateDatabaseItemAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(false))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/notion_v1#create-database-item")
         .perform(NotionCreateDatabaseItemAction::perform);
 
     private NotionCreateDatabaseItemAction() {

@@ -46,6 +46,7 @@ public class QuickbooksGetItemAction {
                 .options(QuickbooksUtils.getOptions(Entity.ITEM, null))
                 .required(true))
         .output(outputSchema(ITEM_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/quickbooks_v1#get-item")
         .perform(QuickbooksGetItemAction::perform);
 
     private QuickbooksGetItemAction() {

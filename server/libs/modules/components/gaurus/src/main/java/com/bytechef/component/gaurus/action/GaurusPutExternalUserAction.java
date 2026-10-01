@@ -44,7 +44,8 @@ public class GaurusPutExternalUserAction {
             .exampleValue(42)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)));
+                    "type", PropertyType.PATH)))
+        .help("", "https://docs.bytechef.io/reference/components/gaurus_v1#updates-an-external-user");
 
     private GaurusPutExternalUserAction() {
     }

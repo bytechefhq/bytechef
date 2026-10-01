@@ -165,6 +165,7 @@ public class WrikeCreateProjectAction {
                                                     .description("End date of the project."),
                                                 string("createdDate")
                                                     .description("Date when the project was created.")))))))
+        .help("", "https://docs.bytechef.io/reference/components/wrike_v1#create-project")
         .perform(WrikeCreateProjectAction::perform);
 
     private WrikeCreateProjectAction() {

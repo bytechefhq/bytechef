@@ -96,7 +96,8 @@ public class PetstoreCreateUserAction {
         .output(outputSchema(object().properties(PetstoreUserProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/petstore_v1#create-user");
 
     private PetstoreCreateUserAction() {
     }

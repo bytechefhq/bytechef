@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generates a video based on the specified template.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/heygen_v1#generate-video-from-template"
+    },
     "metadata": null,
     "name": "generateVideoFromTemplateAction",
     "outputDefinition": {
@@ -214,7 +217,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Translates a video into one or more of 175+ supported languages with natural-sounding voice and accurate lip-sync.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/heygen_v1#translate-video"
+    },
     "metadata": null,
     "name": "translateVideoAction",
     "outputDefinition": {
@@ -417,7 +423,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Uploads a media file to the authenticated user's HeyGen account.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/heygen_v1#upload-asset"
+    },
     "metadata": null,
     "name": "uploadAssetAction",
     "outputDefinition": {
@@ -1928,7 +1937,10 @@
     "deprecated": null,
     "description": "Triggers when a video generation completes successfully.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/heygen_v1#video-generation-completed"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "videoGenerationCompletedTrigger",
@@ -2265,7 +2277,10 @@
     "deprecated": null,
     "description": "Triggers when a video fails to generate.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/heygen_v1#video-generation-failed"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "videoGenerationFailedTrigger",

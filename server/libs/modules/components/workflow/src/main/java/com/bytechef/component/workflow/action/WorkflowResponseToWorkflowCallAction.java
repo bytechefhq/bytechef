@@ -48,5 +48,6 @@ public class WorkflowResponseToWorkflowCallAction {
                 .properties(WorkflowResponseUtils::responseProperties)
                 .required(true))
         .output(WorkflowResponseUtils::actionOutput)
+        .help("", "https://docs.bytechef.io/reference/components/workflow_v1#response-to-workflow-call")
         .perform(WorkflowResponseUtils::perform);
 }

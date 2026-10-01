@@ -46,6 +46,7 @@ public class SalesforceUpdatedRecordTrigger {
                 .options((OptionsFunction<String>) SalesforceUtils::getSalesforceObjectOptions)
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/salesforce_v1#updated-record")
         .poll(SalesforceUpdatedRecordTrigger::poll);
 
     private SalesforceUpdatedRecordTrigger() {

@@ -41,6 +41,7 @@ public class SalesforceSOQLQueryAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/salesforce_v1#soql-query")
         .perform(SalesforceSOQLQueryAction::perform);
 
     private SalesforceSOQLQueryAction() {

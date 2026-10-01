@@ -50,7 +50,8 @@ public class EnchargeAddTagAction {
                     "type", PropertyType.BODY))
                 .label("Email")
                 .description("Email of the person.")
-                .required(true));
+                .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/encharge_v1#add-tag");
 
     private EnchargeAddTagAction() {
     }

@@ -56,6 +56,7 @@ public class FilesystemWriteFileAction {
         .output(
             outputSchema(object().properties(integer("bytes").description("Number of bytes written."))),
             sampleOutput(Map.of("bytes", 1024)))
+        .help("", "https://docs.bytechef.io/reference/components/filesystem_v1#write-to-file")
         .perform(FilesystemWriteFileAction::perform);
 
     private FilesystemWriteFileAction() {

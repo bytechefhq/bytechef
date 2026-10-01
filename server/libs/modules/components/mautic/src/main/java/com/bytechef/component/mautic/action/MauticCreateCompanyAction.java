@@ -88,6 +88,7 @@ public class MauticCreateCompanyAction {
                             .description("Name of the user that last modified the company."),
                         array("fields")
                             .description("Custom fields for the company."))))
+        .help("", "https://docs.bytechef.io/reference/components/mautic_v1#create-company")
         .perform(MauticCreateCompanyAction::perform);
 
     private MauticCreateCompanyAction() {

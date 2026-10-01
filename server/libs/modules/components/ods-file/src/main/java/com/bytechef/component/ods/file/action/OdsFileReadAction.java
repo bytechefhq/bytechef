@@ -89,6 +89,7 @@ public class OdsFileReadAction {
                 .defaultValue(false)
                 .advancedOption(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/ods-file_v1#read-from-file")
         .perform(OdsFileReadAction::perform);
 
     protected static List<Map<String, ?>> perform(

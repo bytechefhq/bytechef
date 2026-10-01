@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Assign value to a variable that can be used in the following steps.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/var_v1#set-value"
+    },
     "metadata": null,
     "name": "set",
     "outputDefinition": {

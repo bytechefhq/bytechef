@@ -53,6 +53,7 @@ public class MongoDBInsertOneAction {
                     .properties(
                         string("insertedId")
                             .description("The identifier of the inserted document."))))
+        .help("", "https://docs.bytechef.io/reference/components/mongodb_v1#insert-one")
         .perform(MongoDBInsertOneAction::perform);
 
     private MongoDBInsertOneAction() {

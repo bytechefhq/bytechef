@@ -213,6 +213,7 @@ public class ApprovalRequestApprovalAction {
                                     .required(false)))
                     .required(false))
             .output(ApprovalRequestApprovalAction::output)
+            .help("", "https://docs.bytechef.io/reference/components/approval_v1#request-approval")
             .perform((MultipleConnectionsPerformFunction) approvalRequestApprovalAction::perform)
             .resumePerform(ApprovalRequestApprovalAction::resumePerform);
     }

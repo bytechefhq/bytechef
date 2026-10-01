@@ -41,6 +41,7 @@ public class FilesystemCreateTempDirAction {
         .output(
             outputSchema(string().description("The full path of the created directory.")),
             sampleOutput("/sample_tmp_dir"))
+        .help("", "https://docs.bytechef.io/reference/components/filesystem_v1#create-temp-directory")
         .perform(FilesystemCreateTempDirAction::perform);
 
     private FilesystemCreateTempDirAction() {

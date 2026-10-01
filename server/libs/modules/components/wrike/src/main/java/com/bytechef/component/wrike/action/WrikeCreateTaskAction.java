@@ -176,6 +176,7 @@ public class WrikeCreateTaskAction {
                                             .description("Metadata of the object."),
                                         array("customFields")
                                             .placeholder("Custom fields of the object."))))))
+        .help("", "https://docs.bytechef.io/reference/components/wrike_v1#create-task")
         .perform(WrikeCreateTaskAction::perform);
 
     private WrikeCreateTaskAction() {

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates feed from website by using website URL.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/rss_v1#create-feed"
+    },
     "metadata": {
       "path": "/feeds",
       "mimeType": "application/json",
@@ -1605,7 +1608,10 @@
     "deprecated": null,
     "description": "Triggers when a new item is added to the feed.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/rss_v1#new-item-in-feed"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newItemInFeed",

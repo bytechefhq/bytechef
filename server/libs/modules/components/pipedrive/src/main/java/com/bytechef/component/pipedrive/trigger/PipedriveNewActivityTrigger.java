@@ -60,6 +60,7 @@ public class PipedriveNewActivityTrigger {
                         string("owner_name"),
                         integer("user_id"),
                         integer("company_id"))))
+        .help("", "https://docs.bytechef.io/reference/components/pipedrive_v1#new-activity")
         .webhookDisable(PipedriveNewActivityTrigger::webhookDisable)
         .webhookEnable(PipedriveNewActivityTrigger::webhookEnable)
         .webhookRequest(PipedriveNewActivityTrigger::webhookRequest);

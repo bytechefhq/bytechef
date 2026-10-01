@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new event.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/posthog_v1#create-event"
+    },
     "metadata": null,
     "name": "createEvent",
     "outputDefinition": {
@@ -182,7 +185,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new Project.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/posthog_v1#create-project"
+    },
     "metadata": null,
     "name": "createProject",
     "outputDefinition": {

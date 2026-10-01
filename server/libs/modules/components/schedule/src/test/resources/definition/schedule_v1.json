@@ -22,7 +22,10 @@
     "deprecated": null,
     "description": "Runs the workflow at a set time every day, or only on selected days of the week.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/schedule_v1#every-day"
+    },
     "listenerDisable": { },
     "listenerEnable": { },
     "name": "everyDay",
@@ -2917,7 +2920,10 @@
     "deprecated": null,
     "description": "Runs the workflow once each week on a chosen day at a specific time.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/schedule_v1#every-week"
+    },
     "listenerDisable": { },
     "listenerEnable": { },
     "name": "everyWeek",
@@ -5749,7 +5755,10 @@
     "deprecated": null,
     "description": "Runs the workflow once each month on a chosen day at a specific time.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/schedule_v1#every-month"
+    },
     "listenerDisable": { },
     "listenerEnable": { },
     "name": "everyMonth",
@@ -8553,7 +8562,10 @@
     "deprecated": null,
     "description": "Runs the workflow repeatedly at a fixed interval (for example, every 5 minutes or every 2 days).",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/schedule_v1#interval"
+    },
     "listenerDisable": { },
     "listenerEnable": { },
     "name": "interval",
@@ -11316,7 +11328,10 @@
     "deprecated": null,
     "description": "Runs the workflow on a custom schedule defined by a cron expression.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/schedule_v1#cron"
+    },
     "listenerDisable": { },
     "listenerEnable": { },
     "name": "cron",

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a temporary script that executes bash commands. The script is afterwards deleted.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bash_v1#execute"
+    },
     "metadata": null,
     "name": "execute",
     "outputDefinition": {

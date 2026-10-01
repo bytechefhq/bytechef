@@ -33,6 +33,7 @@ public class LoggerInfoAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(INFO)
         .title("Info")
         .properties(string(TEXT))
+        .help("", "https://docs.bytechef.io/reference/components/logger_v1#info")
         .perform(LoggerInfoAction::perform);
 
     protected static Object perform(

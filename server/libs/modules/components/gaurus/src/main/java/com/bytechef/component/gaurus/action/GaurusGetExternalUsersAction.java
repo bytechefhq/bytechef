@@ -58,7 +58,8 @@ public class GaurusGetExternalUsersAction {
                                     List.of(Map.<String, Object>ofEntries(Map.entry("bankSlug", "erste"),
                                         Map.entry("ibans", List.of("HR1210010051863000160")),
                                         Map.entry("consentJobStatus", "PENDING"))))))),
-                    Map.entry("errors", List.of()))));
+                    Map.entry("errors", List.of()))))
+        .help("", "https://docs.bytechef.io/reference/components/gaurus_v1#gets-external-users-for-provided-client-id");
 
     private GaurusGetExternalUsersAction() {
     }

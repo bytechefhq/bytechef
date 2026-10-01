@@ -96,6 +96,7 @@ public class IntercomSendMessageAction {
                             .description("The type of message that was sent."),
                         string("conversation_id")
                             .description("The associated conversation_id."))))
+        .help("", "https://docs.bytechef.io/reference/components/intercom_v1#send-message")
         .perform(IntercomSendMessageAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_MESSAGES_CONTEXT_FUNCTION =

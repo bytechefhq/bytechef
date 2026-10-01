@@ -63,6 +63,7 @@ public final class McpClientCallToolAction {
                             lookupDependsOnPaths, context) -> McpClientUtils.getToolProperties(
                                 inputParameters, connectionParameters, connectionDefinitionService, context)))
             .output()
+            .help("", "https://docs.bytechef.io/reference/components/mcp-client_v1#call-tool")
             .perform(
                 (ActionDefinition.PerformFunction) (inputParameters, connectionParameters, actionContext) -> perform(
                     inputParameters, connectionParameters, connectionDefinitionService, actionContext));

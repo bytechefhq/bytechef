@@ -44,7 +44,8 @@ public class PetstoreGetInventoryAction {
         .output(outputSchema(object().additionalProperties(integer())
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/petstore_v1#returns-pet-inventories-by-status");
 
     private PetstoreGetInventoryAction() {
     }

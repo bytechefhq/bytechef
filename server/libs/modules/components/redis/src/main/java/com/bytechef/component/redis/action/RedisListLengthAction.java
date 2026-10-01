@@ -45,6 +45,7 @@ public class RedisListLengthAction {
             outputSchema(
                 integer()
                     .description("The length of the list, or 0 if the key does not exist.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#list-length")
         .perform(RedisListLengthAction::perform);
 
     private RedisListLengthAction() {

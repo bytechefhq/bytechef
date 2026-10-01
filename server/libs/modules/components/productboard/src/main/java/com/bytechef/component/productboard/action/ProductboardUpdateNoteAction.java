@@ -84,7 +84,8 @@ public class ProductboardUpdateNoteAction {
                     .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/productboard_v1#update-note");
 
     private ProductboardUpdateNoteAction() {
     }

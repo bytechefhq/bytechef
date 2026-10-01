@@ -42,6 +42,7 @@ public class RedisInfoAction {
                 object()
                     .additionalProperties(string())
                     .description("Server information as key-value pairs.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#info")
         .perform(RedisInfoAction::perform);
 
     private RedisInfoAction() {

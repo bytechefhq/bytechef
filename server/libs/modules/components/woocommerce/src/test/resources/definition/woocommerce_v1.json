@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new coupon.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/woocommerce_v1#create-coupon"
+    },
     "metadata": null,
     "name": "createCoupon",
     "outputDefinition": {
@@ -2178,7 +2181,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new customer.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/woocommerce_v1#create-customer"
+    },
     "metadata": null,
     "name": "createCustomer",
     "outputDefinition": {
@@ -4820,7 +4826,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new order.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/woocommerce_v1#create-order"
+    },
     "metadata": null,
     "name": "createOrder",
     "outputDefinition": {
@@ -10879,7 +10888,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new product.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/woocommerce_v1#create-product"
+    },
     "metadata": null,
     "name": "createProduct",
     "outputDefinition": {
@@ -32696,7 +32708,10 @@
     "deprecated": null,
     "description": "Triggers when any order is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/woocommerce_v1#new-order"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newOrder",
@@ -33625,7 +33640,10 @@
     "deprecated": null,
     "description": "Triggers when any coupon is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/woocommerce_v1#new-coupon"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newCoupon",

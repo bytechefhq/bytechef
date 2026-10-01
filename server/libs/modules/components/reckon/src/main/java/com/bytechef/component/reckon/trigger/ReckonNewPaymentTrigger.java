@@ -63,6 +63,7 @@ public class ReckonNewPaymentTrigger {
                                         string(NAME)),
                                 date("paymentDate"),
                                 number("totalAmount")))))
+        .help("", "https://docs.bytechef.io/reference/components/reckon_v1#new-payment")
         .poll(ReckonNewPaymentTrigger::poll);
 
     private ReckonNewPaymentTrigger() {

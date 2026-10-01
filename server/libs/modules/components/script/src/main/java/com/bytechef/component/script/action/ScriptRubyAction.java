@@ -60,7 +60,8 @@ public class ScriptRubyAction {
                         .languageId("ruby")
                         .defaultValue("def perform(input, context)\n\treturn null;\nend")
                         .required(true))
-                .output(),
+                .output()
+                .help("", "https://docs.bytechef.io/reference/components/script_v1#ruby"),
             "ruby", polyglotEngine);
     }
 

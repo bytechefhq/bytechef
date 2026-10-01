@@ -65,6 +65,7 @@ public class RedisSetAction {
             outputSchema(
                 bool()
                     .description("True if the value was set successfully.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#set")
         .perform(RedisSetAction::perform);
 
     private RedisSetAction() {

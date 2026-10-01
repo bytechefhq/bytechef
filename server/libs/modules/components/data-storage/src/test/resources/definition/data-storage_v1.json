@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Append value to the end of a list. If the list does not exist, it will be created.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-storage_v1#append-value-to-list"
+    },
     "metadata": null,
     "name": "appendValueToList",
     "outputDefinition": null,
@@ -363,7 +366,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-storage_v1#atomic-increment"
+    },
     "metadata": null,
     "name": "atomicIncrement",
     "outputDefinition": {
@@ -506,7 +512,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Wait for a value under a specified key, until it's available.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-storage_v1#await-get-value"
+    },
     "metadata": null,
     "name": "awaitGetValue",
     "outputDefinition": {
@@ -863,7 +872,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Remove a value associated with a key in the specified scope.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-storage_v1#delete-value"
+    },
     "metadata": null,
     "name": "deleteValue",
     "outputDefinition": null,
@@ -940,7 +952,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete a value from the given index in a list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-storage_v1#delete-value-from-list"
+    },
     "metadata": null,
     "name": "deleteValueFromlist",
     "outputDefinition": null,
@@ -1036,7 +1051,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve all the currently existing keys from storage, along with their values within the provided scope.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-storage_v1#get-all-entrieskeys-and-values"
+    },
     "metadata": null,
     "name": "getAllEntries",
     "outputDefinition": {
@@ -1096,7 +1114,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve a previously assigned value within the specified scope using its corresponding key.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-storage_v1#get-value"
+    },
     "metadata": null,
     "name": "getValue",
     "outputDefinition": {
@@ -1434,7 +1455,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Set a value under a key, in the specified scope.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-storage_v1#set-value"
+    },
     "metadata": null,
     "name": "setValue",
     "outputDefinition": null,
@@ -1767,7 +1791,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Set value under a specified index in a list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-storage_v1#set-value-in-list"
+    },
     "metadata": null,
     "name": "setValueInList",
     "outputDefinition": null,

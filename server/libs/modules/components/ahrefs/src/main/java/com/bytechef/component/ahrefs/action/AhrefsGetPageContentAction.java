@@ -79,7 +79,8 @@ public class AhrefsGetPageContentAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/ahrefs_v1#get-page-content");
 
     private AhrefsGetPageContentAction() {
     }

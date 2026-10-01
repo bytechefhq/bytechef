@@ -45,6 +45,7 @@ public class IntercomGetContactAction {
                 .required(true)
                 .options((OptionsFunction<String>) IntercomUtils::getContactIdOptions))
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/intercom_v1#get-contact")
         .perform(IntercomGetContactAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {

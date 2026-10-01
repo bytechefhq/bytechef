@@ -74,6 +74,7 @@ public class MongoDBUpdateOneAction {
                             .description("The number of documents that were modified."),
                         string("upsertedId")
                             .description("The identifier of the upserted document, if any."))))
+        .help("", "https://docs.bytechef.io/reference/components/mongodb_v1#update-one")
         .perform(MongoDBUpdateOneAction::perform);
 
     private MongoDBUpdateOneAction() {

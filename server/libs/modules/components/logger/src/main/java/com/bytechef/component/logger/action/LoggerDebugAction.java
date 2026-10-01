@@ -33,6 +33,7 @@ public class LoggerDebugAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(DEBUG)
         .title("Debug")
         .properties(string(TEXT))
+        .help("", "https://docs.bytechef.io/reference/components/logger_v1#debug")
         .perform(LoggerDebugAction::perform);
 
     protected static Object perform(

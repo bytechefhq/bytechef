@@ -22,7 +22,10 @@
     "deprecated": null,
     "description": "Triggers when a new form request is received.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/form_v1#new-form-request"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newFormRequest",

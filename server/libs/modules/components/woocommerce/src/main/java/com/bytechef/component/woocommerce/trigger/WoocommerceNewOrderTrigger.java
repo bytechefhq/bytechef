@@ -43,6 +43,7 @@ public class WoocommerceNewOrderTrigger {
         .description("Triggers when any order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(outputSchema(TRIGGER_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/woocommerce_v1#new-order")
         .webhookEnable(WoocommerceNewOrderTrigger::webhookEnable)
         .webhookDisable(WoocommerceNewOrderTrigger::webhookDisable)
         .webhookRequest(WoocommerceNewOrderTrigger::webhookRequest);

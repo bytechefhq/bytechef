@@ -45,7 +45,8 @@ public class HubspotDeleteContactAction {
             .options((ActionDefinition.OptionsFunction<String>) HubspotUtils::getContactIdOptions)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)));
+                    "type", PropertyType.PATH)))
+        .help("", "https://docs.bytechef.io/reference/components/hubspot_v1#delete-contact");
 
     private HubspotDeleteContactAction() {
     }

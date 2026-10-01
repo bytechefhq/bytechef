@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new post for the authenticated user,",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/x_v1#create-post"
+    },
     "metadata": null,
     "name": "createPost",
     "outputDefinition": {
@@ -433,7 +436,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a specific post.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/x_v1#delete-post"
+    },
     "metadata": null,
     "name": "deletePost",
     "outputDefinition": {
@@ -609,7 +615,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Like a specific post by its ID.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/x_v1#like-post"
+    },
     "metadata": null,
     "name": "likePost",
     "outputDefinition": {
@@ -785,7 +794,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Reposts a specific post by its ID.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/x_v1#repost-post"
+    },
     "metadata": null,
     "name": "repostPost",
     "outputDefinition": {
@@ -1005,7 +1017,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a direct message to a specified user.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/x_v1#send-direct-message"
+    },
     "metadata": null,
     "name": "sendDirectMessage",
     "outputDefinition": {
@@ -2820,7 +2835,10 @@
     "deprecated": null,
     "description": "Triggers when a new post is created by a specific user.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/x_v1#new-post"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newPost",

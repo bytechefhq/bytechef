@@ -72,7 +72,8 @@ public class PipelinerCreateAccountAction {
                     .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/pipeliner_v1#create-account");
 
     private PipelinerCreateAccountAction() {
     }

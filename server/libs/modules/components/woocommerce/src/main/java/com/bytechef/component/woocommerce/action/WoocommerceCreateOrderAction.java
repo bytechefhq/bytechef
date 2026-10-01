@@ -182,6 +182,7 @@ public class WoocommerceCreateOrderAction {
                     "Define if the order is paid. It will set the status to processing and reduce stock items.")
                 .required(false))
         .output(outputSchema(ORDER_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/woocommerce_v1#create-order")
         .perform(WoocommerceCreateOrderAction::perform);
 
     private WoocommerceCreateOrderAction() {

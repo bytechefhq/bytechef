@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add a new pet to the store",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#add-a-new-pet-to-the-store"
+    },
     "metadata": {
       "path": "/pet",
       "mimeType": "application/json",
@@ -884,7 +887,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#create-user"
+    },
     "metadata": {
       "path": "/user",
       "mimeType": "application/json",
@@ -1491,7 +1497,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates list of users with given input array",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#creates-list-of-users-with-given-input-array"
+    },
     "metadata": {
       "path": "/user/createWithList",
       "mimeType": "application/json",
@@ -2167,7 +2176,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#delete-purchase-order-by-id"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/store/order/{orderId}"
@@ -2208,7 +2220,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "delete a pet",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#deletes-a-pet"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/pet/{petId}"
@@ -2273,7 +2288,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#delete-user"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/user/{username}"
@@ -2317,7 +2335,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Multiple status values can be provided with comma separated strings",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#finds-pets-by-status"
+    },
     "metadata": {
       "method": "GET",
       "path": "/pet/findByStatus"
@@ -2996,7 +3017,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#finds-pets-by-tags"
+    },
     "metadata": {
       "method": "GET",
       "path": "/pet/findByTags"
@@ -3684,7 +3708,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns a map of status codes to quantities",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#returns-pet-inventories-by-status"
+    },
     "metadata": {
       "method": "GET",
       "path": "/store/inventory"
@@ -3801,7 +3828,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#find-purchase-order-by-id"
+    },
     "metadata": {
       "method": "GET",
       "path": "/store/order/{orderId}"
@@ -4165,7 +4195,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns a single pet",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#find-pet-by-id"
+    },
     "metadata": {
       "method": "GET",
       "path": "/pet/{petId}"
@@ -4787,7 +4820,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#get-user-by-user-name"
+    },
     "metadata": {
       "method": "GET",
       "path": "/user/{username}"
@@ -5230,7 +5266,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Place a new order in the store",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#place-an-order-for-a-pet"
+    },
     "metadata": {
       "path": "/store/order",
       "mimeType": "application/json",
@@ -5719,7 +5758,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update an existing pet by Id",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#update-an-existing-pet"
+    },
     "metadata": {
       "path": "/pet",
       "mimeType": "application/json",
@@ -6597,7 +6639,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#updates-a-pet-in-the-store-with-form-data"
+    },
     "metadata": {
       "method": "POST",
       "path": "/pet/{petId}"
@@ -6686,7 +6731,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#update-user"
+    },
     "metadata": {
       "path": "/user/{username}",
       "mimeType": "application/json",
@@ -7317,7 +7365,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/petstore_v1#uploads-an-image"
+    },
     "metadata": {
       "path": "/pet/{petId}/uploadImage",
       "mimeType": "application/octet-stream",

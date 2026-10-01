@@ -65,6 +65,7 @@ public class MongoDBNewDocumentTrigger {
                 array()
                     .items(object())
                     .description("The list of new documents.")))
+        .help("", "https://docs.bytechef.io/reference/components/mongodb_v1#new-document")
         .poll(MongoDBNewDocumentTrigger::poll);
 
     private MongoDBNewDocumentTrigger() {

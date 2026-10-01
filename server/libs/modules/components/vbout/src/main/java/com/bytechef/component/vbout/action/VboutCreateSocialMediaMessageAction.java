@@ -58,6 +58,7 @@ public class VboutCreateSocialMediaMessageAction {
                 .optionsLookupDependsOn(CHANNEL)
                 .options((OptionsFunction<String>) VboutUtils::getChannelIdOptions)
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/vbout_v1#create-social-media-message")
         .perform(VboutCreateSocialMediaMessageAction::perform);
 
     private VboutCreateSocialMediaMessageAction() {

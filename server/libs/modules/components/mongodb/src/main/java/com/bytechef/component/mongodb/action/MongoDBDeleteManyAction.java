@@ -54,6 +54,7 @@ public class MongoDBDeleteManyAction {
                     .properties(
                         integer("deletedCount")
                             .description("The number of documents deleted."))))
+        .help("", "https://docs.bytechef.io/reference/components/mongodb_v1#delete-many")
         .perform(MongoDBDeleteManyAction::perform);
 
     private MongoDBDeleteManyAction() {

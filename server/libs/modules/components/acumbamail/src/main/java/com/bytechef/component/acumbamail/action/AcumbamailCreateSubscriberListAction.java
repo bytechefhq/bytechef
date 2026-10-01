@@ -73,6 +73,7 @@ public class AcumbamailCreateSubscriberListAction {
                 .description("Phone number of the company")
                 .required(false))
         .output(outputSchema(integer().description("ID of the created list.")))
+        .help("", "https://docs.bytechef.io/reference/components/acumbamail_v1#create-subscriber-list")
         .perform(AcumbamailCreateSubscriberListAction::perform);
 
     private AcumbamailCreateSubscriberListAction() {

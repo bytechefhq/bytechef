@@ -76,7 +76,8 @@ public class ClickupCreateListAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/clickup_v1#create-list");
 
     private ClickupCreateListAction() {
     }

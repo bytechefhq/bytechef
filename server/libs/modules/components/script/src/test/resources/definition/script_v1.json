@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Executes custom JavaScript code.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/script_v1#javascript"
+    },
     "metadata": null,
     "name": "javascript",
     "outputDefinition": {
@@ -264,7 +267,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Executes custom Python code.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/script_v1#python"
+    },
     "metadata": null,
     "name": "python",
     "outputDefinition": {
@@ -522,7 +528,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Executes custom Ruby code.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/script_v1#ruby"
+    },
     "metadata": null,
     "name": "ruby",
     "outputDefinition": {

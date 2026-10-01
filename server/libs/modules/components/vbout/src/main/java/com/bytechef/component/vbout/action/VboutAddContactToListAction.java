@@ -57,6 +57,7 @@ public class VboutAddContactToListAction {
                     option("Active", "active"),
                     option("Disactive", "disactive"))
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/vbout_v1#add-contact-to-list")
         .perform(VboutAddContactToListAction::perform);
 
     private VboutAddContactToListAction() {

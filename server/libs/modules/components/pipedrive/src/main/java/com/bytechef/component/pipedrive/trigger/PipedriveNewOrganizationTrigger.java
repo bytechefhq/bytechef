@@ -47,6 +47,7 @@ public class PipedriveNewOrganizationTrigger {
         .description("Trigger off whenever a new organization is added.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(outputSchema(ORGANIZATION_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/pipedrive_v1#new-organization")
         .webhookDisable(PipedriveNewOrganizationTrigger::webhookDisable)
         .webhookEnable(PipedriveNewOrganizationTrigger::webhookEnable)
         .webhookRequest(PipedriveNewOrganizationTrigger::webhookRequest);

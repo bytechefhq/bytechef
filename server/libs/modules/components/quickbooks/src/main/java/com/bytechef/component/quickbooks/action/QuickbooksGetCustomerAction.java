@@ -46,6 +46,7 @@ public class QuickbooksGetCustomerAction {
                 .options(QuickbooksUtils.getOptions(Entity.CUSTOMER, null))
                 .required(true))
         .output(outputSchema(CUSTOMER_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/quickbooks_v1#get-customer")
         .perform(QuickbooksGetCustomerAction::perform);
 
     private QuickbooksGetCustomerAction() {

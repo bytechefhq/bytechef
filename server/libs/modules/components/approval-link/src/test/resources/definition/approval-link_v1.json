@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates approval/disapproval links.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/approval-link_v1#create-approval-links"
+    },
     "metadata": null,
     "name": "createApprovalLinks",
     "outputDefinition": {

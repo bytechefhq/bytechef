@@ -48,6 +48,7 @@ public class FileStorageWriteAction {
                 .description("Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
         .output(outputSchema(fileEntry().description("File entry with the written data.")))
+        .help("", "https://docs.bytechef.io/reference/components/file-storage_v1#write-to-file")
         .perform(FileStorageWriteAction::perform);
 
     protected static FileEntry perform(

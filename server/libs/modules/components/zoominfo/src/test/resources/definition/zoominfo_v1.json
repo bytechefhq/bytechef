@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Enrich company details.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoominfo_v1#enrich-company"
+    },
     "metadata": null,
     "name": "enrichCompany",
     "outputDefinition": {
@@ -269,7 +272,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Enrich contact details.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoominfo_v1#enrich-contact"
+    },
     "metadata": null,
     "name": "enrichContact",
     "outputDefinition": {
@@ -551,7 +557,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Search company by specific criteria.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoominfo_v1#search-company"
+    },
     "metadata": null,
     "name": "searchCompany",
     "outputDefinition": {
@@ -1381,7 +1390,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Search contact by specific criteria.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoominfo_v1#search-contact"
+    },
     "metadata": null,
     "name": "searchContact",
     "outputDefinition": {

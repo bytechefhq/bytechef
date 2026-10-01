@@ -77,6 +77,7 @@ public class XeroCreateInvoiceAction {
                 .description("Reference number of the invoice.")
                 .required(false))
         .output(outputSchema(INVOICE_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/xero_v1#create-invoice")
         .perform(XeroCreateInvoiceAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_INVOICES_CONTEXT_FUNCTION =

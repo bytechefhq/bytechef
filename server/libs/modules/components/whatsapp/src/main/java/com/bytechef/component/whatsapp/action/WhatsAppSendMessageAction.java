@@ -71,6 +71,7 @@ public class WhatsAppSendMessageAction {
                         object(MESSAGES)
                             .properties(
                                 string(ID)))))
+        .help("", "https://docs.bytechef.io/reference/components/whatsapp_v1#send-message")
         .perform(WhatsAppSendMessageAction::perform);
 
     private WhatsAppSendMessageAction() {

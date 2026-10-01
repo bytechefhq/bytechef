@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts the response to chat request.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/chat_v1#response-to-chat-request"
+    },
     "metadata": null,
     "name": "responseToRequest",
     "outputDefinition": {
@@ -191,7 +194,10 @@
     "deprecated": null,
     "description": "A new chat request comes from the chat interface.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/chat_v1#new-chat-request"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newChatRequest",

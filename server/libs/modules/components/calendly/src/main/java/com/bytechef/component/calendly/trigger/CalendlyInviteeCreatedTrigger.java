@@ -51,6 +51,7 @@ public class CalendlyInviteeCreatedTrigger {
                     option("Organization", "organization"))
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/calendly_v1#invitee-created")
         .webhookDisable(CalendlyInviteeCreatedTrigger::webhookDisable)
         .webhookEnable(CalendlyInviteeCreatedTrigger::webhookEnable)
         .webhookRequest(CalendlyInviteeCreatedTrigger::webhookRequest);

@@ -117,6 +117,7 @@ public class VarSetAction {
                 .displayCondition("type == '%s'".formatted(ValueType.TIME))
                 .required(true))
         .output(VarSetAction::output)
+        .help("", "https://docs.bytechef.io/reference/components/var_v1#set-value")
         .perform(VarSetAction::perform);
 
     protected static OutputResponse output(

@@ -223,6 +223,7 @@ public class NewFormRequestTrigger {
                                 .required(false)))
                 .required(true))
         .output(NewFormRequestTrigger::getOutput)
+        .help("", "https://docs.bytechef.io/reference/components/form_v1#new-form-request")
         .webhookRequest(NewFormRequestTrigger::getWebhookResult);
 
     private static final List<String> BOT_KEYWORDS = List.of(

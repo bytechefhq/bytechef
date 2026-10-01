@@ -68,6 +68,7 @@ public class FtpUploadFileAction {
                         string(REMOTE_PATH).description("The path where the file was uploaded."),
                         bool(SUCCESS).description("Whether the upload was successful."))),
             sampleOutput(Map.of(REMOTE_PATH, "/uploads/document.pdf", SUCCESS, true)))
+        .help("", "https://docs.bytechef.io/reference/components/ftp_v1#upload-file")
         .perform(FtpUploadFileAction::perform);
 
     private FtpUploadFileAction() {

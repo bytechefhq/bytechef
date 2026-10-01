@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a contact with the given properties.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#create-contact"
+    },
     "metadata": {
       "path": "/crm/v3/objects/contacts",
       "mimeType": "application/json",
@@ -589,7 +592,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new deal.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#create-deal"
+    },
     "metadata": {
       "path": "/crm/v3/objects/deals",
       "mimeType": "application/json",
@@ -1166,7 +1172,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a new list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#create-list"
+    },
     "metadata": {
       "path": "/crm/lists/2026-03",
       "mimeType": "application/json",
@@ -2343,7 +2352,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Move Contact to the recycling bin.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#delete-contact"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/crm/v3/objects/contacts/{contactId}"
@@ -2390,7 +2402,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get contact details.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#get-contact"
+    },
     "metadata": {
       "method": "GET",
       "path": "/crm/v3/objects/contacts/{contactId}"
@@ -2844,7 +2859,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get all contacts.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#get-contacts"
+    },
     "metadata": {
       "method": "GET",
       "path": "/crm/v3/objects/contacts"
@@ -3353,7 +3371,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets ticket details.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#get-ticket"
+    },
     "metadata": {
       "method": "GET",
       "path": "/crm/v3/objects/tickets/{ticketId}"
@@ -3807,7 +3828,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update Contact properties.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#update-contact"
+    },
     "metadata": {
       "path": "/crm/v3/objects/contacts/{contactId}",
       "mimeType": "application/json",
@@ -8908,7 +8932,10 @@
     "deprecated": null,
     "description": "Triggers when new contact is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#new-contact"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newContact",
@@ -9179,7 +9206,10 @@
     "deprecated": null,
     "description": "Triggers when a new deal is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#new-deal"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newDeal",
@@ -9450,7 +9480,10 @@
     "deprecated": null,
     "description": "Triggers when new ticket is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hubspot_v1#new-ticket"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newTicket",

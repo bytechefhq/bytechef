@@ -59,6 +59,7 @@ public class RedisIncrementAction {
             outputSchema(
                 integer()
                     .description("The new value after incrementing.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#increment")
         .perform(RedisIncrementAction::perform);
 
     private RedisIncrementAction() {

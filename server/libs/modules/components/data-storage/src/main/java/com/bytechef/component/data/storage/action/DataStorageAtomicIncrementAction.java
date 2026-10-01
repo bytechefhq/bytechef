@@ -63,6 +63,7 @@ public class DataStorageAtomicIncrementAction {
                 .defaultValue(1)
                 .required(true))
         .output(outputSchema(integer()))
+        .help("", "https://docs.bytechef.io/reference/components/data-storage_v1#atomic-increment")
         .perform(DataStorageAtomicIncrementAction::perform);
 
     protected static Integer perform(

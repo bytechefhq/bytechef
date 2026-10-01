@@ -130,6 +130,7 @@ public class DataStorageAwaitGetValueAction {
                 .maxValue(300)
                 .required(true))
         .output(DataStorageAwaitGetValueAction::output)
+        .help("", "https://docs.bytechef.io/reference/components/data-storage_v1#await-get-value")
         .perform(DataStorageAwaitGetValueAction::perform);
 
     protected static OutputResponse output(

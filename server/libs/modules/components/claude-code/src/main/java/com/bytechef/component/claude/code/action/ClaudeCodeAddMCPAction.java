@@ -87,6 +87,7 @@ public class ClaudeCodeAddMCPAction {
                         "The output of the executed bash commands, including any standard output or error messages " +
                             "generated during execution.")),
             sampleOutput("Sample result"))
+        .help("", "https://docs.bytechef.io/reference/components/claude-code_v1#add-mcp-server")
         .perform(ClaudeCodeAddMCPAction::perform);
 
     protected static String perform(

@@ -47,6 +47,7 @@ public class PipedriveUpdatedPersonTrigger {
         .description("Trigger off whenever an existing person is updated.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(outputSchema(PERSON_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/pipedrive_v1#updated-person")
         .webhookDisable(PipedriveUpdatedPersonTrigger::webhookDisable)
         .webhookEnable(PipedriveUpdatedPersonTrigger::webhookEnable)
         .webhookRequest(PipedriveUpdatedPersonTrigger::webhookRequest);

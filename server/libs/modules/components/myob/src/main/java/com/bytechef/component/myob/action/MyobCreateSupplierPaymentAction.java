@@ -54,6 +54,7 @@ public class MyobCreateSupplierPaymentAction {
                 .options((OptionsFunction<String>) MyobUtils::getSupplierOptions)
                 .optionsLookupDependsOn(COMPANY_FILE)
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/myob_v1#create-supplier-payment")
         .perform(MyobCreateSupplierPaymentAction::perform);
 
     private MyobCreateSupplierPaymentAction() {

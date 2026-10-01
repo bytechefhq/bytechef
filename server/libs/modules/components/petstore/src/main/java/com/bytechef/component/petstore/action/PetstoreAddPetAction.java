@@ -92,7 +92,8 @@ public class PetstoreAddPetAction {
         .output(outputSchema(object().properties(PetstorePetProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/petstore_v1#add-a-new-pet-to-the-store");
 
     private PetstoreAddPetAction() {
     }

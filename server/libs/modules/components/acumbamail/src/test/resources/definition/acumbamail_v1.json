@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add a subscriber to a list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/acumbamail_v1#add-subscriber"
+    },
     "metadata": null,
     "name": "addSubscriber",
     "outputDefinition": {
@@ -92,7 +95,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Removes a subscriber from a list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/acumbamail_v1#delete-subscriber"
+    },
     "metadata": null,
     "name": "deleteSubscriber",
     "outputDefinition": null,
@@ -156,7 +162,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new subscribers list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/acumbamail_v1#create-subscriber-list"
+    },
     "metadata": null,
     "name": "createSubscriberList",
     "outputDefinition": {
@@ -374,7 +383,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a list of subscribers.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/acumbamail_v1#delete-subscriber-list"
+    },
     "metadata": null,
     "name": "deleteSubscriberList",
     "outputDefinition": null,

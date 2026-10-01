@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new customer.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/myob_v1#create-customer"
+    },
     "metadata": null,
     "name": "createCustomer",
     "outputDefinition": null,
@@ -379,7 +382,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new customer payment.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/myob_v1#create-customer-payment"
+    },
     "metadata": null,
     "name": "createCustomerPayment",
     "outputDefinition": null,
@@ -498,7 +504,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new supplier.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/myob_v1#create-supplier"
+    },
     "metadata": null,
     "name": "createSupplier",
     "outputDefinition": null,
@@ -871,7 +880,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new supplier payment.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/myob_v1#create-supplier-payment"
+    },
     "metadata": null,
     "name": "createSupplierPayment",
     "outputDefinition": null,

@@ -338,6 +338,7 @@ public class NotionAddBlockToPageAction {
                                 .required(true)))
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/notion_v1#add-block-to-page")
         .perform(NotionAddBlockToPageAction::perform);
 
     private NotionAddBlockToPageAction() {

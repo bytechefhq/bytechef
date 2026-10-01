@@ -86,7 +86,8 @@ public class HubspotCreateDealAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/hubspot_v1#create-deal");
 
     private HubspotCreateDealAction() {
     }

@@ -91,6 +91,7 @@ public class JsonFileWriteAction {
                 .defaultValue("file.json")
                 .advancedOption(true))
         .output(outputSchema(fileEntry()))
+        .help("", "https://docs.bytechef.io/reference/components/json-file_v1#write-to-file")
         .perform(JsonFileWriteAction::perform);
 
     private static String getDefaultFileName(FileType fileType, String defaultFilename) {

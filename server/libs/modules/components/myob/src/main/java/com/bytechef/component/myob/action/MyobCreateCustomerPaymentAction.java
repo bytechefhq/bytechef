@@ -54,6 +54,7 @@ public class MyobCreateCustomerPaymentAction {
                 .options((OptionsFunction<String>) MyobUtils::getCustomerOptions)
                 .optionsLookupDependsOn(COMPANY_FILE)
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/myob_v1#create-customer-payment")
         .perform(MyobCreateCustomerPaymentAction::perform);
 
     private MyobCreateCustomerPaymentAction() {

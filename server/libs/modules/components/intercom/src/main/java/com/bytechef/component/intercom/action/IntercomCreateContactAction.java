@@ -76,6 +76,7 @@ public class IntercomCreateContactAction {
                 .maxLength(500)
                 .required(false))
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/intercom_v1#create-contact")
         .perform(IntercomCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =

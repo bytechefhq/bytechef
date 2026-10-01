@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a new deal.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#add-deal"
+    },
     "metadata": {
       "path": "/deals",
       "mimeType": "application/json",
@@ -1050,7 +1053,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a lead. A lead always has to be linked to a person or an organization or both.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#add-lead"
+    },
     "metadata": {
       "path": "/leads",
       "mimeType": "application/json",
@@ -1725,7 +1731,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a new organization.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#add-organization"
+    },
     "metadata": {
       "path": "/organizations",
       "mimeType": "application/json",
@@ -2180,7 +2189,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a new person.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#add-person"
+    },
     "metadata": {
       "path": "/persons",
       "mimeType": "application/json",
@@ -3511,7 +3523,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Marks a deal as deleted. After 30 days, the deal will be permanently deleted.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#delete-deal"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/deals/{deal_id}"
@@ -3692,7 +3707,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes a specific lead.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#delete-lead"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/leads/{lead_id}"
@@ -3882,7 +3900,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Marks an organization as deleted. After 30 days, the organization will be permanently deleted.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#delete-organization"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/organizations/{organization_id}"
@@ -4063,7 +4084,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Marks a person as deleted. After 30 days, the person will be permanently deleted.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#delete-person"
+    },
     "metadata": {
       "method": "DELETE",
       "path": "/persons/{person_id}"
@@ -4244,7 +4268,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the details of a specific deal.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#get-details-of-deal"
+    },
     "metadata": {
       "method": "GET",
       "path": "/deals/{deal_id}"
@@ -5011,7 +5038,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all deals.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#get-deals"
+    },
     "metadata": {
       "method": "GET",
       "path": "/deals"
@@ -5936,7 +5966,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns details of a specific lead. ",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#get-lead-details"
+    },
     "metadata": {
       "method": "GET",
       "path": "/leads/{lead_id}"
@@ -6402,7 +6435,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#get-leads"
+    },
     "metadata": {
       "method": "GET",
       "path": "/leads"
@@ -7075,7 +7111,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the details of an organization.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#get-details-of-organization"
+    },
     "metadata": {
       "method": "GET",
       "path": "/organizations/{organization_id}"
@@ -7504,7 +7543,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all organizations.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#get-all-organizations"
+    },
     "metadata": {
       "method": "GET",
       "path": "/organizations"
@@ -8047,7 +8089,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns the details of a person. This also returns some additional fields which are not present when asking for all persons.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#get-details-of-person"
+    },
     "metadata": {
       "method": "GET",
       "path": "/persons/{person_id}"
@@ -9078,7 +9123,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all persons.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#get-persons"
+    },
     "metadata": {
       "method": "GET",
       "path": "/persons"
@@ -10223,7 +10271,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches all deals by title, notes and/or custom fields.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#search-deals"
+    },
     "metadata": {
       "method": "GET",
       "path": "/deals/search"
@@ -11296,7 +11347,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches all leads by title, notes and/or custom fields.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#search-leads"
+    },
     "metadata": {
       "method": "GET",
       "path": "/leads/search"
@@ -11979,7 +12033,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#search-organizations"
+    },
     "metadata": {
       "method": "GET",
       "path": "/organizations/search"
@@ -12556,7 +12613,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches all persons by name, email, phone, notes and/or custom fields.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#search-persons"
+    },
     "metadata": {
       "method": "GET",
       "path": "/persons/search"
@@ -27542,7 +27602,10 @@
     "deprecated": null,
     "description": "Trigger off whenever a new activity is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#new-activity"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newActivity",
@@ -27949,7 +28012,10 @@
     "deprecated": null,
     "description": "Trigger off whenever a new deal is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#new-deal"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newDeal",
@@ -28394,7 +28460,10 @@
     "deprecated": null,
     "description": "Trigger off whenever a new organization is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#new-organization"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newOrganization",
@@ -28751,7 +28820,10 @@
     "deprecated": null,
     "description": "Trigger off whenever a new person is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#new-person"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newPerson",
@@ -29456,7 +29528,10 @@
     "deprecated": null,
     "description": "Trigger off whenever an existing deal is updated.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#updated-deal"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "updatedDeal",
@@ -29901,7 +29976,10 @@
     "deprecated": null,
     "description": "Trigger off whenever an existing organization is updated.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#updated-organization"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "updatedOrganization",
@@ -30258,7 +30336,10 @@
     "deprecated": null,
     "description": "Trigger off whenever an existing person is updated.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pipedrive_v1#updated-person"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "updatedPerson",

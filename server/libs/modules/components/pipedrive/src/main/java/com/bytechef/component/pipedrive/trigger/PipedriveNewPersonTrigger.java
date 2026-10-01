@@ -47,6 +47,7 @@ public class PipedriveNewPersonTrigger {
         .description("Trigger off whenever a new person is added.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(outputSchema(PERSON_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/pipedrive_v1#new-person")
         .webhookDisable(PipedriveNewPersonTrigger::webhookDisable)
         .webhookEnable(PipedriveNewPersonTrigger::webhookEnable)
         .webhookRequest(PipedriveNewPersonTrigger::webhookRequest);

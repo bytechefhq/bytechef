@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts the XML string to object/array.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xml-helper_v1#convert-from-xml-string"
+    },
     "metadata": null,
     "name": "parse",
     "outputDefinition": {
@@ -50,7 +53,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Writes the object/array to a XML string.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/xml-helper_v1#convert-to-xml-string"
+    },
     "metadata": null,
     "name": "stringify",
     "outputDefinition": {

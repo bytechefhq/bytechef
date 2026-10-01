@@ -99,6 +99,7 @@ public class XlsxFileReadAction {
                 .defaultValue(false)
                 .advancedOption(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/xlsx-file_v1#read-from-file")
         .perform(XlsxFileReadAction::perform);
 
     protected static List<Map<String, ?>> perform(

@@ -38,5 +38,6 @@ public class HttpClientPutAction {
                 HttpClientConstants.COMMON_PROPERTIES,
                 HttpClientActionUtils.options(true)))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/http-client_v1#put")
         .perform(HttpClientActionUtils.getPerform(RequestMethod.PUT));
 }

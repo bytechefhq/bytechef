@@ -84,6 +84,7 @@ public class ZoominfoSearchContactAction {
             outputSchema(
                 array()
                     .items(CONTACT_OUTPUT_PROPERTY)))
+        .help("", "https://docs.bytechef.io/reference/components/zoominfo_v1#search-contact")
         .perform(ZoominfoSearchContactAction::perform);
 
     private ZoominfoSearchContactAction() {

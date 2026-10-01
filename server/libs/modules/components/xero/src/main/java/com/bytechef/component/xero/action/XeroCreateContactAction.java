@@ -176,6 +176,7 @@ public class XeroCreateContactAction {
                 .maxItems(2)
                 .required(false))
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/xero_v1#create-contact")
         .perform(XeroCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =

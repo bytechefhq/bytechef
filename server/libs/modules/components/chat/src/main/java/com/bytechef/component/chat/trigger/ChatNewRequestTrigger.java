@@ -68,6 +68,7 @@ public class ChatNewRequestTrigger {
                         string(MESSAGE),
                         array(ATTACHMENTS)
                             .items(fileEntry()))))
+        .help("", "https://docs.bytechef.io/reference/components/chat_v1#new-chat-request")
         .webhookRequest(ChatNewRequestTrigger::getWebhookResult);
 
     protected static Map<String, ?> getWebhookResult(

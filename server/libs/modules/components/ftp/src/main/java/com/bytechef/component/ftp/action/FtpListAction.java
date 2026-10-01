@@ -72,6 +72,7 @@ public class FtpListAction {
                                 string(TYPE).description("Type: 'file' or 'directory'."),
                                 integer(SIZE).description("Size in bytes (for files)."),
                                 string(MODIFIED_AT).description("Last modified timestamp.")))))
+        .help("", "https://docs.bytechef.io/reference/components/ftp_v1#list-directory")
         .perform(FtpListAction::perform);
 
     private FtpListAction() {

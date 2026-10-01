@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new opportunity.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/affinity_v1#create-opportunity"
+    },
     "metadata": {
       "path": "/opportunities",
       "mimeType": "application/json",
@@ -199,7 +202,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new organization.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/affinity_v1#create-organization"
+    },
     "metadata": {
       "path": "/organizations",
       "mimeType": "application/json",
@@ -460,7 +466,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new person.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/affinity_v1#create-person"
+    },
     "metadata": {
       "path": "/persons",
       "mimeType": "application/json",

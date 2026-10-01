@@ -57,6 +57,7 @@ public class RedisPushAction {
             outputSchema(
                 integer()
                     .description("The length of the list after the push.")))
+        .help("", "https://docs.bytechef.io/reference/components/redis_v1#push")
         .perform(RedisPushAction::perform);
 
     private RedisPushAction() {

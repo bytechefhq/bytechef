@@ -60,7 +60,8 @@ public class ScriptPythonAction {
                         .languageId("python")
                         .defaultValue("def perform(input, context):\n\treturn None")
                         .required(true))
-                .output(),
+                .output()
+                .help("", "https://docs.bytechef.io/reference/components/script_v1#python"),
             "python", polyglotEngine);
     }
 

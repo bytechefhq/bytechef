@@ -55,6 +55,7 @@ public class RabbitMqNewMessageTrigger {
                 .description("The name of the queue to read from")
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/rabbitmq_v1#new-message")
         .listenerEnable(RabbitMqNewMessageTrigger::listenerEnable)
         .listenerDisable(RabbitMqNewMessageTrigger::listenerDisable);
 

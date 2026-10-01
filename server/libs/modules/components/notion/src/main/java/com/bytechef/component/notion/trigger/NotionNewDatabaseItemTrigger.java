@@ -52,6 +52,7 @@ public class NotionNewDatabaseItemTrigger {
                 .options((OptionsFunction<String>) NotionUtils::getDatabaseIdOptions)
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/notion_v1#new-database-item")
         .poll(NotionNewDatabaseItemTrigger::poll);
 
     protected static PollOutput poll(

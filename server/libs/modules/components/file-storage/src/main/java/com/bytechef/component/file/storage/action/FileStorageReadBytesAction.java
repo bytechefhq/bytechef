@@ -42,6 +42,7 @@ public class FileStorageReadBytesAction {
                 .required(true))
         .output(outputSchema(array().description("File content.")
             .items(integer())))
+        .help("", "https://docs.bytechef.io/reference/components/file-storage_v1#read-from-file-as-byte-array")
         .perform(FileStorageReadBytesAction::perform);
 
     protected static Object perform(

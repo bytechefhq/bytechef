@@ -77,7 +77,8 @@ public class AffinityCreatePersonAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/affinity_v1#create-person");
 
     private AffinityCreatePersonAction() {
     }

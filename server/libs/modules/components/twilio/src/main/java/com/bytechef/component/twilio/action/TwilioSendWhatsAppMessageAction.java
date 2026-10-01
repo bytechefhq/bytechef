@@ -91,6 +91,7 @@ public class TwilioSendWhatsAppMessageAction {
                 .displayCondition("%s == false".formatted(USE_TEMPLATE))
                 .required(true))
         .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/twilio_v1#send-whatsapp-message")
         .perform(TwilioSendWhatsAppMessageAction::perform);
 
     private TwilioSendWhatsAppMessageAction() {

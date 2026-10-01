@@ -81,6 +81,7 @@ public class OdsFileWriteAction {
                 .defaultValue("file.ods")
                 .advancedOption(true))
         .output(outputSchema(fileEntry()))
+        .help("", "https://docs.bytechef.io/reference/components/ods-file_v1#write-to-file")
         .perform(OdsFileWriteAction::perform);
 
     private static Object[] getHeaderValues(Set<String> names) {

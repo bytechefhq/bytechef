@@ -62,6 +62,7 @@ public class VboutUpdateContactAction {
                     option("Active", "active"),
                     option("Disactive", "disactive"))
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/vbout_v1#update-contact")
         .perform(VboutUpdateContactAction::perform);
 
     private VboutUpdateContactAction() {

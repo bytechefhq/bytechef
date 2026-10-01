@@ -64,6 +64,7 @@ public class MyobCreateCustomerAction {
                 .defaultValue(true)
                 .required(true),
             ADDRESSES_PROPERTY)
+        .help("", "https://docs.bytechef.io/reference/components/myob_v1#create-customer")
         .perform(MyobCreateCustomerAction::perform);
 
     private MyobCreateCustomerAction() {

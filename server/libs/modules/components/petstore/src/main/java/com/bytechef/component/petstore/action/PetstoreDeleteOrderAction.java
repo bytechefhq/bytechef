@@ -44,7 +44,8 @@ public class PetstoreDeleteOrderAction {
             .required(true)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)));
+                    "type", PropertyType.PATH)))
+        .help("", "https://docs.bytechef.io/reference/components/petstore_v1#delete-purchase-order-by-id");
 
     private PetstoreDeleteOrderAction() {
     }

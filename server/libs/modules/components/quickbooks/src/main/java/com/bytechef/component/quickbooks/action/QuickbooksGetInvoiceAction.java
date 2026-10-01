@@ -61,6 +61,7 @@ public class QuickbooksGetInvoiceAction {
                                     .properties(
                                         string("name")),
                                 string("Balance")))))
+        .help("", "https://docs.bytechef.io/reference/components/quickbooks_v1#get-invoice")
         .perform(QuickbooksGetInvoiceAction::perform);
 
     private QuickbooksGetInvoiceAction() {

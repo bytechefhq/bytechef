@@ -95,6 +95,7 @@ public class ZoominfoEnrichCompanyAction {
                 .options((OptionsFunction<String>) ZoominfoUtils::getCompanyFieldOptions)
                 .required(false))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/zoominfo_v1#enrich-company")
         .perform(ZoominfoEnrichCompanyAction::perform);
 
     private ZoominfoEnrichCompanyAction() {

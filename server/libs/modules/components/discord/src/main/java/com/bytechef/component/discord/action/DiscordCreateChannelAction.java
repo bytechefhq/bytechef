@@ -107,7 +107,8 @@ public class DiscordCreateChannelAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/discord_v1#create-channel");
 
     private DiscordCreateChannelAction() {
     }

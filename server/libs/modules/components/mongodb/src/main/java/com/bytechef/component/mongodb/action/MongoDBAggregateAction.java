@@ -57,6 +57,7 @@ public class MongoDBAggregateAction {
                 array()
                     .items(object())
                     .description("The list of documents produced by the aggregation pipeline.")))
+        .help("", "https://docs.bytechef.io/reference/components/mongodb_v1#aggregate")
         .perform(MongoDBAggregateAction::perform);
 
     private MongoDBAggregateAction() {

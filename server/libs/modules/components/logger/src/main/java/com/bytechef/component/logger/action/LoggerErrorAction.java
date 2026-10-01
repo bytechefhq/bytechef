@@ -33,6 +33,7 @@ public class LoggerErrorAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ERROR)
         .title("Error")
         .properties(string(TEXT))
+        .help("", "https://docs.bytechef.io/reference/components/logger_v1#error")
         .perform(LoggerErrorAction::perform);
 
     protected static Object perform(

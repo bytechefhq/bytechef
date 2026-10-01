@@ -119,7 +119,8 @@ public class AhrefsGetMetricsAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/ahrefs_v1#get-metrics");
 
     private AhrefsGetMetricsAction() {
     }

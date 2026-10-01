@@ -87,6 +87,7 @@ public class JsonFileReadAction {
                 .displayCondition("%s == true".formatted(IS_ARRAY))
                 .advancedOption(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/json-file_v1#read-from-file")
         .perform(JsonFileReadAction::perform);
 
     protected static FileType getFileType(Parameters inputParameters) {

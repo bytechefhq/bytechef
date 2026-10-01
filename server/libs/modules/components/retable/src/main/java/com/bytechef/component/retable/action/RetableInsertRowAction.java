@@ -119,6 +119,7 @@ public class RetableInsertRowAction {
                                                     .description("Column title."),
                                                 string("cell_value")
                                                     .description("Cell value.")))))))
+        .help("", "https://docs.bytechef.io/reference/components/retable_v1#insert-row")
         .perform(RetableInsertRowAction::perform);
 
     private RetableInsertRowAction() {

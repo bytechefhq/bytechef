@@ -47,6 +47,7 @@ public class SalesforceDeleteRecordAction {
                 .options((OptionsFunction<String>) SalesforceUtils::getRecordIdOptions)
                 .optionsLookupDependsOn(OBJECT)
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/salesforce_v1#delete-record")
         .perform(SalesforceDeleteRecordAction::perform);
 
     private SalesforceDeleteRecordAction() {

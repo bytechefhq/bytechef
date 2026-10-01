@@ -60,7 +60,8 @@ public class ScriptJavaScriptAction {
                         .languageId("javascript")
                         .defaultValue("function perform(input, context) {\n\treturn null;\n}")
                         .required(true))
-                .output(),
+                .output()
+                .help("", "https://docs.bytechef.io/reference/components/script_v1#javascript"),
             "js", polyglotEngine);
     }
 

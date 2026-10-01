@@ -63,6 +63,7 @@ public class FileStorageDownloadAction {
                 .description("Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
         .output(outputSchema(fileEntry().description("Downloaded file.")))
+        .help("", "https://docs.bytechef.io/reference/components/file-storage_v1#download-file")
         .perform(FileStorageDownloadAction::perform);
 
     /**

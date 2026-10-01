@@ -56,7 +56,9 @@ public class PetstoreUpdatePetWithFormAction {
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", PropertyType.QUERY)));
+                        "type", PropertyType.QUERY)))
+        .help("",
+            "https://docs.bytechef.io/reference/components/petstore_v1#updates-a-pet-in-the-store-with-form-data");
 
     private PetstoreUpdatePetWithFormAction() {
     }

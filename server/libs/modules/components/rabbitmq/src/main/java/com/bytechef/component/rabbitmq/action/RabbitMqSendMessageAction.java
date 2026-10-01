@@ -50,6 +50,7 @@ public class RabbitMqSendMessageAction {
             object(MESSAGE)
                 .description("The name of the queue to read from")
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/rabbitmq_v1#send-message")
         .perform(RabbitMqSendMessageAction::perform);
 
     protected static Object perform(

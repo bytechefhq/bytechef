@@ -66,6 +66,7 @@ public class XNewPostTrigger {
                         array("edit_history_tweet_ids")
                             .description("A list of Tweet Ids in this Tweet chain.")
                             .items(string()))))
+        .help("", "https://docs.bytechef.io/reference/components/x_v1#new-post")
         .poll(XNewPostTrigger::poll);
 
     private XNewPostTrigger() {

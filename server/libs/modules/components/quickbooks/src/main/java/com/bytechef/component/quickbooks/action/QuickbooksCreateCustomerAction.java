@@ -76,6 +76,7 @@ public class QuickbooksCreateCustomerAction {
                 .maxLength(100)
                 .required(false))
         .output(outputSchema(CUSTOMER_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/quickbooks_v1#create-customer")
         .perform(QuickbooksCreateCustomerAction::perform);
 
     private QuickbooksCreateCustomerAction() {

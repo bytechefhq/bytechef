@@ -69,6 +69,7 @@ public class ReckonNewInvoiceTrigger {
                                         object()
                                             .properties(
                                                 integer("lineNumber")))))))
+        .help("", "https://docs.bytechef.io/reference/components/reckon_v1#new-invoice")
         .poll(ReckonNewInvoiceTrigger::poll);
 
     private ReckonNewInvoiceTrigger() {
