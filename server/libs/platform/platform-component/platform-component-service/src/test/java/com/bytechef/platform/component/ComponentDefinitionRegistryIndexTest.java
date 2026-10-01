@@ -18,9 +18,11 @@ package com.bytechef.platform.component;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.slack.SlackComponentHandler;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ComponentHandlerEntry;
 import com.bytechef.platform.component.index.ComponentIndex;
 import com.bytechef.platform.component.index.ComponentIndexGenerator;
@@ -88,7 +90,7 @@ public class ComponentDefinitionRegistryIndexTest {
                     "slack", version, "Slack",
                     "Slack is a messaging platform for teams to communicate and collaborate.",
                     "path:assets/slack.svg", null, null,
-                    new ComponentIndex.ConnectionSummary(1, true), actionSummaries, null, null,
+                    new ComponentIndex.ConnectionSummary(1, true), actionSummaries, null, null, null,
                     List.of("channel"), SlackComponentHandler.class.getName(), "default")));
     }
 
@@ -199,7 +201,7 @@ public class ComponentDefinitionRegistryIndexTest {
         ComponentIndex componentIndex = new ComponentIndex(
             List.of(
                 new ComponentIndex.Entry(
-                    "ghost", 1, "Ghost", null, null, null, null, null, null, null, null, null,
+                    "ghost", 1, "Ghost", null, null, null, null, null, null, null, null, null, null,
                     "com.bytechef.component.ghost.DoesNotExistComponentHandler", "default")));
 
         ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);
@@ -259,7 +261,7 @@ public class ComponentDefinitionRegistryIndexTest {
                     List.of(
                         new ComponentIndex.ClusterElementSummary(
                             "myTool", "My Tool", null, "TOOLS", "tools", "Tools", true, false)),
-                    List.of("channel"), "does.not.Matter", "default")));
+                    null, List.of("channel"), "does.not.Matter", "default")));
 
         ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);
 
@@ -293,13 +295,40 @@ public class ComponentDefinitionRegistryIndexTest {
     }
 
     @Test
+    public void testStubOfClusterRootEntryReportsItsClusterElementTypes() {
+        ComponentIndex componentIndex = new ComponentIndex(
+            List.of(
+                new ComponentIndex.Entry(
+                    "fakeRoot", 1, "Fake Root", null, null, null, null, null, null, null, null,
+                    List.of(new ComponentIndex.ClusterElementTypeSummary("TOOLS", "tools", "Tools", true, false)),
+                    null, "does.not.Matter", "default")));
+
+        ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);
+
+        ComponentDefinition stub = componentDefinitionRegistry.getStaticComponentDefinitions()
+            .stream()
+            .filter(componentDefinition -> "fakeRoot".equals(componentDefinition.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(stub).isInstanceOf(ClusterRootComponentDefinition.class);
+
+        assertThat(((ClusterRootComponentDefinition) stub).getClusterElementTypes())
+            .extracting(ClusterElementType::key)
+            .containsExactly("tools");
+
+        assertThat(stub.getTitle()).contains("Fake Root");
+        assertThat(stub.getVersion()).isEqualTo(1);
+    }
+
+    @Test
     public void testGetStaticComponentDefinitionsFallsBackToFullLoadingOnBrokenStub() {
         ComponentIndex brokenComponentIndex = new ComponentIndex(
             List.of(
                 new ComponentIndex.Entry(
                     "slack", 1, "Slack", null, null, null, null, null, null,
                     List.of(new ComponentIndex.TriggerSummary("newMessage", null, null, "NOT_A_REAL_TRIGGER_TYPE")),
-                    null, null, SlackComponentHandler.class.getName(), "default")));
+                    null, null, null, SlackComponentHandler.class.getName(), "default")));
 
         ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(brokenComponentIndex);
 

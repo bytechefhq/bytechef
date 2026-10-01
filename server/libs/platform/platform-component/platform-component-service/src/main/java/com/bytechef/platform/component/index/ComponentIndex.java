@@ -33,7 +33,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDsl.ModifiablePropertyGroup;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -51,7 +52,6 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public record ComponentIndex(List<Entry> entries) {
 
     public static final String RESOURCE_PATH = "META-INF/bytechef/component-index.json";
@@ -112,78 +112,87 @@ public record ComponentIndex(List<Entry> entries) {
             componentDefinition.icon(entry.icon());
         }
 
-        List<CategorySummary> componentCategories = entry.componentCategories();
-
-        if (componentCategories != null && !componentCategories.isEmpty()) {
+        if (entry.componentCategories() != null && !entry.componentCategories()
+            .isEmpty()) {
 
             componentDefinition.categories(
-                componentCategories
+                entry.componentCategories()
                     .stream()
                     .map(category -> new ComponentCategory(category.name(), category.label()))
                     .toList());
         }
 
-        List<String> tags = entry.tags();
+        if (entry.tags() != null && !entry.tags()
+            .isEmpty()) {
 
-        if (tags != null && !tags.isEmpty()) {
-
-            componentDefinition.tags(tags.toArray(String[]::new));
+            componentDefinition.tags(entry.tags()
+                .toArray(String[]::new));
         }
 
-        ConnectionSummary connectionSummary = entry.connection();
-
-        if (connectionSummary != null) {
+        if (entry.connection() != null) {
             componentDefinition.connection(
                 connection()
-                    .version(connectionSummary.version())
-                    .authorizationRequired(connectionSummary.authorizationRequired()));
+                    .version(entry.connection()
+                        .version())
+                    .authorizationRequired(entry.connection()
+                        .authorizationRequired()));
         }
 
-        List<ItemSummary> actions = entry.actions();
-
-        if (actions != null && !actions.isEmpty()) {
+        if (entry.actions() != null && !entry.actions()
+            .isEmpty()) {
 
             componentDefinition.actions(
-                actions
+                entry.actions()
                     .stream()
                     .map(ComponentIndex::toStubActionDefinition)
                     .toList());
         }
 
-        List<TriggerSummary> triggers = entry.triggers();
-
-        if (triggers != null && !triggers.isEmpty()) {
+        if (entry.triggers() != null && !entry.triggers()
+            .isEmpty()) {
 
             componentDefinition.triggers(
-                triggers
+                entry.triggers()
                     .stream()
                     .map(ComponentIndex::toStubTriggerDefinition)
                     .toList());
         }
 
-        List<ClusterElementSummary> clusterElements = entry.clusterElements();
-
-        if (clusterElements != null && !clusterElements.isEmpty()) {
+        if (entry.clusterElements() != null && !entry.clusterElements()
+            .isEmpty()) {
 
             componentDefinition.clusterElements(
-                clusterElements
+                entry.clusterElements()
                     .stream()
                     .map(ComponentIndex::toStubClusterElementDefinition)
                     .toArray(ClusterElementDefinition<?>[]::new));
         }
 
-        List<String> inputs = entry.inputs();
-
-        if (inputs != null && !inputs.isEmpty()) {
+        if (entry.inputs() != null && !entry.inputs()
+            .isEmpty()) {
 
             componentDefinition.inputs(
-                inputs
+                entry.inputs()
                     .stream()
                     .map(ComponentDsl::propertyGroup)
                     .toArray(ModifiablePropertyGroup[]::new));
         }
 
-        return componentDefinition;
+        List<ClusterElementTypeSummary> clusterElementTypes = entry.clusterElementTypes();
+
+        if (clusterElementTypes == null || clusterElementTypes.isEmpty()) {
+            return componentDefinition;
+        }
+
+        return new StubClusterRootComponentDefinition(
+            componentDefinition,
+            clusterElementTypes
+                .stream()
+                .map(
+                    clusterElementType -> new ClusterElementType(
+                        clusterElementType.name(), clusterElementType.key(), clusterElementType.label(),
+                        clusterElementType.multipleElements(), clusterElementType.required()))
+                .toList());
     }
 
     private static ModifiableActionDefinition toStubActionDefinition(ItemSummary itemSummary) {
@@ -240,13 +249,32 @@ public record ComponentIndex(List<Entry> entries) {
         return clusterElementDefinition;
     }
 
-    @SuppressFBWarnings("EI")
     public record Entry(
         String name, int version, @Nullable String title, @Nullable String description, @Nullable String icon,
         @Nullable List<CategorySummary> componentCategories, @Nullable List<String> tags,
         @Nullable ConnectionSummary connection, @Nullable List<ItemSummary> actions,
         @Nullable List<TriggerSummary> triggers, @Nullable List<ClusterElementSummary> clusterElements,
-        @Nullable List<String> inputs, String providerClassName, String loaderKind) {
+        @Nullable List<ClusterElementTypeSummary> clusterElementTypes, @Nullable List<String> inputs,
+        String providerClassName, String loaderKind) {
+    }
+
+    private static final class StubClusterRootComponentDefinition extends AbstractComponentDefinitionWrapper
+        implements ClusterRootComponentDefinition {
+
+        private final List<ClusterElementType> clusterElementTypes;
+
+        private StubClusterRootComponentDefinition(
+            ModifiableComponentDefinition componentDefinition, List<ClusterElementType> clusterElementTypes) {
+
+            super(componentDefinition);
+
+            this.clusterElementTypes = List.copyOf(clusterElementTypes);
+        }
+
+        @Override
+        public List<ClusterElementType> getClusterElementTypes() {
+            return clusterElementTypes;
+        }
     }
 
     public record CategorySummary(String name, @Nullable String label) {
@@ -265,5 +293,9 @@ public record ComponentIndex(List<Entry> entries) {
     public record ClusterElementSummary(
         String name, @Nullable String title, @Nullable String description, String typeName, String typeKey,
         String typeLabel, boolean typeMultipleElements, boolean typeRequired) {
+    }
+
+    public record ClusterElementTypeSummary(
+        String name, String key, String label, boolean multipleElements, boolean required) {
     }
 }
