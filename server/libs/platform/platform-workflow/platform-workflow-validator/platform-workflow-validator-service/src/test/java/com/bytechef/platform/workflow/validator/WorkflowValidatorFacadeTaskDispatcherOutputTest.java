@@ -44,6 +44,8 @@ import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -241,6 +243,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     private final ActionDefinitionService actionDefinitionService = mock(ActionDefinitionService.class);
     private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+    private final ConnectionService connectionService = mock(ConnectionService.class);
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService =
         mock(TaskDispatcherDefinitionService.class);
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService =
@@ -251,7 +254,8 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     private final WorkflowValidatorFacadeImpl workflowValidatorFacade = new WorkflowValidatorFacadeImpl(
         mock(ActionDefinitionFacade.class), actionDefinitionService, mock(ClusterElementDefinitionService.class),
-        componentDefinitionService, taskDispatcherDefinitionService, mock(TriggerDefinitionFacade.class),
+        componentDefinitionService, connectionService, taskDispatcherDefinitionService,
+        mock(TriggerDefinitionFacade.class),
         mock(TriggerDefinitionService.class), workflowNodeTestOutputService, workflowService,
         workflowTestConfigurationService, List.of());
 
@@ -386,6 +390,65 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
     }
 
     @Test
+    void aTestConnectionWithInvalidCredentialsIsAnError() {
+        stubComponent("affinity", "Affinity", true);
+        stubTestConnections("affinity_1", testConnection("affinity", 7L));
+        stubConnection(7L, "My Affinity", Connection.CredentialStatus.INVALID);
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of("[affinity_1] Invalid connection: My Affinity"), result.errors());
+    }
+
+    @Test
+    void aTestConnectionWithValidCredentialsIsNotReported() {
+        stubComponent("affinity", "Affinity", true);
+        stubTestConnections("affinity_1", testConnection("affinity", 7L));
+        stubConnection(7L, "My Affinity", Connection.CredentialStatus.VALID);
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
+    }
+
+    @Test
+    void anOptionalTestConnectionWithInvalidCredentialsIsAnError() {
+        stubComponent("affinity", "Affinity", false);
+        stubTestConnections("affinity_1", testConnection("affinity", 7L));
+        stubConnection(7L, "My Affinity", Connection.CredentialStatus.INVALID);
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of("[affinity_1] Invalid connection: My Affinity"), result.errors());
+    }
+
+    @Test
+    void aTestConnectionThatCannotBeReadIsNotReported() {
+        stubComponent("affinity", "Affinity", true);
+        stubTestConnections("affinity_1", testConnection("affinity", 7L));
+        when(connectionService.getConnection(7L)).thenThrow(new IllegalArgumentException("Connection not found"));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
+    }
+
+    @Test
+    void aClusterElementTestConnectionWithInvalidCredentialsIsReportedUnderTheElementName() {
+        stubComponent("aiAgent", "AI Agent", false);
+        stubComponent("openAi", "OpenAI", true);
+        stubComponent("httpClient", "HTTP Client", false);
+        stubTestConnections(
+            "aiAgent_1", testConnection("openAi_1", 7L), testConnection("httpClient_1", 8L));
+        stubConnection(7L, "My OpenAI", Connection.CredentialStatus.INVALID);
+        stubConnection(8L, "My HTTP", Connection.CredentialStatus.VALID);
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(AGENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of("[openAi_1] Invalid connection: My OpenAI"), result.errors());
+    }
+
+    @Test
     void anOptionalConnectionIsNotReported() {
         stubComponent("affinity", "Affinity", false);
 
@@ -488,6 +551,32 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         assertEquals(
             List.of("[logger_1] Property 'httpClient_1.quote' might not exist in the output of 'httpClient/v1/get'"),
             result.warnings());
+    }
+
+    private void stubConnection(long connectionId, String name, Connection.CredentialStatus credentialStatus) {
+        Connection connection = new Connection();
+
+        connection.setCredentialStatus(credentialStatus);
+        connection.setName(name);
+
+        when(connectionService.getConnection(connectionId)).thenReturn(connection);
+    }
+
+    private void stubTestConnections(
+        String workflowNodeName, WorkflowTestConfigurationConnection... workflowTestConfigurationConnections) {
+
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("wf-1", workflowNodeName, 3L))
+            .thenReturn(List.of(workflowTestConfigurationConnections));
+    }
+
+    private static WorkflowTestConfigurationConnection testConnection(String workflowConnectionKey, long connectionId) {
+        WorkflowTestConfigurationConnection workflowTestConfigurationConnection =
+            mock(WorkflowTestConfigurationConnection.class);
+
+        when(workflowTestConfigurationConnection.getConnectionId()).thenReturn(connectionId);
+        when(workflowTestConfigurationConnection.getWorkflowConnectionKey()).thenReturn(workflowConnectionKey);
+
+        return workflowTestConfigurationConnection;
     }
 
     private static void stubStoredType(WorkflowNodeTestOutput workflowNodeTestOutput, String operationName) {

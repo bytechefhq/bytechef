@@ -40,6 +40,15 @@ class NodeValidationIssueParserTest {
     }
 
     @Test
+    void classifiesAnInvalidConnectionWithoutAPropertyPath() {
+        List<NodeValidationIssue> issues = NodeValidationIssueParser.parse(
+            List.of("[affinity_1] Invalid connection: My Affinity"), List.of());
+
+        assertIssue(
+            issues.getFirst(), "affinity_1", null, WorkflowIssueKind.INVALID_CONNECTION, WorkflowIssueSeverity.ERROR);
+    }
+
+    @Test
     void classifiesPrefixedMessagesByTemplate() {
         List<NodeValidationIssue> issues = NodeValidationIssueParser.parse(
             List.of(

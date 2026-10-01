@@ -51,6 +51,10 @@ class ValidationErrorUtils {
         return "Cluster element '" + elementKey + "' is missing from task " + taskName;
     }
 
+    public static String invalidConnection(String connectionName) {
+        return "Invalid connection: " + connectionName;
+    }
+
     /**
      * Creates a missing property error message.
      */
