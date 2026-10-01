@@ -1108,18 +1108,19 @@ export type UpdateKnowledgeBaseTagsMutation = { updateKnowledgeBaseTags: boolean
 export type AutomationSearchQueryVariables = Exact<{
   query: string;
   limit?: number | null | undefined;
+  types?: Array<Types.SearchAssetType> | Types.SearchAssetType | null | undefined;
 }>;
 
 
 export type AutomationSearchQuery = { automationSearch: Array<
     | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
-    | { collectionId: string, path: string | null, id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { knowledgeBaseId: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
-    | { projectName: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { projectWorkflowId: string | null, id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { projectId: string, label: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
   > };
 
@@ -6395,22 +6396,18 @@ export const useUpdateKnowledgeBaseTagsMutation = <
     )};
 
 export const AutomationSearchDocument = new TypedDocumentString(`
-    query automationSearch($query: String!, $limit: Int) {
-  automationSearch(query: $query, limit: $limit) {
+    query automationSearch($query: String!, $limit: Int, $types: [SearchAssetType!]) {
+  automationSearch(query: $query, limit: $limit, types: $types) {
     id
     name
     description
     type
+    ... on ProjectSearchResult {
+      projectWorkflowId
+    }
     ... on WorkflowSearchResult {
       projectId
       label
-    }
-    ... on ProjectDeploymentSearchResult {
-      projectName
-    }
-    ... on ApiEndpointSearchResult {
-      collectionId
-      path
     }
     ... on KnowledgeBaseDocumentSearchResult {
       knowledgeBaseId

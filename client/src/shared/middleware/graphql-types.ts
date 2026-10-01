@@ -3171,6 +3171,7 @@ export type ProjectSearchResult = SearchResult & {
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  projectWorkflowId?: Maybe<Scalars['ID']['output']>;
   type: SearchAssetType;
 };
 
@@ -3682,6 +3683,7 @@ export type QueryAuditEventsArgs = {
 export type QueryAutomationSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
+  types?: InputMaybe<Array<SearchAssetType>>;
 };
 
 
