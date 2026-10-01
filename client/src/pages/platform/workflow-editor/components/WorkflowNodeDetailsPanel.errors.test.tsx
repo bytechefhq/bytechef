@@ -76,14 +76,6 @@ describe('WorkflowNodeDetailsPanel errors chip', () => {
         expect(screen.queryByLabelText('Warning')).not.toBeInTheDocument();
     });
 
-    it('labels a selected connection with invalid credentials as an invalid connection', () => {
-        const chip = renderPanel([{kind: 'INVALID_CONNECTION', name: 'Google Sheets', severity: 'ERROR'}]);
-
-        expect(chip).toHaveAccessibleName('Errors (1)');
-        expect(screen.getByText('Invalid connection:')).toBeInTheDocument();
-        expect(screen.getByText('Google Sheets')).toBeInTheDocument();
-    });
-
     it('titles a node with only warnings as warnings and styles the chip as a warning', () => {
         const chip = renderPanel([{kind: 'ISSUE', name: 'Missing recommended field: label', severity: 'WARNING'}]);
 

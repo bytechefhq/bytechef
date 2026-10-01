@@ -2,7 +2,6 @@ import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared
 import {describe, expect, it} from 'vitest';
 
 import getMissingRequiredConnectionErrors, {
-    getInvalidConnectionErrors,
     getWorkflowIssueErrors,
     getWorkflowNodeDetailsErrorsSummary,
 } from '../getMissingRequiredConnectionErrors';
@@ -107,60 +106,6 @@ describe('getMissingRequiredConnectionErrors', () => {
     });
 });
 
-describe('getInvalidConnectionErrors', () => {
-    const availableConnections = [
-        {credentialStatus: 'VALID' as const, id: 1, name: 'GitHub'},
-        {credentialStatus: 'INVALID' as const, id: 2, name: 'Google Sheets'},
-    ];
-
-    it('reports a selected connection whose credentials are invalid using the connection name', () => {
-        expect(
-            getInvalidConnectionErrors({
-                availableConnections,
-                connections: [createConnection('googleSheets', 'googleSheets', 'googleSheets_1')],
-                workflowTestConfigurationConnections: [
-                    {connectionId: 2, workflowConnectionKey: 'googleSheets', workflowNodeName: 'googleSheets_1'},
-                ],
-            })
-        ).toEqual([{kind: 'INVALID_CONNECTION', name: 'Google Sheets', severity: 'ERROR'}]);
-    });
-
-    it('does not report a selected connection whose credentials are valid', () => {
-        expect(
-            getInvalidConnectionErrors({
-                availableConnections,
-                connections: [createConnection('github', 'github', 'github_1')],
-                workflowTestConfigurationConnections: [
-                    {connectionId: 1, workflowConnectionKey: 'github', workflowNodeName: 'github_1'},
-                ],
-            })
-        ).toEqual([]);
-    });
-
-    it('ignores test configuration connections that do not belong to the node connections', () => {
-        expect(
-            getInvalidConnectionErrors({
-                availableConnections,
-                connections: [createConnection('github', 'github', 'github_1')],
-                workflowTestConfigurationConnections: [
-                    {connectionId: 2, workflowConnectionKey: 'googleSheets', workflowNodeName: 'github_1'},
-                ],
-            })
-        ).toEqual([]);
-    });
-
-    it('reports nothing while the connections are not loaded', () => {
-        expect(
-            getInvalidConnectionErrors({
-                connections: [createConnection('googleSheets', 'googleSheets', 'googleSheets_1')],
-                workflowTestConfigurationConnections: [
-                    {connectionId: 2, workflowConnectionKey: 'googleSheets', workflowNodeName: 'googleSheets_1'},
-                ],
-            })
-        ).toEqual([]);
-    });
-});
-
 describe('getWorkflowIssueErrors', () => {
     it('lists broken references and other issue kinds by their message', () => {
         expect(
@@ -182,14 +127,21 @@ describe('getWorkflowIssueErrors', () => {
         ]);
     });
 
-    it('skips missing required properties and missing or invalid connections that are listed separately', () => {
+    it('skips missing required properties and connections that are listed separately', () => {
         expect(
             getWorkflowIssueErrors([
                 {kind: 'MISSING_REQUIRED', message: 'Missing required property: owner', severity: 'ERROR'},
                 {kind: 'MISSING_CONNECTION', message: 'Missing required connection: GitHub', severity: 'ERROR'},
-                {kind: 'INVALID_CONNECTION', message: 'Invalid connection: My GitHub', severity: 'ERROR'},
             ])
         ).toEqual([]);
+    });
+
+    it('keeps an invalid connection, which is not listed separately', () => {
+        expect(
+            getWorkflowIssueErrors([
+                {kind: 'INVALID_CONNECTION', message: 'Invalid connection: My GitHub', severity: 'ERROR'},
+            ])
+        ).toEqual([{kind: 'ISSUE', name: 'Invalid connection: My GitHub', severity: 'ERROR'}]);
     });
 
     it('keeps a missing recommended field warning, which is not listed separately', () => {

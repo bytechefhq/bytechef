@@ -86,14 +86,12 @@ import getParametersWithDefaultValues from '../../utils/getParametersWithDefault
 import {getClusterElementRootNames} from '../../utils/getWorkflowIssueOwnerName';
 import hasDataPillPanelContent from '../../utils/hasDataPillPanelContent';
 import invalidateOperationQueries from '../../utils/invalidateOperationQueries';
-import invalidateWorkflowValidation from '../../utils/invalidateWorkflowValidation';
 import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
 import getMissingRequiredConnectionErrors, {
     WorkflowNodeDetailsErrorI,
-    getInvalidConnectionErrors,
     getWorkflowIssueErrors,
 } from './getMissingRequiredConnectionErrors';
 import isActionDefinitionFresh from './isActionDefinitionFresh';
@@ -102,6 +100,7 @@ import {resolveMissingRequiredPropertiesRefetch} from './resolveMissingRequiredP
 import resolveNodeConnectionFields from './resolveNodeConnectionFields';
 import resolveShowOutputTab from './resolveShowOutputTab';
 import useDisplayConditionsRefreshAfterOperationChange from './useDisplayConditionsRefreshAfterOperationChange';
+import useRefreshAfterLookupFailure from './useRefreshAfterLookupFailure';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
     {
@@ -153,7 +152,7 @@ export default function useWorkflowNodeDetailsPanel({
 
     const workflowIssues = useWorkflowIssues();
 
-    const {ConnectionKeys, useGetConnectionsQuery} = useWorkflowEditor();
+    const {ConnectionKeys} = useWorkflowEditor();
 
     const {
         activeTab,
@@ -198,6 +197,12 @@ export default function useWorkflowNodeDetailsPanel({
 
     const queryClient = useQueryClient();
 
+    useRefreshAfterLookupFailure({
+        connectionsQueryKey: ConnectionKeys.connections,
+        nodeName: currentNode?.workflowNodeName,
+        workflowIssues,
+    });
+
     const isClusterElement = !!currentNode?.clusterElementType;
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
@@ -226,8 +231,6 @@ export default function useWorkflowNodeDetailsPanel({
             (!!currentComponentDefinition?.connection ||
                 (!!currentNode.clusterRoot && !currentNode.isNestedClusterRoot))
     );
-
-    const {data: availableConnections} = useGetConnectionsQuery({}, !!workflowTestConfigurationConnections?.length);
 
     const {data: currentClusterElementDefinition} = useGetClusterElementDefinitionQuery(
         {
@@ -713,19 +716,6 @@ export default function useWorkflowNodeDetailsPanel({
 
     const clusterElementRootNames = useMemo(() => getClusterElementRootNames(workflow.tasks), [workflow.tasks]);
 
-    const currentNodeLookupFailures = useMemo(
-        () =>
-            workflowIssues
-                .filter(
-                    (workflowIssue) =>
-                        workflowIssue.kind === 'LOOKUP_FAILED' &&
-                        workflowIssue.nodeName === currentNode?.workflowNodeName
-                )
-                .map((workflowIssue) => `${workflowIssue.propertyPath ?? ''}|${workflowIssue.message}`)
-                .join(','),
-        [currentNode?.workflowNodeName, workflowIssues]
-    );
-
     const errors: Array<WorkflowNodeDetailsErrorI> = useMemo(() => {
         const missingRequiredProperties = currentNode?.clusterElementType
             ? (clusterElementMissingRequiredPropertiesData?.clusterElementMissingRequiredProperties ?? [])
@@ -753,11 +743,6 @@ export default function useWorkflowNodeDetailsPanel({
                 connections: currentWorkflowNodeConnections,
                 workflowTestConfigurationConnections,
             }),
-            ...getInvalidConnectionErrors({
-                availableConnections,
-                connections: currentWorkflowNodeConnections,
-                workflowTestConfigurationConnections,
-            }),
             ...getWorkflowIssueErrors(nodeIssues, (nodeIssue) =>
                 findWorkflowIssueParameterPaths(nodeIssue, currentNode?.parameters, clusterElementRootNames).map(
                     (parameterPath) => {
@@ -772,7 +757,6 @@ export default function useWorkflowNodeDetailsPanel({
             ),
         ];
     }, [
-        availableConnections,
         clusterElementMissingRequiredPropertiesData?.clusterElementMissingRequiredProperties,
         clusterElementRootNames,
         currentComponentDefinition?.title,
@@ -1254,17 +1238,6 @@ export default function useWorkflowNodeDetailsPanel({
             setCurrentNodeName(undefined);
         }
     }, [currentNode?.name, currentOperationDefinition?.properties, isClusterElement]);
-
-    // A failed options or dynamic properties lookup can be a failed credentials refresh, which marks the selected
-    // connection INVALID on the server, so the cached connections and the workflow validation are refetched to pick up
-    // the new status.
-    useEffect(() => {
-        if (currentNodeLookupFailures) {
-            queryClient.invalidateQueries({queryKey: ConnectionKeys.connections});
-
-            invalidateWorkflowValidation(queryClient);
-        }
-    }, [ConnectionKeys.connections, currentNodeLookupFailures, queryClient]);
 
     // Refetch missing required properties once a save is confirmed (workflow.version bumps only on success,
     // not the optimistic update). resolveMissingRequiredPropertiesRefetch replicates the queries' `enabled`
