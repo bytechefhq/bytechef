@@ -29,13 +29,14 @@ import ProjectVersionWorkflowChanges from './ProjectVersionWorkflowChanges';
 
 interface ProjectVersionHistorySheetProps {
     deleteProjectVersionPending?: boolean;
-    onDeleteProjectVersion: (projectVersion: number, onSuccess: () => void) => void;
-    onRestoreProjectVersion: (projectVersion: number, onSuccess: () => void) => void;
+    onDeleteProjectVersion?: (projectVersion: number, onSuccess: () => void) => void;
+    onRestoreProjectVersion?: (projectVersion: number, onSuccess: () => void) => void;
     onSheetOpenChange: (open: boolean) => void;
-    projectId: number;
+    projectId?: number;
     projectVersions: ProjectVersion[];
     restoreProjectVersionPending?: boolean;
     sheetOpen: boolean;
+    title?: string;
 }
 
 const formatVersionDate = (date: Date) =>
@@ -50,14 +51,18 @@ const ProjectVersionHistorySheet = ({
     projectVersions,
     restoreProjectVersionPending,
     sheetOpen,
+    title = 'Project Version History',
 }: ProjectVersionHistorySheetProps) => {
     const [deleteCandidateVersion, setDeleteCandidateVersion] = useState<number | undefined>();
     const [expandedVersions, setExpandedVersions] = useState<Set<number>>(new Set());
     const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState<number | undefined>();
 
+    const versionActionsAvailable =
+        projectId !== undefined && onDeleteProjectVersion !== undefined && onRestoreProjectVersion !== undefined;
+
     const handleDeleteConfirm = () => {
-        if (deleteCandidateVersion === undefined) {
+        if (deleteCandidateVersion === undefined || !onDeleteProjectVersion) {
             return;
         }
 
@@ -85,7 +90,7 @@ const ProjectVersionHistorySheet = ({
     };
 
     const handleRestoreConfirm = () => {
-        if (selectedVersion === undefined) {
+        if (selectedVersion === undefined || !onRestoreProjectVersion) {
             return;
         }
 
@@ -107,7 +112,7 @@ const ProjectVersionHistorySheet = ({
                     <div className="flex items-center gap-x-2">
                         <HistoryIcon className="size-5" />
 
-                        <SheetTitle className="text-lg font-semibold">Project Version History</SheetTitle>
+                        <SheetTitle className="text-lg font-semibold">{title}</SheetTitle>
                     </div>
 
                     <SheetCloseButton />
@@ -195,63 +200,67 @@ const ProjectVersionHistorySheet = ({
                                             </p>
                                         </div>
 
-                                        <Button
-                                            aria-expanded={expanded}
-                                            aria-label={`Toggle changes of version ${version}`}
-                                            className="size-6"
-                                            icon={expanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
-                                            onClick={(event) => {
-                                                event.stopPropagation();
+                                        {projectId !== undefined && (
+                                            <Button
+                                                aria-expanded={expanded}
+                                                aria-label={`Toggle changes of version ${version}`}
+                                                className="size-6"
+                                                icon={expanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
 
-                                                handleToggleExpanded(version);
-                                            }}
-                                            onKeyDown={(event) => event.stopPropagation()}
-                                            size="icon"
-                                            variant="ghost"
-                                        />
+                                                    handleToggleExpanded(version);
+                                                }}
+                                                onKeyDown={(event) => event.stopPropagation()}
+                                                size="icon"
+                                                variant="ghost"
+                                            />
+                                        )}
 
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    aria-label={`Version ${version} actions`}
-                                                    className="size-6"
-                                                    icon={<EllipsisVerticalIcon />}
+                                        {versionActionsAvailable && (
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        aria-label={`Version ${version} actions`}
+                                                        className="size-6"
+                                                        icon={<EllipsisVerticalIcon />}
+                                                        onClick={(event) => event.stopPropagation()}
+                                                        onKeyDown={(event) => event.stopPropagation()}
+                                                        size="icon"
+                                                        variant="ghost"
+                                                    />
+                                                </DropdownMenuTrigger>
+
+                                                <DropdownMenuContent
+                                                    align="end"
                                                     onClick={(event) => event.stopPropagation()}
-                                                    onKeyDown={(event) => event.stopPropagation()}
-                                                    size="icon"
-                                                    variant="ghost"
-                                                />
-                                            </DropdownMenuTrigger>
+                                                >
+                                                    <DropdownMenuItem
+                                                        icon={<DownloadIcon />}
+                                                        label="Export"
+                                                        onClick={() =>
+                                                            (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
+                                                        }
+                                                    />
 
-                                            <DropdownMenuContent
-                                                align="end"
-                                                onClick={(event) => event.stopPropagation()}
-                                            >
-                                                <DropdownMenuItem
-                                                    icon={<DownloadIcon />}
-                                                    label="Export"
-                                                    onClick={() =>
-                                                        (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
-                                                    }
-                                                />
+                                                    {published && (
+                                                        <>
+                                                            <DropdownMenuSeparator />
 
-                                                {published && (
-                                                    <>
-                                                        <DropdownMenuSeparator />
-
-                                                        <DropdownMenuItem
-                                                            icon={<Trash2Icon />}
-                                                            label="Delete"
-                                                            onClick={() => setDeleteCandidateVersion(version)}
-                                                            variant="destructive"
-                                                        />
-                                                    </>
-                                                )}
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                                            <DropdownMenuItem
+                                                                icon={<Trash2Icon />}
+                                                                label="Delete"
+                                                                onClick={() => setDeleteCandidateVersion(version)}
+                                                                variant="destructive"
+                                                            />
+                                                        </>
+                                                    )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        )}
                                     </div>
 
-                                    {expanded && (
+                                    {expanded && projectId !== undefined && (
                                         <div
                                             onClick={(event) => event.stopPropagation()}
                                             onKeyDown={(event) => event.stopPropagation()}
@@ -273,12 +282,14 @@ const ProjectVersionHistorySheet = ({
                 <footer className="flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">
                     <Button label="Cancel" onClick={() => onSheetOpenChange(false)} variant="outline" />
 
-                    <Button
-                        disabled={selectedVersion === undefined || restoreProjectVersionPending}
-                        icon={restoreProjectVersionPending ? <LoadingIcon /> : <CheckIcon />}
-                        label="Apply selected version"
-                        onClick={() => setRestoreConfirmationOpen(true)}
-                    />
+                    {versionActionsAvailable && (
+                        <Button
+                            disabled={selectedVersion === undefined || restoreProjectVersionPending}
+                            icon={restoreProjectVersionPending ? <LoadingIcon /> : <CheckIcon />}
+                            label="Apply selected version"
+                            onClick={() => setRestoreConfirmationOpen(true)}
+                        />
+                    )}
                 </footer>
             </SheetContent>
 

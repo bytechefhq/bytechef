@@ -22,6 +22,10 @@ vi.mock('@tanstack/react-query', async (importOriginal) => ({
     useIsMutating: () => hoisted.isMutating(),
 }));
 
+vi.mock('@/pages/automation/agents/hooks/useAgents', () => ({
+    default: () => ({agents: []}),
+}));
+
 vi.mock('@/pages/automation/project/components/project-header/hooks/useProjectHeader', () => ({
     useProjectHeader: () => ({
         handleProjectWorkflowValueChange: vi.fn(),
