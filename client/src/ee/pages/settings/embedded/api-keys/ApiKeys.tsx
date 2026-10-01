@@ -74,6 +74,7 @@ const ApiKeys = () => {
                     });
 
                     return {
+                        isPending: deleteApiKeyMutation.isPending,
                         mutate: ({apiKeyId}: {apiKeyId: string}) => {
                             deleteApiKeyMutation.mutate({id: apiKeyId});
                         },

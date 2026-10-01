@@ -76,6 +76,7 @@ const WorkspaceApiKeys = () => {
                     });
 
                     return {
+                        isPending: deleteWorkspaceApiKeyMutation.isPending,
                         mutate: ({apiKeyId}: {apiKeyId: string}) => {
                             deleteWorkspaceApiKeyMutation.mutate({apiKeyId});
                         },
