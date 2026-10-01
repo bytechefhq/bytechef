@@ -151,8 +151,11 @@ const submitRegistration = async () => {
     await userEvent.click(screen.getByRole('button', {name: 'Continue with password'}));
 };
 
-it('should offer to log in or reset the password when the email already has an account', async () => {
-    mockRegisterResponse(101, 'Email is already in use!');
+it.each([
+    [101, 'Email is already in use!'],
+    [102, 'Login name already used!'],
+])('should offer to log in or reset the password when the server responds with error %i', async (errorKey, detail) => {
+    mockRegisterResponse(errorKey, detail);
 
     renderRegisterPageWithDestinations();
 
@@ -169,7 +172,7 @@ it('should offer to log in or reset the password when the email already has an a
 });
 
 it('should pass the email to the password reset page when the email already has an account', async () => {
-    mockRegisterResponse(101, 'Email is already in use!');
+    mockRegisterResponse(102, 'Login name already used!');
 
     renderRegisterPageWithDestinations();
 
@@ -181,7 +184,7 @@ it('should pass the email to the password reset page when the email already has 
 });
 
 it('should hide the existing account options once the email is edited', async () => {
-    mockRegisterResponse(101, 'Email is already in use!');
+    mockRegisterResponse(102, 'Login name already used!');
 
     renderRegisterPageWithDestinations();
 
@@ -217,9 +220,9 @@ it('should ignore an existing account response for an email that was edited whil
         resolveRegisterResponse(
             new Response(
                 JSON.stringify({
-                    detail: 'Email is already in use!',
+                    detail: 'Login name already used!',
                     entityClass: 'User',
-                    errorKey: 101,
+                    errorKey: 102,
                     status: 400,
                     title: 'Error',
                 }),
@@ -239,7 +242,7 @@ it('should ignore an existing account response for an email that was edited whil
 });
 
 it('should navigate to the account error page for other registration errors', async () => {
-    mockRegisterResponse(102, 'Login name already used!');
+    mockRegisterResponse(106, 'Email test@example.com is invalid');
 
     renderRegisterPageWithDestinations();
 
