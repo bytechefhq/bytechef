@@ -170,10 +170,6 @@ export function extractClusterElementComponentOperations(
     }, existingClusterElementsOperations);
 }
 
-/**
- * Returns the nested cluster elements of a cluster element. The workflow definition keeps them under
- * `clusterElements`, while the server-computed workflow tasks keep them under `extensions.clusterElements`.
- */
 export function getNestedClusterElements(element: unknown): ClusterElementsType | undefined {
     if (!isPlainObject(element)) {
         return undefined;
