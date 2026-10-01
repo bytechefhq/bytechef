@@ -33,12 +33,14 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.CallableAiAgentDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -94,12 +96,16 @@ class WebhookConfigurationTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testEveryTaskDispatcherOnClasspathIsRegistered() {
+        ObjectProvider<CallableAiAgentDataSource> callableAiAgentDataSourceProvider = mock(ObjectProvider.class);
+
         Set<String> registeredClassNames = webhookConfiguration
             .getTaskDispatcherResolverFactories(
-                mock(ChildJobPrincipalFactory.class), mock(ContextService.class), mock(CounterService.class),
-                mock(ApplicationEventPublisher.class), mock(Evaluator.class), mock(JobService.class),
-                mock(SubflowResolver.class), mock(TaskExecutionService.class), mock(TaskFileStorage.class))
+                callableAiAgentDataSourceProvider, mock(ChildJobPrincipalFactory.class), mock(ContextService.class),
+                mock(CounterService.class), mock(ApplicationEventPublisher.class), mock(Evaluator.class),
+                mock(JobService.class), mock(SubflowResolver.class), mock(TaskExecutionService.class),
+                mock(TaskFileStorage.class))
             .stream()
             .map(
                 taskDispatcherResolverFactory -> taskDispatcherResolverFactory.createTaskDispatcherResolver(
