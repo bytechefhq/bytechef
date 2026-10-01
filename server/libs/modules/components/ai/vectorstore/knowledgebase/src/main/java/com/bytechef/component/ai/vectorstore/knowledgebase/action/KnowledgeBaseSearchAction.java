@@ -109,6 +109,7 @@ public final class KnowledgeBaseSearchAction {
                     .defaultValue(0.0)
                     .required(false))
             .output()
+            .help("", "https://docs.bytechef.io/reference/components/knowledgeBase_v1#search-data")
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions, context) -> perform(
                     inputParameters, vectorStore));

@@ -65,6 +65,7 @@ public class JdbcChatMemoryGetMessagesAction {
                                         .properties(
                                             string("role"),
                                             string("content"))))))
+            .help("", "https://docs.bytechef.io/reference/components/jdbc-chat-memory_v1#get-messages")
             .perform(
                 (MultipleConnectionsPerformFunction) (
                     inputParameters, componentConnections, extensions, context) -> perform(inputParameters,

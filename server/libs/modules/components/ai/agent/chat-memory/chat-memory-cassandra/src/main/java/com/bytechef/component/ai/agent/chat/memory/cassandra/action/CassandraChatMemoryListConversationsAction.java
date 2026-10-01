@@ -46,6 +46,7 @@ public class CassandraChatMemoryListConversationsAction {
                         array("conversationIds")
                             .items(string()),
                         integer("count"))))
+        .help("", "https://docs.bytechef.io/reference/components/cassandra-chat-memory_v1#list-conversations")
         .perform(CassandraChatMemoryListConversationsAction::perform);
 
     private CassandraChatMemoryListConversationsAction() {

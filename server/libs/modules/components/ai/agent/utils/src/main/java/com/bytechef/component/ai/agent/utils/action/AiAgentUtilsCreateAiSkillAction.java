@@ -85,6 +85,7 @@ public class AiAgentUtilsCreateAiSkillAction {
                             integer("id"),
                             string(NAME),
                             string(DESCRIPTION))))
+            .help("", "https://docs.bytechef.io/reference/components/ai_agent-utils_v1#create-ai-skill")
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
                 inputParameters, aiSkillFacade));
     }

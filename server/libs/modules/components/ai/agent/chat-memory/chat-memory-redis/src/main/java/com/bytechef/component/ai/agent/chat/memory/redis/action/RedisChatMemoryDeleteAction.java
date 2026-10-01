@@ -51,6 +51,7 @@ public class RedisChatMemoryDeleteAction {
                     .properties(
                         string(CONVERSATION_ID),
                         bool("deleted"))))
+        .help("", "https://docs.bytechef.io/reference/components/redis-chat-memory_v1#delete-conversation")
         .perform(RedisChatMemoryDeleteAction::perform);
 
     private RedisChatMemoryDeleteAction() {

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "AI reads, analyzes and classifies your text into one of defined categories.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#classify-text"
+    },
     "metadata": null,
     "name": "classifyText",
     "outputDefinition": {
@@ -318,7 +321,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Uses AI to pull specific structured information from unstructured text content.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#extract-data"
+    },
     "metadata": null,
     "name": "extractData",
     "outputDefinition": {
@@ -541,7 +547,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Uses AI to detect and redact sensitive content from text.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#mask"
+    },
     "metadata": null,
     "name": "mask",
     "outputDefinition": {
@@ -1053,7 +1062,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Uses AI and a map of masking entities to unmask the text.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#unmask"
+    },
     "metadata": null,
     "name": "unmask",
     "outputDefinition": {
@@ -1322,7 +1334,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The sentiment of the text is typically categorized as POSITIVE, NEGATIVE, or NEUTRAL.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#sentiment-analysis"
+    },
     "metadata": null,
     "name": "sentimentAnalysis",
     "outputDefinition": {
@@ -1549,7 +1564,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Scores the text based on several criteria",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#score"
+    },
     "metadata": null,
     "name": "score",
     "outputDefinition": {
@@ -1859,7 +1877,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "AI reads, analyzes and summarizes your text into a shorter format.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#summarize-text"
+    },
     "metadata": null,
     "name": "summarizeText",
     "outputDefinition": {
@@ -2150,7 +2171,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Search through a large text and find the parts that are the most relevant. Returns a JSON list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#similarity-search"
+    },
     "metadata": null,
     "name": "similaritySearch",
     "outputDefinition": {
@@ -2389,7 +2413,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "AI generates text based on the given prompt.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#text-generation"
+    },
     "metadata": null,
     "name": "textGeneration",
     "outputDefinition": {

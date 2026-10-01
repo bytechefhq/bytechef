@@ -7,7 +7,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Chat with the AI agent.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-agent_v1#chat"
+    },
     "metadata": null,
     "name": "chat",
     "outputDefinition": {
@@ -522,7 +525,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Chat with the AI agent and stream the response.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-agent_v1#chat-stream"
+    },
     "metadata": null,
     "name": "streamChat",
     "outputDefinition": {

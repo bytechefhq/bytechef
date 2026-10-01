@@ -57,6 +57,7 @@ public class GoogleWorkspaceAdminAssignLicenseAction {
                     "A SKU's unique identifier. Use this documentation to find SKU ID: https://developers.google.com/workspace/admin/licensing/v1/how-tos/products.")
                 .required(true))
         .output(outputSchema(LICENSE_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/google-workspace-admin_v1#assign-license")
         .perform(GoogleWorkspaceAdminAssignLicenseAction::perform)
         .processErrorResponse(GoogleUtils::processErrorResponse);
 

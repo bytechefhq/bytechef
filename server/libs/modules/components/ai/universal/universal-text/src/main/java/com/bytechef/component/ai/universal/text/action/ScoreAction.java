@@ -130,7 +130,8 @@ public class ScoreAction implements AiTextAction {
                     TEMPERATURE_PROPERTY)
                 .output(
                     (inputParameters, connectionParameters, context) -> OutputResponse.of(
-                        context.outputSchema(outputSchema -> outputSchema.getOutputSchema(RESPONSE_SCHEMA)))),
+                        context.outputSchema(outputSchema -> outputSchema.getOutputSchema(RESPONSE_SCHEMA))))
+                .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#score"),
             provider, new ScoreAction(), propertyService);
     }
 

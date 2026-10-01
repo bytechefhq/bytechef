@@ -84,7 +84,8 @@ public class ClassifyTextAction implements AiTextAction {
                     outputSchema(
                         string()
                             .description("The chosen category.")),
-                    sampleOutput("sample category")),
+                    sampleOutput("sample category"))
+                .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#classify-text"),
             provider, new ClassifyTextAction(), propertyService);
     }
 

@@ -79,6 +79,7 @@ public class RedisChatMemoryAddMessagesAction {
                     .properties(
                         string(CONVERSATION_ID),
                         integer("messageCount"))))
+        .help("", "https://docs.bytechef.io/reference/components/redis-chat-memory_v1#add-messages")
         .perform(RedisChatMemoryAddMessagesAction::perform);
 
     private RedisChatMemoryAddMessagesAction() {

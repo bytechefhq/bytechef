@@ -92,6 +92,7 @@ public final class KnowledgeBaseLoadAction {
                     .options(getKnowledgeBaseOptions(knowledgeBaseService))
                     .required(true),
                 ADDITIONAL_METADATA_PROPERTY)
+            .help("", "https://docs.bytechef.io/reference/components/knowledgeBase_v1#load-data")
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions,
                 context) -> perform(

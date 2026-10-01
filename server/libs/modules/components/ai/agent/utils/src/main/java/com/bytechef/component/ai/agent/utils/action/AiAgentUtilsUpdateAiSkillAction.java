@@ -93,6 +93,7 @@ public class AiAgentUtilsUpdateAiSkillAction {
                             integer(ID),
                             string(NAME),
                             string(DESCRIPTION))))
+            .help("", "https://docs.bytechef.io/reference/components/ai_agent-utils_v1#update-ai-skill")
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
                 inputParameters, aiSkillFacade));
     }

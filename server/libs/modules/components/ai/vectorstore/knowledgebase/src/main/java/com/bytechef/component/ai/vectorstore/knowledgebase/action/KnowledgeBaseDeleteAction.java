@@ -62,6 +62,7 @@ public final class KnowledgeBaseDeleteAction {
                     .options(getKnowledgeBaseOptions(knowledgeBaseService))
                     .required(true),
                 METADATA_FILTER_PROPERTY)
+            .help("", "https://docs.bytechef.io/reference/components/knowledgeBase_v1#delete-documents")
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions, context) -> perform(
                     inputParameters, kbVectorStore));

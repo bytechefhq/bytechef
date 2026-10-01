@@ -72,7 +72,8 @@ public class GenerateTextAction implements AiTextAction {
                     outputSchema(
                         string()
                             .description("Generated text.")),
-                    sampleOutput("sample generated text.")),
+                    sampleOutput("sample generated text."))
+                .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#text-generation"),
             provider, new GenerateTextAction(), propertyService);
     }
 

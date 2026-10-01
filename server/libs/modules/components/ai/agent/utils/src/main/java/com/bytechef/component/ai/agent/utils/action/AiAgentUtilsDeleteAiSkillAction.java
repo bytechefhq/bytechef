@@ -41,6 +41,7 @@ public class AiAgentUtilsDeleteAiSkillAction {
                     .description("The ID of the AI skill to delete.")
                     .options(buildSkillOptions(aiSkillFacade))
                     .required(true))
+            .help("", "https://docs.bytechef.io/reference/components/ai_agent-utils_v1#delete-ai-skill")
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
                 inputParameters, aiSkillFacade));
     }

@@ -72,7 +72,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
                 .output(
                     (MultipleConnectionsOutputFunction) (
                         inputParameters, componentConnections, extensions, context) -> ModelUtils.output(
-                            inputParameters, null, context)));
+                            inputParameters, null, context))
+                .help("", "https://docs.bytechef.io/reference/components/ai-agent_v1#chat"));
     }
 
     public class ChatActionDefinitionWrapper extends AbstractActionDefinitionWrapper {

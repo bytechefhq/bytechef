@@ -101,7 +101,8 @@ public class SummarizeTextAction implements AiTextAction {
                     outputSchema(
                         string()
                             .description("The summarized text.")),
-                    sampleOutput("sample summarized text")),
+                    sampleOutput("sample summarized text"))
+                .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#summarize-text"),
             provider, new SummarizeTextAction(), propertyService);
     }
 

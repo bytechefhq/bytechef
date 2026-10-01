@@ -56,6 +56,7 @@ public class JdbcChatMemoryDeleteAction {
                         .properties(
                             string(CONVERSATION_ID),
                             bool("deleted"))))
+            .help("", "https://docs.bytechef.io/reference/components/jdbc-chat-memory_v1#delete-conversation")
             .perform(
                 (MultipleConnectionsPerformFunction) (
                     inputParameters, componentConnections, extensions, context) -> perform(inputParameters,

@@ -123,7 +123,8 @@ public class MaskAction implements AiTextAction {
                     sampleOutput(
                         Map.of(
                             TEXT, "Hello, my name is [REDACTED_1] and my email is [EMAIL_1].",
-                            MASK_MAP, Map.of("[REDACTED_1]", "John Doe", "[EMAIL_1]", "john@example.com")))),
+                            MASK_MAP, Map.of("[REDACTED_1]", "John Doe", "[EMAIL_1]", "john@example.com"))))
+                .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#mask"),
             provider, new MaskAction(), propertyService);
     }
 

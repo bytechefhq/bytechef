@@ -70,6 +70,7 @@ public class AwsS3PutObjectAction {
                     option("private", "private"),
                     option("public-read", "public-read"),
                     option("public-read-write", "public-read-write")))
+        .help("", "https://docs.bytechef.io/reference/components/aws-s3_v1#put-object")
         .perform(AwsS3PutObjectAction::perform);
 
     @SuppressFBWarnings("RV")

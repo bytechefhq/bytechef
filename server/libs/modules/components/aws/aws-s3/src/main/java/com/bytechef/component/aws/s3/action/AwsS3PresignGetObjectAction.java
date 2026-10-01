@@ -52,6 +52,7 @@ public class AwsS3PresignGetObjectAction {
                 .placeholder("15M, 10H, PT-6H3M, etc.")
                 .required(true))
         .output(outputSchema(string()))
+        .help("", "https://docs.bytechef.io/reference/components/aws-s3_v1#get-pre-signed-object")
         .perform(AwsS3PresignGetObjectAction::perform);
 
     protected static String perform(

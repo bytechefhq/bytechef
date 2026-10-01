@@ -53,6 +53,7 @@ public class AwsS3GetObjectAction {
                 .placeholder("file.txt")
                 .required(true))
         .output(outputSchema(fileEntry()))
+        .help("", "https://docs.bytechef.io/reference/components/aws-s3_v1#get-object")
         .perform(AwsS3GetObjectAction::perform);
 
     protected static FileEntry perform(

@@ -104,6 +104,7 @@ public class LiteLLMChatAction {
             VERBOSITY_PROPERTY,
             USER_PROPERTY)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/lite-llm_v1#ask")
         .perform(LiteLLMChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {

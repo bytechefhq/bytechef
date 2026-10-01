@@ -51,6 +51,7 @@ public class Neo4jChatMemoryDeleteAction {
                     .properties(
                         string(CONVERSATION_ID),
                         bool("deleted"))))
+        .help("", "https://docs.bytechef.io/reference/components/neo4j-chat-memory_v1#delete-conversation")
         .perform(Neo4jChatMemoryDeleteAction::perform);
 
     private Neo4jChatMemoryDeleteAction() {

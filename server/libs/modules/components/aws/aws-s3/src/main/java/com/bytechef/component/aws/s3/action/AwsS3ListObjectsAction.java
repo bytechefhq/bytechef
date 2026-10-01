@@ -63,6 +63,7 @@ public class AwsS3ListObjectsAction {
                                 string("key"),
                                 string("name"),
                                 string("uri")))))
+        .help("", "https://docs.bytechef.io/reference/components/aws-s3_v1#list-objects")
         .perform(AwsS3ListObjectsAction::perform);
 
     /**

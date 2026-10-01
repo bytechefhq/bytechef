@@ -46,6 +46,7 @@ public class Neo4jChatMemoryListConversationsAction {
                         array("conversationIds")
                             .items(string()),
                         integer("count"))))
+        .help("", "https://docs.bytechef.io/reference/components/neo4j-chat-memory_v1#list-conversations")
         .perform(Neo4jChatMemoryListConversationsAction::perform);
 
     private Neo4jChatMemoryListConversationsAction() {

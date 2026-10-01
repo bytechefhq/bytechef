@@ -142,6 +142,7 @@ public final class KnowledgeBaseUpdateAction {
                         "The text content to update the knowledge base with. If not provided, uses the configured " +
                             "document reader.")
                     .required(false))
+            .help("", "https://docs.bytechef.io/reference/components/knowledgeBase_v1#update-documents")
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions, context) -> perform(
                     inputParameters, componentConnections, extensions, context, updateVectorStore,

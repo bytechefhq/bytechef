@@ -12,7 +12,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete documents from the knowledge base by metadata filter.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/knowledgeBase_v1#delete-documents"
+    },
     "metadata": null,
     "name": "delete",
     "outputDefinition": null,
@@ -232,7 +235,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Loads data into the knowledge base.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/knowledgeBase_v1#load-data"
+    },
     "metadata": null,
     "name": "load",
     "outputDefinition": null,
@@ -431,7 +437,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Query data from the knowledge base. Supports three modes: tag-only search, vector search, or combined tag filtering with vector search.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/knowledgeBase_v1#search-data"
+    },
     "metadata": null,
     "name": "search",
     "outputDefinition": {
@@ -765,7 +774,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates documents in the knowledge base by deleting existing ones matching the selected document or chunk and loading new ones.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/knowledgeBase_v1#update-documents"
+    },
     "metadata": null,
     "name": "update",
     "outputDefinition": null,

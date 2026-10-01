@@ -60,6 +60,7 @@ public class RedisChatMemoryGetMessagesAction {
                                     .properties(
                                         string("role"),
                                         string("content"))))))
+        .help("", "https://docs.bytechef.io/reference/components/redis-chat-memory_v1#get-messages")
         .perform(RedisChatMemoryGetMessagesAction::perform);
 
     private RedisChatMemoryGetMessagesAction() {

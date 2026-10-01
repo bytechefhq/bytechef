@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the AWS S3 object.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aws-s3_v1#get-object"
+    },
     "metadata": null,
     "name": "getObject",
     "outputDefinition": {
@@ -284,7 +287,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the url of an AWS S3 object.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aws-s3_v1#get-url"
+    },
     "metadata": null,
     "name": "getUrl",
     "outputDefinition": {
@@ -376,7 +382,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the list AWS S3 objects. Every object needs to have read permission in order to be seen.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aws-s3_v1#list-objects"
+    },
     "metadata": null,
     "name": "listObjects",
     "outputDefinition": {
@@ -638,7 +647,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "You can share an object with a pre-signed URL for up to 12 hours or until your session expires.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aws-s3_v1#get-pre-signed-object"
+    },
     "metadata": null,
     "name": "presignGetObject",
     "outputDefinition": {
@@ -752,7 +764,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Store an object to AWS S3.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aws-s3_v1#put-object"
+    },
     "metadata": null,
     "name": "putObject",
     "outputDefinition": null,
