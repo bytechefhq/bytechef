@@ -16,6 +16,7 @@
 
 package com.bytechef.component.slack;
 
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.tool;
@@ -32,6 +33,7 @@ import com.bytechef.component.slack.action.SlackSendDirectMessageAction;
 import com.bytechef.component.slack.cluster.SlackApprovalChannel;
 import com.bytechef.component.slack.connection.SlackConnection;
 import com.bytechef.component.slack.trigger.SlackAnyEventTrigger;
+import com.bytechef.component.slack.trigger.SlackNewMessageTrigger;
 import com.bytechef.component.slack.util.SlackUtils;
 import com.google.auto.service.AutoService;
 
@@ -66,7 +68,13 @@ public final class SlackComponentHandler implements ComponentHandler {
             tool(SlackSendApprovalMessageAction.ACTION_DEFINITION),
             tool(SlackSendChannelMessageAction.ACTION_DEFINITION),
             tool(SlackSendDirectMessageAction.ACTION_DEFINITION))
-        .triggers(SlackAnyEventTrigger.TRIGGER_DEFINITION)
+        .triggers(SlackAnyEventTrigger.TRIGGER_DEFINITION, SlackNewMessageTrigger.TRIGGER_DEFINITION)
+        .agentChannels(
+            agentChannel(
+                "slack", SlackNewMessageTrigger.TRIGGER_DEFINITION,
+                SlackSendChannelMessageAction.ACTION_DEFINITION)
+                    .title("Slack")
+                    .approvalChannel("slack"))
         .version(1);
 
     @Override
