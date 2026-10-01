@@ -21,7 +21,7 @@ The test URL records a request only while the trigger waits for test data (after
 |:---|:---|
 | `POST` | Runs the trigger. Use this method for requests that have a body. |
 | `GET` | Runs the trigger. The query string parameters are available in `parameters`. |
-| `HEAD` | Returns `200 OK`. The workflow does not run. |
+| `HEAD` | Does not run the workflow. Returns `200 OK`, except when the workflow is disabled and uses the **Await Workflow and Respond** trigger: then it returns `410 Gone`. |
 | `PUT`, `PATCH`, `DELETE` | Not supported. The server returns `405 Method Not Allowed`. |
 
 ### Headers
