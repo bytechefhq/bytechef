@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -44,7 +45,8 @@ public class SsoOAuth2AuthenticationSuccessHandler implements AuthenticationSucc
         HttpServletRequest request, HttpServletResponse response, Authentication authentication)
         throws IOException {
 
-        CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+        CustomOAuth2User oAuth2User = (CustomOAuth2User) Objects.requireNonNull(
+            authentication.getPrincipal(), "principal");
 
         String login = oAuth2User.getName();
 

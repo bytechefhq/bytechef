@@ -34,6 +34,7 @@ public abstract class BaseResources {
     protected BaseResources() {
     }
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     protected BaseResources(com.bytechef.definition.BaseResources resources) {
         this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
         this.documentationUrl = Validate.notNull(resources.documentationUrl(), "documentationUrl");

@@ -37,6 +37,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
@@ -95,10 +96,7 @@ class CheckForViolationsClusterWiringTest {
         CallAdvisorChain chain = mock(CallAdvisorChain.class);
         ChatClientResponse response = runAgainst((CallAdvisor) advisor, chain, "this is bad input");
 
-        String text = response.chatResponse()
-            .getResult()
-            .getOutput()
-            .getText();
+        String text = getOutputText(response);
 
         assertThat(text).isEqualTo("Request blocked by guardrail.");
 
@@ -129,10 +127,7 @@ class CheckForViolationsClusterWiringTest {
 
         ChatClientResponse response = runAgainst((CallAdvisor) advisor, mock(CallAdvisorChain.class), "all clear");
 
-        String text = response.chatResponse()
-            .getResult()
-            .getOutput()
-            .getText();
+        String text = getOutputText(response);
 
         assertThat(text).isEqualTo("LLM response");
 
@@ -189,10 +184,7 @@ class CheckForViolationsClusterWiringTest {
         CallAdvisorChain chain = mock(CallAdvisorChain.class);
         ChatClientResponse response = runAgainst((CallAdvisor) advisor, chain, "anything");
 
-        String text = response.chatResponse()
-            .getResult()
-            .getOutput()
-            .getText();
+        String text = getOutputText(response);
 
         assertThat(text).isEqualTo("Request blocked by guardrail.");
 
@@ -237,6 +229,15 @@ class CheckForViolationsClusterWiringTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String getOutputText(ChatClientResponse response) {
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse is required");
+
+        Generation generation = Objects.requireNonNull(chatResponse.getResult(), "result is required");
+
+        return generation.getOutput()
+            .getText();
     }
 
     private static ChatClientResponse runAgainst(CallAdvisor advisor, CallAdvisorChain chain, String userText) {

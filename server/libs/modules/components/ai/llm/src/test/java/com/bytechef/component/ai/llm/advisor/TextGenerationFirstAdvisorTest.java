@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
@@ -69,9 +70,9 @@ class TextGenerationFirstAdvisorTest {
         ChatClientResponse chatClientResponse = textGenerationFirstAdvisor.adviseCall(
             chatClientRequest, callAdvisorChain);
 
-        ChatResponse advisedChatResponse = chatClientResponse.chatResponse();
+        ChatResponse advisedChatResponse = Objects.requireNonNull(chatClientResponse.chatResponse(), "chatResponse");
 
-        Generation result = advisedChatResponse.getResult();
+        Generation result = Objects.requireNonNull(advisedChatResponse.getResult(), "result");
 
         assertEquals("{\"result\":[]}", result.getOutput()
             .getText());

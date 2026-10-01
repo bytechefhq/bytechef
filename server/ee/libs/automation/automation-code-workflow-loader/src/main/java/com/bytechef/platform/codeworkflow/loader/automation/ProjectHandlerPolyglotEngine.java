@@ -173,7 +173,7 @@ class ProjectHandlerPolyglotEngine {
 
         @Override
         public List<WorkflowDefinition> getWorkflows() {
-            return workflows;
+            return List.copyOf(workflows);
         }
 
         @Override

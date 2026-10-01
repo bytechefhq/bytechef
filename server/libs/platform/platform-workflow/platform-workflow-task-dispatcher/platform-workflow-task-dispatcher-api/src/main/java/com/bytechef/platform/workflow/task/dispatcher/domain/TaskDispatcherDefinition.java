@@ -29,7 +29,7 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class TaskDispatcherDefinition {
+public final class TaskDispatcherDefinition {
 
     private String description;
     private Help help;

@@ -34,6 +34,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,10 +92,7 @@ class SanitizeTextClusterWiringTest {
 
         ChatClientResponse response = runAgainst((CallAdvisor) advisor, "has foo inside");
 
-        String text = response.chatResponse()
-            .getResult()
-            .getOutput()
-            .getText();
+        String text = extractText(response);
 
         assertThat(text).isEqualTo("has [redacted] inside");
 
@@ -158,10 +156,7 @@ class SanitizeTextClusterWiringTest {
 
         ChatClientResponse response = ((CallAdvisor) advisor).adviseCall(request, chain);
 
-        String text = response.chatResponse()
-            .getResult()
-            .getOutput()
-            .getText();
+        String text = extractText(response);
 
         assertThat(text)
             .as("LLM echoed the user's email back; the output pass must re-mask it")
@@ -189,12 +184,18 @@ class SanitizeTextClusterWiringTest {
 
         ChatClientResponse response = runAgainst((CallAdvisor) advisor, "unchanged output");
 
-        String text = response.chatResponse()
-            .getResult()
-            .getOutput()
-            .getText();
+        String text = extractText(response);
 
         assertThat(text).isEqualTo("unchanged output");
+    }
+
+    private static String extractText(ChatClientResponse response) {
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        Generation generation = Objects.requireNonNull(chatResponse.getResult(), "generation");
+
+        return generation.getOutput()
+            .getText();
     }
 
     private Advisor buildAdvisorWithTwoSanitizers(

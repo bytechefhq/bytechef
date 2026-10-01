@@ -17,6 +17,7 @@
 package com.bytechef.platform.job.sync.executor;
 
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -124,6 +125,7 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
     }
 
     @Override
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public void error(Throwable throwable) {
         if (completed) {
             return;

@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -48,7 +49,8 @@ public final class MultiTenantAuthenticationSuccessHandler implements Authentica
     public void onAuthenticationSuccess(
         HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) Objects.requireNonNull(
+            authentication.getPrincipal(), "principal is required");
 
         List<String> tenantIds = tenantService.getTenantIdsByUserEmail(userDetails.getUsername());
 

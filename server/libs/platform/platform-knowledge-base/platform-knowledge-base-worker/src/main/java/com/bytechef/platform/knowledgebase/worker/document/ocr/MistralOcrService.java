@@ -135,12 +135,13 @@ public class MistralOcrService implements OcrService {
             .retrieve()
             .toEntity(SignedUrlResponse.class);
 
-        if (response.getBody() == null || response.getBody()
-            .url() == null) {
+        SignedUrlResponse signedUrlResponse = response.getBody();
+
+        if (signedUrlResponse == null || signedUrlResponse.url() == null) {
             throw new RuntimeException("Failed to get signed URL for file: " + fileId);
         }
 
-        return response.getBody();
+        return signedUrlResponse;
     }
 
     private String performOcr(String documentUrl) {

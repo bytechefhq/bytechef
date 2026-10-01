@@ -133,7 +133,7 @@ public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest
         return fieldJsonNode.asString();
     }
 
-    private static class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
+    private static final class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
 
         private String extension;
         private String mimeType;

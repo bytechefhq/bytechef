@@ -32,6 +32,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -167,9 +168,11 @@ class CheckForViolationsAdvisorStreamingOutputTest {
         when(streamChain.nextStream(request))
             .thenReturn(Flux.just(safeChunk, violatingChunk, trailingChunk));
 
-        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses)
             .as("stream emits safe chunk, then a blocked-response replacing the violating chunk, then completes")
@@ -177,24 +180,25 @@ class CheckForViolationsAdvisorStreamingOutputTest {
 
         ChatClientResponse first = responses.get(0);
 
-        assertThat(first.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse firstChatResponse = Objects.requireNonNull(first.chatResponse(), "chatResponse");
+        Generation firstResult = Objects.requireNonNull(firstChatResponse.getResult(), "result");
+
+        assertThat(firstResult.getOutput()
             .getText())
                 .as("first chunk was safe and must have been delivered verbatim")
                 .isEqualTo("safe-1 ");
 
         ChatClientResponse second = responses.get(1);
 
-        assertThat(second.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse secondChatResponse = Objects.requireNonNull(second.chatResponse(), "chatResponse");
+        Generation secondResult = Objects.requireNonNull(secondChatResponse.getResult(), "result");
+
+        assertThat(secondResult.getOutput()
             .getText())
                 .as("violating chunk must be replaced by the BLOCKED placeholder, not delivered")
                 .isEqualTo("BLOCKED");
 
-        assertThat(second.chatResponse()
-            .getMetadata()
+        assertThat(secondChatResponse.getMetadata()
             .containsKey(VIOLATIONS_METADATA_KEY))
                 .as("blocked response must carry violations metadata so the caller can observe the failure")
                 .isTrue();

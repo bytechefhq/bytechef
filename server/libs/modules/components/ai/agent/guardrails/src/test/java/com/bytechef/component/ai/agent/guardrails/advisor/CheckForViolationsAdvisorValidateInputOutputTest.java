@@ -36,6 +36,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -113,9 +114,10 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(requestWithUser("secret data"), chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
         verify(chain, never()).nextCall(any());
     }
@@ -185,9 +187,10 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
     }
 
@@ -240,9 +243,10 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> violations = (List<Map<String, Object>>) response.chatResponse()
-            .getMetadata()
+        List<Map<String, Object>> violations = (List<Map<String, Object>>) blockedChatResponse.getMetadata()
             .get(VIOLATIONS_METADATA_KEY);
 
         assertThat(violations)
@@ -279,9 +283,10 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
     }
 
@@ -320,9 +325,10 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
     }
 
@@ -351,9 +357,10 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(requestWithUser("bad input"), chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
         verify(chain, never()).nextCall(any());
     }
@@ -382,9 +389,10 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
         verify(chain).nextCall(request);
     }
@@ -436,15 +444,21 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
 
         when(streamChain.nextStream(request)).thenReturn(Flux.just(assistantResponse("this is toxic content")));
 
-        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses).hasSize(1);
-        assertThat(responses.get(0)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatResponse blockedChatResponse = Objects.requireNonNull(
+            responses.get(0)
+                .chatResponse(),
+            "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
     }
 
@@ -502,16 +516,22 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
 
         when(streamChain.nextStream(request)).thenReturn(Flux.just(cleanChunk, toxicChunk));
 
-        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
-            .collectList()
-            .block();
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
 
         assertThat(responses).hasSize(2);
         assertThat(responses.get(0)).isSameAs(cleanChunk);
-        assertThat(responses.get(1)
-            .chatResponse()
-            .getResult()
-            .getOutput()
+
+        ChatResponse blockedChatResponse = Objects.requireNonNull(
+            responses.get(1)
+                .chatResponse(),
+            "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText()).isEqualTo("BLOCKED");
     }
 

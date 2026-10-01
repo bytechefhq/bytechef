@@ -51,6 +51,7 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -406,7 +407,7 @@ class AnthropicChatActionTest {
     }
 
     private static Map<String, Object> getOutputSchema(AnthropicChatOptions anthropicChatOptions) {
-        OutputConfig outputConfig = anthropicChatOptions.getOutputConfig();
+        OutputConfig outputConfig = Objects.requireNonNull(anthropicChatOptions.getOutputConfig(), "outputConfig");
 
         JsonOutputFormat jsonOutputFormat = outputConfig.format()
             .orElseThrow();

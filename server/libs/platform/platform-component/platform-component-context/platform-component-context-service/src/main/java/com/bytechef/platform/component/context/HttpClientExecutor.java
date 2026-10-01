@@ -634,6 +634,7 @@ class HttpClientExecutor {
         }
 
         @Override
+        @SuppressFBWarnings("EI_EXPOSE_REP")
         public Map<String, List<String>> getHeaders() {
             return headers;
         }

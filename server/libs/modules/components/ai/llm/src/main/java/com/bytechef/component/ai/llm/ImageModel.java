@@ -96,6 +96,10 @@ public interface ImageModel {
 
         ImageGeneration result = response.getResult();
 
+        if (result == null) {
+            throw new IllegalStateException("Image response contains no result");
+        }
+
         return result.getOutput();
     }
 

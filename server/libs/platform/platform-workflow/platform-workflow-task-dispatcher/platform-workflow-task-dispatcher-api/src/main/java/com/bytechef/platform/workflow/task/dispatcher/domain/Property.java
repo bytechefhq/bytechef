@@ -49,6 +49,7 @@ public abstract class Property extends BaseProperty {
     protected Property() {
     }
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public Property(com.bytechef.platform.workflow.task.dispatcher.definition.Property property) {
         super(property);
 

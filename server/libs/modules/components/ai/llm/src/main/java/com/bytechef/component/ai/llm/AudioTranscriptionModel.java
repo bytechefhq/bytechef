@@ -49,6 +49,10 @@ public interface AudioTranscriptionModel {
 
         org.springframework.ai.audio.transcription.AudioTranscription result = response.getResult();
 
+        if (result == null) {
+            throw new IllegalStateException("Audio transcription response contains no result");
+        }
+
         return result.getOutput();
     }
 

@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class ClusterElementDefinition {
+public final class ClusterElementDefinition {
 
     private String componentName;
     private int componentVersion;

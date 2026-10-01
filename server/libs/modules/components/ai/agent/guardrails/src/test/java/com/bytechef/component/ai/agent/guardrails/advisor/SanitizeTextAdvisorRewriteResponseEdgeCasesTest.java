@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClientRequest;
@@ -101,9 +102,10 @@ class SanitizeTextAdvisorRewriteResponseEdgeCasesTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(response.chatResponse()
-            .getResult()
-            .getOutput()
+        ChatResponse forwardedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(forwardedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
             .getText())
                 .as("null text ⇒ generation must pass through unchanged (tool-calls / media preserved for downstream)")
                 .isNull();

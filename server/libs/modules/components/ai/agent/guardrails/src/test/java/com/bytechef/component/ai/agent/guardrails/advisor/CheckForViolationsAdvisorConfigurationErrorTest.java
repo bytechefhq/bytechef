@@ -29,12 +29,14 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 
 /**
@@ -208,9 +210,10 @@ class CheckForViolationsAdvisorConfigurationErrorTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> surfaced = (List<Map<String, Object>>) response.chatResponse()
-            .getMetadata()
+        List<Map<String, Object>> surfaced = (List<Map<String, Object>>) chatResponse.getMetadata()
             .get(VIOLATIONS_METADATA_KEY);
 
         assertThat(surfaced)

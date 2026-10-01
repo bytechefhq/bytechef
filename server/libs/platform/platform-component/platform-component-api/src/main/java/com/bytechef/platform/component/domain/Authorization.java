@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class Authorization {
+public final class Authorization {
 
     public static final List<Object> DEFAULT_REFRESH_ON = List.of(401);
 
