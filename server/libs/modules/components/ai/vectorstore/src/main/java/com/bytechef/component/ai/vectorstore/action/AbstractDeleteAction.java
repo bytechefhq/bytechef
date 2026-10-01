@@ -67,6 +67,7 @@ public abstract class AbstractDeleteAction {
                 Stream.of(Stream.of(METADATA_FILTER_PROPERTY), properties.stream())
                     .flatMap(stream -> stream)
                     .toList())
+            .help("", "https://docs.bytechef.io/reference/components/" + componentName + "_v1#delete-documents")
             .perform((MultipleConnectionsPerformFunction) deleteAction::perform);
     }
 

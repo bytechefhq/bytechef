@@ -73,6 +73,7 @@ public abstract class AbstractSearchAction {
                     .flatMap(stream -> stream)
                     .toList())
             .output()
+            .help("", "https://docs.bytechef.io/reference/components/" + componentName + "_v1#search-documents")
             .perform((MultipleConnectionsPerformFunction) searchAction::perform);
     }
 
