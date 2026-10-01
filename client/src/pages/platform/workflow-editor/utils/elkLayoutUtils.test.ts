@@ -3187,36 +3187,6 @@ describe('trigger row label separation', () => {
         expect(Math.abs((firstX + secondX) / 2 + 36 - taskCenter)).toBeLessThanOrEqual(1);
     });
 
-    it('uses a single node-to-node gap when one trigger means no fan-in bus', async () => {
-        const nodes: Node[] = [triggerNode('trigger_1', 'Run'), taskNode('task1')];
-
-        const edges: Edge[] = [edge('trigger_1', 'task1')];
-
-        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
-
-        const triggerBottom = positionOf(result.nodes, 'trigger_1').y + 72;
-
-        expect(positionOf(result.nodes, 'task1').y - triggerBottom).toBe(80);
-    });
-
-
-    it('splits an even row around the fan-in target', async () => {
-        const nodes: Node[] = [
-            triggerNode('trigger_1', 'Pokreni Svakog Radnog Dana'),
-            triggerNode('trigger_2', 'Go'),
-            taskNode('task1'),
-        ];
-
-        const edges: Edge[] = [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')];
-
-        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
-
-        const firstX = positionOf(result.nodes, 'trigger_1').x;
-        const secondX = positionOf(result.nodes, 'trigger_2').x;
-
-        expect((firstX + secondX) / 2).toBeCloseTo(positionOf(result.nodes, 'task1').x, 5);
-    });
-
     it('starts the chain at the same height whether or not it has tasks yet', async () => {
         const triggerPlaceholderNode: Node = {
             data: {label: '+'},

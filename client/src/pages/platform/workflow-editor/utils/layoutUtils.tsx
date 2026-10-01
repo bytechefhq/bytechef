@@ -47,7 +47,6 @@ import {getForkJoinBranchSide} from './createForkJoinEdges';
 import {getOnErrorBranchSide} from './createOnErrorEdges';
 import {getCrossAxis, getCrossAxisNodeSize} from './directionUtils';
 import {
-    CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET,
     adjustBottomGhostForMovedChildren,
     alignBranchCaseChildren,
     alignChainNodesCrossAxis,
@@ -59,7 +58,6 @@ import {
     centerDispatcherPlaceholdersOnMainAxis,
     centerLRSmallNodes,
     centerNodesAfterBottomGhost,
-    collectNestedDispatcherNodes,
     constrainBranchGhostsCrossAxis,
     constrainConditionGhostsCrossAxis,
     constrainLeftGhostPositions,
@@ -861,235 +859,6 @@ export function filterAndDedupeLayoutEdges(allNodes: Node[], edges: Edge[]): Edg
     return [...existingEdges.filter(touchesPlaceholder), ...existingEdges.filter((edge) => !touchesPlaceholder(edge))];
 }
 
-const NODE_ANCHOR_HALF = TRIGGER_NODE_BOX_SIZE / 2;
-
-const TRAILING_BRANCH_PLACEHOLDER_GAP = 16;
-
-const TRAILING_PLACEHOLDER_DISPATCHERS: Record<string, string> = {
-    'fork-join': 'forkJoin',
-    parallel: 'parallel',
-};
-
-function getNodeCrossAnchorOffset(node: Node, crossAxis: 'x' | 'y'): number {
-    if (crossAxis === 'x' && rendersClusterElements(node)) {
-        return CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET;
-    }
-
-    return NODE_ANCHOR_HALF;
-}
-
-function getNodeCrossReach(node: Node, crossAxis: 'x' | 'y'): number {
-    if (node.type === 'placeholder') {
-        return crossAxis === 'x' ? CLUSTER_ELEMENT_NODE_WIDTH : PLACEHOLDER_NODE_HEIGHT;
-    }
-
-    if (node.type === 'taskDispatcherLeftGhostNode') {
-        return 16;
-    }
-
-    if (node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode') {
-        return TRIGGER_NODE_BOX_SIZE;
-    }
-
-    const anchorReach = crossAxis === 'x' && rendersClusterElements(node) ? 240 : TRIGGER_NODE_BOX_SIZE;
-
-    return anchorReach + (crossAxis === 'x' ? getLabelCrossOverhang(node) : TRIGGER_LABEL_BLOCK_HEIGHT);
-}
-
-function getNodeMainReach(node: Node, mainAxis: 'x' | 'y'): number {
-    if (node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode') {
-        return 2;
-    }
-
-    if (node.type === 'placeholder') {
-        return mainAxis === 'y' ? PLACEHOLDER_NODE_HEIGHT : CLUSTER_ELEMENT_NODE_WIDTH;
-    }
-
-    return TRIGGER_NODE_BOX_SIZE;
-}
-
-function getDispatcherDepth(dispatcherNode: Node, nodesById: Map<string, Node>): number {
-    let depth = 0;
-    let parentId = getParentDispatcherIdOf(dispatcherNode);
-    const visitedIds = new Set<string>();
-
-    while (parentId && !visitedIds.has(parentId)) {
-        visitedIds.add(parentId);
-        depth++;
-
-        const parentNode = nodesById.get(parentId);
-
-        parentId = parentNode ? getParentDispatcherIdOf(parentNode) : undefined;
-    }
-
-    return depth;
-}
-
-function getParentDispatcherIdOf(node: Node): string | undefined {
-    const nodeData = node.data as NodeDataType;
-
-    return (
-        nodeData.conditionData?.conditionId ||
-        nodeData.loopData?.loopId ||
-        nodeData.branchData?.branchId ||
-        nodeData.parallelData?.parallelId ||
-        nodeData.forkJoinData?.forkJoinId ||
-        nodeData.eachData?.eachId ||
-        nodeData.mapData?.mapId ||
-        nodeData.onErrorData?.onErrorId
-    );
-}
-
-export function tuckTrailingBranchPlaceholders(allNodes: Node[], edges: Edge[], direction: LayoutDirectionType): void {
-    const crossAxis = getCrossAxis(direction);
-    const mainAxis = crossAxis === 'x' ? 'y' : 'x';
-    const nodesById = new Map(allNodes.map((node) => [node.id, node]));
-
-    const trailingPlaceholderIds = new Set(
-        edges
-            .filter(
-                (edge) =>
-                    edge.sourceHandle === `${edge.source}-right` &&
-                    /-(parallel|forkJoin)-top-ghost$/.test(edge.source) &&
-                    nodesById.get(edge.target)?.type === 'placeholder'
-            )
-            .map((edge) => edge.target)
-    );
-
-    const dispatcherNodes = allNodes
-        .filter((node) => {
-            const componentName = (node.data as NodeDataType).componentName as string | undefined;
-
-            return !!componentName && componentName in TRAILING_PLACEHOLDER_DISPATCHERS && node.type !== 'placeholder';
-        })
-        .sort(
-            (dispatcherA, dispatcherB) =>
-                getDispatcherDepth(dispatcherB, nodesById) - getDispatcherDepth(dispatcherA, nodesById)
-        );
-
-    for (const dispatcherNode of dispatcherNodes) {
-        const componentName = (dispatcherNode.data as NodeDataType).componentName as string;
-        const ghostSegment = TRAILING_PLACEHOLDER_DISPATCHERS[componentName];
-        const topGhostId = `${dispatcherNode.id}-${ghostSegment}-top-ghost`;
-        const bottomGhostId = `${dispatcherNode.id}-${ghostSegment}-bottom-ghost`;
-
-        const topGhostEdges = edges.filter((edge) => edge.source === topGhostId);
-
-        const placeholderEdge = topGhostEdges.find(
-            (edge) => edge.sourceHandle === `${topGhostId}-right` && nodesById.get(edge.target)?.type === 'placeholder'
-        );
-
-        const placeholderNode = placeholderEdge ? nodesById.get(placeholderEdge.target) : undefined;
-
-        const entryNodes = topGhostEdges
-            .filter((edge) => edge !== placeholderEdge)
-            .map((edge) => nodesById.get(edge.target))
-            .filter((node): node is Node => !!node && node.type !== 'taskDispatcherLeftGhostNode');
-
-        if (!placeholderNode || entryNodes.length === 0) {
-            continue;
-        }
-
-        const memberIds = new Set<string>();
-
-        collectNestedDispatcherNodes(dispatcherNode.id, allNodes, memberIds);
-
-        const laneNodes = [...memberIds]
-            .filter(
-                (memberId) =>
-                    memberId !== dispatcherNode.id &&
-                    memberId !== placeholderNode.id &&
-                    memberId !== topGhostId &&
-                    memberId !== bottomGhostId
-            )
-            .map((memberId) => nodesById.get(memberId))
-            .filter((node): node is Node => !!node);
-
-        if (laneNodes.length === 0) {
-            continue;
-        }
-
-        const laneReach = Math.max(
-            ...laneNodes.map((laneNode) => laneNode.position[crossAxis] + getNodeCrossReach(laneNode, crossAxis))
-        );
-
-        const entryAnchors = entryNodes
-            .map((entryNode) => entryNode.position[crossAxis] + getNodeCrossAnchorOffset(entryNode, crossAxis))
-            .sort((anchorA, anchorB) => anchorA - anchorB);
-
-        const placeholderPosition = placeholderNode.position[crossAxis];
-        const placeholderReach = getNodeCrossReach(placeholderNode, crossAxis);
-
-        let lanesCenter = (entryAnchors[0] + entryAnchors[entryAnchors.length - 1]) / 2;
-
-        if (entryAnchors.length === 1) {
-            lanesCenter = (entryAnchors[0] + laneReach + TRAILING_BRANCH_PLACEHOLDER_GAP + placeholderReach / 2) / 2;
-        } else if (entryAnchors.length % 2 === 1) {
-            lanesCenter = entryAnchors[(entryAnchors.length - 1) / 2];
-        }
-
-        const dispatcherAnchor =
-            dispatcherNode.position[crossAxis] + getNodeCrossAnchorOffset(dispatcherNode, crossAxis);
-
-        const hasDraggedLane = laneNodes.some((laneNode) =>
-            containsNodePosition((laneNode.data as NodeDataType).metadata)
-        );
-
-        let laneShift = hasDraggedLane ? 0 : Math.max(0, dispatcherAnchor - lanesCenter);
-
-        const frameFarEdge = placeholderPosition + placeholderReach;
-        const centredFarEdge = laneReach + laneShift + TRAILING_BRANCH_PLACEHOLDER_GAP + placeholderReach;
-
-        if (centredFarEdge > frameFarEdge) {
-            const topGhostNode = nodesById.get(topGhostId);
-            const bottomGhostNode = nodesById.get(bottomGhostId);
-
-            const isBandOccupied =
-                !topGhostNode ||
-                !bottomGhostNode ||
-                allNodes.some((otherNode) => {
-                    if (
-                        otherNode === dispatcherNode ||
-                        memberIds.has(otherNode.id) ||
-                        trailingPlaceholderIds.has(otherNode.id)
-                    ) {
-                        return false;
-                    }
-
-                    const otherCrossStart = otherNode.position[crossAxis];
-                    const otherCrossEnd = otherCrossStart + getNodeCrossReach(otherNode, crossAxis);
-                    const otherMainStart = otherNode.position[mainAxis];
-                    const otherMainEnd = otherMainStart + getNodeMainReach(otherNode, mainAxis);
-
-                    return (
-                        otherCrossEnd > frameFarEdge &&
-                        otherCrossStart < centredFarEdge &&
-                        otherMainEnd > topGhostNode.position[mainAxis] &&
-                        otherMainStart < bottomGhostNode.position[mainAxis]
-                    );
-                });
-
-            if (isBandOccupied) {
-                laneShift = Math.max(
-                    0,
-                    Math.min(laneShift, placeholderPosition - laneReach - TRAILING_BRANCH_PLACEHOLDER_GAP)
-                );
-            }
-        }
-
-        if (laneShift >= 1) {
-            laneNodes.forEach((laneNode) => {
-                laneNode.position = {...laneNode.position, [crossAxis]: laneNode.position[crossAxis] + laneShift};
-            });
-        }
-
-        placeholderNode.position = {
-            ...placeholderNode.position,
-            [crossAxis]: laneReach + laneShift + TRAILING_BRANCH_PLACEHOLDER_GAP,
-        };
-    }
-}
-
 export const getLayoutElements = async ({
     canvasHeight,
     canvasWidth,
@@ -1242,8 +1011,6 @@ export const getLayoutElements = async ({
     if (direction === 'TB') {
         centerDispatcherChildrenOnMainAxis(allNodes, edges, mainAxis);
     }
-
-    tuckTrailingBranchPlaceholders(allNodes, edges, direction);
 
     edges = filterAndDedupeLayoutEdges(allNodes, edges);
 
