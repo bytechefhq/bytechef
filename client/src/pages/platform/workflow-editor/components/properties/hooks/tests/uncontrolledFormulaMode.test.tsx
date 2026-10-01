@@ -173,6 +173,116 @@ describe('uncontrolled Text/Formula', () => {
         expect(saveProperty).not.toHaveBeenCalled();
     });
 
+    describe('$ on a select', () => {
+        const methodProperty = {
+            controlType: 'SELECT',
+            expressionEnabled: true,
+            name: 'method',
+            options: [
+                {label: 'GET', value: 'GET'},
+                {label: 'POST', value: 'POST'},
+            ],
+            type: 'STRING',
+        } as PropertyAllType;
+
+        const renderMethod = (property: PropertyAllType = methodProperty) =>
+            renderHook(() => useProperty({parameterValue: 'GET', path: 'parameters.method', property}), {wrapper});
+
+        const pressDollar = (result: ReturnType<typeof renderMethod>['result']) => {
+            const preventDefault = vi.fn();
+
+            act(() => result.current.handleSelectKeyDown({key: '$', preventDefault} as never));
+
+            return preventDefault;
+        };
+
+        it('opens an empty one-pill editor with $ typed although an option is selected', () => {
+            const {result} = renderMethod();
+
+            expect(result.current.inputMode.renderer).toBe('native');
+
+            const preventDefault = pressDollar(result);
+
+            expect(preventDefault).toHaveBeenCalled();
+            expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: true});
+            expect(result.current.mentionInputValue).toBe('');
+            expect(result.current.editorFocusRequest?.initialInput).toBe('$');
+        });
+
+        it('replaces the option with the chosen pill', () => {
+            const {result} = renderMethod();
+
+            pressDollar(result);
+
+            act(() => result.current.handleMentionInputValueChange('${trigger_1.method}'));
+
+            expect(result.current.propertyParameterValue).toBe('${trigger_1.method}');
+            expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: true});
+        });
+
+        it('keeps the option when pill entry is left without a pill', () => {
+            const {result} = renderMethod();
+
+            pressDollar(result);
+
+            act(() => result.current.handleSinglePillAbandoned());
+
+            expect(result.current.inputMode.renderer).toBe('native');
+            expect(result.current.propertyParameterValue).toBe('GET');
+            expect(result.current.selectValue).toBe('GET');
+            expect(saveProperty).not.toHaveBeenCalled();
+        });
+
+        it('keeps the option and drops the pending save when the $ is erased', () => {
+            const {result} = renderMethod();
+
+            pressDollar(result);
+
+            const cancelPendingSave = vi.fn();
+
+            result.current.editorPendingSaveCancelRef.current = cancelPendingSave;
+
+            act(() => result.current.handleMentionInputValueChange(''));
+
+            expect(cancelPendingSave).toHaveBeenCalled();
+            expect(result.current.inputMode.renderer).toBe('native');
+            expect(result.current.propertyParameterValue).toBe('GET');
+            expect(result.current.selectValue).toBe('GET');
+        });
+
+        it('clears the field when the chosen pill is deleted afterwards', () => {
+            const {result} = renderMethod();
+
+            pressDollar(result);
+
+            act(() => result.current.handleMentionInputValueChange('${trigger_1.method}'));
+            act(() => result.current.handleMentionInputValueChange(''));
+
+            expect(result.current.inputMode.renderer).toBe('native');
+            expect(result.current.propertyParameterValue).toBe('');
+        });
+
+        it('ignores other keys', () => {
+            const {result} = renderMethod();
+
+            const preventDefault = vi.fn();
+
+            act(() => result.current.handleSelectKeyDown({key: 'G', preventDefault} as never));
+
+            expect(preventDefault).not.toHaveBeenCalled();
+            expect(result.current.inputMode.renderer).toBe('native');
+        });
+
+        it('ignores $ when expressions are disabled', () => {
+            const {result} = renderMethod({...methodProperty, expressionEnabled: false} as PropertyAllType);
+
+            const preventDefault = pressDollar(result);
+
+            expect(preventDefault).not.toHaveBeenCalled();
+            expect(result.current.inputMode.renderer).toBe('native');
+        });
+    });
+
     it('shows the Formula switch on a STRING property', () => {
         const {result} = renderHook(
             () =>

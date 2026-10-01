@@ -16,7 +16,7 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CheckIcon, ChevronsUpDownIcon, CircleQuestionMarkIcon} from 'lucide-react';
-import {FocusEventHandler, ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
+import {FocusEventHandler, KeyboardEvent, ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -59,6 +59,7 @@ interface PropertyComboBoxProps {
     leadingIcon?: ReactNode;
     name?: string;
     onBlur?: FocusEventHandler;
+    onTriggerKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
     onValueChange?: (value: string) => void;
     options: Array<Option>;
     optionsDataSource?: OptionsDataSource;
@@ -95,6 +96,7 @@ const PropertyComboBox = ({
     lookupDependsOnValues,
     name,
     onBlur,
+    onTriggerKeyDown,
     onValueChange,
     options: initialOptions,
     optionsDataSource,
@@ -563,6 +565,7 @@ const PropertyComboBox = ({
                                     !connectionRequirementMet)
                             }
                             name={name}
+                            onKeyDown={onTriggerKeyDown}
                             role="combobox"
                             variant="outline"
                         >
