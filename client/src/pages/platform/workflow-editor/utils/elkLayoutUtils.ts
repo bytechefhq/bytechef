@@ -1975,7 +1975,16 @@ export const getElkLayoutElements = async ({
         // applySavedPositions also propagates a moved dispatcher's delta to its
         // ghosts, placeholders, and children (iteratively, handling nesting), so a
         // dispatcher with a saved position carries its whole frame rigidly with it.
-        applySavedPositions(allNodes, crossAxis, savedPositionCrossAxisShift);
+        const trailingPlaceholderEdge = edges.find((edge) => edge.target === FINAL_PLACEHOLDER_NODE_ID);
+
+        applySavedPositions(
+            allNodes,
+            crossAxis,
+            savedPositionCrossAxisShift,
+            trailingPlaceholderEdge
+                ? {id: FINAL_PLACEHOLDER_NODE_ID, predecessorId: trailingPlaceholderEdge.source}
+                : undefined
+        );
 
         return {edges: filterAndDedupeLayoutEdges(allNodes, edges), engine: 'elk' as const, nodes: allNodes};
     } catch (error) {

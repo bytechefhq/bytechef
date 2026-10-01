@@ -983,7 +983,16 @@ export const getLayoutElements = async ({
 
     const mainAxis = direction === 'TB' ? 'y' : 'x';
 
-    const savedDispatcherDeltas = applySavedPositions(allNodes, crossAxis, savedPositionCrossAxisShift);
+    const trailingPlaceholderEdge = edges.find((edge) => edge.target === FINAL_PLACEHOLDER_NODE_ID);
+
+    const savedDispatcherDeltas = applySavedPositions(
+        allNodes,
+        crossAxis,
+        savedPositionCrossAxisShift,
+        trailingPlaceholderEdge
+            ? {id: FINAL_PLACEHOLDER_NODE_ID, predecessorId: trailingPlaceholderEdge.source}
+            : undefined
+    );
 
     adjustBottomGhostForMovedChildren(allNodes, edges, mainAxis, direction, savedDispatcherDeltas);
 

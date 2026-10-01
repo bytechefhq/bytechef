@@ -1452,6 +1452,33 @@ describe('applySavedPositions', () => {
         expect(allNodes[0].position).toEqual({x: 999, y: 888});
     });
 
+    it('carries the trailing placeholder by the delta of its pinned predecessor', () => {
+        const allNodes: Node[] = [
+            {
+                data: {componentName: 'httpClient', metadata: {ui: {nodePosition: {x: 400, y: 900}}}},
+                id: 'httpClient_1',
+                position: {x: 100, y: 200},
+                type: 'workflow',
+            },
+            {data: {label: '+'}, id: 'final', position: {x: 100, y: 320}, type: 'placeholder'},
+        ];
+
+        applySavedPositions(allNodes, 'x', 0, {id: 'final', predecessorId: 'httpClient_1'});
+
+        expect(allNodes[1].position).toEqual({x: 400, y: 1020});
+    });
+
+    it('leaves the trailing placeholder alone when its predecessor is not pinned', () => {
+        const allNodes: Node[] = [
+            {data: {componentName: 'httpClient'}, id: 'httpClient_1', position: {x: 100, y: 200}, type: 'workflow'},
+            {data: {label: '+'}, id: 'final', position: {x: 100, y: 320}, type: 'placeholder'},
+        ];
+
+        applySavedPositions(allNodes, 'x', 0, {id: 'final', predecessorId: 'httpClient_1'});
+
+        expect(allNodes[1].position).toEqual({x: 100, y: 320});
+    });
+
     it('should fall back to dagre position for undefined axis in saved position (TB mode)', () => {
         const node: Node = {
             data: {componentName: 'httpClient', metadata: {ui: {nodePosition: {x: 500, y: undefined}}}},
