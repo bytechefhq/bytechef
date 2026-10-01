@@ -33,7 +33,7 @@ import tools.jackson.databind.ObjectMapper;
  *
  * @author Ivica Cardic
  */
-class ToolUsageJudge extends DeterministicJudge {
+final class ToolUsageJudge extends DeterministicJudge {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 

@@ -26,7 +26,7 @@ import java.util.Objects;
  *
  * @author Ivica Cardic
  */
-class StringEqualsJudge extends DeterministicJudge {
+final class StringEqualsJudge extends DeterministicJudge {
 
     private final boolean caseSensitive;
     private final String expectedValue;
