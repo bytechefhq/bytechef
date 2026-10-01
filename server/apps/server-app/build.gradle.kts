@@ -58,8 +58,8 @@ val excludeComponents = project.findProperty("excludeComponents")?.toString()
 fun shouldIncludeComponent(componentPath: String): Boolean {
     val componentName = componentPath.substringAfterLast(":").lowercase()
 
-    // Always exclude the example component
-    if (componentName == "example") return false
+    // Always exclude the example and deepgram components
+    if (componentName == "example" || componentName == "deepgram") return false
 
     // If includeComponents is specified, only include those
     if (includeComponents.isNotEmpty()) {
@@ -391,7 +391,7 @@ val buildComponentJars by tasks.registering {
     doLast {
         val totalComponents = rootProject.subprojects
             .filter { it.path.startsWith(":server:libs:modules:components") || it.path.startsWith(":server:ee:libs:modules:components") }
-            .filterNot { it.path.contains("example") }
+            .filterNot { it.path.contains("example") || it.path.contains("deepgram") }
             .count()
 
         println("\n✅ Built ${filteredComponents.size} / $totalComponents component JARs")
