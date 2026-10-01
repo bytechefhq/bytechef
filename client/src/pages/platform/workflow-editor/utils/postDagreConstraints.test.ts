@@ -572,7 +572,7 @@ describe('alignBranchCaseChildren', () => {
         expect(thirdChild.position.x).toBe(200);
     });
 
-    it('should align middle-case child to parallel dispatcher center', () => {
+    it('should leave a parallel middle lane to tuckTrailingBranchPlaceholders', () => {
         const parallelNode: Node = {
             data: {componentName: 'parallel', taskDispatcher: true, taskDispatcherId: 'parallel_1'},
             id: 'parallel_1',
@@ -604,11 +604,10 @@ describe('alignBranchCaseChildren', () => {
 
         alignBranchCaseChildren(allNodes, edges, 'x', NODE_WIDTH);
 
-        // Parallel center cross = 300 + 240/2 = 420, target = 420 - 240/2 = 300
-        expect(childNode.position.x).toBe(300);
+        expect(childNode.position.x).toBe(600);
     });
 
-    it('should align middle-case child to fork-join dispatcher center', () => {
+    it('should leave a fork-join middle lane to tuckTrailingBranchPlaceholders', () => {
         const forkJoinNode: Node = {
             data: {componentName: 'fork-join', taskDispatcher: true, taskDispatcherId: 'fork-join_1'},
             id: 'fork-join_1',
@@ -640,8 +639,7 @@ describe('alignBranchCaseChildren', () => {
 
         alignBranchCaseChildren(allNodes, edges, 'x', NODE_WIDTH);
 
-        // Fork-join center cross = 400 + 240/2 = 520, target = 520 - 240/2 = 400
-        expect(childNode.position.x).toBe(400);
+        expect(childNode.position.x).toBe(700);
     });
 
     it('should skip edges from ghost nodes without any dispatcher id', () => {
