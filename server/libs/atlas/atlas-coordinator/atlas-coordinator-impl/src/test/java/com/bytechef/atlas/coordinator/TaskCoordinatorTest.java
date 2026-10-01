@@ -167,6 +167,75 @@ class TaskCoordinatorTest {
         verify(contextService).peek(4567L, Context.Classname.JOB);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    void testResumeOfAlreadyStartedJobDispatchesCurrentTaskWithoutTransitioningAgain() {
+        Job job = new Job();
+
+        job.setCurrentTask(1);
+        job.setId(4567L);
+        job.setStatus(Job.Status.STARTED);
+        job.setWorkflowId("workflow1");
+
+        JobRepository jobRepository = mock(JobRepository.class);
+
+        when(jobRepository.findById(4567L))
+            .thenReturn(Optional.of(job));
+
+        WorkflowService workflowService = mock(WorkflowService.class);
+
+        when(workflowService.getWorkflow("workflow1"))
+            .thenReturn(
+                new Workflow(
+                    "workflow1",
+                    """
+                        {
+                            "tasks": [
+                                {"name": "task_1", "type": "noop/v1/noop"},
+                                {"name": "task_2", "type": "noop/v1/noop"}
+                            ]
+                        }
+                        """,
+                    Workflow.Format.JSON));
+
+        TaskFileStorage taskFileStorage = mock(TaskFileStorage.class);
+
+        when(taskFileStorage.readContextValue(any()))
+            .thenReturn((Map) Map.of());
+
+        TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+
+        when(taskExecutionService.create(any()))
+            .thenAnswer(invocation -> {
+                TaskExecution taskExecution = invocation.getArgument(0);
+
+                taskExecution.setId(13L);
+
+                return taskExecution;
+            });
+
+        TaskDispatcher<? super Task> taskDispatcher = (TaskDispatcher<? super Task>) mock(TaskDispatcher.class);
+
+        TaskCoordinator resumingTaskCoordinator = new TaskCoordinator(
+            List.of(), List.of(), mock(ApplicationEventPublisher.class),
+            new JobExecutor(
+                mock(ContextService.class), SpelEvaluator.create(), taskDispatcher, taskExecutionService,
+                taskFileStorage, workflowService),
+            new JobServiceImpl(jobRepository), taskCompletionHandler, taskDispatcher, taskExecutionService);
+
+        resumingTaskCoordinator.onResumeJobEvent(ResumeJobEvent.ofStartedJob(4567L));
+
+        ArgumentCaptor<TaskExecution> taskExecutionArgumentCaptor = ArgumentCaptor.forClass(TaskExecution.class);
+
+        verify(taskDispatcher).dispatch(taskExecutionArgumentCaptor.capture());
+
+        TaskExecution dispatchedTaskExecution = taskExecutionArgumentCaptor.getValue();
+
+        assertThat(dispatchedTaskExecution.getName()).isEqualTo("task_2");
+
+        verify(jobRepository, never()).save(any());
+    }
+
     private static TaskExecution createTaskExecution(TaskExecution.Status status) {
         TaskExecution taskExecution = new TaskExecution();
 

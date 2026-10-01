@@ -146,7 +146,9 @@ public class JobFacadeImpl implements JobFacade {
 
     @Override
     public void resumeJob(long id) {
-        eventPublisher.publishEvent(new ResumeJobEvent(id));
+        jobService.resumeToStatusStarted(id);
+
+        eventPublisher.publishEvent(ResumeJobEvent.ofStartedJob(id));
     }
 
     @Override

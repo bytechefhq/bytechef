@@ -29,6 +29,7 @@ public class ResumeJobEvent extends AbstractEvent {
     private long jobId;
     private Long taskExecutionId;
     private @Nullable Map<String, ?> data;
+    private boolean started;
 
     private ResumeJobEvent() {
     }
@@ -49,6 +50,14 @@ public class ResumeJobEvent extends AbstractEvent {
         this.data = data == null ? null : Collections.unmodifiableMap(data);
     }
 
+    public static ResumeJobEvent ofStartedJob(long jobId) {
+        ResumeJobEvent resumeJobEvent = new ResumeJobEvent(jobId);
+
+        resumeJobEvent.started = true;
+
+        return resumeJobEvent;
+    }
+
     public @Nullable Map<String, ?> getData() {
         return data == null ? null : Collections.unmodifiableMap(data);
     }
@@ -61,11 +70,16 @@ public class ResumeJobEvent extends AbstractEvent {
         return taskExecutionId;
     }
 
+    public boolean isStarted() {
+        return started;
+    }
+
     @Override
     public String toString() {
         return "ResumeJobEvent{" +
             "jobId=" + jobId +
             ", data=" + data +
+            ", started=" + started +
             ", createdDate=" + createDate +
             ", route=" + route +
             "} ";
