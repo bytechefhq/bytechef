@@ -41,6 +41,7 @@ import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
+import ClusterFrameShell from './ClusterFrameShell';
 import styles from './NodeTypes.module.css';
 
 type EffectiveDirectionType = Parameters<typeof mapHandlePosition>[1];
@@ -129,6 +130,9 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             )}
             data-nodetype={data.trigger ? 'trigger' : 'task'}
             key={id}
+            style={
+                isMainRootClusterElement && data.clusterFrame ? {...rest.style, width: `${nodeWidth}px`} : rest.style
+            }
         >
             {nodeMenuTrigger && (
                 <div
@@ -201,11 +205,13 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             data-node-box
                             onClick={handleNodeClick}
                             style={
-                                isMainRootClusterElement
-                                    ? {minWidth: `${nodeWidth}px`}
-                                    : isNestedClusterRoot
-                                      ? {width: `${nodeWidth}px`}
-                                      : undefined
+                                isMainRootClusterElement && data.clusterFrame
+                                    ? {width: `${nodeWidth}px`}
+                                    : isMainRootClusterElement
+                                      ? {minWidth: `${nodeWidth}px`}
+                                      : isNestedClusterRoot
+                                        ? {width: `${nodeWidth}px`}
+                                        : undefined
                             }
                         >
                             <div
@@ -421,30 +427,37 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                 </>
             ) : (
                 <>
-                    <Handle
-                        className={twMerge(
-                            styles.handleVisible,
-                            effectiveDirection === 'LR'
-                                ? '-left-px rounded-l-xs rounded-r-none'
-                                : 'rounded-t-xs rounded-b-none',
-                            data.trigger && 'hidden'
-                        )}
-                        isConnectable={false}
-                        position={mapHandlePosition(Position.Top, effectiveDirection)}
-                        style={effectiveDirection === 'TB' ? {left: '36px'} : undefined}
-                        type="target"
-                    />
+                    {!data.clusterFrame && (
+                        <Handle
+                            className={twMerge(
+                                styles.handleVisible,
+                                effectiveDirection === 'LR'
+                                    ? '-left-px rounded-l-xs rounded-r-none'
+                                    : 'rounded-t-xs rounded-b-none',
+                                data.trigger && 'hidden'
+                            )}
+                            isConnectable={false}
+                            position={mapHandlePosition(Position.Top, effectiveDirection)}
+                            style={effectiveDirection === 'TB' ? {left: '36px'} : undefined}
+                            type="target"
+                        />
+                    )}
 
-                    <Handle
-                        className={twMerge(
-                            styles.handleVisible,
-                            effectiveDirection === 'LR' ? 'rounded-l-none rounded-r-xs' : 'rounded-t-none rounded-b-xs'
-                        )}
-                        isConnectable={false}
-                        position={mapHandlePosition(Position.Bottom, effectiveDirection)}
-                        style={effectiveDirection === 'TB' ? {left: '36px'} : undefined}
-                        type="source"
-                    />
+                    {!data.clusterFrame && (
+                        <Handle
+                            className={twMerge(
+                                styles.handleVisible,
+                                effectiveDirection === 'LR'
+                                    ? 'rounded-l-none rounded-r-xs'
+                                    : 'rounded-t-none rounded-b-xs'
+                            )}
+                            isConnectable={false}
+                            position={mapHandlePosition(Position.Bottom, effectiveDirection)}
+                            style={effectiveDirection === 'TB' ? {left: '36px'} : undefined}
+                            type="source"
+                        />
+                    )}
+
                 </>
             )}
 
@@ -495,10 +508,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
 
     const {
-        clusterElementsCanvasOpen,
+        clusterRootComponentDefinitions,
         copiedNode,
         copiedWorkflowId,
-        mainClusterRootComponentDefinition,
         nestedClusterRootsComponentDefinitions,
         renamingNodeName,
         rootClusterElementNodeData,
@@ -508,10 +520,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         setRootClusterElementNodeData,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
-            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+            clusterRootComponentDefinitions: state.clusterRootComponentDefinitions,
             copiedNode: state.copiedNode,
             copiedWorkflowId: state.copiedWorkflowId,
-            mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
             nestedClusterRootsComponentDefinitions: state.nestedClusterRootsComponentDefinitions,
             renamingNodeName: state.renamingNodeName,
             rootClusterElementNodeData: state.rootClusterElementNodeData,
@@ -579,43 +590,43 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
 
     const filteredClusterElementTypes = useMemo(() => {
-        const clusterRootRequirementMet =
-            clusterElementsCanvasOpen &&
-            (isMainRootClusterElement || isNestedClusterRoot) &&
-            mainClusterRootComponentDefinition;
-
-        if (!clusterRootRequirementMet) {
+        if (!(isMainRootClusterElement || isNestedClusterRoot)) {
             return [];
         }
 
-        const nestedClusterRootDefinition = nestedClusterRootsComponentDefinitions[data.componentName];
+        const rootDefinition =
+            nestedClusterRootsComponentDefinitions[data.componentName] ??
+            clusterRootComponentDefinitions[(data.parentClusterRootId as string) ?? data.workflowNodeName];
+
+        if (!rootDefinition) {
+            return [];
+        }
 
         return getFilteredClusterElementTypes({
-            clusterRootComponentDefinition: nestedClusterRootDefinition || mainClusterRootComponentDefinition,
+            clusterRootComponentDefinition: rootDefinition,
             currentClusterElementsType: (data.clusterElementName as string) || data.clusterElementType,
             isNestedClusterRoot,
             operationName: data.operationName,
         });
     }, [
-        clusterElementsCanvasOpen,
+        clusterRootComponentDefinitions,
         isMainRootClusterElement,
         isNestedClusterRoot,
-        mainClusterRootComponentDefinition,
         nestedClusterRootsComponentDefinitions,
         data.componentName,
         data.clusterElementName,
         data.clusterElementType,
         data.operationName,
+        data.parentClusterRootId,
+        data.workflowNodeName,
     ]);
 
     const clusterElementTypesCount = filteredClusterElementTypes.length;
 
     const nodeWidth = useMemo(
         () =>
-            clusterElementsCanvasOpen && (isMainRootClusterElement || isNestedClusterRoot)
-                ? calculateNodeWidth(clusterElementTypesCount)
-                : NODE_WIDTH,
-        [clusterElementsCanvasOpen, isMainRootClusterElement, isNestedClusterRoot, clusterElementTypesCount]
+            isMainRootClusterElement || isNestedClusterRoot ? calculateNodeWidth(clusterElementTypesCount) : NODE_WIDTH,
+        [isMainRootClusterElement, isNestedClusterRoot, clusterElementTypesCount]
     );
 
     const handleDeleteNodeClick = useCallback(
@@ -638,7 +649,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
             handleDeleteTask({
                 cancelWorkflowQueries: cancelWorkflowQueries!,
-                clusterElementsCanvasOpen,
                 currentNode,
                 data: nodeData,
                 invalidateWorkflowQueries: invalidateWorkflowQueries!,
@@ -652,7 +662,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         },
         [
             cancelWorkflowQueries,
-            clusterElementsCanvasOpen,
             currentNode,
             invalidateWorkflowQueries,
             queryClient,
@@ -910,54 +919,89 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     if (isRegularNode) {
         return (
-            <WorkflowNodeContextMenu
-                canPaste={canPaste}
-                data={data}
-                hasSavedPosition={!!hasSavedNodePosition}
-                onCopy={handleCopyNode}
-                onCut={handleCutNode}
-                onDelete={handleDelete}
-                onInfo={() => setInfoCardOpen(true)}
-                onPaste={handlePasteNode}
-                onRename={handleStartRename}
-                onResetPosition={handleResetPosition}
-                onSwitch={handleSwitch}
-                showCopyAction={!data.trigger}
-                showCutAction={!data.trigger}
-                showDeleteAction={!data.trigger || triggerCount > 1}
-                showInfoAction
-                showRenameAction
-            >
-                <WorkflowNodeContent
-                    {...sharedContentProps}
-                    {...(isTriggerDropzone && dropzoneHandlers)}
-                    nodeMenuTrigger={regularNodeMenuTrigger}
-                />
-            </WorkflowNodeContextMenu>
+            <ClusterFrameShell data={data} nodeId={id}>
+                <WorkflowNodeContextMenu
+                    canPaste={canPaste}
+                    data={data}
+                    hasSavedPosition={!!hasSavedNodePosition}
+                    onCopy={handleCopyNode}
+                    onCut={handleCutNode}
+                    onDelete={handleDelete}
+                    onInfo={() => setInfoCardOpen(true)}
+                    onPaste={handlePasteNode}
+                    onRename={handleStartRename}
+                    onResetPosition={handleResetPosition}
+                    onSwitch={handleSwitch}
+                    showCopyAction={!data.trigger}
+                    showCutAction={!data.trigger}
+                    showDeleteAction={!data.trigger || triggerCount > 1}
+                    showInfoAction
+                    showRenameAction
+                >
+                    <WorkflowNodeContent
+                        {...sharedContentProps}
+                        {...(isTriggerDropzone && dropzoneHandlers)}
+                        nodeMenuTrigger={regularNodeMenuTrigger}
+                    />
+                </WorkflowNodeContextMenu>
+            </ClusterFrameShell>
         );
     }
 
     if (isClusterElement && !isMainRootClusterElement) {
         return (
-            <WorkflowNodeContextMenu
-                data={data}
-                hasSavedPosition={!!hasSavedClusterElementPosition}
-                onDelete={handleDelete}
-                onInfo={() => setInfoCardOpen(true)}
-                onRename={handleStartRename}
-                onResetPosition={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
-                onSwitch={handleSwitch}
-                showDeleteAction
-                showInfoAction
-                showRenameAction
-                showReplaceAction={!data.multipleClusterElementsNode}
-            >
-                <WorkflowNodeContent {...sharedContentProps} nodeMenuTrigger={clusterElementMenuTrigger} />
-            </WorkflowNodeContextMenu>
+            <ClusterFrameShell data={data} nodeId={id}>
+                <WorkflowNodeContextMenu
+                    data={data}
+                    hasSavedPosition={!!hasSavedClusterElementPosition}
+                    onDelete={handleDelete}
+                    onInfo={() => setInfoCardOpen(true)}
+                    onRename={handleStartRename}
+                    onResetPosition={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
+                    onSwitch={handleSwitch}
+                    showDeleteAction
+                    showInfoAction
+                    showRenameAction
+                    showReplaceAction={!data.multipleClusterElementsNode}
+                >
+                    <WorkflowNodeContent {...sharedContentProps} nodeMenuTrigger={clusterElementMenuTrigger} />
+                </WorkflowNodeContextMenu>
+            </ClusterFrameShell>
         );
     }
 
-    return <WorkflowNodeContent {...sharedContentProps} />;
+    if (data.clusterFrame) {
+        return (
+            <ClusterFrameShell data={data} nodeId={id}>
+                <WorkflowNodeContextMenu
+                    canPaste={canPaste}
+                    data={data}
+                    hasSavedPosition={!!hasSavedNodePosition}
+                    onCopy={handleCopyNode}
+                    onCut={handleCutNode}
+                    onDelete={handleDelete}
+                    onInfo={() => setInfoCardOpen(true)}
+                    onPaste={handlePasteNode}
+                    onRename={handleStartRename}
+                    onResetPosition={handleResetPosition}
+                    onSwitch={handleSwitch}
+                    showCopyAction
+                    showCutAction
+                    showDeleteAction
+                    showInfoAction
+                    showRenameAction
+                >
+                    <WorkflowNodeContent {...sharedContentProps} nodeMenuTrigger={regularNodeMenuTrigger} />
+                </WorkflowNodeContextMenu>
+            </ClusterFrameShell>
+        );
+    }
+
+    return (
+        <ClusterFrameShell data={data} nodeId={id}>
+            <WorkflowNodeContent {...sharedContentProps} />
+        </ClusterFrameShell>
+    );
 };
 
 function updateClusterElementLabel(

@@ -1,11 +1,13 @@
 import Button from '@/components/Button/Button';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useClusterElementsViewModeStore from '@/pages/platform/workflow-editor/stores/useClusterElementsViewModeStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {NodeDataType} from '@/shared/types';
 import {Panel, useReactFlow} from '@xyflow/react';
 import {
     ArrowRightIcon,
+    BoxIcon,
     BrushCleaningIcon,
     FocusIcon,
     InfoIcon,
@@ -13,6 +15,7 @@ import {
     LockOpenIcon,
     NetworkIcon,
     RedoIcon,
+    SquareDashedIcon,
     StickyNoteIcon,
     UndoIcon,
     ZoomInIcon,
@@ -65,6 +68,8 @@ const WorkflowEditorToolbar = ({
         }))
     );
 
+    const {clusterElementsViewMode, setClusterElementsViewMode} = useClusterElementsViewModeStore();
+
     const {fitView, zoomIn, zoomOut} = useReactFlow();
     const {canRedo, canUndo, handleRedo, handleUndo} = useWorkflowUndoRedo();
     const {updateWorkflowMutation} = useWorkflowEditor();
@@ -108,6 +113,10 @@ const WorkflowEditorToolbar = ({
         setLayoutEngine(layoutEngine === 'elk' ? 'dagre' : 'elk');
     }, [layoutEngine, setLayoutEngine]);
 
+    const handleToggleClusterElementsViewMode = useCallback(() => {
+        setClusterElementsViewMode(clusterElementsViewMode === 'box' ? 'dialog' : 'box');
+    }, [clusterElementsViewMode, setClusterElementsViewMode]);
+
     const handleClear = useCallback(() => {
         setResetWorkflowLayout(true);
     }, [setResetWorkflowLayout]);
@@ -141,6 +150,32 @@ const WorkflowEditorToolbar = ({
                         side="bottom"
                     >
                         {layoutEngineTooltip}
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            aria-label={
+                                clusterElementsViewMode === 'box'
+                                    ? 'Show cluster elements in the editor dialog'
+                                    : 'Show cluster elements inline'
+                            }
+                            className={twMerge(clusterElementsViewMode === 'box' && 'text-content-brand-primary')}
+                            icon={clusterElementsViewMode === 'box' ? <BoxIcon /> : <SquareDashedIcon />}
+                            onClick={handleToggleClusterElementsViewMode}
+                            size="icon"
+                            variant="outline"
+                        />
+                    </TooltipTrigger>
+
+                    <TooltipContent
+                        className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                        side="bottom"
+                    >
+                        {clusterElementsViewMode === 'box'
+                            ? 'Show cluster elements in the editor dialog'
+                            : 'Show cluster elements inline'}
                     </TooltipContent>
                 </Tooltip>
             </Panel>
@@ -250,7 +285,7 @@ const WorkflowEditorToolbar = ({
                                 className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
                                 side="top"
                             >
-                                Reset layout
+                                Number of tasks executed per workflow run.
                             </TooltipContent>
                         </Tooltip>
 

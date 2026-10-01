@@ -3,7 +3,7 @@ import {Node} from '@xyflow/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
-import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowEditorStore, {WorkflowEditorI} from '../../workflow-editor/stores/useWorkflowEditorStore';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 import useClusterElementsLayout from './useClusterElementsLayout';
 
@@ -34,7 +34,7 @@ vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
 }));
 
 vi.mock('@tanstack/react-query', () => ({
-    useQueryClient: () => ({fetchQuery: vi.fn()}),
+    useQueryClient: () => ({fetchQuery: vi.fn().mockResolvedValue({clusterElementTypes: []})}),
 }));
 
 const ROOT_NODE_NAME = 'aiAgent_1';
@@ -47,14 +47,17 @@ const clusterElementNode = (name: string, label: string): Node => ({
     type: 'workflow',
 });
 
-const buildWorkflowDefinition = (revision: number) =>
+const MODEL_ELEMENT = {name: 'anthropic_1', type: 'anthropic/v1/model'};
+const ADDED_ELEMENT = {name: 'activeCampaign_2', type: 'anthropic/v1/memory'};
+
+const buildWorkflowDefinition = (revision: number, clusterElements: Record<string, unknown> = {model: MODEL_ELEMENT}) =>
     JSON.stringify({
-        tasks: [{clusterElements: {}, name: ROOT_NODE_NAME, revision}],
+        tasks: [{clusterElements, name: ROOT_NODE_NAME, revision}],
     });
 
-const setWorkflowDefinition = (revision: number) => {
+const setWorkflowDefinition = (revision: number, clusterElements?: Record<string, unknown>) => {
     useWorkflowDataStore.setState({
-        workflow: {definition: buildWorkflowDefinition(revision), id: 'workflow-1'},
+        workflow: {definition: buildWorkflowDefinition(revision, clusterElements), id: 'workflow-1'},
     } as Parameters<typeof useWorkflowDataStore.setState>[0]);
 };
 
@@ -78,15 +81,30 @@ describe('useClusterElementsLayout', () => {
         useClusterElementsDataStore.setState({nodes: handPlacedNodes()});
 
         useWorkflowEditorStore.setState({
-            mainClusterRootComponentDefinition: {name: 'aiAgent'},
-            nestedClusterRootsComponentDefinitions: {},
+            clusterRootComponentDefinitions: {
+                [ROOT_NODE_NAME]: {
+                    clusterElement: false,
+                    clusterRoot: true,
+                    connectionRequired: false,
+                    name: 'aiAgent',
+                    version: 1,
+                },
+            },
+            nestedClusterRootsComponentDefinitions: {
+                anthropic: {
+                    actionClusterElementTypes: {},
+                    clusterElementClusterElementTypes: {},
+                    clusterElementTypes: [],
+                },
+            },
             rootClusterElementNodeData: {
                 componentName: 'aiAgent',
+                name: ROOT_NODE_NAME,
                 operationName: 'chat',
                 type: 'aiAgent/v1',
                 workflowNodeName: ROOT_NODE_NAME,
             },
-        } as Parameters<typeof useWorkflowEditorStore.setState>[0]);
+        } as Partial<WorkflowEditorI>);
 
         setWorkflowDefinition(1);
     });
@@ -131,7 +149,7 @@ describe('useClusterElementsLayout', () => {
             clusterElementNode('activeCampaign_2', 'added'),
         ]);
 
-        act(() => setWorkflowDefinition(2));
+        act(() => setWorkflowDefinition(2, {memory: ADDED_ELEMENT, model: MODEL_ELEMENT}));
         rerender();
 
         expect(getClusterElementsLayoutElementsMock).toHaveBeenCalled();
@@ -150,3 +168,5 @@ describe('useClusterElementsLayout', () => {
             {x: 0, y: 0},
             {x: 0, y: 0},
         ]);
+    });
+});

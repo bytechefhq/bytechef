@@ -49,7 +49,8 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
     const {mainClusterRootComponentDefinition, rootClusterElementNodeData, setRootClusterElementNodeData} =
         useWorkflowEditorStore(
             useShallow((state) => ({
-                mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
+                mainClusterRootComponentDefinition:
+                    state.clusterRootComponentDefinitions?.[state.rootClusterElementNodeData?.workflowNodeName ?? ''],
                 rootClusterElementNodeData: state.rootClusterElementNodeData,
                 setRootClusterElementNodeData: state.setRootClusterElementNodeData,
             }))

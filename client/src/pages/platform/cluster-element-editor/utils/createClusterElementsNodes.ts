@@ -12,6 +12,7 @@ interface CreateClusterElementNodesProps {
     nestedClusterRootElementType?: string;
     nestedClusterRootsDefinitions: Record<string, NestedClusterRootComponentDefinitionType>;
     operationName?: string;
+    topLevelClusterRootId?: string;
 }
 
 export default function createClusterElementNodes({
@@ -21,6 +22,7 @@ export default function createClusterElementNodes({
     nestedClusterRootElementType,
     nestedClusterRootsDefinitions,
     operationName = '',
+    topLevelClusterRootId = clusterRootId,
 }: CreateClusterElementNodesProps) {
     if (!currentRootComponentDefinition || !currentRootComponentDefinition.clusterElementTypes || !clusterElements) {
         return [];
@@ -74,6 +76,7 @@ export default function createClusterElementNodes({
 
                     // Set root parent/child relationship
                     multipleElementsNode.data.parentClusterRootId = clusterRootId;
+                    multipleElementsNode.data.topLevelClusterRootId = topLevelClusterRootId;
                     multipleElementsNode.data.isNestedClusterRoot = isNestedClusterRoot;
 
                     createdNodes.push(multipleElementsNode);
@@ -91,6 +94,7 @@ export default function createClusterElementNodes({
                                 currentRootComponentDefinition: nestedClusterRootDefinition,
                                 nestedClusterRootElementType: element.type?.split('/')[2] || clusterElementTypeName,
                                 nestedClusterRootsDefinitions,
+                                topLevelClusterRootId,
                             });
 
                             createdNodes.push(...nestedClusterElementNodes);
@@ -136,6 +140,7 @@ export default function createClusterElementNodes({
 
                 // Set root parent/child relationship
                 singleElementNode.data.parentClusterRootId = clusterRootId;
+                singleElementNode.data.topLevelClusterRootId = topLevelClusterRootId;
                 singleElementNode.data.isNestedClusterRoot = isNestedClusterRoot;
 
                 createdNodes.push(singleElementNode);
@@ -154,6 +159,7 @@ export default function createClusterElementNodes({
                             nestedClusterRootElementType:
                                 clusterElementValue.type?.split('/')[2] || clusterElementTypeName,
                             nestedClusterRootsDefinitions,
+                            topLevelClusterRootId,
                         });
 
                         createdNodes.push(...nestedClusterElementNodes);

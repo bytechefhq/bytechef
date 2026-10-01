@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {NodeDataType} from '@/shared/types';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen} from '@testing-library/react';
@@ -12,13 +13,19 @@ import WorkflowNode from './WorkflowNode';
 // Mutable slice of the editor store so each test can toggle which node is being renamed.
 const {directionStoreState, editorStoreState, popoverMenuMock} = vi.hoisted(() => ({
     directionStoreState: {layoutDirection: 'TB'},
+const {editorStoreState, popoverMenuMock, recordedContextMenuProps} = vi.hoisted(() => ({
     editorStoreState: {renamingNodeName: undefined as string | undefined},
     popoverMenuMock: vi.fn(),
+    recordedContextMenuProps: {value: undefined as Record<string, unknown> | undefined},
 }));
 
 // Render the context menu as a passthrough so the node content (and its rename input) is asserted directly.
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu', () => ({
-    default: ({children}: {children: ReactNode}) => <div>{children}</div>,
+    default: ({children, ...contextMenuProps}: {children: ReactNode}) => {
+        recordedContextMenuProps.value = contextMenuProps;
+
+        return <div>{children}</div>;
+    },
 }));
 
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodeDropdownMenu', () => ({
@@ -90,9 +97,9 @@ vi.mock('../stores/useWorkflowEditorStore', () => ({
     default: (selector: (state: Record<string, unknown>) => unknown) =>
         selector({
             clusterElementsCanvasOpen: true,
+            clusterRootComponentDefinitions: {},
             copiedNode: undefined,
             copiedWorkflowId: undefined,
-            mainClusterRootComponentDefinition: undefined,
             nestedClusterRootsComponentDefinitions: {},
             renamingNodeName: editorStoreState.renamingNodeName,
             rootClusterElementNodeData: undefined,
@@ -130,9 +137,11 @@ function renderNode(data: NodeDataType = NESTED_CLUSTER_ROOT_DATA, id = 'approva
 
     return render(
         <QueryClientProvider client={queryClient}>
-            <ReactFlowProvider>
-                <WorkflowNode data={data} id={id} />
-            </ReactFlowProvider>
+            <TooltipProvider>
+                <ReactFlowProvider>
+                    <WorkflowNode data={data} id={id} />
+                </ReactFlowProvider>
+            </TooltipProvider>
         </QueryClientProvider>
     );
 }
@@ -179,6 +188,38 @@ describe('WorkflowNode', () => {
         fireEvent.dragEnter(nodeBox, {dataTransfer: {types: [CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE]}});
 
         expect(nodeBox).not.toHaveAttribute('data-dropzone-active');
+    describe('main root cluster element', () => {
+        const MAIN_ROOT_DATA = {
+            clusterRoot: true,
+            componentName: 'aiAgent',
+            label: 'AI Agent',
+            name: 'aiAgent_1',
+            operationName: 'chat',
+            version: 1,
+            workflowNodeName: 'aiAgent_1',
+        } as unknown as NodeDataType;
+
+        it('carries the node menu when drawn as a box on the main canvas', () => {
+            recordedContextMenuProps.value = undefined;
+
+            renderNode(
+                {
+                    ...MAIN_ROOT_DATA,
+                    clusterFrame: {clusterRootId: 'aiAgent_1', contentOrigin: {x: 32, y: 40}, height: 320, width: 640},
+                } as NodeDataType,
+                'aiAgent_1'
+            );
+
+            expect(recordedContextMenuProps.value).toBeDefined();
+        });
+
+        it('carries no node menu inside the dialog, whose chrome owns those actions', () => {
+            recordedContextMenuProps.value = undefined;
+
+            renderNode(MAIN_ROOT_DATA, 'aiAgent_1');
+
+            expect(recordedContextMenuProps.value).toBeUndefined();
+        });
     });
 
     it('renders a rename input for a nested cluster root that is being renamed', () => {
