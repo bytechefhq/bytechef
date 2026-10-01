@@ -1,0 +1,10 @@
+query workspaceChatAgents($workspaceId: ID!, $environmentId: ID!) {
+    workspaceChatAgents(workspaceId: $workspaceId, environmentId: $environmentId) {
+        agentName
+        agentTitle
+        aiAgentId
+        projectDeploymentId
+        workflowExecutionId
+        workflowLabel
+    }
+}
