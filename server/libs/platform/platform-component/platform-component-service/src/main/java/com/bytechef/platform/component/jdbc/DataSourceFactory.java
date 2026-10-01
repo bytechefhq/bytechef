@@ -33,9 +33,18 @@ public class DataSourceFactory {
         Assert.notNull(urlTemplate, "'urlTemplate' must not be null");
         Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");
 
-        String url = urlTemplate
+        String port = MapUtils.getString(connectionParameters, JdbcConstants.PORT);
+
+        String url;
+
+        if (port == null || port.isBlank()) {
+            url = urlTemplate.replace(":{port}", "");
+        } else {
+            url = urlTemplate.replace("{port}", port);
+        }
+
+        url = url
             .replace("{host}", MapUtils.getString(connectionParameters, JdbcConstants.HOST))
-            .replace("{port}", MapUtils.getString(connectionParameters, JdbcConstants.PORT))
             .replace("{database}", MapUtils.getString(connectionParameters, JdbcConstants.DATABASE));
         String username = MapUtils.getString(connectionParameters, JdbcConstants.USERNAME);
         String password = MapUtils.getString(connectionParameters, JdbcConstants.PASSWORD);
