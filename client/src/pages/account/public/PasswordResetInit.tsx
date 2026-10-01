@@ -7,7 +7,7 @@ import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -25,11 +25,9 @@ export const PasswordResetInit = () => {
         }))
     );
 
-    const pageLocation = useLocation();
-
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
-            email: (pageLocation.state as {email?: string} | null)?.email || '',
+            email: '',
         },
 
         resolver: zodResolver(formSchema),

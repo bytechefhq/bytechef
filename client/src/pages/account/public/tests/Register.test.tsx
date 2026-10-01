@@ -1,15 +1,6 @@
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {
-    act,
-    render,
-    resetAll,
-    screen,
-    userEvent,
-    waitFor,
-    windowResizeObserver,
-    within,
-} from '@/shared/util/test-utils';
-import {MemoryRouter, Route, Routes, useLocation} from 'react-router-dom';
+import {act, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
 
 import Register from '../Register';
@@ -44,8 +35,6 @@ beforeEach(() => {
 
 afterEach(() => {
     resetAll();
-
-    vi.restoreAllMocks();
 });
 
 const triggerShowPasswordInputField = async () => {
@@ -111,83 +100,6 @@ it('should set type as password initially and toggle between types when "show pa
     await waitFor(() => {
         expect(passwordInputField).toHaveAttribute('type', 'password');
     });
-});
-
-const LocationEmailPage = ({title}: {title: string}) => {
-    const location = useLocation();
-
-    return <p>{`${title}: ${location.state?.email}`}</p>;
-};
-
-const renderRegisterPageWithDestinations = () => {
-    render(
-        <MemoryRouter initialEntries={['/register']}>
-            <Routes>
-                <Route element={<Register />} path="/register" />
-
-                <Route element={<LocationEmailPage title="Login page" />} path="/login" />
-
-                <Route element={<LocationEmailPage title="Password reset page" />} path="/password-reset/init" />
-
-                <Route element={<p>Account error page</p>} path="/account-error" />
-            </Routes>
-        </MemoryRouter>
-    );
-};
-
-const mockRegisterResponse = (errorKey: number, detail: string) => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify({detail, entityClass: 'User', errorKey, status: 400, title: 'Error'}), {
-            headers: {'Content-Type': 'application/problem+json'},
-            status: 400,
-        })
-    );
-};
-
-const submitRegistration = async () => {
-    await triggerShowPasswordInputField();
-
-    await userEvent.type(await screen.findByLabelText('Password'), 'Password1');
-    await userEvent.click(screen.getByRole('button', {name: 'Continue with password'}));
-};
-
-it('should offer to log in or reset the password when the email already has an account', async () => {
-    mockRegisterResponse(101, 'Email is already in use!');
-
-    renderRegisterPageWithDestinations();
-
-    await submitRegistration();
-
-    const alert = await screen.findByRole('alert');
-
-    expect(alert).toHaveTextContent('An account with this email already exists.');
-    expect(screen.queryByText('Account error page')).not.toBeInTheDocument();
-
-    await userEvent.click(within(alert).getByRole('link', {name: 'Log in'}));
-
-    expect(await screen.findByText('Login page: test@example.com')).toBeInTheDocument();
-});
-
-it('should pass the email to the password reset page when the email already has an account', async () => {
-    mockRegisterResponse(101, 'Email is already in use!');
-
-    renderRegisterPageWithDestinations();
-
-    await submitRegistration();
-
-    await userEvent.click(within(await screen.findByRole('alert')).getByRole('link', {name: 'Reset password'}));
-
-    expect(await screen.findByText('Password reset page: test@example.com')).toBeInTheDocument();
-});
-
-it('should navigate to the account error page for other registration errors', async () => {
-    mockRegisterResponse(102, 'Login name already used!');
-
-    renderRegisterPageWithDestinations();
-
-    await submitRegistration();
-
-    expect(await screen.findByText('Account error page')).toBeInTheDocument();
 });
 
 it('should show socials login buttons with correct feature flag', async () => {

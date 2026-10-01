@@ -38,18 +38,6 @@ it('should render the password reset init page', () => {
     expect(screen.getByText('Send link to email')).toBeInTheDocument();
 });
 
-it('should prefill the email passed in the navigation state', () => {
-    render(
-        <MemoryRouter initialEntries={[{pathname: '/password-reset/init', state: {email: 'test@example.com'}}]}>
-            <Routes>
-                <Route element={<PasswordResetInit />} path="/password-reset/init" />
-            </Routes>
-        </MemoryRouter>
-    );
-
-    expect(screen.getByLabelText('Email')).toHaveValue('test@example.com');
-});
-
 it('should render "AccountError" page when "resetPasswordFailure" is true', async () => {
     mockPasswordResetStore({
         resetPasswordFailure: true,
