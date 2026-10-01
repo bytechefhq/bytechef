@@ -32,6 +32,7 @@ public class PostgreSQLJdbcComponentHandler implements JdbcComponentHandler {
         .title("PostgreSQL")
         .description("Query, insert and update data from PostgreSQL.")
         .icon("path:assets/postgresql.svg")
+        .resources("https://docs.bytechef.io/reference/components/postgresql_v1")
         .urlTemplate("jdbc:postgresql://{host}:{port}/{database}")
         .jdbcDriverClassName("org.postgresql.Driver");
 

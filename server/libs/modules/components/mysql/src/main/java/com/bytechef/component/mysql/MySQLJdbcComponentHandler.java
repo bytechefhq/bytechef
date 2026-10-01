@@ -32,6 +32,7 @@ public class MySQLJdbcComponentHandler implements JdbcComponentHandler {
         .title("MySQL")
         .description("Query, insert and update data from MySQL.")
         .icon("path:assets/mysql.svg")
+        .resources("https://docs.bytechef.io/reference/components/mysql_v1")
         .urlTemplate("jdbc:mysql://{host}:{port}/{database}")
         .jdbcDriverClassName("com.mysql.jdbc.Driver");
 

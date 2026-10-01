@@ -69,6 +69,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.Type;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
@@ -92,6 +93,7 @@ import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
@@ -301,6 +303,10 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
     private final UpdateJdbcOperation updateJdbcOperation;
 
     public JdbcComponentHandlerImpl(JdbcComponentDefinition jdbcComponentDefinition) {
+        jdbcComponentDefinition.getResources()
+            .map(Resources::documentationUrl)
+            .ifPresent(this::setHelp);
+
         this.urlTemplate = jdbcComponentDefinition.getUrlTemplate();
         this.jdbcDriverClassName = jdbcComponentDefinition.getJdbcDriverClassName();
 
@@ -382,6 +388,25 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             .clusterElements(
                 JdbcItemWriter.clusterElementDefinition(urlTemplate, jdbcDriverClassName),
                 dataSourceClusterElement);
+    }
+
+    private void setHelp(String documentationUrl) {
+        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
+            actionDefinition.help("", getLearnMoreUrl(documentationUrl, actionDefinition.getTitle()
+                .orElseThrow()));
+        }
+
+        for (ModifiableTriggerDefinition triggerDefinition : triggerDefinitions) {
+            triggerDefinition.help("", getLearnMoreUrl(documentationUrl, triggerDefinition.getTitle()
+                .orElseThrow()));
+        }
+    }
+
+    private static String getLearnMoreUrl(String documentationUrl, String title) {
+        String anchor = title.toLowerCase(Locale.ROOT)
+            .replace(' ', '-');
+
+        return documentationUrl + "#" + anchor;
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
