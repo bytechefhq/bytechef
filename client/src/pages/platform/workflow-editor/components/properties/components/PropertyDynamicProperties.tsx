@@ -1,6 +1,7 @@
 import {PropertyDynamicPropertiesSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {resolveMainClusterRootName} from '@/pages/platform/workflow-editor/utils/resolveClusterRootId';
 import {useClusterElementDynamicPropertiesQuery} from '@/shared/middleware/graphql';
 import {
     useGetClusterElementNodeDynamicPropertiesQuery,
@@ -80,6 +81,8 @@ const PropertyDynamicProperties = ({
         [currentEnvironmentId, lookupDependsOnValuesKey, workflow.id, name, currentNode?.name]
     );
 
+    const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
+
     const clusterElementQueryOptions = useMemo(
         () => ({
             lookupDependsOnValuesKey,
@@ -90,7 +93,7 @@ const PropertyDynamicProperties = ({
                 id: workflow.id!,
                 lookupDependsOnPaths: lookupDependsOnPaths as string[] | undefined,
                 propertyName: name!,
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
+                workflowNodeName: mainClusterRootName || '',
             },
         }),
         [
@@ -101,7 +104,7 @@ const PropertyDynamicProperties = ({
             workflow.id,
             lookupDependsOnPaths,
             name,
-            rootClusterElementNodeData?.workflowNodeName,
+            mainClusterRootName,
         ]
     );
 
