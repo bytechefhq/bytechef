@@ -79,6 +79,7 @@ public abstract class AbstractUpdateAction {
                 Stream.of(properties.stream(), Stream.of(METADATA_FILTER_PROPERTY))
                     .flatMap(stream -> stream)
                     .toList())
+            .help("", "https://docs.bytechef.io/reference/components/" + componentName + "_v1#update-documents")
             .perform((MultipleConnectionsPerformFunction) updateAction::perform);
     }
 

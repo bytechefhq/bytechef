@@ -77,6 +77,7 @@ public abstract class AbstractLoadAction {
                 Stream.of(properties.stream(), Stream.of(METADATA_FILTER_PROPERTY))
                     .flatMap(stream -> stream)
                     .toList())
+            .help("", "https://docs.bytechef.io/reference/components/" + componentName + "_v1#load-documents")
             .perform((MultipleConnectionsPerformFunction) loadAction::perform);
     }
 

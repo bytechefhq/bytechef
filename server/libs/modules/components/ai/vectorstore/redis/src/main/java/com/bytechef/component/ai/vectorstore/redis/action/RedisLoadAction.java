@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.redis.action;
 
-import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.REDIS;
+import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.REDIS_VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
 import com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants;
@@ -30,6 +30,7 @@ import java.util.List;
 public class RedisLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(REDIS, List.of(), RedisConstants.VECTOR_STORE, clusterElementDefinitionService);
+        return AbstractLoadAction.of(REDIS_VECTOR_STORE, List.of(), RedisConstants.VECTOR_STORE,
+            clusterElementDefinitionService);
     }
 }

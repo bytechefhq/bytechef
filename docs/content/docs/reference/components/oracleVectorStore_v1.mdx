@@ -1,0 +1,183 @@
+---
+title: "Oracle Vector Store"
+description: "Oracle Vector Store uses Oracle Database 23ai's native vector storage and similarity search capabilities to store and query document embeddings."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: oracleVectorStore/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | JDBC URL | STRING | Oracle JDBC connection URL (e.g., jdbc:oracle:thin:@localhost:1521/FREEPDB1). | true |
+| username | Username | STRING | Oracle database username. | true |
+| password | Password | STRING | Oracle database password. | true |
+| tableName | Table Name | STRING | Name of the database table used to store vector embeddings. | false |
+| indexType | Index Type | STRING <details> <summary> Options </summary> <span>NONE</span>, <span>HNSW</span>, <span>IVF</span> </details> | Vector index type to use for similarity search. | false |
+| distanceType | Distance Type | STRING <details> <summary> Options </summary> <span>COSINE</span>, <span>DOT</span>, <span>EUCLIDEAN</span>, <span>EUCLIDEAN_SQUARED</span>, <span>MANHATTAN</span> </details> | Distance function used for vector similarity comparison. | false |
+| dimensions | Dimensions | INTEGER | Number of dimensions for the vector embeddings. Use -1 to infer from the embedding model. | false |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to create the vector store table automatically if it does not exist. | false |
+
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Delete Documents
+Name: delete
+
+`Delete documents from the vector store by metadata`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| metadataFilter | Metadata Filter | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Documents",
+  "name" : "delete",
+  "parameters" : {
+    "metadataFilter" : [ { } ]
+  },
+  "type" : "oracleVectorStore/v1/delete"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Load Documents
+Name: load
+
+`Loads documents into the vector store using LLM embeddings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| metadataFilter | Metadata Filter | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Load Documents",
+  "name" : "load",
+  "parameters" : {
+    "metadataFilter" : [ { } ]
+  },
+  "type" : "oracleVectorStore/v1/load"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Search Documents
+Name: search
+
+`Query documents from the vector store using LLM embeddings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The query to be executed. | true |
+| metadataFilter | Metadata Filter | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed. | false |
+| topK | Top K | INTEGER | The top 'k' similar results to return. | false |
+| similarityThreshold | Similarity Threshold | NUMBER | Similarity threshold score to filter the search response by. Only documents with similarity score equal or greater than the threshold will be returned. A threshold value of 0 means any similarity is accepted. A threshold value of 1 means an exact match is required. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Documents",
+  "name" : "search",
+  "parameters" : {
+    "query" : "",
+    "metadataFilter" : [ { } ],
+    "topK" : 1,
+    "similarityThreshold" : 0.0
+  },
+  "type" : "oracleVectorStore/v1/search"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Update Documents
+Name: update
+
+`Updates documents in the vector store by deleting existing ones matching the metadata filter and loading new ones using LLM embeddings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| metadataFilter | Metadata Filter | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Documents",
+  "name" : "update",
+  "parameters" : {
+    "metadataFilter" : [ { } ]
+  },
+  "type" : "oracleVectorStore/v1/update"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+
+

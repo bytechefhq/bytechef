@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.redis.task.handler;
 
-import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.REDIS;
+import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.REDIS_VECTOR_STORE;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -26,10 +26,10 @@ import org.springframework.stereotype.Component;
 /**
  * @author Monika Kušter
  */
-@Component(REDIS + "/v1/" + LOAD)
+@Component(REDIS_VECTOR_STORE + "/v1/" + LOAD)
 public class RedisLoadTaskHandler extends AbstractTaskHandler {
 
     public RedisLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(REDIS, 1, LOAD, actionDefinitionFacade);
+        super(REDIS_VECTOR_STORE, 1, LOAD, actionDefinitionFacade);
     }
 }
