@@ -1,5 +1,14 @@
 {
   "actions": [ {
+    "agentReplyDefinition": {
+      "attachmentsProperty": null,
+      "channelParameters": { },
+      "conversationIdProperty": null,
+      "fixedParameters": {
+        "outputSchema": "{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"}},\"required\":[\"message\"]}"
+      },
+      "messageProperty": "response.message"
+    },
     "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
@@ -61,6 +70,17 @@
     "resumePerform": null,
     "title": "Response to Workflow Call",
     "workflowNodeDescription": null
+  } ],
+  "agentChannels": [ {
+    "approvalChannelName": null,
+    "description": null,
+    "name": "workflowCall",
+    "replyActionName": "responseToWorkflowCall",
+    "title": "Workflow Call",
+    "triggerName": "newWorkflowCall",
+    "triggerParameters": {
+      "inputSchema": "{\"type\":\"object\",\"properties\":{\"conversationId\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"},\"attachments\":{\"type\":\"array\",\"items\":{\"type\":\"object\"}}},\"required\":[\"conversationId\",\"message\"]}"
+    }
   } ],
   "clusterElements": [ {
     "name": "callWorkflow",
@@ -141,6 +161,11 @@
   "tags": [ ],
   "title": "Workflow",
   "triggers": [ {
+    "agentRequestDefinition": {
+      "attachmentsPath": "attachments",
+      "conversationIdPath": "conversationId",
+      "messagePath": "message"
+    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,

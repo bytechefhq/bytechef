@@ -254,7 +254,7 @@ public class ComponentDefinitionRegistryTest {
                         "Slack is a messaging platform for teams to communicate and collaborate.",
                         "path:assets/slack.svg", null, null,
                         new ComponentIndex.ConnectionSummary(1, true), actionSummaries, null, null,
-                        null, List.of("channel"), null, SlackComponentHandler.class.getName(),
+                        null, null, List.of("channel"), null, SlackComponentHandler.class.getName(),
                         ComponentHandlerLoaderKind.DEFAULT)));
         }
 
@@ -366,7 +366,7 @@ public class ComponentDefinitionRegistryTest {
             ComponentIndex componentIndex = new ComponentIndex(
                 List.of(
                     new ComponentIndex.Entry(
-                        "ghost", 1, "Ghost", null, null, null, null, null, null, null, null, null, null, null,
+                        "ghost", 1, "Ghost", null, null, null, null, null, null, null, null, null, null, null, null,
                         "com.bytechef.component.ghost.DoesNotExistComponentHandler",
                         ComponentHandlerLoaderKind.DEFAULT)));
 
@@ -421,7 +421,7 @@ public class ComponentDefinitionRegistryTest {
                     new ComponentIndex.Entry(
                         "fakeRoot", 1, "Fake Root", null, null, null, null, null, null, null, null,
                         List.of(new ComponentIndex.ClusterElementTypeSummary("TOOLS", "tools", "Tools", true, false)),
-                        null, null, "does.not.Matter", ComponentHandlerLoaderKind.DEFAULT)));
+                        null, null, null, "does.not.Matter", ComponentHandlerLoaderKind.DEFAULT)));
 
             ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);
 
@@ -456,7 +456,7 @@ public class ComponentDefinitionRegistryTest {
                         List.of(
                             new ComponentIndex.ClusterElementSummary(
                                 "myTool", "My Tool", null, "TOOLS", "tools", "Tools", true, false)),
-                        null, List.of("channel"), UnifiedApiCategory.CRM, "does.not.Matter",
+                        null, null, List.of("channel"), UnifiedApiCategory.CRM, "does.not.Matter",
                         ComponentHandlerLoaderKind.DEFAULT)));
 
             ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);

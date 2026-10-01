@@ -19,6 +19,7 @@ package com.bytechef.component.definition;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseOutputFunction;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -58,6 +59,11 @@ public interface TriggerDefinition {
         PATCH,
         POST,
         PUT,
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    default Optional<AgentRequestDefinition> getAgentRequestDefinition() {
+        return Optional.empty();
     }
 
     /**

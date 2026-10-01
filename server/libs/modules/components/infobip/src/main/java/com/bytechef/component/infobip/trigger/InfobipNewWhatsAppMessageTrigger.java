@@ -16,6 +16,7 @@
 
 package com.bytechef.component.infobip.trigger;
 
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
@@ -36,6 +37,18 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 
 /**
+ * The request half of the {@code infobip} agent channel.
+ * <p>
+ * {@code number} is the Infobip number this channel listens on. It is the reply's sender too — the paired
+ * {@code sendWhatsappTextMessage} action takes it from the channel row through {@code channelParameter(NUMBER, FROM)} —
+ * and it is required here already, so a channel row cannot leave the reply's sender unset.
+ * <p>
+ * The request paths reproduce the expressions the agent channel generates today, minus their {@code ${__NODE__.}}
+ * wrapper. The trigger declares no output schema, returning Infobip's webhook body verbatim, so nothing validates them
+ * at construction time; they are pinned instead by {@code InfobipNewWhatsAppMessageTriggerAgentChannelTest}, which
+ * names the payload documentation they assume. No {@code attachments} path is bound: there is no declared output to
+ * bind one in, and an absent path is how a channel states that it carries none.
+ *
  * @author Monika Kušter
  */
 public class InfobipNewWhatsAppMessageTrigger {
@@ -51,6 +64,10 @@ public class InfobipNewWhatsAppMessageTrigger {
                 .required(true),
             KEYWORD_PROPERTY)
         .output()
+        .agentRequest(
+            agentRequest()
+                .conversationId("results.from")
+                .message("results.message.text"))
         .help("", "https://docs.bytechef.io/reference/components/infobip_v1#new-whatsapp-message")
         .webhookEnable(InfobipNewWhatsAppMessageTrigger::webhookEnable)
         .webhookDisable(InfobipNewWhatsAppMessageTrigger::webhookDisable)

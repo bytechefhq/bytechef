@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ActionDefinition.WebhookResponse
 
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +43,11 @@ import java.util.function.Consumer;
  * @author Ivica Cardic
  */
 public interface ActionDefinition {
+
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    default Optional<AgentReplyDefinition> getAgentReplyDefinition() {
+        return Optional.empty();
+    }
 
     /**
      * TODO
