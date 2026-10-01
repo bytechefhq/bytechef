@@ -24,15 +24,21 @@ import static com.bytechef.platform.component.constant.WorkflowConstants.INPUT_S
 import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLOW;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.workflow.action.WorkflowResponseToWorkflowCallAction;
+import com.bytechef.component.workflow.cluster.WorkflowCallAiAgentTool;
 import com.bytechef.component.workflow.cluster.WorkflowCallWorkflowTool;
 import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.component.workflow.trigger.WorkflowNewWorkflowCallTrigger;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.CallableAiAgentDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,7 +51,20 @@ public class WorkflowComponentHandler implements ComponentHandler {
 
     public WorkflowComponentHandler(
         SubflowDataSource subflowDataSource, SubflowResolver subflowResolver,
-        SubflowSyncExecutor subflowSyncExecutor) {
+        SubflowSyncExecutor subflowSyncExecutor,
+        ObjectProvider<CallableAiAgentDataSource> callableAgentDataSourceProvider) {
+
+        List<ClusterElementDefinition<?>> clusterElementDefinitions = new ArrayList<>();
+
+        clusterElementDefinitions
+            .add(WorkflowCallWorkflowTool.of(subflowDataSource, subflowResolver, subflowSyncExecutor));
+
+        CallableAiAgentDataSource callableAgentDataSource = callableAgentDataSourceProvider.getIfAvailable();
+
+        if (callableAgentDataSource != null) {
+            clusterElementDefinitions
+                .add(WorkflowCallAiAgentTool.of(callableAgentDataSource, subflowResolver, subflowSyncExecutor));
+        }
 
         this.componentDefinition = component(WORKFLOW)
             .title("Workflow")
@@ -54,7 +73,7 @@ public class WorkflowComponentHandler implements ComponentHandler {
             .categories(ComponentCategory.HELPERS)
             .triggers(WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION)
             .actions(WorkflowResponseToWorkflowCallAction.ACTION_DEFINITION)
-            .clusterElements(WorkflowCallWorkflowTool.of(subflowDataSource, subflowResolver, subflowSyncExecutor))
+            .clusterElements(clusterElementDefinitions.toArray(new ClusterElementDefinition<?>[0]))
             .agentChannels(
                 agentChannel(
                     WORKFLOW_CALL, WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION,
