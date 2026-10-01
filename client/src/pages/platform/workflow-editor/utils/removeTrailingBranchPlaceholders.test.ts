@@ -10,6 +10,7 @@ import removeTrailingBranchPlaceholders from './removeTrailingBranchPlaceholders
 const PLACEHOLDER_ID = 'parallel_1-parallel-placeholder-0';
 const TOP_GHOST_ID = 'parallel_1-parallel-top-ghost';
 const BOTTOM_GHOST_ID = 'parallel_1-parallel-bottom-ghost';
+const LEFT_GHOST_ID = 'parallel_1-taskDispatcher-left-ghost';
 
 function buildReadOnlyParallel(laneCount: number): {edges: Edge[]; nodes: Node[]} {
     const tasks = Array.from({length: laneCount}, (_, index) => ({
@@ -26,7 +27,7 @@ function buildReadOnlyParallel(laneCount: number): {edges: Edge[]; nodes: Node[]
 
     const nodes = createParallelNode({
         allNodes: [parallelNode],
-        options: {createLeftGhost: laneCount === 0},
+        options: {createLeftGhost: laneCount <= 1},
         parallelId: 'parallel_1',
     }).map((node) => (node.type === 'placeholder' ? {...node, type: 'readonlyPlaceholder'} : node));
 
@@ -61,13 +62,15 @@ describe('removeTrailingBranchPlaceholders', () => {
         expect(result.edges.find((edge) => edge.target === 'accelo_2')!.sourceHandle).toBe(`${TOP_GHOST_ID}-right`);
     });
 
-    it('moves a single lane to the bar centre so it runs straight down', () => {
+    it('keeps a single lane on the bar right end, opposite the left rail, so the frame stays a box', () => {
         const {edges, nodes} = buildReadOnlyParallel(1);
 
         const result = removeTrailingBranchPlaceholders(nodes, edges);
 
-        expect(result.edges.find((edge) => edge.target === 'accelo_1')!.sourceHandle).toBe(`${TOP_GHOST_ID}-bottom`);
-        expect(result.edges.find((edge) => edge.source === 'accelo_1')!.targetHandle).toBe(`${BOTTOM_GHOST_ID}-top`);
+        expect(result.nodes.some((node) => node.id === PLACEHOLDER_ID)).toBe(false);
+        expect(result.edges.find((edge) => edge.target === 'accelo_1')!.sourceHandle).toBe(`${TOP_GHOST_ID}-right`);
+        expect(result.edges.find((edge) => edge.source === 'accelo_1')!.targetHandle).toBe(`${BOTTOM_GHOST_ID}-right`);
+        expect(result.edges.find((edge) => edge.target === LEFT_GHOST_ID)!.sourceHandle).toBe(`${TOP_GHOST_ID}-left`);
     });
 
     it('keeps the "+" of an empty dispatcher, which is all that closes its frame', () => {
@@ -83,7 +86,19 @@ describe('removeTrailingBranchPlaceholders', () => {
         ['dagre', getLayoutElements],
         ['elk', getElkLayoutElements],
     ] as const)('laid out by %s', (_, layoutFunction) => {
-        it.each([1, 2, 3])('centres the dispatcher over %i lane(s)', async (laneCount) => {
+        it('keeps a single lane right of the dispatcher, opposite the left rail', async () => {
+            const readOnlyParallel = buildReadOnlyParallel(1);
+            const {edges, nodes} = removeTrailingBranchPlaceholders(readOnlyParallel.nodes, readOnlyParallel.edges);
+
+            const result = await layoutFunction({canvasWidth: 1200, direction: 'TB', edges, nodes});
+
+            const positionOf = (nodeId: string) => result.nodes.find((node) => node.id === nodeId)!.position;
+
+            expect(positionOf('accelo_1').x).toBeGreaterThan(positionOf('parallel_1').x);
+            expect(positionOf(LEFT_GHOST_ID).x).toBeLessThan(positionOf('parallel_1').x);
+        });
+
+        it.each([2, 3])('centres the dispatcher over %i lanes', async (laneCount) => {
             const readOnlyParallel = buildReadOnlyParallel(laneCount);
             const {edges, nodes} = removeTrailingBranchPlaceholders(readOnlyParallel.nodes, readOnlyParallel.edges);
 

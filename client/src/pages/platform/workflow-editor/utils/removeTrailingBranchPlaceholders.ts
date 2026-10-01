@@ -8,7 +8,6 @@ export default function removeTrailingBranchPlaceholders(nodes: Node[], edges: E
     const nodesById = new Map(nodes.map((node) => [node.id, node]));
 
     const removedNodeIds = new Set<string>();
-    const singleLaneGhostIds = new Map<string, string>();
 
     edges.forEach((edge) => {
         if (!TOP_GHOST_PATTERN.test(edge.source) || edge.sourceHandle !== `${edge.source}-right`) {
@@ -33,32 +32,14 @@ export default function removeTrailingBranchPlaceholders(nodes: Node[], edges: E
         }
 
         removedNodeIds.add(placeholderNode.id);
-
-        if (laneEdges.length === 1) {
-            singleLaneGhostIds.set(edge.source, edge.source.replace(/-top-ghost$/, '-bottom-ghost'));
-        }
     });
 
     if (removedNodeIds.size === 0) {
         return {edges, nodes};
     }
 
-    const singleLaneBottomGhostIds = new Set(singleLaneGhostIds.values());
-
     return {
-        edges: edges
-            .filter((edge) => !removedNodeIds.has(edge.source) && !removedNodeIds.has(edge.target))
-            .map((edge) => {
-                if (singleLaneGhostIds.has(edge.source)) {
-                    return {...edge, sourceHandle: `${edge.source}-bottom`};
-                }
-
-                if (singleLaneBottomGhostIds.has(edge.target) && edge.targetHandle) {
-                    return {...edge, targetHandle: `${edge.target}-top`};
-                }
-
-                return edge;
-            }),
+        edges: edges.filter((edge) => !removedNodeIds.has(edge.source) && !removedNodeIds.has(edge.target)),
         nodes: nodes.filter((node) => !removedNodeIds.has(node.id)),
     };
 }

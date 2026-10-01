@@ -10,8 +10,6 @@ import {getLayoutElements} from './layoutUtils';
 
 const NODE_ANCHOR_HALF = 36;
 
-const PLACEHOLDER_BOX_HALF = 36;
-
 type DispatcherKindType = 'fork-join' | 'parallel';
 
 const DISPATCHER_ID: Record<DispatcherKindType, string> = {
@@ -92,26 +90,6 @@ const cases = (['dagre', 'elk'] as const).flatMap((engine) =>
 describe.each(cases)('trailing add-a-branch placeholder (%s, %s)', (engine, dispatcherKind) => {
     const layoutFunction = engine === 'elk' ? getElkLayoutElements : getLayoutElements;
     const dispatcherId = DISPATCHER_ID[dispatcherKind];
-
-    it('centres the dispatcher between a single lane and the "+", the two sides of its frame', async () => {
-        const {edges, nodes} = buildWorkflow(dispatcherKind, 1);
-
-        const result = await layoutFunction({canvasWidth: 1200, direction: 'TB', edges, nodes});
-
-        const positionOf = (nodeId: string) => result.nodes.find((node) => node.id === nodeId)!.position;
-
-        const laneAnchor = positionOf('accelo_1').x + NODE_ANCHOR_HALF;
-        const placeholderCenter =
-            result.nodes.find(
-                (node) => node.type === 'placeholder' && (node.data as {taskDispatcherId?: string}).taskDispatcherId
-            )!.position.x + PLACEHOLDER_BOX_HALF;
-
-        expect(edges.find((edge) => edge.target === 'accelo_1')!.sourceHandle).toMatch(/-left$/);
-        expect(laneAnchor).toBeLessThan(positionOf(dispatcherId).x);
-        expect(
-            Math.abs(positionOf(dispatcherId).x + NODE_ANCHOR_HALF - (laneAnchor + placeholderCenter) / 2)
-        ).toBeLessThan(1);
-    });
 
     it.each([2, 3, 4])('centres the dispatcher on %i real lanes, ignoring the "+" column', async (laneCount) => {
         const {edges, nodes} = buildWorkflow(dispatcherKind, laneCount);

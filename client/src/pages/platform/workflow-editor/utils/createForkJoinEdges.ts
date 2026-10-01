@@ -122,7 +122,7 @@ function distributeBranches<T>(branches: T[]): {
     rightBranches: T[];
 } {
     if (branches.length === 1) {
-        return {leftBranches: branches, middleBranch: null, rightBranches: []};
+        return {leftBranches: [], middleBranch: null, rightBranches: branches};
     }
 
     const isEvenCount = branches.length % 2 === 0;
@@ -142,6 +142,17 @@ function distributeBranches<T>(branches: T[]): {
             leftBranches: branches.slice(0, middleIndex),
             middleBranch: branches[middleIndex],
             rightBranches: branches.slice(middleIndex + 1),
+        };
+    }
+}
+
+function markAddBranchEdge(edges: Edge[], lastLaneEntryEdgeId: string, forkJoinId: string, branchCount: number): void {
+    const lastLaneEntryEdge = edges.find((edge) => edge.id === lastLaneEntryEdgeId);
+
+    if (lastLaneEntryEdge) {
+        lastLaneEntryEdge.data = {
+            ...lastLaneEntryEdge.data,
+            addBranchPlaceholderId: `${forkJoinId}-forkJoin-placeholder-${branchCount}`,
         };
     }
 }
@@ -169,15 +180,16 @@ export default function createForkJoinEdges(forkJoinNode: Node): Edge[] {
         ? nodeData.parameters.branches.map((branch) => (Array.isArray(branch) ? branch : branch ? [branch] : []))
         : [];
 
-    const hasSubtasks = branches.flat().length > 0;
+    const lanes = branches.filter((branch) => branch.length > 0);
 
-    if (!hasSubtasks) {
+    if (lanes.length <= 1) {
         const leftGhostEdges = createEdgesForLeftGhost(forkJoinId);
 
         edges.push(...leftGhostEdges);
-    } else {
-        // Distribute branches into left, middle, right
-        const {leftBranches, middleBranch, rightBranches} = distributeBranches(branches);
+    }
+
+    if (lanes.length > 0) {
+        const {leftBranches, middleBranch, rightBranches} = distributeBranches(lanes);
 
         leftBranches.forEach((branch: WorkflowTask[]) => {
             const branchEdges = createForkJoinTaskEdges(forkJoinId, branch, 'left');
@@ -196,6 +208,10 @@ export default function createForkJoinEdges(forkJoinNode: Node): Edge[] {
 
             edges.push(...branchEdges);
         });
+
+        const lastLane = lanes[lanes.length - 1];
+
+        markAddBranchEdge(edges, `${forkJoinId}-forkJoin-top-ghost=>${lastLane[0].name}`, forkJoinId, branchCount);
     }
 
     const placeholderEdges = createEdgesForPlaceholder(forkJoinId, branchCount);
