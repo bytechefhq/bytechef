@@ -1,6 +1,6 @@
-import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
+import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {WorkflowIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -67,17 +67,16 @@ const AutomationWorkflowProjectWorkflowList = ({
                 </div>
             )}
 
-            <AlertDialog
-                onCancel={() => setWorkflowUuidToDelete(null)}
-                onConfirm={() => {
-                    if (workflowUuidToDelete) {
+            {workflowUuidToDelete !== null && (
+                <DeleteWorkflowAlertDialog
+                    onClose={() => setWorkflowUuidToDelete(null)}
+                    onDelete={() => {
                         onDeleteWorkflow(workflowUuidToDelete);
-                    }
 
-                    setWorkflowUuidToDelete(null);
-                }}
-                open={workflowUuidToDelete !== null}
-            />
+                        setWorkflowUuidToDelete(null);
+                    }}
+                />
+            )}
         </div>
     );
 };

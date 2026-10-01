@@ -1,8 +1,8 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
 import AiSkillFileAddDialog from '@/pages/automation/ai/skills/components/AiSkillFileAddDialog';
-import AiSkillFileDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillFileDeleteAlertDialog';
 import useAiSkillDetail, {
     type FileTreeNodeI,
     buildFileTree,
@@ -396,16 +396,18 @@ const AiSkillDetailRoute = () => {
             )}
 
             {fileToRemove && (
-                <AiSkillFileDeleteAlertDialog
-                    fileName={fileToRemove}
-                    onClose={() => setFileToRemove(null)}
-                    onDelete={async () => {
+                <AlertDialog
+                    confirmLabel="Remove"
+                    description={`This action cannot be undone. This will permanently remove "${fileToRemove}" from the skill.`}
+                    onCancel={() => setFileToRemove(null)}
+                    onConfirm={async () => {
                         const path = fileToRemove;
 
                         setFileToRemove(null);
 
                         await handleRemoveFile(path);
                     }}
+                    open
                 />
             )}
 

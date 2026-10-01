@@ -1,3 +1,4 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
@@ -9,7 +10,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ApiConnectorDeleteAlertDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorDeleteAlertDialog';
 import ApiConnectorEditDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEditDialog';
 import ApiConnectorEndpointListItem from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEndpointListItem';
 import {ApiConnector} from '@/shared/middleware/graphql';
@@ -144,9 +144,11 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
             </CollapsibleContent>
 
             {showDeleteDialog && (
-                <ApiConnectorDeleteAlertDialog
-                    onClose={() => setShowDeleteDialog(false)}
-                    onDelete={handleAlertDeleteDialogClick}
+                <AlertDialog
+                    description="This action cannot be undone. This will permanently delete the API connector."
+                    onCancel={() => setShowDeleteDialog(false)}
+                    onConfirm={handleAlertDeleteDialogClick}
+                    open
                 />
             )}
 

@@ -1,9 +1,9 @@
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import IntegrationInstanceConfigurationListItemAlertDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItemAlertDialog';
 import IntegrationInstanceConfigurationListItemDropdownMenu from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItemDropdownMenu';
 import {useIntegrationInstanceConfigurationsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
 import {IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
@@ -236,14 +236,16 @@ const IntegrationInstanceConfigurationListItem = ({
             </div>
 
             {showDeleteDialog && (
-                <IntegrationInstanceConfigurationListItemAlertDialog
+                <AlertDialog
+                    description="This action cannot be undone. This will permanently delete the instance configuration. The integration and its workflows are not affected."
                     isPending={deleteIntegrationInstanceConfigurationMutation.isPending}
-                    onCancelClick={() => setShowDeleteDialog(false)}
-                    onDeleteClick={() => {
+                    onCancel={() => setShowDeleteDialog(false)}
+                    onConfirm={() => {
                         if (integrationInstanceConfiguration.id) {
                             deleteIntegrationInstanceConfigurationMutation.mutate(integrationInstanceConfiguration.id);
                         }
                     }}
+                    open
                 />
             )}
 

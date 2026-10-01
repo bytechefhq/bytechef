@@ -1,3 +1,4 @@
+import AlertDialog from '@/components/AlertDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -10,10 +11,8 @@ import {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
-import CancelPlanDialog from './components/CancelPlanDialog';
 import ManageBillingCard from './components/ManageBillingCard';
 import PlanCard from './components/PlanCard';
-import ReactivatePlanDialog from './components/ReactivatePlanDialog';
 import SelectPlanDialog from './components/SelectPlanDialog';
 
 const POLL_INTERVAL_MS = 3000;
@@ -235,9 +234,12 @@ const Billing = () => {
 
                     {customerPortalUrl && <ManageBillingCard customerPortalUrl={customerPortalUrl} />}
 
-                    <CancelPlanDialog
+                    <AlertDialog
+                        cancelLabel="Keep plan"
+                        confirmLabel={isCancelPending ? 'Cancelling…' : 'Cancel subscription'}
+                        description="Your subscription will be cancelled at the end of the current billing period. You will retain access until then and will not be charged again."
                         isPending={isCancelPending}
-                        onClose={() => setCancelDialogOpen(false)}
+                        onCancel={() => setCancelDialogOpen(false)}
                         onConfirm={() =>
                             cancelSubscription(undefined, {
                                 onSuccess: () => {
@@ -248,11 +250,16 @@ const Billing = () => {
                             })
                         }
                         open={cancelDialogOpen}
+                        title="Cancel subscription?"
                     />
 
-                    <ReactivatePlanDialog
+                    <AlertDialog
+                        cancelLabel="Keep cancelled"
+                        confirmButtonVariant="default"
+                        confirmLabel={isReactivateMutationPending ? 'Reactivating…' : 'Reactivate subscription'}
+                        description="Your subscription will continue and you will be charged at the next billing cycle. Your plan will no longer be cancelled."
                         isPending={isReactivateMutationPending}
-                        onClose={() => setReactivateDialogOpen(false)}
+                        onCancel={() => setReactivateDialogOpen(false)}
                         onConfirm={() =>
                             reactivateSubscription(undefined, {
                                 onSuccess: () => {
@@ -263,6 +270,7 @@ const Billing = () => {
                             })
                         }
                         open={reactivateDialogOpen}
+                        title="Reactivate subscription?"
                     />
 
                     <SelectPlanDialog
