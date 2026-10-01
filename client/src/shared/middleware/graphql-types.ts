@@ -3744,6 +3744,7 @@ export type WorkflowInfo = {
 export enum WorkflowIssueKind {
   BrokenReference = 'BROKEN_REFERENCE',
   DuplicateNodeName = 'DUPLICATE_NODE_NAME',
+  InvalidConnection = 'INVALID_CONNECTION',
   MissingClusterElement = 'MISSING_CLUSTER_ELEMENT',
   MissingConnection = 'MISSING_CONNECTION',
   MissingRequired = 'MISSING_REQUIRED',
