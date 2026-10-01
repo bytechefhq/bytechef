@@ -17,10 +17,13 @@
 package com.bytechef.component.rocketchat.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.CHANNEL_ID;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.ID;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.NAME;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.TEXT;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.USERNAME;
 
 import com.bytechef.component.definition.Context.Http.Body;
@@ -38,6 +41,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * The request half of the {@code rocketchat} agent channel.
+ * <p>
+ * The webhook body is handed through untouched and the trigger declares no output schema, so the descriptor's paths
+ * name the fields of Rocket.Chat's own outgoing-webhook payload and cannot be checked against anything at build time —
+ * the documented gap of the agent channel design. {@code RocketchatNewMessageTriggerAgentChannelTest} pins them
+ * instead.
+ * <p>
+ * No {@code attachments} path is bound: the trigger declares no output to bind one from, the outgoing-webhook payload
+ * documents no such field, and an absent path is how a channel states that it carries none — leaving the generator to
+ * wire the literal {@code []} it wires today.
+ *
  * @author Marija Horvat
  */
 public class RocketchatNewMessageTrigger {
@@ -49,6 +63,10 @@ public class RocketchatNewMessageTrigger {
         .help("", "https://docs.bytechef.io/reference/components/rocketchat_v1#new-message")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output()
+        .agentRequest(
+            agentRequest()
+                .conversationId(CHANNEL_ID)
+                .message(TEXT))
         .webhookDisable(RocketchatNewMessageTrigger::webhookDisable)
         .webhookEnable(RocketchatNewMessageTrigger::webhookEnable)
         .webhookRequest(RocketchatNewMessageTrigger::webhookRequest);

@@ -16,11 +16,16 @@
 
 package com.bytechef.component.telegram.trigger;
 
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.telegram.constant.TelegramConstants.CHAT;
+import static com.bytechef.component.telegram.constant.TelegramConstants.ID;
+import static com.bytechef.component.telegram.constant.TelegramConstants.MESSAGE;
 import static com.bytechef.component.telegram.constant.TelegramConstants.MESSAGE_OUTPUT_PROPERTIES;
+import static com.bytechef.component.telegram.constant.TelegramConstants.TEXT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
@@ -35,6 +40,10 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import java.util.List;
 
 /**
+ * The request half of the {@code telegram} agent channel. Its descriptor deliberately binds no {@code attachments}
+ * path: Telegram's message output declares no attachments field, and an absent path is how a channel states that it
+ * carries none, leaving the generator to wire the literal {@code []} it wires today.
+ *
  * @author Monika Kušter
  */
 public class TelegramNewMessageTrigger {
@@ -50,8 +59,12 @@ public class TelegramNewMessageTrigger {
                 object()
                     .properties(
                         integer("update_id"),
-                        object("message")
+                        object(MESSAGE)
                             .properties(MESSAGE_OUTPUT_PROPERTIES))))
+        .agentRequest(
+            agentRequest()
+                .conversationId(MESSAGE + "." + CHAT + "." + ID)
+                .message(MESSAGE + "." + TEXT))
         .webhookEnable(TelegramNewMessageTrigger::webhookEnable)
         .webhookDisable(TelegramNewMessageTrigger::webhookDisable)
         .webhookRequest(TelegramNewMessageTrigger::webhookRequest)

@@ -40,6 +40,7 @@ public final class ComponentDefinition {
 
     private Map<String, List<String>> actionClusterElementTypes;
     private List<ActionDefinition> actions;
+    private List<AgentChannelDefinition> agentChannels;
     private List<ComponentCategory> componentCategories;
     private boolean clusterElement;
     private Map<String, List<String>> clusterElementClusterElementTypes;
@@ -64,14 +65,47 @@ public final class ComponentDefinition {
 
     public ComponentDefinition(String name) {
         this.actions = List.of();
+        this.agentChannels = List.of();
         this.name = name;
         this.inputs = List.of();
         this.tags = List.of();
         this.triggers = List.of();
     }
 
+    public ComponentDefinition(
+        ComponentDefinition componentDefinition, List<ActionDefinition> actions, List<TriggerDefinition> triggers) {
+
+        this.actionClusterElementTypes = componentDefinition.actionClusterElementTypes;
+        this.actions = actions;
+        this.agentChannels = componentDefinition.agentChannels;
+        this.componentCategories = componentDefinition.componentCategories;
+        this.clusterElement = componentDefinition.clusterElement;
+        this.clusterElementClusterElementTypes = componentDefinition.clusterElementClusterElementTypes;
+        this.clusterElements = componentDefinition.clusterElements;
+        this.clusterElementTypes = componentDefinition.clusterElementTypes;
+        this.clusterRoot = componentDefinition.clusterRoot;
+        this.connection = componentDefinition.connection;
+        this.connectionRequired = componentDefinition.connectionRequired;
+        this.description = componentDefinition.description;
+        this.icon = componentDefinition.icon;
+        this.name = componentDefinition.name;
+        this.inputs = componentDefinition.inputs;
+        this.resources = componentDefinition.resources;
+        this.tags = componentDefinition.tags;
+        this.triggers = triggers;
+        this.title = componentDefinition.title;
+        this.unifiedApiCategory = componentDefinition.unifiedApiCategory;
+        this.version = componentDefinition.version;
+    }
+
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
+        this.agentChannels = componentDefinition.getAgentChannels()
+            .stream()
+            .map(
+                agentChannelDefinition -> new AgentChannelDefinition(
+                    agentChannelDefinition, componentDefinition.getName(), componentDefinition.getVersion()))
+            .toList();
         this.inputs = getInputs(componentDefinition);
 
         this.clusterElement = !componentDefinition.getClusterElements()
@@ -139,6 +173,10 @@ public final class ComponentDefinition {
 
     public int getActionsCount() {
         return actions.size();
+    }
+
+    public List<AgentChannelDefinition> getAgentChannels() {
+        return agentChannels;
     }
 
     public Map<String, List<String>> getClusterElementClusterElementTypes() {
@@ -231,7 +269,8 @@ public final class ComponentDefinition {
         return clusterElement == that.clusterElement && clusterRoot == that.clusterRoot &&
             connectionRequired == that.connectionRequired && version == that.version &&
             Objects.equals(actionClusterElementTypes, that.actionClusterElementTypes) &&
-            Objects.equals(actions, that.actions) && Objects.equals(componentCategories, that.componentCategories) &&
+            Objects.equals(actions, that.actions) && Objects.equals(agentChannels, that.agentChannels) &&
+            Objects.equals(componentCategories, that.componentCategories) &&
             Objects.equals(clusterElementClusterElementTypes, that.clusterElementClusterElementTypes) &&
             Objects.equals(clusterElements, that.clusterElements) &&
             Objects.equals(clusterElementTypes, that.clusterElementTypes) &&
@@ -246,9 +285,10 @@ public final class ComponentDefinition {
     @Override
     public int hashCode() {
         return Objects.hash(
-            actionClusterElementTypes, actions, componentCategories, clusterElement, clusterElementClusterElementTypes,
-            clusterElements, clusterElementTypes, clusterRoot, connection, connectionRequired, description, icon, name,
-            inputs, resources, tags, triggers, title, unifiedApiCategory, version);
+            actionClusterElementTypes, actions, agentChannels, componentCategories, clusterElement,
+            clusterElementClusterElementTypes, clusterElements, clusterElementTypes, clusterRoot, connection,
+            connectionRequired, description, icon, name, inputs, resources, tags, triggers, title, unifiedApiCategory,
+            version);
     }
 
     @Override
@@ -263,6 +303,7 @@ public final class ComponentDefinition {
             ", clusterRoot=" + clusterRoot +
             ", clusterElement=" + clusterElement +
             ", actions=" + actions +
+            ", agentChannels=" + agentChannels +
             ", inputs=" + inputs +
             ", triggers=" + triggers +
             ", clusterElementTypes=" + clusterElementTypes +

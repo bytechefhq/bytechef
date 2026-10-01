@@ -17,24 +17,35 @@
 package com.bytechef.platform.component.index;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.AgentChannelDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAgentChannelDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAgentReplyDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiablePropertyGroup;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -42,8 +53,12 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +67,7 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record ComponentIndex(List<Entry> entries) {
 
     public static final String RESOURCE_PATH = "META-INF/bytechef/component-index.json";
@@ -112,70 +128,85 @@ public record ComponentIndex(List<Entry> entries) {
             componentDefinition.icon(entry.icon());
         }
 
-        if (entry.componentCategories() != null && !entry.componentCategories()
-            .isEmpty()) {
+        List<CategorySummary> componentCategories = entry.componentCategories();
+
+        if (componentCategories != null && !componentCategories.isEmpty()) {
 
             componentDefinition.categories(
-                entry.componentCategories()
+                componentCategories
                     .stream()
                     .map(category -> new ComponentCategory(category.name(), category.label()))
                     .toList());
         }
 
-        if (entry.tags() != null && !entry.tags()
-            .isEmpty()) {
+        List<String> tags = entry.tags();
 
-            componentDefinition.tags(entry.tags()
-                .toArray(String[]::new));
+        if (tags != null && !tags.isEmpty()) {
+
+            componentDefinition.tags(tags.toArray(String[]::new));
         }
 
-        if (entry.connection() != null) {
+        ConnectionSummary connectionSummary = entry.connection();
+
+        if (connectionSummary != null) {
             componentDefinition.connection(
                 connection()
-                    .version(entry.connection()
-                        .version())
-                    .authorizationRequired(entry.connection()
-                        .authorizationRequired()));
+                    .version(connectionSummary.version())
+                    .authorizationRequired(connectionSummary.authorizationRequired()));
         }
 
-        if (entry.actions() != null && !entry.actions()
-            .isEmpty()) {
+        List<ItemSummary> actions = entry.actions();
+
+        if (actions != null && !actions.isEmpty()) {
 
             componentDefinition.actions(
-                entry.actions()
+                actions
                     .stream()
                     .map(ComponentIndex::toStubActionDefinition)
                     .toList());
         }
 
-        if (entry.triggers() != null && !entry.triggers()
-            .isEmpty()) {
+        List<TriggerSummary> triggers = entry.triggers();
+
+        if (triggers != null && !triggers.isEmpty()) {
 
             componentDefinition.triggers(
-                entry.triggers()
+                triggers
                     .stream()
                     .map(ComponentIndex::toStubTriggerDefinition)
                     .toList());
         }
 
-        if (entry.clusterElements() != null && !entry.clusterElements()
-            .isEmpty()) {
+        List<ClusterElementSummary> clusterElements = entry.clusterElements();
+
+        if (clusterElements != null && !clusterElements.isEmpty()) {
 
             componentDefinition.clusterElements(
-                entry.clusterElements()
+                clusterElements
                     .stream()
                     .map(ComponentIndex::toStubClusterElementDefinition)
                     .toArray(ClusterElementDefinition<?>[]::new));
         }
 
-        if (entry.inputs() != null && !entry.inputs()
-            .isEmpty()) {
+        List<String> inputs = entry.inputs();
+
+        if (inputs != null && !inputs.isEmpty()) {
 
             componentDefinition.inputs(
-                entry.inputs()
+                inputs
                     .stream()
                     .map(ComponentDsl::propertyGroup)
                     .toArray(ModifiablePropertyGroup[]::new));
+        }
+
+        List<AgentChannelSummary> agentChannels = entry.agentChannels();
+
+        if (agentChannels != null && !agentChannels.isEmpty()) {
+            componentDefinition.agentChannels(
+                agentChannels
+                    .stream()
+                    .map(agentChannelSummary -> toStubAgentChannelDefinition(componentDefinition, agentChannelSummary))
+                    .toList());
         }
 
         List<ClusterElementTypeSummary> clusterElementTypes = entry.clusterElementTypes();
@@ -249,13 +280,105 @@ public record ComponentIndex(List<Entry> entries) {
         return clusterElementDefinition;
     }
 
+    private static AgentChannelDefinition toStubAgentChannelDefinition(
+        ModifiableComponentDefinition componentDefinition, AgentChannelSummary agentChannelSummary) {
+
+        TriggerDefinition triggerDefinition = componentDefinition.getTriggers()
+            .stream()
+            .filter(candidate -> Objects.equals(candidate.getName(), agentChannelSummary.triggerName()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                "Index entry '%s' agent channel '%s' references unknown trigger '%s'".formatted(
+                    componentDefinition.getName(), agentChannelSummary.name(), agentChannelSummary.triggerName())));
+
+        if (triggerDefinition instanceof ModifiableTriggerDefinition modifiableTrigger) {
+            modifiableTrigger.agentRequest(
+                agentRequest()
+                    .conversationId(agentChannelSummary.conversationIdPath())
+                    .message(agentChannelSummary.messagePath())
+                    .attachments(agentChannelSummary.attachmentsPath()));
+
+            Map<String, String> replyChannelParameters = agentChannelSummary.replyChannelParameters();
+
+            if (modifiableTrigger.getProperties()
+                .isEmpty() && !replyChannelParameters.isEmpty()) {
+
+                modifiableTrigger.properties(
+                    replyChannelParameters.keySet()
+                        .stream()
+                        .map(ComponentDsl::string)
+                        .toArray(Property[]::new));
+            }
+        }
+
+        ModifiableAgentChannelDefinition agentChannelDefinition;
+
+        if (agentChannelSummary.replyActionName() == null) {
+            agentChannelDefinition = agentChannel(agentChannelSummary.name(), triggerDefinition);
+        } else {
+            ActionDefinition actionDefinition = componentDefinition.getActions()
+                .stream()
+                .filter(candidate -> Objects.equals(candidate.getName(), agentChannelSummary.replyActionName()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                    "Index entry '%s' agent channel '%s' references unknown action '%s'".formatted(
+                        componentDefinition.getName(), agentChannelSummary.name(),
+                        agentChannelSummary.replyActionName())));
+
+            if (actionDefinition instanceof ModifiableActionDefinition modifiableAction) {
+                if (modifiableAction.getProperties()
+                    .isEmpty()) {
+
+                    modifiableAction.properties(
+                        Stream.of(
+                            Stream.of(
+                                agentChannelSummary.replyMessageProperty(),
+                                agentChannelSummary.replyConversationIdProperty(),
+                                agentChannelSummary.replyAttachmentsProperty()),
+                            agentChannelSummary.replyChannelParameters()
+                                .values()
+                                .stream(),
+                            agentChannelSummary.replyFixedParameters()
+                                .keySet()
+                                .stream())
+                            .flatMap(Function.identity())
+                            .filter(Objects::nonNull)
+                            .map(propertyName -> string(propertyName.split("\\.")[0]))
+                            .distinct()
+                            .toList());
+                }
+
+                ModifiableAgentReplyDefinition agentReplyDefinition = agentReply()
+                    .conversationId(agentChannelSummary.replyConversationIdProperty())
+                    .message(agentChannelSummary.replyMessageProperty())
+                    .attachments(agentChannelSummary.replyAttachmentsProperty());
+
+                agentChannelSummary.replyChannelParameters()
+                    .forEach(agentReplyDefinition::channelParameter);
+                agentChannelSummary.replyFixedParameters()
+                    .forEach(agentReplyDefinition::fixedParameter);
+
+                modifiableAction.agentReply(agentReplyDefinition);
+            }
+
+            agentChannelDefinition = agentChannel(agentChannelSummary.name(), triggerDefinition, actionDefinition);
+        }
+
+        return agentChannelDefinition
+            .title(agentChannelSummary.title())
+            .description(agentChannelSummary.description())
+            .approvalChannel(agentChannelSummary.approvalChannelName());
+    }
+
+    @SuppressFBWarnings("EI")
     public record Entry(
         String name, int version, @Nullable String title, @Nullable String description, @Nullable String icon,
         @Nullable List<CategorySummary> componentCategories, @Nullable List<String> tags,
         @Nullable ConnectionSummary connection, @Nullable List<ItemSummary> actions,
         @Nullable List<TriggerSummary> triggers, @Nullable List<ClusterElementSummary> clusterElements,
-        @Nullable List<ClusterElementTypeSummary> clusterElementTypes, @Nullable List<String> inputs,
-        String providerClassName, String loaderKind) {
+        @Nullable List<ClusterElementTypeSummary> clusterElementTypes,
+        @Nullable List<AgentChannelSummary> agentChannels, @Nullable List<String> inputs, String providerClassName,
+        String loaderKind) {
     }
 
     private static final class StubClusterRootComponentDefinition extends AbstractComponentDefinitionWrapper
@@ -297,5 +420,14 @@ public record ComponentIndex(List<Entry> entries) {
 
     public record ClusterElementTypeSummary(
         String name, String key, String label, boolean multipleElements, boolean required) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record AgentChannelSummary(
+        String name, @Nullable String title, @Nullable String description, String triggerName,
+        @Nullable String replyActionName, @Nullable String approvalChannelName, String conversationIdPath,
+        String messagePath, @Nullable String attachmentsPath, @Nullable String replyMessageProperty,
+        @Nullable String replyConversationIdProperty, @Nullable String replyAttachmentsProperty,
+        Map<String, String> replyChannelParameters, Map<String, Object> replyFixedParameters) {
     }
 }

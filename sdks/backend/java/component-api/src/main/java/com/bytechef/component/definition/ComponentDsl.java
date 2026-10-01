@@ -27,10 +27,13 @@ import com.bytechef.component.definition.TriggerDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
 import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.definition.BaseOutputDefinition.Placeholder;
 import com.bytechef.definition.BaseOutputDefinition.SampleOutput;
 import com.bytechef.definition.BaseOutputFunction;
+import com.bytechef.definition.BaseProperty;
+import com.bytechef.definition.BaseProperty.BaseObjectProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Constructor;
 import java.time.LocalDate;
@@ -40,12 +43,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -53,8 +59,44 @@ import java.util.stream.Collectors;
  */
 public final class ComponentDsl {
 
+    private static final String UNVERIFIED_PATHS_HINT =
+        "; declare agentRequest().unverifiedPaths(reason) if the declared output schema is known to contradict the "
+            + "real payload";
+
     public static ModifiableActionDefinition action(String name) {
         return new ModifiableActionDefinition(name);
+    }
+
+    public static ModifiableAgentChannelDefinition agentChannel(String name, TriggerDefinition trigger) {
+        return new ModifiableAgentChannelDefinition(name, trigger, null);
+    }
+
+    public static ModifiableAgentChannelDefinition agentChannel(
+        String name, TriggerDefinition trigger, ActionDefinition replyAction) {
+
+        return new ModifiableAgentChannelDefinition(
+            name, trigger, Objects.requireNonNull(replyAction, "'replyAction' must not be null"));
+    }
+
+    public static ModifiableObjectProperty agentChannelRequest() {
+        return object()
+            .properties(
+                string(AgentChannelDefinition.CONVERSATION_ID)
+                    .description("Identifier of the conversation the message was posted to.")
+                    .required(true),
+                string(AgentChannelDefinition.MESSAGE)
+                    .description("Text of the message."),
+                array(AgentChannelDefinition.ATTACHMENTS)
+                    .description("Files that arrived with the message.")
+                    .items(fileEntry()));
+    }
+
+    public static ModifiableAgentReplyDefinition agentReply() {
+        return new ModifiableAgentReplyDefinition();
+    }
+
+    public static ModifiableAgentRequestDefinition agentRequest() {
+        return new ModifiableAgentRequestDefinition();
     }
 
     public static ModifiableArrayProperty array() {
@@ -295,8 +337,152 @@ public final class ComponentDsl {
         return new ModifiableUnifiedApiDefinition(category);
     }
 
+    private static String getFirstSegment(String name) {
+        int index = name.indexOf('.');
+
+        return index < 0 ? name : name.substring(0, index);
+    }
+
+    private static Set<String> getPropertyNames(List<? extends Property> properties) {
+        return properties.stream()
+            .map(Property::getName)
+            .collect(Collectors.toSet());
+    }
+
+    private static void validateAgentReplyProperties(
+        ActionDefinition actionDefinition, AgentReplyDefinition agentReplyDefinition) {
+
+        Set<String> propertyNames = getPropertyNames(actionDefinition.getProperties());
+
+        validateAgentReplyProperty(actionDefinition, propertyNames, agentReplyDefinition.getMessageProperty());
+
+        agentReplyDefinition.getConversationIdProperty()
+            .ifPresent(property -> validateAgentReplyProperty(actionDefinition, propertyNames, property));
+        agentReplyDefinition.getAttachmentsProperty()
+            .ifPresent(property -> validateAgentReplyProperty(actionDefinition, propertyNames, property));
+
+        Map<String, String> channelParameters = agentReplyDefinition.getChannelParameters();
+
+        for (String property : channelParameters.values()) {
+            validateAgentReplyProperty(actionDefinition, propertyNames, property);
+        }
+
+        Map<String, Object> fixedParameters = agentReplyDefinition.getFixedParameters();
+
+        for (String property : fixedParameters.keySet()) {
+            validateAgentReplyProperty(actionDefinition, propertyNames, property);
+        }
+    }
+
+    private static void validateAgentReplyProperty(
+        ActionDefinition actionDefinition, Set<String> propertyNames, String property) {
+
+        if (!propertyNames.contains(getFirstSegment(property))) {
+            throw new IllegalArgumentException(
+                "Agent reply property '%s' is not declared by action '%s'".formatted(
+                    property, actionDefinition.getName()));
+        }
+    }
+
+    private static void validateAgentRequestPaths(
+        String channelName, TriggerDefinition trigger, AgentRequestDefinition agentRequestDefinition) {
+
+        BaseObjectProperty<?> outputSchema = trigger.getOutputDefinition()
+            .flatMap(OutputDefinition::getOutputResponse)
+            .map(OutputResponse::getOutputSchema)
+            .filter(BaseObjectProperty.class::isInstance)
+            .map(property -> (BaseObjectProperty<?>) property)
+            .filter(objectProperty -> !objectProperty.getProperties()
+                .isEmpty())
+            .orElse(null);
+
+        if (outputSchema == null) {
+            return;
+        }
+
+        Optional<String> unverifiedPathsReason = agentRequestDefinition.getUnverifiedPathsReason();
+
+        boolean deep = unverifiedPathsReason.isEmpty();
+
+        validateAgentRequestPath(channelName, outputSchema, agentRequestDefinition.getConversationIdPath(), deep);
+        validateAgentRequestPath(channelName, outputSchema, agentRequestDefinition.getMessagePath(), deep);
+
+        agentRequestDefinition.getAttachmentsPath()
+            .ifPresent(path -> validateAgentRequestPath(channelName, outputSchema, path, deep));
+    }
+
+    private static void validateAgentRequestPath(
+        String channelName, BaseObjectProperty<?> outputSchema, String path, boolean deep) {
+
+        List<? extends BaseProperty> properties = outputSchema.getProperties();
+        String[] segments = path.split("\\.");
+
+        for (int index = 0; index < segments.length; index++) {
+            BaseProperty property = findProperty(properties, segments[index]);
+
+            if (property == null) {
+                throw new IllegalArgumentException(
+                    ("Agent request path '%s' of agent channel '%s' addresses '%s', which the trigger's output schema "
+                        + "does not declare%s").formatted(
+                            path, channelName, segments[index], deep ? UNVERIFIED_PATHS_HINT : ""));
+            }
+
+            if (!deep || index == segments.length - 1) {
+                return;
+            }
+
+            properties = getObjectProperties(property);
+
+            if (properties == null) {
+                throw new IllegalArgumentException(
+                    ("Agent request path '%s' of agent channel '%s' descends into '%s', which the trigger's output "
+                        + "schema does not declare as an object%s").formatted(
+                            path, channelName, segments[index], UNVERIFIED_PATHS_HINT));
+            }
+
+            if (properties.isEmpty()) {
+                return;
+            }
+        }
+    }
+
+    private static BaseProperty findProperty(List<? extends BaseProperty> properties, String name) {
+        for (BaseProperty property : properties) {
+            if (Objects.equals(property.getName(), name)) {
+                return property;
+            }
+        }
+
+        return null;
+    }
+
+    private static List<? extends BaseProperty> getObjectProperties(BaseProperty property) {
+        if (property instanceof BaseObjectProperty<?> objectProperty) {
+            return objectProperty.getProperties();
+        }
+
+        return null;
+    }
+
+    private static void validateChannelParameterKeys(
+        String channelName, TriggerDefinition trigger, AgentReplyDefinition agentReplyDefinition) {
+
+        Set<String> triggerPropertyNames = getPropertyNames(trigger.getProperties());
+
+        Map<String, String> channelParameters = agentReplyDefinition.getChannelParameters();
+
+        for (String rowKey : channelParameters.keySet()) {
+            if (!triggerPropertyNames.contains(rowKey)) {
+                throw new IllegalArgumentException(
+                    "Channel parameter '%s' of agent channel '%s' is not a property of trigger '%s'".formatted(
+                        rowKey, channelName, trigger.getName()));
+            }
+        }
+    }
+
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
+        private AgentReplyDefinition agentReplyDefinition;
         private Boolean batch = Boolean.FALSE;
         private BeforeSuspendConsumer beforeSuspendConsumer;
         private BeforeResumeFunction beforeResumeFunction;
@@ -319,6 +505,16 @@ public final class ComponentDsl {
 
         private ModifiableActionDefinition(String name) {
             this.name = Objects.requireNonNull(name);
+        }
+
+        public ModifiableActionDefinition agentReply(AgentReplyDefinition agentReply) {
+            Objects.requireNonNull(agentReply, "'agentReply' must not be null");
+
+            validateAgentReplyProperties(this, agentReply);
+
+            this.agentReplyDefinition = agentReply;
+
+            return this;
         }
 
         public ModifiableActionDefinition batch(boolean batch) {
@@ -525,7 +721,8 @@ public final class ComponentDsl {
                 return false;
             }
 
-            return Objects.equals(description, that.description) &&
+            return Objects.equals(agentReplyDefinition, that.agentReplyDefinition) &&
+                Objects.equals(description, that.description) &&
                 Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help) &&
                 Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name) &&
                 Objects.equals(outputDefinition, that.outputDefinition) &&
@@ -536,8 +733,13 @@ public final class ComponentDsl {
         @Override
         public int hashCode() {
             return Objects.hash(
-                batch, deprecated, description, performFunction, help, metadata, name, outputDefinition, properties,
-                title, workflowNodeDescriptionFunction);
+                agentReplyDefinition, batch, deprecated, description, performFunction, help, metadata, name,
+                outputDefinition, properties, title, workflowNodeDescriptionFunction);
+        }
+
+        @Override
+        public Optional<AgentReplyDefinition> getAgentReplyDefinition() {
+            return Optional.ofNullable(agentReplyDefinition);
         }
 
         @Override
@@ -638,6 +840,367 @@ public final class ComponentDsl {
                 ", properties=" + properties +
                 ", outputDefinition=" + outputDefinition +
                 ", metadata=" + metadata +
+                ", agentReplyDefinition=" + agentReplyDefinition +
+                '}';
+        }
+    }
+
+    public static final class ModifiableAgentChannelDefinition implements AgentChannelDefinition {
+
+        private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9]+");
+
+        private String approvalChannelName;
+        private String description;
+        private final String name;
+        private final ActionDefinition replyAction;
+        private String title;
+        private final TriggerDefinition trigger;
+        private Map<String, Object> triggerParameters = Map.of();
+
+        private ModifiableAgentChannelDefinition(
+            String name, TriggerDefinition trigger, ActionDefinition replyAction) {
+
+            Objects.requireNonNull(name, "'name' must not be null");
+            Objects.requireNonNull(trigger, "'trigger' must not be null");
+
+            if (!NAME_PATTERN.matcher(name)
+                .matches()) {
+
+                throw new IllegalArgumentException(
+                    "Agent channel name '%s' is invalid, the name must match %s".formatted(name, NAME_PATTERN));
+            }
+
+            this.name = name;
+            this.replyAction = replyAction;
+            this.trigger = trigger;
+
+            AgentRequestDefinition agentRequestDefinition = trigger.getAgentRequestDefinition()
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "Trigger '%s' paired into agent channel '%s' does not declare an agentRequest descriptor"
+                        .formatted(trigger.getName(), name)));
+
+            validateAgentRequestPaths(name, trigger, agentRequestDefinition);
+
+            if (replyAction != null) {
+                AgentReplyDefinition agentReplyDefinition = replyAction.getAgentReplyDefinition()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "Reply action '%s' paired into agent channel '%s' does not declare an agentReply descriptor"
+                            .formatted(replyAction.getName(), name)));
+
+                validateChannelParameterKeys(name, trigger, agentReplyDefinition);
+            }
+        }
+
+        public ModifiableAgentChannelDefinition approvalChannel(String approvalChannelName) {
+            this.approvalChannelName = approvalChannelName;
+
+            return this;
+        }
+
+        public ModifiableAgentChannelDefinition description(String description) {
+            this.description = description;
+
+            return this;
+        }
+
+        public ModifiableAgentChannelDefinition title(String title) {
+            this.title = title;
+
+            return this;
+        }
+
+        public ModifiableAgentChannelDefinition triggerParameter(String key, Object value) {
+            Objects.requireNonNull(key, "'key' must not be null");
+            Objects.requireNonNull(value, "'value' must not be null");
+
+            Map<String, Object> map = new LinkedHashMap<>(triggerParameters);
+
+            map.put(key, value);
+
+            this.triggerParameters = Collections.unmodifiableMap(map);
+
+            return this;
+        }
+
+        public ModifiableAgentChannelDefinition triggerParameters(Map<String, Object> triggerParameters) {
+            this.triggerParameters = triggerParameters == null
+                ? Map.of()
+                : Collections.unmodifiableMap(new LinkedHashMap<>(triggerParameters));
+
+            return this;
+        }
+
+        @Override
+        public Optional<String> getApprovalChannelName() {
+            return Optional.ofNullable(approvalChannelName);
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Optional<ActionDefinition> getReplyAction() {
+            return Optional.ofNullable(replyAction);
+        }
+
+        @Override
+        public Optional<String> getTitle() {
+            return Optional.ofNullable(title);
+        }
+
+        @Override
+        public TriggerDefinition getTrigger() {
+            return trigger;
+        }
+
+        @SuppressFBWarnings("EI")
+        @Override
+        public Map<String, Object> getTriggerParameters() {
+            return triggerParameters;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableAgentChannelDefinition that)) {
+                return false;
+            }
+
+            return Objects.equals(approvalChannelName, that.approvalChannelName) &&
+                Objects.equals(description, that.description) && Objects.equals(name, that.name) &&
+                Objects.equals(replyAction, that.replyAction) && Objects.equals(title, that.title) &&
+                Objects.equals(trigger, that.trigger) && Objects.equals(triggerParameters, that.triggerParameters);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(
+                approvalChannelName, description, name, replyAction, title, trigger, triggerParameters);
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableAgentChannelDefinition{" +
+                "name='" + name + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", trigger=" + trigger +
+                ", replyAction=" + replyAction +
+                ", approvalChannelName='" + approvalChannelName + '\'' +
+                ", triggerParameters=" + triggerParameters +
+                '}';
+        }
+    }
+
+    public static final class ModifiableAgentReplyDefinition implements AgentReplyDefinition {
+
+        private String attachmentsProperty;
+        private Map<String, String> channelParameters = Map.of();
+        private String conversationIdProperty;
+        private Map<String, Object> fixedParameters = Map.of();
+        private String messageProperty = AgentChannelDefinition.MESSAGE;
+
+        private ModifiableAgentReplyDefinition() {
+        }
+
+        public ModifiableAgentReplyDefinition attachments(String attachmentsProperty) {
+            this.attachmentsProperty = attachmentsProperty;
+
+            return this;
+        }
+
+        public ModifiableAgentReplyDefinition channelParameter(String rowKey, String property) {
+            Objects.requireNonNull(rowKey, "'rowKey' must not be null");
+            Objects.requireNonNull(property, "'property' must not be null");
+
+            Map<String, String> map = new LinkedHashMap<>(channelParameters);
+
+            map.put(rowKey, property);
+
+            this.channelParameters = Collections.unmodifiableMap(map);
+
+            return this;
+        }
+
+        public ModifiableAgentReplyDefinition conversationId(String conversationIdProperty) {
+            this.conversationIdProperty = conversationIdProperty;
+
+            return this;
+        }
+
+        public ModifiableAgentReplyDefinition fixedParameter(String property, Object value) {
+            Objects.requireNonNull(property, "'property' must not be null");
+            Objects.requireNonNull(value, "'value' must not be null");
+
+            Map<String, Object> map = new LinkedHashMap<>(fixedParameters);
+
+            map.put(property, value);
+
+            this.fixedParameters = Collections.unmodifiableMap(map);
+
+            return this;
+        }
+
+        public ModifiableAgentReplyDefinition message(String messageProperty) {
+            this.messageProperty = Objects.requireNonNull(messageProperty, "'messageProperty' must not be null");
+
+            return this;
+        }
+
+        @Override
+        public Optional<String> getAttachmentsProperty() {
+            return Optional.ofNullable(attachmentsProperty);
+        }
+
+        @Override
+        public Map<String, String> getChannelParameters() {
+            return channelParameters;
+        }
+
+        @Override
+        public Optional<String> getConversationIdProperty() {
+            return Optional.ofNullable(conversationIdProperty);
+        }
+
+        @Override
+        public Map<String, Object> getFixedParameters() {
+            return fixedParameters;
+        }
+
+        @Override
+        public String getMessageProperty() {
+            return messageProperty;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableAgentReplyDefinition that)) {
+                return false;
+            }
+
+            return Objects.equals(attachmentsProperty, that.attachmentsProperty) &&
+                Objects.equals(channelParameters, that.channelParameters) &&
+                Objects.equals(conversationIdProperty, that.conversationIdProperty) &&
+                Objects.equals(fixedParameters, that.fixedParameters) &&
+                Objects.equals(messageProperty, that.messageProperty);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(
+                attachmentsProperty, channelParameters, conversationIdProperty, fixedParameters, messageProperty);
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableAgentReplyDefinition{" +
+                "messageProperty='" + messageProperty + '\'' +
+                ", conversationIdProperty='" + conversationIdProperty + '\'' +
+                ", attachmentsProperty='" + attachmentsProperty + '\'' +
+                ", channelParameters=" + channelParameters +
+                ", fixedParameters=" + fixedParameters +
+                '}';
+        }
+    }
+
+    public static final class ModifiableAgentRequestDefinition implements AgentRequestDefinition {
+
+        private String attachmentsPath;
+        private String conversationIdPath = AgentChannelDefinition.CONVERSATION_ID;
+        private String messagePath = AgentChannelDefinition.MESSAGE;
+        private String unverifiedPathsReason;
+
+        private ModifiableAgentRequestDefinition() {
+        }
+
+        public ModifiableAgentRequestDefinition attachments(String attachmentsPath) {
+            this.attachmentsPath = attachmentsPath;
+
+            return this;
+        }
+
+        public ModifiableAgentRequestDefinition conversationId(String conversationIdPath) {
+            this.conversationIdPath = Objects.requireNonNull(
+                conversationIdPath, "'conversationIdPath' must not be null");
+
+            return this;
+        }
+
+        public ModifiableAgentRequestDefinition message(String messagePath) {
+            this.messagePath = Objects.requireNonNull(messagePath, "'messagePath' must not be null");
+
+            return this;
+        }
+
+        public ModifiableAgentRequestDefinition unverifiedPaths(String unverifiedPathsReason) {
+            this.unverifiedPathsReason = Objects.requireNonNull(
+                unverifiedPathsReason, "'unverifiedPathsReason' must not be null");
+
+            return this;
+        }
+
+        @Override
+        public Optional<String> getAttachmentsPath() {
+            return Optional.ofNullable(attachmentsPath);
+        }
+
+        @Override
+        public String getConversationIdPath() {
+            return conversationIdPath;
+        }
+
+        @Override
+        public String getMessagePath() {
+            return messagePath;
+        }
+
+        @Override
+        public Optional<String> getUnverifiedPathsReason() {
+            return Optional.ofNullable(unverifiedPathsReason);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableAgentRequestDefinition that)) {
+                return false;
+            }
+
+            return Objects.equals(attachmentsPath, that.attachmentsPath) &&
+                Objects.equals(conversationIdPath, that.conversationIdPath) &&
+                Objects.equals(messagePath, that.messagePath) &&
+                Objects.equals(unverifiedPathsReason, that.unverifiedPathsReason);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(attachmentsPath, conversationIdPath, messagePath, unverifiedPathsReason);
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableAgentRequestDefinition{" +
+                "conversationIdPath='" + conversationIdPath + '\'' +
+                ", messagePath='" + messagePath + '\'' +
+                ", attachmentsPath='" + attachmentsPath + '\'' +
+                ", unverifiedPathsReason='" + unverifiedPathsReason + '\'' +
                 '}';
         }
     }
@@ -1298,6 +1861,7 @@ public final class ComponentDsl {
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
         private List<ActionDefinition> actions = List.of();
+        private List<AgentChannelDefinition> agentChannels = List.of();
         private List<ComponentCategory> componentCategories = List.of();
         private ConnectionDefinition connection;
         private Boolean customAction = Boolean.FALSE;
@@ -1329,6 +1893,18 @@ public final class ComponentDsl {
 
         public <A extends ActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
             this.actions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition agentChannels(AgentChannelDefinition... agentChannelDefinitions) {
+            return agentChannels(List.of(Objects.requireNonNull(agentChannelDefinitions)));
+        }
+
+        public <C extends AgentChannelDefinition> ModifiableComponentDefinition agentChannels(
+            List<C> agentChannelDefinitions) {
+
+            this.agentChannels = List.copyOf(Objects.requireNonNull(agentChannelDefinitions));
 
             return this;
         }
@@ -1484,6 +2060,11 @@ public final class ComponentDsl {
         }
 
         @Override
+        public List<AgentChannelDefinition> getAgentChannels() {
+            return agentChannels == null ? List.of() : agentChannels;
+        }
+
+        @Override
         public List<? extends PropertyGroup> getInputs() {
             return inputs == null ? List.of() : inputs;
         }
@@ -1573,7 +2154,7 @@ public final class ComponentDsl {
                 return false;
             }
 
-            return Objects.equals(actions, that.actions) &&
+            return Objects.equals(actions, that.actions) && Objects.equals(agentChannels, that.agentChannels) &&
                 Objects.equals(componentCategories, that.componentCategories) &&
                 Objects.equals(connection, that.connection) &&
                 Objects.equals(customAction, that.customAction) &&
@@ -1589,8 +2170,8 @@ public final class ComponentDsl {
         @Override
         public int hashCode() {
             return Objects.hash(
-                actions, componentCategories, connection, customAction, customActionHelp, description, icon, tags,
-                metadata, name, resources, version, title, triggers, inputs);
+                actions, agentChannels, componentCategories, connection, customAction, customActionHelp, description,
+                icon, tags, metadata, name, resources, version, title, triggers, inputs);
         }
 
         @Override
@@ -1612,6 +2193,7 @@ public final class ComponentDsl {
                 ", triggerDefinitions=" + triggers +
                 ", inputs=" + inputs +
                 ", icon='" + icon + '\'' +
+                ", agentChannels=" + agentChannels +
                 '}';
         }
     }
@@ -3553,6 +4135,7 @@ public final class ComponentDsl {
 
     public static final class ModifiableTriggerDefinition implements TriggerDefinition {
 
+        private AgentRequestDefinition agentRequestDefinition;
         private Boolean batch = Boolean.FALSE;
         private DeduplicateFunction deduplicateFunction;
         private Boolean deprecated = Boolean.FALSE;
@@ -3582,6 +4165,12 @@ public final class ComponentDsl {
 
         private ModifiableTriggerDefinition(String name) {
             this.name = Objects.requireNonNull(name);
+        }
+
+        public ModifiableTriggerDefinition agentRequest(AgentRequestDefinition agentRequest) {
+            this.agentRequestDefinition = Objects.requireNonNull(agentRequest, "'agentRequest' must not be null");
+
+            return this;
         }
 
         public ModifiableTriggerDefinition batch(boolean batch) {
@@ -3779,7 +4368,8 @@ public final class ComponentDsl {
                 return false;
             }
 
-            return Objects.equals(batch, that.batch) &&
+            return Objects.equals(agentRequestDefinition, that.agentRequestDefinition) &&
+                Objects.equals(batch, that.batch) &&
                 Objects.equals(deduplicateFunction, that.deduplicateFunction) &&
                 Objects.equals(deprecated, that.deprecated) && Objects.equals(description, that.description) &&
                 Objects.equals(webhookDisableConsumer, that.webhookDisableConsumer) &&
@@ -3801,12 +4391,18 @@ public final class ComponentDsl {
 
         @Override
         public int hashCode() {
-            return Objects.hash(batch, deduplicateFunction, deprecated, description, webhookDisableConsumer,
+            return Objects.hash(agentRequestDefinition, batch, deduplicateFunction, deprecated, description,
+                webhookDisableConsumer,
                 webhookEnableFunction, dynamicWebhookRefreshFunction, webhookRequestFunction, help,
                 listenerDisableConsumer, listenerEnableConsumer, name, outputDefinition, pollFunction, properties,
                 title, type, webhookRawBody, webhookValidateFunction,
                 webhookValidateOnEnableFunction, workflowNodeDescriptionFunction,
                 workflowSyncExecution);
+        }
+
+        @Override
+        public Optional<AgentRequestDefinition> getAgentRequestDefinition() {
+            return Optional.ofNullable(agentRequestDefinition);
         }
 
         @Override
@@ -3938,6 +4534,7 @@ public final class ComponentDsl {
                 ", outputDefinition=" + outputDefinition +
                 ", webhookRawBody=" + webhookRawBody +
                 ", workflowSyncExecution=" + workflowSyncExecution +
+                ", agentRequestDefinition=" + agentRequestDefinition +
                 '}';
         }
     }

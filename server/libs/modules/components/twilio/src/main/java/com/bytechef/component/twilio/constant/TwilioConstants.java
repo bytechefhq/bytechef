@@ -36,8 +36,11 @@ public class TwilioConstants {
     public static final String BODY = "Body";
     public static final String DATE_TIME = "dateTime";
     public static final String FROM = "From";
+    public static final String NUMBER = "number";
     public static final String TO = "To";
+    public static final String TWILIO = "twilio";
     public static final String USE_TEMPLATE = "useTemplate";
+    public static final String WHATS_APP = "whatsApp";
     public static final String ZONE_ID = "zoneId";
 
     public static final ComponentDsl.ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object()

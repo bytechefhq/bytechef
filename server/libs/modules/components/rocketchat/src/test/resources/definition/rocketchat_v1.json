@@ -1028,6 +1028,13 @@
     "title": "Send Direct Message",
     "workflowNodeDescription": null
   }, {
+    "agentReplyDefinition": {
+      "attachmentsProperty": null,
+      "channelParameters": { },
+      "conversationIdProperty": "roomId",
+      "fixedParameters": { },
+      "messageProperty": "text"
+    },
     "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
@@ -3025,6 +3032,15 @@
     "title": "Create Channel",
     "workflowNodeDescription": null
   } ],
+  "agentChannels": [ {
+    "approvalChannelName": "rocketchat",
+    "description": null,
+    "name": "rocketchat",
+    "replyActionName": "sendChannelMessage",
+    "title": "Rocket.Chat",
+    "triggerName": "newMessage",
+    "triggerParameters": { }
+  } ],
   "clusterElements": [ {
     "name": "rocketchat",
     "description": "Sends an approval request message to a Rocket.Chat channel.",
@@ -3033,26 +3049,26 @@
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
-      "advancedOption": null,
+      "advancedOption": false,
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "Channel to send the approval request to. Must have the # prefix.",
       "displayCondition": null,
       "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
+      "expressionEnabled": true,
+      "hidden": false,
       "label": "Channel",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
       "minLength": null,
       "name": "roomId",
-      "options": null,
+      "options": [ ],
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": null
+        "optionsLookupDependsOn": [ ]
       },
-      "optionsLoadedDynamically": null,
+      "optionsLoadedDynamically": false,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -6202,6 +6218,11 @@
   "tags": [ ],
   "title": "Rocket.Chat",
   "triggers": [ {
+    "agentRequestDefinition": {
+      "attachmentsPath": null,
+      "conversationIdPath": "channel_id",
+      "messagePath": "text"
+    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,

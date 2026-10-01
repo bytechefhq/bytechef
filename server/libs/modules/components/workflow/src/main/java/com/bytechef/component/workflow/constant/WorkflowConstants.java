@@ -21,5 +21,16 @@ package com.bytechef.component.workflow.constant;
  */
 public class WorkflowConstants {
 
+    public static final String AI_AGENT_CALL_INPUT_SCHEMA =
+        "{\"type\":\"object\",\"properties\":{\"conversationId\":{\"type\":\"string\"},"
+            + "\"message\":{\"type\":\"string\"},"
+            + "\"attachments\":{\"type\":\"array\",\"items\":{\"type\":\"object\"}}},"
+            + "\"required\":[\"conversationId\",\"message\"]}";
+
+    public static final String AI_AGENT_CALL_OUTPUT_SCHEMA =
+        "{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"}},\"required\":[\"message\"]}";
+
     public static final String RESPONSE = "response";
+
+    public static final String WORKFLOW_CALL = "workflowCall";
 }

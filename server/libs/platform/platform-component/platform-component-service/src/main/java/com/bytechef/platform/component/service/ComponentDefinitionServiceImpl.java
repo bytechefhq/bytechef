@@ -31,6 +31,7 @@ import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.AgentChannelDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -73,6 +74,11 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         this.componentDefinitionFilters = componentDefinitionFilters;
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
+    }
+
+    @Override
+    public Optional<AgentChannelDefinition> fetchAgentChannelDefinition(String name) {
+        return componentDefinitionRegistry.fetchAgentChannelDefinition(name);
     }
 
     @Override
@@ -120,6 +126,11 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
             throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
         }
+    }
+
+    @Override
+    public List<AgentChannelDefinition> getAgentChannelDefinitions() {
+        return componentDefinitionRegistry.getAgentChannelDefinitions();
     }
 
     @Override
