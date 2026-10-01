@@ -1,0 +1,3 @@
+mutation updateAiAgentSettings($id: ID!, $settings: Map!) {
+    updateAiAgentSettings(id: $id, settings: $settings)
+}

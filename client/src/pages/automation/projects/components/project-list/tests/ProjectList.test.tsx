@@ -1,4 +1,4 @@
-import ProjectList from '@/pages/automation/projects/components/project-list/ProjectList';
+import ProjectList, {ProjectListTabType} from '@/pages/automation/projects/components/project-list/ProjectList';
 import {ProjectListItemTabType} from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
@@ -8,12 +8,20 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 vi.mock('@/pages/automation/projects/components/project-list/ProjectListItem', () => ({
     default: ({
         activeTab,
+        agentCount,
+        agentsActions,
+        agentsContent,
+        defaultTab,
         deploymentsContent,
         onTabChange,
         project,
         workflowsContent,
     }: {
         activeTab?: ProjectListItemTabType;
+        agentCount: number;
+        agentsActions?: React.ReactNode;
+        agentsContent: React.ReactNode;
+        defaultTab?: ProjectListItemTabType;
         deploymentsContent: React.ReactNode;
         onTabChange: (tab?: ProjectListItemTabType, expandedProjectDeploymentId?: number) => void;
         project: Project;
@@ -22,7 +30,15 @@ vi.mock('@/pages/automation/projects/components/project-list/ProjectListItem', (
         <div>
             <span>{`${project.name} tab ${activeTab ?? 'none'}`}</span>
 
+            <span>{`${project.name} agents ${agentCount}`}</span>
+
             <button onClick={() => onTabChange('deployments', 9)}>{`Open ${project.name} deployments`}</button>
+
+            <button onClick={() => onTabChange(defaultTab)}>{`Open ${project.name}`}</button>
+
+            {activeTab === 'agents' && agentsActions}
+
+            {activeTab === 'agents' && agentsContent}
 
             {activeTab === 'deployments' && deploymentsContent}
 
@@ -35,6 +51,23 @@ vi.mock('@/pages/automation/project/components/ProjectDeploymentsPanel', () => (
     default: ({expandedProjectDeploymentId, project}: {expandedProjectDeploymentId?: number; project: Project}) => (
         <div>{`${project.name} deployments panel ${expandedProjectDeploymentId ?? 'none'}`}</div>
     ),
+}));
+
+vi.mock('@/pages/automation/agents/hooks/useAgents', () => ({
+    default: () => ({
+        agents: [
+            {id: 'a1', projectId: '1', title: 'Support Bot'},
+            {id: 'a2', projectId: '1', title: 'Billing Bot'},
+        ],
+    }),
+}));
+
+vi.mock('@/pages/automation/projects/components/project-agent-list/ProjectAgentCreationActions', () => ({
+    default: () => <button aria-label="Create Agent">+ Agent</button>,
+}));
+
+vi.mock('@/pages/automation/projects/components/project-agent-list/ProjectAgentList', () => ({
+    default: ({project}: {project: Project}) => <div>{`${project.name} agent list`}</div>,
 }));
 
 vi.mock('@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowList', () => ({
@@ -52,10 +85,18 @@ const CurrentSearch = () => {
     return <div>{`search: ${location.search}`}</div>;
 };
 
-const renderProjectList = (initialEntry: string | {pathname: string; search: string; state: unknown}) =>
+const renderProjectList = (
+    initialEntry: string | {pathname: string; search: string; state: unknown},
+    defaultActiveTab?: ProjectListTabType
+) =>
     render(
         <MemoryRouter initialEntries={[initialEntry]}>
-            <ProjectList projectGitConfigurations={[]} projects={projects} tags={[]} />
+            <ProjectList
+                defaultActiveTab={defaultActiveTab}
+                projectGitConfigurations={[]}
+                projects={projects}
+                tags={[]}
+            />
 
             <CurrentSearch />
         </MemoryRouter>
@@ -116,5 +157,49 @@ describe('ProjectList', () => {
 
         expect(screen.getByText('Orders tab deployments')).toBeInTheDocument();
         expect(screen.getByText('Orders deployments panel 9')).toBeInTheDocument();
+    });
+
+    it('passes each project its agent count', () => {
+        renderProjectList('/automation/projects');
+
+        expect(screen.getByText('Orders agents 2')).toBeInTheDocument();
+        expect(screen.getByText('Leads agents 0')).toBeInTheDocument();
+    });
+
+    it('opens a row on the Agents tab when that is the default', () => {
+        renderProjectList('/automation/projects', 'agents');
+
+        fireEvent.click(screen.getByText('Open Orders'));
+
+        expect(screen.getByText('Orders tab agents')).toBeInTheDocument();
+        expect(screen.getByText('Orders agent list')).toBeInTheDocument();
+    });
+
+    it('offers the tab-row create-agent button only for a project that has agents', () => {
+        renderProjectList('/automation/projects', 'agents');
+
+        fireEvent.click(screen.getByText('Open Orders'));
+        fireEvent.click(screen.getByText('Open Leads'));
+
+        expect(screen.getAllByRole('button', {name: 'Create Agent'})).toHaveLength(1);
+    });
+
+    it('moves the open rows to the new default tab when the default changes', () => {
+        const {rerender} = renderProjectList('/automation/projects');
+
+        fireEvent.click(screen.getByText('Open Orders'));
+
+        expect(screen.getByText('Orders tab workflows')).toBeInTheDocument();
+
+        rerender(
+            <MemoryRouter initialEntries={['/automation/projects']}>
+                <ProjectList defaultActiveTab="agents" projectGitConfigurations={[]} projects={projects} tags={[]} />
+
+                <CurrentSearch />
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('Orders tab agents')).toBeInTheDocument();
+        expect(screen.getByText('Leads tab none')).toBeInTheDocument();
     });
 });

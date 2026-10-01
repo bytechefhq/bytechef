@@ -1,0 +1,17 @@
+query aiAgentChannelDefinitions {
+    aiAgentChannelDefinitions {
+        approvalCapable
+        channelType
+        componentName
+        componentVersion
+        connectionRequired
+        description
+        icon
+        pinned
+        propertiesConfigurable
+        replyActionName
+        schedule
+        title
+        triggerName
+    }
+}
