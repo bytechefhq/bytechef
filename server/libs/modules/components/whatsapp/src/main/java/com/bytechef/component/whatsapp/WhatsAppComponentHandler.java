@@ -16,8 +16,11 @@
 
 package com.bytechef.component.whatsapp;
 
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.whatsapp.connection.WhatsAppConnection.CONNECTION_DEFINITION;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.AGENT_CHANNEL_NAME;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.WHATS_APP;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -33,7 +36,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class WhatsAppComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("whatsApp")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(WHATS_APP)
         .title("WhatsApp")
         .description(
             "WhatsApp is a free-to-use messaging app offering end-to-end encrypted chat, voice, and " +
@@ -43,6 +46,12 @@ public class WhatsAppComponentHandler implements ComponentHandler {
         .actions(WhatsAppSendMessageAction.ACTION_DEFINITION)
         .clusterElements(WhatsAppApprovalChannel.CLUSTER_ELEMENT_DEFINITION)
         .triggers(WhatsAppNewIncomingMessageTrigger.TRIGGER_DEFINITION)
+        .agentChannels(
+            agentChannel(
+                AGENT_CHANNEL_NAME, WhatsAppNewIncomingMessageTrigger.TRIGGER_DEFINITION,
+                WhatsAppSendMessageAction.ACTION_DEFINITION)
+                    .title("WhatsApp")
+                    .approvalChannel(WHATS_APP))
         .icon("path:assets/whatsapp.svg");
 
     @Override

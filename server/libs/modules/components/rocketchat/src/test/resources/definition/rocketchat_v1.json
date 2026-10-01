@@ -1028,6 +1028,13 @@
     "title": "Send Direct Message",
     "workflowNodeDescription": null
   }, {
+    "agentReplyDefinition": {
+      "attachmentsProperty": null,
+      "channelParameters": { },
+      "conversationIdProperty": "roomId",
+      "fixedParameters": { },
+      "messageProperty": "text"
+    },
     "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
@@ -3024,6 +3031,15 @@
     "resumePerform": null,
     "title": "Create Channel",
     "workflowNodeDescription": null
+  } ],
+  "agentChannels": [ {
+    "approvalChannelName": "rocketchat",
+    "description": null,
+    "name": "rocketchat",
+    "replyActionName": "sendChannelMessage",
+    "title": "Rocket.Chat",
+    "triggerName": "newMessage",
+    "triggerParameters": { }
   } ],
   "clusterElements": [ {
     "name": "rocketchat",
@@ -6202,6 +6218,11 @@
   "tags": [ ],
   "title": "Rocket.Chat",
   "triggers": [ {
+    "agentRequestDefinition": {
+      "attachmentsPath": null,
+      "conversationIdPath": "channel_id",
+      "messagePath": "text"
+    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,
