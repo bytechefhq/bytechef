@@ -97,7 +97,7 @@ public class SshExecuteAction {
                                 string(RESULT).description("The standard output of the command."),
                                 string(ERROR).description("The standard error output of the command."),
                                 integer(EXIT_STATUS).description("The exit status of the command, 0 on success.")))))
-        .help("", "https://docs.bytechef.io/reference/components/ssh_v1#execute-commands")
+        .help("", "https://docs.bytechef.io/reference/components/ssh_v1#execute-shell-commands")
         .perform(SshExecuteAction::perform);
 
     private SshExecuteAction() {
