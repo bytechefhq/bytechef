@@ -183,7 +183,7 @@ const ProjectsLeftSidebar = ({
                                         </TooltipTrigger>
                                     </DropdownMenuTrigger>
 
-                                    <TooltipContent>New project</TooltipContent>
+                                    <TooltipContent side="left">New project</TooltipContent>
                                 </Tooltip>
 
                                 <DropdownMenuContent align="end">
