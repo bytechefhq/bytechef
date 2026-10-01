@@ -14,9 +14,8 @@ interface GetNodeIssuesProps {
 }
 
 /**
- * Returns the issues that belong to a node. A cluster root also gets the missing and invalid connections of its cluster
- * elements, because they are configured on the cluster root, and every cluster element issue when it is shown
- * collapsed.
+ * Returns the issues that belong to a node. A cluster root also gets the missing connections of its cluster elements,
+ * because they are configured on the cluster root, and every cluster element issue when it is shown collapsed.
  */
 export default function getNodeIssues({
     clusterElementRootNames,
