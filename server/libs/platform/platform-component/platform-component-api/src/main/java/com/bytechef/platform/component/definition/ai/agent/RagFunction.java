@@ -31,7 +31,7 @@ public interface RagFunction {
     /**
      *
      */
-    ClusterElementType RAG = new ClusterElementType("RAG", "rag", "RAG");
+    ClusterElementType RAG = new ClusterElementType("RAG", "rag", "RAG", true, false);
 
     /**
      * @param inputParameters

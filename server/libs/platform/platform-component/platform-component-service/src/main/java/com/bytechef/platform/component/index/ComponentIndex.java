@@ -36,6 +36,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiablePropertyGroup;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
+import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoaderKind;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -182,7 +184,20 @@ public record ComponentIndex(List<Entry> entries) {
             componentDefinition.unifiedApi(unifiedApi(unifiedApiCategory));
         }
 
-        return componentDefinition;
+        List<ClusterElementTypeSummary> clusterElementTypes = entry.clusterElementTypes();
+
+        if (clusterElementTypes.isEmpty()) {
+            return componentDefinition;
+        }
+
+        return new StubClusterRootComponentDefinition(
+            componentDefinition,
+            clusterElementTypes.stream()
+                .map(
+                    clusterElementType -> new ClusterElementType(
+                        clusterElementType.name(), clusterElementType.key(), clusterElementType.label(),
+                        clusterElementType.multipleElements(), clusterElementType.required()))
+                .toList());
     }
 
     private static ModifiableActionDefinition toStubActionDefinition(ItemSummary itemSummary) {
@@ -244,8 +259,8 @@ public record ComponentIndex(List<Entry> entries) {
         String name, int version, @Nullable String title, @Nullable String description, @Nullable String icon,
         List<CategorySummary> componentCategories, List<String> tags, @Nullable ConnectionSummary connection,
         List<ItemSummary> actions, List<TriggerSummary> triggers, List<ClusterElementSummary> clusterElements,
-        List<String> inputs, @Nullable UnifiedApiCategory unifiedApiCategory, String providerClassName,
-        ComponentHandlerLoaderKind loaderKind) {
+        List<ClusterElementTypeSummary> clusterElementTypes, List<String> inputs,
+        @Nullable UnifiedApiCategory unifiedApiCategory, String providerClassName, ComponentHandlerLoaderKind loaderKind) {
 
         public Entry {
             Objects.requireNonNull(name, "name");
@@ -257,6 +272,7 @@ public record ComponentIndex(List<Entry> entries) {
             actions = copyOrEmpty(actions);
             triggers = copyOrEmpty(triggers);
             clusterElements = copyOrEmpty(clusterElements);
+            clusterElementTypes = copyOrEmpty(clusterElementTypes);
             inputs = copyOrEmpty(inputs);
         }
 
@@ -281,5 +297,28 @@ public record ComponentIndex(List<Entry> entries) {
     public record ClusterElementSummary(
         String name, @Nullable String title, @Nullable String description, String typeName, String typeKey,
         String typeLabel, boolean typeMultipleElements, boolean typeRequired) {
+    }
+
+    public record ClusterElementTypeSummary(
+        String name, String key, String label, boolean multipleElements, boolean required) {
+    }
+
+    private static final class StubClusterRootComponentDefinition extends AbstractComponentDefinitionWrapper
+        implements ClusterRootComponentDefinition {
+
+        private final List<ClusterElementType> clusterElementTypes;
+
+        private StubClusterRootComponentDefinition(
+            ModifiableComponentDefinition componentDefinition, List<ClusterElementType> clusterElementTypes) {
+
+            super(componentDefinition);
+
+            this.clusterElementTypes = List.copyOf(clusterElementTypes);
+        }
+
+        @Override
+        public List<ClusterElementType> getClusterElementTypes() {
+            return clusterElementTypes;
+        }
     }
 }
