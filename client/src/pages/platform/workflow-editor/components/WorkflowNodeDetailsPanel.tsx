@@ -36,7 +36,6 @@ import useWorkflowNodeDetailsPanel from './hooks/useWorkflowNodeDetailsPanel';
 
 const ERROR_KIND_LABELS: Record<Exclude<WorkflowNodeDetailsErrorI['kind'], 'ISSUE'>, string> = {
     CONNECTION: 'Missing required connection:',
-    INVALID_CONNECTION: 'Invalid connection:',
     PROPERTY: 'Missing required property:',
 };
 
