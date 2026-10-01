@@ -6,7 +6,7 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 export interface RegisterI {
-    registerAlreadyUsedEmail: string;
+    registerEmailAlreadyUsed: boolean;
     registerErrorMessage: string;
     registerSuccess: boolean;
 
@@ -30,7 +30,7 @@ const fetchRegister = async (data: string): Promise<Response> => {
 export const useRegisterStore = create<RegisterI>()(
     devtools(
         (set) => ({
-            registerAlreadyUsedEmail: '',
+            registerEmailAlreadyUsed: false,
             registerSuccess: false,
             registerErrorMessage: '',
 
@@ -45,7 +45,7 @@ export const useRegisterStore = create<RegisterI>()(
                             response.json().then((data) => {
                                 if (data.entityClass === 'User' && data.errorKey === EMAIL_ALREADY_USED_ERROR_KEY) {
                                     set(() => ({
-                                        registerAlreadyUsedEmail: email,
+                                        registerEmailAlreadyUsed: true,
                                     }));
                                 } else {
                                     set(() => ({
@@ -60,7 +60,7 @@ export const useRegisterStore = create<RegisterI>()(
 
             reset: () => {
                 set(() => ({
-                    registerAlreadyUsedEmail: '',
+                    registerEmailAlreadyUsed: false,
                     registerErrorMessage: '',
                     registerSuccess: false,
                 }));

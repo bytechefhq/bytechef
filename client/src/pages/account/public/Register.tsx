@@ -57,14 +57,14 @@ const formSchema = z
     });
 
 const Register = () => {
-    const [alreadyUsedEmail, setAlreadyUsedEmail] = useState('');
+    const [emailAlreadyUsed, setEmailAlreadyUsed] = useState(false);
     const [emailIsValid, setEmailIsValid] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const {register, registerAlreadyUsedEmail, registerErrorMessage, registerSuccess, reset} = useRegisterStore(
+    const {register, registerEmailAlreadyUsed, registerErrorMessage, registerSuccess, reset} = useRegisterStore(
         useShallow((state) => ({
             register: state.register,
-            registerAlreadyUsedEmail: state.registerAlreadyUsedEmail,
+            registerEmailAlreadyUsed: state.registerEmailAlreadyUsed,
             registerErrorMessage: state.registerErrorMessage,
             registerSuccess: state.registerSuccess,
             reset: state.reset,
@@ -95,8 +95,6 @@ const Register = () => {
         getValues,
     } = form;
 
-    const showAlreadyUsedEmailOptions = alreadyUsedEmail !== '' && alreadyUsedEmail === form.watch('email');
-
     const handleValidateEmailInput = () => {
         const email = form.watch('email');
 
@@ -125,12 +123,12 @@ const Register = () => {
     }, [registerErrorMessage, navigate, reset]);
 
     useEffect(() => {
-        if (registerAlreadyUsedEmail) {
-            setAlreadyUsedEmail(registerAlreadyUsedEmail);
+        if (registerEmailAlreadyUsed) {
+            setEmailAlreadyUsed(true);
 
             reset();
         }
-    }, [registerAlreadyUsedEmail, reset]);
+    }, [registerEmailAlreadyUsed, reset]);
 
     useEffect(() => {
         if (registerSuccess) {
@@ -210,6 +208,11 @@ const Register = () => {
                                                 className="py-5 hover:border-stroke-brand-primary"
                                                 type="email"
                                                 {...field}
+                                                onChange={(event) => {
+                                                    field.onChange(event);
+
+                                                    setEmailAlreadyUsed(false);
+                                                }}
                                             />
                                         </FormControl>
 
@@ -357,7 +360,7 @@ const Register = () => {
                             )}
                         </form>
 
-                        {showAlreadyUsedEmailOptions && (
+                        {emailAlreadyUsed && (
                             <Alert>
                                 <AlertDescription className="flex flex-col gap-1">
                                     <p>An account with this email already exists.</p>
@@ -365,7 +368,7 @@ const Register = () => {
                                     <div className="flex gap-4">
                                         <Link
                                             className="font-medium underline"
-                                            state={{email: alreadyUsedEmail}}
+                                            state={{email: getValues('email')}}
                                             to="/login"
                                         >
                                             Log in
@@ -373,7 +376,7 @@ const Register = () => {
 
                                         <Link
                                             className="font-medium underline"
-                                            state={{email: alreadyUsedEmail}}
+                                            state={{email: getValues('email')}}
                                             to="/password-reset/init"
                                         >
                                             Reset password
