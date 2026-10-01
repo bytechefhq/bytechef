@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.com.github.ben.manes.versions)
+    alias(libs.plugins.io.github.ben.manes.versions)
     id("com.bytechef.java-common-conventions")
     id("jacoco-report-aggregation")
     id("jvm-test-suite")

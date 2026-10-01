@@ -75,8 +75,8 @@ org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.2"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.13.0"
 
 [plugins]
-com-github-ben-manes-versions = "com.github.ben-manes.versions:0.64.0"
 gradle-git-properties = "com.gorylenko.gradle-git-properties:4.0.1"
+io-github-ben-manes-versions = "io.github.ben-manes.versions:0.64.0"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.1"
 org-graalvm-buildtools-native = "org.graalvm.buildtools.native:1.1.1"
 org-openapi-generator = "org.openapi.generator:7.25.0"
