@@ -1,7 +1,7 @@
 import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {AlertTriangleIcon, FileInputIcon, Link2Icon, WorkflowIcon, WrenchIcon} from 'lucide-react';
+import {AlertTriangleIcon, FileInputIcon, Link2Icon, type LucideIcon, WorkflowIcon, WrenchIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -15,6 +15,7 @@ interface WorkflowConfigurationCardProps {
     disabledMessage?: string;
     enabled: boolean;
     forceMountContent?: boolean;
+    icon?: LucideIcon;
     inputCount: number;
     inputsContent: ReactNode;
     label?: string;
@@ -35,6 +36,7 @@ const WorkflowConfigurationCard = ({
     disabledMessage,
     enabled,
     forceMountContent = false,
+    icon: Icon = WorkflowIcon,
     inputCount,
     inputsContent,
     label,
@@ -69,7 +71,7 @@ const WorkflowConfigurationCard = ({
                                 enabled && 'bg-surface-brand-secondary'
                             )}
                         >
-                            <WorkflowIcon
+                            <Icon
                                 className={twMerge(
                                     'size-4 text-content-neutral-secondary transition-colors',
                                     enabled && 'text-content-brand-primary'

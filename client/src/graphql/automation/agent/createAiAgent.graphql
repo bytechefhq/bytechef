@@ -1,0 +1,6 @@
+mutation createAiAgent($input: CreateAiAgentInput!) {
+    createAiAgent(input: $input) {
+        id
+        projectId
+    }
+}

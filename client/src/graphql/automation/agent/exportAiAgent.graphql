@@ -1,0 +1,3 @@
+query exportAiAgent($id: ID!) {
+    exportAiAgent(id: $id)
+}
