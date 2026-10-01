@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +41,21 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
 
     @Override
     public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId) {
-        return projectWorkflowRepository.save(new ProjectWorkflow(projectId, projectVersion, workflowId));
+        return addWorkflow(projectId, projectVersion, workflowId, ProjectWorkflowType.WORKFLOW);
     }
 
     @Override
-    public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, UUID uuid) {
-        return projectWorkflowRepository.save(new ProjectWorkflow(projectId, projectVersion, workflowId, uuid));
+    public ProjectWorkflow addWorkflow(
+        long projectId, int projectVersion, String workflowId, ProjectWorkflowType type) {
+
+        return projectWorkflowRepository.save(new ProjectWorkflow(projectId, projectVersion, workflowId, type));
+    }
+
+    @Override
+    public ProjectWorkflow addWorkflow(
+        long projectId, int projectVersion, String workflowId, UUID uuid, ProjectWorkflowType type) {
+
+        return projectWorkflowRepository.save(new ProjectWorkflow(projectId, projectVersion, workflowId, uuid, type));
     }
 
     @Override
@@ -173,6 +183,11 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public Optional<ProjectWorkflow> fetchWorkflowProjectWorkflow(String workflowId) {
+        return projectWorkflowRepository.findByWorkflowId(workflowId);
+    }
+
+    @Override
     public ProjectWorkflow getWorkflowProjectWorkflow(String workflowId) {
         return projectWorkflowRepository.findByWorkflowId(workflowId)
             .orElseThrow(() -> new IllegalArgumentException("ProjectWorkflow not found"));
@@ -215,7 +230,8 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         update(projectWorkflow);
 
         projectWorkflow = new ProjectWorkflow(
-            projectId, oldProjectVersion, oldWorkflowId, UUID.fromString(projectWorkflow.getUuidAsString()));
+            projectId, oldProjectVersion, oldWorkflowId, UUID.fromString(projectWorkflow.getUuidAsString()),
+            projectWorkflow.getType());
 
         projectWorkflowRepository.save(projectWorkflow);
     }
