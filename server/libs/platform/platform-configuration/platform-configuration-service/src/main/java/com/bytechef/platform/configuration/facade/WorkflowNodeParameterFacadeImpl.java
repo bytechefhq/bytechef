@@ -240,8 +240,16 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             case TRIGGER -> WorkflowNodeStructure.OperationType.TRIGGER;
         };
 
-        return checkDisplayConditionsAndParameters(
-            "", structureOperationType, parameters, Map.of(), Map.of(), properties, false, Map.of());
+        Map<String, Boolean> displayConditionMap = new HashMap<>();
+
+        for (String parameterName : new HashSet<>(parameters.keySet())) {
+            displayConditionMap.putAll(
+                checkDisplayConditionsAndParameters(
+                    parameterName, structureOperationType, parameters, Map.of(), Map.of(), properties, false,
+                    Map.of()));
+        }
+
+        return displayConditionMap;
     }
 
     @Override
