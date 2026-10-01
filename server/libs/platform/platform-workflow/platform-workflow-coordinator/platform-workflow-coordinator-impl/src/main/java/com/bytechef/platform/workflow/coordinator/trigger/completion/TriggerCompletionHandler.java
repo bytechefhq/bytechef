@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.coordinator.trigger.completion;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -98,14 +99,14 @@ public class TriggerCompletionHandler {
             triggerExecution.addJobId(
                 createJob(
                     workflowId,
-                    MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), Map.of())),
+                    withTriggerInputs(inputMap, triggerExecution.getName(), Map.of()),
                     workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
         } else if (!triggerExecution.isBatch() && output instanceof Collection<?> triggerOutputValues) {
             for (Object triggerOutputValue : triggerOutputValues) {
                 triggerExecution.addJobId(
                     createJob(
                         workflowId,
-                        MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
+                        withTriggerInputs(inputMap, triggerExecution.getName(), triggerOutputValue),
                         workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
             }
         } else if (triggerExecution.isBatch()) {
@@ -113,14 +114,14 @@ public class TriggerCompletionHandler {
                 triggerExecution.addJobId(
                     createJob(
                         workflowId,
-                        MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
+                        withTriggerInputs(inputMap, triggerExecution.getName(), output),
                         workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
             }
         } else {
             triggerExecution.addJobId(
                 createJob(
                     workflowId,
-                    MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
+                    withTriggerInputs(inputMap, triggerExecution.getName(), output),
                     workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
         }
 
@@ -162,5 +163,13 @@ public class TriggerCompletionHandler {
             workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getMetadataMap(workflowExecutionId.getJobPrincipalId());
+    }
+
+    private static Map<String, ?> withTriggerInputs(
+        Map<String, Object> inputMap, String triggerName, Object triggerOutputValue) {
+
+        return MapUtils.concat(
+            inputMap,
+            Map.of(triggerName, triggerOutputValue, JobInputConstants.TRIGGER_NAME_INPUT, triggerName));
     }
 }
