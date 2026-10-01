@@ -236,7 +236,7 @@ export const convertTaskToNode = (
             icon: (
                 <InlineSVG
                     className="size-9"
-                    loader={<ComponentIcon className="size-9 flex-none text-gray-900" />}
+                    loader={<ComponentIcon className="size-9 flex-none text-content-neutral-primary" />}
                     src={taskDefinition.icon!}
                 />
             ),
@@ -281,7 +281,7 @@ export const buildTriggerNodes = (
             data: {
                 ...trigger,
                 componentName,
-                icon: <ComponentIcon className="size-9 flex-none text-gray-900" />,
+                icon: <ComponentIcon className="size-9 flex-none text-content-neutral-primary" />,
                 operationName: trigger.type.split('/')[2],
                 trigger: true,
                 workflowNodeName: trigger.name,
@@ -1725,7 +1725,7 @@ export const createDefaultNodes = (canvasWidth: number, direction: LayoutDirecti
     {
         data: {
             componentName: 'manual',
-            icon: <PlayIcon className="size-9 text-gray-700" />,
+            icon: <PlayIcon className="size-9 text-content-neutral-primary" />,
             id: 'manual',
             label: 'Manual',
             name: 'manual',

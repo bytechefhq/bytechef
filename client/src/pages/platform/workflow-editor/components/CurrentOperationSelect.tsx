@@ -47,7 +47,7 @@ const OperationSelect = ({
         </Label>
 
         <Select onValueChange={(value) => handleValueChange(value)} value={value}>
-            <SelectTrigger className="w-full border-none bg-gray-100 shadow-none">
+            <SelectTrigger className="w-full border-none bg-surface-neutral-secondary shadow-none">
                 <SelectValue placeholder="Select an action..." />
             </SelectTrigger>
 
@@ -55,7 +55,7 @@ const OperationSelect = ({
                 {operations?.map((operation) => (
                     <SelectPrimitive.Item
                         className={twMerge(
-                            'radix-disabled:opacity-50 flex cursor-pointer items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 select-none focus:bg-gray-100 focus:outline-hidden'
+                            'radix-disabled:opacity-50 flex cursor-pointer items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-content-neutral-primary select-none focus:bg-surface-neutral-secondary focus:outline-hidden'
                         )}
                         key={operation.name}
                         value={operation.name}
@@ -112,7 +112,7 @@ const CurrentOperationSelect = ({
                     )}
                 </div>
 
-                <span className="flex flex-col overflow-hidden rounded-md bg-gray-100 px-4 py-2 text-sm font-medium">
+                <span className="flex flex-col overflow-hidden rounded-md bg-surface-neutral-secondary px-4 py-2 text-sm font-medium">
                     {operations[0].title}
                 </span>
             </div>
