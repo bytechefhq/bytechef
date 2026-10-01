@@ -3,19 +3,24 @@ import {memo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import styles from './NodeTypes.module.css';
 
-// Iteration rings flip their content to the TOP edge in LR (see
+// ELK's iteration rings flip their content to the TOP edge in LR (see
 // getRingContentSign in elkLayoutUtils): the rail leaves from the bar's
 // bottom end and the body enters from its top end, so the side handles swap
 // ends — otherwise the ring connectors would cut diagonally across the body.
+// Dagre keeps the loop body BELOW the main axis in LR, so the flip applies
+// only when ELK actually produced the current layout — flipped handles under
+// dagre make every ring connector double back in box-shaped detours.
 const LR_FLIPPED_RING_BAR_PATTERN = /-(loop|each|map)-(top|bottom)-ghost$/;
 
 const TaskDispatcherTopGhostNode = ({id}: {id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
+    const lastAppliedLayoutEngine = useLayoutEngineStore((state) => state.lastAppliedLayoutEngine);
     const isHorizontal = layoutDirection === 'LR';
-    const isFlippedRingBar = isHorizontal && LR_FLIPPED_RING_BAR_PATTERN.test(id);
+    const isFlippedRingBar = isHorizontal && lastAppliedLayoutEngine === 'elk' && LR_FLIPPED_RING_BAR_PATTERN.test(id);
 
     return (
         <div

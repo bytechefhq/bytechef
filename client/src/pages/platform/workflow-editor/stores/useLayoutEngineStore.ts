@@ -4,7 +4,9 @@ import {devtools, persist} from 'zustand/middleware';
 export type LayoutEngineType = 'dagre' | 'elk';
 
 interface LayoutEngineStateI {
+    lastAppliedLayoutEngine: LayoutEngineType;
     layoutEngine: LayoutEngineType;
+    setLastAppliedLayoutEngine: (lastAppliedLayoutEngine: LayoutEngineType) => void;
     setLayoutEngine: (layoutEngine: LayoutEngineType) => void;
 }
 
@@ -19,7 +21,11 @@ const useLayoutEngineStore = create<LayoutEngineStateI>()(
     devtools(
         persist(
             (set) => ({
+                lastAppliedLayoutEngine: 'elk',
+
                 layoutEngine: 'elk',
+
+                setLastAppliedLayoutEngine: (lastAppliedLayoutEngine) => set({lastAppliedLayoutEngine}),
 
                 setLayoutEngine: (layoutEngine) => set({layoutEngine}),
             }),

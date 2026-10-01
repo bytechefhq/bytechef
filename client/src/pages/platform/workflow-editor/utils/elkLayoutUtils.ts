@@ -12,6 +12,7 @@ import {getCrossAxis} from './directionUtils';
 import {ELK_FRAME_DISPATCHER_COMPONENT_NAMES} from './isElkLayoutSupported';
 import {
     GetLayoutElementsProps,
+    LayoutElementsResultI,
     filterAndDedupeLayoutEdges,
     getDagreNodeSize,
     getLabelCrossOverhang,
@@ -832,7 +833,7 @@ export const getElkLayoutElements = async ({
     edges,
     nodes,
     savedPositionCrossAxisShift = 0,
-}: GetLayoutElementsProps): Promise<{edges: Edge[]; nodes: Node[]}> => {
+}: GetLayoutElementsProps): Promise<LayoutElementsResultI> => {
     try {
         const elk = await loadElk();
 
@@ -1969,7 +1970,7 @@ export const getElkLayoutElements = async ({
         // dispatcher with a saved position carries its whole frame rigidly with it.
         applySavedPositions(allNodes, crossAxis, savedPositionCrossAxisShift);
 
-        return {edges: filterAndDedupeLayoutEdges(allNodes, edges), nodes: allNodes};
+        return {edges: filterAndDedupeLayoutEdges(allNodes, edges), engine: 'elk' as const, nodes: allNodes};
     } catch (error) {
         console.error('ELK layout failed, falling back to dagre', error);
 

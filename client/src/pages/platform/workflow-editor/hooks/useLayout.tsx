@@ -908,6 +908,8 @@ export default function useLayout({
                     return;
                 }
 
+                useLayoutEngineStore.getState().setLastAppliedLayoutEngine(elements.engine);
+
                 const targetNodes: Node[] = [...elements.nodes, ...buildCurrentStickyNoteNodes()];
 
                 if (isInitialLayoutRef.current || readOnlyWorkflow) {
