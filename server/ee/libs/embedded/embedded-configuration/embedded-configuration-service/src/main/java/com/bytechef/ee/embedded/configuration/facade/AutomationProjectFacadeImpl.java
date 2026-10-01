@@ -50,6 +50,7 @@ import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
+import com.bytechef.platform.configuration.workflow.WorkflowUpdateGuard;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -111,6 +112,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
+    private final List<WorkflowUpdateGuard> workflowUpdateGuards;
 
     @SuppressFBWarnings("EI")
     public AutomationProjectFacadeImpl(
@@ -127,7 +129,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
-        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners, List<WorkflowUpdateGuard> workflowUpdateGuards) {
+
         this.automationProjectConfigurationResolver = automationProjectConfigurationResolver;
         this.automationProjectConfigurationService = automationProjectConfigurationService;
         this.automationProjectService = automationProjectService;
@@ -148,6 +151,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         this.workflowService = workflowService;
         this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+        this.workflowUpdateGuards = workflowUpdateGuards;
     }
 
     @Override
@@ -560,6 +564,10 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
         getProjectOfAutomationProject(projectWorkflow.getProjectId());
+
+        for (WorkflowUpdateGuard workflowUpdateGuard : workflowUpdateGuards) {
+            workflowUpdateGuard.checkUpdatable(workflowId);
+        }
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
