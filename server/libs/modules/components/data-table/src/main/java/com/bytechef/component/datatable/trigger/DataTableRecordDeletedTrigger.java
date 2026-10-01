@@ -88,6 +88,7 @@ public class DataTableRecordDeletedTrigger {
 
                 return DataTableUtils.createTriggerOutputResponse(dataTableRowService, dataTableService, baseName);
             })
+            .help("", "https://docs.bytechef.io/reference/components/data-table_v1#record-deleted")
             .webhookEnable((
                 inputParameters, connectionParameters, webhookUrl, workflowExecutionId,
                 context) -> webhookEnable(inputParameters, webhookUrl, context))

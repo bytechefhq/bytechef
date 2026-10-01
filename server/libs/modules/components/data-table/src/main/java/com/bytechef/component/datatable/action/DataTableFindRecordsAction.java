@@ -82,6 +82,7 @@ public class DataTableFindRecordsAction {
                     .description("Number of records to skip")
                     .defaultValue(0))
             .output(this::output)
+            .help("", "https://docs.bytechef.io/reference/components/data-table_v1#find-records")
             .perform(this::perform);
     }
 

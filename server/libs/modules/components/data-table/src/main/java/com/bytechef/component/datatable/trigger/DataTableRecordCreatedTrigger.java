@@ -84,6 +84,7 @@ public class DataTableRecordCreatedTrigger {
                     .required(true)
                     .options(DataTableUtils.getTriggerTableOptions(dataTableService)))
             .output(this::output)
+            .help("", "https://docs.bytechef.io/reference/components/data-table_v1#record-created")
             .webhookEnable(this::webhookEnable)
             .webhookDisable(this::webhookDisable)
             .webhookRequest(this::webhookRequest);

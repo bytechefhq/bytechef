@@ -86,6 +86,7 @@ public class DataTableDeleteRecordsAction {
                             array("deletedIds")
                                 .items(
                                     integer()))))
+            .help("", "https://docs.bytechef.io/reference/components/data-table_v1#delete-records")
             .perform(this::perform);
     }
 
