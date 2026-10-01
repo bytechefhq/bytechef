@@ -18,7 +18,7 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
         onSuccess: () => {
             toast('Restarting Workflow Execution');
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowExecutionKeys.workflowExecutions,
             });
         },
@@ -28,7 +28,7 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
         onSuccess: () => {
             toast('Stopping Workflow Execution');
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowExecutionKeys.workflowExecutions,
             });
         },
