@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,6 +71,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     private static final ConcurrentHashMap<String, ReentrantLock> TENANT_LOCKS = new ConcurrentHashMap<>();
 
     private final String branch;
+    private final List<String> contentDirectories;
     private final List<String> extensions;
     private File repositoryDir;
     private final List<String> searchPaths;
@@ -82,8 +84,17 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         String url, String branch, List<String> extensions, List<String> searchPaths, String username,
         String password) {
 
+        this(url, branch, extensions, searchPaths, List.of(), username, password);
+    }
+
+    @SuppressFBWarnings("EI")
+    public JGitWorkflowOperations(
+        String url, String branch, List<String> extensions, List<String> searchPaths,
+        List<String> contentDirectories, String username, String password) {
+
         this.branch = branch;
         this.password = password;
+        this.contentDirectories = contentDirectories;
         this.extensions = extensions;
         this.searchPaths = searchPaths;
         this.url = url;
@@ -114,6 +125,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         Repository repository = getRepository();
 
         List<WorkflowResource> workflowResources = getHeadFiles(repository, extensions, searchPaths);
+        Map<String, byte[]> contentFiles = getContentFiles(repository);
 
         GitInfo gitInfo;
 
@@ -130,7 +142,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
             throw new RuntimeException(e);
         }
 
-        return new HeadFiles(workflowResources, gitInfo);
+        return new HeadFiles(workflowResources, gitInfo, contentFiles);
     }
 
     @Override
@@ -154,15 +166,23 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         }
     }
 
+    @Override
+    public String write(List<WorkflowResource> workflowResources, String commitMessage) {
+        return write(workflowResources, Map.of(), commitMessage);
+    }
+
     /**
      * Security Note: PATH_TRAVERSAL_IN - Path traversal is intentional. Paths are derived from Git repository contents,
-     * not external user input. Access is controlled through Git authentication credentials.
+     * not external user input. Access is controlled through Git authentication credentials. Content file paths are
+     * additionally checked to stay inside a content directory of the repository.
      */
     @Override
     @SuppressFBWarnings({
         "REC_CATCH_EXCEPTION", "PATH_TRAVERSAL_IN"
     })
-    public String write(List<WorkflowResource> workflowResources, String commitMessage) {
+    public String write(
+        List<WorkflowResource> workflowResources, Map<String, byte[]> contentFiles, String commitMessage) {
+
         ReentrantLock lock = getTenantLock();
         try {
             lock.lock();
@@ -202,6 +222,22 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                         .call();
                 }
 
+                for (Map.Entry<String, byte[]> contentFile : contentFiles.entrySet()) {
+                    Path path = resolveContentFilePath(contentFile.getKey());
+
+                    Path parentPath = path.getParent();
+
+                    if (parentPath != null) {
+                        Files.createDirectories(parentPath);
+                    }
+
+                    Files.write(path, contentFile.getValue());
+
+                    git.add()
+                        .addFilepattern(".")
+                        .call();
+                }
+
                 git.commit()
                     .setMessage(commitMessage)
                     .call();
@@ -228,6 +264,76 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         }
     }
 
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
+    private Path resolveContentFilePath(String contentFilePath) {
+        if (contentFilePath.indexOf('\0') >= 0 || !isContentFile(contentFilePath)) {
+            throw new IllegalArgumentException("Invalid content file path: " + contentFilePath);
+        }
+
+        Path repositoryPath = repositoryDir.toPath()
+            .toAbsolutePath()
+            .normalize();
+        Path path = repositoryPath.resolve(contentFilePath)
+            .normalize();
+
+        if (!path.startsWith(repositoryPath) || !isContentFile(repositoryPath.relativize(path)
+            .toString()
+            .replace(File.separatorChar, '/'))) {
+
+            throw new IllegalArgumentException("Invalid content file path: " + contentFilePath);
+        }
+
+        return path;
+    }
+
+    private boolean isContentFile(String path) {
+        for (String contentDirectory : contentDirectories) {
+            if (path.startsWith(contentDirectory) && path.length() > contentDirectory.length()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private Map<String, byte[]> getContentFiles(Repository repository) {
+        Map<String, byte[]> contentFiles = new LinkedHashMap<>();
+
+        if (contentDirectories.isEmpty()) {
+            return contentFiles;
+        }
+
+        try (ObjectReader objectReader = repository.newObjectReader();
+            RevWalk revWalk = new RevWalk(objectReader);
+            TreeWalk treeWalk = new TreeWalk(repository, objectReader)) {
+
+            ObjectId objectId = repository.resolve(Constants.HEAD);
+
+            if (objectId == null) {
+                return contentFiles;
+            }
+
+            RevCommit revCommit = revWalk.parseCommit(objectId);
+
+            treeWalk.addTree(revCommit.getTree());
+            treeWalk.setRecursive(true);
+
+            while (treeWalk.next()) {
+                String path = treeWalk.getPathString();
+
+                if (isContentFile(path)) {
+                    ObjectLoader objectLoader = objectReader.open(treeWalk.getObjectId(0));
+
+                    contentFiles.put(path, objectLoader.getBytes());
+                }
+            }
+
+            return contentFiles;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private List<WorkflowResource> getHeadFiles(
         Repository repository, List<String> extensions, List<String> searchPaths) {
 
@@ -251,6 +357,10 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
 
             while (treeWalk.next()) {
                 String path = treeWalk.getPathString();
+
+                if (isContentFile(path)) {
+                    continue;
+                }
 
                 String extension = Optional.of(path)
                     .filter(f -> f.contains("."))
