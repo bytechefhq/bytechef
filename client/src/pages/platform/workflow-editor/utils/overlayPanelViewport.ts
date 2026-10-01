@@ -1,6 +1,7 @@
 import {DATA_PILL_PANEL_WIDTH, NODE_DETAILS_PANEL_WIDTH, WORKFLOW_NODES_SIDEBAR_WIDTH} from '@/shared/constants';
 
 export interface OverlayPanelsStateI {
+    agentPlaygroundOpen: boolean;
     dataPillPanelOpen: boolean;
     issuesSidebarOpen: boolean;
     rightSidebarOpen: boolean;
@@ -9,6 +10,7 @@ export interface OverlayPanelsStateI {
 }
 
 export function computeOverlayViewportOffset({
+    agentPlaygroundOpen,
     dataPillPanelOpen,
     issuesSidebarOpen,
     rightSidebarOpen,
@@ -26,6 +28,10 @@ export function computeOverlayViewportOffset({
     }
 
     if (workflowTestChatPanelOpen) {
+        offset -= NODE_DETAILS_PANEL_WIDTH / 2;
+    }
+
+    if (agentPlaygroundOpen) {
         offset -= NODE_DETAILS_PANEL_WIDTH / 2;
     }
 

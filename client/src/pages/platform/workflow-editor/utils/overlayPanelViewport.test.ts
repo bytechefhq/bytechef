@@ -4,6 +4,7 @@ import {describe, expect, it} from 'vitest';
 import {OverlayPanelsStateI, computeOverlayViewportOffset} from './overlayPanelViewport';
 
 const allClosed: OverlayPanelsStateI = {
+    agentPlaygroundOpen: false,
     dataPillPanelOpen: false,
     issuesSidebarOpen: false,
     rightSidebarOpen: false,
@@ -27,6 +28,9 @@ describe('computeOverlayViewportOffset', () => {
             -NODE_DETAILS_PANEL_WIDTH / 2
         );
         expect(computeOverlayViewportOffset({...allClosed, workflowNodeDetailsPanelOpen: true})).toBe(
+            -NODE_DETAILS_PANEL_WIDTH / 2
+        );
+        expect(computeOverlayViewportOffset({...allClosed, agentPlaygroundOpen: true})).toBe(
             -NODE_DETAILS_PANEL_WIDTH / 2
         );
     });

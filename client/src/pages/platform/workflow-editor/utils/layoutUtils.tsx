@@ -184,6 +184,12 @@ export function getDagreNodeSize(
     direction: LayoutDirectionType,
     triggerRowWidth: number = TRIGGER_NODE_DAGRE_WIDTH
 ): {height: number; width: number} {
+    const clusterFrame = (node.data as NodeDataType)?.clusterFrame;
+
+    if (clusterFrame) {
+        return {height: clusterFrame.height, width: clusterFrame.width};
+    }
+
     const height = calculateNodeHeight(node);
 
     const isTrigger = (node.data as NodeDataType)?.trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID;

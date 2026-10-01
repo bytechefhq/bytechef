@@ -3,6 +3,7 @@ import {useTestingModeStore} from '@/pages/platform/cluster-element-editor/ai-ag
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import useClusterElementsDataStore from '@/pages/platform/cluster-element-editor/stores/useClusterElementsDataStore';
 import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
+import useClusterElementsViewMode from '@/pages/platform/workflow-editor/hooks/useClusterElementsViewMode';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -35,8 +36,10 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         (state) => state.setDataStreamSimpleEditorPreferred
     );
     const setTestingPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setTestingPanelOpen);
+    const clusterElementsViewMode = useClusterElementsViewMode();
 
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
+    const setClusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.setClusterElementsCanvasOpen);
     const resetNodeDetailsPanel = useWorkflowNodeDetailsPanelStore((state) => state.reset);
 
     const isAiAgentClusterRoot = rootClusterElementNodeData?.componentName === 'aiAgent';
@@ -62,6 +65,22 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
 
     const handleToggleEditor = useCallback(
         (showSimpleEditor: boolean) => {
+            if (!showSimpleEditor && clusterElementsViewMode === 'box') {
+                setClusterElementsCanvasOpen(false);
+
+                useTestingModeStore.getState().resetTestingMode();
+
+                useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
+
+                if (isAiAgentClusterRoot) {
+                    setAiAgentSimpleEditorPreferred(showSimpleEditor);
+                } else if (isDataStreamClusterRoot) {
+                    setDataStreamSimpleEditorPreferred(showSimpleEditor);
+                }
+
+                return;
+            }
+
             if (isAiAgentClusterRoot) {
                 setShowAiAgentEditor(showSimpleEditor);
                 setAiAgentSimpleEditorPreferred(showSimpleEditor);
@@ -93,9 +112,11 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
             }
         },
         [
+            clusterElementsViewMode,
             isAiAgentClusterRoot,
             isDataStreamClusterRoot,
             rootClusterElementNodeData,
+            setClusterElementsCanvasOpen,
             setAiAgentSimpleEditorPreferred,
             setDataStreamSimpleEditorPreferred,
             setShowAiAgentEditor,
@@ -166,14 +187,23 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     }, [handleOpenChange]);
 
     useEffect(() => {
+        if (clusterElementsViewMode !== 'dialog') {
+            return;
+        }
+
         setShowAiAgentEditor(isAiAgentClusterRoot && aiAgentSimpleEditorPreferred);
-    }, [aiAgentSimpleEditorPreferred, isAiAgentClusterRoot, setShowAiAgentEditor]);
+    }, [aiAgentSimpleEditorPreferred, clusterElementsViewMode, isAiAgentClusterRoot, setShowAiAgentEditor]);
 
     useEffect(() => {
+        if (clusterElementsViewMode !== 'dialog') {
+            return;
+        }
+
         setShowDataStreamEditor(
             isDataStreamClusterRoot && isDataStreamSimpleModeAvailable && dataStreamSimpleEditorPreferred
         );
     }, [
+        clusterElementsViewMode,
         dataStreamSimpleEditorPreferred,
         isDataStreamClusterRoot,
         isDataStreamSimpleModeAvailable,

@@ -4,6 +4,7 @@ import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {NodeDataType, TabNameType} from '@/shared/types';
 
+import {getClusterElementsViewMode} from '../hooks/useClusterElementsViewMode';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -42,7 +43,7 @@ export default function openNodeDetails(data: NodeDataType, activeTab: TabNameTy
             label: getNodeLabel({fallbackLabel: data.label, workflow, workflowNodeName: data.workflowNodeName}),
         }));
 
-        if (!!data.clusterRoot && !clusterElementsCanvasOpen) {
+        if (!!data.clusterRoot && !clusterElementsCanvasOpen && getClusterElementsViewMode() === 'dialog') {
             setClusterElementsCanvasOpen(true);
         }
     }

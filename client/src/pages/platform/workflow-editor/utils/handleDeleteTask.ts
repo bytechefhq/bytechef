@@ -16,6 +16,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import findAndRemoveClusterElement from './findAndRemoveClusterElement';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
+import {resolveClusterRootId} from './resolveClusterRootId';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 import {forEachNestedTaskGroup} from './taskTraversalUtils';
@@ -24,7 +25,6 @@ import {drainPendingSaves, isWorkflowMutating, setWorkflowMutating} from './work
 interface HandleDeleteTaskProps {
     cancelWorkflowQueries: () => void;
     rootClusterElementNodeData?: NodeDataType;
-    clusterElementsCanvasOpen?: boolean;
     currentNode?: NodeDataType;
     data: NodeDataType;
     invalidateWorkflowQueries: () => void;
@@ -37,7 +37,6 @@ interface HandleDeleteTaskProps {
 
 export default function handleDeleteTask({
     cancelWorkflowQueries,
-    clusterElementsCanvasOpen,
     currentNode,
     data,
     invalidateWorkflowQueries,
@@ -59,6 +58,8 @@ export default function handleDeleteTask({
     if (!workflowTasks) {
         return;
     }
+
+    const clusterRootId = data.clusterElementType ? resolveClusterRootId(data) : undefined;
 
     let updatedTasks: Array<WorkflowTaskType>;
 
@@ -251,10 +252,10 @@ export default function handleDeleteTask({
 
             return parentOnErrorTask;
         }) as Array<WorkflowTaskType>;
-    } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
+    } else if (clusterRootId) {
         const mainRootClusterElementTask = getTask({
             tasks: workflowTasks,
-            workflowNodeName: rootClusterElementNodeData.name,
+            workflowNodeName: clusterRootId,
         });
 
         if (!mainRootClusterElementTask || !mainRootClusterElementTask.clusterElements) {
@@ -275,7 +276,7 @@ export default function handleDeleteTask({
         if (clusterElementRemovalResult.elementFound) {
             const updatedClusterElements = clusterElementRemovalResult.elements;
 
-            if (setRootClusterElementNodeData && setCurrentNode) {
+            if (rootClusterElementNodeData && setRootClusterElementNodeData && setCurrentNode) {
                 if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
                     setCurrentNode({
                         ...currentNode,
