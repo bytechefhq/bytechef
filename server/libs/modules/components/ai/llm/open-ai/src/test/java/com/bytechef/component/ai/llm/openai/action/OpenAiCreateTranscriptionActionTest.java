@@ -89,6 +89,7 @@ class OpenAiCreateTranscriptionActionTest {
             OpenAiAudioTranscriptionOptions openAiAudioTranscriptionModelOptions = openAiAudioTranscriptionModel
                 .getOptions();
 
+            assertEquals("TOKEN", openAiAudioTranscriptionModelOptions.getApiKey());
             assertEquals(AudioModel.GPT_4O_MINI_TRANSCRIBE.asString(), openAiAudioTranscriptionModelOptions.getModel());
             assertEquals("prompt", openAiAudioTranscriptionModelOptions.getPrompt());
             assertEquals(Language.HR.getCode(), openAiAudioTranscriptionModelOptions.getLanguage());
