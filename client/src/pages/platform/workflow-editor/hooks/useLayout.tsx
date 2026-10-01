@@ -63,6 +63,7 @@ function getClusterElementsFingerprint(clusterElements: unknown): string {
     }
 
     return Object.entries(clusterElements as Record<string, unknown>)
+        .sort(([firstElementKey], [secondElementKey]) => firstElementKey.localeCompare(secondElementKey))
         .map(([elementKey, elementValue]) => {
             const elements = (Array.isArray(elementValue) ? elementValue : [elementValue]).filter(
                 (element): element is {name?: string; type?: string; workflowNodeName?: string} =>
@@ -75,7 +76,8 @@ function getClusterElementsFingerprint(clusterElements: unknown): string {
 
             const elementFingerprints = elements.map((element) => {
                 const elementName = element.name || element.workflowNodeName;
-                const nestedFingerprint = getClusterElementsFingerprint(getNestedClusterElements(element));
+                const nestedClusterElements = getNestedClusterElements(element);
+                const nestedFingerprint = getClusterElementsFingerprint(nestedClusterElements);
 
                 return `${elementName}:${element.type}${nestedFingerprint ? `{${nestedFingerprint}}` : ''}`;
             });

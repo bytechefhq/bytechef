@@ -194,4 +194,31 @@ describe('getTasksStructuralFingerprint', () => {
 
         expect(getTasksStructuralFingerprint(definitionShape)).toBe(getTasksStructuralFingerprint(taskShape));
     });
+
+    it('should produce the same fingerprint regardless of cluster element key order', () => {
+        const makeAiAgentTask = (clusterElements: Record<string, unknown>) =>
+            makeTask({
+                clusterElements,
+                clusterRoot: true,
+                name: 'aiAgent_1',
+                type: 'aiAgent/v1/chat',
+            });
+
+        const model = {name: 'openAi_1', type: 'openAi/v1/model'};
+        const vectorStore = {name: 'knowledgeBase_1', type: 'knowledgeBase/v1/vectorStore'};
+        const tools = [{name: 'dateHelper_1', type: 'dateHelper/v1/getCurrentDate'}];
+
+        const rag = {clusterElements: {vectorStore}, name: 'questionAnswerRag_1', type: 'questionAnswerRag/v1/rag'};
+
+        const definitionOrder = makeAiAgentTask({model, rag, tools});
+        const serverOrder = makeAiAgentTask(
+            Object.fromEntries([
+                ['tools', tools],
+                ['rag', rag],
+                ['model', model],
+            ])
+        );
+
+        expect(getTasksStructuralFingerprint([definitionOrder])).toBe(getTasksStructuralFingerprint([serverOrder]));
+    });
 });
