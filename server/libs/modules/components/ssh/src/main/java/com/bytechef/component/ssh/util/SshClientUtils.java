@@ -28,9 +28,14 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import java.io.IOException;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.FingerprintVerifier;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import net.schmizz.sshj.userauth.UserAuthException;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
+import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
+import net.schmizz.sshj.userauth.method.AuthPassword;
+import net.schmizz.sshj.userauth.method.PasswordResponseProvider;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
 import net.schmizz.sshj.userauth.password.PasswordUtils;
 
@@ -75,7 +80,7 @@ public class SshClientUtils {
             String username = connectionParameters.getRequiredString(USERNAME);
 
             if (privateKey == null || privateKey.isBlank()) {
-                sshClient.authPassword(username, connectionParameters.getRequiredString(PASSWORD));
+                authenticateWithPassword(sshClient, username, connectionParameters.getRequiredString(PASSWORD));
             } else {
                 sshClient.authPublickey(username, loadKeyProvider(sshClient, privateKey, connectionParameters));
             }
@@ -100,6 +105,33 @@ public class SshClientUtils {
         SSHClient sshClient = connect(connectionParameters);
 
         closeQuietly(sshClient);
+    }
+
+    static void authenticateWithPassword(SSHClient sshClient, String username, String password)
+        throws UserAuthException, TransportException {
+
+        try {
+            sshClient.auth(username, new AuthPassword(PasswordUtils.createOneOff(password.toCharArray())));
+        } catch (UserAuthException userAuthException) {
+            if (isTransportFailure(userAuthException) || !sshClient.isConnected()) {
+                throw userAuthException;
+            }
+
+            sshClient.auth(
+                username,
+                new AuthKeyboardInteractive(
+                    new PasswordResponseProvider(PasswordUtils.createOneOff(password.toCharArray()))));
+        }
+    }
+
+    private static boolean isTransportFailure(Throwable throwable) {
+        for (Throwable cause = throwable; cause != null; cause = cause.getCause()) {
+            if (cause instanceof TransportException) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static KeyProvider loadKeyProvider(
