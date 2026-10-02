@@ -18,29 +18,6 @@ vi.mock('../hooks/useEditKnowledgeBaseDialog', () => ({
     default: hoisted.mockUseEditKnowledgeBaseDialog,
 }));
 
-vi.mock('@/components/Button/Button', () => ({
-    default: ({
-        children,
-        disabled,
-        icon,
-        onClick,
-        variant,
-    }: {
-        children?: React.ReactNode;
-        disabled?: boolean;
-        icon?: React.ReactNode;
-        onClick?: () => void;
-        size?: string;
-        variant?: string;
-    }) => (
-        <button data-testid={`button-${variant || 'default'}`} disabled={disabled} onClick={onClick}>
-            {icon}
-
-            {children}
-        </button>
-    ),
-}));
-
 const mockKnowledgeBase = {
     description: 'Test description',
     id: 'kb-1',
@@ -78,6 +55,12 @@ const renderComponent = (props = {}) => {
 };
 
 describe('EditKnowledgeBaseDialog', () => {
+    it('renders the close control', () => {
+        renderComponent();
+
+        expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
+    });
+
     it('renders dialog title', () => {
         renderComponent();
 

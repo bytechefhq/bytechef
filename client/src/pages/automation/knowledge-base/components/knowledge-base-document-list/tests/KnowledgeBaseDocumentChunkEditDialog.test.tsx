@@ -43,6 +43,12 @@ const renderComponent = () => {
 };
 
 describe('KnowledgeBaseDocumentChunkEditDialog', () => {
+    it('renders the close control', () => {
+        renderComponent();
+
+        expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
+    });
+
     it('renders the dialog when open is true', () => {
         renderComponent();
 

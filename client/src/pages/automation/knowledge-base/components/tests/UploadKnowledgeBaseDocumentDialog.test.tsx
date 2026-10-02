@@ -46,6 +46,12 @@ afterEach(() => {
 });
 
 describe('UploadKnowledgeBaseDocumentDialog', () => {
+    it('renders the close control', () => {
+        render(<UploadKnowledgeBaseDocumentDialog knowledgeBaseId="kb-1" />);
+
+        expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
+    });
+
     it('renders dialog when open', () => {
         render(<UploadKnowledgeBaseDocumentDialog knowledgeBaseId="kb-1" />);
 
