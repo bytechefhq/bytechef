@@ -1,0 +1,9 @@
+mutation UpdateComponentPolicy($name: String!, $enabled: Boolean!) {
+    updateComponentPolicy(name: $name, enabled: $enabled) {
+        name
+        title
+        icon
+        version
+        enabled
+    }
+}
