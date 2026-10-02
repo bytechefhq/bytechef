@@ -17,7 +17,7 @@
 package com.bytechef.component.ai.agent.chat.memory.session.cluster;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,23 +33,18 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.chat.client.ChatClientRequest;
-import org.springframework.ai.chat.client.ChatClientResponse;
-import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
-import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
@@ -118,7 +113,7 @@ class SessionChatMemoryTest {
     }
 
     @Test
-    void testConversationSearchIsScopedToTheAgentBranch() throws Exception {
+    void testConversationSearchFindsArchivedEventsAndSkipsSummaries() throws Exception {
         SessionRepository sessionRepository = InMemorySessionRepository.builder()
             .build();
 
@@ -128,15 +123,12 @@ class SessionChatMemoryTest {
             .createdAt(Instant.now())
             .build());
 
-        appendEvent(sessionRepository, "alpha root", null);
-        appendEvent(sessionRepository, "alpha research", "orch.researcher");
-        appendEvent(sessionRepository, "alpha writer", "orch.writer");
+        appendEvent(sessionRepository, "alpha archived", true, false);
+        appendEvent(sessionRepository, "alpha summary", false, true);
+        appendEvent(sessionRepository, "alpha live", false, false);
 
         ChatMemoryFunction.Result result = applySessionChatMemory(
-            sessionRepository,
-            Map.of(
-                "conversationId", CONVERSATION_ID, "enableConversationSearch", true, "agentBranch",
-                "orch.researcher"));
+            sessionRepository, Map.of("conversationId", CONVERSATION_ID, "enableConversationSearch", true));
 
         ToolCallback conversationSearchToolCallback = result.toolCallbacks()[0];
 
@@ -145,110 +137,179 @@ class SessionChatMemoryTest {
             new ToolContext(Map.of("chat_memory_conversation_id", CONVERSATION_ID)));
 
         assertThat(searchResult)
-            .contains("alpha root", "alpha research")
-            .doesNotContain("alpha writer");
+            .contains("alpha archived", "alpha live")
+            .doesNotContain("alpha summary");
     }
 
     @Test
-    void testAdvisorWritesAreIsolatedBetweenSiblingAgentBranches() throws Exception {
+    void testConversationSearchRejectsNonPositiveSearchPageSize() {
         SessionRepository sessionRepository = InMemorySessionRepository.builder()
             .build();
 
-        sessionRepository.save(Session.builder()
-            .id(CONVERSATION_ID)
-            .userId("user-1")
-            .createdAt(Instant.now())
-            .build());
-
-        appendEvent(sessionRepository, "root context", null);
-
-        ChatMemoryFunction.Result orchestratorResult = applySessionChatMemory(
-            sessionRepository, Map.of("conversationId", CONVERSATION_ID, "agentBranch", "orch"));
-        ChatMemoryFunction.Result researcherResult = applySessionChatMemory(
-            sessionRepository, Map.of("conversationId", CONVERSATION_ID, "agentBranch", "orch.researcher"));
-        ChatMemoryFunction.Result writerResult = applySessionChatMemory(
-            sessionRepository, Map.of("conversationId", CONVERSATION_ID, "agentBranch", "orch.writer"));
-
-        runTurn(orchestratorResult, "orchestrator question", "orchestrator answer");
-        runTurn(researcherResult, "research question", "research answer");
-        runTurn(writerResult, "writer question", "writer answer");
-
-        assertThat(sessionRepository.findEvents(CONVERSATION_ID, EventFilter.all()))
-            .extracting(event -> event.getMessage()
-                .getText(), SessionEvent::getBranch)
-            .containsExactly(
-                tuple("root context", null),
-                tuple("orchestrator question", "orch"),
-                tuple("orchestrator answer", "orch"),
-                tuple("research question", "orch.researcher"),
-                tuple("research answer", "orch.researcher"),
-                tuple("writer question", "orch.writer"),
-                tuple("writer answer", "orch.writer"));
-
-        ChatMemory researcherChatMemory = researcherResult.chatMemory();
-
-        assertThat(researcherChatMemory.get(CONVERSATION_ID))
-            .extracting(Message::getText)
-            .containsExactly(
-                "root context", "orchestrator question", "orchestrator answer", "research question",
-                "research answer");
-
-        ChatMemory writerChatMemory = writerResult.chatMemory();
-
-        assertThat(writerChatMemory.get(CONVERSATION_ID))
-            .extracting(Message::getText)
-            .containsExactly(
-                "root context", "orchestrator question", "orchestrator answer", "writer question", "writer answer");
+        assertThatThrownBy(() -> applySessionChatMemory(
+            sessionRepository,
+            Map.of("conversationId", CONVERSATION_ID, "enableConversationSearch", true, "searchPageSize", 0)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageStartingWith("Search page size must be");
     }
 
     @Test
-    void testAdvisorWritesStayRootLevelWithoutAgentBranch() throws Exception {
+    void testRecursiveSummarizationWithoutModelChildIsRejected() {
         SessionRepository sessionRepository = InMemorySessionRepository.builder()
             .build();
 
-        ChatMemoryFunction.Result result = applySessionChatMemory(
-            sessionRepository, Map.of("conversationId", CONVERSATION_ID));
-
-        runTurn(result, "question", "answer");
-
-        assertThat(sessionRepository.findEvents(CONVERSATION_ID, EventFilter.all()))
-            .extracting(SessionEvent::getBranch)
-            .containsExactly(null, null);
+        assertThatThrownBy(() -> applySessionChatMemory(
+            sessionRepository,
+            Map.of(
+                "conversationId", CONVERSATION_ID, "compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents", 20,
+                "maxEventsToKeep", 10)))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("requires a Model child");
     }
 
     @Test
     void testSlidingWindowTriggerCountsEventsNotTurns() {
-        CompactionTrigger compactionTrigger = SessionChatMemory.resolveCompactionTrigger(
-            MockParametersFactory.create(Map.of("compactionStrategy", "SLIDING_WINDOW", "maxEvents", 2)));
+        CompactionTrigger compactionTrigger = resolveCompactionTrigger(
+            Map.of("compactionStrategy", "SLIDING_WINDOW", "maxEvents", 2));
 
         assertThat(compactionTrigger.shouldCompact(oneToolUsingTurn())).isTrue();
     }
 
     @Test
     void testRecursiveSummarizationTriggerCountsEventsNotTurns() {
-        CompactionTrigger compactionTrigger = SessionChatMemory.resolveCompactionTrigger(
-            MockParametersFactory
-                .create(Map.of("compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEventsToKeep", 2)));
+        CompactionTrigger compactionTrigger = resolveCompactionTrigger(
+            Map.of(
+                "compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents", 2, "maxEventsToKeep", 1, "overlapSize",
+                0));
 
         assertThat(compactionTrigger.shouldCompact(oneToolUsingTurn())).isTrue();
     }
 
     @Test
-    void testEventCountTriggerIgnoresBranchAndSyntheticEventsLikeTheStrategies() {
-        CompactionTrigger compactionTrigger = SessionChatMemory.resolveCompactionTrigger(
-            MockParametersFactory.create(Map.of("compactionStrategy", "SLIDING_WINDOW", "maxEvents", 2)));
+    void testEventCountTriggerIgnoresSyntheticEventsLikeTheStrategies() {
+        CompactionTrigger compactionTrigger = resolveCompactionTrigger(
+            Map.of("compactionStrategy", "SLIDING_WINDOW", "maxEvents", 2));
 
         Session session = compactionSession();
 
         CompactionRequest compactionRequest = CompactionRequest.of(
             session,
             List.of(
-                compactionEvent(new UserMessage("question"), null, false),
-                compactionEvent(new AssistantMessage("answer"), null, false),
-                compactionEvent(new AssistantMessage("sub-agent work"), "orch.researcher", false),
-                compactionEvent(new AssistantMessage("summary"), null, true)));
+                compactionEvent(new UserMessage("question"), false),
+                compactionEvent(new AssistantMessage("answer"), false),
+                compactionEvent(new AssistantMessage("summary"), true)));
 
         assertThat(compactionTrigger.shouldCompact(compactionRequest)).isFalse();
+    }
+
+    @Test
+    void testRecursiveSummarizationDoesNotRunAgainOnTheTurnAfterACompaction() {
+        CompactionTrigger compactionTrigger = resolveCompactionTrigger(
+            Map.of("compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents", 20, "maxEventsToKeep", 10));
+
+        assertThat(compactionTrigger.shouldCompact(eventsAfterCompaction(10, 2))).isFalse();
+        assertThat(compactionTrigger.shouldCompact(eventsAfterCompaction(10, 12))).isTrue();
+    }
+
+    @Test
+    void testRecursiveSummarizationRejectsMaxEventsNotAboveMaxEventsToKeep() {
+        Parameters inputParameters = MockParametersFactory.create(
+            Map.of("compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents", 10, "maxEventsToKeep", 10));
+
+        assertThatThrownBy(() -> SessionChatMemory.resolveCompaction(inputParameters, () -> mock(ChatClient.class)))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testSlidingWindowRejectsNonPositiveMaxEvents() {
+        assertCompactionRejected(Map.of("compactionStrategy", "SLIDING_WINDOW", "maxEvents", 0), "Max events");
+    }
+
+    @Test
+    void testTurnWindowRejectsNonPositiveMaxTurns() {
+        assertCompactionRejected(Map.of("compactionStrategy", "TURN_WINDOW", "maxTurns", 0), "Max turns");
+    }
+
+    @Test
+    void testTokenCountRejectsNonPositiveMaxTokens() {
+        assertCompactionRejected(Map.of("compactionStrategy", "TOKEN_COUNT", "maxTokens", -1), "Max tokens");
+    }
+
+    @Test
+    void testRecursiveSummarizationRejectsNonPositiveMaxEventsToKeep() {
+        assertCompactionRejected(
+            Map.of(
+                "compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents", 20, "maxEventsToKeep", 0, "overlapSize",
+                0),
+            "Max events to keep");
+    }
+
+    @Test
+    void testRecursiveSummarizationRejectsOverlapSizeNotBelowMaxEventsToKeep() {
+        assertCompactionRejected(
+            Map.of(
+                "compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents", 20, "maxEventsToKeep", 5, "overlapSize",
+                5),
+            "Overlap size");
+    }
+
+    @Test
+    void testRecursiveSummarizationRejectsNegativeOverlapSize() {
+        assertCompactionRejected(
+            Map.of(
+                "compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents", 20, "maxEventsToKeep", 5, "overlapSize",
+                -1),
+            "Overlap size");
+    }
+
+    @Test
+    void testUnknownCompactionStrategyIsRejected() {
+        Parameters inputParameters = MockParametersFactory.create(Map.of("compactionStrategy", "SLIDING"));
+
+        assertThatThrownBy(() -> SessionChatMemory.resolveCompaction(inputParameters, () -> mock(ChatClient.class)))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testNoneHasNoCompaction() throws Exception {
+        Parameters inputParameters = MockParametersFactory.create(Map.of("compactionStrategy", "NONE"));
+
+        assertThat(SessionChatMemory.resolveCompaction(inputParameters, () -> mock(ChatClient.class))).isNull();
+    }
+
+    private static void assertCompactionRejected(Map<String, Object> inputParameterValues, String expectedLabel) {
+        Parameters inputParameters = MockParametersFactory.create(inputParameterValues);
+
+        assertThatThrownBy(() -> SessionChatMemory.resolveCompaction(inputParameters, () -> mock(ChatClient.class)))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageStartingWith(expectedLabel + " must be");
+    }
+
+    private static CompactionRequest eventsAfterCompaction(int keptEventCount, int newEventCount) {
+        List<SessionEvent> events = new ArrayList<>();
+
+        events.add(compactionEvent(new AssistantMessage("summary"), true));
+
+        for (int index = 0; index < keptEventCount + newEventCount; index++) {
+            Message message = index % 2 == 0
+                ? new UserMessage("question " + index) : new AssistantMessage("answer " + index);
+
+            events.add(compactionEvent(message, false));
+        }
+
+        return CompactionRequest.of(compactionSession(), events);
+    }
+
+    private static CompactionTrigger resolveCompactionTrigger(Map<String, Object> inputParameterValues) {
+        try {
+            SessionChatMemory.Compaction compaction = SessionChatMemory.resolveCompaction(
+                MockParametersFactory.create(inputParameterValues), () -> mock(ChatClient.class));
+
+            return Objects.requireNonNull(compaction)
+                .trigger();
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
     private static ChatMemoryFunction.Result applySessionChatMemory(
@@ -283,31 +344,14 @@ class SessionChatMemoryTest {
             Map.of("sessionRepository_1", componentConnection));
     }
 
-    private static void runTurn(ChatMemoryFunction.Result result, String userText, String assistantText) {
-        BaseAdvisor advisor = result.advisor();
+    private static void appendEvent(
+        SessionRepository sessionRepository, String text, boolean archived, boolean synthetic) {
 
-        Map<String, Object> context = Map.of(SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY, CONVERSATION_ID);
-
-        advisor.before(
-            ChatClientRequest.builder()
-                .prompt(new Prompt(new UserMessage(userText)))
-                .context(context)
-                .build(),
-            mock(AdvisorChain.class));
-
-        advisor.after(
-            ChatClientResponse.builder()
-                .chatResponse(new ChatResponse(List.of(new Generation(new AssistantMessage(assistantText)))))
-                .context(context)
-                .build(),
-            mock(AdvisorChain.class));
-    }
-
-    private static void appendEvent(SessionRepository sessionRepository, String text, String branch) {
         sessionRepository.appendEvent(SessionEvent.builder()
             .sessionId(CONVERSATION_ID)
             .message(new UserMessage(text))
-            .branch(branch)
+            .archived(archived)
+            .metadata(synthetic ? Map.of(SessionEvent.METADATA_SYNTHETIC, true) : Map.of())
             .build());
     }
 
@@ -315,18 +359,18 @@ class SessionChatMemoryTest {
         return CompactionRequest.of(
             compactionSession(),
             List.of(
-                compactionEvent(new UserMessage("look it up"), null, false),
+                compactionEvent(new UserMessage("look it up"), false),
                 compactionEvent(
                     AssistantMessage.builder()
                         .content("")
                         .toolCalls(List.of(new AssistantMessage.ToolCall("call-1", "function", "lookup", "{}")))
                         .build(),
-                    null, false),
+                    false),
                 compactionEvent(
                     ToolResponseMessage.builder()
                         .responses(List.of(new ToolResponseMessage.ToolResponse("call-1", "lookup", "found")))
                         .build(),
-                    null, false)));
+                    false)));
     }
 
     private static Session compactionSession() {
@@ -337,11 +381,10 @@ class SessionChatMemoryTest {
             .build();
     }
 
-    private static SessionEvent compactionEvent(Message message, String branch, boolean synthetic) {
+    private static SessionEvent compactionEvent(Message message, boolean synthetic) {
         return SessionEvent.builder()
             .sessionId("compaction-session")
             .message(message)
-            .branch(branch)
             .metadata(synthetic ? Map.of(SessionEvent.METADATA_SYNTHETIC, true) : Map.of())
             .build();
     }

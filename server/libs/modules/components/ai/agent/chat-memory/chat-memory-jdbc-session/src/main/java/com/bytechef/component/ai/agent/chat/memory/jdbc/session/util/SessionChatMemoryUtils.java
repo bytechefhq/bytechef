@@ -18,6 +18,8 @@ package com.bytechef.component.ai.agent.chat.memory.jdbc.session.util;
 
 import static com.bytechef.platform.component.definition.ai.agent.DataSourceFunction.DATA_SOURCE;
 
+import com.bytechef.commons.util.ClientCacheSettings;
+import com.bytechef.commons.util.ClientCacheUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -25,15 +27,23 @@ import com.bytechef.platform.component.definition.ai.agent.DataSourceFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.DatabaseMetaData;
+import java.time.Duration;
 import java.util.Map;
 import javax.sql.DataSource;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.jdbc.JdbcSessionRepository;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.jdbc.support.MetaDataAccessException;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -41,17 +51,54 @@ import tools.jackson.databind.json.JsonMapper;
  */
 public class SessionChatMemoryUtils {
 
+    private static final Duration POOLED_CONNECTION_IDLE_TIMEOUT = Duration.ofMinutes(10);
+    private static final int POOL_MAXIMUM_SIZE = 5;
+
+    private static final Cache<DataSourceKey, PooledSessionRepository> SESSION_REPOSITORIES =
+        createSessionRepositoryCache(ClientCacheSettings.defaults());
+
     private SessionChatMemoryUtils() {
     }
 
-    public static SessionRepository getSessionRepository(DataSource dataSource) {
-        initializeSchema(dataSource);
+    static <K> Cache<K, PooledSessionRepository> createSessionRepositoryCache(
+        ClientCacheSettings clientCacheSettings) {
 
+        return ClientCacheUtils.createClientCache(clientCacheSettings, PooledSessionRepository::close);
+    }
+
+    public static SessionRepository createSessionRepository(DataSource dataSource) {
         return JdbcSessionRepository.builder()
             .dataSource(dataSource)
             .jsonMapper(JsonMapper.builder()
                 .build())
             .build();
+    }
+
+    public static SessionRepository getSessionRepository(DataSource dataSource) {
+        return getSessionRepository(dataSource, SESSION_REPOSITORIES);
+    }
+
+    static SessionRepository getSessionRepository(
+        DataSource dataSource, Cache<DataSourceKey, PooledSessionRepository> sessionRepositories) {
+
+        if (dataSource instanceof DriverManagerDataSource driverManagerDataSource) {
+            DataSourceKey dataSourceKey = new DataSourceKey(
+                driverManagerDataSource.getUrl(), driverManagerDataSource.getUsername(),
+                driverManagerDataSource.getPassword());
+
+            if (driverManagerDataSource instanceof SingleConnectionDataSource singleConnectionDataSource) {
+                singleConnectionDataSource.destroy();
+            }
+
+            PooledSessionRepository pooledSessionRepository = sessionRepositories.get(
+                dataSourceKey, SessionChatMemoryUtils::createPooledSessionRepository);
+
+            return pooledSessionRepository.sessionRepository();
+        }
+
+        initializeSchema(dataSource);
+
+        return createSessionRepository(dataSource);
     }
 
     public static DataSource getDataSource(
@@ -65,7 +112,15 @@ public class SessionChatMemoryUtils {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
+        String workflowNodeName = clusterElement.getWorkflowNodeName();
+
+        ComponentConnection componentConnection = componentConnections.get(workflowNodeName);
+
+        if (componentConnection == null) {
+            throw new IllegalStateException(
+                "The Data Source " + workflowNodeName + " of JDBC Session Chat Memory has no connection; select a " +
+                    "database connection for it.");
+        }
 
         return dataSourceFunction.apply(
             ParametersFactory.create(clusterElement.getParameters()),
@@ -74,28 +129,85 @@ public class SessionChatMemoryUtils {
     }
 
     public static void initializeSchema(DataSource dataSource) {
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
+        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator(
             new ClassPathResource(resolveSchemaScript(dataSource)));
 
-        populator.setContinueOnError(true);
+        DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
+    }
 
-        DatabasePopulatorUtils.execute(populator, dataSource);
+    private static PooledSessionRepository createPooledSessionRepository(DataSourceKey dataSourceKey) {
+        HikariConfig hikariConfig = new HikariConfig();
+
+        hikariConfig.setJdbcUrl(dataSourceKey.url());
+        hikariConfig.setUsername(dataSourceKey.username());
+        hikariConfig.setPassword(dataSourceKey.password());
+        hikariConfig.setMaximumPoolSize(POOL_MAXIMUM_SIZE);
+        hikariConfig.setMinimumIdle(0);
+        hikariConfig.setIdleTimeout(POOLED_CONNECTION_IDLE_TIMEOUT.toMillis());
+        hikariConfig.setPoolName("session-chat-memory");
+
+        HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
+
+        try {
+            initializeSchema(hikariDataSource);
+        } catch (RuntimeException runtimeException) {
+            hikariDataSource.close();
+
+            throw runtimeException;
+        }
+
+        return new PooledSessionRepository(createSessionRepository(hikariDataSource), hikariDataSource);
     }
 
     private static String resolveSchemaScript(DataSource dataSource) {
-        String productName = null;
+        String productName;
 
         try {
             productName = JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductName);
-        } catch (Exception ignored) {
+        } catch (MetaDataAccessException metaDataAccessException) {
+            throw new IllegalStateException(
+                "Failed to read the database product name for the session chat memory schema",
+                metaDataAccessException);
         }
 
-        String schemaName = switch (productName != null ? productName : "") {
+        String schemaName = switch (productName) {
             case "MySQL", "MariaDB" -> "schema-mysql.sql";
             case "H2" -> "schema-h2.sql";
-            default -> "schema-postgresql.sql";
+            case "PostgreSQL" -> "schema-postgresql.sql";
+            default -> throw new IllegalStateException(
+                "Session chat memory does not support the " + productName + " database");
         };
 
         return "org/springframework/ai/session/jdbc/" + schemaName;
+    }
+
+    record DataSourceKey(String url, @Nullable String username, @Nullable String password) {
+
+        @Override
+        public String toString() {
+            return "DataSourceKey{url=" + redactUrl(url) + ", username=" + username + "}";
+        }
+
+        private static String redactUrl(String url) {
+            String urlWithoutParameters = url.split("[?;]", 2)[0];
+
+            int credentialsEndIndex = urlWithoutParameters.lastIndexOf('@');
+
+            if (credentialsEndIndex < 0) {
+                return urlWithoutParameters;
+            }
+
+            int subprotocolEndIndex = urlWithoutParameters.indexOf(':', "jdbc:".length());
+
+            return urlWithoutParameters.substring(0, subprotocolEndIndex + 1) +
+                urlWithoutParameters.substring(credentialsEndIndex + 1);
+        }
+    }
+
+    record PooledSessionRepository(SessionRepository sessionRepository, HikariDataSource hikariDataSource) {
+
+        void close() {
+            hikariDataSource.close();
+        }
     }
 }

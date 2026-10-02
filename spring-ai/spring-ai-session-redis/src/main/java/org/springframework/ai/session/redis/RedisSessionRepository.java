@@ -18,19 +18,17 @@ package org.springframework.ai.session.redis;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
-import org.springframework.ai.session.EventFilter;
-import org.springframework.ai.session.Session;
-import org.springframework.ai.session.SessionEvent;
-import org.springframework.ai.session.SessionRepository;
-import org.springframework.ai.session.redis.StoredSession.StoredEvent;
+import org.springframework.ai.session.store.AbstractDocumentSessionRepository;
+import org.springframework.ai.session.store.ConditionalWriteRetry;
+import org.springframework.ai.session.store.StoredSession;
+import org.springframework.ai.session.store.UnreadableSessionDocumentException;
 import org.springframework.util.Assert;
 import redis.clients.jedis.UnifiedJedis;
+import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.resps.ScanResult;
 import tools.jackson.databind.json.JsonMapper;
@@ -38,266 +36,82 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Ivica Cardic
  */
-public final class RedisSessionRepository implements SessionRepository {
+public final class RedisSessionRepository
+    extends AbstractDocumentSessionRepository<RedisSessionRepository.RedisCasToken> {
 
-    private static final int MAX_RETRIES = 5;
-    private static final int SCAN_BATCH_SIZE = 500;
+    static final String DOCUMENT_FIELD = "document";
+    static final String EXPIRES_AT_FIELD = "expiresAt";
+    static final String REVISION_FIELD = "revision";
 
-    private static final String CAS_SCRIPT = """
-        local current = redis.call('GET', KEYS[1])
-        if current == false then
-          if ARGV[2] == '-1' then
-            redis.call('SET', KEYS[1], ARGV[1])
+    static final String CAS_SCRIPT = """
+        local keyType = redis.call('TYPE', KEYS[1])['ok']
+        if keyType == 'none' then
+          if ARGV[2] ~= '-1' then
+            return 0
+          end
+        elseif keyType == 'hash' then
+          local revision = redis.call('HGET', KEYS[1], 'revision')
+          if not revision then
+            return -1
+          end
+          if revision ~= ARGV[2] then
+            return 0
+          end
+        elseif keyType == 'string' then
+          if ARGV[5] == '' or redis.call('GET', KEYS[1]) ~= ARGV[5] then
+            return 0
+          end
+          redis.call('DEL', KEYS[1])
+        else
+          return keyType
+        end
+        redis.call('HSET', KEYS[1], 'revision', ARGV[3], 'expiresAt', ARGV[4], 'document', ARGV[1])
+        return 1
+        """;
+
+    static final String DELETE_IF_EXPIRED_SCRIPT = """
+        local keyType = redis.call('TYPE', KEYS[1])['ok']
+        if keyType == 'hash' then
+          local expiresAt = tonumber(redis.call('HGET', KEYS[1], 'expiresAt'))
+          if expiresAt ~= nil and expiresAt < tonumber(ARGV[1]) then
+            redis.call('DEL', KEYS[1])
             return 1
           end
           return 0
         end
-        local ok, doc = pcall(cjson.decode, current)
-        if not ok or tostring(doc['version']) ~= ARGV[2] then
-          return 0
+        if keyType == 'string' and ARGV[2] ~= '' and redis.call('GET', KEYS[1]) == ARGV[2] then
+          redis.call('DEL', KEYS[1])
+          return 1
         end
-        redis.call('SET', KEYS[1], ARGV[1])
-        return 1
+        return 0
         """;
 
-    private static final long EXPECT_ABSENT = -1L;
+    private static final int SCAN_BATCH_SIZE = 500;
+    private static final String EXPECT_ABSENT = "-1";
+    private static final String GLOB_METACHARACTERS = "*?[]\\";
+    private static final Long MISSING_REVISION_RESULT = -1L;
+    private static final String NO_LEGACY_DOCUMENT = "";
+    private static final String NO_EXPIRY = "";
+    private static final String UNCHECKED_REVISION = "";
+    private static final String WRONG_TYPE_ERROR_PREFIX = "WRONGTYPE";
 
     private final UnifiedJedis jedis;
     private final String keyPrefix;
-    private final JsonMapper jsonMapper;
 
     private RedisSessionRepository(Builder builder) {
+        super(builder.jsonMapper, builder.conditionalWriteRetry, builder.maxArchivedEvents);
+
         this.jedis = builder.jedis;
         this.keyPrefix = builder.keyPrefix;
-        this.jsonMapper = builder.jsonMapper;
     }
 
     @Override
-    public Session save(Session session) {
-        Assert.notNull(session, "session must not be null");
-
-        for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
-            StoredSession existing = load(session.id());
-
-            long version = existing != null ? existing.version() : 0L;
-            List<StoredEvent> events = existing != null ? existing.events() : List.of();
-            long expectedVersion = existing != null ? existing.version() : EXPECT_ABSENT;
-
-            if (tryPut(StoredSession.fromSession(session, version, events), expectedVersion)) {
-                return session;
-            }
-        }
-
-        throw new IllegalStateException(
-            "Failed to save session after " + MAX_RETRIES + " attempts: " + session.id());
-    }
-
-    @Override
-    @Nullable
-    public Session findById(String sessionId) {
-        Assert.hasText(sessionId, "sessionId must not be null or empty");
-
-        StoredSession document = load(sessionId);
-
-        return document == null ? null : document.toSession();
-    }
-
-    @Override
-    public List<Session> findByUserId(String userId) {
-        Assert.hasText(userId, "userId must not be null or empty");
-
-        List<Session> sessions = new ArrayList<>();
-
-        for (StoredSession document : loadAll()) {
-            if (userId.equals(document.userId())) {
-                sessions.add(document.toSession());
-            }
-        }
-
-        return sessions;
-    }
-
-    @Override
-    public List<String> findExpiredSessionIds(Instant before) {
-        Assert.notNull(before, "before must not be null");
-
-        List<String> ids = new ArrayList<>();
-
-        for (StoredSession document : loadAll()) {
-            Long expiresAt = document.expiresAtEpochMilli();
-
-            if (expiresAt != null && expiresAt < before.toEpochMilli()) {
-                ids.add(document.id());
-            }
-        }
-
-        return ids;
-    }
-
-    @Override
-    public void delete(String sessionId) {
-        Assert.hasText(sessionId, "sessionId must not be null or empty");
-
-        jedis.del(key(sessionId));
-    }
-
-    @Override
-    public void appendEvent(SessionEvent event) {
-        Assert.notNull(event, "event must not be null");
-
-        String sessionId = event.getSessionId();
-
-        for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
-            StoredSession document = requireSession(sessionId);
-
-            List<StoredEvent> events = new ArrayList<>(document.events());
-
-            events.add(StoredEvent.fromEvent(event, jsonMapper));
-
-            StoredSession next = withEvents(document, events, document.version() + 1);
-
-            if (tryPut(next, document.version())) {
-                return;
-            }
-        }
-
-        throw new IllegalStateException(
-            "Failed to append event after " + MAX_RETRIES + " attempts: " + sessionId);
-    }
-
-    @Override
-    public boolean compactEvents(
-        String sessionId, List<SessionEvent> archivedEvents, List<SessionEvent> retainedEvents,
-        long expectedVersion) {
-
-        Assert.hasText(sessionId, "sessionId must not be null or empty");
-        Assert.notNull(archivedEvents, "archivedEvents must not be null");
-        Assert.notNull(retainedEvents, "retainedEvents must not be null");
-
-        StoredSession document = requireSession(sessionId);
-
-        if (document.version() != expectedVersion) {
-            return false;
-        }
-
-        List<SessionEvent> newEvents = new ArrayList<>();
-
-        for (StoredEvent storedEvent : document.events()) {
-            SessionEvent event = storedEvent.toEvent(jsonMapper);
-
-            if (event.isArchived()) {
-                newEvents.add(event);
-            }
-        }
-
-        for (SessionEvent archivedEvent : archivedEvents) {
-            newEvents.add(archivedEvent.asArchived());
-        }
-
-        newEvents.addAll(retainedEvents);
-
-        StoredSession next = withEvents(
-            document, StoredSession.toStoredEvents(newEvents, jsonMapper), document.version() + 1);
-
-        return tryPut(next, document.version());
-    }
-
-    @Override
-    public long getEventVersion(String sessionId) {
-        Assert.hasText(sessionId, "sessionId must not be null or empty");
-
-        StoredSession document = load(sessionId);
-
-        return document == null ? 0L : document.version();
-    }
-
-    @Override
-    public List<SessionEvent> findEvents(String sessionId, EventFilter filter) {
-        Assert.hasText(sessionId, "sessionId must not be null or empty");
-        Assert.notNull(filter, "filter must not be null");
-
-        StoredSession document = load(sessionId);
-
-        if (document == null) {
-            return List.of();
-        }
-
-        List<SessionEvent> events = new ArrayList<>();
-
-        for (StoredEvent storedEvent : document.events()) {
-            events.add(storedEvent.toEvent(jsonMapper));
-        }
-
-        return applyFilter(events, filter);
-    }
-
-    private List<SessionEvent> applyFilter(List<SessionEvent> events, EventFilter filter) {
-        List<SessionEvent> matched = new ArrayList<>();
-
-        for (SessionEvent event : events) {
-            if (filter.matches(event)) {
-                matched.add(event);
-            }
-        }
-
-        matched.sort((left, right) -> left.getTimestamp()
-            .compareTo(right.getTimestamp()));
-
-        Integer lastN = filter.lastN();
-
-        if (lastN != null) {
-            int from = Math.max(0, matched.size() - lastN);
-
-            return Collections.unmodifiableList(new ArrayList<>(matched.subList(from, matched.size())));
-        }
-
-        Integer pageSize = filter.pageSize();
-
-        if (pageSize != null) {
-            Integer pageNumber = filter.page();
-
-            int page = pageNumber != null ? pageNumber : 0;
-            int from = Math.min(page * pageSize, matched.size());
-            int to = Math.min(from + pageSize, matched.size());
-
-            return Collections.unmodifiableList(new ArrayList<>(matched.subList(from, to)));
-        }
-
-        return Collections.unmodifiableList(matched);
-    }
-
-    private StoredSession withEvents(StoredSession document, List<StoredEvent> events, long version) {
-        return new StoredSession(
-            document.id(), document.userId(), document.createdAtEpochMilli(), document.expiresAtEpochMilli(),
-            document.metadata(), version, events);
-    }
-
-    private StoredSession requireSession(String sessionId) {
-        StoredSession document = load(sessionId);
-
-        if (document == null) {
-            throw new IllegalArgumentException("Session not found: " + sessionId);
-        }
-
-        return document;
-    }
-
-    private String key(String sessionId) {
+    protected String documentKey(String sessionId) {
         return keyPrefix + sessionId;
     }
 
-    @Nullable
-    private StoredSession load(String sessionId) {
-        String json = jedis.get(key(sessionId));
-
-        if (json == null) {
-            return null;
-        }
-
-        return jsonMapper.readValue(json, StoredSession.class);
-    }
-
-    private List<StoredSession> loadAll() {
+    @Override
+    protected List<String> listDocumentKeys() {
         Set<String> keys = new LinkedHashSet<>();
         ScanParams scanParams = new ScanParams()
             .match(keyPrefix + "*")
@@ -312,31 +126,161 @@ public final class RedisSessionRepository implements SessionRepository {
             cursor = scanResult.getCursor();
         } while (!ScanParams.SCAN_POINTER_START.equals(cursor));
 
-        List<StoredSession> documents = new ArrayList<>();
-
-        for (String key : keys) {
-            String json = jedis.get(key);
-
-            if (json == null) {
-                continue;
-            }
-
-            documents.add(jsonMapper.readValue(json, StoredSession.class));
-        }
-
-        return documents;
+        return List.copyOf(keys);
     }
 
-    private boolean tryPut(StoredSession document, long expectedVersion) {
-        Object result = jedis.eval(
-            CAS_SCRIPT, List.of(key(document.id())),
-            List.of(jsonMapper.writeValueAsString(document), Long.toString(expectedVersion)));
+    @Override
+    @Nullable
+    protected LoadedSession<RedisCasToken> loadDocument(String documentKey) {
+        try {
+            return loadHash(documentKey);
+        } catch (JedisDataException jedisDataException) {
+            requireWrongType(jedisDataException);
+        }
 
-        return result instanceof Long resultValue && resultValue == 1L;
+        String legacyDocument;
+
+        try {
+            legacyDocument = jedis.get(documentKey);
+        } catch (JedisDataException jedisDataException) {
+            requireWrongType(jedisDataException);
+
+            return loadRetypedHash(documentKey);
+        }
+
+        if (legacyDocument == null) {
+            return null;
+        }
+
+        StoredSession document = jsonMapper().readValue(legacyDocument, StoredSession.class);
+
+        return new LoadedSession<>(document, new RedisCasToken(UNCHECKED_REVISION, legacyDocument));
+    }
+
+    @Override
+    protected boolean tryPut(StoredSession document, @Nullable LoadedSession<RedisCasToken> current) {
+        RedisCasToken casToken = current == null ? null : current.casToken();
+
+        String expectedRevision = casToken == null ? EXPECT_ABSENT : casToken.expectedRevision();
+        String legacyDocument = casToken == null ? NO_LEGACY_DOCUMENT : casToken.legacyDocument();
+
+        Long expiresAtEpochMilli = document.expiresAtEpochMilli();
+
+        String expiresAt = expiresAtEpochMilli == null ? NO_EXPIRY : Long.toString(expiresAtEpochMilli);
+
+        String key = documentKey(document.id());
+
+        Object result = jedis.eval(
+            CAS_SCRIPT, List.of(key),
+            List.of(
+                jsonMapper().writeValueAsString(document), expectedRevision, Long.toString(document.revision()),
+                expiresAt, legacyDocument));
+
+        if (result instanceof String keyType) {
+            throw new IllegalStateException(
+                "Redis key " + key + " holds a " + keyType + " instead of a session hash or JSON string");
+        }
+
+        if (MISSING_REVISION_RESULT.equals(result)) {
+            throw new IllegalStateException(
+                "Redis session hash " + key + " has no " + REVISION_FIELD + " field; conditional writes require one");
+        }
+
+        return toScriptOutcome(key, result);
+    }
+
+    @Override
+    protected boolean tryDeleteIfExpired(LoadedSession<RedisCasToken> loadedSession, Instant before) {
+        RedisCasToken casToken = loadedSession.casToken();
+
+        String legacyDocument = casToken.legacyDocument();
+
+        StoredSession document = loadedSession.document();
+
+        String key = documentKey(document.id());
+
+        Object result = jedis.eval(
+            DELETE_IF_EXPIRED_SCRIPT, List.of(key), List.of(Long.toString(before.toEpochMilli()), legacyDocument));
+
+        return toScriptOutcome(key, result);
+    }
+
+    @Override
+    protected void deleteDocument(String documentKey) {
+        jedis.del(documentKey);
+    }
+
+    @Nullable
+    private LoadedSession<RedisCasToken> loadHash(String key) {
+        List<String> fieldValues = jedis.hmget(key, DOCUMENT_FIELD, REVISION_FIELD);
+
+        String document = fieldValues.get(0);
+
+        if (document == null) {
+            if (fieldValues.get(1) != null) {
+                throw new UnreadableSessionDocumentException(
+                    "Redis session hash " + key + " has a " + REVISION_FIELD + " field but no " + DOCUMENT_FIELD +
+                        " field");
+            }
+
+            return null;
+        }
+
+        StoredSession storedSession = jsonMapper().readValue(document, StoredSession.class);
+
+        return new LoadedSession<>(
+            storedSession, new RedisCasToken(Long.toString(storedSession.revision()), NO_LEGACY_DOCUMENT));
+    }
+
+    @Nullable
+    private LoadedSession<RedisCasToken> loadRetypedHash(String key) {
+        try {
+            return loadHash(key);
+        } catch (JedisDataException jedisDataException) {
+            requireWrongType(jedisDataException);
+
+            throw new UnreadableSessionDocumentException(
+                "Redis key " + key + " holds neither a session hash nor a JSON string", jedisDataException);
+        }
+    }
+
+    private static boolean toScriptOutcome(String key, @Nullable Object result) {
+        if (result instanceof Long resultValue) {
+            if (resultValue == 1L) {
+                return true;
+            }
+
+            if (resultValue == 0L) {
+                return false;
+            }
+        }
+
+        throw new IllegalStateException("Unexpected session script result " + result + " for Redis key " + key);
+    }
+
+    private static boolean containsGlobMetacharacter(String keyPrefix) {
+        for (char character : keyPrefix.toCharArray()) {
+            if (GLOB_METACHARACTERS.indexOf(character) >= 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void requireWrongType(JedisDataException jedisDataException) {
+        String message = jedisDataException.getMessage();
+
+        if (message == null || !message.startsWith(WRONG_TYPE_ERROR_PREFIX)) {
+            throw jedisDataException;
+        }
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    record RedisCasToken(String expectedRevision, String legacyDocument) {
     }
 
     public static final class Builder {
@@ -345,6 +289,8 @@ public final class RedisSessionRepository implements SessionRepository {
         private String keyPrefix = "spring-ai-session:";
         private JsonMapper jsonMapper = JsonMapper.builder()
             .build();
+        private ConditionalWriteRetry conditionalWriteRetry = ConditionalWriteRetry.defaults();
+        private int maxArchivedEvents = StoredSession.DEFAULT_MAX_ARCHIVED_EVENTS;
 
         private Builder() {
         }
@@ -369,9 +315,28 @@ public final class RedisSessionRepository implements SessionRepository {
             return this;
         }
 
+        public Builder maxArchivedEvents(int maxArchivedEvents) {
+            this.maxArchivedEvents = maxArchivedEvents;
+
+            return this;
+        }
+
+        Builder conditionalWriteRetry(ConditionalWriteRetry conditionalWriteRetry) {
+            this.conditionalWriteRetry = conditionalWriteRetry;
+
+            return this;
+        }
+
         public RedisSessionRepository build() {
             Assert.notNull(jedis, "jedis must not be null");
             Assert.hasText(keyPrefix, "keyPrefix must not be null or empty");
+            Assert.isTrue(
+                !containsGlobMetacharacter(keyPrefix),
+                () -> "keyPrefix " + keyPrefix + " must not contain any of the Redis glob characters " +
+                    GLOB_METACHARACTERS);
+            Assert.notNull(jsonMapper, "jsonMapper must not be null");
+            Assert.notNull(conditionalWriteRetry, "conditionalWriteRetry must not be null");
+            Assert.isTrue(maxArchivedEvents >= 0, "maxArchivedEvents must not be negative");
 
             return new RedisSessionRepository(this);
         }

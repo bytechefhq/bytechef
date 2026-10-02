@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.agent.chat.memory.session.compaction;
 
-import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.compaction.CompactionRequest;
 import org.springframework.ai.session.compaction.CompactionTrigger;
 
@@ -37,12 +36,11 @@ public final class EventCountTrigger implements CompactionTrigger {
 
     @Override
     public boolean shouldCompact(CompactionRequest compactionRequest) {
-        long rootEventCount = compactionRequest.events()
+        long eventCount = compactionRequest.events()
             .stream()
             .filter(event -> !event.isSynthetic())
-            .filter(SessionEvent::isRootEvent)
             .count();
 
-        return rootEventCount > maxEvents;
+        return eventCount > maxEvents;
     }
 }

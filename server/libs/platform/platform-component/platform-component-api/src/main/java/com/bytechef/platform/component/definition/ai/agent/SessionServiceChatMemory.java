@@ -20,8 +20,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.session.EventFilter;
-import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionService;
 
 /**
@@ -29,12 +27,10 @@ import org.springframework.ai.session.SessionService;
  */
 public final class SessionServiceChatMemory implements ChatMemory {
 
-    private final EventFilter eventFilter;
     private final SessionService sessionService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public SessionServiceChatMemory(SessionService sessionService, EventFilter eventFilter) {
-        this.eventFilter = eventFilter.merge(EventFilter.active());
+    public SessionServiceChatMemory(SessionService sessionService) {
         this.sessionService = sessionService;
     }
 
@@ -45,10 +41,7 @@ public final class SessionServiceChatMemory implements ChatMemory {
 
     @Override
     public List<Message> get(String conversationId) {
-        return sessionService.getEvents(conversationId, eventFilter)
-            .stream()
-            .map(SessionEvent::getMessage)
-            .toList();
+        return sessionService.getActiveMessages(conversationId);
     }
 
     @Override

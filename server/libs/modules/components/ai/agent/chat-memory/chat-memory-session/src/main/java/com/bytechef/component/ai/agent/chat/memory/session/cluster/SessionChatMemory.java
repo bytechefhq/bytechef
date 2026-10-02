@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.agent.chat.memory.session.cluster;
 
-import static com.bytechef.component.ai.agent.chat.memory.session.constant.SessionChatMemoryConstants.AGENT_BRANCH;
 import static com.bytechef.component.ai.agent.chat.memory.session.constant.SessionChatMemoryConstants.COMPACTION_STRATEGY;
 import static com.bytechef.component.ai.agent.chat.memory.session.constant.SessionChatMemoryConstants.CONVERSATION_ID;
 import static com.bytechef.component.ai.agent.chat.memory.session.constant.SessionChatMemoryConstants.DEFAULT_USER_ID;
@@ -42,8 +41,6 @@ import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.
 import static com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction.SESSION_REPOSITORY;
 
 import com.bytechef.component.ai.agent.chat.memory.session.compaction.EventCountTrigger;
-import com.bytechef.component.ai.agent.chat.memory.session.service.BranchStampingSessionService;
-import com.bytechef.component.ai.agent.chat.memory.session.tool.SessionConversationSearchTools;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -57,11 +54,12 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.session.DefaultSessionService;
-import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
@@ -73,9 +71,9 @@ import org.springframework.ai.session.compaction.TokenCountCompactionStrategy;
 import org.springframework.ai.session.compaction.TokenCountTrigger;
 import org.springframework.ai.session.compaction.TurnCountTrigger;
 import org.springframework.ai.session.compaction.TurnWindowCompactionStrategy;
+import org.springframework.ai.session.tool.SessionEventTools;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -112,12 +110,12 @@ public class SessionChatMemory {
                     .required(true),
                 string(DEFAULT_USER_ID)
                     .label("Default User ID")
-                    .description("User id assigned to new sessions when none is supplied per request.")
+                    .description("User id assigned to new sessions.")
                     .defaultValue(DEFAULT_USER_ID_VALUE)
                     .required(false),
                 string(COMPACTION_STRATEGY)
                     .label("Compaction Strategy")
-                    .description("How to shrink history when it grows. The strategy's size also drives compaction.")
+                    .description("How to shrink history when it grows. Older events are archived, not deleted.")
                     .options(
                         option("None", NONE),
                         option("Sliding window (by events)", SLIDING_WINDOW),
@@ -128,26 +126,37 @@ public class SessionChatMemory {
                     .required(false),
                 integer(MAX_EVENTS)
                     .label("Max events")
+                    .description(
+                        "Compaction runs once the history has more events than this. For recursive summarization " +
+                            "it must be greater than Max events to keep.")
                     .defaultValue(DEFAULT_MAX_EVENTS)
-                    .displayCondition("%s == '%s'".formatted(COMPACTION_STRATEGY, SLIDING_WINDOW))
+                    .displayCondition(
+                        "%s == '%s' || %s == '%s'".formatted(
+                            COMPACTION_STRATEGY, SLIDING_WINDOW, COMPACTION_STRATEGY, RECURSIVE_SUMMARIZATION))
                     .required(true),
                 integer(MAX_TURNS)
                     .label("Max turns")
+                    .description("The number of most recent turns kept in the history.")
                     .defaultValue(DEFAULT_MAX_TURNS)
                     .displayCondition("%s == '%s'".formatted(COMPACTION_STRATEGY, TURN_WINDOW))
                     .required(true),
                 integer(MAX_TOKENS)
                     .label("Max tokens")
+                    .description("The estimated token budget of the history.")
                     .defaultValue(DEFAULT_MAX_TOKENS)
                     .displayCondition("%s == '%s'".formatted(COMPACTION_STRATEGY, TOKEN_COUNT))
                     .required(true),
                 integer(MAX_EVENTS_TO_KEEP)
                     .label("Max events to keep")
+                    .description("The number of most recent events kept in full; older events are summarized.")
                     .defaultValue(DEFAULT_MAX_EVENTS_TO_KEEP)
                     .displayCondition("%s == '%s'".formatted(COMPACTION_STRATEGY, RECURSIVE_SUMMARIZATION))
                     .required(true),
                 integer(OVERLAP_SIZE)
                     .label("Overlap size")
+                    .description(
+                        "The number of kept events also shown to the summarizer for continuity. It must be less " +
+                            "than Max events to keep.")
                     .defaultValue(DEFAULT_OVERLAP_SIZE)
                     .displayCondition("%s == '%s'".formatted(COMPACTION_STRATEGY, RECURSIVE_SUMMARIZATION))
                     .required(true),
@@ -158,15 +167,9 @@ public class SessionChatMemory {
                     .required(false),
                 integer(SEARCH_PAGE_SIZE)
                     .label("Search page size")
+                    .description("The number of results the conversation search tool returns per page.")
                     .defaultValue(DEFAULT_SEARCH_PAGE_SIZE)
                     .displayCondition("%s == true".formatted(ENABLE_CONVERSATION_SEARCH))
-                    .required(false),
-                string(AGENT_BRANCH)
-                    .label("Agent branch")
-                    .description(
-                        "Dot-path branch of this agent (e.g. orch.researcher) for multi-agent isolation. New " +
-                            "events are tagged with it, and the agent sees only its own branch, its ancestors' and " +
-                            "root-level events.")
                     .required(false))
             .type(CHAT_MEMORY)
             .object(() -> this::apply);
@@ -180,32 +183,25 @@ public class SessionChatMemory {
             .sessionRepository(resolveSessionRepository(extensions, componentConnections))
             .build();
 
-        String agentBranch = StringUtils.hasText(inputParameters.getString(AGENT_BRANCH))
-            ? inputParameters.getString(AGENT_BRANCH)
-            : null;
-
-        EventFilter eventFilter = EventFilter.forBranch(agentBranch);
-
         SessionMemoryAdvisor.Builder builder = SessionMemoryAdvisor
-            .builder(new BranchStampingSessionService(sessionService, agentBranch))
+            .builder(sessionService)
             .defaultUserId(inputParameters.getString(DEFAULT_USER_ID, DEFAULT_USER_ID_VALUE))
-            .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
-            .eventFilter(eventFilter);
+            .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER);
 
-        CompactionStrategy compactionStrategy = resolveCompactionStrategy(
-            inputParameters, extensions, componentConnections);
+        Compaction compaction = resolveCompaction(
+            inputParameters, () -> resolveSummarizerChatClient(extensions, componentConnections));
 
-        if (compactionStrategy != null) {
-            builder.compactionStrategy(compactionStrategy)
-                .compactionTrigger(resolveCompactionTrigger(inputParameters));
+        if (compaction != null) {
+            builder.compactionStrategy(compaction.strategy())
+                .compactionTrigger(compaction.trigger());
         }
 
         BaseAdvisor advisor = builder.build();
 
-        ToolCallback[] toolCallbacks = resolveRecallToolCallbacks(inputParameters, sessionService, eventFilter);
+        ToolCallback[] toolCallbacks = resolveRecallToolCallbacks(inputParameters, sessionService);
 
         return new ChatMemoryFunction.Result(
-            advisor, new SessionServiceChatMemory(sessionService, eventFilter), toolCallbacks, true);
+            advisor, new SessionServiceChatMemory(sessionService), toolCallbacks, true);
     }
 
     private SessionRepository resolveSessionRepository(
@@ -226,44 +222,79 @@ public class SessionChatMemory {
             ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
     }
 
-    private CompactionStrategy resolveCompactionStrategy(
-        Parameters inputParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections) throws Exception {
+    static @Nullable Compaction resolveCompaction(
+        Parameters inputParameters, Callable<ChatClient> summarizerChatClientResolver) throws Exception {
 
-        String selection = inputParameters.getString(COMPACTION_STRATEGY, NONE);
+        String compactionStrategy = inputParameters.getString(COMPACTION_STRATEGY, NONE);
 
-        return switch (selection) {
-            case SLIDING_WINDOW -> SlidingWindowCompactionStrategy.builder()
-                .maxEvents(inputParameters.getInteger(MAX_EVENTS, DEFAULT_MAX_EVENTS))
-                .build();
-            case TURN_WINDOW -> TurnWindowCompactionStrategy.builder()
-                .maxTurns(inputParameters.getInteger(MAX_TURNS, DEFAULT_MAX_TURNS))
-                .build();
-            case TOKEN_COUNT -> TokenCountCompactionStrategy.builder()
-                .maxTokens(inputParameters.getInteger(MAX_TOKENS, DEFAULT_MAX_TOKENS))
-                .build();
-            case RECURSIVE_SUMMARIZATION -> RecursiveSummarizationCompactionStrategy
-                .builder(resolveSummarizerChatClient(extensions, componentConnections))
-                .maxEventsToKeep(inputParameters.getInteger(MAX_EVENTS_TO_KEEP, DEFAULT_MAX_EVENTS_TO_KEEP))
-                .overlapSize(inputParameters.getInteger(OVERLAP_SIZE, DEFAULT_OVERLAP_SIZE))
-                .build();
-            default -> null;
+        return switch (compactionStrategy) {
+            case NONE -> null;
+            case SLIDING_WINDOW -> {
+                int maxEvents = getPositiveInteger(inputParameters, MAX_EVENTS, DEFAULT_MAX_EVENTS, "Max events");
+
+                yield new Compaction(
+                    SlidingWindowCompactionStrategy.builder()
+                        .maxEvents(maxEvents)
+                        .build(),
+                    new EventCountTrigger(maxEvents));
+            }
+            case TURN_WINDOW -> {
+                int maxTurns = getPositiveInteger(inputParameters, MAX_TURNS, DEFAULT_MAX_TURNS, "Max turns");
+
+                yield new Compaction(
+                    TurnWindowCompactionStrategy.builder()
+                        .maxTurns(maxTurns)
+                        .build(),
+                    new TurnCountTrigger(maxTurns));
+            }
+            case TOKEN_COUNT -> {
+                int maxTokens = getPositiveInteger(inputParameters, MAX_TOKENS, DEFAULT_MAX_TOKENS, "Max tokens");
+
+                yield new Compaction(
+                    TokenCountCompactionStrategy.builder()
+                        .maxTokens(maxTokens)
+                        .build(),
+                    TokenCountTrigger.builder()
+                        .threshold(maxTokens)
+                        .build());
+            }
+            case RECURSIVE_SUMMARIZATION -> {
+                int maxEvents = inputParameters.getInteger(MAX_EVENTS, DEFAULT_MAX_EVENTS);
+                int maxEventsToKeep = getPositiveInteger(
+                    inputParameters, MAX_EVENTS_TO_KEEP, DEFAULT_MAX_EVENTS_TO_KEEP, "Max events to keep");
+                int overlapSize = inputParameters.getInteger(OVERLAP_SIZE, DEFAULT_OVERLAP_SIZE);
+
+                if (overlapSize < 0 || overlapSize >= maxEventsToKeep) {
+                    throw new IllegalArgumentException(
+                        "Overlap size must be at least 0 and less than max events to keep (" + maxEventsToKeep +
+                            ") for recursive summarization, but was " + overlapSize);
+                }
+
+                if (maxEvents <= maxEventsToKeep) {
+                    throw new IllegalArgumentException(
+                        "Max events (" + maxEvents + ") must be greater than max events to keep (" +
+                            maxEventsToKeep + ") for recursive summarization");
+                }
+
+                yield new Compaction(
+                    RecursiveSummarizationCompactionStrategy.builder(summarizerChatClientResolver.call())
+                        .maxEventsToKeep(maxEventsToKeep)
+                        .overlapSize(overlapSize)
+                        .build(),
+                    new EventCountTrigger(maxEvents));
+            }
+            default -> throw new IllegalArgumentException("Unknown compaction strategy: " + compactionStrategy);
         };
     }
 
-    static CompactionTrigger resolveCompactionTrigger(Parameters inputParameters) {
-        String selection = inputParameters.getString(COMPACTION_STRATEGY, NONE);
+    private static int getPositiveInteger(Parameters inputParameters, String name, int defaultValue, String label) {
+        int value = inputParameters.getInteger(name, defaultValue);
 
-        return switch (selection) {
-            case SLIDING_WINDOW -> new EventCountTrigger(inputParameters.getInteger(MAX_EVENTS, DEFAULT_MAX_EVENTS));
-            case TURN_WINDOW -> new TurnCountTrigger(inputParameters.getInteger(MAX_TURNS, DEFAULT_MAX_TURNS));
-            case TOKEN_COUNT -> TokenCountTrigger.builder()
-                .threshold(inputParameters.getInteger(MAX_TOKENS, DEFAULT_MAX_TOKENS))
-                .build();
-            case RECURSIVE_SUMMARIZATION -> new EventCountTrigger(
-                inputParameters.getInteger(MAX_EVENTS_TO_KEEP, DEFAULT_MAX_EVENTS_TO_KEEP));
-            default -> throw new IllegalStateException("No compaction trigger for strategy: " + selection);
-        };
+        if (value <= 0) {
+            throw new IllegalArgumentException(label + " must be greater than 0, but was " + value);
+        }
+
+        return value;
     }
 
     private ChatClient resolveSummarizerChatClient(
@@ -289,16 +320,21 @@ public class SessionChatMemory {
             .build();
     }
 
-    private ToolCallback[] resolveRecallToolCallbacks(
-        Parameters inputParameters, SessionService sessionService, EventFilter eventFilter) {
+    private @Nullable ToolCallback[] resolveRecallToolCallbacks(
+        Parameters inputParameters, SessionService sessionService) {
 
         if (!Boolean.TRUE.equals(inputParameters.getBoolean(ENABLE_CONVERSATION_SEARCH, false))) {
             return null;
         }
 
-        SessionConversationSearchTools sessionConversationSearchTools = new SessionConversationSearchTools(
-            sessionService, inputParameters.getInteger(SEARCH_PAGE_SIZE, DEFAULT_SEARCH_PAGE_SIZE), eventFilter);
+        SessionEventTools sessionEventTools = SessionEventTools.builder(sessionService)
+            .pageSize(
+                getPositiveInteger(inputParameters, SEARCH_PAGE_SIZE, DEFAULT_SEARCH_PAGE_SIZE, "Search page size"))
+            .build();
 
-        return ToolCallbacks.from(sessionConversationSearchTools);
+        return ToolCallbacks.from(sessionEventTools);
+    }
+
+    record Compaction(CompactionStrategy strategy, CompactionTrigger trigger) {
     }
 }

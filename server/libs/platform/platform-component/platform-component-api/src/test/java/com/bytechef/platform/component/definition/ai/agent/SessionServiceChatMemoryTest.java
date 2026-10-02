@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.session.DefaultSessionService;
-import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
@@ -66,8 +65,7 @@ class SessionServiceChatMemoryTest {
         sessionServiceChatMemory = new SessionServiceChatMemory(
             DefaultSessionService.builder()
                 .sessionRepository(sessionRepository)
-                .build(),
-            EventFilter.all());
+                .build());
     }
 
     @Test

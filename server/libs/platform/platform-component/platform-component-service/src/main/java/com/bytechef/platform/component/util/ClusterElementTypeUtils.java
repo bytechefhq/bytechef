@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
-
-import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
-import static com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction.SESSION_REPOSITORY;
+package com.bytechef.platform.component.util;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import java.util.List;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
-public interface SessionChatMemoryComponentDefinition extends ClusterRootComponentDefinition {
+public final class ClusterElementTypeUtils {
 
-    ClusterElementType SUMMARIZER_MODEL = new ClusterElementType(MODEL.name(), MODEL.key(), MODEL.label(), false);
+    private ClusterElementTypeUtils() {
+    }
 
-    @Override
-    default List<ClusterElementType> getClusterElementTypes() {
-        return List.of(SESSION_REPOSITORY, SUMMARIZER_MODEL);
+    public static boolean isSameClusterElementType(
+        ClusterElementType clusterElementType, @Nullable ClusterElementType otherClusterElementType) {
+
+        return otherClusterElementType != null &&
+            Objects.equals(clusterElementType.name(), otherClusterElementType.name());
     }
 }

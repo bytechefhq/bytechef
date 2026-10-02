@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.service;
 
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
+import static com.bytechef.platform.component.util.ClusterElementTypeUtils.isSameClusterElementType;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
@@ -385,7 +386,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                     .orElseThrow(() -> new IllegalArgumentException(
                         "Cluster elements not found in component %s".formatted(componentDefinition.getName())))
                     .stream()
-                    .filter(clusterElementDefinition -> clusterElementType.equals(clusterElementDefinition.getType()))
+                    .filter(clusterElementDefinition -> isSameClusterElementType(
+                        clusterElementType, clusterElementDefinition.getType()))
                     .map(clusterElementDefinition -> toClusterElementDefinition(
                         clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
                         getIcon(componentDefinition)))
@@ -406,7 +408,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         return componentDefinition.getClusterElements()
             .orElse(List.of())
             .stream()
-            .filter(clusterElementDefinition -> clusterElementType == clusterElementDefinition.getType())
+            .filter(clusterElementDefinition -> isSameClusterElementType(
+                clusterElementType, clusterElementDefinition.getType()))
             .map(clusterElementDefinition -> toClusterElementDefinition(
                 clusterElementDefinition, componentDefinition.getName(), componentVersion, icon))
             .toList();

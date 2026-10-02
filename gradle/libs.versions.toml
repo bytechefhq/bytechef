@@ -25,7 +25,7 @@ spring-cloud-aws = "4.2.0"
 spring-cloud-dependencies = "2025.1.3"
 spring-shell = "4.0.3"
 springaicommunity-agent-utils = "0.12.0"
-springaicommunity-spring-ai-session = "0.7.0"
+springaicommunity-spring-ai-session = "0.10.0"
 testcontainers = "1.21.3"
 
 [libraries]

@@ -7,11 +7,14 @@ val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("l
 version = "1.0"
 
 dependencies {
+    api(project(":spring-ai:spring-ai-session-store"))
+
     implementation(platform("org.springframework.ai:spring-ai-bom:${libs.findVersion("spring-ai").get()}"))
 
     compileOnly("org.jspecify:jspecify")
 
     implementation(libs.findLibrary("org.springaicommunity.spring.ai.session").get())
+    implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.ai:spring-ai-model")
     implementation("redis.clients:jedis")
     implementation("tools.jackson.core:jackson-databind")
