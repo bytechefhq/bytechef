@@ -89,6 +89,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
             id: currentWorkspaceId!,
             pageNumber,
             projectDeploymentId,
+            projectVersion,
             workflowId: workflow.id,
         },
         enabled && !!currentWorkspaceId

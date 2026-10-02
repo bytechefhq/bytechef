@@ -217,7 +217,7 @@ No authorization required
 
 ## getWorkflowExecutionsPage
 
-> Page getWorkflowExecutionsPage(id, embedded, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, workflowId, pageNumber)
+> Page getWorkflowExecutionsPage(id, embedded, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, workflowId, projectVersion, pageNumber)
 
 Get project workflow executions
 
@@ -255,6 +255,8 @@ async function example() {
     projectDeploymentId: 789,
     // string | The id of a workflow. (optional)
     workflowId: workflowId_example,
+    // number | The project version the workflow executions ran. Only applies together with workflowId. (optional)
+    projectVersion: 56,
     // number | The number of the page to return. (optional)
     pageNumber: 56,
   } satisfies GetWorkflowExecutionsPageRequest;
@@ -284,7 +286,8 @@ example().catch(console.error);
 | **jobEndDate** | `Date` | The end date of a job. | [Optional] [Defaults to `undefined`] |
 | **projectId** | `number` | The id of a project. | [Optional] [Defaults to `undefined`] |
 | **projectDeploymentId** | `number` | The id of a project deployment. | [Optional] [Defaults to `undefined`] |
-| **workflowId** | `string` | The id of a workflow. | [Optional] [Defaults to `undefined`] |
+| **workflowId** | `string` | The id of a workflow. Executions of every version of the workflow are matched unless projectVersion is set. | [Optional] [Defaults to `undefined`] |
+| **projectVersion** | `number` | The project version the workflow executions ran. Only applies together with workflowId. | [Optional] [Defaults to `undefined`] |
 | **pageNumber** | `number` | The number of the page to return. | [Optional] [Defaults to `0`] |
 
 ### Return type
