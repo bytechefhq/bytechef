@@ -72,7 +72,7 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                     </p>
 
                                     <input
-                                        accept=".jar,.js,.py,.rb"
+                                        accept=".jar,.js,.py"
                                         className="hidden"
                                         disabled={uploading}
                                         id="component-file-upload"

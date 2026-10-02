@@ -60,7 +60,6 @@ org-graalvm-polyglot-java = { module = "org.graalvm.polyglot:java", version.ref 
 org-graalvm-polyglot-js = { module = "org.graalvm.polyglot:js", version.ref = "graalvm" }
 org-graalvm-polyglot-polyglot = { module = "org.graalvm.polyglot:polyglot", version.ref = "graalvm" }
 org-graalvm-polyglot-python = { module = "org.graalvm.polyglot:python", version.ref = "graalvm" }
-org-graalvm-polyglot-ruby = "org.graalvm.polyglot:ruby:25.0.0"
 org-json = "org.json:json:20260814"
 org-jsoup = "org.jsoup:jsoup:1.23.2"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
