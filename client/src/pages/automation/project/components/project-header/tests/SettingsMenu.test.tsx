@@ -54,6 +54,11 @@ const renderSettingsMenu = () => {
                             }
                             path="/"
                         />
+
+                        <Route
+                            element={<div>Project templates</div>}
+                            path="/automation/projects/:projectId/templates"
+                        />
                     </Routes>
                 </TooltipProvider>
             </QueryClientProvider>
@@ -163,4 +168,45 @@ it('should close the delete project dialog without deleting when cancelled', asy
     await waitFor(() => {
         expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     });
+});
+
+it('should open the create workflow dialog from the Project tab', async () => {
+    renderSettingsMenu();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    await userEvent.click(screen.getByLabelText('Project tab'));
+
+    await userEvent.click(screen.getByRole('button', {name: 'New Workflow'}));
+
+    expect(await screen.findByRole('dialog', {name: 'Create Workflow'})).toBeInTheDocument();
+});
+
+it('should open the project templates page from the Project tab', async () => {
+    renderSettingsMenu();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    await userEvent.click(screen.getByLabelText('Project tab'));
+
+    await userEvent.click(screen.getByRole('button', {name: 'New Workflow from Template'}));
+
+    expect(await screen.findByText('Project templates')).toBeInTheDocument();
+});
+
+it('should open the workflow file picker from the Project tab', async () => {
+    const inputClickSpy = vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(() => {});
+
+    renderSettingsMenu();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    await userEvent.click(screen.getByLabelText('Project tab'));
+
+    await userEvent.click(screen.getByRole('button', {name: 'Import Workflow'}));
+
+    expect(inputClickSpy).toHaveBeenCalledTimes(1);
+    expect((inputClickSpy.mock.contexts[0] as HTMLInputElement).accept).toBe('.json,.yaml,.yml');
+
+    inputClickSpy.mockRestore();
 });
