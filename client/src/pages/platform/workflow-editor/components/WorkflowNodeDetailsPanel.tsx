@@ -190,7 +190,7 @@ const WorkflowNodeDetailsPanel = ({
                                     <PopoverTrigger asChild>
                                         <Button
                                             aria-busy={errorsLoading}
-                                            aria-label={errorsLoading ? 'Checking errors…' : errorsHeading}
+                                            aria-label={errorsHeading}
                                             className={twMerge(
                                                 'mr-1 h-7 shrink-0 gap-1 rounded-full border px-2 text-xs font-semibold',
                                                 errorsWarningOnly
