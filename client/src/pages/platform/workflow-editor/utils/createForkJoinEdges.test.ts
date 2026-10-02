@@ -55,6 +55,21 @@ describe('createForkJoinEdges', () => {
         );
     });
 
+    it('should centre the middle lane and still hang the chip on the last one when the lane count is odd', () => {
+        const edges = createForkJoinEdges(buildForkJoinNode([['accelo_1'], ['accelo_3'], ['accelo_5']]));
+
+        const laneEntryEdges = edges.filter((edge) => edge.source === 'fork-join_1-forkJoin-top-ghost');
+
+        expect(laneEntryEdges.map((edge) => edge.target)).toEqual(
+            expect.arrayContaining(['accelo_1', 'accelo_3', 'accelo_5'])
+        );
+
+        const chipEdges = edges.filter((edge) => edge.data?.addBranchPlaceholderId);
+
+        expect(chipEdges.map((edge) => edge.id)).toEqual(['fork-join_1-forkJoin-top-ghost=>accelo_5']);
+        expect(chipEdges[0].data?.addBranchPlaceholderId).toBe('fork-join_1-forkJoin-placeholder-3');
+    });
+
     it('should hang no chip on a fork-join without lanes', () => {
         const edges = createForkJoinEdges(buildForkJoinNode([]));
 
