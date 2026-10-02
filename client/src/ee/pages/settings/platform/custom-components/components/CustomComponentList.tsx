@@ -6,15 +6,11 @@ const CustomComponentList = ({customComponents}: {customComponents: CustomCompon
     return (
         <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
             {customComponents.length > 0 && (
-                <>
-                    <div className="w-full divide-y divide-stroke-neutral-primary">
-                        {customComponents.map((customComponent) => {
-                            return (
-                                <CustomComponentListItem customComponent={customComponent} key={customComponent.id} />
-                            );
-                        })}
-                    </div>
-                </>
+                <div className="w-full">
+                    {customComponents.map((customComponent) => {
+                        return <CustomComponentListItem customComponent={customComponent} key={customComponent.id} />;
+                    })}
+                </div>
             )}
         </div>
     );
