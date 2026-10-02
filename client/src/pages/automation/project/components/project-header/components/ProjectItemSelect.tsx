@@ -44,7 +44,7 @@ const ProjectItemSelect = ({
             {currentLabel && currentLabel.length > 30 && <TooltipContent>{currentLabel}</TooltipContent>}
         </Tooltip>
 
-        <DropdownMenuContent align="start" className="max-w-80 min-w-64">
+        <DropdownMenuContent align="start" className="max-w-lg min-w-64">
             <DropdownMenuRadioGroup
                 onValueChange={(value) => onWorkflowValueChange(Number(value))}
                 value={currentProjectWorkflowId !== undefined ? currentProjectWorkflowId.toString() : ''}
@@ -57,7 +57,7 @@ const ProjectItemSelect = ({
                             <DropdownMenuRadioItem
                                 className="cursor-pointer"
                                 key={workflow.projectWorkflowId!}
-                                title={workflow.label!.length > 32 ? workflow.label! : undefined}
+                                title={workflow.label!.length > 55 ? workflow.label! : undefined}
                                 value={workflow.projectWorkflowId!.toString()}
                             >
                                 <WorkflowIcon className="size-4 shrink-0" />
