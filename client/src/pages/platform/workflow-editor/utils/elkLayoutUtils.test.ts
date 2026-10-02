@@ -17,11 +17,9 @@ const CHAIN_GAP = 80;
 const BOX_GAP = 66;
 
 // The frame's entry bar is pulled toward the condition so the TRUE/FALSE labels
-// read as attached to the box. TB pulls 28 (clean 38px corridor); LR pulls 16
-// (50px corridor) because its rotated labels live inside the node→bar gap and
-// need room. See TB_BAR_LABEL_PULL / LR_BAR_LABEL_PULL in elkLayoutUtils.
+// read as attached to the box: both directions pull 28 for a 38px corridor.
+// See BAR_LABEL_PULL in elkLayoutUtils.
 const TOP_BOX_GAP = 38;
-const LR_TOP_BOX_GAP = 50;
 const BAR_TO_CHILD_GAP = 94;
 const CHAIN_STEP = 72 + CHAIN_GAP;
 
@@ -3252,11 +3250,9 @@ describe('LR ring content side', () => {
 });
 
 describe('LR entry gap', () => {
-    it('gives the LR condition a wider node-to-bar corridor than TB for its rotated labels', async () => {
-        // LR pulls the bar less (16 vs 28) so the rotated TRUE/FALSE labels that
-        // live INSIDE the node->bar corridor get balanced air: gap is 50, not
-        // TB's 38. The child side still reads the 94px entry run, restored by
-        // LR_FRAME_ENTRY_INSET so the smaller pull costs no add-button room.
+    it('gives the LR condition the same node-to-bar corridor as TB', async () => {
+        // LR pulls the bar by the same 28 as TB, so the condition->bar gap is 38
+        // in both directions and the child side still reads the 94px entry run.
         const {edges, nodes} = singleConditionFixture();
 
         const result = await getElkLayoutElements({
@@ -3270,7 +3266,7 @@ describe('LR entry gap', () => {
         const conditionRight = positionOf(result.nodes, 'condition_1').x + 72;
         const topGhostBarX = positionOf(result.nodes, 'condition_1-condition-top-ghost').x;
 
-        expect(topGhostBarX - conditionRight).toBe(LR_TOP_BOX_GAP);
+        expect(topGhostBarX - conditionRight).toBe(TOP_BOX_GAP);
 
         // Entry run: bar -> first row node keeps the same add-button room as TB
         const trueChildX = positionOf(result.nodes, 'childTrue1').x;
