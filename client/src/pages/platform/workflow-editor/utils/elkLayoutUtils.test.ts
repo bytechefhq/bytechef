@@ -3,7 +3,7 @@ import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import {buildElkGraph, getElkLayoutElements, getFrameId} from './elkLayoutUtils';
-import {getLabelCrossOverhang} from './layoutUtils';
+import {NODE_LABEL_MAX_CROSS_OVERHANG, getLabelCrossOverhang} from './layoutUtils';
 
 import type {ElkNode} from 'elkjs/lib/elk-api';
 
@@ -2053,7 +2053,7 @@ describe('getElkLayoutElements with branches', () => {
 
         // The lopsided outer pair keeps its compact repack instead of the
         // error column being pushed out to the success column's distance
-        expect(errorDistance - successDistance).toBeGreaterThan(200);
+        expect(errorDistance - successDistance).toBeGreaterThan(NODE_LABEL_MAX_CROSS_OVERHANG);
 
         // The nested branch's lanes are lopsided only by labels, so they still mirror
         const innerCenter = centerOf('branch_2');

@@ -15,6 +15,7 @@ import {ELK_FRAME_DISPATCHER_COMPONENT_NAMES} from './isElkLayoutSupported';
 import {
     GetLayoutElementsProps,
     LayoutElementsResultI,
+    NODE_LABEL_MAX_CROSS_OVERHANG,
     filterAndDedupeLayoutEdges,
     getDagreNodeSize,
     getLabelCrossOverhang,
@@ -111,11 +112,6 @@ const CASE_PLACEHOLDER_CROSS_FOOTPRINT = 160;
 // all render on this axis. Reserved for the column's full frame height so no
 // sibling content is ever packed onto a drawn edge.
 const COLUMN_SPINE_HALF_WIDTH = 45;
-
-// Largest gap between a mirrored column pair's distances from the dispatcher
-// that the mirror pass evens out — the widest label overhang a column can
-// carry. Anything larger comes from a nested subtree's own asymmetry.
-const MIRROR_MAX_IMBALANCE = 200;
 
 // In TB a node's title/description block renders to the RIGHT of its 72px
 // icon, reaching up to ~236px past the icon's center (measured 272px DOM on
@@ -1948,7 +1944,8 @@ export const getElkLayoutElements = async ({
             // column pairs center-outward and push the nearer one — together with
             // every column beyond it — out to its partner's distance. Moving only
             // outward keeps every clearance the repack established. Only label-sized
-            // imbalances are mirrored: a pair lopsided by a nested subtree would push
+            // imbalances — up to the widest label overhang a column can carry — are
+            // mirrored: a pair lopsided by a nested subtree would push
             // its partner, and every column beyond it, out by the whole subtree
             // asymmetry and leave the frame mostly empty space.
             const columnCount = entryColumns.length;
@@ -1959,7 +1956,7 @@ export const getElkLayoutElements = async ({
                 const leftDistance = dispatcherCrossCenter - getEntryCenter(entryColumns[leftIndex].entryNode);
                 const rightDistance = getEntryCenter(entryColumns[rightIndex].entryNode) - dispatcherCrossCenter;
 
-                if (Math.abs(rightDistance - leftDistance) > MIRROR_MAX_IMBALANCE) {
+                if (Math.abs(rightDistance - leftDistance) > NODE_LABEL_MAX_CROSS_OVERHANG) {
                     continue;
                 }
 
