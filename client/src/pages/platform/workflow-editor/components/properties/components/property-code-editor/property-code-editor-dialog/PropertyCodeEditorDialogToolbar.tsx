@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import {DialogClose} from '@/components/Dialog';
 import LoadingIcon from '@/components/LoadingIcon';
 import {ButtonGroup, ButtonGroupSeparator} from '@/components/ui/button-group';
-import {DialogClose} from '@/components/ui/dialog';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {usePropertyCodeEditorDialogToolbar} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks';
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';

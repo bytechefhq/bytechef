@@ -1,15 +1,14 @@
 import Button from '@/components/Button/Button';
-import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {
     Dialog,
-    DialogCloseButton,
+    DialogBody,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
 import {getCookie} from '@/shared/util/cookie-utils';
@@ -102,7 +101,6 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
             </DialogTrigger>
 
             <DialogContent
-                className="max-w-output-tab-sample-data-dialog-width sm:max-w-output-tab-sample-data-dialog-width"
                 onFocusOutside={(event) => event.preventDefault()}
                 onOpenAutoFocus={(event) => {
                     event.preventDefault();
@@ -110,41 +108,38 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
                     setTimeout(() => editorRef.current?.focus(), 0);
                 }}
                 onPointerDownOutside={(event) => event.preventDefault()}
+                size="lg"
             >
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>Sample JSON</DialogTitle>
+                <DialogMain>
+                    <DialogHeader description="Generate JSON schema from sample JSON" title="Sample JSON" />
 
-                        <DialogDescription>Generate JSON schema from sample JSON</DialogDescription>
-                    </div>
+                    <DialogBody>
+                        <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
+                            <div className="absolute inset-0">
+                                <Suspense fallback={<MonacoEditorLoader />}>
+                                    <MonacoEditor
+                                        className="bg-transparent"
+                                        defaultLanguage="json"
+                                        onChange={handleEditorOnChange}
+                                        onMount={handleEditorOnMount}
+                                        value={JSON.stringify(curSchema, null, SPACE)}
+                                    />
+                                </Suspense>
 
-                    <DialogCloseButton />
-                </DialogHeader>
-
-                <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
-                    <div className="absolute inset-0">
-                        <Suspense fallback={<MonacoEditorLoader />}>
-                            <MonacoEditor
-                                className="bg-transparent"
-                                defaultLanguage="json"
-                                onChange={handleEditorOnChange}
-                                onMount={handleEditorOnMount}
-                                value={JSON.stringify(curSchema, null, SPACE)}
-                            />
-                        </Suspense>
-
-                        <div
-                            className="pointer-events-none absolute top-[-2px] left-[70px] h-full text-sm text-muted-foreground"
-                            id="monaco-placeholder"
-                        >
-                            {EDITOR_PLACEHOLDER}
+                                <div
+                                    className="pointer-events-none absolute top-[-2px] left-[70px] h-full text-sm text-muted-foreground"
+                                    id="monaco-placeholder"
+                                >
+                                    {EDITOR_PLACEHOLDER}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </DialogBody>
 
-                <DialogFooter>
-                    <Button disabled={!curSchema} label="Generate" onClick={handleOnSubmit} type="submit" />
-                </DialogFooter>
+                    <DialogFooter>
+                        <Button disabled={!curSchema} label="Generate" onClick={handleOnSubmit} type="submit" />
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
