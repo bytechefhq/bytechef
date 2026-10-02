@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.llm.facade;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SUBAGENT_CONVERSATION_ID;
+
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.evaluator.Evaluator;
@@ -89,7 +91,8 @@ public class AiAgentToolFacade extends AbstractToolFacade {
     }
 
     public ToolCallback getFunctionToolCallback(
-        ClusterElement clusterElement, Map<String, ComponentConnection> componentConnections, ActionContext context) {
+        ClusterElement clusterElement, Map<String, ComponentConnection> componentConnections,
+        @Nullable String subagentConversationId, ActionContext context) {
 
         ClusterElementDefinition clusterElementDefinition =
             clusterElementDefinitionService.getClusterElementDefinition(
@@ -106,7 +109,7 @@ public class AiAgentToolFacade extends AbstractToolFacade {
             getMultipleConnectionsToolCallbackFunction(
                 clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                 clusterElementDefinition.getName(), toolParameters, clusterElement.getExtensions(),
-                componentConnections, context))
+                componentConnections, subagentConversationId, context))
             .inputType(Map.class)
             .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -128,13 +131,15 @@ public class AiAgentToolFacade extends AbstractToolFacade {
         @Nullable ComponentConnection componentConnection, ActionContext context) {
 
         return request -> {
+            Map<String, Object> modelRequest = removeSubagentConversationId(request);
+
             Map<String, Object> resolvedParameters = new HashMap<>();
 
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), request));
+                resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), modelRequest));
             }
 
-            Map<String, Object> toolParameters = MapUtils.concat(request, resolvedParameters);
+            Map<String, Object> toolParameters = MapUtils.concat(modelRequest, resolvedParameters);
 
             if (context instanceof ActionContextAware actionContextAware) {
                 return clusterElementDefinitionService.executeTool(
@@ -150,16 +155,23 @@ public class AiAgentToolFacade extends AbstractToolFacade {
 
     private Function<Map<String, Object>, Object> getMultipleConnectionsToolCallbackFunction(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
-        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections, ActionContext context) {
+        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections,
+        @Nullable String subagentConversationId, ActionContext context) {
 
         return request -> {
+            Map<String, Object> modelRequest = removeSubagentConversationId(request);
+
             Map<String, Object> resolvedParameters = new HashMap<>();
 
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), request));
+                resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), modelRequest));
             }
 
-            Map<String, Object> toolParameters = MapUtils.concat(request, resolvedParameters);
+            Map<String, Object> toolParameters = new HashMap<>(MapUtils.concat(modelRequest, resolvedParameters));
+
+            if (subagentConversationId != null) {
+                toolParameters.put(SUBAGENT_CONVERSATION_ID, subagentConversationId);
+            }
 
             if (context instanceof ActionContextAware actionContextAware) {
                 return clusterElementDefinitionService.executeTool(
@@ -173,4 +185,11 @@ public class AiAgentToolFacade extends AbstractToolFacade {
         };
     }
 
+    private static Map<String, Object> removeSubagentConversationId(Map<String, Object> request) {
+        Map<String, Object> modelRequest = new HashMap<>(request);
+
+        modelRequest.remove(SUBAGENT_CONVERSATION_ID);
+
+        return modelRequest;
+    }
 }

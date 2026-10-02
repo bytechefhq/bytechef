@@ -77,6 +77,7 @@ public class LLMConstants {
     public static final String ROLE = "role";
     public static final String STOP = "stop";
     public static final String STYLE = "style";
+    public static final String SUBAGENT_CONVERSATION_ID = "subagentConversationId";
     public static final String SYSTEM_PROMPT = "systemPrompt";
     public static final String TEMPERATURE = "temperature";
     public static final String THINKING = "thinking";
