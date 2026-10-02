@@ -185,10 +185,17 @@ describe('uncontrolled Text/Formula', () => {
             type: 'STRING',
         } as PropertyAllType;
 
-        const renderMethod = (property: PropertyAllType = methodProperty) =>
-            renderHook(() => useProperty({parameterValue: 'GET', path: 'parameters.method', property}), {wrapper});
+        const enabledProperty = {
+            controlType: 'SELECT',
+            expressionEnabled: true,
+            name: 'enabled',
+            type: 'BOOLEAN',
+        } as PropertyAllType;
 
-        const pressDollar = (result: ReturnType<typeof renderMethod>['result']) => {
+        const renderSelect = (property: PropertyAllType, parameterValue: unknown) =>
+            renderHook(() => useProperty({parameterValue, path: `parameters.${property.name}`, property}), {wrapper});
+
+        const pressDollar = (result: ReturnType<typeof renderSelect>['result']) => {
             const preventDefault = vi.fn();
 
             act(() => result.current.handleSelectKeyDown({key: '$', preventDefault} as never));
@@ -196,74 +203,168 @@ describe('uncontrolled Text/Formula', () => {
             return preventDefault;
         };
 
-        it('opens an empty one-pill editor with $ typed although an option is selected', () => {
-            const {result} = renderMethod();
+        describe('of BOOLEAN type', () => {
+            it('opens an empty one-pill editor with $ typed although an option is selected', () => {
+                const {result} = renderSelect(enabledProperty, true);
 
-            expect(result.current.inputMode.renderer).toBe('native');
+                expect(result.current.inputMode.renderer).toBe('native');
 
-            const preventDefault = pressDollar(result);
+                const preventDefault = pressDollar(result);
 
-            expect(preventDefault).toHaveBeenCalled();
-            expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: true});
-            expect(result.current.mentionInputValue).toBe('');
-            expect(result.current.editorFocusRequest?.initialInput).toBe('$');
+                expect(preventDefault).toHaveBeenCalled();
+                expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: true});
+                expect(result.current.mentionInputValue).toBe('');
+                expect(result.current.editorFocusRequest?.initialInput).toBe('$');
+            });
+
+            it('replaces the option with the chosen pill', () => {
+                const {result} = renderSelect(enabledProperty, true);
+
+                pressDollar(result);
+
+                act(() => result.current.handleMentionInputValueChange('${trigger_1.enabled}'));
+
+                expect(result.current.propertyParameterValue).toBe('${trigger_1.enabled}');
+                expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: true});
+            });
+
+            it('keeps the option when pill entry is left without a pill', () => {
+                const {result} = renderSelect(enabledProperty, true);
+
+                pressDollar(result);
+
+                act(() => result.current.handleSinglePillAbandoned());
+
+                expect(result.current.inputMode.renderer).toBe('native');
+                expect(result.current.propertyParameterValue).toBe(true);
+                expect(result.current.selectValue).toBe('true');
+                expect(saveProperty).not.toHaveBeenCalled();
+            });
+
+            it('keeps the option and drops the pending save when the $ is erased', () => {
+                const {result} = renderSelect(enabledProperty, true);
+
+                pressDollar(result);
+
+                const cancelPendingSave = vi.fn();
+
+                result.current.editorPendingSaveCancelRef.current = cancelPendingSave;
+
+                act(() => result.current.handleMentionInputValueChange(''));
+
+                expect(cancelPendingSave).toHaveBeenCalled();
+                expect(result.current.inputMode.renderer).toBe('native');
+                expect(result.current.propertyParameterValue).toBe(true);
+                expect(result.current.selectValue).toBe('true');
+            });
+
+            it('clears the field when the chosen pill is deleted afterwards', () => {
+                const {result} = renderSelect(enabledProperty, true);
+
+                pressDollar(result);
+
+                act(() => result.current.handleMentionInputValueChange('${trigger_1.enabled}'));
+                act(() => result.current.handleMentionInputValueChange(''));
+
+                expect(result.current.inputMode.renderer).toBe('native');
+                expect(result.current.propertyParameterValue).toBe('');
+            });
         });
 
-        it('replaces the option with the chosen pill', () => {
-            const {result} = renderMethod();
+        describe('of STRING type', () => {
+            it('opens an empty editor for text and pills with $ typed although an option is selected', () => {
+                const {result} = renderSelect(methodProperty, 'GET');
 
-            pressDollar(result);
+                expect(result.current.inputMode.renderer).toBe('native');
 
-            act(() => result.current.handleMentionInputValueChange('${trigger_1.method}'));
+                const preventDefault = pressDollar(result);
 
-            expect(result.current.propertyParameterValue).toBe('${trigger_1.method}');
-            expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: true});
-        });
+                expect(preventDefault).toHaveBeenCalled();
+                expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: false});
+                expect(result.current.mentionInputValue).toBe('');
+                expect(result.current.editorFocusRequest?.initialInput).toBe('$');
+            });
 
-        it('keeps the option when pill entry is left without a pill', () => {
-            const {result} = renderMethod();
+            it('renders a saved value with text and pills in the editor without the one-pill limit', () => {
+                const {result} = renderSelect(methodProperty, 'Hi ${trigger_1.name} and ${trigger_1.email}');
 
-            pressDollar(result);
+                expect(result.current.inputMode).toMatchObject({
+                    legacyMixed: false,
+                    renderer: 'mentions',
+                    singlePill: false,
+                });
+            });
 
-            act(() => result.current.handleSinglePillAbandoned());
+            it('renders a saved lone pill in the editor without the one-pill limit', () => {
+                const {result} = renderSelect(methodProperty, '${trigger_1.method}');
 
-            expect(result.current.inputMode.renderer).toBe('native');
-            expect(result.current.propertyParameterValue).toBe('GET');
-            expect(result.current.selectValue).toBe('GET');
-            expect(saveProperty).not.toHaveBeenCalled();
-        });
+                expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: false});
+            });
 
-        it('keeps the option and drops the pending save when the $ is erased', () => {
-            const {result} = renderMethod();
+            it('saves only values holding a pill or a formula from the editor', () => {
+                const {result} = renderSelect(methodProperty, 'GET');
 
-            pressDollar(result);
+                expect(result.current.validateMentionInputValue('PATCH')).toBe(false);
+                expect(result.current.validateMentionInputValue('Hi ${trigger_1.name}')).toBe(true);
+                expect(result.current.validateMentionInputValue("='GET'")).toBe(true);
+                expect(result.current.validatePropertyValue('GET')).toBe(true);
+            });
 
-            const cancelPendingSave = vi.fn();
+            it('keeps the option when pill entry is left without a pill', () => {
+                const {result} = renderSelect(methodProperty, 'GET');
 
-            result.current.editorPendingSaveCancelRef.current = cancelPendingSave;
+                pressDollar(result);
 
-            act(() => result.current.handleMentionInputValueChange(''));
+                act(() => result.current.handleMentionInputValueChange('$GE'));
+                act(() => result.current.handleSinglePillAbandoned());
 
-            expect(cancelPendingSave).toHaveBeenCalled();
-            expect(result.current.inputMode.renderer).toBe('native');
-            expect(result.current.propertyParameterValue).toBe('GET');
-            expect(result.current.selectValue).toBe('GET');
-        });
+                expect(result.current.inputMode.renderer).toBe('native');
+                expect(result.current.propertyParameterValue).toBe('GET');
+                expect(result.current.selectValue).toBe('GET');
+                expect(saveProperty).not.toHaveBeenCalled();
+            });
 
-        it('clears the field when the chosen pill is deleted afterwards', () => {
-            const {result} = renderMethod();
+            it('stays in the editor when the $ is erased, without saving the empty value', () => {
+                const {result} = renderSelect(methodProperty, 'GET');
 
-            pressDollar(result);
+                pressDollar(result);
 
-            act(() => result.current.handleMentionInputValueChange('${trigger_1.method}'));
-            act(() => result.current.handleMentionInputValueChange(''));
+                const cancelPendingSave = vi.fn();
 
-            expect(result.current.inputMode.renderer).toBe('native');
-            expect(result.current.propertyParameterValue).toBe('');
+                result.current.editorPendingSaveCancelRef.current = cancelPendingSave;
+
+                act(() => result.current.handleMentionInputValueChange(''));
+
+                expect(cancelPendingSave).toHaveBeenCalled();
+                expect(result.current.inputMode.renderer).toBe('mentions');
+
+                act(() => result.current.handleSinglePillAbandoned());
+
+                expect(result.current.inputMode.renderer).toBe('native');
+                expect(result.current.selectValue).toBe('GET');
+                expect(saveProperty).not.toHaveBeenCalled();
+            });
+
+            it('stays in the editor while every pill is deleted, and clears the field when left without one', () => {
+                const {result} = renderSelect(methodProperty, 'GET');
+
+                pressDollar(result);
+
+                act(() => result.current.handleMentionInputValueChange('Hi ${trigger_1.name}'));
+                act(() => result.current.handleMentionInputValueChange('Hi '));
+
+                expect(result.current.inputMode.renderer).toBe('mentions');
+
+                act(() => result.current.handleSinglePillAbandoned());
+
+                expect(result.current.inputMode.renderer).toBe('native');
+                expect(result.current.propertyParameterValue).toBe('');
+                expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: null}));
+            });
         });
 
         it('ignores other keys', () => {
-            const {result} = renderMethod();
+            const {result} = renderSelect(methodProperty, 'GET');
 
             const preventDefault = vi.fn();
 
@@ -274,7 +375,7 @@ describe('uncontrolled Text/Formula', () => {
         });
 
         it('ignores $ when expressions are disabled', () => {
-            const {result} = renderMethod({...methodProperty, expressionEnabled: false} as PropertyAllType);
+            const {result} = renderSelect({...methodProperty, expressionEnabled: false} as PropertyAllType, 'GET');
 
             const preventDefault = pressDollar(result);
 

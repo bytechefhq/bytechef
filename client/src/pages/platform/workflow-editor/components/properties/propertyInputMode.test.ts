@@ -94,6 +94,59 @@ describe('getPropertyInputMode', () => {
         ).toEqual({legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: false});
     });
 
+    describe('a STRING select', () => {
+        it.each([
+            {
+                expected: {legacyMixed: false, mode: 'text', renderer: 'native', singlePill: false},
+                name: 'an option renders the native control',
+                pillEntry: false,
+                value: 'GET',
+            },
+            {
+                expected: {legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: false},
+                name: 'a lone pill renders the editor without the one-pill limit',
+                pillEntry: false,
+                value: '${trigger_1.method}',
+            },
+            {
+                expected: {legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: false},
+                name: 'text and pills are not legacy mixed',
+                pillEntry: false,
+                value: 'Hi ${a.b} and ${c.d}',
+            },
+            {
+                expected: {legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: false},
+                name: 'pill entry opens the editor without the one-pill limit',
+                pillEntry: true,
+                value: 'GET',
+            },
+        ])('$name', ({expected, pillEntry, value}) => {
+            expect(
+                getPropertyInputMode({
+                    controlType: 'SELECT',
+                    formulaMode: false,
+                    isFromAi: false,
+                    pillEntry,
+                    type: 'STRING',
+                    value,
+                })
+            ).toEqual(expected);
+        });
+
+        it('keeps the one-pill limit on a select of another type', () => {
+            expect(
+                getPropertyInputMode({
+                    controlType: 'SELECT',
+                    formulaMode: false,
+                    isFromAi: false,
+                    pillEntry: true,
+                    type: 'BOOLEAN',
+                    value: true,
+                }).singlePill
+            ).toBe(true);
+        });
+    });
+
     it('pill entry shows the one-pill editor on an empty value', () => {
         expect(
             getPropertyInputMode({

@@ -30,6 +30,7 @@ import usePillTarget from '@/pages/platform/workflow-editor/components/propertie
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
 import {isEmptyPillContainerValue} from '@/pages/platform/workflow-editor/components/properties/pillContainerValue';
+import {isStringSelect} from '@/pages/platform/workflow-editor/components/properties/propertyInputMode';
 import useOpenDataPillPanel from '@/pages/platform/workflow-editor/hooks/useOpenDataPillPanel';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {encodeParameters, encodePath, safeResolvePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';
@@ -163,6 +164,7 @@ const Property = ({
         startPillEntry,
         type,
         typeIcon,
+        validateMentionInputValue,
         validatePropertyValue,
         workflow,
     } = useProperty({
@@ -381,6 +383,7 @@ const Property = ({
                     onSinglePillAbandoned={handleSinglePillAbandoned}
                     onValueChange={handleMentionInputValueChange}
                     path={calculatedPath}
+                    pillRequired={isStringSelect(controlType, type) && !isFormulaMode}
                     placeholder={placeholder}
                     ref={editorRef}
                     required={required}
@@ -389,7 +392,7 @@ const Property = ({
                     singlePill={inputMode.singlePill}
                     toolProperty={isToolsClusterElement}
                     type={type}
-                    validateBeforeSave={validatePropertyValue}
+                    validateBeforeSave={validateMentionInputValue}
                     value={mentionInputValue}
                 />
             )}

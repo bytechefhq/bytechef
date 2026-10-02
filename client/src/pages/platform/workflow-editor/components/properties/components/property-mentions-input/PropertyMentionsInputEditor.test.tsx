@@ -844,7 +844,93 @@ describe('PropertyMentionsInputEditor', () => {
     });
 });
 
+describe('editor that requires a pill', () => {
+    beforeEach(() => {
+        useWorkflowDataStore.setState({
+            dataPills: [
+                {id: 'firecrawl_5', value: 'firecrawl_5'},
+                {id: 'trigger_1', value: 'trigger_1'},
+            ],
+        } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+    });
+
+    it('takes text and several pills, and keeps them when it loses focus', async () => {
+        const onSinglePillAbandoned = vi.fn();
+
+        renderEditor({controlType: 'SELECT', onSinglePillAbandoned, pillRequired: true, type: 'STRING'});
+
+        const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+        await userEvent.click(textbox);
+        await userEvent.keyboard('Hi $fire');
+        await microtaskTick(3);
+        await userEvent.keyboard('{Enter}');
+        await userEvent.keyboard(' and $trig');
+        await microtaskTick(3);
+        await userEvent.keyboard('{Enter}');
+
+        await waitFor(() => expect(textbox.querySelectorAll('.property-mention')).toHaveLength(2));
+
+        expect(textbox.textContent).toContain('Hi ');
+        expect(textbox.textContent).toContain(' and ');
+
+        await userEvent.click(document.body);
+        await microtaskTick(2);
+
+        expect(onSinglePillAbandoned).not.toHaveBeenCalled();
+    });
+
+    it('abandons the entry when it loses focus with text but no pill', async () => {
+        const onSinglePillAbandoned = vi.fn();
+
+        renderEditor({controlType: 'SELECT', onSinglePillAbandoned, pillRequired: true, type: 'STRING'});
+
+        const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+        await userEvent.click(textbox);
+        await userEvent.keyboard('abc');
+        await microtaskTick(2);
+
+        expect(textbox.textContent).toBe('abc');
+
+        await userEvent.click(document.body);
+        await microtaskTick(2);
+
+        expect(onSinglePillAbandoned).toHaveBeenCalledTimes(1);
+        expect(textbox.textContent).toBe('');
+    });
+});
+
 describe('one-pill editor', () => {
+    it('inserts a data pill clicked in the suggestion list instead of abandoning the entry', async () => {
+        useWorkflowDataStore.setState({
+            dataPills: [{id: 'firecrawl_5', value: 'firecrawl_5'}],
+        } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+
+        const onSinglePillAbandoned = vi.fn();
+
+        renderEditor({controlType: 'INTEGER', onSinglePillAbandoned, singlePill: true, type: 'INTEGER'});
+
+        const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+        await userEvent.click(textbox);
+        await userEvent.keyboard('$fire');
+        await microtaskTick(3);
+
+        const suggestionButton = document.querySelector('.property-mentions-suggestion-menu button') as HTMLElement;
+
+        await userEvent.click(suggestionButton);
+
+        await waitFor(() => {
+            expect(
+                (saveProperty as unknown as Mock).mock.calls.map(([options]) => String(options.value).trim())
+            ).toEqual(['${firecrawl_5}']);
+        });
+
+        expect(onSinglePillAbandoned).not.toHaveBeenCalled();
+        expect(textbox.querySelector('[data-id="firecrawl_5"]')).not.toBeNull();
+    });
+
     it('refuses $ over a pill it was loaded with', async () => {
         const {container} = renderEditor({
             controlType: 'INTEGER',
