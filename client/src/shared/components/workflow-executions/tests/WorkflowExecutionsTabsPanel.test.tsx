@@ -85,6 +85,12 @@ describe('WorkflowExecutionsTabsPanel', () => {
         expect(dialog).toHaveClass('sm:w-[1000px]');
     });
 
+    it('gives the expanded output dialog a close control', () => {
+        renderPanel({activeTab: 'output', dialogOpen: true, job, selectedItem: taskExecution});
+
+        expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
+    });
+
     it('shows what the trigger handed the job on the output tab', () => {
         renderPanel({activeTab: 'output', job});
 
