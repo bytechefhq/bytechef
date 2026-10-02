@@ -44,6 +44,10 @@ public class PolyglotSandboxConfiguration {
             sandbox.getMaxConcurrentExecutions());
     }
 
+    PolyglotSandboxSettings getPolyglotSandboxSettings() {
+        return polyglotSandboxSettings;
+    }
+
     @PostConstruct
     public void applyPolyglotSandboxSettings() {
         PolyglotSandbox.setSettings(polyglotSandboxSettings);
