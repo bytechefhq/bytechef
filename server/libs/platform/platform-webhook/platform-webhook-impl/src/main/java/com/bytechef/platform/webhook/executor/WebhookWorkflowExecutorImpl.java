@@ -29,6 +29,7 @@ import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
@@ -39,6 +40,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.webhook.exception.WebhookErrorType;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
@@ -54,6 +56,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
@@ -67,6 +70,13 @@ import org.springframework.context.ApplicationEventPublisher;
 public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
     private static final String TIMEOUT = "timeout";
+
+    public static final String SUSPENDING_TASK_MESSAGE =
+        "Workflows that return a synchronous response can't contain steps that pause the run, such as approval " +
+            "or wait steps. Step '%s' (%s) would pause it. Use a trigger that responds asynchronously, or remove " +
+            "the step.";
+
+    private static final List<String> SUSPENDING_TASK_TYPE_PREFIXES = List.of("approval/", "wait/", "waitForApproval/");
 
     private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
@@ -145,10 +155,17 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     public @Nullable Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         Object outputs;
 
+        String workflowId = getWorkflowId(workflowExecutionId);
+
+        findSuspendingTask(workflowId).ifPresent(workflowTask -> {
+            throw new ConfigurationException(
+                String.format(SUSPENDING_TASK_MESSAGE, workflowTask.getName(), workflowTask.getType()),
+                WebhookErrorType.SUSPENDING_TASK_IN_SYNC_EXECUTION);
+        });
+
         TriggerOutput triggerOutput = webhookWorkflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
 
         Map<String, ?> inputMap = getInputMap(workflowExecutionId);
-        String workflowId = getWorkflowId(workflowExecutionId);
 
         Duration timeout = getTimeout(workflowExecutionId, workflowId, inputMap);
 
@@ -368,6 +385,20 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
 
         return WorkflowNodeType.ofType(workflowTrigger.getType());
+    }
+
+    private Optional<WorkflowTask> findSuspendingTask(String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        return workflow.getTasks(true)
+            .stream()
+            .filter(workflowTask -> {
+                String type = workflowTask.getType();
+
+                return type != null && SUSPENDING_TASK_TYPE_PREFIXES.stream()
+                    .anyMatch(type::startsWith);
+            })
+            .findFirst();
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
