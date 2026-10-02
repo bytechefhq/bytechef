@@ -15,11 +15,15 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {onlineManager, useIsFetching} from '@tanstack/react-query';
-import {RefObject} from 'react';
+import {onlineManager, useIsMutating} from '@tanstack/react-query';
+import {RefObject, useSyncExternalStore} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
+
+const getOnlineStatus = () => onlineManager.isOnline();
+
+const subscribeToOnlineStatus = (onOnlineStatusChange: () => void) => onlineManager.subscribe(onOnlineStatusChange);
 
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
@@ -58,7 +62,8 @@ const ProjectHeader = ({
         }))
     );
 
-    const isFetching = useIsFetching();
+    const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
+    const isSaving = useIsMutating();
     const {
         handleProjectWorkflowValueChange,
         handlePublishProjectSubmit,
@@ -75,12 +80,10 @@ const ProjectHeader = ({
         projectId,
     });
 
-    const isOnline = onlineManager.isOnline();
-
-    const loadingIndicator = (isFetching > 0 || !isOnline) && (
+    const loadingIndicator = (isSaving > 0 || !isOnline) && (
         <LoadingIndicator
             className="absolute -top-1 -right-1 size-5 rounded-full"
-            isFetching={isFetching}
+            isFetching={isSaving}
             isOnline={isOnline}
         />
     );
