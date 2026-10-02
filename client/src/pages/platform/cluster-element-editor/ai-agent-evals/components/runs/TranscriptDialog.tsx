@@ -1,11 +1,4 @@
-import {
-    Dialog,
-    DialogCloseButton,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import {Dialog, DialogBody, DialogContent, DialogHeader, DialogMain} from '@/components/Dialog';
 import useTranscriptDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/hooks/useTranscriptDialog';
 import {AlertCircleIcon, BotIcon, Loader2Icon, UserIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
@@ -21,135 +14,144 @@ const TranscriptDialog = ({onClose, resultId, scenarioName}: TranscriptDialogPro
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={true}>
-            <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
-                <DialogHeader className="flex flex-row items-center justify-between">
-                    <div>
-                        <DialogTitle>Conversation Transcript - {scenarioName}</DialogTitle>
+            <DialogContent size="md">
+                <DialogMain>
+                    <DialogHeader
+                        description="Conversation transcript for this scenario result."
+                        title={`Conversation Transcript - ${scenarioName}`}
+                    />
 
-                        <DialogDescription>Conversation transcript for this scenario result.</DialogDescription>
-                    </div>
+                    <DialogBody>
+                        {isLoading && (
+                            <div className="flex items-center justify-center py-8">
+                                <Loader2Icon className="size-5 animate-spin text-gray-400" />
 
-                    <DialogCloseButton />
-                </DialogHeader>
-
-                {isLoading && (
-                    <div className="flex items-center justify-center py-8">
-                        <Loader2Icon className="size-5 animate-spin text-gray-400" />
-
-                        <span className="ml-2 text-sm text-content-neutral-secondary">Loading transcript...</span>
-                    </div>
-                )}
-
-                {!!error && (
-                    <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-4 py-3">
-                        <AlertCircleIcon className="size-4 text-red-500" />
-
-                        <span className="text-sm text-red-600">Failed to load transcript.</span>
-                    </div>
-                )}
-
-                {!isLoading && !error && !transcriptData && (
-                    <div className="rounded-md border border-border/50 bg-gray-50 px-4 py-3">
-                        <div className="text-sm text-content-neutral-secondary">No transcript data available.</div>
-                    </div>
-                )}
-
-                {transcriptData && (
-                    <div className="space-y-4">
-                        {groupedTurns.map((turn) => (
-                            <div className="space-y-2" key={turn.turnIndex}>
-                                {groupedTurns.length > 1 && (
-                                    <div className="text-xs font-medium text-gray-400">Turn {turn.turnIndex}</div>
-                                )}
-
-                                {turn.userMessage && (
-                                    <div className="rounded-lg border border-blue-100 bg-blue-50/50 px-3 py-2.5">
-                                        <div className="mb-1.5 flex items-center gap-1.5">
-                                            <UserIcon className="size-3.5 text-blue-600" />
-
-                                            <span className="text-xs font-semibold text-blue-700">User</span>
-                                        </div>
-
-                                        <div className="text-sm whitespace-pre-wrap text-gray-800">
-                                            {turn.userMessage.content}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {turn.assistantMessage && (
-                                    <div className="rounded-lg border border-gray-200 bg-gray-50/50 px-3 py-2.5">
-                                        <div className="mb-1.5 flex items-center gap-1.5">
-                                            <BotIcon className="size-3.5 text-gray-600" />
-
-                                            <span className="text-xs font-semibold text-gray-700">Assistant</span>
-                                        </div>
-
-                                        <div className="text-sm whitespace-pre-wrap text-gray-800">
-                                            {turn.assistantMessage.content}
-                                        </div>
-
-                                        {turn.assistantMessage.toolCalls &&
-                                            turn.assistantMessage.toolCalls.length > 0 && (
-                                                <div className="mt-2 space-y-1.5">
-                                                    {turn.assistantMessage.toolCalls.map((toolCall, toolCallIndex) => (
-                                                        <details
-                                                            className="rounded border border-gray-200 bg-white"
-                                                            key={toolCallIndex}
-                                                        >
-                                                            <summary
-                                                                className={twMerge(
-                                                                    'cursor-pointer px-2.5 py-1.5 text-xs font-medium text-gray-600',
-                                                                    'hover:text-gray-800'
-                                                                )}
-                                                            >
-                                                                Tool: {toolCall.name}
-                                                            </summary>
-
-                                                            <div className="space-y-1 border-t border-gray-100 px-2.5 py-2">
-                                                                {toolCall.input && (
-                                                                    <div>
-                                                                        <div className="text-[10px] font-medium tracking-wide text-gray-400 uppercase">
-                                                                            Input
-                                                                        </div>
-
-                                                                        <pre className="mt-0.5 overflow-x-auto rounded bg-gray-100 p-1.5 font-mono text-xs break-all whitespace-pre-wrap text-gray-700">
-                                                                            {toolCall.input}
-                                                                        </pre>
-                                                                    </div>
-                                                                )}
-
-                                                                {toolCall.output && (
-                                                                    <div>
-                                                                        <div className="text-[10px] font-medium tracking-wide text-gray-400 uppercase">
-                                                                            Output
-                                                                        </div>
-
-                                                                        <pre className="mt-0.5 overflow-x-auto rounded bg-gray-100 p-1.5 font-mono text-xs break-all whitespace-pre-wrap text-gray-700">
-                                                                            {toolCall.output}
-                                                                        </pre>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </details>
-                                                    ))}
-                                                </div>
-                                            )}
-                                    </div>
-                                )}
+                                <span className="ml-2 text-sm text-content-neutral-secondary">
+                                    Loading transcript...
+                                </span>
                             </div>
-                        ))}
+                        )}
 
-                        {transcriptData.expectedOutput && (
-                            <div className="rounded-lg border border-amber-200 bg-amber-50/50 px-3 py-2.5">
-                                <div className="mb-1 text-xs font-semibold text-amber-700">Expected Output</div>
+                        {!!error && (
+                            <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-4 py-3">
+                                <AlertCircleIcon className="size-4 text-red-500" />
 
-                                <div className="text-sm whitespace-pre-wrap text-gray-700">
-                                    {transcriptData.expectedOutput}
+                                <span className="text-sm text-red-600">Failed to load transcript.</span>
+                            </div>
+                        )}
+
+                        {!isLoading && !error && !transcriptData && (
+                            <div className="rounded-md border border-border/50 bg-gray-50 px-4 py-3">
+                                <div className="text-sm text-content-neutral-secondary">
+                                    No transcript data available.
                                 </div>
                             </div>
                         )}
-                    </div>
-                )}
+
+                        {transcriptData && (
+                            <div className="space-y-4">
+                                {groupedTurns.map((turn) => (
+                                    <div className="space-y-2" key={turn.turnIndex}>
+                                        {groupedTurns.length > 1 && (
+                                            <div className="text-xs font-medium text-gray-400">
+                                                Turn {turn.turnIndex}
+                                            </div>
+                                        )}
+
+                                        {turn.userMessage && (
+                                            <div className="rounded-lg border border-blue-100 bg-blue-50/50 px-3 py-2.5">
+                                                <div className="mb-1.5 flex items-center gap-1.5">
+                                                    <UserIcon className="size-3.5 text-blue-600" />
+
+                                                    <span className="text-xs font-semibold text-blue-700">User</span>
+                                                </div>
+
+                                                <div className="text-sm whitespace-pre-wrap text-gray-800">
+                                                    {turn.userMessage.content}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {turn.assistantMessage && (
+                                            <div className="rounded-lg border border-gray-200 bg-gray-50/50 px-3 py-2.5">
+                                                <div className="mb-1.5 flex items-center gap-1.5">
+                                                    <BotIcon className="size-3.5 text-gray-600" />
+
+                                                    <span className="text-xs font-semibold text-gray-700">
+                                                        Assistant
+                                                    </span>
+                                                </div>
+
+                                                <div className="text-sm whitespace-pre-wrap text-gray-800">
+                                                    {turn.assistantMessage.content}
+                                                </div>
+
+                                                {turn.assistantMessage.toolCalls &&
+                                                    turn.assistantMessage.toolCalls.length > 0 && (
+                                                        <div className="mt-2 space-y-1.5">
+                                                            {turn.assistantMessage.toolCalls.map(
+                                                                (toolCall, toolCallIndex) => (
+                                                                    <details
+                                                                        className="rounded border border-gray-200 bg-white"
+                                                                        key={toolCallIndex}
+                                                                    >
+                                                                        <summary
+                                                                            className={twMerge(
+                                                                                'cursor-pointer px-2.5 py-1.5 text-xs font-medium text-gray-600',
+                                                                                'hover:text-gray-800'
+                                                                            )}
+                                                                        >
+                                                                            Tool: {toolCall.name}
+                                                                        </summary>
+
+                                                                        <div className="space-y-1 border-t border-gray-100 px-2.5 py-2">
+                                                                            {toolCall.input && (
+                                                                                <div>
+                                                                                    <div className="text-[10px] font-medium tracking-wide text-gray-400 uppercase">
+                                                                                        Input
+                                                                                    </div>
+
+                                                                                    <pre className="mt-0.5 overflow-x-auto rounded bg-gray-100 p-1.5 font-mono text-xs break-all whitespace-pre-wrap text-gray-700">
+                                                                                        {toolCall.input}
+                                                                                    </pre>
+                                                                                </div>
+                                                                            )}
+
+                                                                            {toolCall.output && (
+                                                                                <div>
+                                                                                    <div className="text-[10px] font-medium tracking-wide text-gray-400 uppercase">
+                                                                                        Output
+                                                                                    </div>
+
+                                                                                    <pre className="mt-0.5 overflow-x-auto rounded bg-gray-100 p-1.5 font-mono text-xs break-all whitespace-pre-wrap text-gray-700">
+                                                                                        {toolCall.output}
+                                                                                    </pre>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </details>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+
+                                {transcriptData.expectedOutput && (
+                                    <div className="rounded-lg border border-amber-200 bg-amber-50/50 px-3 py-2.5">
+                                        <div className="mb-1 text-xs font-semibold text-amber-700">Expected Output</div>
+
+                                        <div className="text-sm whitespace-pre-wrap text-gray-700">
+                                            {transcriptData.expectedOutput}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </DialogBody>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
