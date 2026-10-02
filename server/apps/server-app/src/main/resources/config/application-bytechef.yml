@@ -96,6 +96,9 @@ bytechef:
   cloud:
     # Cloud provider (AWS(EE) | NONE)
     provider: NONE
+  component:
+    custom-component:
+      java-enabled: true
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job and trigger execution)
     enabled: true
