@@ -1,15 +1,14 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import {useForm} from 'react-hook-form';
@@ -51,64 +50,61 @@ const AutomationWorkflowDialog = ({onClose, onSubmit, workflow}: AutomationWorkf
             open
         >
             <DialogContent aria-label="Workflow Dialog" onInteractOutside={(event) => event.preventDefault()}>
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveWorkflow)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>{isEditMode ? 'Edit Workflow' : 'Create Workflow'}</DialogTitle>
-
-                                <DialogDescription>
-                                    {isEditMode
+                <DialogMain>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveWorkflow)}>
+                            <DialogHeader
+                                description={
+                                    isEditMode
                                         ? "Update the workflow's label and description."
-                                        : 'Create a new workflow by filling out the form below.'}
-                                </DialogDescription>
-                            </div>
+                                        : 'Create a new workflow by filling out the form below.'
+                                }
+                                title={isEditMode ? 'Edit Workflow' : 'Create Workflow'}
+                            />
 
-                            <DialogCloseButton />
-                        </DialogHeader>
+                            <DialogBody className="flex flex-col gap-4">
+                                <FormField
+                                    control={control}
+                                    name="label"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Label</FormLabel>
 
-                        <FormField
-                            control={control}
-                            name="label"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Label</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
 
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    rules={{required: true}}
+                                />
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            rules={{required: true}}
-                        />
+                                <FormField
+                                    control={control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
 
-                        <FormField
-                            control={control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
+                                            <FormControl>
+                                                <Textarea rows={5} {...field} />
+                                            </FormControl>
 
-                                    <FormControl>
-                                        <Textarea rows={5} {...field} />
-                                    </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </DialogBody>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
-
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
