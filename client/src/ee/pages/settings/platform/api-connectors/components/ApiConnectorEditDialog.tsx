@@ -1,15 +1,14 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import IconField from '@/ee/pages/settings/platform/api-connectors/components/IconField';
 import OpenApiSpecificationField from '@/ee/pages/settings/platform/api-connectors/components/OpenApiSpecificationField';
@@ -38,79 +37,74 @@ const ApiConnectorEditDialog = ({apiConnector, onClose}: ApiConnectorEditDialogP
             open={isOpen}
         >
             <DialogContent>
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveApiConnector)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>Edit API Connector</DialogTitle>
+                <DialogMain>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveApiConnector)}>
+                            <DialogHeader
+                                description="Update the API connector configuration."
+                                title="Edit API Connector"
+                            />
 
-                                <DialogDescription>Update the API connector configuration.</DialogDescription>
-                            </div>
+                            <DialogBody className="flex flex-col gap-4">
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
 
-                            <DialogCloseButton />
-                        </DialogHeader>
+                                            <FormControl>
+                                                <Input disabled {...field} />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    rules={{required: true}}
+                                />
 
-                                    <FormControl>
-                                        <Input disabled {...field} />
-                                    </FormControl>
+                                <FormField
+                                    control={control}
+                                    name="icon"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Icon</FormLabel>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            rules={{required: true}}
-                        />
+                                            <FormControl>
+                                                <IconField field={field} />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="icon"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Icon</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <FormControl>
-                                        <IconField field={field} />
-                                    </FormControl>
+                                <FormField
+                                    control={control}
+                                    name="specification"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Open API Specification</FormLabel>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                            <FormControl>
+                                                <OpenApiSpecificationField field={field} />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="specification"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Open API Specification</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    rules={{required: true}}
+                                />
+                            </DialogBody>
 
-                                    <FormControl>
-                                        <OpenApiSpecificationField field={field} />
-                                    </FormControl>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            rules={{required: true}}
-                        />
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-
-                            <Button type="submit">Save</Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button type="submit">Save</Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );

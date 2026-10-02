@@ -1,16 +1,16 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
-import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Checkbox} from '@/components/ui/checkbox';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {PlusIcon, Trash2Icon} from 'lucide-react';
 import {KeyboardEvent, useCallback} from 'react';
@@ -109,152 +109,148 @@ const ParameterList = ({onChange, parameters}: ParameterListProps) => {
 
             <Dialog onOpenChange={handleDialogOpen} open={isDialogOpen}>
                 <DialogContent>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(handleSaveParameter)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <DialogTitle>{editingParameter ? 'Edit' : 'Add'} Parameter</DialogTitle>
+                    <DialogMain>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(handleSaveParameter)}>
+                            <DialogHeader title={`${editingParameter ? 'Edit' : 'Add'} Parameter`} />
 
-                            <DialogCloseButton />
-                        </DialogHeader>
+                            <DialogBody className="flex flex-col gap-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField
+                                        control={control}
+                                        name="name"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Name</FormLabel>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={control}
-                                name="name"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Name</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="userId" {...field} />
+                                                </FormControl>
 
-                                        <FormControl>
-                                            <Input placeholder="userId" {...field} />
-                                        </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                        rules={{required: 'Name is required'}}
+                                    />
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                rules={{required: 'Name is required'}}
-                            />
+                                    <FormField
+                                        control={control}
+                                        name="in"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Location</FormLabel>
 
-                            <FormField
-                                control={control}
-                                name="in"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Location</FormLabel>
+                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                    </FormControl>
 
-                                        <Select onValueChange={field.onChange} value={field.value}>
+                                                    <SelectContent>
+                                                        <SelectItem value="query">Query</SelectItem>
+
+                                                        <SelectItem value="path">Path</SelectItem>
+
+                                                        <SelectItem value="header">Header</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField
+                                        control={control}
+                                        name="type"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Type</FormLabel>
+
+                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+
+                                                    <SelectContent>
+                                                        <SelectItem value="string">String</SelectItem>
+
+                                                        <SelectItem value="number">Number</SelectItem>
+
+                                                        <SelectItem value="integer">Integer</SelectItem>
+
+                                                        <SelectItem value="boolean">Boolean</SelectItem>
+
+                                                        <SelectItem value="array">Array</SelectItem>
+
+                                                        <SelectItem value="object">Object</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={control}
+                                        name="example"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Example</FormLabel>
+
+                                                <FormControl>
+                                                    <Input placeholder="123" {...field} />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <FormField
+                                    control={control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+
                                             <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue />
-                                                </SelectTrigger>
+                                                <Input placeholder="The unique user identifier" {...field} />
                                             </FormControl>
 
-                                            <SelectContent>
-                                                <SelectItem value="query">Query</SelectItem>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                                <SelectItem value="path">Path</SelectItem>
-
-                                                <SelectItem value="header">Header</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={control}
-                                name="type"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Type</FormLabel>
-
-                                        <Select onValueChange={field.onChange} value={field.value}>
+                                <FormField
+                                    control={control}
+                                    name="required"
+                                    render={({field}) => (
+                                        <FormItem className="flex items-center gap-2 space-y-0">
                                             <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue />
-                                                </SelectTrigger>
+                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                             </FormControl>
 
-                                            <SelectContent>
-                                                <SelectItem value="string">String</SelectItem>
+                                            <FormLabel className="font-normal">Required</FormLabel>
+                                        </FormItem>
+                                    )}
+                                />
+                            </DialogBody>
 
-                                                <SelectItem value="number">Number</SelectItem>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                                                <SelectItem value="integer">Integer</SelectItem>
-
-                                                <SelectItem value="boolean">Boolean</SelectItem>
-
-                                                <SelectItem value="array">Array</SelectItem>
-
-                                                <SelectItem value="object">Object</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={control}
-                                name="example"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Example</FormLabel>
-
-                                        <FormControl>
-                                            <Input placeholder="123" {...field} />
-                                        </FormControl>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <FormField
-                            control={control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
-
-                                    <FormControl>
-                                        <Input placeholder="The unique user identifier" {...field} />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="required"
-                            render={({field}) => (
-                                <FormItem className="flex items-center gap-2 space-y-0">
-                                    <FormControl>
-                                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                    </FormControl>
-
-                                    <FormLabel className="font-normal">Required</FormLabel>
-                                </FormItem>
-                            )}
-                        />
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-
-                            <Button type="submit">{editingParameter ? 'Update' : 'Add'}</Button>
-                        </DialogFooter>
-                    </form>
+                                <Button type="submit">{editingParameter ? 'Update' : 'Add'}</Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogMain>
                 </DialogContent>
             </Dialog>
         </div>
