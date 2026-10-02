@@ -1,7 +1,8 @@
-import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import Button from '@/components/Button/Button';
+import {Dialog, DialogBody, DialogContent, DialogHeader, DialogMain} from '@/components/Dialog';
 import {BillingApi, CheckoutSessionRequestPlanNameEnum} from '@/shared/middleware/platform/billing';
 import {useUpgradeSubscriptionMutation} from '@/shared/mutations/platform/billing.mutations';
-import {ArrowUpRightIcon, XIcon} from 'lucide-react';
+import {ArrowUpRightIcon} from 'lucide-react';
 import {useState} from 'react';
 import {toast} from 'sonner';
 
@@ -175,48 +176,38 @@ const SelectPlanDialog = ({
     return (
         <>
             <Dialog onOpenChange={(isOpen) => !isOpen && onClose()} open={open}>
-                <DialogContent className="gap-6 sm:max-w-[960px]">
-                    <DialogHeader className="flex-row items-start justify-between space-y-0">
-                        <div className="flex flex-col gap-1">
-                            <DialogTitle>Select a plan</DialogTitle>
+                <DialogContent size="xl">
+                    <DialogMain>
+                        <DialogHeader
+                            description="You can upgrade, downgrade, or cancel at any time."
+                            endContent={
+                                <Button
+                                    icon={<ArrowUpRightIcon />}
+                                    label="Compare plans"
+                                    onClick={() => window.open('https://bytechef.io/pricing', '_blank')}
+                                    variant="outline"
+                                />
+                            }
+                            title="Select a plan"
+                        />
 
-                            <DialogDescription>You can upgrade, downgrade, or cancel at any time.</DialogDescription>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <button
-                                className="flex h-9 items-center gap-2 rounded-md border border-slate-200 bg-white px-4 text-sm font-medium text-foreground hover:bg-slate-50"
-                                onClick={() => window.open('https://bytechef.io/pricing', '_blank')}
-                                type="button"
-                            >
-                                Compare plans
-                                <ArrowUpRightIcon className="size-4" />
-                            </button>
-
-                            <DialogClose className="opacity-50 hover:opacity-100">
-                                <XIcon className="size-4" />
-
-                                <span className="sr-only">Close</span>
-                            </DialogClose>
-                        </div>
-                    </DialogHeader>
-
-                    <div className="flex gap-4">
-                        {PLANS.map((plan) => (
-                            <PlanTierCard
-                                ctaLabel={loadingPlan === plan.name ? 'Loading…' : plan.ctaLabel}
-                                description={plan.description}
-                                disabled={'disabled' in plan && plan.disabled}
-                                features={plan.features}
-                                highlighted={plan.highlighted}
-                                isCurrent={plan.name?.toLocaleLowerCase() === currentPlanName?.toLocaleLowerCase()}
-                                key={plan.name}
-                                name={plan.name}
-                                onSelect={() => handlePlanSelect(plan.name, plan.planNameEnum)}
-                                price={plan.price}
-                            />
-                        ))}
-                    </div>
+                        <DialogBody className="flex gap-4">
+                            {PLANS.map((plan) => (
+                                <PlanTierCard
+                                    ctaLabel={loadingPlan === plan.name ? 'Loading…' : plan.ctaLabel}
+                                    description={plan.description}
+                                    disabled={'disabled' in plan && plan.disabled}
+                                    features={plan.features}
+                                    highlighted={plan.highlighted}
+                                    isCurrent={plan.name?.toLocaleLowerCase() === currentPlanName?.toLocaleLowerCase()}
+                                    key={plan.name}
+                                    name={plan.name}
+                                    onSelect={() => handlePlanSelect(plan.name, plan.planNameEnum)}
+                                    price={plan.price}
+                                />
+                            ))}
+                        </DialogBody>
+                    </DialogMain>
                 </DialogContent>
             </Dialog>
 
