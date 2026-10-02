@@ -1,17 +1,16 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
-import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
+import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
@@ -181,110 +180,171 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent>
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>{`${mcpProject?.id ? 'Edit' : 'Select'}`} Workflows</DialogTitle>
-
-                        <DialogDescription>
-                            {mcpProject?.id
+                <DialogMain>
+                    <DialogHeader
+                        description={
+                            mcpProject?.id
                                 ? 'Edit the MCP server workflow configuration.'
-                                : 'Select workflows to MCP server.'}
-                        </DialogDescription>
-                    </div>
+                                : 'Select workflows to MCP server.'
+                        }
+                        title={`${mcpProject?.id ? 'Edit' : 'Select'} Workflows`}
+                    />
 
-                    <DialogCloseButton />
-                </DialogHeader>
-
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveMcpProject)}>
-                        {isEditMode && (
-                            <>
-                                <FormItem>
-                                    <FormLabel>Project</FormLabel>
-
-                                    <Input disabled value={mcpProject.project?.name || ''} />
-                                </FormItem>
-
-                                <FormItem>
-                                    <FormLabel>Project Version</FormLabel>
-
-                                    <Input disabled value={`v${mcpProject.projectVersion}`} />
-                                </FormItem>
-                            </>
-                        )}
-
-                        {!isEditMode && (
-                            <>
-                                <FormField
-                                    control={control}
-                                    name="mcpServerId"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>MCP Server</FormLabel>
-
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    disabled={!!mcpServer}
-                                                    placeholder={mcpServer ? mcpServer.name : 'Select MCP Server'}
-                                                    value={mcpServer ? mcpServer.name : field.value}
-                                                />
-                                            </FormControl>
-
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={control}
-                                    name="projectId"
-                                    render={({field}) => (
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveMcpProject)}>
+                            <DialogBody className="flex flex-col gap-4">
+                                {isEditMode && (
+                                    <>
                                         <FormItem>
                                             <FormLabel>Project</FormLabel>
 
-                                            <FormControl>
-                                                <ProjectDeploymentDialogBasicStepProjectsComboBox
-                                                    onBlur={field.onBlur}
-                                                    onChange={(item) => {
-                                                        if (item) {
-                                                            setValue('projectId', item.value);
-                                                            resetField('projectVersion');
-
-                                                            setCurrentProjectId(item.value);
-                                                            setCurrentProjectVersion(undefined);
-                                                        }
-                                                    }}
-                                                    projects={projects}
-                                                    value={field.value}
-                                                />
-                                            </FormControl>
-
-                                            <FormMessage />
+                                            <Input disabled value={mcpProject.project?.name || ''} />
                                         </FormItem>
-                                    )}
-                                    shouldUnregister={false}
-                                />
 
-                                {currentProjectId && (
+                                        <FormItem>
+                                            <FormLabel>Project Version</FormLabel>
+
+                                            <Input disabled value={`v${mcpProject.projectVersion}`} />
+                                        </FormItem>
+                                    </>
+                                )}
+
+                                {!isEditMode && (
+                                    <>
+                                        <FormField
+                                            control={control}
+                                            name="mcpServerId"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>MCP Server</FormLabel>
+
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            disabled={!!mcpServer}
+                                                            placeholder={
+                                                                mcpServer ? mcpServer.name : 'Select MCP Server'
+                                                            }
+                                                            value={mcpServer ? mcpServer.name : field.value}
+                                                        />
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={control}
+                                            name="projectId"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Project</FormLabel>
+
+                                                    <FormControl>
+                                                        <ProjectDeploymentDialogBasicStepProjectsComboBox
+                                                            onBlur={field.onBlur}
+                                                            onChange={(item) => {
+                                                                if (item) {
+                                                                    setValue('projectId', item.value);
+                                                                    resetField('projectVersion');
+
+                                                                    setCurrentProjectId(item.value);
+                                                                    setCurrentProjectVersion(undefined);
+                                                                }
+                                                            }}
+                                                            projects={projects}
+                                                            value={field.value}
+                                                        />
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                            shouldUnregister={false}
+                                        />
+
+                                        {currentProjectId && (
+                                            <FormField
+                                                control={control}
+                                                name="projectVersion"
+                                                render={({field}) => (
+                                                    <FormItem>
+                                                        <FormLabel>Project Version</FormLabel>
+
+                                                        <FormControl>
+                                                            <ProjectDeploymentDialogBasicStepProjectVersionsSelect
+                                                                onChange={(value) => {
+                                                                    field.onChange(value);
+                                                                    setCurrentProjectVersion(value);
+                                                                    setValue('selectedWorkflowIds', []);
+                                                                }}
+                                                                projectId={currentProjectId}
+                                                                projectVersion={currentProjectVersion}
+                                                            />
+                                                        </FormControl>
+
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                                shouldUnregister={false}
+                                            />
+                                        )}
+                                    </>
+                                )}
+
+                                {hasNoEligibleWorkflows && (
+                                    <p className="text-sm text-content-neutral-secondary">
+                                        No tool-eligible workflows found for this project version. Only workflows with a
+                                        New Workflow Call trigger can be added to an MCP server.
+                                    </p>
+                                )}
+
+                                {eligibleWorkflows && eligibleWorkflows.length > 0 && (
                                     <FormField
                                         control={control}
-                                        name="projectVersion"
+                                        name="selectedWorkflowIds"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Project Version</FormLabel>
+                                                <FormLabel>Select Workflows</FormLabel>
 
-                                                <FormControl>
-                                                    <ProjectDeploymentDialogBasicStepProjectVersionsSelect
-                                                        onChange={(value) => {
-                                                            field.onChange(value);
-                                                            setCurrentProjectVersion(value);
-                                                            setValue('selectedWorkflowIds', []);
-                                                        }}
-                                                        projectId={currentProjectId}
-                                                        projectVersion={currentProjectVersion}
-                                                    />
-                                                </FormControl>
+                                                <div className="space-y-2">
+                                                    {eligibleWorkflows.map((projectWorkflow) => (
+                                                        <div
+                                                            className="flex items-center space-x-2"
+                                                            key={projectWorkflow.id}
+                                                        >
+                                                            <Checkbox
+                                                                checked={field.value?.includes(
+                                                                    projectWorkflow.workflow.id || ''
+                                                                )}
+                                                                onCheckedChange={(checked) => {
+                                                                    const currentValues = field.value || [];
+
+                                                                    if (checked) {
+                                                                        field.onChange([
+                                                                            ...currentValues,
+                                                                            projectWorkflow.workflow.id,
+                                                                        ]);
+                                                                    } else {
+                                                                        field.onChange(
+                                                                            currentValues.filter(
+                                                                                (workflowId) =>
+                                                                                    workflowId !==
+                                                                                    projectWorkflow.workflow.id
+                                                                            )
+                                                                        );
+                                                                    }
+                                                                }}
+                                                            />
+
+                                                            <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                                                {projectWorkflow.workflow.label ||
+                                                                    projectWorkflow.workflow.id}
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
 
                                                 <FormMessage />
                                             </FormItem>
@@ -292,97 +352,42 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                                         shouldUnregister={false}
                                     />
                                 )}
-                            </>
-                        )}
 
-                        {hasNoEligibleWorkflows && (
-                            <p className="text-sm text-content-neutral-secondary">
-                                No tool-eligible workflows found for this project version. Only workflows with a New
-                                Workflow Call trigger can be added to an MCP server.
-                            </p>
-                        )}
+                                {!isEditMode && (
+                                    <FormField
+                                        control={control}
+                                        name="description"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Description</FormLabel>
 
-                        {eligibleWorkflows && eligibleWorkflows.length > 0 && (
-                            <FormField
-                                control={control}
-                                name="selectedWorkflowIds"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Select Workflows</FormLabel>
+                                                <FormControl>
+                                                    <Textarea {...field} placeholder="Describe this MCP project..." />
+                                                </FormControl>
 
-                                        <div className="space-y-2">
-                                            {eligibleWorkflows.map((projectWorkflow) => (
-                                                <div className="flex items-center space-x-2" key={projectWorkflow.id}>
-                                                    <Checkbox
-                                                        checked={field.value?.includes(
-                                                            projectWorkflow.workflow.id || ''
-                                                        )}
-                                                        onCheckedChange={(checked) => {
-                                                            const currentValues = field.value || [];
-
-                                                            if (checked) {
-                                                                field.onChange([
-                                                                    ...currentValues,
-                                                                    projectWorkflow.workflow.id,
-                                                                ]);
-                                                            } else {
-                                                                field.onChange(
-                                                                    currentValues.filter(
-                                                                        (workflowId) =>
-                                                                            workflowId !== projectWorkflow.workflow.id
-                                                                    )
-                                                                );
-                                                            }
-                                                        }}
-                                                    />
-
-                                                    <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                        {projectWorkflow.workflow.label || projectWorkflow.workflow.id}
-                                                    </label>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <FormMessage />
-                                    </FormItem>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
-                                shouldUnregister={false}
-                            />
-                        )}
+                            </DialogBody>
 
-                        {!isEditMode && (
-                            <FormField
-                                control={control}
-                                name="description"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Description</FormLabel>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                                        <FormControl>
-                                            <Textarea {...field} placeholder="Describe this MCP project..." />
-                                        </FormControl>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        )}
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
-
-                            <Button
-                                disabled={
-                                    hasNoEligibleWorkflows || !selectedWorkflowIds || selectedWorkflowIds.length === 0
-                                }
-                                label={isEditMode ? 'Update' : 'Add'}
-                                type="submit"
-                            />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button
+                                    disabled={
+                                        hasNoEligibleWorkflows ||
+                                        !selectedWorkflowIds ||
+                                        selectedWorkflowIds.length === 0
+                                    }
+                                    label={isEditMode ? 'Update' : 'Add'}
+                                    type="submit"
+                                />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
