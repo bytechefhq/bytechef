@@ -8,6 +8,7 @@ const SPACE = ' ';
 
 export type UseSSEOptionsType = {
     eventHandlers?: EventHandlersType;
+    onClose?: () => void;
 };
 
 export type SSERequestType = null | {
@@ -18,6 +19,7 @@ export type SSERequestType = null | {
 export type UseSSEResultType<T = unknown> = {
     data: T | string | null;
     error: string | null;
+    errorStatus: number | null;
     connectionState: 'CONNECTING' | 'CONNECTED' | 'ERROR' | 'CLOSED';
     close: () => void;
 };
@@ -84,10 +86,12 @@ function parseAndDispatchSSE(
 export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOptionsType = {}): UseSSEResultType<T> => {
     const [data, setData] = useState<T | string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [errorStatus, setErrorStatus] = useState<number | null>(null);
     const [connectionState, setConnectionState] = useState<'CONNECTING' | 'CONNECTED' | 'ERROR' | 'CLOSED'>('CLOSED');
 
     const abortControllerRef = useRef<AbortController | null>(null);
     const handlersRef = useRef<EventHandlersType | undefined>(options.eventHandlers);
+    const onCloseRef = useRef<(() => void) | undefined>(options.onClose);
 
     const stableRequest = useMemo(() => {
         if (request == null) {
@@ -109,6 +113,10 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
     }, [options.eventHandlers]);
 
     useEffect(() => {
+        onCloseRef.current = options.onClose;
+    }, [options.onClose]);
+
+    useEffect(() => {
         if (!stableRequest) {
             return;
         }
@@ -120,6 +128,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
 
         (async () => {
             try {
+                setError(null);
+                setErrorStatus(null);
                 setConnectionState('CONNECTING');
 
                 const headers: Record<string, string> = {
@@ -135,14 +145,18 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                     signal: controller.signal,
                 });
 
+                if (controller.signal.aborted || abortControllerRef.current !== controller) {
+                    return;
+                }
+
                 if (!response.ok || !response.body) {
                     setError(`HTTP ${response.status}`);
+                    setErrorStatus(response.status);
                     setConnectionState('ERROR');
 
                     return;
                 }
 
-                setError(null);
                 setConnectionState('CONNECTED');
 
                 const reader = response.body.getReader();
@@ -174,6 +188,10 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                     }
                 }
 
+                if (controller.signal.aborted || abortControllerRef.current !== controller) {
+                    return;
+                }
+
                 // flush any remaining buffered event
                 if (buffer.trim()) {
                     parseAndDispatchSSE(
@@ -186,6 +204,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                 }
 
                 setConnectionState('CLOSED');
+
+                onCloseRef.current?.();
             } catch (error) {
                 if ((error as Error)?.name !== 'AbortError') {
                     setError('Connection error occurred');
@@ -200,5 +220,5 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
         };
     }, [stableRequest]);
 
-    return {close, connectionState, data, error};
+    return {close, connectionState, data, error, errorStatus};
 };

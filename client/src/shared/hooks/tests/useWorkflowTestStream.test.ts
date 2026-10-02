@@ -1,3 +1,4 @@
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useSSE} from '@/shared/hooks/useSSE';
 import {act, renderHook} from '@testing-library/react';
 import {afterEach, describe, expect, it, vi} from 'vitest';
@@ -141,6 +142,26 @@ describe('useWorkflowTestStream', () => {
         expect(result.current.error).toBe(errorMessage);
     });
 
+    it('should report a malformed ask_user_question event as an error', () => {
+        const onError = vi.fn();
+
+        renderHook(() =>
+            useWorkflowTestStream({
+                onError,
+                workflowId: 'workflow-123',
+            })
+        );
+
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.ask_user_question({questions: 'not a list'});
+        });
+
+        expect(onError).toHaveBeenCalledWith('The agent asked a question in an unexpected format.');
+        expect(mockSetWorkflowIsRunning).toHaveBeenCalledWith(false);
+    });
+
     it('should handle stream event with valid chunk', () => {
         renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
 
@@ -275,6 +296,32 @@ describe('useWorkflowTestStream', () => {
         consoleErrorSpy.mockRestore();
     });
 
+    it('should end the run with an error when the result cannot be parsed', () => {
+        const onError = vi.fn();
+        const onResult = vi.fn();
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        renderHook(() =>
+            useWorkflowTestStream({
+                onError,
+                onResult,
+                workflowId: 'workflow-123',
+            })
+        );
+
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result('{invalid json}');
+        });
+
+        expect(onResult).not.toHaveBeenCalled();
+        expect(onError).toHaveBeenCalledWith('Failed to read the workflow test result.');
+        expect(mockSetWorkflowIsRunning).toHaveBeenCalledWith(false);
+
+        consoleErrorSpy.mockRestore();
+    });
+
     it('should handle start event with string data', () => {
         const onStart = vi.fn();
         renderHook(() =>
@@ -303,5 +350,130 @@ describe('useWorkflowTestStream', () => {
         act(() => {
             eventHandlers.stream({text: ''});
         });
+    });
+
+    it('should clear the stream request and call onStreamEnd when the stream closes', () => {
+        const onStreamEnd = vi.fn();
+
+        const {result} = renderHook(() => useWorkflowTestStream({onStreamEnd, workflowId: 'workflow-123'}));
+
+        const mockRequest = {init: {method: 'POST'}, url: '/api/platform/internal/workflow-tests'};
+
+        act(() => {
+            result.current.setStreamRequest(mockRequest);
+        });
+
+        expect(useSSE).toHaveBeenLastCalledWith(mockRequest, expect.any(Object));
+
+        const {onClose} = (useSSE as any).mock.lastCall[1];
+
+        act(() => {
+            onClose();
+        });
+
+        expect(onStreamEnd).toHaveBeenCalledTimes(1);
+        expect(useSSE).toHaveBeenLastCalledWith(null, expect.any(Object));
+    });
+
+    it('should stop the run when the stream closes without a result and no onStreamEnd is given', () => {
+        const streamRequest = {init: {method: 'POST'}, url: '/test'};
+
+        const {result} = renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        act(() => {
+            result.current.setStreamRequest(streamRequest);
+        });
+
+        const {onClose} = (useSSE as any).mock.lastCall[1];
+
+        act(() => {
+            onClose();
+        });
+
+        expect(mockSetWorkflowIsRunning).toHaveBeenCalledWith(false);
+    });
+
+    it('should show the question and keep the run going when the agent asks the user a question', () => {
+        const onStreamEnd = vi.fn();
+        const streamRequest = {init: {method: 'POST'}, url: '/test'};
+
+        const {result} = renderHook(() => useWorkflowTestStream({onStreamEnd, workflowId: 'workflow-123'}));
+
+        act(() => {
+            result.current.setStreamRequest(streamRequest);
+        });
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.ask_user_question({
+                questions: [{header: 'Color', multiSelect: false, options: [], question: 'Which color?'}],
+            });
+        });
+
+        expect(onStreamEnd).not.toHaveBeenCalled();
+        expect(mockSetWorkflowIsRunning).not.toHaveBeenCalledWith(false);
+        expect(useSSE).toHaveBeenLastCalledWith(streamRequest, expect.any(Object));
+    });
+
+    it('should keep a question asked during the run when the run ends with a final message', () => {
+        useWorkflowTestChatStore.setState({messages: [{content: '', role: 'assistant'}]});
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.start({jobId: 42});
+            eventHandlers.ask_user_question({
+                questions: [{header: 'Color', multiSelect: false, options: [], question: 'Which color?'}],
+            });
+            eventHandlers.stream('Answer in your next message.');
+            eventHandlers.result({job: {outputs: {message: 'Answer in your next message.'}, status: 'COMPLETED'}});
+        });
+
+        const {messages} = useWorkflowTestChatStore.getState();
+
+        expect(messages[messages.length - 1].content).toEqual(expect.stringContaining('**Color**: Which color?'));
+        expect(mockSetWorkflowIsRunning).toHaveBeenCalledWith(false);
+        expect(mockPersistJobId).toHaveBeenLastCalledWith(null);
+    });
+
+    it('should show the final message of a run that follows a run in which a question was asked', () => {
+        useWorkflowTestChatStore.setState({messages: [{content: '', role: 'assistant'}]});
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.start({jobId: 1});
+            eventHandlers.ask_user_question({
+                questions: [{header: 'Color', multiSelect: false, options: [], question: 'Which color?'}],
+            });
+            eventHandlers.result({job: {outputs: {message: 'First'}, status: 'COMPLETED'}});
+        });
+
+        act(() => {
+            useWorkflowTestChatStore.getState().setMessage({content: 'Again', role: 'user'});
+            useWorkflowTestChatStore.getState().setMessage({content: '', role: 'assistant'});
+        });
+
+        act(() => {
+            eventHandlers.start({jobId: 2});
+            eventHandlers.result({job: {outputs: {message: 'Second'}, status: 'COMPLETED'}});
+        });
+
+        const {messages} = useWorkflowTestChatStore.getState();
+
+        expect(messages[messages.length - 1].content).toBe('Second');
+    });
+
+    it('should ignore a stream close when no onStreamEnd is given', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const {onClose} = (useSSE as any).mock.calls[0][1];
+
+        expect(() => act(() => onClose())).not.toThrow();
     });
 });
