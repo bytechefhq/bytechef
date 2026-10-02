@@ -30,6 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.tool.ToolCallback;
 
 /**
@@ -50,6 +51,13 @@ public class ClusterElementToolCallbacks {
 
     public List<ToolCallback> build(
         ClusterElement clusterElement, Map<String, ComponentConnection> componentConnections, ActionContext context) {
+
+        return build(clusterElement, componentConnections, null, context);
+    }
+
+    public List<ToolCallback> build(
+        ClusterElement clusterElement, Map<String, ComponentConnection> componentConnections,
+        @Nullable String subagentConversationId, ActionContext context) {
 
         Object clusterElementFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -86,7 +94,8 @@ public class ClusterElementToolCallbacks {
             }
         } else if (clusterElementFunction instanceof MultipleConnectionsToolFunction) {
             return List.of(
-                aiAgentToolFacade.getFunctionToolCallback(clusterElement, componentConnections, context));
+                aiAgentToolFacade.getFunctionToolCallback(
+                    clusterElement, componentConnections, subagentConversationId, context));
         } else {
             ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
