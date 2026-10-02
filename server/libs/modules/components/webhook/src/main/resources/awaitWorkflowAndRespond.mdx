@@ -33,7 +33,7 @@ The HTTP connection stays open while the workflow runs. ByteChef sends the respo
 
 If the workflow runs more than one **Response to Webhook Request** step, for example in different branches, the last step that runs sets the response.
 
-The test URL does not wait for the workflow and does not apply **Response to Webhook Request**. It always returns `200 OK` with an empty body. To test the response, use the static workflow webhook trigger URL.
+The test URL checks the token in the same way: a missing or incorrect token returns `400 Bad Request`. It does not wait for the workflow and does not apply **Response to Webhook Request**, so a request with a correct token returns `200 OK` with an empty body. To test the response, use the static workflow webhook trigger URL.
 
 ##### Example
 

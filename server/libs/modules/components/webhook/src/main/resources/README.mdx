@@ -6,7 +6,7 @@ Each Webhook trigger listens on a URL. You can use any HTTP client, such as [Pos
 
 | URL | Where to find it | What it does |
 |:---|:---|:---|
-| **Webhook test URL** | In the workflow editor, open the trigger, go to the **Output** tab and click **Test**. The URL is shown under **Action Required**. | Records the request as the sample output of the trigger. The workflow does **not** run. The CSRF token is **not** checked. The response is always `200 OK` with an empty body. |
+| **Webhook test URL** | In the workflow editor, open the trigger, go to the **Output** tab and click **Test**. The URL is shown under **Action Required**. | Records the request as the sample output of the trigger. The workflow does **not** run. If the trigger has a **CSRF Token**, the token is checked: a missing or incorrect token returns `400 Bad Request` and the request is not recorded. Otherwise, the response is `200 OK` with an empty body. |
 | **Static workflow webhook trigger URL** | After you publish and deploy the workflow, go to **Deployments**, find the workflow and click the **Copy static workflow webhook trigger url** icon. | Runs the deployed workflow. The response depends on the trigger type. |
 
 The production URL has the form `https://<your-bytechef-host>/webhooks/<id>`. The test URL has the form `https://<your-bytechef-host>/webhooks/<id>/test/environments/<environmentId>`. Always copy the URL from ByteChef. Do not build it manually.
@@ -43,6 +43,8 @@ The `Content-Type` header controls how ByteChef reads the body:
 | **binary** / **File** | `application/pdf`, `application/octet-stream`, other `application/*` | A file object that contains the uploaded content. |
 | **raw → Text** / **Text** | `text/plain`, other `text/*` | The body as a string. |
 | **none** / **No Body** | (none) | `body` is not included. |
+
+An empty JSON or XML body is treated as no body, so `body` is not included. A JSON or XML body that cannot be parsed returns `400 Bad Request`, and the `detail` field of the response describes the error.
 
 ### Trigger Output
 
