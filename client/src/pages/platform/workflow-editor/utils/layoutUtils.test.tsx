@@ -826,14 +826,17 @@ describe('getClusterElementsLayoutElements sibling spacing after a cross-subtree
 describe('getClusterElementsLayoutElements rows of user-positioned elements', () => {
     const nestedRootIds = ['firstTool', 'secondTool', 'thirdTool'];
 
-    function buildRootWithThreeNestedRoots(savedChildPositions: Record<string, {x: number; y: number}> = {}): Node[] {
+    function buildRootWithThreeNestedRoots(savedPositions: Record<string, {x: number; y: number}> = {}): Node[] {
+        const savedMetadata = (nodeId: string) =>
+            savedPositions[nodeId] ? {ui: {nodePosition: savedPositions[nodeId]}} : {};
+
         const nestedRoot = (nodeId: string): Node => ({
             data: {
                 clusterElementType: 'tools',
                 clusterElementTypeIndex: 0,
                 clusterElementTypesCount: 1,
                 isNestedClusterRoot: true,
-                metadata: {},
+                metadata: savedMetadata(nodeId),
                 parentClusterRootElementsTypeCount: 1,
             },
             id: nodeId,
@@ -844,14 +847,13 @@ describe('getClusterElementsLayoutElements rows of user-positioned elements', ()
 
         const child = (parentId: string): Node => {
             const nodeId = `${parentId}Child`;
-            const savedPosition = savedChildPositions[nodeId];
 
             return {
                 data: {
                     clusterElementType: 'tools',
                     clusterElementTypeIndex: 0,
                     isNestedClusterRoot: false,
-                    metadata: savedPosition ? {ui: {nodePosition: savedPosition}} : {},
+                    metadata: savedMetadata(nodeId),
                     parentClusterRootElementsTypeCount: 1,
                 },
                 id: nodeId,
@@ -921,6 +923,36 @@ describe('getClusterElementsLayoutElements rows of user-positioned elements', ()
         const thirdX = absolutePoint('thirdToolChild').x;
 
         expect(Math.abs(thirdX - secondX)).toBeGreaterThanOrEqual(CLUSTER_ELEMENT_NODE_WIDTH);
+    });
+
+    it('moves a child positioned above its parent together with the parent before comparing it', () => {
+        const layOutNodes = (nodes: Node[]) =>
+            getClusterElementsLayoutElements({canvasHeight: 800, canvasWidth: 1600, edges: [], nodes}).nodes;
+
+        const relativePosition = (nodes: Node[], nodeId: string) => nodes.find((node) => node.id === nodeId)!.position;
+
+        const firstToolPosition = relativePosition(layOutNodes(buildRootWithThreeNestedRoots()), 'firstTool');
+
+        const secondToolShiftedPosition = relativePosition(
+            layOutNodes(buildRootWithThreeNestedRoots({secondTool: firstToolPosition})),
+            'secondTool'
+        );
+
+        const childOffsetY = -6 * NODE_HEIGHT;
+
+        const {absolutePoint} = layOut(
+            buildRootWithThreeNestedRoots({
+                firstToolChild: {x: 0, y: childOffsetY},
+                secondTool: firstToolPosition,
+                secondToolChild: {x: firstToolPosition.x - secondToolShiftedPosition.x, y: childOffsetY},
+            })
+        );
+
+        expect(secondToolShiftedPosition.x).toBeGreaterThan(firstToolPosition.x + CLUSTER_ELEMENT_NODE_WIDTH);
+        expect(absolutePoint('secondToolChild').y).toBe(absolutePoint('firstToolChild').y);
+        expect(Math.abs(absolutePoint('secondToolChild').x - absolutePoint('firstToolChild').x)).toBeGreaterThanOrEqual(
+            CLUSTER_ELEMENT_NODE_WIDTH
+        );
     });
 
     it('does not move an element away from one in the same chain that it does not overlap vertically', () => {
