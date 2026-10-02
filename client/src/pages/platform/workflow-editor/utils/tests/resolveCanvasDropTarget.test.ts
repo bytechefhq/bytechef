@@ -52,6 +52,11 @@ describe('resolveCanvasDropTarget', () => {
         });
     });
 
+    it('resolves nothing for a target that is not an element', () => {
+        expect(resolveCanvasDropTarget({dragKind: 'task', edges, nodes, target: null})).toBeUndefined();
+        expect(resolveCanvasDropTarget({dragKind: 'task', edges, nodes, target: document})).toBeUndefined();
+    });
+
     it('resolves a task dropped on the placeholder box to that placeholder', () => {
         const nodeElement = renderNode('final-placeholder', '<div></div>');
 
