@@ -12,7 +12,7 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
-import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
+import {NodeDataType} from '@/shared/types';
 import {Node, NodeChange, XYPosition, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -37,7 +37,7 @@ import TriggerPlaceholderNode from '../nodes/TriggerPlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
-import {CANVAS_DRAG_DATA_TYPE, getCanvasDragKind} from '../utils/canvasDragData';
+import {handleCanvasDragOver, handleCanvasDrop} from '../utils/canvasDrop';
 import clearAllNodePositions from '../utils/clearAllNodePositions';
 import {collectAllDescendantNodes, collectChainSuccessorNodes} from '../utils/collectDescendantNodes';
 import {
@@ -48,8 +48,6 @@ import {
 import getInitialViewportPosition from '../utils/getInitialViewportPosition';
 import {extractLayoutDirection} from '../utils/layoutDirectionDefinitionUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
-import resolveCanvasDropTarget from '../utils/resolveCanvasDropTarget';
-import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveWorkflowNodesPosition from '../utils/saveWorkflowNodesPosition';
 import {STICKY_NOTE_NODE_TYPE, compensateStickyNotePosition, updateStickyNote} from '../utils/stickyNoteUtils';
 import {isWorkflowMutating} from '../utils/workflowMutationGuard';
@@ -148,91 +146,27 @@ const useWorkflowEditorCanvas = ({
     );
 
     const onDragOver: DragEventHandler = useCallback((event) => {
-        if (event.target instanceof HTMLButtonElement && event.target.dataset.nodeType === 'workflow') {
-            return;
-        }
+        const {edges, nodes} = useWorkflowDataStore.getState();
 
-        const dragKind = getCanvasDragKind(event.dataTransfer);
-
-        if (dragKind) {
-            const {edges, nodes} = useWorkflowDataStore.getState();
-
-            if (!resolveCanvasDropTarget({dragKind, edges, nodes, target: event.target})) {
-                event.dataTransfer.dropEffect = 'none';
-
-                return;
-            }
-        }
-
-        event.preventDefault();
-
-        event.dataTransfer.dropEffect = 'move';
+        handleCanvasDragOver(event, edges, nodes);
     }, []);
 
     const onDrop: DragEventHandler = useCallback((event) => {
-        const droppedNodeData = event.dataTransfer.getData(CANVAS_DRAG_DATA_TYPE);
-
-        let droppedNodeType = '';
-        let droppedNodeName;
-
-        if (droppedNodeData.includes('--')) {
-            droppedNodeName = droppedNodeData.split('--')[0];
-            droppedNodeType = droppedNodeData.split('--')[1];
-        } else {
-            droppedNodeName = droppedNodeData;
-        }
-
-        let droppedNode = componentDefinitions.find((node) => node.name === droppedNodeName) as
-            | ClickedDefinitionType
-            | undefined;
-
-        if (!droppedNode) {
-            const taskDispatcherNode = taskDispatcherDefinitions.find((node) => node.name === droppedNodeName);
-
-            if (taskDispatcherNode) {
-                droppedNode = {...taskDispatcherNode, taskDispatcher: true} as ClickedDefinitionType;
-            }
-        }
-
-        if (!droppedNode) {
-            return;
-        }
-
-        const isTriggerDrop = droppedNodeType === 'trigger';
-
-        if (isTriggerDrop) {
-            droppedNode = {
-                ...droppedNode,
-                trigger: true,
-            };
-        }
-
         const {edges, nodes} = useWorkflowDataStore.getState();
 
-        const dropTarget = resolveCanvasDropTarget({
-            dragKind: isTriggerDrop ? 'trigger' : 'task',
+        handleCanvasDrop({
+            componentDefinitions,
             edges,
+            event,
+            handlers: {
+                onDropOnPlaceholderNode: handleDropOnPlaceholderNode,
+                onDropOnTriggerNode: handleDropOnTriggerNode,
+                onDropOnTriggerPlaceholder: handleDropOnTriggerPlaceholder,
+                onDropOnWorkflowEdge: handleDropOnWorkflowEdge,
+            },
             nodes,
-            target: event.target,
+            taskDispatcherDefinitions,
         });
-
-        if (!dropTarget) {
-            return;
-        }
-
-        if (dropTarget.type === 'triggerPlaceholder') {
-            handleDropOnTriggerPlaceholder(droppedNode);
-        } else if (dropTarget.type === 'trigger') {
-            const targetTriggerName = resolveTargetTriggerName(dropTarget.node.data as NodeDataType);
-
-            if (targetTriggerName) {
-                handleDropOnTriggerNode(droppedNode, targetTriggerName);
-            }
-        } else if (dropTarget.type === 'placeholder') {
-            handleDropOnPlaceholderNode(dropTarget.node, droppedNode);
-        } else {
-            handleDropOnWorkflowEdge(dropTarget.edge, droppedNode);
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

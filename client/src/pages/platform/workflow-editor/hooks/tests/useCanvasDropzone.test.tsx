@@ -30,6 +30,21 @@ describe('useCanvasDropzone', () => {
         expect(screen.getByTestId('dropzone')).toHaveAttribute('data-active', 'true');
     });
 
+    it('accepts a drop and re-arms while a drag of the accepted kind moves over it', () => {
+        render(<Dropzone acceptedDragKind="trigger" />);
+
+        const dropzone = screen.getByTestId('dropzone');
+
+        const dragOverAllowed = fireEvent.dragOver(dropzone, {dataTransfer: createDataTransfer('trigger')});
+
+        expect(dragOverAllowed).toBe(false);
+        expect(dropzone).toHaveAttribute('data-active', 'true');
+
+        fireEvent.drop(dropzone, {dataTransfer: createDataTransfer('trigger')});
+
+        expect(dropzone).toHaveAttribute('data-active', 'false');
+    });
+
     it('ignores a drag of another kind', () => {
         render(<Dropzone acceptedDragKind="task" />);
 
