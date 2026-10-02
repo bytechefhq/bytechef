@@ -822,3 +822,116 @@ describe('getClusterElementsLayoutElements sibling spacing after a cross-subtree
         expect(overlaps).toEqual([]);
     });
 });
+
+describe('getClusterElementsLayoutElements rows of user-positioned elements', () => {
+    const nestedRootIds = ['firstTool', 'secondTool', 'thirdTool'];
+
+    function buildRootWithThreeNestedRoots(savedChildPositions: Record<string, {x: number; y: number}> = {}): Node[] {
+        const nestedRoot = (nodeId: string): Node => ({
+            data: {
+                clusterElementType: 'tools',
+                clusterElementTypeIndex: 0,
+                clusterElementTypesCount: 1,
+                isNestedClusterRoot: true,
+                metadata: {},
+                parentClusterRootElementsTypeCount: 1,
+            },
+            id: nodeId,
+            parentId: 'root',
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        });
+
+        const child = (parentId: string): Node => {
+            const nodeId = `${parentId}Child`;
+            const savedPosition = savedChildPositions[nodeId];
+
+            return {
+                data: {
+                    clusterElementType: 'tools',
+                    clusterElementTypeIndex: 0,
+                    isNestedClusterRoot: false,
+                    metadata: savedPosition ? {ui: {nodePosition: savedPosition}} : {},
+                    parentClusterRootElementsTypeCount: 1,
+                },
+                id: nodeId,
+                parentId,
+                position: {x: 0, y: 0},
+                type: 'workflow',
+            };
+        };
+
+        return [
+            {
+                data: {clusterElementTypesCount: 1, clusterElements: {tools: []}},
+                id: 'root',
+                position: {x: 0, y: 0},
+                type: 'clusterRoot',
+            },
+            ...nestedRootIds.map(nestedRoot),
+            ...nestedRootIds.map(child),
+        ];
+    }
+
+    function layOut(nodes: Node[]) {
+        const result = getClusterElementsLayoutElements({canvasHeight: 800, canvasWidth: 1600, edges: [], nodes});
+
+        const absolutePoint = (nodeId: string): {x: number; y: number} => {
+            let node = result.nodes.find((candidate) => candidate.id === nodeId);
+            let x = 0;
+            let y = 0;
+
+            while (node) {
+                x += node.position.x;
+                y += node.position.y;
+
+                node = node.parentId ? result.nodes.find((candidate) => candidate.id === node!.parentId) : undefined;
+            }
+
+            return {x, y};
+        };
+
+        return {absolutePoint};
+    }
+
+    function layOutWithChildrenAt(absoluteTargets: Record<string, {x: number; y: number}>) {
+        const {absolutePoint: unpinnedAbsolutePoint} = layOut(buildRootWithThreeNestedRoots());
+
+        const savedChildPositions = Object.fromEntries(
+            Object.entries(absoluteTargets).map(([childId, target]) => {
+                const parentPoint = unpinnedAbsolutePoint(childId.replace(/Child$/, ''));
+
+                return [childId, {x: target.x - parentPoint.x, y: target.y - parentPoint.y}];
+            })
+        );
+
+        return layOut(buildRootWithThreeNestedRoots(savedChildPositions));
+    }
+
+    it('separates a chain of vertically overlapping elements whose ends do not overlap each other', () => {
+        const rowHeight = NODE_HEIGHT + 40;
+
+        const {absolutePoint} = layOutWithChildrenAt({
+            firstToolChild: {x: 0, y: 600},
+            secondToolChild: {x: 400, y: 600 + rowHeight - 10},
+            thirdToolChild: {x: 400, y: 600 + 2 * (rowHeight - 10)},
+        });
+
+        const secondX = absolutePoint('secondToolChild').x;
+        const thirdX = absolutePoint('thirdToolChild').x;
+
+        expect(Math.abs(thirdX - secondX)).toBeGreaterThanOrEqual(CLUSTER_ELEMENT_NODE_WIDTH);
+    });
+
+    it('does not move an element away from one in the same chain that it does not overlap vertically', () => {
+        const rowHeight = NODE_HEIGHT + 40;
+
+        const {absolutePoint} = layOutWithChildrenAt({
+            firstToolChild: {x: 0, y: 600},
+            secondToolChild: {x: 800, y: 600 + rowHeight - 10},
+            thirdToolChild: {x: 0, y: 600 + 2 * (rowHeight - 10)},
+        });
+
+        expect(absolutePoint('thirdToolChild').x).toBe(absolutePoint('firstToolChild').x);
+    });
+});

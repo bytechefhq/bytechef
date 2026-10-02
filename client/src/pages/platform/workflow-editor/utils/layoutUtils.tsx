@@ -685,12 +685,14 @@ export const getClusterElementsLayoutElements = ({
         .filter((node) => !!node.parentId)
         .sort((nodeA, nodeB) => getAbsolutePoint(nodeA).y - getAbsolutePoint(nodeB).y);
 
-    for (const node of parentedNodes) {
-        const nodeY = getAbsolutePoint(node).y;
-        const openRow = rows.find((row) => Math.abs(getAbsolutePoint(row[0]).y - nodeY) < NODE_HEIGHT + labelOverhang);
+    const verticallyOverlaps = (nodeA: Node, nodeB: Node): boolean =>
+        Math.abs(getAbsolutePoint(nodeA).y - getAbsolutePoint(nodeB).y) < NODE_HEIGHT + labelOverhang;
 
-        if (openRow) {
-            openRow.push(node);
+    for (const node of parentedNodes) {
+        const lastRow = rows[rows.length - 1];
+
+        if (lastRow && verticallyOverlaps(lastRow[lastRow.length - 1], node)) {
+            lastRow.push(node);
         } else {
             rows.push([node]);
         }
@@ -706,30 +708,37 @@ export const getClusterElementsLayoutElements = ({
             .sort((placementA, placementB) => placementA.absoluteX - placementB.absoluteX);
 
         for (let index = 1; index < placements.length; index++) {
-            const previous = placements[index - 1];
             const current = placements[index];
 
-            const previousLabelPadding = previous.node.data.clusterElementTypesCount
-                ? 0
-                : CLUSTER_ELEMENT_LABEL_PADDING;
-            const currentLabelPadding = current.node.data.clusterElementTypesCount ? 0 : CLUSTER_ELEMENT_LABEL_PADDING;
-            const minGap =
-                previous.node.data.clusterElementTypesCount && current.node.data.clusterElementTypesCount
-                    ? CLUSTER_ROOT_GAP
-                    : overlapPadding;
+            for (const previous of placements.slice(0, index)) {
+                if (!verticallyOverlaps(previous.node, current.node)) {
+                    continue;
+                }
 
-            const minAbsoluteX =
-                previous.absoluteX + previous.width + previousLabelPadding + currentLabelPadding + minGap;
+                const previousLabelPadding = previous.node.data.clusterElementTypesCount
+                    ? 0
+                    : CLUSTER_ELEMENT_LABEL_PADDING;
+                const currentLabelPadding = current.node.data.clusterElementTypesCount
+                    ? 0
+                    : CLUSTER_ELEMENT_LABEL_PADDING;
+                const minGap =
+                    previous.node.data.clusterElementTypesCount && current.node.data.clusterElementTypesCount
+                        ? CLUSTER_ROOT_GAP
+                        : overlapPadding;
 
-            const encroachmentX = containsNodePosition(current.node.data.metadata)
-                ? previous.absoluteX + previous.width
-                : minAbsoluteX;
+                const minAbsoluteX =
+                    previous.absoluteX + previous.width + previousLabelPadding + currentLabelPadding + minGap;
 
-            if (current.absoluteX < encroachmentX) {
-                const shift = minAbsoluteX - current.absoluteX;
+                const encroachmentX = containsNodePosition(current.node.data.metadata)
+                    ? previous.absoluteX + previous.width
+                    : minAbsoluteX;
 
-                current.node.position = {...current.node.position, x: current.node.position.x + shift};
-                current.absoluteX = minAbsoluteX;
+                if (current.absoluteX < encroachmentX) {
+                    const shift = minAbsoluteX - current.absoluteX;
+
+                    current.node.position = {...current.node.position, x: current.node.position.x + shift};
+                    current.absoluteX = minAbsoluteX;
+                }
             }
         }
     }
