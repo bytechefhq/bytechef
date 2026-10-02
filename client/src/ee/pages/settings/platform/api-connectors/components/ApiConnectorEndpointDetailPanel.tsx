@@ -1,6 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import {lazy} from 'react';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import {Suspense, lazy} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {getHttpMethodBadgeColor} from '../utils/httpMethod-utils';
@@ -70,13 +71,15 @@ const ApiConnectorEndpointDetailPanel = () => {
                                     className="overflow-hidden rounded-md border"
                                     style={{height: calculateEditorHeight(endpointYaml)}}
                                 >
-                                    <MonacoEditorWrapper
-                                        defaultLanguage="yaml"
-                                        onChange={() => {}}
-                                        onMount={() => {}}
-                                        options={editorOptions}
-                                        value={endpointYaml}
-                                    />
+                                    <Suspense fallback={<MonacoEditorLoader />}>
+                                        <MonacoEditorWrapper
+                                            defaultLanguage="yaml"
+                                            onChange={() => {}}
+                                            onMount={() => {}}
+                                            options={editorOptions}
+                                            value={endpointYaml}
+                                        />
+                                    </Suspense>
                                 </div>
                             </div>
                         )}
@@ -89,13 +92,15 @@ const ApiConnectorEndpointDetailPanel = () => {
                                     className="overflow-hidden rounded-md border"
                                     style={{height: calculateEditorHeight(specification)}}
                                 >
-                                    <MonacoEditorWrapper
-                                        defaultLanguage="yaml"
-                                        onChange={() => {}}
-                                        onMount={() => {}}
-                                        options={editorOptions}
-                                        value={specification}
-                                    />
+                                    <Suspense fallback={<MonacoEditorLoader />}>
+                                        <MonacoEditorWrapper
+                                            defaultLanguage="yaml"
+                                            onChange={() => {}}
+                                            onMount={() => {}}
+                                            options={editorOptions}
+                                            value={specification}
+                                        />
+                                    </Suspense>
                                 </div>
                             </div>
                         )}
