@@ -39,5 +39,6 @@ public interface ProjectWorkflowExecutionFacade {
 
     Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
-        Long projectId, Long projectDeploymentId, String workflowId, long workspaceId, int pageNumber);
+        Long projectId, Long projectDeploymentId, String workflowId, Integer projectVersion, long workspaceId,
+        int pageNumber);
 }

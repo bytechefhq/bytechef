@@ -183,7 +183,8 @@ public interface WorkflowExecutionApi {
      * @param jobEndDate The end date of a job. (optional)
      * @param projectId The id of a project. (optional)
      * @param projectDeploymentId The id of a project deployment. (optional)
-     * @param workflowId The id of a workflow. (optional)
+     * @param workflowId The id of a workflow. Executions of every version of the workflow are matched unless projectVersion is set. (optional)
+     * @param projectVersion The project version the workflow executions ran. Only applies together with workflowId. (optional)
      * @param pageNumber The number of the page to return. (optional, default to 0)
      * @return The page of workflow executions. (status code 200)
      */
@@ -212,7 +213,8 @@ public interface WorkflowExecutionApi {
         @Parameter(name = "jobEndDate", description = "The end date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobEndDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime jobEndDate,
         @Parameter(name = "projectId", description = "The id of a project.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectId", required = false) @Nullable Long projectId,
         @Parameter(name = "projectDeploymentId", description = "The id of a project deployment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectDeploymentId", required = false) @Nullable Long projectDeploymentId,
-        @Parameter(name = "workflowId", description = "The id of a workflow.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "workflowId", required = false) @Nullable String workflowId,
+        @Parameter(name = "workflowId", description = "The id of a workflow. Executions of every version of the workflow are matched unless projectVersion is set.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "workflowId", required = false) @Nullable String workflowId,
+        @Parameter(name = "projectVersion", description = "The project version the workflow executions ran. Only applies together with workflowId.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectVersion", required = false) @Nullable Integer projectVersion,
         @Parameter(name = "pageNumber", description = "The number of the page to return.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber
     ) {
         getRequest().ifPresent(request -> {
