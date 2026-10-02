@@ -46,6 +46,7 @@ import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutorImpl;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowSyncExecutor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
@@ -69,6 +70,7 @@ import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -83,8 +85,8 @@ import org.springframework.core.task.TaskExecutor;
 public class WebhookConfiguration {
 
     @Bean
-    SseStreamBridgeRegistry sseStreamBridgeRegistry() {
-        return new SseStreamBridgeRegistry();
+    SseStreamBridgeRegistry sseStreamBridgeRegistry(ObjectProvider<JobResumeFacade> jobResumeFacadeProvider) {
+        return new SseStreamBridgeRegistry(jobResumeFacadeProvider.getIfAvailable());
     }
 
     @Bean

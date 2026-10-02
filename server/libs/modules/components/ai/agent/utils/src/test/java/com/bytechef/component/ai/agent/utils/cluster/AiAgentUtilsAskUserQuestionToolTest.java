@@ -18,9 +18,6 @@ package com.bytechef.component.ai.agent.utils.cluster;
 
 import static com.bytechef.platform.ai.constant.AiAgentSseEventType.ASK_USER_QUESTION;
 import static com.bytechef.platform.ai.constant.AiAgentSseEventType.EVENT_TYPE;
-import static com.bytechef.platform.ai.constant.AiAgentToolContextKey.ACTION_CONTEXT;
-import static com.bytechef.platform.ai.constant.AiAgentToolContextKey.SSE_BUFFERED_EVENTS;
-import static com.bytechef.platform.ai.constant.AiAgentToolContextKey.SSE_EMITTER_REFERENCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,18 +39,21 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.tool.AiAgentToolContext;
+import com.bytechef.platform.ai.tool.AiAgentToolContext.SseTransport;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -124,7 +124,7 @@ class AiAgentUtilsAskUserQuestionToolTest {
 
     @Test
     void testCallWithoutEventTransportReturnsGuidanceWithoutSuspending() {
-        ToolContext toolContext = new ToolContext(Map.of(ACTION_CONTEXT, actionContext));
+        ToolContext toolContext = new ToolContext(new AiAgentToolContext(actionContext).toMap());
 
         String result = toolCallback.call(TOOL_INPUT, toolContext);
 
@@ -137,22 +137,20 @@ class AiAgentUtilsAskUserQuestionToolTest {
     void testCallWithResumeUrlSendsQuestionAndSuspends() {
         when(((ActionContextAware) actionContext).getResumeUrl()).thenReturn(RESUME_URL);
 
-        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        SseTransport sseTransport = new SseTransport();
 
         Instant before = Instant.now();
 
-        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(bufferedEvents));
+        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(sseTransport));
 
-        assertTrue(ToolSuspension.isSuspendedToolResult(result));
+        assertTrue(ToolSuspension.isSuspendedToolResult(result, suspendReference.get()));
 
-        Map<String, Object> event = bufferedEvents.poll();
+        Map<String, @Nullable Object> event = getFirstBufferedEvent(sseTransport);
 
         assertNotNull(event);
         assertEquals(ASK_USER_QUESTION, event.get(EVENT_TYPE));
         assertEquals(RESUME_URL, event.get("resumeUrl"));
         assertEquals(EXPECTED_QUESTIONS, event.get("questions"));
-
-        verify(actionContext, times(1)).suspend(any(Suspend.class));
 
         Suspend suspend = suspendReference.get();
 
@@ -174,13 +172,13 @@ class AiAgentUtilsAskUserQuestionToolTest {
         when(((ActionContextAware) actionContext).isEditorEnvironment()).thenReturn(true);
         when(((ActionContextAware) actionContext).getResumeUrl()).thenReturn(RESUME_URL);
 
-        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        SseTransport sseTransport = new SseTransport();
 
-        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(bufferedEvents));
+        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(sseTransport));
 
         assertEquals(AiAgentUtilsAskUserQuestionTool.NO_RESUME_URL_RESULT, result);
 
-        Map<String, Object> event = bufferedEvents.poll();
+        Map<String, @Nullable Object> event = getFirstBufferedEvent(sseTransport);
 
         assertNotNull(event);
         assertFalse(event.containsKey("resumeUrl"));
@@ -193,13 +191,13 @@ class AiAgentUtilsAskUserQuestionToolTest {
     void testCallWithoutResumeUrlSendsQuestionAndTellsModelToEndTurn() {
         when(((ActionContextAware) actionContext).getResumeUrl()).thenReturn(null);
 
-        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        SseTransport sseTransport = new SseTransport();
 
-        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(bufferedEvents));
+        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(sseTransport));
 
         assertEquals(AiAgentUtilsAskUserQuestionTool.NO_RESUME_URL_RESULT, result);
 
-        Map<String, Object> event = bufferedEvents.poll();
+        Map<String, @Nullable Object> event = getFirstBufferedEvent(sseTransport);
 
         assertNotNull(event);
         assertEquals(ASK_USER_QUESTION, event.get(EVENT_TYPE));
@@ -213,14 +211,13 @@ class AiAgentUtilsAskUserQuestionToolTest {
         when(((ActionContextAware) actionContext).getResumeUrl()).thenReturn(RESUME_URL);
 
         SseEmitter sseEmitter = mock(SseEmitter.class);
-        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        SseTransport sseTransport = new SseTransport();
 
         String result = toolCallback.call(
-            TOOL_INPUT, createStreamingToolContext(bufferedEvents, new AtomicReference<>(sseEmitter)));
+            TOOL_INPUT, createStreamingToolContext(attach(sseTransport, sseEmitter)));
 
-        assertTrue(ToolSuspension.isSuspendedToolResult(result));
+        assertTrue(ToolSuspension.isSuspendedToolResult(result, suspendReference.get()));
         verify(sseEmitter, times(1)).send(any(Map.class));
-        assertTrue(bufferedEvents.isEmpty());
     }
 
     @Test
@@ -232,13 +229,12 @@ class AiAgentUtilsAskUserQuestionToolTest {
         doThrow(new IllegalStateException("client disconnected")).when(sseEmitter)
             .send(any());
 
-        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        SseTransport sseTransport = new SseTransport();
 
         String result = toolCallback.call(
-            TOOL_INPUT, createStreamingToolContext(bufferedEvents, new AtomicReference<>(sseEmitter)));
+            TOOL_INPUT, createStreamingToolContext(attach(sseTransport, sseEmitter)));
 
         assertEquals(AiAgentUtilsAskUserQuestionTool.QUESTIONS_NOT_DELIVERED_RESULT, result);
-        assertTrue(bufferedEvents.isEmpty());
         verify(actionContext, never()).suspend(any());
     }
 
@@ -246,44 +242,30 @@ class AiAgentUtilsAskUserQuestionToolTest {
     void testMalformedInputFailsWithoutSendingAQuestionOrSuspending() {
         when(((ActionContextAware) actionContext).getResumeUrl()).thenReturn(RESUME_URL);
 
-        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        SseTransport sseTransport = new SseTransport();
 
-        ToolContext toolContext = createStreamingToolContext(bufferedEvents);
+        ToolContext toolContext = createStreamingToolContext(sseTransport);
 
         assertThrows(RuntimeException.class, () -> toolCallback.call("not json", toolContext));
 
-        assertTrue(bufferedEvents.isEmpty());
+        assertTrue(getBufferedEvents(sseTransport).isEmpty());
         verify(actionContext, never()).suspend(any());
     }
 
     @Test
-    void testCallReportsUndeliveredQuestionsWhenNoEmitterAndNoBuffer() {
-        when(((ActionContextAware) actionContext).getResumeUrl()).thenReturn(RESUME_URL);
+    void testCallWithoutAgentToolContextReturnsGuidanceAndDoesNotLeakToolContext() {
+        SseTransport sseTransport = new SseTransport();
 
-        ToolContext toolContext = new ToolContext(
-            Map.of(ACTION_CONTEXT, actionContext, SSE_EMITTER_REFERENCE, new AtomicReference<>()));
+        ToolContext toolContextWithoutAgentToolContext = new ToolContext(Map.of("unrelated", "value"));
 
-        String result = toolCallback.call(TOOL_INPUT, toolContext);
+        String guidance = toolCallback.call(TOOL_INPUT, toolContextWithoutAgentToolContext);
 
-        assertEquals(AiAgentUtilsAskUserQuestionTool.QUESTIONS_NOT_DELIVERED_RESULT, result);
-        verify(actionContext, never()).suspend(any());
-    }
-
-    @Test
-    void testCallFailsWhenActionContextMissingAndDoesNotLeakToolContext() {
-        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
-
-        ToolContext toolContextWithoutActionContext = new ToolContext(Map.of(SSE_BUFFERED_EVENTS, bufferedEvents));
-
-        RuntimeException exception = assertThrows(
-            RuntimeException.class, () -> toolCallback.call(TOOL_INPUT, toolContextWithoutActionContext));
-
-        assertTrue(getRootCauseMessage(exception).contains("ActionContext not available"));
-        assertTrue(bufferedEvents.isEmpty());
+        assertEquals(AiAgentUtilsAskUserQuestionTool.NO_EVENT_TRANSPORT_RESULT, guidance);
+        assertTrue(getBufferedEvents(sseTransport).isEmpty());
 
         when(((ActionContextAware) actionContext).getResumeUrl()).thenReturn(null);
 
-        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(bufferedEvents));
+        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(sseTransport));
 
         assertEquals(AiAgentUtilsAskUserQuestionTool.NO_RESUME_URL_RESULT, result);
     }
@@ -299,15 +281,19 @@ class AiAgentUtilsAskUserQuestionToolTest {
             .thenReturn(new ActionContext.Suspend(Map.of("questions", "q1"), null));
 
         ToolContext toolContext = new ToolContext(
-            Map.of(ACTION_CONTEXT, actionContextAware, SSE_EMITTER_REFERENCE, new AtomicReference<>()));
+            new AiAgentToolContext(actionContextAware, new SseTransport()).toMap());
 
         AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback callback =
             new AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback(delegate);
 
         String result = callback.call("input", toolContext);
 
+        ArgumentCaptor<Suspend> suspendCaptor = ArgumentCaptor.forClass(Suspend.class);
+
+        verify(actionContextAware).suspend(suspendCaptor.capture());
+
         assertTrue(
-            ToolSuspension.isSuspendedToolResult(result),
+            ToolSuspension.isSuspendedToolResult(result, suspendCaptor.getValue()),
             "When the tool sets a suspend on the agent context, the callback must replace the delegate's result with " +
                 "the suspended tool result so the agent loop can locate the pending tool call on resume.");
 
@@ -324,7 +310,7 @@ class AiAgentUtilsAskUserQuestionToolTest {
         when(actionContextAware.getSuspend()).thenReturn(null);
 
         ToolContext toolContext = new ToolContext(
-            Map.of(ACTION_CONTEXT, actionContextAware, SSE_EMITTER_REFERENCE, new AtomicReference<>()));
+            new AiAgentToolContext(actionContextAware, new SseTransport()).toMap());
 
         AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback callback =
             new AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback(delegate);
@@ -336,13 +322,15 @@ class AiAgentUtilsAskUserQuestionToolTest {
     }
 
     @Test
-    void testPassesThroughDelegateResultWhenActionContextMissing() {
+    void testPassesThroughDelegateResultWhenTheActionContextCannotSuspend() {
         ToolCallback delegate = mock(ToolCallback.class);
 
         when(delegate.getToolDefinition()).thenReturn(createToolDefinition());
         when(delegate.call(eq("input"), any(ToolContext.class))).thenReturn("real-delegate-result");
 
-        ToolContext toolContext = new ToolContext(Map.of(SSE_EMITTER_REFERENCE, new AtomicReference<>()));
+        ToolContext toolContext = new ToolContext(
+            new AiAgentToolContext(mock(ActionContext.class), new SseTransport())
+                .toMap());
 
         AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback callback =
             new AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback(delegate);
@@ -366,18 +354,35 @@ class AiAgentUtilsAskUserQuestionToolTest {
         assertEquals(toolDefinition, callback.getToolDefinition());
     }
 
-    private ToolContext createStreamingToolContext(Queue<Map<String, Object>> bufferedEvents) {
-        return createStreamingToolContext(bufferedEvents, new AtomicReference<>());
+    private ToolContext createStreamingToolContext(SseTransport sseTransport) {
+        return new ToolContext(new AiAgentToolContext(actionContext, sseTransport).toMap());
     }
 
-    private ToolContext createStreamingToolContext(
-        Queue<Map<String, Object>> bufferedEvents, AtomicReference<SseEmitter> emitterReference) {
+    private static SseTransport attach(SseTransport sseTransport, SseEmitter sseEmitter) {
+        sseTransport.attach(sseEmitter, exception -> {
+            throw new IllegalStateException(exception);
+        });
 
-        return new ToolContext(
-            Map.of(
-                ACTION_CONTEXT, actionContext,
-                SSE_BUFFERED_EVENTS, bufferedEvents,
-                SSE_EMITTER_REFERENCE, emitterReference));
+        return sseTransport;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Map<String, @Nullable Object>> getBufferedEvents(SseTransport sseTransport) {
+        List<Map<String, @Nullable Object>> events = new ArrayList<>();
+        SseEmitter recordingSseEmitter = mock(SseEmitter.class);
+
+        doAnswer(invocation -> events.add(invocation.getArgument(0))).when(recordingSseEmitter)
+            .send(any());
+
+        attach(sseTransport, recordingSseEmitter);
+
+        return events;
+    }
+
+    private static @Nullable Map<String, @Nullable Object> getFirstBufferedEvent(SseTransport sseTransport) {
+        List<Map<String, @Nullable Object>> events = getBufferedEvents(sseTransport);
+
+        return events.isEmpty() ? null : events.getFirst();
     }
 
     private static ToolDefinition createToolDefinition() {
@@ -388,13 +393,4 @@ class AiAgentUtilsAskUserQuestionToolTest {
             .build();
     }
 
-    private static String getRootCauseMessage(Throwable throwable) {
-        Throwable rootCause = throwable;
-
-        while (rootCause.getCause() != null) {
-            rootCause = rootCause.getCause();
-        }
-
-        return String.valueOf(rootCause.getMessage());
-    }
 }

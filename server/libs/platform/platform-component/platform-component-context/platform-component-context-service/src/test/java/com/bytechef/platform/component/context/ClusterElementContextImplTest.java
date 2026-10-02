@@ -32,6 +32,7 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
@@ -187,8 +188,16 @@ class ClusterElementContextImplTest {
 
         toolActionContext.suspend(suspend);
 
-        assertSame(suspend, parentActionContext.getSuspend());
-        assertSame(suspend, toolActionContext.getSuspend());
+        Suspend parentSuspend = parentActionContext.getSuspend();
+
+        assertNotNull(parentSuspend);
+        assertEquals(
+            "https://example.com/resume", parentSuspend.continueParameters()
+                .get("formUrl"));
+        assertEquals(
+            parentActionContext.getJobResumeId(), parentSuspend.continueParameters()
+                .get(MetadataConstants.JOB_RESUME_ID));
+        assertEquals(parentSuspend, toolActionContext.getSuspend());
     }
 
     @Test

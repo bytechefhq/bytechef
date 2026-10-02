@@ -25,8 +25,7 @@ import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.LongConsumer;
 import org.slf4j.Logger;
@@ -63,7 +62,9 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     }
 
     @Override
-    public JobResumeOutcome resumeJobStreaming(String id, Map<String, Object> data, LongConsumer jobIdConsumer) {
+    public JobResumeOutcome resumeJobStreaming(
+        String id, Map<String, Object> data, LongConsumer jobIdConsumer) {
+
         return resumeJob(id, data, true, jobIdConsumer);
     }
 
@@ -84,15 +85,37 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
             Job job = jobService.getJob(jobResumeId.getJobId());
 
-            if (job.getStatus() != Job.Status.STOPPED) {
-                log.warn("Cannot resume job {}; status is {}", jobResumeId.getJobId(), job.getStatus());
+            String consumedJobResumeIdString = (String) job.getMetadata(MetadataConstants.CONSUMED_JOB_RESUME_ID);
+
+            if (jobResumeId.matches(consumedJobResumeIdString)) {
+                log.debug("Job {} was already resumed with this resume id", jobResumeId.getJobId());
+
+                return JobResumeOutcome.GONE;
+            }
+
+            Job.Status status = job.getStatus();
+
+            if (status == Job.Status.CREATED || status == Job.Status.STARTED) {
+                log.debug("Job {} has not been suspended yet; status is {}", jobResumeId.getJobId(), status);
+
+                return JobResumeOutcome.NOT_YET_SUSPENDED;
+            }
+
+            if (status == Job.Status.FAILED) {
+                log.warn("Cannot resume job {}; it failed", jobResumeId.getJobId());
+
+                return JobResumeOutcome.JOB_FAILED;
+            }
+
+            if (status != Job.Status.STOPPED) {
+                log.warn("Cannot resume job {}; status is {}", jobResumeId.getJobId(), status);
 
                 return JobResumeOutcome.GONE;
             }
 
             String storedJobResumeIdString = (String) job.getMetadata(MetadataConstants.JOB_RESUME_ID);
 
-            if (storedJobResumeIdString == null || !tokenMatches(storedJobResumeIdString, jobResumeId)) {
+            if (!jobResumeId.matches(storedJobResumeIdString)) {
                 log.warn("Resume token does not match stored value for job {}", jobResumeId.getJobId());
 
                 return JobResumeOutcome.INVALID_ID;
@@ -104,6 +127,14 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
                 return JobResumeOutcome.STREAMING_NOT_ALLOWED;
             }
 
+            Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
+
+            jobMetadata.put(MetadataConstants.CONSUMED_JOB_RESUME_ID, storedJobResumeIdString);
+
+            job.setMetadata(jobMetadata);
+
+            jobService.update(job);
+
             jobIdConsumer.accept(jobResumeId.getJobId());
 
             jobFacade.resumeJob(
@@ -114,32 +145,5 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
             return JobResumeOutcome.OK;
         });
-    }
-
-    private static boolean tokenMatches(String storedJobResumeIdString, JobResumeId suppliedJobResumeId) {
-        JobResumeId storedJobResumeId;
-
-        try {
-            storedJobResumeId = JobResumeId.parse(storedJobResumeIdString);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return false;
-        }
-
-        if (storedJobResumeId.getJobId() != suppliedJobResumeId.getJobId()) {
-            return false;
-        }
-
-        if (!storedJobResumeId.getTenantId()
-            .equals(suppliedJobResumeId.getTenantId())) {
-
-            return false;
-        }
-
-        byte[] storedUuidBytes = storedJobResumeId.getUuidAsString()
-            .getBytes(StandardCharsets.UTF_8);
-        byte[] suppliedUuidBytes = suppliedJobResumeId.getUuidAsString()
-            .getBytes(StandardCharsets.UTF_8);
-
-        return MessageDigest.isEqual(storedUuidBytes, suppliedUuidBytes);
     }
 }

@@ -31,6 +31,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailStage;
+import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolResponses;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.MaskResult;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.PreflightMasking;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
@@ -58,7 +60,8 @@ import reactor.core.publisher.Flux;
 /**
  * Spring-AI advisor that runs sanitizers over the user message (input) and the assistant message (output). PREFLIGHT
  * (rule-based) sanitizers run first and mask their entities; LLM-based sanitizers run afterwards on the already-masked
- * text. Any exception escaping a sanitizer triggers a withheld-placeholder response.
+ * text. Any exception escaping a sanitizer triggers a withheld-placeholder response. Input sanitizing also covers a
+ * tool response that carries a human's answer (see {@code HumanToolResponses}), treated like a user message.
  *
  * <p>
  * Streaming: {@link #adviseStream} sanitizes per chunk — cross-chunk patterns are not masked and chunks already shipped
@@ -303,6 +306,29 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
         boolean modified = false;
 
         for (Message message : messages) {
+            if (message instanceof ToolResponseMessage toolResponseMessage) {
+                String humanResponseText = HumanToolResponses.getHumanResponseText(toolResponseMessage);
+
+                if (humanResponseText == null || humanResponseText.isEmpty()) {
+                    sanitizedMessages.add(message);
+
+                    continue;
+                }
+
+                String sanitizedHumanResponseText = sanitize(humanResponseText, true);
+
+                if (sanitizedHumanResponseText.equals(humanResponseText)) {
+                    sanitizedMessages.add(message);
+                } else {
+                    sanitizedMessages.add(
+                        HumanToolResponses.withHumanResponseText(toolResponseMessage, sanitizedHumanResponseText));
+
+                    modified = true;
+                }
+
+                continue;
+            }
+
             if (message.getMessageType() != MessageType.USER) {
                 sanitizedMessages.add(message);
 
