@@ -42,6 +42,9 @@ public interface WebhookTriggerTestFacade {
 
     boolean isWorkflowEnabled(WorkflowExecutionId workflowExecutionId);
 
+    WebhookValidateResponse validate(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, long environmentId);
+
     WebhookValidateResponse validateOnEnable(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, long environmentId);
 }

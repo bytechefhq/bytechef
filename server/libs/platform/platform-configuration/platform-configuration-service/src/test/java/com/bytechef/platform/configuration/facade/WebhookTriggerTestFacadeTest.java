@@ -31,6 +31,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -194,6 +195,25 @@ class WebhookTriggerTestFacadeTest {
             WORKFLOW_ID, WEBHOOK_TRIGGER_NAME, ENVIRONMENT_ID);
         verify(triggerDefinitionFacade).executeWebhookValidateOnEnable(
             eq("webhook"), eq(1), eq("autoRespondWithHTTP200"), anyMap(), eq(webhookRequest), isNull());
+    }
+
+    @Test
+    void testValidateUsesTriggerNamedInWorkflowExecutionIdWithoutEnablingWorkflow() {
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, -1, WORKFLOW_UUID, WEBHOOK_TRIGGER_NAME);
+        WebhookRequest webhookRequest = mock(WebhookRequest.class);
+        WebhookValidateResponse badRequestResponse = WebhookValidateResponse.badRequest();
+
+        when(triggerDefinitionFacade.executeWebhookValidate(
+            eq("webhook"), eq(1), eq("autoRespondWithHTTP200"), anyMap(), eq(webhookRequest), isNull()))
+                .thenReturn(badRequestResponse);
+
+        assertThat(webhookTriggerTestFacade.validate(workflowExecutionId, webhookRequest, ENVIRONMENT_ID))
+            .isSameAs(badRequestResponse);
+        assertThat(webhookTriggerTestFacade.isWorkflowEnabled(workflowExecutionId)).isFalse();
+
+        verify(workflowTestConfigurationService).fetchWorkflowTestConfigurationConnectionId(
+            WORKFLOW_ID, WEBHOOK_TRIGGER_NAME, ENVIRONMENT_ID);
     }
 
     private static WorkflowExecutionId parseWorkflowExecutionId(String webhookUrl) {

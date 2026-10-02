@@ -130,6 +130,23 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     }
 
     @Override
+    public WebhookValidateResponse validate(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, long environmentId) {
+
+        String workflowId = getLatestWorkflowId(
+            workflowExecutionId.getWorkflowUuid(), workflowExecutionId.getType());
+
+        WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId, workflowExecutionId.getTriggerName());
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+        return triggerDefinitionFacade.executeWebhookValidate(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
+            getTriggerParameters(workflowId, workflowTrigger, environmentId), webhookRequest,
+            getConnectionId(workflowId, workflowTrigger, environmentId));
+    }
+
+    @Override
     public WebhookValidateResponse validateOnEnable(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, long environmentId) {
 
@@ -139,20 +156,29 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId, workflowExecutionId.getTriggerName());
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-        Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
-            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, environmentId),
-            evaluator);
-        Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName(), environmentId)
-            .orElse(null);
 
         Cache cache = Objects.requireNonNull(cacheManager.getCache(WORKFLOW_ENABLED_CACHE));
 
         cache.put(workflowExecutionId.toString(), true);
 
         return triggerDefinitionFacade.executeWebhookValidateOnEnable(
-            workflowNodeType.name(), workflowNodeType.version(),
-            workflowNodeType.operation(), triggerParameters, webhookRequest, connectionId);
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
+            getTriggerParameters(workflowId, workflowTrigger, environmentId), webhookRequest,
+            getConnectionId(workflowId, workflowTrigger, environmentId));
+    }
+
+    private @Nullable Long getConnectionId(String workflowId, WorkflowTrigger workflowTrigger, long environmentId) {
+        return workflowTestConfigurationService
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName(), environmentId)
+            .orElse(null);
+    }
+
+    private Map<String, ?> getTriggerParameters(
+        String workflowId, WorkflowTrigger workflowTrigger, long environmentId) {
+
+        return workflowTrigger.evaluateParameters(
+            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, environmentId),
+            evaluator);
     }
 
     private String executeTrigger(
