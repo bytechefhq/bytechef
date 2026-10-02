@@ -121,6 +121,7 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
             projectDeploymentWorkflowSheetOpen: false,
             projectId: undefined,
             projectName: undefined,
+            projectVersion: undefined,
             workflow: undefined,
         });
 
@@ -156,6 +157,29 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
         expect(screen.getByText('No Executions')).toBeInTheDocument();
         expect(queryMock).toHaveBeenCalledWith(
             {id: 1, pageNumber: 0, projectDeploymentId: 3, projectVersion: 3, workflowId: 'workflow1'},
+            true
+        );
+    });
+
+    it('fetches only the new version when the sheet is reopened after the deployment moves to another version', () => {
+        mockQueryResult([]);
+
+        openSheet();
+
+        renderSheet();
+
+        act(() => {
+            useProjectDeploymentWorkflowSheetStore.getState().openProjectDeploymentWorkflowSheet({
+                projectDeploymentId: 3,
+                projectName: 'Subflow',
+                projectVersion: 4,
+                workflow: {id: 'workflow1-v4', label: 'workflow1'} as Workflow,
+            });
+        });
+
+        expect(document.querySelector('header')).toHaveTextContent('Subflow /workflow1/ V4');
+        expect(queryMock).toHaveBeenLastCalledWith(
+            {id: 1, pageNumber: 0, projectDeploymentId: 3, projectVersion: 4, workflowId: 'workflow1-v4'},
             true
         );
     });
