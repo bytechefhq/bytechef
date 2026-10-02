@@ -1,16 +1,16 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
-import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Checkbox} from '@/components/ui/checkbox';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {EditIcon, PlusIcon, Trash2Icon} from 'lucide-react';
 
@@ -92,137 +92,135 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
             )}
 
             <Dialog onOpenChange={handleDialogOpen} open={isDialogOpen}>
-                <DialogContent className="max-w-lg">
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(handleSaveRequestBody)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <DialogTitle>{requestBody ? 'Edit' : 'Add'} Request Body</DialogTitle>
+                <DialogContent>
+                    <DialogMain>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(handleSaveRequestBody)}>
+                            <DialogHeader title={`${requestBody ? 'Edit' : 'Add'} Request Body`} />
 
-                            <DialogCloseButton />
-                        </DialogHeader>
+                            <DialogBody className="flex flex-col gap-4">
+                                <FormField
+                                    control={control}
+                                    name="contentType"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Content Type</FormLabel>
 
-                        <FormField
-                            control={control}
-                            name="contentType"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Content Type</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                </FormControl>
 
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                        </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="application/json">application/json</SelectItem>
 
-                                        <SelectContent>
-                                            <SelectItem value="application/json">application/json</SelectItem>
+                                                    <SelectItem value="application/xml">application/xml</SelectItem>
 
-                                            <SelectItem value="application/xml">application/xml</SelectItem>
+                                                    <SelectItem value="multipart/form-data">
+                                                        multipart/form-data
+                                                    </SelectItem>
 
-                                            <SelectItem value="multipart/form-data">multipart/form-data</SelectItem>
+                                                    <SelectItem value="application/x-www-form-urlencoded">
+                                                        application/x-www-form-urlencoded
+                                                    </SelectItem>
 
-                                            <SelectItem value="application/x-www-form-urlencoded">
-                                                application/x-www-form-urlencoded
-                                            </SelectItem>
+                                                    <SelectItem value="text/plain">text/plain</SelectItem>
+                                                </SelectContent>
+                                            </Select>
 
-                                            <SelectItem value="text/plain">text/plain</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                <FormField
+                                    control={control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
 
-                        <FormField
-                            control={control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Request body description" {...field} />
+                                            </FormControl>
 
-                                    <FormControl>
-                                        <Input placeholder="Request body description" {...field} />
-                                    </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                <FormField
+                                    control={control}
+                                    name="schema"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>JSON Schema</FormLabel>
 
-                        <FormField
-                            control={control}
-                            name="schema"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>JSON Schema</FormLabel>
+                                            <FormControl>
+                                                <div className="h-48 overflow-hidden rounded-md border">
+                                                    <MonacoEditorWrapper
+                                                        defaultLanguage="json"
+                                                        onChange={(value) => field.onChange(value || '')}
+                                                        onMount={() => {}}
+                                                        options={{
+                                                            automaticLayout: true,
+                                                            folding: true,
+                                                            fontSize: 12,
+                                                            lineNumbers: 'on',
+                                                            minimap: {enabled: false},
+                                                            scrollBeyondLastLine: false,
+                                                            tabSize: 2,
+                                                            wordWrap: 'on',
+                                                        }}
+                                                        value={field.value}
+                                                    />
+                                                </div>
+                                            </FormControl>
 
-                                    <FormControl>
-                                        <div className="h-48 overflow-hidden rounded-md border">
-                                            <MonacoEditorWrapper
-                                                defaultLanguage="json"
-                                                onChange={(value) => field.onChange(value || '')}
-                                                onMount={() => {}}
-                                                options={{
-                                                    automaticLayout: true,
-                                                    folding: true,
-                                                    fontSize: 12,
-                                                    lineNumbers: 'on',
-                                                    minimap: {enabled: false},
-                                                    scrollBeyondLastLine: false,
-                                                    tabSize: 2,
-                                                    wordWrap: 'on',
-                                                }}
-                                                value={field.value}
-                                            />
-                                        </div>
-                                    </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    rules={{
+                                        required: 'Schema is required',
+                                        validate: (value: string) => {
+                                            if (!value || value.trim().length === 0) {
+                                                return 'Schema is required';
+                                            }
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            rules={{
-                                required: 'Schema is required',
-                                validate: (value: string) => {
-                                    if (!value || value.trim().length === 0) {
-                                        return 'Schema is required';
-                                    }
+                                            try {
+                                                JSON.parse(value);
 
-                                    try {
-                                        JSON.parse(value);
+                                                return true;
+                                            } catch {
+                                                return 'Schema must be valid JSON';
+                                            }
+                                        },
+                                    }}
+                                />
 
-                                        return true;
-                                    } catch {
-                                        return 'Schema must be valid JSON';
-                                    }
-                                },
-                            }}
-                        />
+                                <FormField
+                                    control={control}
+                                    name="required"
+                                    render={({field}) => (
+                                        <FormItem className="flex items-center gap-2 space-y-0">
+                                            <FormControl>
+                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="required"
-                            render={({field}) => (
-                                <FormItem className="flex items-center gap-2 space-y-0">
-                                    <FormControl>
-                                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                    </FormControl>
+                                            <FormLabel className="font-normal">Required</FormLabel>
+                                        </FormItem>
+                                    )}
+                                />
+                            </DialogBody>
 
-                                    <FormLabel className="font-normal">Required</FormLabel>
-                                </FormItem>
-                            )}
-                        />
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-
-                            <Button type="submit">{requestBody ? 'Update' : 'Add'}</Button>
-                        </DialogFooter>
-                    </form>
+                                <Button type="submit">{requestBody ? 'Update' : 'Add'}</Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogMain>
                 </DialogContent>
             </Dialog>
         </div>
