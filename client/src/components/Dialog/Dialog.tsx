@@ -2,6 +2,7 @@ import {
     Dialog as ShadcnDialog,
     DialogClose as ShadcnDialogClose,
     DialogContent as ShadcnDialogContent,
+    DialogTitle as ShadcnDialogTitle,
     DialogTrigger as ShadcnDialogTrigger,
 } from '@/components/ui/dialog';
 import {ComponentPropsWithRef, createContext, useContext, useMemo} from 'react';
@@ -59,7 +60,15 @@ const DialogTrigger = (props: ComponentPropsWithRef<typeof ShadcnDialogTrigger>)
 
 DialogTrigger.displayName = 'DialogTrigger';
 
+/**
+ * Radix requires every DialogContent to carry a title. DialogHeader is the usual way to give one, but it also renders
+ * visible chrome, so full-bleed surfaces that supply their own toolbar pair this with VisuallyHidden instead.
+ */
+const DialogTitle = (props: ComponentPropsWithRef<typeof ShadcnDialogTitle>) => <ShadcnDialogTitle {...props} />;
+
+DialogTitle.displayName = 'DialogTitle';
+
 const useDialogLayout = () => useContext(DialogLayoutContext);
 
-export {Dialog, DialogClose, DialogContent, DialogTrigger, useDialogLayout};
+export {Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger, useDialogLayout};
 export type {DialogContentProps, DialogContentSizeType, DialogLayoutContextI};
