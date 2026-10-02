@@ -1898,15 +1898,27 @@ export const getElkLayoutElements = async ({
                 return;
             }
 
-            const entryCenters = entryColumns
-                .map((entryColumn) => {
-                    const renderedSize = getRenderedNodeSize(entryColumn.entryNode, direction);
+            const getEntryCenter = (entryNode: Node): number => {
+                const renderedSize = getRenderedNodeSize(entryNode, direction);
 
-                    return (
-                        entryColumn.entryNode.position[crossAxis] +
-                        (crossAxis === 'x' ? renderedSize.width : renderedSize.height) / 2
-                    );
-                })
+                return (
+                    entryNode.position[crossAxis] + (crossAxis === 'x' ? renderedSize.width : renderedSize.height) / 2
+                );
+            };
+
+            const shiftEntryColumns = (shiftedColumns: typeof entryColumns, columnShift: number): void => {
+                shiftedColumns.forEach((entryColumn) => {
+                    entryColumn.memberNodes.forEach((memberNode) => {
+                        memberNode.position = {
+                            ...memberNode.position,
+                            [crossAxis]: memberNode.position[crossAxis] + columnShift,
+                        };
+                    });
+                });
+            };
+
+            const entryCenters = entryColumns
+                .map((entryColumn) => getEntryCenter(entryColumn.entryNode))
                 .sort((firstCenter, secondCenter) => firstCenter - secondCenter);
 
             const entryAnchor =
@@ -1922,14 +1934,28 @@ export const getElkLayoutElements = async ({
             const anchorShift = dispatcherCrossCenter - entryAnchor;
 
             if (Math.abs(anchorShift) >= 1) {
-                entryColumns.forEach((entryColumn) => {
-                    entryColumn.memberNodes.forEach((memberNode) => {
-                        memberNode.position = {
-                            ...memberNode.position,
-                            [crossAxis]: memberNode.position[crossAxis] + anchorShift,
-                        };
-                    });
-                });
+                shiftEntryColumns(entryColumns, anchorShift);
+            }
+
+            // Mirror: the repack clears each column against its LEFT neighbour, so a
+            // label hanging right of an inner column widens only the pitches on the
+            // right and the lanes read lopsided around the dispatcher. Walk mirrored
+            // column pairs center-outward and push the nearer one — together with
+            // every column beyond it — out to its partner's distance. Moving only
+            // outward keeps every clearance the repack established.
+            const columnCount = entryColumns.length;
+
+            for (let leftIndex = Math.floor(columnCount / 2) - 1; leftIndex >= 0; leftIndex--) {
+                const rightIndex = columnCount - 1 - leftIndex;
+
+                const leftDistance = dispatcherCrossCenter - getEntryCenter(entryColumns[leftIndex].entryNode);
+                const rightDistance = getEntryCenter(entryColumns[rightIndex].entryNode) - dispatcherCrossCenter;
+
+                if (rightDistance - leftDistance >= 1) {
+                    shiftEntryColumns(entryColumns.slice(0, leftIndex + 1), leftDistance - rightDistance);
+                } else if (leftDistance - rightDistance >= 1) {
+                    shiftEntryColumns(entryColumns.slice(rightIndex), leftDistance - rightDistance);
+                }
             }
         });
 

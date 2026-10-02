@@ -1943,6 +1943,38 @@ describe('getElkLayoutElements with branches', () => {
         expect(Math.abs(caseACenter - branchCenter)).toBeLessThanOrEqual(1);
     });
 
+    it('mirrors the outer case columns around the branch axis when the middle case has a label', async () => {
+        // The repack clears each column against its LEFT neighbour, so the middle
+        // task's right-hand label widened only the right pitch and the empty outer
+        // cases sat at different distances from the branch
+        const nodes: Node[] = [
+            branchNode('branch_1', ['case_0', 'case_1']),
+            ...branchGhostNodes('branch_1'),
+            branchCasePlaceholderNode('branch_1', 'default'),
+            branchChildTaskNode('caseZeroChild', 'branch_1', 'case_0'),
+            branchCasePlaceholderNode('branch_1', 'case_1'),
+        ];
+
+        const edges: Edge[] = [
+            edge('branch_1', 'branch_1-branch-top-ghost'),
+            edge('branch_1-branch-top-ghost', 'branch_1-branch-default-placeholder-0'),
+            edge('branch_1-branch-top-ghost', 'caseZeroChild'),
+            edge('branch_1-branch-top-ghost', 'branch_1-branch-case_1-placeholder-0'),
+            edge('branch_1-branch-default-placeholder-0', 'branch_1-branch-bottom-ghost'),
+            edge('caseZeroChild', 'branch_1-branch-bottom-ghost'),
+            edge('branch_1-branch-case_1-placeholder-0', 'branch_1-branch-bottom-ghost'),
+        ];
+
+        const result = await getElkLayoutElements({canvasWidth: 1600, direction: 'TB', edges, nodes});
+
+        const branchCenter = positionOf(result.nodes, 'branch_1').x + 36;
+        const defaultCenter = positionOf(result.nodes, 'branch_1-branch-default-placeholder-0').x + 36;
+        const caseOneCenter = positionOf(result.nodes, 'branch_1-branch-case_1-placeholder-0').x + 36;
+
+        expect(Math.abs(positionOf(result.nodes, 'caseZeroChild').x + 36 - branchCenter)).toBeLessThanOrEqual(1);
+        expect(Math.abs(branchCenter - defaultCenter - (caseOneCenter - branchCenter))).toBeLessThanOrEqual(1);
+    });
+
     it('ranks unknown case keys last', async () => {
         const nodes: Node[] = [
             branchNode('branch_1', ['case_a']),
