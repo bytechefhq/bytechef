@@ -1,13 +1,10 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import React from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectsLeftSidebar from './ProjectsLeftSidebar';
-
-// Simple utility to flush promises
-const flushPromises = () => new Promise((r) => setTimeout(r, 0));
 
 // React Query test client setup
 const createTestQueryClient = () =>
@@ -21,33 +18,7 @@ const createTestQueryClient = () =>
 
 let queryClient: QueryClient;
 
-// Mocks for UI components used inside dropdown/scroll
-vi.mock('@/components/Button/Button', () => ({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    default: ({children, icon, label, ...props}: any) => (
-        <button data-testid="btn" {...props}>
-            {icon}
-
-            {label ?? children}
-        </button>
-    ),
-}));
-
-vi.mock('@/components/ui/dropdown-menu', () => ({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    DropdownMenu: ({children}: any) => <div>{children}</div>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    DropdownMenuContent: ({children}: any) => <div>{children}</div>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    DropdownMenuItem: ({children, disabled, onClick}: any) => (
-        <div aria-disabled={disabled ? 'true' : undefined} onClick={disabled ? undefined : onClick} role="menuitem">
-            {children}
-        </div>
-    ),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    DropdownMenuTrigger: ({children}: any) => <div>{children}</div>,
-}));
-
+// Mocks for UI components used inside the scroll area
 vi.mock('@/components/ui/scroll-area', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ScrollArea: ({children, ...props}: any) => <div {...props}>{children}</div>,
@@ -78,10 +49,6 @@ vi.mock('@/pages/automation/project/components/projects-sidebar/components/Workf
     default: () => <div data-testid="skeleton">Loading...</div>,
 }));
 
-vi.mock('@/shared/components/workflow/WorkflowDialog', () => ({
-    default: () => <div role="dialog">WorkflowDialog</div>,
-}));
-
 // Hooks and stores
 const mockGetProjectWorkflowsQuery = vi.fn();
 const mockGetWorkflowsQuery = vi.fn();
@@ -94,24 +61,13 @@ vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
 
 const mockGetWorkspaceProjectsQuery = vi.fn();
 vi.mock('@/shared/queries/automation/projects.queries', async () => ({
-    ProjectKeys: {project: (id: number) => ['project', id], projects: ['projects']},
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useGetWorkspaceProjectsQuery: (args: any) => mockGetWorkspaceProjectsQuery(args),
-}));
-
-const hasEnabledAiProviderMock = vi.fn();
-vi.mock('@/shared/hooks/useHasEnabledAiProvider', () => ({
-    useHasEnabledAiProvider: () => hasEnabledAiProviderMock(),
-}));
-
-vi.mock('@/shared/queries/automation/workflows.queries', () => ({
-    useGetWorkflowQuery: vi.fn(),
 }));
 
 vi.mock('@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar', () => ({
     useProjectsLeftSidebar: () => ({
         calculateTimeDifference: vi.fn(),
-        createProjectWorkflowMutation: {mutate: vi.fn()},
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         getFilteredWorkflows: (workflows: any[]) => workflows || [],
         getWorkflowsProjectId: () => vi.fn(),
@@ -123,30 +79,6 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: any) => selector({currentWorkspaceId: 10}),
 }));
 
-vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    useImportProjectMutation: (opts: any) => ({
-        mutate: vi.fn().mockImplementation(() => {
-            opts?.onSuccess?.();
-        }),
-    }),
-}));
-
-vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    useCreateProjectWorkflowMutation: (opts: any) => ({
-        mutate: vi.fn().mockImplementation(() => {
-            opts?.onSuccess?.();
-        }),
-    }),
-}));
-
-vi.mock('@/shared/hooks/useAnalytics', () => ({
-    useAnalytics: () => ({captureProjectWorkflowImported: vi.fn()}),
-}));
-
-vi.mock('sonner', () => ({toast: vi.fn()}));
-
 vi.mock('@tanstack/react-query', async () => {
     const actual = await vi.importActual<typeof import('@tanstack/react-query')>('@tanstack/react-query');
     return {
@@ -154,13 +86,6 @@ vi.mock('@tanstack/react-query', async () => {
         useQueryClient: () => ({invalidateQueries: vi.fn()}),
     };
 });
-
-const mockNavigate = vi.hoisted(() => vi.fn());
-
-vi.mock('react-router-dom', async () => ({
-    useNavigate: () => mockNavigate,
-    useSearchParams: () => [new URLSearchParams(), vi.fn()],
-}));
 
 // Helper to set default mocks per test scenario
 const setupQueries = ({
@@ -188,8 +113,6 @@ const setupQueries = ({
 };
 
 const baseProps = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    bottomResizablePanelRef: {current: null} as any,
     currentWorkflowId: 'w1',
     onProjectClick: vi.fn(),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -208,8 +131,6 @@ describe('ProjectsLeftSidebar', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         queryClient = createTestQueryClient();
-
-        hasEnabledAiProviderMock.mockReturnValue({hasEnabledAiProvider: true, isPending: false});
     });
 
     afterEach(() => {
@@ -246,50 +167,17 @@ describe('ProjectsLeftSidebar', () => {
         expect(items).toHaveLength(workflows.length);
     });
 
-    it('shows Workflow button and opens WorkflowDialog on click', async () => {
+    it('leaves project and workflow creation to the settings menu', async () => {
         setupQueries({selectedProjectId: 9});
 
         renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
 
-        // Button visible
-        expect(screen.getByText('Workflow')).toBeInTheDocument();
+        await screen.findAllByTestId('workflow-item');
 
-        // Click primary button to open dialog
-        fireEvent.click(screen.getByText('Workflow'));
-
-        expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    });
-
-    it('calls import workflow mutation when selecting a file', async () => {
-        setupQueries({selectedProjectId: 3});
-
-        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={3} />);
-
-        // Open dropdown (chevron) -> Import Workflow
-        const buttons = screen.getAllByTestId('btn');
-        const chevronBtn = buttons[buttons.length - 1]; // the chevron is rendered after the primary button
-        fireEvent.click(chevronBtn);
-        fireEvent.click(screen.getByText(/Import Workflow/i));
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const input = screen.queryByAltText('file') as any;
-
-        // Fallback: query by selector if role not available due to hidden input
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fileInput = (input ?? (document.querySelector('input[type="file"]') as any)) as HTMLInputElement;
-
-        expect(fileInput).toBeTruthy();
-
-        const content = 'my-definition';
-        const file = new File([content], 'wf.json', {type: 'application/json'});
-
-        // Fire change event
-        fireEvent.change(fileInput, {target: {files: [file]}});
-
-        await flushPromises();
-
-        // onSuccess toast etc. are called within mutation; test by checking that input is reset to empty string
-        await waitFor(() => expect(fileInput.value).toBe(''));
+        expect(screen.queryByLabelText('New project')).not.toBeInTheDocument();
+        expect(screen.queryByText('Workflow')).not.toBeInTheDocument();
+        expect(screen.queryByText('Import Workflow')).not.toBeInTheDocument();
+        expect(document.querySelector('input[type="file"]')).toBeNull();
     });
 
     it('updates selectedProjectId when projectId prop changes', async () => {
@@ -425,47 +313,5 @@ describe('ProjectsLeftSidebar', () => {
 
         const items = await screen.findAllByTestId('project-workflows-list');
         expect(items).toHaveLength(projects.length);
-    });
-
-    it('disables the Import n8n Workflow item when no AI provider is enabled', async () => {
-        hasEnabledAiProviderMock.mockReturnValue({hasEnabledAiProvider: false, isPending: false});
-        setupQueries({selectedProjectId: 5});
-
-        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
-
-        const menuItem = (await screen.findByText('Import n8n Workflow')).closest('[role="menuitem"]');
-
-        expect(menuItem).toHaveAttribute('aria-disabled', 'true');
-    });
-
-    it('keeps the Import n8n Workflow item enabled while the AI provider check is pending', async () => {
-        hasEnabledAiProviderMock.mockReturnValue({hasEnabledAiProvider: false, isPending: true});
-        setupQueries({selectedProjectId: 5});
-
-        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
-
-        const menuItem = (await screen.findByText('Import n8n Workflow')).closest('[role="menuitem"]');
-
-        expect(menuItem).not.toHaveAttribute('aria-disabled');
-    });
-
-    it('opens the template pages with absolute routes', () => {
-        setupQueries({selectedProjectId: 5});
-
-        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
-
-        const templateItems = screen
-            .getAllByRole('menuitem')
-            .filter((menuItem) => /From Template/.test(menuItem.textContent ?? ''));
-
-        expect(templateItems).toHaveLength(2);
-
-        fireEvent.click(templateItems[0]);
-
-        expect(mockNavigate).toHaveBeenCalledWith('/automation/projects/templates');
-
-        fireEvent.click(templateItems[1]);
-
-        expect(mockNavigate).toHaveBeenCalledWith('/automation/projects/5/templates');
     });
 });

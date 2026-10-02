@@ -1,6 +1,7 @@
 import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {Separator} from '@/components/ui/separator';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import EEVersion from '@/shared/edition/EEVersion';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -11,15 +12,23 @@ import {
     GitBranchIcon,
     GitPullRequestArrowIcon,
     HistoryIcon,
+    LayoutTemplateIcon,
+    PlusIcon,
     Share2Icon,
     Trash2Icon,
+    UploadIcon,
 } from 'lucide-react';
 import {MouseEvent} from 'react';
 
 const ProjectTabButtons = ({
+    importN8nWorkflowDisabled,
     onCloseDropdownMenuClick,
     onDeleteProjectClick,
     onDuplicateProjectClick,
+    onImportN8nWorkflowClick,
+    onImportWorkflowClick,
+    onNewWorkflowClick,
+    onNewWorkflowFromTemplateClick,
     onPullProjectFromGitClick,
     onShareProject,
     onShowEditProjectDialogClick,
@@ -28,9 +37,14 @@ const ProjectTabButtons = ({
     projectGitConfigurationEnabled,
     projectId,
 }: {
+    importN8nWorkflowDisabled: boolean;
     onCloseDropdownMenuClick: () => void;
     onDeleteProjectClick: () => void;
     onDuplicateProjectClick: () => void;
+    onImportN8nWorkflowClick: () => void;
+    onImportWorkflowClick: () => void;
+    onNewWorkflowClick: () => void;
+    onNewWorkflowFromTemplateClick: () => void;
     onShareProject: () => void;
     onShowEditProjectDialogClick: () => void;
     onPullProjectFromGitClick: () => void;
@@ -97,6 +111,55 @@ const ProjectTabButtons = ({
                 onClick={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
                 variant="ghost"
             />
+
+            <Separator />
+
+            <Button
+                aria-label="New Workflow"
+                className="dropdown-menu-item"
+                icon={<PlusIcon />}
+                label="New Workflow"
+                onClick={onNewWorkflowClick}
+                variant="ghost"
+            />
+
+            <Button
+                aria-label="New Workflow from Template"
+                className="dropdown-menu-item"
+                icon={<LayoutTemplateIcon />}
+                label="Workflow from Template"
+                onClick={onNewWorkflowFromTemplateClick}
+                variant="ghost"
+            />
+
+            <Button
+                aria-label="Import Workflow"
+                className="dropdown-menu-item"
+                icon={<UploadIcon />}
+                label="Import Workflow"
+                onClick={onImportWorkflowClick}
+                variant="ghost"
+            />
+
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <span className="block">
+                        <Button
+                            aria-label="Import n8n Workflow"
+                            className="dropdown-menu-item w-full"
+                            disabled={importN8nWorkflowDisabled}
+                            icon={<UploadIcon />}
+                            label="Import n8n Workflow"
+                            onClick={onImportN8nWorkflowClick}
+                            variant="ghost"
+                        />
+                    </span>
+                </TooltipTrigger>
+
+                {importN8nWorkflowDisabled && (
+                    <TooltipContent>Enable an AI provider to import n8n workflows.</TooltipContent>
+                )}
+            </Tooltip>
 
             <Separator />
 
