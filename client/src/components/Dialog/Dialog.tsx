@@ -14,6 +14,12 @@ const contentStyles =
 const sidebarLayoutStyles = 'lg:h-[648px] lg:w-[860px] lg:gap-2 lg:bg-surface-main lg:p-2';
 
 const contentSizeStyles = {
+    /**
+     * Emits no width at all, for full-bleed dialogs that compute their own geometry. They need it: the scale is
+     * expressed at the `sm` breakpoint, so a plain `w-*` in className is a different Tailwind group and still loses to
+     * the scale from 640px up.
+     */
+    custom: '',
     lg: 'sm:w-[800px]',
     md: 'sm:w-[640px]',
     sm: 'sm:w-[512px]',

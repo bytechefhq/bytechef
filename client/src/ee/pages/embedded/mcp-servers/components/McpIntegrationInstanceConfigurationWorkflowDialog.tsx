@@ -190,7 +190,7 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
                             className="flex min-h-0 flex-1 flex-col"
                             onSubmit={handleSubmit(saveMcpIntegrationInstanceConfiguration)}
                         >
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 {isEditMode && (
                                     <>
                                         <FormItem>

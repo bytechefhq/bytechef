@@ -126,6 +126,17 @@ describe('ClusterElementsCanvasDialog - no scale animation', () => {
         expect(screen.getByRole('dialog', {name: 'Cluster elements canvas'})).toBeInTheDocument();
     });
 
+    // The canvas spans the viewport rather than sitting on the sm/md/lg/xl scale, so it opts out of the family width.
+    // Without that opt-out the scale's sm:w-[512px] won from 640 px up and the canvas was clipped.
+    it('spans the viewport instead of taking the family width', () => {
+        renderDialog();
+
+        const dialog = screen.getByRole('dialog');
+
+        expect(dialog).toHaveClass('w-[calc(100vw-80px)]');
+        expect(dialog.className).not.toMatch(/\bsm:w-\[/);
+    });
+
     it('pins the enter scale to 1 so ReactFlow never measures handles mid-scale', () => {
         renderDialog();
 

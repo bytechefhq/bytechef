@@ -110,7 +110,7 @@ const ResponseEditor = ({onChange, responses}: ResponseEditorProps) => {
                         <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(handleSaveResponse)}>
                             <DialogHeader title={`${editingResponse ? 'Edit' : 'Add'} Response`} />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <div className="grid grid-cols-2 gap-4">
                                     <FormField
                                         control={control}

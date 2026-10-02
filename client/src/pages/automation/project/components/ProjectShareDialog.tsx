@@ -123,7 +123,7 @@ export function ProjectShareDialog({
                 <DialogMain>
                     <DialogHeader title="Share project as template" />
 
-                    <DialogBody className="space-y-4">
+                    <DialogBody>
                         <Alert
                             className={twMerge(shareState === 'not-shared' && 'bg-muted')}
                             variant={

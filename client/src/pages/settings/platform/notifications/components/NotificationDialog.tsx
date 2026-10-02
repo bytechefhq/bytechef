@@ -68,7 +68,7 @@ const NotificationDialog = ({
                                 console.error('There has been an error submitting the Notifications form', error)
                             )}
                         >
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <FormField
                                     control={control}
                                     name="name"

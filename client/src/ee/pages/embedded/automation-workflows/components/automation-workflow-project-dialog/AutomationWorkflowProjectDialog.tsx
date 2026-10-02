@@ -110,7 +110,7 @@ const AutomationWorkflowProjectDialog = ({
                                 title={`${project ? 'Edit' : 'Create'} Project`}
                             />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <FormField
                                     control={control}
                                     name="name"

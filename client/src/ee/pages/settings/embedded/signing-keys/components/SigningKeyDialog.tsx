@@ -126,7 +126,7 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
                                 }
                             />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 {privateKey ? (
                                     <div className="space-y-4">
                                         <p className="text-sm">

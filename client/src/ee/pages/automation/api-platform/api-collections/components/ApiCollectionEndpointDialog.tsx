@@ -134,7 +134,7 @@ const ApiCollectionEndpointDialog = ({
                                 title={`${apiEndpoint?.id ? 'Edit' : 'Create'} API Endpoint`}
                             />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <FormField
                                     control={control}
                                     name="workflowUuid"

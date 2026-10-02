@@ -162,7 +162,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                                 title={`${apiCollection?.id ? 'Edit' : 'Create'} API Collection`}
                             />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 {!apiCollection?.id && (
                                     <FormField
                                         control={control}

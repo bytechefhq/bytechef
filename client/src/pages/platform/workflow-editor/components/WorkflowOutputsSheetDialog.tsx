@@ -114,7 +114,7 @@ const WorkflowOutputsSheetDialog = ({
                                 title={`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}
                             />
 
-                            <DialogBody className="space-y-4">
+                            <DialogBody>
                                 <FormField
                                     control={form.control}
                                     name="name"
