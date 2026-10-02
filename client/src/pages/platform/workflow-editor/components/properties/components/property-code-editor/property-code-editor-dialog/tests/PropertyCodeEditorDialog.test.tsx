@@ -121,6 +121,14 @@ describe('PropertyCodeEditorDialog', () => {
             expect(screen.getByText('Edit Script')).toBeInTheDocument();
         });
 
+        // The title used to be rendered as a sibling of DialogContent, which left a stray heading in
+        // the page flow. Radix still wired aria-labelledby to it by id, so only containment catches it.
+        it('should keep the title inside the dialog', () => {
+            renderWithProviders(<PropertyCodeEditorDialog {...defaultProps} />);
+
+            expect(screen.getByRole('dialog')).toContainElement(screen.getByText('Edit Script'));
+        });
+
         it('should render the toolbar', () => {
             renderWithProviders(<PropertyCodeEditorDialog {...defaultProps} />);
 
