@@ -12,6 +12,8 @@ query customComponent($id: ID!) {
         createdDate
         lastModifiedBy
         lastModifiedDate
+        status
+        publishedDate
         version
     }
 }
