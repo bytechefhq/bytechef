@@ -12,6 +12,8 @@ query customComponents {
         createdDate
         lastModifiedBy
         lastModifiedDate
+        status
+        publishedDate
         version
     }
 }
