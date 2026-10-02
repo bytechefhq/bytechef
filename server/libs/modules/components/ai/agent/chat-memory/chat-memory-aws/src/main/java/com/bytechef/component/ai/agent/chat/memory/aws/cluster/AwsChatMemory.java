@@ -63,6 +63,6 @@ public class AwsChatMemory {
         MessageChatMemoryAdvisor messageChatMemoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory)
             .build();
 
-        return new ChatMemoryFunction.Result(messageChatMemoryAdvisor, chatMemory);
+        return ChatMemoryFunction.Result.of(messageChatMemoryAdvisor, chatMemory);
     }
 }

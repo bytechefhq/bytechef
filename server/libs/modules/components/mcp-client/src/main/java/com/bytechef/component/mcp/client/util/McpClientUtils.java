@@ -57,11 +57,14 @@ import io.modelcontextprotocol.spec.McpSchema;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.mcp.McpToolFilter;
+import org.springframework.ai.mcp.ToolContextToMcpMetaConverter;
 
 /**
  * @author Ivica Cardic
@@ -220,6 +223,18 @@ public class McpClientUtils {
                 yield (connectionInfo, tool) -> !excludeSet.contains(tool.name());
             }
             default -> (connectionInfo, tool) -> true;
+        };
+    }
+
+    public static ToolContextToMcpMetaConverter createToolContextToMcpMetaConverter() {
+        ToolContextToMcpMetaConverter defaultConverter = ToolContextToMcpMetaConverter.defaultConverter();
+
+        return toolContext -> {
+            Map<String, Object> mcpMeta = new HashMap<>(defaultConverter.convert(toolContext));
+
+            mcpMeta.remove(ChatMemory.CONVERSATION_ID);
+
+            return mcpMeta;
         };
     }
 

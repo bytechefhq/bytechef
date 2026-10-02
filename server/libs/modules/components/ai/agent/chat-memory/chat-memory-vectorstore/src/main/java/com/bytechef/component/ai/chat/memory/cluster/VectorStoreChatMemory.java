@@ -99,6 +99,6 @@ public class VectorStoreChatMemory {
             .defaultTopK(
                 inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20));
 
-        return new ChatMemoryFunction.Result(builder.build(), null);
+        return ChatMemoryFunction.Result.of(builder.build(), null);
     }
 }

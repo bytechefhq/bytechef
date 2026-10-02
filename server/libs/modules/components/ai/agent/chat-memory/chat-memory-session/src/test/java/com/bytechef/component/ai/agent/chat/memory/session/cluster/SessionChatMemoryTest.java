@@ -20,16 +20,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.ai.agent.chat.memory.session.compaction.ContextLoggingSessionService;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextConsumer;
+import com.bytechef.component.definition.Context.Log;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
+import com.bytechef.platform.component.definition.ai.agent.ConversationHistoryReader;
+import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.time.Instant;
@@ -37,21 +49,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import org.mockito.AdditionalAnswers;
+import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.client.ChatClientResponse;
+import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionRepository;
+import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.ai.session.compaction.CompactionRequest;
 import org.springframework.ai.session.compaction.CompactionTrigger;
+import org.springframework.ai.session.compaction.TokenCountCompactionStrategy;
+import org.springframework.ai.session.compaction.TokenCountTrigger;
+import org.springframework.ai.session.compaction.TurnCountTrigger;
+import org.springframework.ai.session.compaction.TurnWindowCompactionStrategy;
+import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.tool.ToolCallback;
 
 /**
@@ -101,11 +128,10 @@ class SessionChatMemoryTest {
 
         assertEquals(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER, sessionMemoryAdvisor.getOrder());
         assertTrue(result.supportsToolMessagePersistence());
-        ChatMemory chatMemory = result.chatMemory();
 
-        assertNotNull(chatMemory, "session memory must expose its history to guardrails");
+        ConversationHistoryReader conversationHistoryReader = result.conversationHistoryReader();
 
-        List<Message> messages = chatMemory.get(CONVERSATION_ID);
+        List<Message> messages = conversationHistoryReader.read(CONVERSATION_ID);
 
         assertEquals(1, messages.size());
         assertEquals("live turn", messages.getFirst()
@@ -130,7 +156,9 @@ class SessionChatMemoryTest {
         ChatMemoryFunction.Result result = applySessionChatMemory(
             sessionRepository, Map.of("conversationId", CONVERSATION_ID, "enableConversationSearch", true));
 
-        ToolCallback conversationSearchToolCallback = result.toolCallbacks()[0];
+        List<ToolCallback> toolCallbacks = result.toolCallbacks();
+
+        ToolCallback conversationSearchToolCallback = toolCallbacks.getFirst();
 
         String searchResult = conversationSearchToolCallback.call(
             "{\"innerThought\":\"recall\",\"query\":\"alpha\"}",
@@ -165,6 +193,71 @@ class SessionChatMemoryTest {
                 "maxEventsToKeep", 10)))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("requires a Model child");
+    }
+
+    @Test
+    void testRecursiveSummarizationBuildsTheSummarizerFromTheModelChild() throws Exception {
+        ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
+
+        SessionRepository sessionRepository = InMemorySessionRepository.builder()
+            .build();
+
+        SessionRepositoryFunction sessionRepositoryFunction =
+            (inputParameters, connectionParameters, extensions, componentConnections) -> sessionRepository;
+
+        when(clusterElementDefinitionService.<SessionRepositoryFunction>getClusterElement(
+            eq("builtInSessionChatMemory"), eq(1), eq("sessionRepository"))).thenReturn(sessionRepositoryFunction);
+
+        ModelFunction modelFunction = mock(ModelFunction.class);
+
+        doReturn(mock(ChatModel.class)).when(modelFunction)
+            .apply(any(), any(), anyBoolean());
+
+        when(clusterElementDefinitionService.<ModelFunction>getClusterElement(eq("openAi"), eq(1), eq("model")))
+            .thenReturn(modelFunction);
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of(
+                    "sessionRepository",
+                    Map.of(
+                        "name", "sessionRepository_1",
+                        "type", "builtInSessionChatMemory/v1/sessionRepository",
+                        "parameters", Map.of()),
+                    "model",
+                    Map.of(
+                        "name", "model_1",
+                        "type", "openAi/v1/model",
+                        "parameters", Map.of("model", "gpt-4o-mini")))));
+
+        Map<String, ComponentConnection> componentConnections = Map.of(
+            "sessionRepository_1", new ComponentConnection("builtInSessionChatMemory", 1, 1L, Map.of(), null),
+            "model_1", new ComponentConnection("openAi", 1, 2L, Map.of("token", "test-token"), null));
+
+        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(clusterElementDefinitionService)
+            .getElement();
+
+        ChatMemoryFunction.Result result = chatMemoryFunction.apply(
+            MockParametersFactory.create(
+                Map.of(
+                    "conversationId", CONVERSATION_ID, "compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents",
+                    20, "maxEventsToKeep", 10, "overlapSize", 2)),
+            MockParametersFactory.create(Map.of()), extensions, componentConnections);
+
+        assertInstanceOf(SessionMemoryAdvisor.class, result.advisor());
+
+        ArgumentCaptor<Parameters> inputParametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+        ArgumentCaptor<Parameters> connectionParametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+
+        verify(modelFunction).apply(
+            inputParametersArgumentCaptor.capture(), connectionParametersArgumentCaptor.capture(), eq(false));
+
+        Parameters modelInputParameters = inputParametersArgumentCaptor.getValue();
+        Parameters modelConnectionParameters = connectionParametersArgumentCaptor.getValue();
+
+        assertEquals("gpt-4o-mini", modelInputParameters.getString("model"));
+        assertEquals("test-token", modelConnectionParameters.getString("token"));
     }
 
     @Test
@@ -209,6 +302,44 @@ class SessionChatMemoryTest {
 
         assertThat(compactionTrigger.shouldCompact(eventsAfterCompaction(10, 2))).isFalse();
         assertThat(compactionTrigger.shouldCompact(eventsAfterCompaction(10, 12))).isTrue();
+    }
+
+    @Test
+    void testTurnWindowCompactsOnceTheTurnsExceedMaxTurns() {
+        SessionChatMemory.Compaction compaction = resolveCompaction(
+            Map.of("compactionStrategy", "TURN_WINDOW", "maxTurns", 3));
+
+        TurnWindowCompactionStrategy turnWindowCompactionStrategy = assertInstanceOf(
+            TurnWindowCompactionStrategy.class, compaction.strategy());
+        TurnCountTrigger turnCountTrigger = assertInstanceOf(TurnCountTrigger.class, compaction.trigger());
+
+        assertEquals(3, turnWindowCompactionStrategy.getMaxTurns());
+        assertEquals(3, turnCountTrigger.getMaxTurns());
+        assertThat(turnCountTrigger.shouldCompact(turns(3))).isFalse();
+        assertThat(turnCountTrigger.shouldCompact(turns(4))).isTrue();
+    }
+
+    @Test
+    void testTokenCountCompactsOnceTheTokensReachMaxTokens() {
+        CompactionRequest compactionRequest = turns(4);
+
+        int tokenCount = estimateTokens(compactionRequest);
+
+        SessionChatMemory.Compaction compaction = resolveCompaction(
+            Map.of("compactionStrategy", "TOKEN_COUNT", "maxTokens", tokenCount));
+
+        TokenCountCompactionStrategy tokenCountCompactionStrategy = assertInstanceOf(
+            TokenCountCompactionStrategy.class, compaction.strategy());
+        TokenCountTrigger tokenCountTrigger = assertInstanceOf(TokenCountTrigger.class, compaction.trigger());
+
+        assertEquals(tokenCount, tokenCountCompactionStrategy.getMaxTokens());
+        assertEquals(tokenCount, tokenCountTrigger.getThreshold());
+        assertThat(tokenCountTrigger.shouldCompact(compactionRequest)).isTrue();
+
+        CompactionTrigger aboveTokenCountTrigger = resolveCompactionTrigger(
+            Map.of("compactionStrategy", "TOKEN_COUNT", "maxTokens", tokenCount + 1));
+
+        assertThat(aboveTokenCountTrigger.shouldCompact(compactionRequest)).isFalse();
     }
 
     @Test
@@ -271,6 +402,63 @@ class SessionChatMemoryTest {
     }
 
     @Test
+    void testSessionServiceIsWrappedWithContextLoggingWhenAContextIsGiven() {
+        SessionService sessionService = mock(SessionService.class);
+
+        assertThat(SessionChatMemory.withContextLogging(sessionService, mock(Context.class)))
+            .isInstanceOf(ContextLoggingSessionService.class);
+        assertThat(SessionChatMemory.withContextLogging(sessionService, null)).isSameAs(sessionService);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testAdvisorLogsCompactionFailuresToTheContext() throws Exception {
+        IllegalStateException storageFailure = new IllegalStateException("Redis connection refused");
+
+        SessionRepository sessionRepository = mock(
+            SessionRepository.class, AdditionalAnswers.delegatesTo(InMemorySessionRepository.builder()
+                .build()));
+
+        sessionRepository.save(Session.builder()
+            .id(CONVERSATION_ID)
+            .userId("user-1")
+            .createdAt(Instant.now())
+            .build());
+
+        appendEvent(sessionRepository, "question", false, false);
+
+        doThrow(storageFailure).when(sessionRepository)
+            .findEvents(eq(CONVERSATION_ID), any(EventFilter.class));
+
+        Context context = mock(Context.class);
+
+        ChatMemoryFunction.Result result = applySessionChatMemory(
+            sessionRepository,
+            Map.of("conversationId", CONVERSATION_ID, "compactionStrategy", "SLIDING_WINDOW", "maxEvents", 1),
+            context);
+
+        SessionMemoryAdvisor sessionMemoryAdvisor = assertInstanceOf(SessionMemoryAdvisor.class, result.advisor());
+
+        ChatClientResponse chatClientResponse = new ChatClientResponse(
+            new ChatResponse(List.of(new Generation(new AssistantMessage("answer")))),
+            Map.of(SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY, CONVERSATION_ID));
+
+        sessionMemoryAdvisor.after(chatClientResponse, mock(AdvisorChain.class));
+
+        ArgumentCaptor<ContextConsumer<Log>> logConsumerCaptor = ArgumentCaptor.forClass(ContextConsumer.class);
+
+        verify(context).log(logConsumerCaptor.capture());
+
+        Log log = mock(Log.class);
+
+        ContextConsumer<Log> logConsumer = logConsumerCaptor.getValue();
+
+        logConsumer.accept(log);
+
+        verify(log).warn(contains(CONVERSATION_ID), same(storageFailure));
+    }
+
+    @Test
     void testNoneHasNoCompaction() throws Exception {
         Parameters inputParameters = MockParametersFactory.create(Map.of("compactionStrategy", "NONE"));
 
@@ -301,19 +489,57 @@ class SessionChatMemoryTest {
     }
 
     private static CompactionTrigger resolveCompactionTrigger(Map<String, Object> inputParameterValues) {
-        try {
-            SessionChatMemory.Compaction compaction = SessionChatMemory.resolveCompaction(
-                MockParametersFactory.create(inputParameterValues), () -> mock(ChatClient.class));
+        SessionChatMemory.Compaction compaction = resolveCompaction(inputParameterValues);
 
-            return Objects.requireNonNull(compaction)
-                .trigger();
+        return compaction.trigger();
+    }
+
+    private static SessionChatMemory.Compaction resolveCompaction(Map<String, Object> inputParameterValues) {
+        try {
+            return Objects.requireNonNull(
+                SessionChatMemory.resolveCompaction(
+                    MockParametersFactory.create(inputParameterValues), () -> mock(ChatClient.class)));
         } catch (Exception exception) {
             throw new IllegalStateException(exception);
         }
     }
 
+    private static CompactionRequest turns(int turnCount) {
+        List<SessionEvent> events = new ArrayList<>();
+
+        for (int index = 0; index < turnCount; index++) {
+            events.add(compactionEvent(new UserMessage("question " + index), false));
+            events.add(compactionEvent(new AssistantMessage("answer " + index), false));
+        }
+
+        return CompactionRequest.of(compactionSession(), events);
+    }
+
+    private static int estimateTokens(CompactionRequest compactionRequest) {
+        JTokkitTokenCountEstimator tokenCountEstimator = new JTokkitTokenCountEstimator();
+
+        int tokenCount = 0;
+
+        for (SessionEvent sessionEvent : compactionRequest.events()) {
+            Message message = sessionEvent.getMessage();
+
+            String role = message.getMessageType() == MessageType.USER ? "User" : "Assistant";
+
+            tokenCount += tokenCountEstimator.estimate(role + ": " + message.getText());
+        }
+
+        return tokenCount;
+    }
+
     private static ChatMemoryFunction.Result applySessionChatMemory(
         SessionRepository sessionRepository, Map<String, Object> inputParameterValues) throws Exception {
+
+        return applySessionChatMemory(sessionRepository, inputParameterValues, null);
+    }
+
+    private static ChatMemoryFunction.Result applySessionChatMemory(
+        SessionRepository sessionRepository, Map<String, Object> inputParameterValues, @Nullable Context context)
+        throws Exception {
 
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
@@ -339,9 +565,16 @@ class SessionChatMemoryTest {
         ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(clusterElementDefinitionService)
             .getElement();
 
+        Parameters inputParameters = MockParametersFactory.create(inputParameterValues);
+        Parameters connectionParameters = MockParametersFactory.create(Map.of());
+        Map<String, ComponentConnection> componentConnections = Map.of("sessionRepository_1", componentConnection);
+
+        if (context == null) {
+            return chatMemoryFunction.apply(inputParameters, connectionParameters, extensions, componentConnections);
+        }
+
         return chatMemoryFunction.apply(
-            MockParametersFactory.create(inputParameterValues), MockParametersFactory.create(Map.of()), extensions,
-            Map.of("sessionRepository_1", componentConnection));
+            inputParameters, connectionParameters, extensions, componentConnections, context);
     }
 
     private static void appendEvent(
