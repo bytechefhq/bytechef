@@ -22,17 +22,19 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.action.AiAgentChatAction;
 import com.bytechef.component.ai.agent.action.AiAgentStreamChatAction;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.agent.tool.AiAgentChatTool;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiAgentComponentDefinition;
 import com.bytechef.platform.component.rule.ComponentRuleEnforcer;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
-import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,10 +47,12 @@ public class AiAgentComponentHandler implements ComponentHandler {
 
     public AiAgentComponentHandler(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager, List<ComponentRuleEnforcer> componentRuleEnforcers) {
+        AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
+        ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
         final ActionDefinition aiAgentChatActionDefinition = AiAgentChatAction.of(
-            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, componentRuleEnforcers);
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, componentRuleEnforcers,
+            aiGuardrailsAdvisorProviderObjectProvider);
 
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
             component(AI_AGENT)
@@ -59,8 +63,8 @@ public class AiAgentComponentHandler implements ComponentHandler {
                 .actions(
                     aiAgentChatActionDefinition,
                     AiAgentStreamChatAction.of(
-                        aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
-                        componentRuleEnforcers))
+                        aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
+                        componentRuleEnforcers, aiGuardrailsAdvisorProviderObjectProvider))
                 .clusterElements(AiAgentChatTool.of(aiAgentChatActionDefinition)));
     }
 

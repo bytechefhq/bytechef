@@ -47,6 +47,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.agent.guardrails.advisor.CheckForViolationsAdvisor;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.agent.tool.DeferredToolCallReplay;
 import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
@@ -350,7 +351,9 @@ class AiAgentChatActionTest {
 
         MultipleConnectionsPerformFunction performFunction = getPerformFunction(
             AiAgentChatAction.of(
-                mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager()));
+                mock(AiAgentToolFacade.class), clusterElementDefinitionService,
+                new AgentToolCallingManagers(createToolCallingManager()),
+                null));
 
         Throwable throwable = catchThrowable(() -> performFunction.apply(
             createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
@@ -380,7 +383,9 @@ class AiAgentChatActionTest {
 
         MultipleConnectionsPerformFunction performFunction = getPerformFunction(
             AiAgentChatAction.of(
-                mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager()));
+                mock(AiAgentToolFacade.class), clusterElementDefinitionService,
+                new AgentToolCallingManagers(createToolCallingManager()),
+                null));
 
         Throwable throwable = catchThrowable(() -> performFunction.apply(
             createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false, false, true),
@@ -410,7 +415,9 @@ class AiAgentChatActionTest {
 
         MultipleConnectionsPerformFunction performFunction = getPerformFunction(
             AiAgentChatAction.of(
-                mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager()));
+                mock(AiAgentToolFacade.class), clusterElementDefinitionService,
+                new AgentToolCallingManagers(createToolCallingManager()),
+                null));
 
         Throwable throwable = catchThrowable(() -> performFunction.apply(
             createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false),
@@ -570,7 +577,8 @@ class AiAgentChatActionTest {
             eq("testComponent"), eq(1), eq("testGuardrail"))).thenReturn(guardrailsFunction);
 
         AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = AiAgentChatAction.of(
-            mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager());
+            mock(AiAgentToolFacade.class), clusterElementDefinitionService,
+            new AgentToolCallingManagers(createToolCallingManager()), null);
 
         AtomicReference<ActionContext.Suspend> firstTurnSuspend = new AtomicReference<>();
 
@@ -1062,7 +1070,7 @@ class AiAgentChatActionTest {
         return AiAgentChatAction.of(
             mock(AiAgentToolFacade.class),
             createClusterElementDefinitionService(createChatModel(prompts, responseFunction), chatMemoryResult),
-            createToolCallingManager());
+            new AgentToolCallingManagers(createToolCallingManager()), null);
     }
 
     private static ActionContextAware createRecordingActionContext(
@@ -1113,7 +1121,9 @@ class AiAgentChatActionTest {
         }
 
         return AiAgentChatAction.of(
-            mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager());
+            mock(AiAgentToolFacade.class), clusterElementDefinitionService,
+            new AgentToolCallingManagers(createToolCallingManager()),
+            null);
     }
 
     private static MultipleConnectionsPerformFunction getPerformFunction(
