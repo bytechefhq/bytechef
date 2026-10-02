@@ -55,6 +55,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.AiAgentComponentHandler;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspensionStorage;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
@@ -67,6 +68,7 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
@@ -119,6 +121,7 @@ import org.springframework.ai.model.tool.DefaultToolCallingManager;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.resolution.DelegatingToolCallbackResolver;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -732,9 +735,12 @@ class AiAgentChatActionIntTest {
         @Bean
         AiAgentComponentHandler aiAgentComponentHandler(
             AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-            ToolCallingManager toolCallingManager) {
+            ToolCallingManager toolCallingManager,
+            ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
-            return new AiAgentComponentHandler(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+            return new AiAgentComponentHandler(
+                aiAgentToolFacade, clusterElementDefinitionService, new AgentToolCallingManagers(toolCallingManager),
+                aiGuardrailsAdvisorProviderObjectProvider);
         }
 
         @Bean

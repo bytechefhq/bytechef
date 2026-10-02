@@ -23,11 +23,13 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
@@ -45,7 +47,7 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
-import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -54,16 +56,22 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
     public static ChatActionDefinitionWrapper of(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        AgentToolCallingManagers agentToolCallingManagers,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
-        return new AiAgentChatAction(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager).build();
+        return new AiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
+            aiGuardrailsAdvisorProviderObjectProvider).build();
     }
 
     private AiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        AgentToolCallingManagers agentToolCallingManagers,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
-        super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        super(
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
+            aiGuardrailsAdvisorProviderObjectProvider);
     }
 
     private ChatActionDefinitionWrapper build() {
