@@ -1,5 +1,5 @@
+import {Dialog, DialogContent, DialogTitle} from '@/components/Dialog';
 import UnsavedChangesAlertDialog from '@/components/UnsavedChangesAlertDialog';
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import PropertyCodeEditorDialogEditor from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogEditor';
 import PropertyCodeEditorDialogExecutionOutput from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogExecutionOutput';
@@ -9,6 +9,7 @@ import {usePropertyCodeEditorDialog} from '@/pages/platform/workflow-editor/comp
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {Workflow} from '@/shared/middleware/platform/configuration';
+import {VisuallyHidden} from 'radix-ui';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyCodeEditorDialogProps {
@@ -42,12 +43,6 @@ const PropertyCodeEditorDialog = ({
     return (
         <>
             <Dialog onOpenChange={handleOpenChange} open={true}>
-                <DialogHeader>
-                    <DialogTitle>Edit Script</DialogTitle>
-
-                    <DialogDescription />
-                </DialogHeader>
-
                 <DialogContent
                     className={twMerge(
                         'absolute top-12 bottom-4 flex h-[calc(100vh-64px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden border-stroke-neutral-secondary bg-surface-neutral-secondary p-0 transition-[left,width] duration-300 ease-in-out sm:max-w-none',
@@ -56,6 +51,10 @@ const PropertyCodeEditorDialog = ({
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
+                    <VisuallyHidden.Root>
+                        <DialogTitle>Edit Script</DialogTitle>
+                    </VisuallyHidden.Root>
+
                     <div className="flex min-w-0 flex-1 flex-col">
                         <PropertyCodeEditorDialogToolbar
                             language={language}
