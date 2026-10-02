@@ -55,7 +55,7 @@ const ProjectItemSelect = ({
 
                         {projectWorkflows.map((workflow) => (
                             <DropdownMenuRadioItem
-                                className="cursor-pointer"
+                                className="cursor-pointer pl-2 data-[state=checked]:bg-surface-brand-secondary data-[state=checked]:text-content-brand-primary [&>span:first-child]:hidden"
                                 key={workflow.projectWorkflowId!}
                                 title={workflow.label!.length > 55 ? workflow.label! : undefined}
                                 value={workflow.projectWorkflowId!.toString()}
