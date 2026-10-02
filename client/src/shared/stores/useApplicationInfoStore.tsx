@@ -34,6 +34,11 @@ export interface ApplicationInfoI {
         customerPortalUrl: string | undefined;
         enabled: boolean;
     };
+    component: {
+        customComponent: {
+            javaEnabled: boolean;
+        };
+    };
     embedded: {
         allowedParentOrigins: string[];
     } | null;
@@ -116,6 +121,11 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     customerPortalUrl: undefined,
                     enabled: false,
                 },
+                component: {
+                    customComponent: {
+                        javaEnabled: true,
+                    },
+                },
                 docs: {
                     changelogUrl: undefined,
                     communitySupportUrl: undefined,
@@ -175,6 +185,11 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             billing: {
                                 customerPortalUrl: json.billing?.customerPortalUrl || undefined,
                                 enabled: json.billing?.enabled === 'true',
+                            },
+                            component: {
+                                customComponent: {
+                                    javaEnabled: json.component?.customComponent?.javaEnabled !== 'false',
+                                },
                             },
                             docs: {
                                 changelogUrl: json.docs?.changelogUrl || undefined,
