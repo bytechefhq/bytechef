@@ -2,6 +2,10 @@ server:
   port: 9999
 
 bytechef:
+  ai:
+    memory:
+      session-cleanup-interval: PT1H
+      session-time-to-live: P60D
   discovery-service:
     provider: redis
   data-storage:

@@ -18,6 +18,7 @@ package com.bytechef.config;
 
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -777,6 +778,26 @@ public class ApplicationProperties {
 
             private Redis redis = new Redis();
 
+            /**
+             * Interval between runs that delete expired sessions from the built-in and in-memory session chat memory
+             * repositories.
+             */
+            private Duration sessionCleanupInterval;
+
+            /**
+             * Maximum number of archived (compacted-away) events kept in a session document by the built-in session
+             * chat memory repository when the provider is redis or aws.
+             */
+            private Integer sessionMaxArchivedEvents;
+
+            /**
+             * How long a session of the built-in and in-memory session chat memory repositories stays available after
+             * its last use, less up to a day: reading the session extends its expiry only once its remaining lifetime
+             * has dropped by the smaller of half this value and one day. Once expired, the session is no longer
+             * available and the expired-session cleanup deletes it.
+             */
+            private Duration sessionTimeToLive;
+
             public Aws getAws() {
                 return aws;
             }
@@ -787,6 +808,18 @@ public class ApplicationProperties {
 
             public Redis getRedis() {
                 return redis;
+            }
+
+            public Duration getSessionCleanupInterval() {
+                return sessionCleanupInterval;
+            }
+
+            public Integer getSessionMaxArchivedEvents() {
+                return sessionMaxArchivedEvents;
+            }
+
+            public Duration getSessionTimeToLive() {
+                return sessionTimeToLive;
             }
 
             public void setAws(Aws aws) {
@@ -801,15 +834,27 @@ public class ApplicationProperties {
                 this.redis = redis;
             }
 
+            public void setSessionCleanupInterval(Duration sessionCleanupInterval) {
+                this.sessionCleanupInterval = sessionCleanupInterval;
+            }
+
+            public void setSessionMaxArchivedEvents(Integer sessionMaxArchivedEvents) {
+                this.sessionMaxArchivedEvents = sessionMaxArchivedEvents;
+            }
+
+            public void setSessionTimeToLive(Duration sessionTimeToLive) {
+                this.sessionTimeToLive = sessionTimeToLive;
+            }
+
             /**
              * AWS S3-backed chat memory provider configuration. Active when {@code provider} is {@code AWS}.
              */
             public static class Aws {
 
                 /**
-                 * Prefix used to derive the per-tenant S3 bucket name.
+                 * Prefix used to derive the per-tenant S3 bucket name of the chat memory repository.
                  */
-                private String bucketPrefix = "bytechef-chat-memory";
+                private String bucketPrefix;
 
                 /**
                  * AWS region
@@ -829,7 +874,12 @@ public class ApplicationProperties {
                 /**
                  * Key prefix prepended to every stored object key.
                  */
-                private String keyPrefix = "";
+                private String keyPrefix;
+
+                /**
+                 * Prefix used to derive the per-tenant S3 bucket name of the built-in session repository.
+                 */
+                private String sessionBucketPrefix;
 
                 public String getBucketPrefix() {
                     return bucketPrefix;
@@ -851,6 +901,10 @@ public class ApplicationProperties {
                     return keyPrefix;
                 }
 
+                public String getSessionBucketPrefix() {
+                    return sessionBucketPrefix;
+                }
+
                 public void setBucketPrefix(String bucketPrefix) {
                     this.bucketPrefix = bucketPrefix;
                 }
@@ -870,29 +924,55 @@ public class ApplicationProperties {
                 public void setKeyPrefix(String keyPrefix) {
                     this.keyPrefix = keyPrefix;
                 }
+
+                public void setSessionBucketPrefix(String sessionBucketPrefix) {
+                    this.sessionBucketPrefix = sessionBucketPrefix;
+                }
             }
 
+            /**
+             * Redis-backed chat memory provider configuration. Active when {@code provider} is {@code REDIS}.
+             */
             public static class Redis {
 
-                private String host = "localhost";
-                private String keyPrefix = "bytechef-session:";
+                /**
+                 * Redis server hostname
+                 */
+                private String host;
+
+                /**
+                 * Key prefix of the built-in session repository; its keys start with {@code <prefix><tenantId>:}.
+                 */
+                private String sessionKeyPrefix;
+
+                /**
+                 * Redis server password, required when {@code username} is set
+                 */
                 private String password;
-                private int port = 6379;
+
+                /**
+                 * Redis server port
+                 */
+                private Integer port;
+
+                /**
+                 * Redis ACL username
+                 */
                 private String username;
 
                 public String getHost() {
                     return host;
                 }
 
-                public String getKeyPrefix() {
-                    return keyPrefix;
+                public String getSessionKeyPrefix() {
+                    return sessionKeyPrefix;
                 }
 
                 public String getPassword() {
                     return password;
                 }
 
-                public int getPort() {
+                public Integer getPort() {
                     return port;
                 }
 
@@ -904,15 +984,15 @@ public class ApplicationProperties {
                     this.host = host;
                 }
 
-                public void setKeyPrefix(String keyPrefix) {
-                    this.keyPrefix = keyPrefix;
+                public void setSessionKeyPrefix(String sessionKeyPrefix) {
+                    this.sessionKeyPrefix = sessionKeyPrefix;
                 }
 
                 public void setPassword(String password) {
                     this.password = password;
                 }
 
-                public void setPort(int port) {
+                public void setPort(Integer port) {
                     this.port = port;
                 }
 

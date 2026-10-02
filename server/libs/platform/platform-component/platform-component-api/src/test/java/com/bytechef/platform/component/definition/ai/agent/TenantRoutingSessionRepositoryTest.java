@@ -17,6 +17,8 @@
 package com.bytechef.platform.component.definition.ai.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.jspecify.annotations.Nullable;
@@ -40,7 +43,7 @@ import org.springframework.ai.session.SessionRepository;
 class TenantRoutingSessionRepositoryTest {
 
     @Test
-    void testDeleteExpiredSessionsOfLoadedTenantsCoversEveryTenant() {
+    void testDeleteExpiredSessionsOfEveryTenantCoversEveryTenant() {
         TenantRoutingSessionRepository sessionRepository = createInMemorySessionRepository();
 
         Instant now = Instant.now();
@@ -48,9 +51,9 @@ class TenantRoutingSessionRepositoryTest {
         TenantContext.runWithTenantId("tenanta", () -> saveSessions(sessionRepository, now));
         TenantContext.runWithTenantId("tenantb", () -> saveSessions(sessionRepository, now));
 
-        int deletedCount = sessionRepository.deleteExpiredSessionsOfLoadedTenants(now);
+        Map<String, Integer> deletedCounts = sessionRepository.deleteExpiredSessionsOfEveryTenant(now);
 
-        assertThat(deletedCount).isEqualTo(2);
+        assertThat(deletedCounts).containsOnly(entry("tenanta", 1), entry("tenantb", 1));
         assertThat(findSession(sessionRepository, "tenanta", "expired-session")).isNull();
         assertThat(findSession(sessionRepository, "tenantb", "expired-session")).isNull();
         assertThat(findSession(sessionRepository, "tenanta", "live-session")).isNotNull();
@@ -58,7 +61,7 @@ class TenantRoutingSessionRepositoryTest {
     }
 
     @Test
-    void testDeleteExpiredSessionsOfLoadedTenantsRunsInTheTenantContext() {
+    void testDeleteExpiredSessionsOfEveryTenantRunsInTheTenantContext() {
         List<String> tenantIds = new ArrayList<>();
 
         TenantRoutingSessionRepository sessionRepository = new TenantRoutingSessionRepository(
@@ -67,9 +70,57 @@ class TenantRoutingSessionRepositoryTest {
         TenantContext.runWithTenantId("tenanta", () -> sessionRepository.findById("session-1"));
         TenantContext.runWithTenantId("tenantb", () -> sessionRepository.findById("session-1"));
 
-        sessionRepository.deleteExpiredSessionsOfLoadedTenants(Instant.now());
+        sessionRepository.deleteExpiredSessionsOfEveryTenant(Instant.now());
 
         assertThat(tenantIds).containsExactlyInAnyOrder("tenanta", "tenantb");
+    }
+
+    @Test
+    void testDeleteExpiredSessionsOfEveryTenantContinuesPastAFailingTenant() {
+        TenantRoutingSessionRepository sessionRepository = new TenantRoutingSessionRepository(
+            tenantId -> "tenanta".equals(tenantId) ? createFailingSessionRepository() : InMemorySessionRepository
+                .builder()
+                .build());
+
+        Instant now = Instant.now();
+
+        TenantContext.runWithTenantId("tenanta", () -> sessionRepository.findById("session-1"));
+        TenantContext.runWithTenantId("tenantb", () -> saveSessions(sessionRepository, now));
+
+        Map<String, Integer> deletedCounts = sessionRepository.deleteExpiredSessionsOfEveryTenant(now);
+
+        assertThat(deletedCounts).containsOnly(entry("tenantb", 1));
+        assertThat(findSession(sessionRepository, "tenantb", "expired-session")).isNull();
+        assertThat(findSession(sessionRepository, "tenantb", "live-session")).isNotNull();
+    }
+
+    @Test
+    void testDeleteExpiredSessionsOfEveryTenantRejectsAnExternallySuppliedRepositoryMap() {
+        ConcurrentMap<String, SessionRepository> repositories = new ConcurrentHashMap<>();
+
+        TenantRoutingSessionRepository sessionRepository = new TenantRoutingSessionRepository(
+            repositories, tenantId -> InMemorySessionRepository.builder()
+                .build());
+
+        Instant now = Instant.now();
+
+        assertThatThrownBy(() -> sessionRepository.deleteExpiredSessionsOfEveryTenant(now))
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void testConstructorRejectsNullArguments() {
+        ConcurrentMap<String, SessionRepository> repositories = new ConcurrentHashMap<>();
+
+        assertThatThrownBy(() -> new TenantRoutingSessionRepository(null))
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining("repositoryFactory");
+        assertThatThrownBy(() -> new TenantRoutingSessionRepository(repositories, null))
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining("repositoryFactory");
+        assertThatThrownBy(() -> new TenantRoutingSessionRepository(null, tenantId -> null))
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining("repositories");
     }
 
     @Test
@@ -101,6 +152,15 @@ class TenantRoutingSessionRepositoryTest {
 
         assertThat(repositories.get("tenanta")).isSameAs(firstSessionRepository);
         assertThat(repositories.get("tenantb")).isNotSameAs(firstSessionRepository);
+    }
+
+    private static SessionRepository createFailingSessionRepository() {
+        SessionRepository sessionRepository = mock(SessionRepository.class);
+
+        when(sessionRepository.deleteExpiredSessions(any(Instant.class)))
+            .thenThrow(new IllegalStateException("storage unavailable"));
+
+        return sessionRepository;
     }
 
     private static SessionRepository createTenantRecordingSessionRepository(List<String> tenantIds) {

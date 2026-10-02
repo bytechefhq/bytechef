@@ -19,12 +19,16 @@ package com.bytechef.platform.component.definition.ai.agent;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
@@ -36,32 +40,56 @@ import org.springframework.ai.session.compaction.CompactionPlan;
  */
 public final class TenantRoutingSessionRepository implements SessionRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(TenantRoutingSessionRepository.class);
+
     private final ConcurrentMap<String, SessionRepository> repositories;
+    private final boolean repositoriesRetainEveryTenant;
     private final Function<String, SessionRepository> repositoryFactory;
 
     public TenantRoutingSessionRepository(Function<String, SessionRepository> repositoryFactory) {
-        this(new ConcurrentHashMap<>(), repositoryFactory);
+        this(new ConcurrentHashMap<>(), true, repositoryFactory);
     }
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public TenantRoutingSessionRepository(
         ConcurrentMap<String, SessionRepository> repositories, Function<String, SessionRepository> repositoryFactory) {
 
-        this.repositories = repositories;
-        this.repositoryFactory = repositoryFactory;
+        this(repositories, false, repositoryFactory);
     }
 
-    public int deleteExpiredSessionsOfLoadedTenants(Instant before) {
-        int deletedCount = 0;
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    private TenantRoutingSessionRepository(
+        ConcurrentMap<String, SessionRepository> repositories, boolean repositoriesRetainEveryTenant,
+        Function<String, SessionRepository> repositoryFactory) {
 
-        for (Map.Entry<String, SessionRepository> entry : repositories.entrySet()) {
-            SessionRepository sessionRepository = entry.getValue();
+        this.repositories = Objects.requireNonNull(repositories, "repositories must not be null");
+        this.repositoriesRetainEveryTenant = repositoriesRetainEveryTenant;
+        this.repositoryFactory = Objects.requireNonNull(repositoryFactory, "repositoryFactory must not be null");
+    }
 
-            deletedCount += TenantContext.callWithTenantId(
-                entry.getKey(), () -> sessionRepository.deleteExpiredSessions(before));
+    public Map<String, Integer> deleteExpiredSessionsOfEveryTenant(Instant before) {
+        if (!repositoriesRetainEveryTenant) {
+            throw new IllegalStateException(
+                "deleteExpiredSessionsOfEveryTenant requires the repositories map this class creates itself; an " +
+                    "externally supplied map may have evicted tenants whose expired sessions would be skipped");
         }
 
-        return deletedCount;
+        Map<String, Integer> deletedCounts = new HashMap<>();
+
+        for (Map.Entry<String, SessionRepository> entry : repositories.entrySet()) {
+            String tenantId = entry.getKey();
+            SessionRepository sessionRepository = entry.getValue();
+
+            try {
+                int deletedCount = TenantContext.callWithTenantId(
+                    tenantId, () -> sessionRepository.deleteExpiredSessions(before));
+
+                deletedCounts.put(tenantId, deletedCount);
+            } catch (RuntimeException runtimeException) {
+                log.error("Failed to delete expired sessions for tenant {}", tenantId, runtimeException);
+            }
+        }
+
+        return deletedCounts;
     }
 
     @Override
