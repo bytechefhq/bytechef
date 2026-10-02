@@ -50,7 +50,7 @@ const WorkflowSelect = ({
         </Tooltip>
 
         {integrationWorkflows && (
-            <SelectContent>
+            <SelectContent className="w-auto max-w-lg min-w-(--radix-select-trigger-width)">
                 <SelectGroup>
                     <SelectLabel>Workflows</SelectLabel>
 
@@ -58,7 +58,7 @@ const WorkflowSelect = ({
                         <SelectItem
                             className="[&>span]:truncate"
                             key={workflow.integrationWorkflowId!}
-                            title={workflow.label!.length > 32 ? workflow.label! : undefined}
+                            title={workflow.label!.length > 55 ? workflow.label! : undefined}
                             value={workflow.integrationWorkflowId!.toString()}
                         >
                             {workflow.label!}
