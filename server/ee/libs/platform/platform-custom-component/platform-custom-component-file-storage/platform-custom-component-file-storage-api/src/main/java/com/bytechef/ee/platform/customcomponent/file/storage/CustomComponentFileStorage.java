@@ -21,5 +21,7 @@ public interface CustomComponentFileStorage {
 
     URL getCustomComponentFileURL(FileEntry componentFile);
 
+    String readCustomComponentFileContent(FileEntry componentFile);
+
     FileEntry storeCustomComponentFile(String filename, byte[] bytes);
 }
