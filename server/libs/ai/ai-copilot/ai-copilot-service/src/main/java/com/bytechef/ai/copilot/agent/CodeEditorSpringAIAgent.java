@@ -69,7 +69,6 @@ public class CodeEditorSpringAIAgent extends CopilotSpringAIAgent {
         String promptLanguage = switch ((String) parameters.get("language")) {
             case "javascript" -> "The language you have to assist with is Javascript.";
             case "python" -> "The language you have to assist with is Python.";
-            case "ruby" -> "The language you have to assist with is Ruby.";
             case "r" -> "The language you have to assist with is R.";
             case "java" -> "The language you have to assist with is Java.";
             default -> throw new IllegalStateException("Unexpected value: " + parameters.get("language"));

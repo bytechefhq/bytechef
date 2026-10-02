@@ -45,7 +45,7 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
     private static final String DESCRIPTION =
         """
             Delegate a user request about embedded script code to a specialised Code Editor subagent.
-            Use this for requests that write, edit, debug, or explain JavaScript / Python / Ruby script
+            Use this for requests that write, edit, debug, or explain JavaScript / Python script
             embedded inside a workflow task. The subagent owns the canonical behaviour for this domain;
             prefer calling it over generating script code directly. Returns the updated script (BUILD)
             or an explanation (ASK). Include the workflow's ID and the Script task's name in the request —
