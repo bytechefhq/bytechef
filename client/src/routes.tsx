@@ -100,6 +100,7 @@ const AutomationWorkflowConfigurations = lazy(
 const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
 const AutomationWorkflow = lazy(() => import('@/ee/pages/embedded/automation-workflow/AutomationWorkflow'));
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
+const ComponentPolicies = lazy(() => import('@/ee/pages/settings/platform/component-policies/ComponentPolicies'));
 const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
 const EmbeddedConnections = lazy(() =>
     import('@/ee/pages/embedded/connections/Connections').then((module) => ({default: module.Connections}))
@@ -304,6 +305,18 @@ const platformSettingsRoutes = {
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <EEVersion>
                         <LazyLoadWrapper>
+                            <ComponentPolicies />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'component-policies',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
                             <CustomComponents />
                         </LazyLoadWrapper>
                     </EEVersion>
@@ -452,6 +465,10 @@ const platformSettingsRoutes = {
         {
             href: 'mcp-server',
             title: 'MCP Server',
+        },
+        {
+            href: 'component-policies',
+            title: 'Component Policies',
         },
         {
             href: 'custom-components',
