@@ -119,6 +119,13 @@ describe('ClusterElementsCanvasDialog - no scale animation', () => {
         vi.clearAllMocks();
     });
 
+    // The title used to sit outside DialogContent and carried no text, leaving the dialog unnamed.
+    it('names the dialog for assistive technology', () => {
+        renderDialog();
+
+        expect(screen.getByRole('dialog', {name: 'Cluster elements canvas'})).toBeInTheDocument();
+    });
+
     it('pins the enter scale to 1 so ReactFlow never measures handles mid-scale', () => {
         renderDialog();
 

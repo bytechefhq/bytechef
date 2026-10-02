@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {Dialog, DialogClose, DialogContent, DialogTitle} from '@/components/Dialog';
 import AiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-editor/AiAgentEditor';
 import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
 import AiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/AiAgentEvals';
@@ -23,6 +23,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {XIcon} from 'lucide-react';
+import {VisuallyHidden} from 'radix-ui';
 import {CSSProperties, Suspense, lazy, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -133,17 +134,15 @@ const ClusterElementsCanvasDialog = ({
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
-            <DialogHeader>
-                <DialogTitle className="sr-only"></DialogTitle>
-
-                <DialogDescription />
-            </DialogHeader>
-
             <DialogContent
                 className="absolute top-12 bottom-4 left-16 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 overflow-hidden bg-surface-main p-0 duration-300 data-[state=closed]:slide-out-to-left-0 data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-left-0 data-[state=open]:slide-in-from-top-0 sm:max-w-none"
                 onPointerDownOutside={handlePointerDownOutside}
                 style={{'--tw-enter-scale': '1', '--tw-exit-scale': '1'} as CSSProperties}
             >
+                <VisuallyHidden.Root>
+                    <DialogTitle>Cluster elements canvas</DialogTitle>
+                </VisuallyHidden.Root>
+
                 {isDataStreamClusterRoot && showDataStreamEditor ? (
                     <div className="flex size-full min-h-0 overflow-hidden">
                         <DataStreamEditor

@@ -1,3 +1,4 @@
+import {Dialog} from '@/components/Dialog';
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -32,12 +33,13 @@ vi.mock('../hooks', () => ({
     }),
 }));
 
-vi.mock('@/components/ui/dialog', () => ({
-    DialogClose: ({children}: {children: React.ReactNode}) => <div data-testid="dialog-close">{children}</div>,
-}));
-
+// The toolbar only ever renders inside the code editor dialog, and its DialogClose needs that context.
 const renderWithProviders = (ui: React.ReactElement) => {
-    return render(<TooltipProvider>{ui}</TooltipProvider>);
+    return render(
+        <TooltipProvider>
+            <Dialog open>{ui}</Dialog>
+        </TooltipProvider>
+    );
 };
 
 describe('PropertyCodeEditorDialogToolbar', () => {
@@ -80,7 +82,7 @@ describe('PropertyCodeEditorDialogToolbar', () => {
         it('should render close button', () => {
             renderWithProviders(<PropertyCodeEditorDialogToolbar {...defaultProps} />);
 
-            expect(screen.getByTestId('dialog-close')).toBeInTheDocument();
+            expect(screen.getByTitle('Close')).toBeInTheDocument();
         });
     });
 
