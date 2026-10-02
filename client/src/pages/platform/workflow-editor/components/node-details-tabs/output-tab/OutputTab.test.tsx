@@ -29,7 +29,9 @@ vi.mock('@/pages/platform/workflow-editor/components/node-details-tabs/output-ta
 vi.mock(
     '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls',
     () => ({
-        default: () => <div data-testid="output-schema-creation-controls" />,
+        default: ({testable}: {testable?: boolean}) => (
+            <div data-testable={String(testable)} data-testid="output-schema-creation-controls" />
+        ),
     })
 );
 
@@ -74,6 +76,18 @@ describe('OutputTab', () => {
 
         expect(screen.getByTestId('output-schema-creation-controls')).toBeInTheDocument();
         expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('marks the creation controls testable for an action', () => {
+        renderOutputTab({outputDefined: true});
+
+        expect(screen.getByTestId('output-schema-creation-controls')).toHaveAttribute('data-testable', 'true');
+    });
+
+    it('marks the creation controls untestable for a task dispatcher', () => {
+        renderOutputTab({currentNode: {...currentNode, taskDispatcher: true}, outputDefined: true});
+
+        expect(screen.getByTestId('output-schema-creation-controls')).toHaveAttribute('data-testable', 'false');
     });
 
     describe('a failed test', () => {
