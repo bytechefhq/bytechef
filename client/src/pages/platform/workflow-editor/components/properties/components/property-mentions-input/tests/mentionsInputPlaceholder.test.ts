@@ -16,7 +16,7 @@ describe('getMentionsInputPlaceholder', () => {
 
     it('uses the data-pill placeholder for non-tool properties', () => {
         expect(getMentionsInputPlaceholder({expressionEnabled: true, toolProperty: false})).toBe(
-            "Use '$' for data pills and '=' for an expression"
+            "Use '$' for data pills and '=' for a formula"
         );
     });
 

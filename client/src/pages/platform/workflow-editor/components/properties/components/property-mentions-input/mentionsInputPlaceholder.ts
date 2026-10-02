@@ -4,7 +4,7 @@ export const FORMULA_MODE_PLACEHOLDER = "e.g. concat(firstName, ' ', lastName)";
 
 export const TOOL_PROPERTY_FORMULA_MODE_PLACEHOLDER = "e.g. fromAi('name', 'STRING')";
 
-const DEFAULT_PLACEHOLDER = "Use '$' for data pills and '=' for an expression";
+const DEFAULT_PLACEHOLDER = "Use '$' for data pills and '=' for a formula";
 
 interface MentionsInputPlaceholderProps {
     expressionEnabled: boolean | undefined;
