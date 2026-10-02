@@ -1,6 +1,4 @@
-import {Dialog, DialogContent} from '@/components/ui/dialog';
-import {XIcon} from 'lucide-react';
-import {PropsWithChildren, ReactNode, useState} from 'react';
+import {PropsWithChildren, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface SidebarContentLayoutProps {
@@ -56,34 +54,8 @@ const LayoutContainer = ({
     rightToolbarOpen = false,
     topHeader,
 }: PropsWithChildren<SidebarContentLayoutProps>) => {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-
     return (
         <div className={twMerge('size-full overflow-auto', className)}>
-            <Dialog open={sidebarOpen}>
-                <DialogContent className="h-full sm:max-w-[425px]">
-                    <div className="relative">
-                        <div className="absolute right-0 p-1">
-                            <button
-                                className="ml-1 items-center justify-center rounded-full p-2 focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset"
-                                onClick={() => setSidebarOpen(false)}
-                                type="button"
-                            >
-                                <XIcon aria-hidden="true" className="size-4" />
-
-                                <span className="sr-only">Close sidebar</span>
-                            </button>
-                        </div>
-
-                        <div className="absolute inset-0 mt-5 overflow-auto">
-                            <nav className="flex h-full flex-col bg-muted/50">
-                                <div className="space-y-1 px-2 py-4">{leftSidebarBody}</div>
-                            </nav>
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
-
             {leftSidebarOpen && (
                 <aside
                     className={twMerge(
