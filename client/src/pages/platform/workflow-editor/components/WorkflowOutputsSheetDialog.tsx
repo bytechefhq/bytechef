@@ -1,16 +1,16 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
-import RequiredMark from '@/components/RequiredMark';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
+    DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
+import RequiredMark from '@/components/RequiredMark';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -102,75 +102,75 @@ const WorkflowOutputsSheetDialog = ({
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className="grid w-workflow-outputs-sheet-dialog-width gap-4">
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>{`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}</DialogTitle>
+            <DialogContent>
+                <DialogMain>
+                    <Form {...form}>
+                        <form
+                            className="flex min-h-0 flex-1 flex-col"
+                            onSubmit={form.handleSubmit(saveWorkflowOutputs)}
+                        >
+                            <DialogHeader
+                                description={`${outputIndex === -1 ? 'Create a new' : 'Edit the'} workflow output expression.`}
+                                title={`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}
+                            />
 
-                        <DialogDescription>{`${outputIndex === -1 ? 'Create a new' : 'Edit the'} workflow output expression.`}</DialogDescription>
-                    </div>
+                            <DialogBody className="space-y-4">
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel className="gap-0">
+                                                Name
+                                                <RequiredMark />
+                                            </FormLabel>
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Add new output name"
+                                                    {...field}
+                                                    readOnly={outputIndex !== -1}
+                                                />
+                                            </FormControl>
 
-                <Form {...form}>
-                    <form className="space-y-4" onSubmit={form.handleSubmit(saveWorkflowOutputs)}>
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel className="gap-0">
-                                        Name
-                                        <RequiredMark />
-                                    </FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Add new output name"
-                                            {...field}
-                                            readOnly={outputIndex !== -1}
-                                        />
-                                    </FormControl>
+                                <FormField
+                                    control={form.control}
+                                    name="value"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel className="gap-0">
+                                                Value
+                                                <RequiredMark />
+                                            </FormLabel>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                            <FormControl>
+                                                <PropertyMentionsInput
+                                                    className="rounded-md border"
+                                                    {...field}
+                                                    ref={editorRef}
+                                                    value={mentionInputValue}
+                                                />
+                                            </FormControl>
 
-                        <FormField
-                            control={form.control}
-                            name="value"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel className="gap-0">
-                                        Value
-                                        <RequiredMark />
-                                    </FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </DialogBody>
 
-                                    <FormControl>
-                                        <PropertyMentionsInput
-                                            className="rounded-md border"
-                                            {...field}
-                                            ref={editorRef}
-                                            value={mentionInputValue}
-                                        />
-                                    </FormControl>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <div className="flex justify-end space-x-2">
-                            <DialogClose asChild>
-                                <Button label="Cancel" variant="outline" />
-                            </DialogClose>
-
-                            <Button label="Save" type="submit" />
-                        </div>
-                    </form>
-                </Form>
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
