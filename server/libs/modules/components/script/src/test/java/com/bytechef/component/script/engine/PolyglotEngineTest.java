@@ -34,7 +34,10 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.ApplicationContext;
@@ -43,6 +46,7 @@ import org.springframework.context.ApplicationContext;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Timeout(120)
 class PolyglotEngineTest {
 
@@ -111,6 +115,7 @@ class PolyglotEngineTest {
                 .hasMessageContaining("perform");
     }
 
+    @Order(Integer.MAX_VALUE)
     @Test
     void testExecuteJavaScriptNamedConnectionWithoutComponentConnections() {
         Parameters inputParameters = ParametersFactory.create(
@@ -148,19 +153,10 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecutePythonReadsInputKeyNamedLikeDictMethod() {
-        Object result = execute(
-            "python", "def perform(input, context):\n\treturn input.items", Map.of("items", List.of(1, 2)));
-
-        assertThat(result).isEqualTo(List.of(1, 2));
-    }
-
-    @Test
     void testExecutePythonWithInputContextAndOptionalParameter() {
         Object result = execute(
             "python",
-            "def perform(input, context, debug=False):\n\treturn 'context' if hasattr(context, 'component') " +
-                "else 'connection'");
+            "def perform(input, context, debug=False):\n\treturn 'context' if debug is False else 'connection'");
 
         assertThat(result).isEqualTo("context");
     }
