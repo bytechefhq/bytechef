@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.platform.ai.sensitivedata.SensitiveKind;
+import com.bytechef.platform.ai.sensitivedata.SensitiveSpan;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
@@ -111,6 +113,53 @@ class SecretKeysTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("BOGUS")
                 .hasMessageContaining("STRICT");
+    }
+
+    @Test
+    void testCheckUnionsPublishedSecretSpansWithItsOwnDetection() throws Exception {
+        GuardrailCheckFunction function = SecretKeys.ofCheck()
+            .getElement();
+
+        GuardrailContext context = contextOf(Map.of())
+            .withPublishedInputSpans(List.of(SensitiveSpan.of(SensitiveKind.SECRET, "AWS_ACCESS_KEY", 0, 20)));
+
+        Optional<Violation> violation = function.apply(
+            "[REDACTED_AWS_ACCESS_KEY] and sk-abcdefghijklmnopqrstuvwxyz0123456789", context);
+
+        assertThat(violation).isPresent();
+        assertThat(violation.get()).isInstanceOf(Violation.SpanViolation.class);
+        assertThat(((Violation.SpanViolation) violation.get()).matchCount()).isEqualTo(2);
+        assertThat(violation.get()
+            .info()).containsKey("providerTypes");
+    }
+
+    @Test
+    void testPublishedPiiSpansNeverCountForTheSecretKeysCheck() throws Exception {
+        GuardrailCheckFunction function = SecretKeys.ofCheck()
+            .getElement();
+
+        GuardrailContext context = contextOf(Map.of())
+            .withPublishedInputSpans(List.of(SensitiveSpan.of(SensitiveKind.PII, "EMAIL_ADDRESS", 0, 16)));
+
+        assertThat(function.apply("[PII_EMAIL_ADDRESS_1_abcd]", context)).isEmpty();
+    }
+
+    @Test
+    void testCheckCountsEachOccurrenceOfTheSameSecretSeparately() throws Exception {
+        GuardrailCheckFunction function = SecretKeys.ofCheck()
+            .getElement();
+
+        GuardrailContext context = contextOf(Map.of())
+            .withPublishedInputSpans(List.of(SensitiveSpan.of(SensitiveKind.SECRET, "AWS_ACCESS_KEY", 0, 20)));
+
+        Optional<Violation> violation = function.apply(
+            "[REDACTED_AWS_ACCESS_KEY] and sk-abcdefghijklmnopqrstuvwxyz0123456789 then again "
+                + "sk-abcdefghijklmnopqrstuvwxyz0123456789 end",
+            context);
+
+        assertThat(violation).isPresent();
+        assertThat(violation.get()).isInstanceOf(Violation.SpanViolation.class);
+        assertThat(((Violation.SpanViolation) violation.get()).matchCount()).isEqualTo(3);
     }
 
     private static GuardrailContext contextOf(Map<String, ?> input) {

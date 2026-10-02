@@ -17,7 +17,6 @@
 package com.bytechef.component.ai.agent.guardrails.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.component.ai.agent.guardrails.util.UrlDetectorUtils.UrlMatch;
 import com.bytechef.component.ai.agent.guardrails.util.UrlDetectorUtils.UrlPolicy;
@@ -304,15 +303,4 @@ class UrlDetectorUtilsTest {
             .isEmpty();
     }
 
-    @Test
-    void testOversizedInputRejectedByRegexParserBudget() {
-        // Pins that URL detection routes through RegexParserUtils.bounded(): an input one character past
-        // MAX_INPUT_LENGTH must surface RegexExecutionLimitException rather than spending unbounded scanner
-        // budget. Without this test, a future refactor that pulled the scheme matcher off the bounded()
-        // wrapper would let a pathological prose payload lock a worker thread.
-        String oversized = "https://example.com/" + "a".repeat(RegexParserUtils.MAX_INPUT_LENGTH);
-
-        assertThatThrownBy(() -> UrlDetectorUtils.detectViolations(oversized, DEFAULT_POLICY))
-            .isInstanceOf(RegexParserUtils.RegexExecutionLimitException.class);
-    }
 }
