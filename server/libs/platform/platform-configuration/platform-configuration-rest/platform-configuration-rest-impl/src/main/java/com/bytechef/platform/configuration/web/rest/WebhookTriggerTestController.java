@@ -117,7 +117,7 @@ public class WebhookTriggerTestController {
 
                 if (webhookValidateResponse.status() == HttpStatus.OK.value()) {
                     workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                        workflowExecutionId, environmentId, webhookRequest);
+                        workflowExecutionId, environmentId, webhookRequest.asValidated());
 
                     responseEntity = ResponseEntity.ok()
                         .build();

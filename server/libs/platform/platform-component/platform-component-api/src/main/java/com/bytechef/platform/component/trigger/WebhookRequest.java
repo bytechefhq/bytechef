@@ -21,6 +21,8 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +33,20 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record WebhookRequest(
     Map<String, List<String>> headers, Map<String, List<String>> parameters, WebhookBodyImpl body,
-    WebhookMethod method) {
+    WebhookMethod method, @JsonSetter(nulls = Nulls.AS_EMPTY) boolean validated) {
 
     public static final String WEBHOOK_REQUEST = "webhookRequest";
+
+    public WebhookRequest(
+        Map<String, List<String>> headers, Map<String, List<String>> parameters, WebhookBodyImpl body,
+        WebhookMethod method) {
+
+        this(headers, parameters, body, method, false);
+    }
+
+    public WebhookRequest asValidated() {
+        return new WebhookRequest(headers, parameters, body, method, true);
+    }
 
     @Override
     public String toString() {
@@ -42,6 +55,7 @@ public record WebhookRequest(
             ", parameters=" + MapUtils.toString(parameters) +
             ", body=" + body +
             ", method=" + method +
+            ", validated=" + validated +
             '}';
     }
 

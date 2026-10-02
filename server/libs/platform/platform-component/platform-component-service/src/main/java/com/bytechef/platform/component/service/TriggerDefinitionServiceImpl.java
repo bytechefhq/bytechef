@@ -611,20 +611,16 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         TriggerType triggerType = triggerDefinition.getType();
 
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
-            WebhookValidateResponse response = executeWebhookValidate(
-                triggerDefinition, ParametersFactory.create(inputParameters), Objects.requireNonNull(webhookRequest),
-                context);
+            WebhookRequest requiredWebhookRequest = Objects.requireNonNull(webhookRequest, "webhookRequest");
 
-            if (response.status() != HttpStatus.OK.getValue()) {
-                throw new IllegalStateException("Invalid trigger signature.");
+            if (!requiredWebhookRequest.validated()) {
+                validateWebhookRequest(triggerDefinition, inputParameters, requiredWebhookRequest, context);
             }
-        }
 
-        if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
             triggerOutput = triggerDefinition.getWebhookRequest()
                 .map(webhookRequestFunction -> executeWebhookTrigger(
                     triggerDefinition, inputParameters, toWebhookEnabledOutputParameters(triggerState),
-                    webhookRequest, componentConnection, context, webhookRequestFunction))
+                    requiredWebhookRequest, componentConnection, context, webhookRequestFunction))
                 .orElseThrow();
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
             triggerOutput = triggerDefinition.getPoll()
@@ -725,6 +721,18 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 context))
             .orElse(WebhookValidateResponse.ok());
+    }
+
+    private void validateWebhookRequest(
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, TriggerContext context) {
+
+        WebhookValidateResponse response = executeWebhookValidate(
+            triggerDefinition, ParametersFactory.create(inputParameters), webhookRequest, context);
+
+        if (response.status() != HttpStatus.OK.getValue()) {
+            throw new IllegalStateException("Invalid trigger signature.");
+        }
     }
 
     private static TriggerOutput executeWebhookTrigger(
