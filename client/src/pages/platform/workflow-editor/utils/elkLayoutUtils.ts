@@ -112,6 +112,11 @@ const CASE_PLACEHOLDER_CROSS_FOOTPRINT = 160;
 // sibling content is ever packed onto a drawn edge.
 const COLUMN_SPINE_HALF_WIDTH = 45;
 
+// Largest gap between a mirrored column pair's distances from the dispatcher
+// that the mirror pass evens out — the widest label overhang a column can
+// carry. Anything larger comes from a nested subtree's own asymmetry.
+const MIRROR_MAX_IMBALANCE = 200;
+
 // In TB a node's title/description block renders to the RIGHT of its 72px
 // icon, reaching up to ~236px past the icon's center (measured 272px DOM on
 // long labels) — while the dagre footprint models the node as 240px CENTERED
@@ -1942,7 +1947,10 @@ export const getElkLayoutElements = async ({
             // right and the lanes read lopsided around the dispatcher. Walk mirrored
             // column pairs center-outward and push the nearer one — together with
             // every column beyond it — out to its partner's distance. Moving only
-            // outward keeps every clearance the repack established.
+            // outward keeps every clearance the repack established. Only label-sized
+            // imbalances are mirrored: a pair lopsided by a nested subtree would push
+            // its partner, and every column beyond it, out by the whole subtree
+            // asymmetry and leave the frame mostly empty space.
             const columnCount = entryColumns.length;
 
             for (let leftIndex = Math.floor(columnCount / 2) - 1; leftIndex >= 0; leftIndex--) {
@@ -1950,6 +1958,10 @@ export const getElkLayoutElements = async ({
 
                 const leftDistance = dispatcherCrossCenter - getEntryCenter(entryColumns[leftIndex].entryNode);
                 const rightDistance = getEntryCenter(entryColumns[rightIndex].entryNode) - dispatcherCrossCenter;
+
+                if (Math.abs(rightDistance - leftDistance) > MIRROR_MAX_IMBALANCE) {
+                    continue;
+                }
 
                 if (rightDistance - leftDistance >= 1) {
                     shiftEntryColumns(entryColumns.slice(0, leftIndex + 1), leftDistance - rightDistance);
