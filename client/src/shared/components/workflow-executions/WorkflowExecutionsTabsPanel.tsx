@@ -1,13 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Dialog, DialogBody, DialogContent, DialogHeader, DialogMain, DialogTrigger} from '@/components/Dialog';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import {
-    Dialog,
-    DialogCloseButton,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
@@ -199,38 +192,33 @@ const WorkflowExecutionsTabsPanel = ({
                                 <Button icon={<ExpandIcon />} size="iconXs" variant="ghost" />
                             </DialogTrigger>
 
-                            <DialogContent className="max-w-workflow-execution-content-width sm:max-w-workflow-execution-content-width">
-                                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                                    <DialogTitle>{activeTab.toUpperCase()}</DialogTitle>
-
-                                    <div className="flex items-center gap-2">
-                                        <WorkflowExecutionContentClipboardButton value={displayValue} />
-
-                                        <DialogCloseButton />
-                                    </div>
-                                </DialogHeader>
-
-                                <ScrollArea className="max-h-workflow-execution-content-height overflow-auto pb-4">
-                                    <WorkflowExecutionContent
-                                        error={activeTab === 'error' ? selectedItem?.error : undefined}
-                                        input={activeTab === 'input' ? selectedItem?.input : undefined}
-                                        jobInputs={
-                                            activeTab === 'output' && isTriggerExecution ? job?.inputs : undefined
-                                        }
-                                        output={
-                                            activeTab === 'output' && !isTriggerExecution
-                                                ? selectedItem?.output
-                                                : undefined
-                                        }
-                                        workflowTriggerName={
-                                            activeTab === 'output' && isTriggerExecution
-                                                ? triggerExecution?.workflowTrigger?.name
-                                                : undefined
-                                        }
+                            <DialogContent size="xl">
+                                <DialogMain>
+                                    <DialogHeader
+                                        endContent={<WorkflowExecutionContentClipboardButton value={displayValue} />}
+                                        title={activeTab.toUpperCase()}
                                     />
 
-                                    <ScrollBar orientation="horizontal" />
-                                </ScrollArea>
+                                    <DialogBody>
+                                        <WorkflowExecutionContent
+                                            error={activeTab === 'error' ? selectedItem?.error : undefined}
+                                            input={activeTab === 'input' ? selectedItem?.input : undefined}
+                                            jobInputs={
+                                                activeTab === 'output' && isTriggerExecution ? job?.inputs : undefined
+                                            }
+                                            output={
+                                                activeTab === 'output' && !isTriggerExecution
+                                                    ? selectedItem?.output
+                                                    : undefined
+                                            }
+                                            workflowTriggerName={
+                                                activeTab === 'output' && isTriggerExecution
+                                                    ? triggerExecution?.workflowTrigger?.name
+                                                    : undefined
+                                            }
+                                        />
+                                    </DialogBody>
+                                </DialogMain>
                             </DialogContent>
                         </Dialog>
 
