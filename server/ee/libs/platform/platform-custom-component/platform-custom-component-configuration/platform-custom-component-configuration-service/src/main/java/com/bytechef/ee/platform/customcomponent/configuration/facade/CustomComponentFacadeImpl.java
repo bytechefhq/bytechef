@@ -14,9 +14,11 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
+import com.bytechef.ee.platform.customcomponent.configuration.exception.CustomComponentErrorType;
 import com.bytechef.ee.platform.customcomponent.configuration.service.CustomComponentService;
 import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFileStorage;
 import com.bytechef.ee.platform.customcomponent.loader.ComponentHandlerLoader;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -104,6 +106,12 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void save(byte[] bytes, Language language) {
+        if (language == Language.RUBY) {
+            throw new ConfigurationException(
+                "Uploading of Ruby custom components is temporarily disabled",
+                CustomComponentErrorType.LANGUAGE_NOT_SUPPORTED);
+        }
+
         try {
             ComponentDefinition componentDefinition = loadComponentDefinition(language, bytes);
 
