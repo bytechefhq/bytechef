@@ -1,17 +1,16 @@
 import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox/ComboBox';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import {Category, Integration, Tag} from '@/ee/shared/middleware/embedded/configuration';
@@ -169,180 +168,182 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent>
-                <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                        <div className="flex flex-col space-y-1">
-                            <DialogTitle>{`${integration?.id ? 'Edit' : 'Create'} Integration`}</DialogTitle>
+                <DialogMain>
+                    <Form {...form}>
+                        <DialogHeader
+                            description={`Use this to ${
+                                integration?.id ? 'edit' : 'create'
+                            } your integration which will contain workflows`}
+                            title={`${integration?.id ? 'Edit' : 'Create'} Integration`}
+                        />
 
-                            <DialogDescription>
-                                {`Use this to ${
-                                    integration?.id ? 'edit' : 'create'
-                                } your integration which will contain workflows`}
-                            </DialogDescription>
-                        </div>
+                        <DialogBody>
+                            {categoriesError &&
+                                !categoriesLoading &&
+                                `An error has occurred: ${categoriesError.message}`}
 
-                        <DialogCloseButton />
-                    </DialogHeader>
+                            {tagsError && !tagsLoading && `An error has occurred: ${tagsError.message}`}
 
-                    {categoriesError && !categoriesLoading && `An error has occurred: ${categoriesError.message}`}
+                            <FormField
+                                control={control}
+                                name="componentName"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Component</FormLabel>
 
-                    {tagsError && !tagsLoading && `An error has occurred: ${tagsError.message}`}
+                                        <FormControl>
+                                            {componentDefinitions && (
+                                                <ComboBox
+                                                    disabled={!!integration?.id}
+                                                    items={componentDefinitions.map((componentDefinition) => ({
+                                                        componentDefinition,
+                                                        icon: componentDefinition.icon,
+                                                        label: componentDefinition.title!,
+                                                        value: componentDefinition.name,
+                                                    }))}
+                                                    maxHeight={true}
+                                                    name="component"
+                                                    onBlur={field.onBlur}
+                                                    onChange={(item) => {
+                                                        const componentName = (
+                                                            item?.componentDefinition as ComponentDefinitionBasic
+                                                        ).name;
+                                                        const title = (
+                                                            item?.componentDefinition as ComponentDefinitionBasic
+                                                        ).title;
 
-                    <FormField
-                        control={control}
-                        name="componentName"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Component</FormLabel>
+                                                        setValue('componentName', componentName);
+                                                        setValue('name', title);
+                                                    }}
+                                                    value={field.value}
+                                                />
+                                            )}
+                                        </FormControl>
 
-                                <FormControl>
-                                    {componentDefinitions && (
-                                        <ComboBox
-                                            disabled={!!integration?.id}
-                                            items={componentDefinitions.map((componentDefinition) => ({
-                                                componentDefinition,
-                                                icon: componentDefinition.icon,
-                                                label: componentDefinition.title!,
-                                                value: componentDefinition.name,
-                                            }))}
-                                            maxHeight={true}
-                                            name="component"
-                                            onBlur={field.onBlur}
-                                            onChange={(item) => {
-                                                const componentName = (
-                                                    item?.componentDefinition as ComponentDefinitionBasic
-                                                ).name;
-                                                const title = (item?.componentDefinition as ComponentDefinitionBasic)
-                                                    .title;
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                rules={{required: true}}
+                            />
 
-                                                setValue('componentName', componentName);
-                                                setValue('name', title);
-                                            }}
-                                            value={field.value}
-                                        />
+                            <FormField
+                                control={control}
+                                name="name"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                rules={{required: true}}
+                            />
+
+                            {!categoriesLoading && (
+                                <FormField
+                                    control={control}
+                                    name="category"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Category</FormLabel>
+
+                                            <FormControl>
+                                                <CreatableSelect
+                                                    field={field}
+                                                    isMulti={false}
+                                                    onCreateOption={(inputValue: string) => {
+                                                        setValue('category', {
+                                                            label: inputValue,
+                                                            name: inputValue,
+                                                            value: inputValue,
+                                                            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                                                        } as any);
+                                                    }}
+                                                    options={categories!.map((category: Category) => ({
+                                                        label: category.name,
+                                                        value: category.name.toLowerCase().replace(/\W/g, ''),
+                                                        ...category,
+                                                    }))}
+                                                    placeholder="Marketing, Sales, Social Media..."
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
                                     )}
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                    />
-
-                    <FormField
-                        control={control}
-                        name="name"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-
-                                <FormControl>
-                                    <Input {...field} />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                    />
-
-                    {!categoriesLoading && (
-                        <FormField
-                            control={control}
-                            name="category"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Category</FormLabel>
-
-                                    <FormControl>
-                                        <CreatableSelect
-                                            field={field}
-                                            isMulti={false}
-                                            onCreateOption={(inputValue: string) => {
-                                                setValue('category', {
-                                                    label: inputValue,
-                                                    name: inputValue,
-                                                    value: inputValue,
-                                                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                                                } as any);
-                                            }}
-                                            options={categories!.map((category: Category) => ({
-                                                label: category.name,
-                                                value: category.name.toLowerCase().replace(/\W/g, ''),
-                                                ...category,
-                                            }))}
-                                            placeholder="Marketing, Sales, Social Media..."
-                                        />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
+                                />
                             )}
-                        />
-                    )}
 
-                    <FormField
-                        control={control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Description</FormLabel>
+                            <FormField
+                                control={control}
+                                name="description"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Description</FormLabel>
 
-                                <FormControl>
-                                    <Textarea placeholder="Cute description of your integration" rows={5} {...field} />
-                                </FormControl>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder="Cute description of your integration"
+                                                rows={5}
+                                                {...field}
+                                            />
+                                        </FormControl>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                    {remainingTags && (
-                        <FormField
-                            control={control}
-                            name="tags"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Tags</FormLabel>
+                            {remainingTags && (
+                                <FormField
+                                    control={control}
+                                    name="tags"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Tags</FormLabel>
 
-                                    <FormControl>
-                                        <CreatableSelect
-                                            field={field}
-                                            isMulti
-                                            onCreateOption={(inputValue: string) => {
-                                                setValue('tags', [
-                                                    ...getValues().tags!,
-                                                    {
-                                                        label: inputValue,
-                                                        name: inputValue,
-                                                        value: inputValue,
-                                                    },
-                                                ] as never[]);
-                                            }}
-                                            options={remainingTags!.map((tag: Tag) => {
-                                                return {
-                                                    label: tag.name,
-                                                    value: tag.name.toLowerCase().replace(/\W/g, ''),
-                                                    ...tag,
-                                                };
-                                            })}
-                                        />
-                                    </FormControl>
+                                            <FormControl>
+                                                <CreatableSelect
+                                                    field={field}
+                                                    isMulti
+                                                    onCreateOption={(inputValue: string) => {
+                                                        setValue('tags', [
+                                                            ...getValues().tags!,
+                                                            {
+                                                                label: inputValue,
+                                                                name: inputValue,
+                                                                value: inputValue,
+                                                            },
+                                                        ] as never[]);
+                                                    }}
+                                                    options={remainingTags!.map((tag: Tag) => {
+                                                        return {
+                                                            label: tag.name,
+                                                            value: tag.name.toLowerCase().replace(/\W/g, ''),
+                                                            ...tag,
+                                                        };
+                                                    })}
+                                                />
+                                            </FormControl>
 
-                                    <FormMessage />
-                                </FormItem>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             )}
-                        />
-                    )}
+                        </DialogBody>
 
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button label="Cancel" type="button" variant="outline" />
-                        </DialogClose>
+                        <DialogFooter>
+                            <DialogCancelButton />
 
-                        <Button label="Save" onClick={handleSubmit(saveIntegration)} type="submit" />
-                    </DialogFooter>
-                </Form>
+                            <Button label="Save" onClick={handleSubmit(saveIntegration)} type="submit" />
+                        </DialogFooter>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
