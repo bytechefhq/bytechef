@@ -1,4 +1,5 @@
-import {lazy} from 'react';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import {Suspense, lazy} from 'react';
 
 const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
@@ -21,13 +22,15 @@ const EndpointYamlEditor = ({onChange, value}: EndpointYamlEditorProps) => {
 
     return (
         <div className="h-80 overflow-hidden rounded-md border">
-            <MonacoEditorWrapper
-                defaultLanguage="yaml"
-                onChange={(newValue) => onChange(newValue || '')}
-                onMount={() => {}}
-                options={editorOptions}
-                value={value}
-            />
+            <Suspense fallback={<MonacoEditorLoader />}>
+                <MonacoEditorWrapper
+                    defaultLanguage="yaml"
+                    onChange={(newValue) => onChange(newValue || '')}
+                    onMount={() => {}}
+                    options={editorOptions}
+                    value={value}
+                />
+            </Suspense>
         </div>
     );
 };
