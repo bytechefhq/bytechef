@@ -216,12 +216,13 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
-        Long projectId, Long projectDeploymentId, String workflowId, long workspaceId, int pageNumber) {
+        Long projectId, Long projectDeploymentId, String workflowId, Integer projectVersion, long workspaceId,
+        int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();
 
         if (workflowId != null) {
-            workflowIds.addAll(getWorkflowVersionWorkflowIds(workflowId));
+            workflowIds.addAll(getWorkflowVersionWorkflowIds(workflowId, projectVersion));
         } else if (projectId != null) {
             workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
         } else {
@@ -295,7 +296,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 Map<String, Integer> workflowProjectVersionMap = projectWorkflows.stream()
                     .collect(Collectors.toMap(
                         ProjectWorkflow::getWorkflowId, ProjectWorkflow::getProjectVersion,
-                        (projectVersion, otherProjectVersion) -> projectVersion));
+                        (firstProjectVersion, otherProjectVersion) -> firstProjectVersion));
 
                 List<PrincipalJob> principalJobs =
                     principalJobService.getPrincipalJobs(jobIds, PlatformType.AUTOMATION);
@@ -534,14 +535,17 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
      * Publishing a project version gives each workflow a new id, and a job records the id of the version it ran, so a
      * deployment upgraded in place has runs under several ids. They all share the project workflow's uuid.
      */
-    private List<String> getWorkflowVersionWorkflowIds(String workflowId) {
+    private List<String> getWorkflowVersionWorkflowIds(String workflowId, Integer projectVersion) {
         return projectWorkflowService.getWorkflowProjectWorkflows(List.of(workflowId))
             .stream()
             .findFirst()
-            .map(projectWorkflow -> CollectionUtils.map(
-                projectWorkflowService.getProjectWorkflows(
-                    projectWorkflow.getProjectId(), projectWorkflow.getUuidAsString()),
-                ProjectWorkflow::getWorkflowId))
+            .map(projectWorkflow -> projectWorkflowService
+                .getProjectWorkflows(projectWorkflow.getProjectId(), projectWorkflow.getUuidAsString())
+                .stream()
+                .filter(versionProjectWorkflow -> projectVersion == null ||
+                    projectVersion.equals(versionProjectWorkflow.getProjectVersion()))
+                .map(ProjectWorkflow::getWorkflowId)
+                .toList())
             .orElseGet(() -> List.of(workflowId));
     }
 

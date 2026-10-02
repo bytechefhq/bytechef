@@ -188,7 +188,7 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
             .thenReturn(List.of(triggerExecution));
 
         Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
-            false, null, null, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, 1L, 0);
+            false, null, null, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, null, 1L, 0);
 
         assertEquals(1, page.getTotalElements());
 
@@ -214,7 +214,7 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
             any(), any(), any(), anyList(), any(), anyList(), anyBoolean(), anyList(), anyInt()))
                 .thenReturn(Page.empty());
 
-        facade.getWorkflowExecutions(false, null, null, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, 1L, 0);
+        facade.getWorkflowExecutions(false, null, null, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, null, 1L, 0);
 
         ArgumentCaptor<List<String>> idsArgumentCaptor = ArgumentCaptor.captor();
 
@@ -243,11 +243,31 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
                 .thenReturn(Page.empty());
 
         facade.getWorkflowExecutions(
-            false, null, Status.COMPLETED, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, 1L, 0);
+            false, null, Status.COMPLETED, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, null, 1L, 0);
 
         verify(workflowExecutionRowService).getWorkflowExecutionRows(
             any(), any(), any(), anyList(), any(), eq(List.of(PREVIOUS_VERSION_WORKFLOW_ID, WORKFLOW_ID)),
             anyBoolean(), anyList(), anyInt());
+    }
+
+    @Test
+    void testAWorkflowFilterPinnedToAProjectVersionMatchesOnlyTheRunsOfThatVersion() {
+        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of(WORKFLOW_ID)))
+            .thenReturn(List.of(new ProjectWorkflow(PROJECT_ID, 2, WORKFLOW_ID, WORKFLOW_UUID)));
+        when(projectWorkflowService.getProjectWorkflows(PROJECT_ID, WORKFLOW_UUID.toString()))
+            .thenReturn(
+                List.of(
+                    new ProjectWorkflow(PROJECT_ID, 1, PREVIOUS_VERSION_WORKFLOW_ID, WORKFLOW_UUID),
+                    new ProjectWorkflow(PROJECT_ID, 2, WORKFLOW_ID, WORKFLOW_UUID)));
+        when(workflowExecutionRowService.getWorkflowExecutionRows(
+            any(), any(), any(), anyList(), any(), anyList(), anyBoolean(), anyList(), anyInt()))
+                .thenReturn(Page.empty());
+
+        facade.getWorkflowExecutions(
+            false, null, Status.COMPLETED, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, 2, 1L, 0);
+
+        verify(workflowExecutionRowService).getWorkflowExecutionRows(
+            any(), any(), any(), anyList(), any(), eq(List.of(WORKFLOW_ID)), anyBoolean(), anyList(), anyInt());
     }
 
     @Test
@@ -281,7 +301,7 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
             .thenReturn(List.of(previousVersionWorkflow));
 
         Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
-            false, null, null, null, null, PROJECT_ID, DEPLOYMENT_ID, null, 1L, 0);
+            false, null, null, null, null, PROJECT_ID, DEPLOYMENT_ID, null, null, 1L, 0);
 
         WorkflowExecutionDTO row = page.getContent()
             .get(0);
@@ -336,7 +356,7 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
                 .thenReturn(Page.empty());
 
         facade.getWorkflowExecutions(
-            false, null, Status.COMPLETED, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, 1L, 0);
+            false, null, Status.COMPLETED, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, null, 1L, 0);
 
         verify(workflowExecutionRowService).getWorkflowExecutionRows(
             any(), any(), any(), anyList(), any(), eq(List.of(WORKFLOW_ID)), anyBoolean(), anyList(), anyInt());
@@ -349,7 +369,7 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
                 .thenReturn(Page.empty());
 
         facade.getWorkflowExecutions(
-            false, null, Status.COMPLETED, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, 1L, 0);
+            false, null, Status.COMPLETED, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, null, 1L, 0);
 
         verify(workflowExecutionRowService).getWorkflowExecutionRows(
             eq(Status.COMPLETED), any(), any(), anyList(), any(), anyList(), anyBoolean(), eq(List.of()), anyInt());
