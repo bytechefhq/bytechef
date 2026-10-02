@@ -80,9 +80,9 @@ describe('WorkflowExecutionsTabsPanel', () => {
 
         const dialog = screen.getByRole('dialog');
 
-        // The base DialogContent carries sm:max-w-lg, which wins over an unprefixed max-w at the sm
-        // breakpoint, so the wider width has to be applied on the sm variant too.
-        expect(dialog).toHaveClass('sm:max-w-workflow-execution-content-width');
+        // The width comes from DialogContent's xl size token rather than a bespoke class; the family
+        // applies it on the sm variant so it wins over the base width at that breakpoint.
+        expect(dialog).toHaveClass('sm:w-[1000px]');
     });
 
     it('shows what the trigger handed the job on the output tab', () => {
