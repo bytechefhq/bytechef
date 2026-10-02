@@ -18,42 +18,6 @@ vi.mock('../hooks/useUploadKnowledgeBaseDocumentDialog', () => ({
     default: hoisted.mockUseUploadKnowledgeBaseDocumentDialog,
 }));
 
-vi.mock('@/components/Button/Button', () => ({
-    default: ({
-        children,
-        disabled,
-        onClick,
-    }: {
-        children?: React.ReactNode;
-        disabled?: boolean;
-        onClick?: () => void;
-        size?: string;
-        variant?: string;
-    }) => (
-        <button data-testid="button" disabled={disabled} onClick={onClick}>
-            {children}
-        </button>
-    ),
-}));
-
-vi.mock('@/components/ui/dialog', () => ({
-    Dialog: ({children, open}: {children: React.ReactNode; onOpenChange?: (open: boolean) => void; open?: boolean}) =>
-        open ? <div data-testid="dialog">{children}</div> : null,
-    DialogCloseButton: () => <button data-testid="dialog-close">Close</button>,
-    DialogContent: ({children}: {children: React.ReactNode; className?: string}) => (
-        <div data-testid="dialog-content">{children}</div>
-    ),
-    DialogDescription: ({children}: {children: React.ReactNode}) => <p data-testid="dialog-description">{children}</p>,
-    DialogFooter: ({children}: {children: React.ReactNode}) => <div data-testid="dialog-footer">{children}</div>,
-    DialogHeader: ({children}: {children: React.ReactNode; className?: string}) => (
-        <div data-testid="dialog-header">{children}</div>
-    ),
-    DialogTitle: ({children}: {children: React.ReactNode}) => <h2 data-testid="dialog-title">{children}</h2>,
-    DialogTrigger: ({children}: {asChild?: boolean; children: React.ReactNode}) => (
-        <div data-testid="dialog-trigger">{children}</div>
-    ),
-}));
-
 const defaultMockReturn = {
     canSubmit: true,
     formatFileSize: (bytes: number) => `${bytes} bytes`,
@@ -85,21 +49,21 @@ describe('UploadKnowledgeBaseDocumentDialog', () => {
     it('renders dialog when open', () => {
         render(<UploadKnowledgeBaseDocumentDialog knowledgeBaseId="kb-1" />);
 
-        expect(screen.getByTestId('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     it('renders dialog title', () => {
         render(<UploadKnowledgeBaseDocumentDialog knowledgeBaseId="kb-1" />);
 
-        expect(screen.getByTestId('dialog-title')).toHaveTextContent('Upload Documents');
+        expect(screen.getByRole('heading', {name: 'Upload Documents'})).toBeInTheDocument();
     });
 
     it('renders dialog description', () => {
         render(<UploadKnowledgeBaseDocumentDialog knowledgeBaseId="kb-1" />);
 
-        expect(screen.getByTestId('dialog-description')).toHaveTextContent(
-            'Upload documents to be processed and indexed in the knowledge base.'
-        );
+        expect(
+            screen.getByText('Upload documents to be processed and indexed in the knowledge base.')
+        ).toBeInTheDocument();
     });
 
     it('renders file drop zone', () => {

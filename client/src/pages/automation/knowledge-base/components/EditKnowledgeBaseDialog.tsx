@@ -1,15 +1,14 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogCloseButton,
+    DialogBody,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import useEditKnowledgeBaseDialog from '@/pages/automation/knowledge-base/components/hooks/useEditKnowledgeBaseDialog';
@@ -63,51 +62,50 @@ const EditKnowledgeBaseDialog = ({
         <Dialog onOpenChange={handleOpenChange} open={open}>
             {renderTrigger()}
 
-            <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>{`${knowledgeBase?.id ? 'Edit' : 'Create'} Knowledge Base`}</DialogTitle>
+            <DialogContent>
+                <DialogMain>
+                    <DialogHeader
+                        description="Update the general settings for this knowledge base."
+                        title={`${knowledgeBase?.id ? 'Edit' : 'Create'} Knowledge Base`}
+                    />
 
-                        <DialogDescription>Update the general settings for this knowledge base.</DialogDescription>
-                    </div>
+                    <DialogBody>
+                        <fieldset className="space-y-4 border-0 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="kb-name">Name</Label>
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                                <Input
+                                    id="kb-name"
+                                    onChange={(event) => handleNameChange(event.target.value)}
+                                    placeholder="Knowledge base name"
+                                    value={name}
+                                />
+                            </div>
 
-                <fieldset className="space-y-4 border-0 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="kb-name">Name</Label>
+                            <div className="space-y-2">
+                                <Label htmlFor="kb-description">Description</Label>
 
-                        <Input
-                            id="kb-name"
-                            onChange={(event) => handleNameChange(event.target.value)}
-                            placeholder="Knowledge base name"
-                            value={name}
-                        />
-                    </div>
+                                <Textarea
+                                    id="kb-description"
+                                    onChange={(event) => handleDescriptionChange(event.target.value)}
+                                    placeholder="Describe this knowledge base (optional)"
+                                    rows={3}
+                                    value={description}
+                                />
+                            </div>
+                        </fieldset>
+                    </DialogBody>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="kb-description">Description</Label>
+                    <DialogFooter>
+                        <Button onClick={handleCancel} variant="ghost">
+                            Cancel
+                        </Button>
 
-                        <Textarea
-                            id="kb-description"
-                            onChange={(event) => handleDescriptionChange(event.target.value)}
-                            placeholder="Describe this knowledge base (optional)"
-                            rows={3}
-                            value={description}
-                        />
-                    </div>
-                </fieldset>
-
-                <DialogFooter>
-                    <Button onClick={handleCancel} variant="ghost">
-                        Cancel
-                    </Button>
-
-                    <Button disabled={!canSubmit || isPending} onClick={handleSave}>
-                        {isPending ? 'Saving...' : 'Save'}
-                    </Button>
-                </DialogFooter>
+                        <Button disabled={!canSubmit || isPending} onClick={handleSave}>
+                            {isPending ? 'Saving...' : 'Save'}
+                        </Button>
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
