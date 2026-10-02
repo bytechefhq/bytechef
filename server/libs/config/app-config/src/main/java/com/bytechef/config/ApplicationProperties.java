@@ -1519,6 +1519,8 @@ public class ApplicationProperties {
 
             private Detection detection = new Detection();
 
+            private OpenNlp opennlp = new OpenNlp();
+
             private Session session = new Session();
 
             private Violation violation = new Violation();
@@ -1547,6 +1549,14 @@ public class ApplicationProperties {
                 this.detection = detection;
             }
 
+            public OpenNlp getOpennlp() {
+                return opennlp;
+            }
+
+            public void setOpennlp(OpenNlp opennlp) {
+                this.opennlp = opennlp;
+            }
+
             public static class Detection {
 
                 private Duration timeout;
@@ -1567,6 +1577,49 @@ public class ApplicationProperties {
 
                 public void setMaxUnwindowableInput(int maxUnwindowableInput) {
                     this.maxUnwindowableInput = maxUnwindowableInput;
+                }
+            }
+
+            public static class OpenNlp {
+
+                private boolean enabled;
+
+                private Map<String, String> entityModels;
+
+                private double minConfidence;
+
+                private String tokenizerModel;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public Map<String, String> getEntityModels() {
+                    return entityModels;
+                }
+
+                public void setEntityModels(Map<String, String> entityModels) {
+                    this.entityModels = entityModels;
+                }
+
+                public double getMinConfidence() {
+                    return minConfidence;
+                }
+
+                public void setMinConfidence(double minConfidence) {
+                    this.minConfidence = minConfidence;
+                }
+
+                public String getTokenizerModel() {
+                    return tokenizerModel;
+                }
+
+                public void setTokenizerModel(String tokenizerModel) {
+                    this.tokenizerModel = tokenizerModel;
                 }
             }
 
