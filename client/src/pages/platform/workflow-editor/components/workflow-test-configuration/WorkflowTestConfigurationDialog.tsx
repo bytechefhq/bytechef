@@ -1,15 +1,14 @@
 import Button from '@/components/Button/Button';
-import Switch from '@/components/Switch/Switch';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import Switch from '@/components/Switch/Switch';
 import {Form} from '@/components/ui/form';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -164,139 +163,139 @@ const WorkflowTestConfigurationDialog = ({
 
     return (
         <Dialog onOpenChange={onClose} open={true}>
-            <DialogContent
-                className="max-w-workflow-test-configuration-dialog-width gap-0 p-0"
-                onInteractOutside={(event) => event.preventDefault()}
-            >
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0 p-6">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>Workflow Test Configuration</DialogTitle>
+            <DialogContent onInteractOutside={(event) => event.preventDefault()} size="md">
+                <DialogMain>
+                    <DialogHeader
+                        description="Set workflow input, trigger output values and test connections."
+                        title="Workflow Test Configuration"
+                    />
 
-                        <DialogDescription>
-                            Set workflow input, trigger output values and test connections.
-                        </DialogDescription>
-                    </div>
+                    <DialogBody>
+                        <Form {...form}>
+                            <Tabs
+                                className="max-h-workflow-test-configuration-dialog-height w-full min-w-0 gap-2.5"
+                                defaultValue="connections"
+                            >
+                                <TabsList className="mx-6 flex">
+                                    <TabsTrigger
+                                        className="flex w-full data-[state=active]:shadow-none"
+                                        value="connections"
+                                    >
+                                        <Link2Icon className="mr-2 size-4" />
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                                        <span>Connections</span>
 
-                <Form {...form}>
-                    <Tabs
-                        className="max-h-workflow-test-configuration-dialog-height w-full max-w-workflow-test-configuration-dialog-width min-w-0 gap-2.5"
-                        defaultValue="connections"
-                    >
-                        <TabsList className="mx-6 flex">
-                            <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="connections">
-                                <Link2Icon className="mr-2 size-4" />
+                                        <span className="ml-1">({componentConnections.length})</span>
+                                    </TabsTrigger>
 
-                                <span>Connections</span>
+                                    <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="inputs">
+                                        <FileInputIcon className="mr-2 size-4" />
 
-                                <span className="ml-1">({componentConnections.length})</span>
-                            </TabsTrigger>
+                                        <span>Inputs</span>
 
-                            <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="inputs">
-                                <FileInputIcon className="mr-2 size-4" />
+                                        <span className="ml-1">({workflow.inputs?.length})</span>
+                                    </TabsTrigger>
+                                </TabsList>
 
-                                <span>Inputs</span>
+                                <form
+                                    className="min-w-0"
+                                    id="workflow-test-configuration-form"
+                                    onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}
+                                >
+                                    <TabsContent
+                                        className="mt-2 min-w-0 overflow-hidden px-6 py-2.5"
+                                        value="connections"
+                                    >
+                                        <ConnectionConfigurationList
+                                            componentConnections={componentConnections}
+                                            connectionDialogAllowed={connectionDialogAllowed}
+                                            connections={connections}
+                                            connectionsGrouped={connectionsGrouped}
+                                            control={control as unknown as Control<FieldValues>}
+                                            getCurrentConnectionId={(index) =>
+                                                watchedConnections?.[index]?.connectionId
+                                            }
+                                            handleConnectionDialogOpen={(componentConnection) => {
+                                                setComponentConnection(componentConnection);
 
-                                <span className="ml-1">({workflow.inputs?.length})</span>
-                            </TabsTrigger>
-                        </TabsList>
+                                                setShowNewConnectionDialog(true);
+                                            }}
+                                            handleConnectionIdChange={(index, connectionId) =>
+                                                setValue(`connections.${index}.connectionId`, connectionId, {
+                                                    shouldDirty: true,
+                                                })
+                                            }
+                                            workflow={workflow}
+                                        />
+                                    </TabsContent>
 
-                        <form
-                            className="min-w-0"
-                            id="workflow-test-configuration-form"
-                            onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}
-                        >
-                            <TabsContent className="mt-2 min-w-0 overflow-hidden px-6 py-2.5" value="connections">
-                                <ConnectionConfigurationList
-                                    componentConnections={componentConnections}
-                                    connectionDialogAllowed={connectionDialogAllowed}
-                                    connections={connections}
-                                    connectionsGrouped={connectionsGrouped}
-                                    control={control as unknown as Control<FieldValues>}
-                                    getCurrentConnectionId={(index) => watchedConnections?.[index]?.connectionId}
-                                    handleConnectionDialogOpen={(componentConnection) => {
-                                        setComponentConnection(componentConnection);
+                                    <TabsContent className="mt-2 px-6 py-2.5" value="inputs">
+                                        <InputConfigurationList
+                                            control={control as unknown as Control<FieldValues>}
+                                            controlPath="inputs"
+                                            formState={formState}
+                                            inputs={inputs}
+                                            onOpenInputs={handleOpenInputs}
+                                        />
+                                    </TabsContent>
+                                </form>
+                            </Tabs>
+                        </Form>
+                    </DialogBody>
 
-                                        setShowNewConnectionDialog(true);
-                                    }}
-                                    handleConnectionIdChange={(index, connectionId) =>
-                                        setValue(`connections.${index}.connectionId`, connectionId, {
-                                            shouldDirty: true,
-                                        })
-                                    }
-                                    workflow={workflow}
+                    <DialogFooter className="flex items-center p-6">
+                        {componentConnections.length > 1 && (
+                            <div className="mr-auto flex items-center gap-2">
+                                <Switch
+                                    checked={connectionsGrouped}
+                                    label="Group Connections"
+                                    onCheckedChange={handleConnectionsGroupedChange}
                                 />
-                            </TabsContent>
 
-                            <TabsContent className="mt-2 px-6 py-2.5" value="inputs">
-                                <InputConfigurationList
-                                    control={control as unknown as Control<FieldValues>}
-                                    controlPath="inputs"
-                                    formState={formState}
-                                    inputs={inputs}
-                                    onOpenInputs={handleOpenInputs}
-                                />
-                            </TabsContent>
-                        </form>
-                    </Tabs>
-                </Form>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
+                                    </TooltipTrigger>
 
-                <DialogFooter className="flex items-center p-6">
-                    {componentConnections.length > 1 && (
-                        <div className="mr-auto flex items-center gap-2">
-                            <Switch
-                                checked={connectionsGrouped}
-                                label="Group Connections"
-                                onCheckedChange={handleConnectionsGroupedChange}
-                            />
-
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
-                                </TooltipTrigger>
-
-                                <TooltipContent>Connections grouped by their component.</TooltipContent>
-                            </Tooltip>
-                        </div>
-                    )}
-
-                    <DialogClose asChild>
-                        <Button label="Cancel" type="button" variant="outline" />
-                    </DialogClose>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div>
-                                <Button
-                                    disabled={!formState.isDirty || saveWorkflowTestConfigurationMutation.isPending}
-                                    form="workflow-test-configuration-form"
-                                    label="Save"
-                                    type="submit"
-                                />
+                                    <TooltipContent>Connections grouped by their component.</TooltipContent>
+                                </Tooltip>
                             </div>
-                        </TooltipTrigger>
+                        )}
 
-                        <TooltipContent>
-                            {!formState.isDirty ? 'Nothing to save.' : 'Save workflow test configuration.'}
-                        </TooltipContent>
-                    </Tooltip>
-                </DialogFooter>
+                        <DialogCancelButton />
 
-                {showNewConnectionDialog && componentDefinitions && (
-                    <Portal.Root>
-                        <ConnectionDialog
-                            componentDefinition={componentDefinition}
-                            componentDefinitions={componentDefinitions}
-                            connectionTagsQueryKey={ConnectionKeys!.connectionTags}
-                            connectionsQueryKey={ConnectionKeys!.connections}
-                            onClose={() => setShowNewConnectionDialog(false)}
-                            useCreateConnectionMutation={useCreateConnectionMutation}
-                            useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
-                        />
-                    </Portal.Root>
-                )}
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div>
+                                    <Button
+                                        disabled={!formState.isDirty || saveWorkflowTestConfigurationMutation.isPending}
+                                        form="workflow-test-configuration-form"
+                                        label="Save"
+                                        type="submit"
+                                    />
+                                </div>
+                            </TooltipTrigger>
+
+                            <TooltipContent>
+                                {!formState.isDirty ? 'Nothing to save.' : 'Save workflow test configuration.'}
+                            </TooltipContent>
+                        </Tooltip>
+                    </DialogFooter>
+
+                    {showNewConnectionDialog && componentDefinitions && (
+                        <Portal.Root>
+                            <ConnectionDialog
+                                componentDefinition={componentDefinition}
+                                componentDefinitions={componentDefinitions}
+                                connectionTagsQueryKey={ConnectionKeys!.connectionTags}
+                                connectionsQueryKey={ConnectionKeys!.connections}
+                                onClose={() => setShowNewConnectionDialog(false)}
+                                useCreateConnectionMutation={useCreateConnectionMutation}
+                                useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
+                            />
+                        </Portal.Root>
+                    )}
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
