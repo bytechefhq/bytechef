@@ -23,41 +23,6 @@ vi.mock('../hooks/useCreateKnowledgeBaseDialog', () => ({
     default: hoisted.mockUseCreateKnowledgeBaseDialog,
 }));
 
-vi.mock('@/components/Button/Button', () => ({
-    default: ({
-        children,
-        disabled,
-        onClick,
-    }: {
-        children?: React.ReactNode;
-        disabled?: boolean;
-        onClick?: () => void;
-        variant?: string;
-    }) => (
-        <button data-testid="button" disabled={disabled} onClick={onClick}>
-            {children}
-        </button>
-    ),
-}));
-
-vi.mock('@/components/ui/dialog', () => ({
-    Dialog: ({children, open}: {children: React.ReactNode; onOpenChange?: (open: boolean) => void; open?: boolean}) =>
-        open ? <div data-testid="dialog">{children}</div> : null,
-    DialogCloseButton: () => <button data-testid="dialog-close">Close</button>,
-    DialogContent: ({children}: {children: React.ReactNode; className?: string}) => (
-        <div data-testid="dialog-content">{children}</div>
-    ),
-    DialogDescription: ({children}: {children: React.ReactNode}) => <p data-testid="dialog-description">{children}</p>,
-    DialogFooter: ({children}: {children: React.ReactNode}) => <div data-testid="dialog-footer">{children}</div>,
-    DialogHeader: ({children}: {children: React.ReactNode; className?: string}) => (
-        <div data-testid="dialog-header">{children}</div>
-    ),
-    DialogTitle: ({children}: {children: React.ReactNode}) => <h2 data-testid="dialog-title">{children}</h2>,
-    DialogTrigger: ({children}: {asChild?: boolean; children: React.ReactNode}) => (
-        <div data-testid="dialog-trigger">{children}</div>
-    ),
-}));
-
 const defaultMockReturn = {
     canSubmit: true,
     createMutation: {isPending: false},
@@ -96,13 +61,19 @@ describe('CreateKnowledgeBaseDialog', () => {
     it('renders dialog when open', () => {
         render(<CreateKnowledgeBaseDialog workspaceId="ws-1" />);
 
-        expect(screen.getByTestId('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     it('renders dialog title', () => {
         render(<CreateKnowledgeBaseDialog workspaceId="ws-1" />);
 
-        expect(screen.getByTestId('dialog-title')).toHaveTextContent('Create Knowledge Base');
+        expect(screen.getByRole('heading', {name: 'Create Knowledge Base'})).toBeInTheDocument();
+    });
+
+    it('renders the close control', () => {
+        render(<CreateKnowledgeBaseDialog workspaceId="ws-1" />);
+
+        expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
     });
 
     it('renders name input', () => {
@@ -167,9 +138,7 @@ describe('CreateKnowledgeBaseDialog', () => {
 
         render(<CreateKnowledgeBaseDialog workspaceId="ws-1" />);
 
-        const createButton = screen.getByText('Create').closest('button');
-
-        expect(createButton).toBeDisabled();
+        expect(screen.getByRole('button', {name: 'Create'})).toBeDisabled();
     });
 
     it('shows Creating... when mutation is pending', () => {
@@ -212,8 +181,7 @@ describe('CreateKnowledgeBaseDialog', () => {
     it('calls handleSubmit when Create is clicked', async () => {
         render(<CreateKnowledgeBaseDialog workspaceId="ws-1" />);
 
-        const createButton = screen.getByText('Create');
-        await userEvent.click(createButton);
+        await userEvent.click(screen.getByRole('button', {name: 'Create'}));
 
         expect(hoisted.handleSubmit).toHaveBeenCalled();
     });
