@@ -8,6 +8,8 @@ import {HTMLAttributes, MouseEvent, useEffect, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
+import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../../utils/canvasDragData';
+
 interface DragEventI<T = Element> extends MouseEvent<T, DragEventInit> {
     dataTransfer: DataTransfer;
 }
@@ -38,7 +40,12 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
     }
 
     const onDragStart = (event: DragEventI) => {
-        event.dataTransfer.setData('application/reactflow', nodeName);
+        event.dataTransfer.setData(CANVAS_DRAG_DATA_TYPE, nodeName);
+
+        if (node.trigger) {
+            event.dataTransfer.setData(TRIGGER_DRAG_DATA_TYPE, nodeName);
+        }
+
         event.dataTransfer.effectAllowed = 'move';
 
         if (iconRef.current) {

@@ -37,6 +37,7 @@ import TriggerPlaceholderNode from '../nodes/TriggerPlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import {CANVAS_DRAG_DATA_TYPE, getCanvasDragKind} from '../utils/canvasDragData';
 import clearAllNodePositions from '../utils/clearAllNodePositions';
 import {collectAllDescendantNodes, collectChainSuccessorNodes} from '../utils/collectDescendantNodes';
 import {
@@ -47,6 +48,7 @@ import {
 import getInitialViewportPosition from '../utils/getInitialViewportPosition';
 import {extractLayoutDirection} from '../utils/layoutDirectionDefinitionUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
+import resolveCanvasDropTarget from '../utils/resolveCanvasDropTarget';
 import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveWorkflowNodesPosition from '../utils/saveWorkflowNodesPosition';
 import {STICKY_NOTE_NODE_TYPE, compensateStickyNotePosition, updateStickyNote} from '../utils/stickyNoteUtils';
@@ -150,13 +152,25 @@ const useWorkflowEditorCanvas = ({
             return;
         }
 
+        const dragKind = getCanvasDragKind(event.dataTransfer);
+
+        if (dragKind) {
+            const {edges, nodes} = useWorkflowDataStore.getState();
+
+            if (!resolveCanvasDropTarget({dragKind, edges, nodes, target: event.target})) {
+                event.dataTransfer.dropEffect = 'none';
+
+                return;
+            }
+        }
+
         event.preventDefault();
 
         event.dataTransfer.dropEffect = 'move';
     }, []);
 
     const onDrop: DragEventHandler = useCallback((event) => {
-        const droppedNodeData = event.dataTransfer.getData('application/reactflow');
+        const droppedNodeData = event.dataTransfer.getData(CANVAS_DRAG_DATA_TYPE);
 
         let droppedNodeType = '';
         let droppedNodeName;
@@ -184,117 +198,40 @@ const useWorkflowEditorCanvas = ({
             return;
         }
 
-        if (droppedNodeType === 'trigger') {
+        const isTriggerDrop = droppedNodeType === 'trigger';
+
+        if (isTriggerDrop) {
             droppedNode = {
                 ...droppedNode,
                 trigger: true,
             };
+        }
 
-            const targetChildNode = (event.target as HTMLElement).closest('.react-flow__node > div') as HTMLElement;
+        const {edges, nodes} = useWorkflowDataStore.getState();
 
-            const targetNodeType = targetChildNode?.dataset.nodetype;
+        const dropTarget = resolveCanvasDropTarget({
+            dragKind: isTriggerDrop ? 'trigger' : 'task',
+            edges,
+            nodes,
+            target: event.target,
+        });
 
-            const targetNodeElement =
-                event.target instanceof HTMLElement
-                    ? targetChildNode?.parentNode
-                    : (event.target as SVGElement).closest('.react-flow__node');
+        if (!dropTarget) {
+            return;
+        }
 
-            if (targetNodeType === 'trigger' && targetNodeElement instanceof HTMLElement) {
-                const targetNodeId = targetNodeElement.dataset.id;
-
-                if (!targetNodeId) {
-                    return;
-                }
-
-                const targetNode = useWorkflowDataStore.getState().nodes.find((node) => node.id === targetNodeId);
-
-                if (targetNode) {
-                    const targetNodeName = resolveTargetTriggerName(targetNode.data as NodeDataType);
-
-                    if (targetNodeName) {
-                        handleDropOnTriggerNode(droppedNode, targetNodeName);
-                    }
-                }
-
-                return;
-            }
-
+        if (dropTarget.type === 'triggerPlaceholder') {
             handleDropOnTriggerPlaceholder(droppedNode);
-        } else {
-            const getClosestEdgeElement = (element: HTMLElement | null): HTMLElement | null => {
-                let current: HTMLElement | null = element;
+        } else if (dropTarget.type === 'trigger') {
+            const targetTriggerName = resolveTargetTriggerName(dropTarget.node.data as NodeDataType);
 
-                while (current) {
-                    if (
-                        current.tagName === 'DIV' &&
-                        current.id &&
-                        current.id.match(/^.+=>.+$/) &&
-                        !current.id.endsWith('-button')
-                    ) {
-                        return current;
-                    }
-
-                    current = current.parentElement;
-                }
-
-                return null;
-            };
-
-            const isTargetNode = event.target instanceof HTMLElement;
-            const isTargetEdge = event.target instanceof SVGElement;
-
-            if (isTargetNode) {
-                const targetNodeElement = (event.target as HTMLElement).closest('.react-flow__node') as HTMLElement;
-
-                if (targetNodeElement && targetNodeElement?.dataset.nodetype !== 'trigger') {
-                    const targetNodeId = targetNodeElement.dataset.id!;
-
-                    const {nodes} = useWorkflowDataStore.getState();
-
-                    const targetNode = nodes.find((node) => node.id === targetNodeId);
-
-                    if (targetNode && targetNode.type === 'placeholder') {
-                        if (targetNode?.position.x === 0 && targetNode?.position.y === 0) {
-                            return;
-                        }
-
-                        handleDropOnPlaceholderNode(targetNode, droppedNode);
-
-                        return;
-                    }
-                }
-
-                const edgeElement = getClosestEdgeElement(event.target as HTMLElement);
-
-                if (edgeElement) {
-                    const {edges} = useWorkflowDataStore.getState();
-
-                    const targetEdge = edges.find((edge) => edge.id === edgeElement.id);
-
-                    if (targetEdge) {
-                        handleDropOnWorkflowEdge(targetEdge, droppedNode);
-
-                        return;
-                    }
-                }
-            } else if (isTargetEdge) {
-                const closestDiv = (event.target as SVGElement).closest('div');
-                const edgeElement = closestDiv instanceof HTMLElement ? getClosestEdgeElement(closestDiv) : null;
-
-                if (!edgeElement) {
-                    return;
-                }
-
-                const {edges} = useWorkflowDataStore.getState();
-
-                const targetEdge = edges.find((edge) => edge.id === edgeElement.id);
-
-                if (targetEdge) {
-                    handleDropOnWorkflowEdge(targetEdge, droppedNode);
-
-                    return;
-                }
+            if (targetTriggerName) {
+                handleDropOnTriggerNode(droppedNode, targetTriggerName);
             }
+        } else if (dropTarget.type === 'placeholder') {
+            handleDropOnPlaceholderNode(dropTarget.node, droppedNode);
+        } else {
+            handleDropOnWorkflowEdge(dropTarget.edge, droppedNode);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

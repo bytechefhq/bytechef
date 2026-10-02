@@ -3,11 +3,12 @@ import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} fr
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 import {ClipboardPlusIcon, PlusIcon} from 'lucide-react';
-import {type DragEvent, type MouseEvent, useCallback, useEffect, useMemo, useState} from 'react';
+import {type MouseEvent, useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
+import useCanvasDropzone from '../hooks/useCanvasDropzone';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -37,7 +38,6 @@ export default function WorkflowEdge({
     targetX,
     targetY,
 }: EdgeProps) {
-    const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
     const [menuReady, setMenuReady] = useState<boolean>(false);
 
     const {edges, nodes, workflow} = useWorkflowDataStore(
@@ -51,6 +51,8 @@ export default function WorkflowEdge({
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     const {updateWorkflowMutation} = useWorkflowEditor();
+
+    const {dropzoneHandlers, isDropzoneActive} = useCanvasDropzone('task');
 
     const sourceNodeId = id.split('=>')[0];
     const targetNodeId = id.split('=>')[1];
@@ -206,28 +208,6 @@ export default function WorkflowEdge({
         });
     }, [edges, id, nodes, sourceNode, sourceNodeId, updateWorkflowMutation]);
 
-    const handleDragEnter = () => setDropzoneActive(true);
-
-    const handleDragLeave = (event: DragEvent) => {
-        const relatedTarget = event.relatedTarget as Node | null;
-
-        if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
-            setDropzoneActive(false);
-        }
-    };
-
-    const handleDragOver = (event: DragEvent) => {
-        event.preventDefault();
-
-        setDropzoneActive(true);
-    };
-
-    const handleDrop = (event: DragEvent) => {
-        event.preventDefault();
-
-        setDropzoneActive(false);
-    };
-
     const handleClick = (event: MouseEvent) => event.stopPropagation();
 
     const handleOpenChange = (open: boolean) => {
@@ -238,20 +218,6 @@ export default function WorkflowEdge({
             setMenuReady(false);
         }
     };
-
-    useEffect(() => {
-        const handleGlobalDragEnd = () => {
-            setDropzoneActive(false);
-        };
-
-        document.addEventListener('dragend', handleGlobalDragEnd);
-        document.addEventListener('drop', handleGlobalDragEnd);
-
-        return () => {
-            document.removeEventListener('dragend', handleGlobalDragEnd);
-            document.removeEventListener('drop', handleGlobalDragEnd);
-        };
-    }, []);
 
     return (
         <>
@@ -294,10 +260,7 @@ export default function WorkflowEdge({
                     className="nodrag nopan p-8"
                     id={id}
                     onClick={handleClick}
-                    onDragEnter={handleDragEnter}
-                    onDragLeave={handleDragLeave}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
+                    {...dropzoneHandlers}
                     style={{
                         pointerEvents: 'all',
                         position: 'absolute',

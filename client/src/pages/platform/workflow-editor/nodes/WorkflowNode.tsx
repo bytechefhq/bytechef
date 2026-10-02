@@ -25,6 +25,7 @@ import {
     getFilteredClusterElementTypes,
     getHandlePosition,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
+import useCanvasDropzone from '../hooks/useCanvasDropzone';
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -57,6 +58,7 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     id: string;
     infoCardOpen: boolean;
     isClusterElement: string | undefined;
+    isDropzoneActive: boolean;
     isHorizontal: boolean;
     isMainRootClusterElement: boolean;
     isNestedClusterRoot: boolean | undefined;
@@ -91,6 +93,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             id,
             infoCardOpen,
             isClusterElement,
+            isDropzoneActive,
             isHorizontal,
             isMainRootClusterElement,
             isNestedClusterRoot,
@@ -190,8 +193,11 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                 isClusterElement &&
                                     !isNestedClusterRoot &&
                                     !hasSavedClusterElementPosition &&
-                                    'border-dashed'
+                                    'border-dashed',
+                                isDropzoneActive &&
+                                    'border-surface-brand-secondary-hover bg-surface-brand-secondary-hover hover:bg-surface-brand-secondary-hover'
                             )}
+                            data-dropzone-active={isDropzoneActive || undefined}
                             data-node-box
                             onClick={handleNodeClick}
                             style={
@@ -522,6 +528,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const queryClient = useQueryClient();
 
+    const {dropzoneHandlers, isDropzoneActive} = useCanvasDropzone('trigger');
+
     const isHorizontal = layoutDirection === 'LR';
 
     const isSelected = currentNode?.name === data.name;
@@ -535,6 +543,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const parentClusterRootId = data.parentClusterRootId;
     const hasSavedClusterElementPosition = data.metadata?.ui?.nodePosition;
     const hasSavedNodePosition = isRegularNode && !data.trigger && data.metadata?.ui?.nodePosition;
+    const isTriggerDropzone = isRegularNode && !!data.trigger;
 
     const {tasks: workflowTasks, triggers: workflowTriggers} = workflow;
 
@@ -879,6 +888,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         id,
         infoCardOpen,
         isClusterElement,
+        isDropzoneActive: isTriggerDropzone && isDropzoneActive,
         isHorizontal,
         isMainRootClusterElement,
         isNestedClusterRoot,
@@ -918,7 +928,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 showInfoAction
                 showRenameAction
             >
-                <WorkflowNodeContent {...sharedContentProps} nodeMenuTrigger={regularNodeMenuTrigger} />
+                <WorkflowNodeContent
+                    {...sharedContentProps}
+                    {...(isTriggerDropzone && dropzoneHandlers)}
+                    nodeMenuTrigger={regularNodeMenuTrigger}
+                />
             </WorkflowNodeContextMenu>
         );
     }

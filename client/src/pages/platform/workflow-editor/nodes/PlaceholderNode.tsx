@@ -4,11 +4,12 @@ import {FINAL_PLACEHOLDER_NODE_ID} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
 import {ClipboardPlusIcon, PlusIcon} from 'lucide-react';
-import {DragEvent, memo, useCallback, useMemo, useState} from 'react';
+import {memo, useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
+import useCanvasDropzone from '../hooks/useCanvasDropzone';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -16,10 +17,10 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import {getContextFromPlaceholderNode} from '../utils/getTaskDispatcherContext';
 import pasteNode from '../utils/pasteNode';
+import DropzoneHighlight from './DropzoneHighlight';
 import styles from './NodeTypes.module.css';
 
 const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
-    const [isDropzoneActive, setDropzoneActive] = useState(false);
     const [menuReady, setMenuReady] = useState(false);
 
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
@@ -39,6 +40,8 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
 
     const {updateWorkflowMutation} = useWorkflowEditor();
+
+    const {dropzoneHandlers, isDropzoneActive} = useCanvasDropzone('task');
 
     const nodeIndex = nodes.findIndex((node) => node.id === id);
     const isClusterElement = !!data.clusterElementType;
@@ -84,14 +87,6 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         }
     };
 
-    const handleDragEnter = () => setDropzoneActive(true);
-
-    const handleDragLeave = () => setDropzoneActive(false);
-
-    const handleDragOver = (event: DragEvent) => event.preventDefault();
-
-    const handleDrop = () => setDropzoneActive(false);
-
     return (
         <ContextMenu onOpenChange={handleOpenChange}>
             <ContextMenuTrigger asChild disabled={!canPaste || isClusterElement}>
@@ -110,22 +105,17 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     >
                         <div
                             className={twMerge(
-                                'nodrag relative mx-[22px] flex cursor-pointer items-center justify-center rounded-md text-lg text-content-neutral-secondary shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
-                                isDropzoneActive
-                                    ? 'absolute ml-2 size-16 scale-150 cursor-pointer bg-blue-100'
-                                    : 'size-7 bg-gray-300',
+                                'nodrag relative mx-[22px] flex size-7 cursor-pointer items-center justify-center rounded-md bg-gray-300 text-lg text-content-neutral-secondary shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
                                 isClusterElement && 'mx-0 size-6',
                                 isFinalPlaceholder &&
-                                    !isDropzoneActive &&
                                     'mx-3 size-12 border-2 border-dashed border-stroke-neutral-tertiary bg-surface-neutral-primary hover:scale-105 hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:text-content-neutral-primary'
                             )}
-                            onDragEnter={handleDragEnter}
-                            onDragLeave={handleDragLeave}
-                            onDragOver={handleDragOver}
-                            onDrop={handleDrop}
                             title="Click to add a node"
+                            {...dropzoneHandlers}
                         >
                             {isFinalPlaceholder ? <PlusIcon className="size-6" /> : data.label}
+
+                            {isDropzoneActive && <DropzoneHighlight />}
 
                             <Handle
                                 className={styles.handle}
