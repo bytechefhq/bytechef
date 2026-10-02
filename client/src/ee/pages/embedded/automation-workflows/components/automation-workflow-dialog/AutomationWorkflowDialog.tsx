@@ -62,7 +62,7 @@ const AutomationWorkflowDialog = ({onClose, onSubmit, workflow}: AutomationWorkf
                                 title={isEditMode ? 'Edit Workflow' : 'Create Workflow'}
                             />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <FormField
                                     control={control}
                                     name="label"

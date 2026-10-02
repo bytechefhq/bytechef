@@ -167,7 +167,7 @@ const WorkflowDialog = ({
                     />
 
                     <Form {...form}>
-                        <DialogBody className="flex flex-col gap-4">
+                        <DialogBody>
                             <FormField
                                 control={control}
                                 name="label"

@@ -439,7 +439,7 @@ const ConnectionDialog = ({
                             title={`${connection?.id ? 'Edit' : 'Create'} Connection`}
                         />
 
-                        <DialogBody className="flex min-w-0 flex-col space-y-4">
+                        <DialogBody className="flex min-w-0 flex-col">
                             {errors?.length > 0 && <Errors errors={errors} />}
 
                             {connection?.id && currentType === PlatformType.EMBEDDED && (

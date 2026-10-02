@@ -168,7 +168,7 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
                                 title={`${project?.id ? 'Edit' : 'Create'} Project`}
                             />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 {categoriesError &&
                                     !categoriesLoading &&
                                     `An error has occurred: ${categoriesError.message}`}

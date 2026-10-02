@@ -129,6 +129,17 @@ describe('PropertyCodeEditorDialog', () => {
             expect(screen.getByRole('dialog')).toContainElement(screen.getByText('Edit Script'));
         });
 
+        // The dialog spans the canvas rather than sitting on the sm/md/lg/xl scale, so it opts out of the family
+        // width. Without that opt-out the scale's sm:w-[512px] won from 640 px up and the editor was clipped.
+        it('should span the viewport instead of taking the family width', () => {
+            renderWithProviders(<PropertyCodeEditorDialog {...defaultProps} />);
+
+            const dialog = screen.getByRole('dialog');
+
+            expect(dialog).toHaveClass('w-[calc(100vw-80px)]');
+            expect(dialog.className).not.toMatch(/\bsm:w-\[/);
+        });
+
         it('should render the toolbar', () => {
             renderWithProviders(<PropertyCodeEditorDialog {...defaultProps} />);
 

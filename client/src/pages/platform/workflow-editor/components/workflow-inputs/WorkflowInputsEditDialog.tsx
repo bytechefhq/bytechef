@@ -84,7 +84,7 @@ const WorkflowInputsEditDialog = ({
 
                     <Form {...form}>
                         <form className="flex min-h-0 flex-1 flex-col" onSubmit={form.handleSubmit(saveWorkflowInput)}>
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <FormField
                                     control={form.control}
                                     name="name"

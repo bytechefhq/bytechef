@@ -272,6 +272,7 @@ describe('DialogMain, DialogBody, DialogFooter', () => {
         expect(dialog.querySelector('[data-slot="dialog-body"]')).toHaveClass(
             'min-h-0',
             'flex-1',
+            'space-y-4',
             'overflow-y-auto',
             'px-4',
             'pb-4'
@@ -282,6 +283,47 @@ describe('DialogMain, DialogBody, DialogFooter', () => {
             'px-4',
             'py-2.5'
         );
+    });
+
+    // The shadcn surface was a grid with gap-4, so every stacked field was spaced by the content element. The family
+    // surface is a gapless flex column, which left form fields touching until the body took the spacing over.
+    it('should space the stacked body content', () => {
+        render(
+            <Dialog open>
+                <DialogContent aria-describedby={undefined}>
+                    <DialogMain>
+                        <DialogHeader title="Edit Integration" />
+
+                        <DialogBody>
+                            <label htmlFor="name">Name</label>
+
+                            <input id="name" />
+                        </DialogBody>
+                    </DialogMain>
+                </DialogContent>
+            </Dialog>
+        );
+
+        expect(screen.getByRole('dialog').querySelector('[data-slot="dialog-body"]')).toHaveClass('space-y-4');
+    });
+
+    it('should let className override the body spacing', () => {
+        render(
+            <Dialog open>
+                <DialogContent aria-describedby={undefined}>
+                    <DialogMain>
+                        <DialogHeader title="Select Plan" />
+
+                        <DialogBody className="flex gap-4 space-y-0">Body content</DialogBody>
+                    </DialogMain>
+                </DialogContent>
+            </Dialog>
+        );
+
+        const body = screen.getByRole('dialog').querySelector('[data-slot="dialog-body"]');
+
+        expect(body).toHaveClass('space-y-0');
+        expect(body).not.toHaveClass('space-y-4');
     });
 
     it('should put startContent before the footer actions', () => {

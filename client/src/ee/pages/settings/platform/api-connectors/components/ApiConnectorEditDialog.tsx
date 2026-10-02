@@ -45,7 +45,7 @@ const ApiConnectorEditDialog = ({apiConnector, onClose}: ApiConnectorEditDialogP
                                 title="Edit API Connector"
                             />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <FormField
                                     control={control}
                                     name="name"

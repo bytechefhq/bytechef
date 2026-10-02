@@ -192,7 +192,7 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
 
                     <Form {...form}>
                         <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveMcpProject)}>
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 {isEditMode && (
                                     <>
                                         <FormItem>

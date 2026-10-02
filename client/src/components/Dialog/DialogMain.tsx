@@ -147,7 +147,7 @@ DialogHeader.displayName = 'DialogHeader';
 
 const DialogBody = ({className, ...props}: DialogBodyPropsType) => (
     <div
-        className={twMerge('min-h-0 flex-1 overflow-y-auto px-4 pb-4', className)}
+        className={twMerge('min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-4', className)}
         data-slot="dialog-body"
         {...props}
     />

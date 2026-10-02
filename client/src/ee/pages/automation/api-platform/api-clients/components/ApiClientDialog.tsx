@@ -123,7 +123,7 @@ const ApiClientDialog = ({apiClient, onClose, triggerNode}: ApiClientDialogProps
                                 }
                             />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 {secretApiKey ? (
                                     <div className="space-y-4">
                                         <p className="text-sm">
