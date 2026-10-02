@@ -29,10 +29,13 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -108,11 +111,19 @@ public class WebhookTriggerTestController {
                         .build();
                 }
             } else {
-                workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                    workflowExecutionId, environmentId, webhookRequest);
+                WebhookValidateResponse webhookValidateResponse = webhookTriggerFlags.workflowSyncValidation()
+                    ? webhookTriggerTestFacade.validate(workflowExecutionId, webhookRequest, environmentId)
+                    : WebhookValidateResponse.ok();
 
-                responseEntity = ResponseEntity.ok()
-                    .build();
+                if (webhookValidateResponse.status() == HttpStatus.OK.value()) {
+                    workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
+                        workflowExecutionId, environmentId, webhookRequest);
+
+                    responseEntity = ResponseEntity.ok()
+                        .build();
+                } else {
+                    responseEntity = toResponseEntity(webhookValidateResponse);
+                }
             }
 
             return responseEntity;
@@ -122,14 +133,15 @@ public class WebhookTriggerTestController {
     private ResponseEntity<?> doValidateOnEnable(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, long environmentId) {
 
-        WebhookValidateResponse response = webhookTriggerTestFacade.validateOnEnable(
-            workflowExecutionId, webhookRequest, environmentId);
+        return toResponseEntity(
+            webhookTriggerTestFacade.validateOnEnable(workflowExecutionId, webhookRequest, environmentId));
+    }
 
-        return ResponseEntity.status(response.status())
-            .headers(
-                response.headers() == null
-                    ? null
-                    : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
-            .body(response.body());
+    private static ResponseEntity<?> toResponseEntity(WebhookValidateResponse webhookValidateResponse) {
+        Map<String, List<String>> headers = webhookValidateResponse.headers();
+
+        return ResponseEntity.status(webhookValidateResponse.status())
+            .headers(headers == null ? null : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(headers)))
+            .body(webhookValidateResponse.body());
     }
 }
