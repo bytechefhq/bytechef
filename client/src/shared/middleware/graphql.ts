@@ -1884,6 +1884,36 @@ export type TriggerExecutionFileLogsExistQueryVariables = Exact<{
 
 export type TriggerExecutionFileLogsExistQuery = { triggerExecutionFileLogsExist: boolean };
 
+export type ComponentOperationPoliciesQueryVariables = Exact<{
+  componentName: string;
+}>;
+
+
+export type ComponentOperationPoliciesQuery = { componentOperationPolicies: Array<{ componentName: string, operationType: Types.ComponentPolicyOperationType, operationName: string }> };
+
+export type ComponentPoliciesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ComponentPoliciesQuery = { componentPolicies: Array<{ name: string, title: string | null, description: string | null, icon: string | null, version: number, enabled: boolean }> };
+
+export type UpdateComponentOperationPolicyMutationVariables = Exact<{
+  componentName: string;
+  operationType: Types.ComponentPolicyOperationType;
+  operationName: string;
+  enabled: boolean;
+}>;
+
+
+export type UpdateComponentOperationPolicyMutation = { updateComponentOperationPolicy: boolean };
+
+export type UpdateComponentPolicyMutationVariables = Exact<{
+  name: string;
+  enabled: boolean;
+}>;
+
+
+export type UpdateComponentPolicyMutation = { updateComponentPolicy: { name: string, title: string | null, icon: string | null, version: number, enabled: boolean } };
+
 export type AdminApiKeysQueryVariables = Exact<{
   environmentId: string | number;
 }>;
@@ -9338,6 +9368,110 @@ export const useTriggerExecutionFileLogsExistQuery = <
       {
     queryKey: ['triggerExecutionFileLogsExist', variables],
     queryFn: fetcher<TriggerExecutionFileLogsExistQuery, TriggerExecutionFileLogsExistQueryVariables>(TriggerExecutionFileLogsExistDocument, variables),
+    ...options
+  }
+    )};
+
+export const ComponentOperationPoliciesDocument = new TypedDocumentString(`
+    query ComponentOperationPolicies($componentName: String!) {
+  componentOperationPolicies(componentName: $componentName) {
+    componentName
+    operationType
+    operationName
+  }
+}
+    `);
+
+export const useComponentOperationPoliciesQuery = <
+      TData = ComponentOperationPoliciesQuery,
+      TError = unknown
+    >(
+      variables: ComponentOperationPoliciesQueryVariables,
+      options?: Omit<UseQueryOptions<ComponentOperationPoliciesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentOperationPoliciesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ComponentOperationPoliciesQuery, TError, TData>(
+      {
+    queryKey: ['ComponentOperationPolicies', variables],
+    queryFn: fetcher<ComponentOperationPoliciesQuery, ComponentOperationPoliciesQueryVariables>(ComponentOperationPoliciesDocument, variables),
+    ...options
+  }
+    )};
+
+export const ComponentPoliciesDocument = new TypedDocumentString(`
+    query ComponentPolicies {
+  componentPolicies {
+    name
+    title
+    description
+    icon
+    version
+    enabled
+  }
+}
+    `);
+
+export const useComponentPoliciesQuery = <
+      TData = ComponentPoliciesQuery,
+      TError = unknown
+    >(
+      variables?: ComponentPoliciesQueryVariables,
+      options?: Omit<UseQueryOptions<ComponentPoliciesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentPoliciesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ComponentPoliciesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['ComponentPolicies'] : ['ComponentPolicies', variables],
+    queryFn: fetcher<ComponentPoliciesQuery, ComponentPoliciesQueryVariables>(ComponentPoliciesDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateComponentOperationPolicyDocument = new TypedDocumentString(`
+    mutation UpdateComponentOperationPolicy($componentName: String!, $operationType: ComponentPolicyOperationType!, $operationName: String!, $enabled: Boolean!) {
+  updateComponentOperationPolicy(
+    componentName: $componentName
+    operationType: $operationType
+    operationName: $operationName
+    enabled: $enabled
+  )
+}
+    `);
+
+export const useUpdateComponentOperationPolicyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateComponentOperationPolicyMutation, TError, UpdateComponentOperationPolicyMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateComponentOperationPolicyMutation, TError, UpdateComponentOperationPolicyMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateComponentOperationPolicy'],
+    mutationFn: (variables?: UpdateComponentOperationPolicyMutationVariables) => fetcher<UpdateComponentOperationPolicyMutation, UpdateComponentOperationPolicyMutationVariables>(UpdateComponentOperationPolicyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateComponentPolicyDocument = new TypedDocumentString(`
+    mutation UpdateComponentPolicy($name: String!, $enabled: Boolean!) {
+  updateComponentPolicy(name: $name, enabled: $enabled) {
+    name
+    title
+    icon
+    version
+    enabled
+  }
+}
+    `);
+
+export const useUpdateComponentPolicyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateComponentPolicyMutation, TError, UpdateComponentPolicyMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateComponentPolicyMutation, TError, UpdateComponentPolicyMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateComponentPolicy'],
+    mutationFn: (variables?: UpdateComponentPolicyMutationVariables) => fetcher<UpdateComponentPolicyMutation, UpdateComponentPolicyMutationVariables>(UpdateComponentPolicyDocument, variables)(),
     ...options
   }
     )};

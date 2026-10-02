@@ -807,9 +807,31 @@ export type ComponentDefinitionTuple = {
   value: Array<Maybe<ComponentDefinition>>;
 };
 
+export type ComponentOperationPolicy = {
+  __typename?: 'ComponentOperationPolicy';
+  componentName: Scalars['String']['output'];
+  operationName: Scalars['String']['output'];
+  operationType: ComponentPolicyOperationType;
+};
+
 export enum ComponentOperationType {
   Action = 'ACTION',
   ClusterElement = 'CLUSTER_ELEMENT',
+  Trigger = 'TRIGGER'
+}
+
+export type ComponentPolicy = {
+  __typename?: 'ComponentPolicy';
+  description?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  icon?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+  version: Scalars['Int']['output'];
+};
+
+export enum ComponentPolicyOperationType {
+  Action = 'ACTION',
   Trigger = 'TRIGGER'
 }
 
@@ -1958,6 +1980,10 @@ export type Mutation = {
   updateAutomationWorkflowProjectConfigurationWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
+  /** Disables (enabled: false) or re-enables (enabled: true) a single action or trigger tenant-wide. Admin-only. */
+  updateComponentOperationPolicy: Scalars['Boolean']['output'];
+  /** Enables or disables a component tenant-wide. Admin-only. */
+  updateComponentPolicy: ComponentPolicy;
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
@@ -2813,6 +2839,20 @@ export type MutationUpdateAutomationWorkflowProjectWorkflowPermissionExpressionA
 };
 
 
+export type MutationUpdateComponentOperationPolicyArgs = {
+  componentName: Scalars['String']['input'];
+  enabled: Scalars['Boolean']['input'];
+  operationName: Scalars['String']['input'];
+  operationType: ComponentPolicyOperationType;
+};
+
+
+export type MutationUpdateComponentPolicyArgs = {
+  enabled: Scalars['Boolean']['input'];
+  name: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateDataTableRowArgs = {
   input: UpdateRowInput;
 };
@@ -3379,6 +3419,13 @@ export type Query = {
   componentDefinitionSearch: Array<ComponentDefinition>;
   componentDefinitionVersions: Array<ComponentDefinition>;
   componentDefinitions: Array<ComponentDefinition>;
+  /** Lists the disabled operations of a component (deny-list rows only). Admin-only. */
+  componentOperationPolicies: Array<ComponentOperationPolicy>;
+  /**
+   * Lists every registry component with its tenant-wide visibility flag. Components with no policy row are reported
+   * enabled. Admin-only.
+   */
+  componentPolicies: Array<ComponentPolicy>;
   componentPropertyDisplayConditions: Scalars['Map']['output'];
   connectedUser?: Maybe<ConnectedUser>;
   connectedUserCodeWorkflowReferences: Array<ConnectedUserCodeWorkflowReference>;
@@ -3846,6 +3893,11 @@ export type QueryComponentDefinitionsArgs = {
   include?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   platformType: PlatformType;
   triggerDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryComponentOperationPoliciesArgs = {
+  componentName: Scalars['String']['input'];
 };
 
 
