@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button';
+import {Dialog, DialogBody, DialogContent, DialogHeader, DialogMain} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import Switch from '@/components/Switch/Switch';
 import {Alert, AlertDescription} from '@/components/ui/alert';
-import {Dialog, DialogCloseButton, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {TEMPLATE_SHARING_DOCUMENTATION_URL} from '@/shared/constants';
@@ -117,102 +117,30 @@ export function WorkflowShareDialog({
 
     return (
         <Dialog onOpenChange={onOpenChange} open={open}>
-            <DialogContent className="flex flex-col">
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <DialogTitle className="text-center text-lg font-semibold">Share workflow as template</DialogTitle>
+            <DialogContent>
+                <DialogMain>
+                    <DialogHeader title="Share workflow as template" />
 
-                    <DialogCloseButton />
-                </DialogHeader>
-
-                <div className="space-y-4">
-                    <Alert
-                        className={twMerge(shareState === 'not-shared' && 'bg-muted')}
-                        variant={
-                            shareState === 'exported' && !exportSharedWorkflowMutation.isPending
-                                ? sharedWorkflow?.projectVersion === projectVersion
-                                    ? 'success'
-                                    : 'destructive'
-                                : 'default'
-                        }
-                    >
-                        <AlertDescription>
-                            {shareState === 'not-shared' ? (
-                                <div>
-                                    <p className="mb-2 text-sm font-medium">This workflow has not been shared</p>
-
-                                    <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
-                                        Exporting this workflow as a template will let others import it through a unique
-                                        link that you can share. You can disable (and re-enable) the template at any
-                                        time.
-                                    </p>
-
-                                    <Button
-                                        className="h-auto p-0"
-                                        label="Learn more"
-                                        onClick={handleLearnMoreClick}
-                                        variant="link"
-                                    />
-                                </div>
-                            ) : shareState === 'exported' ? (
-                                <>
-                                    <div className="flex w-full items-center justify-between pb-4 font-semibold text-primary">
-                                        {sharedWorkflow?.projectVersion === projectVersion ? (
-                                            <span className="text-sm font-medium text-primary">
-                                                This workflow has been exported
-                                            </span>
-                                        ) : (
-                                            <span>An older version of this workflow is shared as a template</span>
-                                        )}
-
-                                        <Switch checked={true} onCheckedChange={handleToggleCheckedChange} />
-                                    </div>
-
-                                    {sharedWorkflow?.projectVersion === projectVersion ? (
-                                        <p className="mb-3 text-sm text-muted-foreground">
-                                            Please test the link and import experience before sharing.
-                                        </p>
-                                    ) : (
-                                        <p className="mb-3 text-sm text-muted-foreground">
-                                            To update the template based on the latest version of your workflow, click
-                                            the Update button below.
-                                        </p>
-                                    )}
-
-                                    <div className="flex w-full items-center gap-2">
-                                        <Input className="grow text-primary" readOnly value={templateUrl!} />
-
-                                        {isCopied ? (
-                                            <div className="flex items-center text-sm font-medium">
-                                                <CheckIcon className="mr-1 size-4" />
-
-                                                <span>Copied</span>
-                                            </div>
-                                        ) : (
-                                            <Button
-                                                icon={<LinkIcon />}
-                                                label="Copy link"
-                                                onClick={handleCopyLinkClick}
-                                                size="sm"
-                                                variant="secondary"
-                                            />
-                                        )}
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium">
-                                            This workflow is not currently shared
-                                        </span>
-
-                                        <Switch onCheckedChange={handleToggleCheckedChange} />
-                                    </div>
-
+                    <DialogBody className="space-y-4">
+                        <Alert
+                            className={twMerge(shareState === 'not-shared' && 'bg-muted')}
+                            variant={
+                                shareState === 'exported' && !exportSharedWorkflowMutation.isPending
+                                    ? sharedWorkflow?.projectVersion === projectVersion
+                                        ? 'success'
+                                        : 'destructive'
+                                    : 'default'
+                            }
+                        >
+                            <AlertDescription>
+                                {shareState === 'not-shared' ? (
                                     <div>
+                                        <p className="mb-2 text-sm font-medium">This workflow has not been shared</p>
+
                                         <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
-                                            The link that was generated previously will not work any more. Use the
-                                            toggle above to export the current version of your workflow and re-enable
-                                            the link.
+                                            Exporting this workflow as a template will let others import it through a
+                                            unique link that you can share. You can disable (and re-enable) the template
+                                            at any time.
                                         </p>
 
                                         <Button
@@ -222,76 +150,146 @@ export function WorkflowShareDialog({
                                             variant="link"
                                         />
                                     </div>
-                                </div>
-                            )}
-                        </AlertDescription>
-                    </Alert>
+                                ) : shareState === 'exported' ? (
+                                    <>
+                                        <div className="flex w-full items-center justify-between pb-4 font-semibold text-primary">
+                                            {sharedWorkflow?.projectVersion === projectVersion ? (
+                                                <span className="text-sm font-medium text-primary">
+                                                    This workflow has been exported
+                                                </span>
+                                            ) : (
+                                                <span>An older version of this workflow is shared as a template</span>
+                                            )}
 
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <Label className="text-sm font-medium" htmlFor="description">
-                                Description <span className="text-red-500">*</span>
-                            </Label>
+                                            <Switch checked={true} onCheckedChange={handleToggleCheckedChange} />
+                                        </div>
 
-                            {/*<Button*/}
+                                        {sharedWorkflow?.projectVersion === projectVersion ? (
+                                            <p className="mb-3 text-sm text-muted-foreground">
+                                                Please test the link and import experience before sharing.
+                                            </p>
+                                        ) : (
+                                            <p className="mb-3 text-sm text-muted-foreground">
+                                                To update the template based on the latest version of your workflow,
+                                                click the Update button below.
+                                            </p>
+                                        )}
 
-                            {/*    className="h-auto p-1 text-purple-600 hover:bg-purple-50 hover:text-purple-700"*/}
+                                        <div className="flex w-full items-center gap-2">
+                                            <Input className="grow text-primary" readOnly value={templateUrl!} />
 
-                            {/*    size="sm"*/}
+                                            {isCopied ? (
+                                                <div className="flex items-center text-sm font-medium">
+                                                    <CheckIcon className="mr-1 size-4" />
 
-                            {/*    variant="ghost"*/}
+                                                    <span>Copied</span>
+                                                </div>
+                                            ) : (
+                                                <Button
+                                                    icon={<LinkIcon />}
+                                                    label="Copy link"
+                                                    onClick={handleCopyLinkClick}
+                                                    size="sm"
+                                                    variant="secondary"
+                                                />
+                                            )}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-medium">
+                                                This workflow is not currently shared
+                                            </span>
 
-                            {/*>*/}
+                                            <Switch onCheckedChange={handleToggleCheckedChange} />
+                                        </div>
 
-                            {/*    <SparklesIcon className="mr-1 size-3" />*/}
+                                        <div>
+                                            <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
+                                                The link that was generated previously will not work any more. Use the
+                                                toggle above to export the current version of your workflow and
+                                                re-enable the link.
+                                            </p>
 
-                            {/*    <span className="text-xs">Generate with AI</span>*/}
+                                            <Button
+                                                className="h-auto p-0"
+                                                label="Learn more"
+                                                onClick={handleLearnMoreClick}
+                                                variant="link"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </AlertDescription>
+                        </Alert>
 
-                            {/*</Button>*/}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-sm font-medium" htmlFor="description">
+                                    Description <span className="text-red-500">*</span>
+                                </Label>
+
+                                {/*<Button*/}
+
+                                {/*    className="h-auto p-1 text-purple-600 hover:bg-purple-50 hover:text-purple-700"*/}
+
+                                {/*    size="sm"*/}
+
+                                {/*    variant="ghost"*/}
+
+                                {/*>*/}
+
+                                {/*    <SparklesIcon className="mr-1 size-3" />*/}
+
+                                {/*    <span className="text-xs">Generate with AI</span>*/}
+
+                                {/*</Button>*/}
+                            </div>
+
+                            <Textarea
+                                className="min-h-[80px] text-sm"
+                                id="description"
+                                onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Describe what this workflow does..."
+                                value={description}
+                            />
                         </div>
 
-                        <Textarea
-                            className="min-h-[80px] text-sm"
-                            id="description"
-                            onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Describe what this workflow does..."
-                            value={description}
-                        />
-                    </div>
+                        {shareState === 'not-shared' && (
+                            <Button
+                                className="w-full"
+                                disabled={!description}
+                                label="Export and generate template link"
+                                onClick={handleExport}
+                            />
+                        )}
 
-                    {shareState === 'not-shared' && (
-                        <Button
-                            className="w-full"
-                            disabled={!description}
-                            label="Export and generate template link"
-                            onClick={handleExport}
-                        />
-                    )}
+                        {shareState === 'exported' && sharedWorkflow?.projectVersion !== projectVersion && (
+                            <Button
+                                className="w-full"
+                                disabled={!description}
+                                label="Update template based on the current version"
+                                onClick={handleExport}
+                            />
+                        )}
 
-                    {shareState === 'exported' && sharedWorkflow?.projectVersion !== projectVersion && (
-                        <Button
-                            className="w-full"
-                            disabled={!description}
-                            label="Update template based on the current version"
-                            onClick={handleExport}
-                        />
-                    )}
+                        <p className="space-x-1 text-xs leading-relaxed text-muted-foreground">
+                            <span>
+                                Template links will not be distributed by ByteChef app. You decide with whom and where
+                                to share, and you may disable and re-enable them at any time.
+                            </span>
 
-                    <p className="space-x-1 text-xs leading-relaxed text-muted-foreground">
-                        <span>
-                            Template links will not be distributed by ByteChef app. You decide with whom and where to
-                            share, and you may disable and re-enable them at any time.
-                        </span>
-
-                        <Button
-                            className="h-auto p-0"
-                            label="Learn more"
-                            onClick={handleLearnMoreClick}
-                            size="sm"
-                            variant="link"
-                        />
-                    </p>
-                </div>
+                            <Button
+                                className="h-auto p-0"
+                                label="Learn more"
+                                onClick={handleLearnMoreClick}
+                                size="sm"
+                                variant="link"
+                            />
+                        </p>
+                    </DialogBody>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
