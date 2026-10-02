@@ -19,15 +19,24 @@ package com.bytechef.platform.component.polyglot;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import io.micrometer.context.ContextRegistry;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
@@ -195,6 +204,78 @@ public class PolyglotSandboxTest {
     }
 
     @Test
+    public void testTrustedModeRoutesGuestOutputThroughTheGuestLogger() {
+        ch.qos.logback.classic.Logger polyglotSandboxLogger =
+            (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(PolyglotSandbox.class);
+
+        Level previousLevel = polyglotSandboxLogger.getLevel();
+        ListAppender<ILoggingEvent> logAppender = new ListAppender<>();
+
+        logAppender.start();
+        polyglotSandboxLogger.addAppender(logAppender);
+        polyglotSandboxLogger.setLevel(Level.INFO);
+
+        try {
+            PolyglotSandbox.call(
+                ScriptSandboxMode.TRUSTED, "js", null,
+                context -> context.eval("js", "print('trusted-guest-line')"));
+
+            assertThat(getFormattedMessages(logAppender)).contains("[guest] trusted-guest-line");
+        } finally {
+            polyglotSandboxLogger.setLevel(previousLevel);
+            polyglotSandboxLogger.detachAppender(logAppender);
+        }
+    }
+
+    @Test
+    public void testContextStreamsOverrideTheEngineWithoutMutatingIt() {
+        ByteArrayOutputStream engineOutputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream contextOutputStream = new ByteArrayOutputStream();
+
+        try (Engine engine = Engine.newBuilder("js")
+            .out(engineOutputStream)
+            .build()) {
+
+            try (Context overridingContext = Context.newBuilder("js")
+                .engine(engine)
+                .out(contextOutputStream)
+                .build()) {
+
+                overridingContext.eval("js", "print('overridden-line')");
+            }
+
+            try (Context inheritingContext = Context.newBuilder("js")
+                .engine(engine)
+                .build()) {
+
+                inheritingContext.eval("js", "print('inherited-line')");
+            }
+        }
+
+        assertThat(contextOutputStream.toString(StandardCharsets.UTF_8))
+            .contains("overridden-line")
+            .doesNotContain("inherited-line");
+        assertThat(engineOutputStream.toString(StandardCharsets.UTF_8))
+            .contains("inherited-line")
+            .doesNotContain("overridden-line");
+    }
+
+    @Test
+    public void testTrustedAndStrictContextsDoNotShareAnEngine() {
+        PolyglotSandbox.setSettings(PolyglotSandboxSettings.disabled());
+
+        Value trustedValue = PolyglotSandbox.call(
+            ScriptSandboxMode.TRUSTED, "js", null, context -> context.eval("js", "1 + 1"));
+
+        assertThat(trustedValue.asInt()).isEqualTo(2);
+
+        Value strictValue =
+            PolyglotSandbox.call(ScriptSandboxMode.STRICT, "js", context -> context.eval("js", "2 + 2"));
+
+        assertThat(strictValue.asInt()).isEqualTo(4);
+    }
+
+    @Test
     public void testTrustedModeIgnoresResourceCeilings() {
         PolyglotSandbox.setSettings(
             new PolyglotSandboxSettings(
@@ -212,6 +293,12 @@ public class PolyglotSandboxTest {
             ScriptSandboxMode.TRUSTED, "js", null, context -> context.eval("js", loopScript));
 
         assertThat(value.asDouble()).isEqualTo(199999990000000.0);
+    }
+
+    private static List<String> getFormattedMessages(ListAppender<ILoggingEvent> logAppender) {
+        return logAppender.list.stream()
+            .map(ILoggingEvent::getFormattedMessage)
+            .toList();
     }
 
     private static <V> V onVirtualThread(Supplier<V> supplier) {

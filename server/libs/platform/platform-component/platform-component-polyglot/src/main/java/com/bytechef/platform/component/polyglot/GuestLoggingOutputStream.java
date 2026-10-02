@@ -24,14 +24,14 @@ import java.util.function.Consumer;
 /**
  * @author Ivica Cardic
  */
-final class GuestLoggingOutputStream extends OutputStream {
+public final class GuestLoggingOutputStream extends OutputStream {
 
     private static final int MAX_LINE_LENGTH = 8192;
 
     private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     private final Consumer<String> lineConsumer;
 
-    GuestLoggingOutputStream(Consumer<String> lineConsumer) {
+    public GuestLoggingOutputStream(Consumer<String> lineConsumer) {
         this.lineConsumer = lineConsumer;
     }
 
