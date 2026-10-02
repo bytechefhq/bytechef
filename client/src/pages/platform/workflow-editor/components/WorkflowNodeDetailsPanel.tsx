@@ -219,11 +219,33 @@ const WorkflowNodeDetailsPanel = ({
                                         />
                                     </PopoverTrigger>
 
-                                    <PopoverContent align="end" className="w-80 p-0">
-                                        <div className="border-b px-3 py-2 text-sm font-semibold">{errorsHeading}</div>
+                                    <PopoverContent
+                                        align="end"
+                                        className={twMerge(
+                                            'w-80 overflow-hidden p-0',
+                                            errorsWarningOnly
+                                                ? 'border-stroke-warning-secondary bg-surface-warning-secondary'
+                                                : 'border-stroke-destructive-primary bg-surface-destructive-secondary'
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-2 px-3 py-2 text-sm font-semibold">
+                                            {errorsWarningOnly ? (
+                                                <TriangleAlertIcon
+                                                    aria-hidden="true"
+                                                    className="size-4 text-content-warning-primary"
+                                                />
+                                            ) : (
+                                                <InfoIcon
+                                                    aria-hidden="true"
+                                                    className="size-4 text-content-destructive-primary"
+                                                />
+                                            )}
+
+                                            {errorsHeading}
+                                        </div>
 
                                         <ScrollArea className="max-h-60">
-                                            <ul className="flex flex-col gap-2 p-2">
+                                            <ul className="flex flex-col gap-2 px-3 pb-3">
                                                 {errors.map((error, index) => (
                                                     <li
                                                         className="space-x-1 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm dark:bg-surface-neutral-secondary"
