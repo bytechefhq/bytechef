@@ -3,6 +3,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {hasLastAssistantMessageText} from '@/shared/util/assistant-message-utils';
 import {getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {
     AppendMessage,
@@ -16,11 +17,22 @@ import {
     useAui,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
-import {ReactNode, useState} from 'react';
+import {ReactNode, useEffect, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
     return message;
+};
+
+const showErrorMessage = (errorMessage: string) => {
+    const {appendToLastAssistantMessage, messages, setLastAssistantMessageContent} =
+        useWorkflowTestChatStore.getState();
+
+    if (hasLastAssistantMessageText(messages)) {
+        appendToLastAssistantMessage(`\n\n${errorMessage}`);
+    } else {
+        setLastAssistantMessageContent(errorMessage);
+    }
 };
 
 const WORKFLOW_TEST_CHAT_SUGGESTIONS: SuggestionConfig[] = [
@@ -37,6 +49,8 @@ export function WorkflowTestChatRuntimeProvider({
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
+    const awaitingStreamEventRef = useRef(false);
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {setWorkflowIsRunning} = useWorkflowEditorStore(
         useShallow((state) => ({
@@ -44,17 +58,40 @@ export function WorkflowTestChatRuntimeProvider({
         }))
     );
     const workflow = useWorkflowDataStore((state) => state.workflow!);
-    const {conversationId, messages, setMessage} = useWorkflowTestChatStore(
+    const {conversationId, messages, setLastAssistantMessageContent, setMessage} = useWorkflowTestChatStore(
         useShallow((state) => ({
             conversationId: state.conversationId,
             messages: state.messages,
+            setLastAssistantMessageContent: state.setLastAssistantMessageContent,
             setMessage: state.setMessage,
         }))
     );
 
-    const {setStreamRequest} = useWorkflowTestStream({
-        onError: () => setIsRunning(false),
-        onResult: () => setIsRunning(false),
+    const {error: streamError, setStreamRequest} = useWorkflowTestStream({
+        onError: (errorMessage) => {
+            awaitingStreamEventRef.current = false;
+
+            showErrorMessage(errorMessage || 'An unexpected error occurred');
+            setIsRunning(false);
+        },
+        onResult: () => {
+            awaitingStreamEventRef.current = false;
+
+            setIsRunning(false);
+        },
+        onStreamEnd: () => {
+            if (
+                awaitingStreamEventRef.current &&
+                !hasLastAssistantMessageText(useWorkflowTestChatStore.getState().messages)
+            ) {
+                setLastAssistantMessageContent('The response ended unexpectedly.');
+            }
+
+            awaitingStreamEventRef.current = false;
+
+            setIsRunning(false);
+            setWorkflowIsRunning(false);
+        },
         workflowId: workflow.id!,
     });
 
@@ -64,41 +101,10 @@ export function WorkflowTestChatRuntimeProvider({
         }
 
         const input = message.content[0].text;
-        const currentResumeUrl = useWorkflowTestChatStore.getState().resumeUrl;
 
         setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
         setIsRunning(true);
         setWorkflowIsRunning(true);
-
-        if (currentResumeUrl) {
-            try {
-                useWorkflowTestChatStore.getState().setResumeUrl(null);
-
-                const response = await fetch(currentResumeUrl, {
-                    body: JSON.stringify({message: input}),
-                    headers: {'Content-Type': 'application/json'},
-                    method: 'POST',
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Resume request failed with status ${response.status}`);
-                }
-
-                setMessage({content: 'Answer submitted. The workflow will resume.', role: 'assistant'});
-            } catch (error) {
-                console.error('Failed to submit answer to resume URL:', error);
-
-                setMessage({
-                    content: 'Failed to submit your answer. Please try again.',
-                    role: 'assistant',
-                });
-            } finally {
-                setIsRunning(false);
-                setWorkflowIsRunning(false);
-            }
-
-            return;
-        }
 
         try {
             // Prepare an empty assistant message so streaming appears immediately
@@ -118,10 +124,13 @@ export function WorkflowTestChatRuntimeProvider({
                 },
             });
 
+            awaitingStreamEventRef.current = true;
+
             setStreamRequest(request);
         } catch (error) {
             console.error('Failed to build test workflow stream request:', error);
 
+            showErrorMessage('Failed to send your message. Please try again.');
             setIsRunning(false);
             setWorkflowIsRunning(false);
         }
@@ -141,6 +150,15 @@ export function WorkflowTestChatRuntimeProvider({
     });
 
     const aui = useAui({suggestions: Suggestions(WORKFLOW_TEST_CHAT_SUGGESTIONS)}, {parent: null});
+
+    useEffect(() => {
+        if (streamError) {
+            showErrorMessage(`The request failed: ${streamError}`);
+
+            setIsRunning(false);
+            setWorkflowIsRunning(false);
+        }
+    }, [setWorkflowIsRunning, streamError]);
 
     return (
         <AssistantRuntimeProvider aui={aui} runtime={runtime}>
