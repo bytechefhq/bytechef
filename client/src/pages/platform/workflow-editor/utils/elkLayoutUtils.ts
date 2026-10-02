@@ -57,20 +57,10 @@ const ELK_SIBLING_SPACING = 50;
 
 // The TRUE/FALSE case labels hang off a condition's icon, so the frame's entry
 // bar is pulled toward the dispatcher (node→bar gap becomes ELK_LAYER_SPACING +
-// slack − pull) to keep the labels reading attached to the box. TB pulls the
-// full 28 for a clean 38px corridor, since its horizontal labels sit at the box
-// top, OUT of the node→bar gap. LR pulls less (50px corridor): its rotated
-// labels sit INSIDE that corridor, so a 38px gap would crowd them — the wider
-// corridor gives the label balanced air on both sides. The child side of the
-// bar keeps its 94px entry run regardless of pull (LR restores the pull it
-// gave up via LR_FRAME_ENTRY_INSET, see interiorStart).
-const TB_BAR_LABEL_PULL = 28;
-const LR_BAR_LABEL_PULL = 16;
-
-// Restores the entry run the smaller LR pull would otherwise cost: the run is
-// (footprint + ELK_LAYER_SPACING − barThickness + pull), so LR adds
-// TB_BAR_LABEL_PULL − LR_BAR_LABEL_PULL here to match TB's 94px run.
-const LR_FRAME_ENTRY_INSET = TB_BAR_LABEL_PULL - LR_BAR_LABEL_PULL;
+// slack − pull = 38px in both directions) to keep the labels reading attached
+// to the box. The child side of the bar keeps its 94px entry run regardless of
+// pull.
+const BAR_LABEL_PULL = 28;
 
 // TB branch entries stack [case chip][add-button] between the bar and the
 // column's first node; the standard 94px run makes the chip and the button
@@ -1127,7 +1117,6 @@ export const getElkLayoutElements = async ({
                     frameTopFootprintStart +
                     footprintMainOf(topGhostNode) +
                     ELK_LAYER_SPACING +
-                    (direction === 'LR' ? LR_FRAME_ENTRY_INSET : 0) +
                     (direction === 'TB' && isBranchFrame ? TB_BRANCH_ENTRY_INSET : 0);
 
                 let interiorEnd = interiorStart;
@@ -1270,13 +1259,10 @@ export const getElkLayoutElements = async ({
 
             // Pull the box's entry bar toward the dispatcher so the box reads as
             // attached to its node (and, for conditions, so the TRUE/FALSE labels
-            // sit on the box edge instead of floating). LR pulls less because its
-            // rotated labels live inside the node→bar corridor (see the pull
-            // constants); the entry run is held at 94 via LR_FRAME_ENTRY_INSET.
+            // sit on the box edge instead of floating).
             topGhostNode.position = {
                 ...topGhostNode.position,
-                [mainAxis]:
-                    topGhostNode.position[mainAxis] - (direction === 'TB' ? TB_BAR_LABEL_PULL : LR_BAR_LABEL_PULL),
+                [mainAxis]: topGhostNode.position[mainAxis] - BAR_LABEL_PULL,
             };
 
             // Center the dispatcher's aux members — empty-branch placeholders and
