@@ -19,7 +19,7 @@ const WorkflowExecutionsHeader = ({job, triggerExecution}: {job?: Job; triggerEx
     const taskExecutionsCount = groupTaskExecutionAttempts(job?.taskExecutions || []).length;
 
     return (
-        <header className="flex w-full items-center gap-x-3 px-3 py-4">
+        <header className="flex w-full items-center gap-x-3 px-3 py-3">
             <div className="flex items-center gap-x-2">
                 <span className="text-base font-bold uppercase">
                     {workflowStatus === 'completed' && (

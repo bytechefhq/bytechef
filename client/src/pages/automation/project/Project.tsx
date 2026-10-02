@@ -124,11 +124,11 @@ const Project = () => {
                             </WorkflowEditorProvider>
                         </ResizablePanel>
 
-                        <ResizableHandle className="bg-surface-neutral-secondary" withHandle />
+                        <ResizableHandle className="bg-transparent aria-[orientation=horizontal]:-top-1.5 aria-[orientation=horizontal]:h-0" />
 
                         <ResizablePanel
                             className={twMerge(
-                                'bg-surface-main px-3 py-3',
+                                'bg-surface-main px-3 pb-3',
                                 projectLeftSidebarOpen && 'pl-0',
                                 copilotLayoutShifted && 'pr-0'
                             )}
