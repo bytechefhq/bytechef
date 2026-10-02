@@ -121,7 +121,7 @@ export function WorkflowShareDialog({
                 <DialogMain>
                     <DialogHeader title="Share workflow as template" />
 
-                    <DialogBody className="space-y-4">
+                    <DialogBody>
                         <Alert
                             className={twMerge(shareState === 'not-shared' && 'bg-muted')}
                             variant={

@@ -97,7 +97,7 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
                         <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(handleSaveRequestBody)}>
                             <DialogHeader title={`${requestBody ? 'Edit' : 'Add'} Request Body`} />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <FormField
                                     control={control}
                                     name="contentType"

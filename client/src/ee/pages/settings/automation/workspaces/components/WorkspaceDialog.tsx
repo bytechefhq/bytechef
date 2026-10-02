@@ -116,7 +116,7 @@ const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps
 
                     <Form {...form}>
                         <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveWorkspace)}>
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <FormField
                                     control={control}
                                     name="name"

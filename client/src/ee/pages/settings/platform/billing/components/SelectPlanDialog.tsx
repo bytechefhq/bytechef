@@ -191,7 +191,7 @@ const SelectPlanDialog = ({
                             title="Select a plan"
                         />
 
-                        <DialogBody className="flex gap-4">
+                        <DialogBody className="flex gap-4 space-y-0">
                             {PLANS.map((plan) => (
                                 <PlanTierCard
                                     ctaLabel={loadingPlan === plan.name ? 'Loading…' : plan.ctaLabel}

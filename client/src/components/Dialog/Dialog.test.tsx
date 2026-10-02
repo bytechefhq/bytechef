@@ -91,6 +91,17 @@ describe('DialogContent - Surface', () => {
         expect(dialog).not.toHaveClass('sm:w-[512px]');
     });
 
+    // The scale lives at the sm breakpoint, so an unprefixed width is a different Tailwind group and twMerge keeps
+    // both. Without the custom size a full-bleed dialog collapses to 512 px from 640 px up.
+    it('should emit no width for the custom size so an unprefixed className width survives', () => {
+        renderOpenDialog(undefined, 'w-[calc(100vw-80px)]', undefined, 'custom');
+
+        const dialog = screen.getByRole('dialog');
+
+        expect(dialog).toHaveClass('w-[calc(100vw-80px)]');
+        expect(dialog).not.toHaveClass('sm:w-[512px]');
+    });
+
     it('should merge className', () => {
         renderOpenDialog(undefined, 'max-h-96');
 

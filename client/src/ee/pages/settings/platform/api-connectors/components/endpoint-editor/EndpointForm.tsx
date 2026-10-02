@@ -56,7 +56,7 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
                         <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(handleSaveEndpoint)}>
                             <DialogHeader title={`${endpoint ? 'Edit' : 'Add'} Endpoint`} />
 
-                            <DialogBody className="flex flex-col gap-4">
+                            <DialogBody>
                                 <Tabs className="w-full" onValueChange={handleModeChange} value={editorMode}>
                                     <TabsList className="grid h-8 w-full grid-cols-2">
                                         <TabsTrigger className="flex items-center gap-1.5 text-xs" value="form">
