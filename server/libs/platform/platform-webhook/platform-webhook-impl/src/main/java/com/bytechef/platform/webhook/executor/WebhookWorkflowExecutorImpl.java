@@ -302,7 +302,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         WebhookValidateResponse response = webhookWorkflowSyncExecutor.validate(workflowExecutionId, webhookRequest);
 
         if (response.status() == HttpStatus.OK.getValue()) {
-            executeAsync(workflowExecutionId, webhookRequest);
+            executeAsync(workflowExecutionId, webhookRequest.asValidated());
         }
 
         return response;

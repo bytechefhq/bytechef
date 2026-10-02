@@ -108,7 +108,7 @@ public abstract class AbstractWebhookTriggerController {
 
             if (webhookValidateResponse.status() == HttpStatus.OK.value()) {
                 responseEntity = executeSync(
-                    workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);
+                    workflowExecutionId, webhookRequest.asValidated(), httpServletRequest, httpServletResponse);
             } else {
                 responseEntity = toResponseEntity(webhookValidateResponse);
             }
@@ -290,6 +290,8 @@ public abstract class AbstractWebhookTriggerController {
             headers.put(HEADER_PUBLIC_URL, List.of(publicUrl));
         }
 
-        return new WebhookRequest(headers, webhookRequest.parameters(), webhookRequest.body(), webhookRequest.method());
+        return new WebhookRequest(
+            headers, webhookRequest.parameters(), webhookRequest.body(), webhookRequest.method(),
+            webhookRequest.validated());
     }
 }

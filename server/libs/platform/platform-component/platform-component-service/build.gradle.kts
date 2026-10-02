@@ -41,4 +41,5 @@ dependencies {
     testImplementation(project(":server:libs:modules:components:http-client"))
     testImplementation(project(":server:libs:modules:components:slack"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }
