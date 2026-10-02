@@ -16,6 +16,7 @@ markpollack-agent-claude = "0.31.0"
 markpollack-agent-judge = "0.18.0"
 net-javacrumbs-shedlock = "7.10.1"
 openai-java = "4.38.0"
+opennlp = "2.5.12"
 org-mapstruct = "1.6.3"
 org-mapstruct-extensions-spring = "2.0.0"
 org-springdoc = "3.1.1"
@@ -55,6 +56,7 @@ net-javacrumbs-shedlock-shedlock-provider-jdbc-template = { module = "net.javacr
 net-javacrumbs-shedlock-shedlock-provider-redis-spring = { module = "net.javacrumbs.shedlock:shedlock-provider-redis-spring", version.ref = "net-javacrumbs-shedlock" }
 net-javacrumbs-shedlock-shedlock-spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "net-javacrumbs-shedlock" }
 org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.57.0"
+org-apache-opennlp-opennlp-tools = { module = "org.apache.opennlp:opennlp-tools", version.ref = "opennlp" }
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.5.1"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r"
 org-graalvm-polyglot-java = { module = "org.graalvm.polyglot:java", version.ref = "graalvm" }
