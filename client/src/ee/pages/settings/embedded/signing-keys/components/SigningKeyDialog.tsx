@@ -1,15 +1,15 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import {SigningKey} from '@/ee/shared/middleware/embedded/security';
@@ -115,81 +115,80 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className="min-w-signing-key-dialog-width">
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveSigningKey)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <DialogTitle>
-                                {(privateKey ? 'Save your private ' : `${signingKey?.id ? 'Edit' : 'Create'}`) +
-                                    ' Signing Key'}
-                            </DialogTitle>
-
-                            <DialogCloseButton />
-                        </DialogHeader>
-
-                        {privateKey ? (
-                            <div className="space-y-4">
-                                <p className="text-sm">
-                                    Please save this Signing Key somewhere safe and accessible. For security reasons,
-                                    you won&apos;t be able to view it again through your ByteChef account. If you lose
-                                    this Signing Key, you&apos;ll need to generate a new one.
-                                </p>
-
-                                <div className="flex flex-col space-y-1">
-                                    <Textarea
-                                        className="field-sizing-fixed resize-none font-mono text-xs text-nowrap md:text-xs"
-                                        readOnly={true}
-                                        rows={12}
-                                        value={privateKey}
-                                    />
-
-                                    <div className="flex justify-end">
-                                        <Button
-                                            onClick={() => {
-                                                copyToClipboard(privateKey);
-
-                                                toast('The Signing Key is copied.');
-                                            }}
-                                            type="button"
-                                        >
-                                            <ClipboardIcon className="h-4" /> Copy
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <FormField
-                                control={control}
-                                name="name"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Name</FormLabel>
-
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+            <DialogContent>
+                <DialogMain>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveSigningKey)}>
+                            <DialogHeader
+                                title={
+                                    (privateKey ? 'Save your private ' : `${signingKey?.id ? 'Edit' : 'Create'}`) +
+                                    ' Signing Key'
+                                }
                             />
-                        )}
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    {privateKey ? 'Done' : 'Cancel'}
-                                </Button>
-                            </DialogClose>
+                            <DialogBody className="flex flex-col gap-4">
+                                {privateKey ? (
+                                    <div className="space-y-4">
+                                        <p className="text-sm">
+                                            Please save this Signing Key somewhere safe and accessible. For security
+                                            reasons, you won&apos;t be able to view it again through your ByteChef
+                                            account. If you lose this Signing Key, you&apos;ll need to generate a new
+                                            one.
+                                        </p>
 
-                            {!privateKey && (
-                                <Button onClick={handleSubmit(saveSigningKey)} type="submit">
-                                    {signingKey?.id ? 'Save' : 'Create Signing Key'}
-                                </Button>
-                            )}
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                        <div className="flex flex-col space-y-1">
+                                            <Textarea
+                                                className="field-sizing-fixed resize-none font-mono text-xs text-nowrap md:text-xs"
+                                                readOnly={true}
+                                                rows={12}
+                                                value={privateKey}
+                                            />
+
+                                            <div className="flex justify-end">
+                                                <Button
+                                                    onClick={() => {
+                                                        copyToClipboard(privateKey);
+
+                                                        toast('The Signing Key is copied.');
+                                                    }}
+                                                    type="button"
+                                                >
+                                                    <ClipboardIcon className="h-4" /> Copy
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <FormField
+                                        control={control}
+                                        name="name"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Name</FormLabel>
+
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+                            </DialogBody>
+
+                            <DialogFooter>
+                                <DialogCancelButton label={privateKey ? 'Done' : 'Cancel'} />
+
+                                {!privateKey && (
+                                    <Button onClick={handleSubmit(saveSigningKey)} type="submit">
+                                        {signingKey?.id ? 'Save' : 'Create Signing Key'}
+                                    </Button>
+                                )}
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
