@@ -33,6 +33,7 @@ interface UseEndpointFormProps {
 interface UseEndpointFormI {
     control: UseFormReturn<EndpointFormDataI>['control'];
     editorMode: 'form' | 'yaml';
+    form: UseFormReturn<EndpointFormDataI>;
     handleModeChange: (mode: string) => void;
     handleSaveEndpoint: (data: EndpointFormDataI) => void;
     handleSetParameters: (parameters: ParameterDefinitionI[]) => void;
@@ -406,6 +407,7 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
     return {
         control,
         editorMode,
+        form,
         handleModeChange,
         handleSaveEndpoint,
         handleSetParameters: setParameters,
