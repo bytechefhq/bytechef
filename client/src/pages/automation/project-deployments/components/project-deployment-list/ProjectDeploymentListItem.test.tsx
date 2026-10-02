@@ -7,6 +7,7 @@ import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
 const hoisted = vi.hoisted(() => ({
     canOpenInProject: true,
+    deleteProjectDeploymentMock: vi.fn(),
     openProjectMock: vi.fn(),
 }));
 
@@ -19,7 +20,7 @@ vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => (
 }));
 
 vi.mock('@/shared/mutations/automation/projectDeployments.mutations', () => ({
-    useDeleteProjectDeploymentMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useDeleteProjectDeploymentMutation: () => ({isPending: false, mutate: hoisted.deleteProjectDeploymentMock}),
     useEnableProjectDeploymentMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
@@ -67,7 +68,35 @@ const projectDeployment: ProjectDeployment = {
 describe('ProjectDeploymentListItem', () => {
     beforeEach(() => {
         hoisted.canOpenInProject = true;
+        hoisted.deleteProjectDeploymentMock.mockReset();
         hoisted.openProjectMock.mockReset();
+    });
+
+    it('closes the delete dialog without deleting when cancelled', async () => {
+        const user = userEvent.setup();
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        await user.click(screen.getByText('Delete'));
+
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+        expect(hoisted.deleteProjectDeploymentMock).not.toHaveBeenCalled();
+    });
+
+    it('deletes the deployment when the delete dialog is confirmed', async () => {
+        const user = userEvent.setup();
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        await user.click(screen.getByText('Delete'));
+
+        await user.click(screen.getByRole('button', {name: 'Delete'}));
+
+        expect(hoisted.deleteProjectDeploymentMock).toHaveBeenCalledWith(42);
     });
 
     it('opens the project from the icon beside the name and from the menu', async () => {

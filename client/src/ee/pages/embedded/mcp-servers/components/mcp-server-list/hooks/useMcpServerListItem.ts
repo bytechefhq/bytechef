@@ -12,7 +12,6 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showMcpComponentDialog, setShowMcpComponentDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
-    const [isPending, setIsPending] = useState(false);
     const [isEnablePending, setIsEnablePending] = useState(false);
 
     const toolsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -76,20 +75,11 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     };
 
     const handleDeleteClick = async () => {
-        if (isPending) {
-            return;
-        }
-
-        setIsPending(true);
-
         deleteEmbeddedMcpServerMutation.mutate(
             {
                 mcpServerId: mcpServer.id,
             },
             {
-                onSettled: () => {
-                    setIsPending(false);
-                },
                 onSuccess: () => {
                     queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
                     setShowDeleteDialog(false);
@@ -103,7 +93,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
         handleMcpServerListItemClick,
         handleOnCheckedChange,
         isEnablePending,
-        isPending,
+        isPending: deleteEmbeddedMcpServerMutation.isPending,
         mcpServerTagIds,
         setShowDeleteDialog,
         setShowEditDialog,

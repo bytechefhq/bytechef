@@ -6,9 +6,10 @@ import {describe, expect, it, vi} from 'vitest';
 
 import McpComponentToolListItem from './McpComponentToolListItem';
 
-vi.mock('./hooks/useMcpComponentToolDropdownMenu', () => ({
+vi.mock('./hooks/useMcpProjectComponentToolDropdownMenu', () => ({
     default: () => ({
         handleConfirmDelete: vi.fn(),
+        isDeletePending: false,
         setShowDeleteDialog: vi.fn(),
         showDeleteDialog: false,
     }),

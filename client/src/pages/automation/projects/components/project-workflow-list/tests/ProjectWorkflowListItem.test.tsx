@@ -1,6 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
-import {render, screen} from '@/shared/util/test-utils';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const mockInvalidateQueries = vi.fn();
@@ -90,7 +90,13 @@ vi.mock('@/shared/components/workflow/WorkflowDialog', () => ({
 }));
 
 vi.mock('@/shared/components/DeleteWorkflowAlertDialog', () => ({
-    default: () => <div data-testid="delete-workflow-dialog" />,
+    default: ({onClose}: {onClose: () => void}) => (
+        <div data-testid="delete-workflow-dialog">
+            <button onClick={onClose} type="button">
+                Dismiss delete dialog
+            </button>
+        </div>
+    ),
 }));
 
 const mockProject = {
@@ -150,6 +156,23 @@ describe('ProjectWorkflowListItem', () => {
         const link = screen.getByRole('link');
 
         expect(link).toHaveAttribute('href', '/automation/projects/1/project-workflows/101?');
+    });
+
+    describe('delete dialog', () => {
+        it('should close the delete dialog when it is dismissed', async () => {
+            renderProjectWorkflowListItem();
+
+            await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
+
+            await userEvent.click(screen.getByRole('menuitem', {name: /Delete/}));
+
+            expect(screen.getByTestId('delete-workflow-dialog')).toBeInTheDocument();
+
+            await userEvent.click(screen.getByRole('button', {name: 'Dismiss delete dialog'}));
+
+            expect(screen.queryByTestId('delete-workflow-dialog')).not.toBeInTheDocument();
+            expect(mockDeleteMutate).not.toHaveBeenCalled();
+        });
     });
 
     describe('deleteWorkflowMutation', () => {

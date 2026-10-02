@@ -5,9 +5,8 @@ import {ArrowUpRightIcon, XIcon} from 'lucide-react';
 import {useState} from 'react';
 import {toast} from 'sonner';
 
-import DowngradeConfirmationDialog from './DowngradeConfirmationDialog';
+import PlanChangeConfirmationDialog from './PlanChangeConfirmationDialog';
 import PlanTierCard from './PlanTierCard';
-import UpgradeConfirmationDialog from './UpgradeConfirmationDialog';
 
 interface PendingPlanChangeI {
     name: string;
@@ -221,8 +220,9 @@ const SelectPlanDialog = ({
                 </DialogContent>
             </Dialog>
 
-            <DowngradeConfirmationDialog
+            <PlanChangeConfirmationDialog
                 currentPlanName={currentPlanName}
+                direction="downgrade"
                 isPending={isUpgradeMutationPending}
                 newPlanName={pendingDowngrade?.name ?? ''}
                 onClose={closeDowngradeConfirm}
@@ -238,8 +238,9 @@ const SelectPlanDialog = ({
                 open={downgradeConfirmOpen}
             />
 
-            <UpgradeConfirmationDialog
+            <PlanChangeConfirmationDialog
                 currentPlanName={currentPlanName}
+                direction="upgrade"
                 isPending={isUpgradeMutationPending}
                 newPlanName={pendingUpgrade?.name ?? ''}
                 onClose={closeUpgradeConfirm}
