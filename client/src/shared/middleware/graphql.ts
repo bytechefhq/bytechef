@@ -2184,34 +2184,6 @@ export type UpgradeAutomationProjectConfigurationConnectedUsersMutationVariables
 
 export type UpgradeAutomationProjectConfigurationConnectedUsersMutation = { upgradeAutomationProjectConfigurationConnectedUsers: { movedConnectedUserIds: Array<string>, needsAttentionConnectedUserIds: Array<string>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
 
-export type CreateIntegrationCodeWorkflowMutationVariables = Exact<{
-  componentName: string;
-  language: Types.CodeWorkflowLanguage;
-  name?: string | null | undefined;
-  description?: string | null | undefined;
-  categoryId?: string | number | null | undefined;
-  tags?: Array<string> | string | null | undefined;
-  permissionExpression?: string | null | undefined;
-}>;
-
-
-export type CreateIntegrationCodeWorkflowMutation = { createIntegrationCodeWorkflow: string };
-
-export type IntegrationCodeWorkflowSourceQueryVariables = Exact<{
-  integrationId: string | number;
-}>;
-
-
-export type IntegrationCodeWorkflowSourceQuery = { integrationCodeWorkflowSource: string };
-
-export type UpdateIntegrationCodeWorkflowSourceMutationVariables = Exact<{
-  integrationId: string | number;
-  content: string;
-}>;
-
-
-export type UpdateIntegrationCodeWorkflowSourceMutation = { updateIntegrationCodeWorkflowSource: boolean };
-
 export type ExternalInvocationLogsQueryVariables = Exact<{
   type: Types.PlatformType;
   environmentId?: string | number | null | undefined;
@@ -2246,6 +2218,34 @@ export type WorkspaceExternalInvocationLogsQueryVariables = Exact<{
 
 
 export type WorkspaceExternalInvocationLogsQuery = { workspaceExternalInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, source: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+
+export type CreateIntegrationCodeWorkflowMutationVariables = Exact<{
+  componentName: string;
+  language: Types.CodeWorkflowLanguage;
+  name?: string | null | undefined;
+  description?: string | null | undefined;
+  categoryId?: string | number | null | undefined;
+  tags?: Array<string> | string | null | undefined;
+  permissionExpression?: string | null | undefined;
+}>;
+
+
+export type CreateIntegrationCodeWorkflowMutation = { createIntegrationCodeWorkflow: string };
+
+export type IntegrationCodeWorkflowSourceQueryVariables = Exact<{
+  integrationId: string | number;
+}>;
+
+
+export type IntegrationCodeWorkflowSourceQuery = { integrationCodeWorkflowSource: string };
+
+export type UpdateIntegrationCodeWorkflowSourceMutationVariables = Exact<{
+  integrationId: string | number;
+  content: string;
+}>;
+
+
+export type UpdateIntegrationCodeWorkflowSourceMutation = { updateIntegrationCodeWorkflowSource: boolean };
 
 export type AiDefaultModelQueryVariables = Exact<{
   environment: string | number;
@@ -2866,12 +2866,20 @@ export type GenerateWorkflowDescriptionMutationVariables = Exact<{
 
 export type GenerateWorkflowDescriptionMutation = { generateWorkflowDescription: { value: string } };
 
+export type CreateCustomComponentMutationVariables = Exact<{
+  name: string;
+  language: Types.CustomComponentLanguage;
+}>;
+
+
+export type CreateCustomComponentMutation = { createCustomComponent: { id: string, name: string, language: Types.CustomComponentLanguage | null } };
+
 export type CustomComponentQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type CustomComponentQuery = { customComponent: { id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
+export type CustomComponentQuery = { customComponent: { id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, status: Types.CustomComponentStatus | null, publishedDate: any, version: number | null } | null };
 
 export type CustomComponentDefinitionQueryVariables = Exact<{
   id: string | number;
@@ -2880,10 +2888,17 @@ export type CustomComponentDefinitionQueryVariables = Exact<{
 
 export type CustomComponentDefinitionQuery = { customComponentDefinition: { actions: Array<{ name: string, title: string | null, description: string | null }>, triggers: Array<{ name: string, title: string | null, description: string | null }> } | null };
 
+export type CustomComponentSourceQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type CustomComponentSourceQuery = { customComponentSource: string };
+
 export type CustomComponentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CustomComponentsQuery = { customComponents: Array<{ id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null }> };
+export type CustomComponentsQuery = { customComponents: Array<{ id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, status: Types.CustomComponentStatus | null, publishedDate: any, version: number | null }> };
 
 export type DeleteCustomComponentMutationVariables = Exact<{
   id: string | number;
@@ -2899,6 +2914,21 @@ export type EnableCustomComponentMutationVariables = Exact<{
 
 
 export type EnableCustomComponentMutation = { enableCustomComponent: boolean };
+
+export type PublishCustomComponentMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type PublishCustomComponentMutation = { publishCustomComponent: { id: string, publishedDate: any, status: Types.CustomComponentStatus | null } };
+
+export type UpdateCustomComponentSourceMutationVariables = Exact<{
+  id: string | number;
+  content: string;
+}>;
+
+
+export type UpdateCustomComponentSourceMutation = { updateCustomComponentSource: { id: string, componentVersion: number | null, status: Types.CustomComponentStatus | null } };
 
 export type DeleteRegisteredClientMutationVariables = Exact<{
   id: string | number;
@@ -10913,77 +10943,6 @@ export const useUpgradeAutomationProjectConfigurationConnectedUsersMutation = <
   }
     )};
 
-export const CreateIntegrationCodeWorkflowDocument = new TypedDocumentString(`
-    mutation createIntegrationCodeWorkflow($componentName: String!, $language: CodeWorkflowLanguage!, $name: String, $description: String, $categoryId: ID, $tags: [String!], $permissionExpression: String) {
-  createIntegrationCodeWorkflow(
-    componentName: $componentName
-    language: $language
-    name: $name
-    description: $description
-    categoryId: $categoryId
-    tags: $tags
-    permissionExpression: $permissionExpression
-  )
-}
-    `);
-
-export const useCreateIntegrationCodeWorkflowMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateIntegrationCodeWorkflowMutation, TError, CreateIntegrationCodeWorkflowMutationVariables, TContext>) => {
-    
-    return useMutation<CreateIntegrationCodeWorkflowMutation, TError, CreateIntegrationCodeWorkflowMutationVariables, TContext>(
-      {
-    mutationKey: ['createIntegrationCodeWorkflow'],
-    mutationFn: (variables?: CreateIntegrationCodeWorkflowMutationVariables) => fetcher<CreateIntegrationCodeWorkflowMutation, CreateIntegrationCodeWorkflowMutationVariables>(CreateIntegrationCodeWorkflowDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const IntegrationCodeWorkflowSourceDocument = new TypedDocumentString(`
-    query integrationCodeWorkflowSource($integrationId: ID!) {
-  integrationCodeWorkflowSource(integrationId: $integrationId)
-}
-    `);
-
-export const useIntegrationCodeWorkflowSourceQuery = <
-      TData = IntegrationCodeWorkflowSourceQuery,
-      TError = unknown
-    >(
-      variables: IntegrationCodeWorkflowSourceQueryVariables,
-      options?: Omit<UseQueryOptions<IntegrationCodeWorkflowSourceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationCodeWorkflowSourceQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<IntegrationCodeWorkflowSourceQuery, TError, TData>(
-      {
-    queryKey: ['integrationCodeWorkflowSource', variables],
-    queryFn: fetcher<IntegrationCodeWorkflowSourceQuery, IntegrationCodeWorkflowSourceQueryVariables>(IntegrationCodeWorkflowSourceDocument, variables),
-    ...options
-  }
-    )};
-
-export const UpdateIntegrationCodeWorkflowSourceDocument = new TypedDocumentString(`
-    mutation updateIntegrationCodeWorkflowSource($integrationId: ID!, $content: String!) {
-  updateIntegrationCodeWorkflowSource(
-    integrationId: $integrationId
-    content: $content
-  )
-}
-    `);
-
-export const useUpdateIntegrationCodeWorkflowSourceMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateIntegrationCodeWorkflowSourceMutation, TError, UpdateIntegrationCodeWorkflowSourceMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateIntegrationCodeWorkflowSourceMutation, TError, UpdateIntegrationCodeWorkflowSourceMutationVariables, TContext>(
-      {
-    mutationKey: ['updateIntegrationCodeWorkflowSource'],
-    mutationFn: (variables?: UpdateIntegrationCodeWorkflowSourceMutationVariables) => fetcher<UpdateIntegrationCodeWorkflowSourceMutation, UpdateIntegrationCodeWorkflowSourceMutationVariables>(UpdateIntegrationCodeWorkflowSourceDocument, variables)(),
-    ...options
-  }
-    )};
-
 export const ExternalInvocationLogsDocument = new TypedDocumentString(`
     query ExternalInvocationLogs($type: PlatformType!, $environmentId: ID, $source: String, $outcome: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
   externalInvocationLogs(
@@ -11105,6 +11064,77 @@ export const useWorkspaceExternalInvocationLogsQuery = <
       {
     queryKey: ['WorkspaceExternalInvocationLogs', variables],
     queryFn: fetcher<WorkspaceExternalInvocationLogsQuery, WorkspaceExternalInvocationLogsQueryVariables>(WorkspaceExternalInvocationLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateIntegrationCodeWorkflowDocument = new TypedDocumentString(`
+    mutation createIntegrationCodeWorkflow($componentName: String!, $language: CodeWorkflowLanguage!, $name: String, $description: String, $categoryId: ID, $tags: [String!], $permissionExpression: String) {
+  createIntegrationCodeWorkflow(
+    componentName: $componentName
+    language: $language
+    name: $name
+    description: $description
+    categoryId: $categoryId
+    tags: $tags
+    permissionExpression: $permissionExpression
+  )
+}
+    `);
+
+export const useCreateIntegrationCodeWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateIntegrationCodeWorkflowMutation, TError, CreateIntegrationCodeWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<CreateIntegrationCodeWorkflowMutation, TError, CreateIntegrationCodeWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['createIntegrationCodeWorkflow'],
+    mutationFn: (variables?: CreateIntegrationCodeWorkflowMutationVariables) => fetcher<CreateIntegrationCodeWorkflowMutation, CreateIntegrationCodeWorkflowMutationVariables>(CreateIntegrationCodeWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const IntegrationCodeWorkflowSourceDocument = new TypedDocumentString(`
+    query integrationCodeWorkflowSource($integrationId: ID!) {
+  integrationCodeWorkflowSource(integrationId: $integrationId)
+}
+    `);
+
+export const useIntegrationCodeWorkflowSourceQuery = <
+      TData = IntegrationCodeWorkflowSourceQuery,
+      TError = unknown
+    >(
+      variables: IntegrationCodeWorkflowSourceQueryVariables,
+      options?: Omit<UseQueryOptions<IntegrationCodeWorkflowSourceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationCodeWorkflowSourceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<IntegrationCodeWorkflowSourceQuery, TError, TData>(
+      {
+    queryKey: ['integrationCodeWorkflowSource', variables],
+    queryFn: fetcher<IntegrationCodeWorkflowSourceQuery, IntegrationCodeWorkflowSourceQueryVariables>(IntegrationCodeWorkflowSourceDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateIntegrationCodeWorkflowSourceDocument = new TypedDocumentString(`
+    mutation updateIntegrationCodeWorkflowSource($integrationId: ID!, $content: String!) {
+  updateIntegrationCodeWorkflowSource(
+    integrationId: $integrationId
+    content: $content
+  )
+}
+    `);
+
+export const useUpdateIntegrationCodeWorkflowSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateIntegrationCodeWorkflowSourceMutation, TError, UpdateIntegrationCodeWorkflowSourceMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateIntegrationCodeWorkflowSourceMutation, TError, UpdateIntegrationCodeWorkflowSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['updateIntegrationCodeWorkflowSource'],
+    mutationFn: (variables?: UpdateIntegrationCodeWorkflowSourceMutationVariables) => fetcher<UpdateIntegrationCodeWorkflowSourceMutation, UpdateIntegrationCodeWorkflowSourceMutationVariables>(UpdateIntegrationCodeWorkflowSourceDocument, variables)(),
     ...options
   }
     )};
@@ -13599,6 +13629,29 @@ export const useGenerateWorkflowDescriptionMutation = <
   }
     )};
 
+export const CreateCustomComponentDocument = new TypedDocumentString(`
+    mutation createCustomComponent($name: String!, $language: CustomComponentLanguage!) {
+  createCustomComponent(name: $name, language: $language) {
+    id
+    name
+    language
+  }
+}
+    `);
+
+export const useCreateCustomComponentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateCustomComponentMutation, TError, CreateCustomComponentMutationVariables, TContext>) => {
+    
+    return useMutation<CreateCustomComponentMutation, TError, CreateCustomComponentMutationVariables, TContext>(
+      {
+    mutationKey: ['createCustomComponent'],
+    mutationFn: (variables?: CreateCustomComponentMutationVariables) => fetcher<CreateCustomComponentMutation, CreateCustomComponentMutationVariables>(CreateCustomComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const CustomComponentDocument = new TypedDocumentString(`
     query customComponent($id: ID!) {
   customComponent(id: $id) {
@@ -13614,6 +13667,8 @@ export const CustomComponentDocument = new TypedDocumentString(`
     createdDate
     lastModifiedBy
     lastModifiedDate
+    status
+    publishedDate
     version
   }
 }
@@ -13668,6 +13723,28 @@ export const useCustomComponentDefinitionQuery = <
   }
     )};
 
+export const CustomComponentSourceDocument = new TypedDocumentString(`
+    query customComponentSource($id: ID!) {
+  customComponentSource(id: $id)
+}
+    `);
+
+export const useCustomComponentSourceQuery = <
+      TData = CustomComponentSourceQuery,
+      TError = unknown
+    >(
+      variables: CustomComponentSourceQueryVariables,
+      options?: Omit<UseQueryOptions<CustomComponentSourceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentSourceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<CustomComponentSourceQuery, TError, TData>(
+      {
+    queryKey: ['customComponentSource', variables],
+    queryFn: fetcher<CustomComponentSourceQuery, CustomComponentSourceQueryVariables>(CustomComponentSourceDocument, variables),
+    ...options
+  }
+    )};
+
 export const CustomComponentsDocument = new TypedDocumentString(`
     query customComponents {
   customComponents {
@@ -13683,6 +13760,8 @@ export const CustomComponentsDocument = new TypedDocumentString(`
     createdDate
     lastModifiedBy
     lastModifiedDate
+    status
+    publishedDate
     version
   }
 }
@@ -13738,6 +13817,52 @@ export const useEnableCustomComponentMutation = <
       {
     mutationKey: ['enableCustomComponent'],
     mutationFn: (variables?: EnableCustomComponentMutationVariables) => fetcher<EnableCustomComponentMutation, EnableCustomComponentMutationVariables>(EnableCustomComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const PublishCustomComponentDocument = new TypedDocumentString(`
+    mutation publishCustomComponent($id: ID!) {
+  publishCustomComponent(id: $id) {
+    id
+    publishedDate
+    status
+  }
+}
+    `);
+
+export const usePublishCustomComponentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<PublishCustomComponentMutation, TError, PublishCustomComponentMutationVariables, TContext>) => {
+    
+    return useMutation<PublishCustomComponentMutation, TError, PublishCustomComponentMutationVariables, TContext>(
+      {
+    mutationKey: ['publishCustomComponent'],
+    mutationFn: (variables?: PublishCustomComponentMutationVariables) => fetcher<PublishCustomComponentMutation, PublishCustomComponentMutationVariables>(PublishCustomComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateCustomComponentSourceDocument = new TypedDocumentString(`
+    mutation updateCustomComponentSource($id: ID!, $content: String!) {
+  updateCustomComponentSource(id: $id, content: $content) {
+    id
+    componentVersion
+    status
+  }
+}
+    `);
+
+export const useUpdateCustomComponentSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateCustomComponentSourceMutation, TError, UpdateCustomComponentSourceMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateCustomComponentSourceMutation, TError, UpdateCustomComponentSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['updateCustomComponentSource'],
+    mutationFn: (variables?: UpdateCustomComponentSourceMutationVariables) => fetcher<UpdateCustomComponentSourceMutation, UpdateCustomComponentSourceMutationVariables>(UpdateCustomComponentSourceDocument, variables)(),
     ...options
   }
     )};
