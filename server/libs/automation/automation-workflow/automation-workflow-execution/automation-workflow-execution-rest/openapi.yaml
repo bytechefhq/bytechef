@@ -101,11 +101,18 @@ paths:
           type: "integer"
           format: "int64"
       - name: "workflowId"
-        description: "The id of a workflow."
+        description: "The id of a workflow. Executions of every version of the workflow are matched unless projectVersion is set."
         in: "query"
         required: false
         schema:
           type: "string"
+      - name: "projectVersion"
+        description: "The project version the workflow executions ran. Only applies together with workflowId."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int32"
       - name: "pageNumber"
         description: "The number of the page to return."
         in: "query"

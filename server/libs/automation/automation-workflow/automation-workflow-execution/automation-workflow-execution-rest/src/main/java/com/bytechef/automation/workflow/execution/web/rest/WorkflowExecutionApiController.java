@@ -74,7 +74,8 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     @Override
     public ResponseEntity<Page> getWorkflowExecutionsPage(
         Long workspaceId, Boolean embedded, Long environmentId, String jobStatus, OffsetDateTime jobStartDate,
-        OffsetDateTime jobEndDate, Long projectId, Long projectDeploymentId, String workflowId, Integer pageNumber) {
+        OffsetDateTime jobEndDate, Long projectId, Long projectDeploymentId, String workflowId, Integer projectVersion,
+        Integer pageNumber) {
 
         return ResponseEntity.ok(
             projectWorkflowExecutionFacade
@@ -82,6 +83,6 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
                     embedded, environmentId, jobStatus == null ? null : Status.valueOf(jobStatus),
                     jobStartDate == null ? null : jobStartDate.toInstant(),
                     jobEndDate == null ? null : jobEndDate.toInstant(), projectId, projectDeploymentId,
-                    workflowId, workspaceId, pageNumber));
+                    workflowId, projectVersion, workspaceId, pageNumber));
     }
 }
