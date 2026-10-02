@@ -1,13 +1,13 @@
 import Button from '@/components/Button/Button';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
 import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItem from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItem';
 import {
@@ -139,32 +139,30 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
             open={isOpen}
         >
             <DialogContent onInteractOutside={(event) => event.preventDefault()}>
-                <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                        <DialogTitle>{`Edit ${workflow?.label} Workflow`}</DialogTitle>
+                <DialogMain>
+                    <Form {...form}>
+                        <DialogHeader title={`Edit ${workflow?.label} Workflow`} />
 
-                        <DialogCloseButton />
-                    </DialogHeader>
+                        <DialogBody>
+                            <IntegrationInstanceConfigurationDialogWorkflowsStepItem
+                                componentName={componentName}
+                                control={control}
+                                formState={formState}
+                                key={workflow.id!}
+                                label="Enable"
+                                setValue={setValue}
+                                workflow={workflow}
+                                workflowIndex={0}
+                            />
+                        </DialogBody>
 
-                    <IntegrationInstanceConfigurationDialogWorkflowsStepItem
-                        componentName={componentName}
-                        control={control}
-                        formState={formState}
-                        key={workflow.id!}
-                        label="Enable"
-                        setValue={setValue}
-                        workflow={workflow}
-                        workflowIndex={0}
-                    />
+                        <DialogFooter>
+                            <DialogCancelButton />
 
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
-                        </DialogClose>
-
-                        <Button onClick={handleSubmit(updateIntegrationInstanceConfigurationWorkflow)}>Save</Button>
-                    </DialogFooter>
-                </Form>
+                            <Button onClick={handleSubmit(updateIntegrationInstanceConfigurationWorkflow)}>Save</Button>
+                        </DialogFooter>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
