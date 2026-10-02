@@ -62,6 +62,7 @@ interface PropertyMentionsInputProps {
     onSinglePillAbandoned?: () => void;
     onValueChange?: (value: string | number) => void;
     path?: string;
+    pillRequired?: boolean;
     placeholder?: string;
     required?: boolean;
     setIsFormulaMode?: (isFormulaMode: boolean) => void;
@@ -97,6 +98,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             onSinglePillAbandoned,
             onValueChange,
             path,
+            pillRequired,
             placeholder,
             required = false,
             setIsFormulaMode,
@@ -363,6 +365,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             onSinglePillAbandoned={onSinglePillAbandoned}
                             onValueChange={onValueChange}
                             path={path}
+                            pillRequired={pillRequired}
                             placeholder={placeholder}
                             ref={getPropertyMentionsInputEditorRef}
                             setIsFormulaMode={setIsFormulaMode}
