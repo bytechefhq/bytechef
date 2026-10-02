@@ -37,5 +37,11 @@ export const restrictedImports = {
                 "Import AlertDialog from '@/components/AlertDialog' instead. It builds on the design-system Dialog and handles the pending state, so a confirmed action cannot be submitted twice or dismissed mid-flight.",
             allowTypeImports: true,
         },
+        {
+            name: '@/components/ui/dialog',
+            message:
+                "Import Dialog primitives from '@/components/Dialog' instead. The wrapper supplies the surface through DialogMain, keeps widths on the sm/md/lg/xl scale, and gives DialogHeader the title, description and close button.",
+            allowTypeImports: true,
+        },
     ],
 };
