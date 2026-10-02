@@ -2,7 +2,11 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
+import {
+    AskUserQuestionEventI,
+    formatAskUserQuestionMessage,
+    hasLastAssistantMessageText,
+} from '@/shared/util/assistant-message-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
 import {
     AppendMessage,
@@ -13,7 +17,7 @@ import {
     ThreadMessageLike,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useAiAgentTestingChatStore, useTestingModeStore} from '../../../stores';
@@ -29,6 +33,9 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
     const [isRunning, setIsRunning] = useState(false);
     const [streamRequest, setStreamRequest] = useState<SSERequestType>(null);
 
+    const awaitingStreamEventRef = useRef(false);
+    const questionShownRef = useRef(false);
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -40,7 +47,6 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         setLastAssistantMessageContent,
         setLastAssistantMessageError,
         setMessage,
-        setResumeUrl,
         truncateMessagesFrom,
     } = useAiAgentTestingChatStore(
         useShallow((state) => ({
@@ -51,7 +57,6 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
             setLastAssistantMessageContent: state.setLastAssistantMessageContent,
             setLastAssistantMessageError: state.setLastAssistantMessageError,
             setMessage: state.setMessage,
-            setResumeUrl: state.setResumeUrl,
             truncateMessagesFrom: state.truncateMessagesFrom,
         }))
     );
@@ -68,25 +73,37 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
                 ) {
                     console.error('Received malformed ask_user_question event:', data);
 
+                    awaitingStreamEventRef.current = false;
+
+                    setLastAssistantMessageError('The agent asked a question in an unexpected format.');
+                    setIsRunning(false);
+                    setStreamRequest(null);
+
                     return;
                 }
 
                 const questionEvent = data as AskUserQuestionEventI;
 
-                setLastAssistantMessageContent(formatAskUserQuestionMessage(questionEvent));
-                setResumeUrl(questionEvent.resumeUrl ?? null);
-                setIsRunning(false);
-                setStreamRequest(null);
+                awaitingStreamEventRef.current = false;
+                questionShownRef.current = true;
+
+                setLastAssistantMessageContent(`${formatAskUserQuestionMessage(questionEvent)}\n\n`);
             },
             error: (data) => {
                 const errorMessage = typeof data === 'string' ? data : 'An unexpected error occurred';
+
+                awaitingStreamEventRef.current = false;
 
                 setLastAssistantMessageError(errorMessage);
                 setIsRunning(false);
                 setStreamRequest(null);
             },
             result: (data) => {
-                if (typeof data === 'string' && data.trim().length > 0) {
+                awaitingStreamEventRef.current = false;
+
+                if (questionShownRef.current) {
+                    questionShownRef.current = false;
+                } else if (typeof data === 'string' && data.trim().length > 0) {
                     setLastAssistantMessageContent(data);
                 } else if (data !== null && typeof data === 'object') {
                     setLastAssistantMessageContent('```json\n' + JSON.stringify(data, null, 2) + '\n```');
@@ -112,6 +129,8 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
                 const chunk = extractStreamChunk(data);
 
                 if (chunk) {
+                    awaitingStreamEventRef.current = false;
+
                     appendToLastAssistantMessage(chunk);
                 }
             },
@@ -133,6 +152,19 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
                 addToolExecution(toolEvent);
             },
         },
+        onClose: () => {
+            if (
+                awaitingStreamEventRef.current &&
+                !hasLastAssistantMessageText(useAiAgentTestingChatStore.getState().messages)
+            ) {
+                setLastAssistantMessageError('The response ended unexpectedly.');
+            }
+
+            awaitingStreamEventRef.current = false;
+
+            setIsRunning(false);
+            setStreamRequest(null);
+        },
     });
 
     useEffect(() => {
@@ -149,36 +181,9 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         }
 
         const input = message.content[0].text;
-        const currentResumeUrl = useAiAgentTestingChatStore.getState().resumeUrl;
 
         setMessage({content: input, role: 'user'});
         setIsRunning(true);
-
-        if (currentResumeUrl) {
-            try {
-                setResumeUrl(null);
-
-                const response = await fetch(currentResumeUrl, {
-                    body: JSON.stringify({message: input}),
-                    headers: {'Content-Type': 'application/json'},
-                    method: 'POST',
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Resume request failed with status ${response.status}`);
-                }
-
-                setMessage({content: 'Answer submitted. The workflow will resume.', role: 'assistant'});
-            } catch (error) {
-                console.error('Failed to submit answer to resume URL:', error);
-
-                setLastAssistantMessageError('Failed to submit your answer. Please try again.');
-            } finally {
-                setIsRunning(false);
-            }
-
-            return;
-        }
 
         try {
             setMessage({content: [], role: 'assistant'} as ThreadMessageLike);
@@ -198,6 +203,9 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
                 },
                 url: '/api/platform/internal/ai-agent-tests',
             };
+
+            awaitingStreamEventRef.current = true;
+            questionShownRef.current = false;
 
             setStreamRequest(request);
         } catch (error) {

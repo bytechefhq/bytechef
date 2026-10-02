@@ -32,7 +32,6 @@ beforeEach(() => {
     useWorkflowTestChatStore.setState({
         conversationId: undefined,
         messages: [],
-        resumeUrl: null,
         workflowTestChatPanelOpen: true,
     });
 });
@@ -54,10 +53,7 @@ describe('WorkflowTestChatPanel', () => {
     it('clears the conversation and starts a new one when reset', async () => {
         renderPanel();
 
-        useWorkflowTestChatStore.setState({
-            messages: [{content: 'Hello', role: 'user'}],
-            resumeUrl: 'https://example.com/resume',
-        });
+        useWorkflowTestChatStore.setState({messages: [{content: 'Hello', role: 'user'}]});
 
         const conversationIdBeforeReset = useWorkflowTestChatStore.getState().conversationId;
 
@@ -66,7 +62,6 @@ describe('WorkflowTestChatPanel', () => {
         const state = useWorkflowTestChatStore.getState();
 
         expect(state.messages).toEqual([]);
-        expect(state.resumeUrl).toBeNull();
         expect(state.conversationId).not.toBe(conversationIdBeforeReset);
     });
 

@@ -1,6 +1,12 @@
 import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
 import {useSSE} from '@/shared/hooks/useSSE';
-import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
+import {
+    AskUserQuestionEventI,
+    formatAskUserQuestionMessage,
+    getResumeFailure,
+    getResumeStreamRequest,
+    hasLastAssistantMessageText,
+} from '@/shared/util/assistant-message-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
 import {
     AppendMessage,
@@ -11,7 +17,7 @@ import {
     ThreadMessageLike,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
-import {ReactNode, memo, useCallback, useEffect, useMemo, useState} from 'react';
+import {ReactNode, memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
@@ -39,6 +45,10 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         init?: RequestInit;
     } | null>(null);
 
+    const awaitingStreamEventRef = useRef(false);
+    const pendingResumeUrlRef = useRef<string | null>(null);
+    const questionShownRef = useRef(false);
+
     const {
         appendToLastAssistantMessage,
         isRunning,
@@ -59,30 +69,63 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         }))
     );
 
-    const handleError = useCallback(() => {
-        setIsRunning(false);
-        setStreamRequest(null);
-    }, [setIsRunning]);
+    const handleError = useCallback(
+        (data: unknown) => {
+            const errorMessage =
+                typeof data === 'string' && data.trim().length > 0
+                    ? data
+                    : data && typeof data === 'object' && 'message' in data
+                      ? String((data as {message: unknown}).message)
+                      : 'An unexpected error occurred';
+
+            awaitingStreamEventRef.current = false;
+
+            if (questionShownRef.current) {
+                questionShownRef.current = false;
+
+                appendToLastAssistantMessage(`\n\n${errorMessage}`);
+                setResumeUrl(null);
+            } else {
+                setLastAssistantMessageContent(errorMessage);
+            }
+
+            setIsRunning(false);
+            setStreamRequest(null);
+        },
+        [appendToLastAssistantMessage, setIsRunning, setLastAssistantMessageContent, setResumeUrl]
+    );
 
     const handleResult = useCallback(
         (data: unknown) => {
+            awaitingStreamEventRef.current = false;
+
             try {
                 const resultData = typeof data === 'string' ? JSON.parse(data) : (data as {message: string});
 
                 const message = resultData?.message ?? '';
 
-                // Do not overwrite streamed content with empty final text
-                if (message && message.trim().length > 0) {
+                // Do not overwrite streamed content with empty final text, nor a question asked during the run
+                if (!questionShownRef.current && message && message.trim().length > 0) {
                     setLastAssistantMessageContent(message);
                 }
             } catch (error) {
                 console.error('Failed to parse workflow result:', error);
+
+                if (!questionShownRef.current && !hasLastAssistantMessageText(useChatsStore.getState().messages)) {
+                    setLastAssistantMessageContent('Failed to read the workflow result.');
+                }
             } finally {
+                if (questionShownRef.current) {
+                    questionShownRef.current = false;
+
+                    setResumeUrl(null);
+                }
+
                 setIsRunning(false);
                 setStreamRequest(null);
             }
         },
-        [setIsRunning, setLastAssistantMessageContent]
+        [setIsRunning, setLastAssistantMessageContent, setResumeUrl]
     );
 
     const handleStream = useCallback(
@@ -90,6 +133,8 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             const chunk = extractStreamChunk(data);
 
             if (chunk) {
+                awaitingStreamEventRef.current = false;
+
                 appendToLastAssistantMessage(chunk);
             }
         },
@@ -106,18 +151,37 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             ) {
                 console.error('Received malformed ask_user_question event:', data);
 
+                awaitingStreamEventRef.current = false;
+
+                setLastAssistantMessageContent('The agent asked a question in an unexpected format.');
+                setIsRunning(false);
+                setStreamRequest(null);
+
                 return;
             }
 
             const questionEvent = data as AskUserQuestionEventI;
 
+            awaitingStreamEventRef.current = false;
+            questionShownRef.current = true;
+
             setLastAssistantMessageContent(formatAskUserQuestionMessage(questionEvent));
             setResumeUrl(questionEvent.resumeUrl ?? null);
             setIsRunning(false);
-            setStreamRequest(null);
         },
         [setIsRunning, setLastAssistantMessageContent, setResumeUrl]
     );
+
+    const handleSuspended = useCallback(() => {
+        awaitingStreamEventRef.current = false;
+
+        if (!hasLastAssistantMessageText(useChatsStore.getState().messages)) {
+            setLastAssistantMessageContent('The workflow is waiting for a response before it can continue.');
+        }
+
+        setIsRunning(false);
+        setStreamRequest(null);
+    }, [setIsRunning, setLastAssistantMessageContent]);
 
     const eventHandlers = useMemo(
         () => ({
@@ -125,8 +189,9 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             error: handleError,
             result: handleResult,
             stream: handleStream,
+            suspended: handleSuspended,
         }),
-        [handleAskUserQuestion, handleError, handleResult, handleStream]
+        [handleAskUserQuestion, handleError, handleResult, handleStream, handleSuspended]
     );
 
     const onNew = useCallback(
@@ -138,10 +203,33 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             const input = message.content[0].text;
             const currentResumeUrl = useChatsStore.getState().resumeUrl;
 
+            questionShownRef.current = false;
+
             setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
             setIsRunning(true);
 
+            if (currentResumeUrl && sseStreamResponse) {
+                awaitingStreamEventRef.current = true;
+                pendingResumeUrlRef.current = currentResumeUrl;
+
+                setResumeUrl(null);
+                setMessage({content: '', role: 'assistant'});
+                setStreamRequest(getResumeStreamRequest(currentResumeUrl, input));
+
+                return;
+            }
+
             if (currentResumeUrl) {
+                const showResumeFailure = (status: number | null) => {
+                    const resumeFailure = getResumeFailure(status);
+
+                    if (resumeFailure.retryable) {
+                        setResumeUrl(currentResumeUrl);
+                    }
+
+                    setMessage({content: resumeFailure.message, role: 'assistant'});
+                };
+
                 try {
                     setResumeUrl(null);
 
@@ -151,15 +239,15 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
                         method: 'POST',
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`Resume request failed with status ${response.status}`);
+                    if (response.ok) {
+                        setMessage({content: 'Answer submitted. The workflow will resume.', role: 'assistant'});
+                    } else {
+                        showResumeFailure(response.status);
                     }
-
-                    setMessage({content: 'Answer submitted. The workflow will resume.', role: 'assistant'});
                 } catch (error) {
                     console.error('Failed to submit answer to resume URL:', error);
 
-                    setMessage({content: 'Failed to submit your answer. Please try again.', role: 'assistant'});
+                    showResumeFailure(null);
                 } finally {
                     setIsRunning(false);
                 }
@@ -181,6 +269,9 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             }
 
             if (sseStreamResponse) {
+                awaitingStreamEventRef.current = true;
+                pendingResumeUrlRef.current = null;
+
                 setMessage({content: '', role: 'assistant'});
 
                 setStreamRequest({
@@ -270,13 +361,53 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         )
     );
 
-    const {connectionState} = useSSE(streamRequest, {eventHandlers});
+    const {connectionState, error, errorStatus} = useSSE(streamRequest, {eventHandlers});
 
     useEffect(() => {
+        if (connectionState === 'CONNECTED') {
+            pendingResumeUrlRef.current = null;
+        }
+
+        if (connectionState === 'ERROR' && pendingResumeUrlRef.current) {
+            const resumeFailure = getResumeFailure(errorStatus);
+
+            setLastAssistantMessageContent(resumeFailure.message);
+
+            if (resumeFailure.retryable) {
+                setResumeUrl(pendingResumeUrlRef.current);
+            }
+
+            pendingResumeUrlRef.current = null;
+        } else if (connectionState === 'ERROR') {
+            const errorMessage = `The request failed: ${error || 'Connection error occurred'}`;
+
+            if (hasLastAssistantMessageText(useChatsStore.getState().messages)) {
+                appendToLastAssistantMessage(`\n\n${errorMessage}`);
+            } else {
+                setLastAssistantMessageContent(errorMessage);
+            }
+        }
+
+        if (connectionState === 'CLOSED' && awaitingStreamEventRef.current) {
+            if (!hasLastAssistantMessageText(useChatsStore.getState().messages)) {
+                setLastAssistantMessageContent('The response ended unexpectedly.');
+            }
+        }
+
         if (connectionState === 'CLOSED' || connectionState === 'ERROR') {
+            awaitingStreamEventRef.current = false;
+
             setIsRunning(false);
         }
-    }, [connectionState, setIsRunning]);
+    }, [
+        appendToLastAssistantMessage,
+        connectionState,
+        error,
+        errorStatus,
+        setIsRunning,
+        setLastAssistantMessageContent,
+        setResumeUrl,
+    ]);
 
     // Reset isRunning on unmount to prevent permanently blocked navigation
     useEffect(() => {

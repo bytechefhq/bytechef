@@ -7,7 +7,7 @@ import {WorkflowTestExecutionFromJSON} from '@/shared/middleware/platform/workfl
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 export interface UseWorkflowTestStreamProps {
@@ -15,6 +15,7 @@ export interface UseWorkflowTestStreamProps {
     onResult?: (execution: WorkflowTestExecution) => void;
     onError?: (errorMessage?: string) => void;
     onStart?: (jobId: string) => void;
+    onStreamEnd?: () => void;
 }
 
 export interface UseWorkflowTestStreamResultI {
@@ -29,9 +30,12 @@ export function useWorkflowTestStream({
     onError,
     onResult,
     onStart,
+    onStreamEnd,
     workflowId,
 }: UseWorkflowTestStreamProps): UseWorkflowTestStreamResultI {
     const [streamRequest, setStreamRequest] = useState<SSERequestType>(null);
+
+    const questionShownRef = useRef(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {setWorkflowIsRunning, setWorkflowTestExecution} = useWorkflowEditorStore(
@@ -40,11 +44,10 @@ export function useWorkflowTestStream({
             setWorkflowTestExecution: state.setWorkflowTestExecution,
         }))
     );
-    const {appendToLastAssistantMessage, setLastAssistantMessageContent, setResumeUrl} = useWorkflowTestChatStore(
+    const {appendToLastAssistantMessage, setLastAssistantMessageContent} = useWorkflowTestChatStore(
         useShallow((state) => ({
             appendToLastAssistantMessage: state.appendToLastAssistantMessage,
             setLastAssistantMessageContent: state.setLastAssistantMessageContent,
-            setResumeUrl: state.setResumeUrl,
         }))
     );
 
@@ -61,15 +64,21 @@ export function useWorkflowTestStream({
                 ) {
                     console.error('Received malformed ask_user_question event:', data);
 
+                    setWorkflowIsRunning(false);
+                    setStreamRequest(null);
+
+                    if (onError) {
+                        onError('The agent asked a question in an unexpected format.');
+                    }
+
                     return;
                 }
 
                 const questionEvent = data as AskUserQuestionEventI;
 
-                setLastAssistantMessageContent(formatAskUserQuestionMessage(questionEvent));
-                setResumeUrl(questionEvent.resumeUrl ?? null);
-                setWorkflowIsRunning(false);
-                setStreamRequest(null);
+                questionShownRef.current = true;
+
+                setLastAssistantMessageContent(`${formatAskUserQuestionMessage(questionEvent)}\n\n`);
             },
             error: (data) => {
                 setWorkflowIsRunning(false);
@@ -96,8 +105,8 @@ export function useWorkflowTestStream({
 
                     const message = workflowTestExecution.job?.outputs?.message ?? '';
 
-                    // Do not overwrite streamed content with empty final text
-                    if (message && message.trim().length > 0) {
+                    // Do not overwrite streamed content with empty final text, nor a question asked during the run
+                    if (!questionShownRef.current && message && message.trim().length > 0) {
                         setLastAssistantMessageContent(message);
                     }
 
@@ -108,6 +117,10 @@ export function useWorkflowTestStream({
                     }
                 } catch (error) {
                     console.error('Failed to parse workflow test execution result:', error);
+
+                    if (onError) {
+                        onError('Failed to read the workflow test result.');
+                    }
                 } finally {
                     setWorkflowIsRunning(false);
                     setStreamRequest(null);
@@ -119,6 +132,8 @@ export function useWorkflowTestStream({
                     const startData = typeof data === 'string' ? JSON.parse(data) : (data as {jobId: number});
 
                     const jobId = String(startData.jobId);
+
+                    questionShownRef.current = false;
 
                     persistJobId(jobId);
 
@@ -143,6 +158,14 @@ export function useWorkflowTestStream({
                     appendToLastAssistantMessage(chunk);
                 }
             },
+        },
+        onClose: () => {
+            setWorkflowIsRunning(false);
+            setStreamRequest(null);
+
+            if (onStreamEnd) {
+                onStreamEnd();
+            }
         },
     });
 

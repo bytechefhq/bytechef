@@ -1,3 +1,4 @@
+import {SSERequestType} from '@/shared/hooks/useSSE';
 import {ThreadMessageLike} from '@assistant-ui/react';
 
 export interface AskUserQuestionOptionI {
@@ -17,12 +18,75 @@ export interface AskUserQuestionEventI {
     resumeUrl?: string;
 }
 
+export interface ResumeFailureI {
+    message: string;
+    retryable: boolean;
+}
+
 export interface ToolExecutionEventI {
     confidence: string;
     inputs: Record<string, unknown>;
     output: unknown;
     reasoning: string;
     toolName: string;
+}
+
+export function getResumeStreamRequest(resumeUrl: string, message: string): SSERequestType {
+    return {
+        init: {
+            body: JSON.stringify({message}),
+            headers: {'Content-Type': 'application/json'},
+            method: 'POST',
+        },
+        url: resumeUrl,
+    };
+}
+
+export function getResumeFailure(status: number | null): ResumeFailureI {
+    if (status === null) {
+        return {message: 'Could not reach the workflow. Please send your answer again.', retryable: true};
+    }
+
+    if (status === 409) {
+        return {message: "The workflow wasn't ready for your answer yet. Please send it again.", retryable: true};
+    }
+
+    if (status === 400) {
+        return {message: 'This answer link is not valid.', retryable: false};
+    }
+
+    if (status === 410) {
+        return {message: 'This question has expired or was already answered.', retryable: false};
+    }
+
+    if (status === 422) {
+        return {message: 'The workflow failed, so your answer could not be delivered.', retryable: false};
+    }
+
+    if (status === 429 || status >= 500) {
+        return {message: `Failed to submit your answer (HTTP ${status}). Please send it again.`, retryable: true};
+    }
+
+    return {message: `Failed to submit your answer (HTTP ${status}).`, retryable: false};
+}
+
+/**
+ * Returns whether the last assistant message has any non-blank text.
+ */
+export function hasLastAssistantMessageText(messages: ThreadMessageLike[]): boolean {
+    const lastAssistantMessage = messages.findLast((message) => message?.role === 'assistant');
+
+    if (!lastAssistantMessage) {
+        return false;
+    }
+
+    if (typeof lastAssistantMessage.content === 'string') {
+        return lastAssistantMessage.content.trim().length > 0;
+    }
+
+    return (lastAssistantMessage.content as ContentPartType[]).some(
+        (part) => part.type === 'text' && String(part.text || '').trim().length > 0
+    );
 }
 
 type ContentPartType = {type: string; text?: string; [key: string]: unknown};

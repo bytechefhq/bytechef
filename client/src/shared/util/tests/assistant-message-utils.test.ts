@@ -1,7 +1,13 @@
 import {ThreadMessageLike} from '@assistant-ui/react';
 import {describe, expect, it} from 'vitest';
 
-import {appendToLastAssistantMessage, setLastAssistantMessageContent} from '../assistant-message-utils';
+import {
+    appendToLastAssistantMessage,
+    getResumeFailure,
+    getResumeStreamRequest,
+    hasLastAssistantMessageText,
+    setLastAssistantMessageContent,
+} from '../assistant-message-utils';
 
 describe('assistant-message-utils', () => {
     describe('appendToLastAssistantMessage', () => {
@@ -196,6 +202,74 @@ describe('assistant-message-utils', () => {
                 createdAt: new Date('2024-01-01'),
                 id: 'msg-123',
                 role: 'assistant',
+            });
+        });
+    });
+
+    describe('getResumeFailure', () => {
+        it.each([
+            [null, true],
+            [400, false],
+            [404, false],
+            [406, false],
+            [409, true],
+            [410, false],
+            [422, false],
+            [429, true],
+            [500, true],
+            [502, true],
+            [503, true],
+            [504, true],
+        ])('for status %s returns retryable=%s', (status, retryable) => {
+            expect(getResumeFailure(status).retryable).toBe(retryable);
+        });
+
+        it('tells the user the workflow failed for a failed job', () => {
+            expect(getResumeFailure(422).message).toBe('The workflow failed, so your answer could not be delivered.');
+        });
+
+        it('tells the user the question is gone for an expired or answered question', () => {
+            expect(getResumeFailure(410).message).toBe('This question has expired or was already answered.');
+        });
+    });
+
+    describe('hasLastAssistantMessageText', () => {
+        it('returns false when there is no assistant message', () => {
+            expect(hasLastAssistantMessageText([{content: 'question', role: 'user'}])).toBe(false);
+        });
+
+        it('returns false for a blank string assistant message', () => {
+            expect(hasLastAssistantMessageText([{content: '  ', role: 'assistant'}])).toBe(false);
+        });
+
+        it('returns true for an assistant message with text', () => {
+            expect(
+                hasLastAssistantMessageText([
+                    {content: 'partial answer', role: 'assistant'},
+                    {content: 'follow up', role: 'user'},
+                ])
+            ).toBe(true);
+        });
+
+        it('checks the text parts of a content array', () => {
+            expect(hasLastAssistantMessageText([{content: [{text: '', type: 'text'}], role: 'assistant'}])).toBe(false);
+            expect(hasLastAssistantMessageText([{content: [{text: 'partial', type: 'text'}], role: 'assistant'}])).toBe(
+                true
+            );
+        });
+    });
+
+    describe('getResumeStreamRequest', () => {
+        it('posts the answer as JSON to the resume URL', () => {
+            const request = getResumeStreamRequest('https://example.com/job/resume/abc', 'Blue');
+
+            expect(request).toEqual({
+                init: {
+                    body: JSON.stringify({message: 'Blue'}),
+                    headers: {'Content-Type': 'application/json'},
+                    method: 'POST',
+                },
+                url: 'https://example.com/job/resume/abc',
             });
         });
     });

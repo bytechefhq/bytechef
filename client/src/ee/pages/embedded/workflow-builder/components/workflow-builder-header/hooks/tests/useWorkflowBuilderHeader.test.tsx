@@ -150,7 +150,7 @@ vi.mock('@/shared/hooks/useSSE', async () => {
         useSSE: (req: SSERequestType, options: UseSSEOptionsType = {}): UseSSEResultType => {
             latest.req = req;
             latest.handlers = options.eventHandlers;
-            return {close: latest.close, connectionState: 'CONNECTED', data: null, error: null};
+            return {close: latest.close, connectionState: 'CONNECTED', data: null, error: null, errorStatus: null};
         },
     };
 });
