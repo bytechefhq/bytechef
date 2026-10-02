@@ -142,7 +142,7 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
         expect(queryMock).not.toHaveBeenCalled();
     });
 
-    it('shows one header with project, workflow and tabs and fetches only that workflow in the deployment', () => {
+    it('shows one header with project, workflow and tabs and fetches only that workflow version in the deployment', () => {
         mockQueryResult([]);
 
         openSheet();
@@ -155,7 +155,7 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
         expect(screen.getByRole('tab', {name: 'Workflow'})).toHaveAttribute('data-state', 'inactive');
         expect(screen.getByText('No Executions')).toBeInTheDocument();
         expect(queryMock).toHaveBeenCalledWith(
-            {id: 1, pageNumber: 0, projectDeploymentId: 3, workflowId: 'workflow1'},
+            {id: 1, pageNumber: 0, projectDeploymentId: 3, projectVersion: 3, workflowId: 'workflow1'},
             true
         );
     });
