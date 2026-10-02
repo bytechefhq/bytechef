@@ -698,14 +698,14 @@ export const getClusterElementsLayoutElements = ({
         }
     }
 
-    for (const rowNodes of rows) {
-        if (rowNodes.length < 2) {
-            continue;
-        }
+    const positionTolerance = 0.5;
+
+    const sweepRow = (rowNodes: Node[]): boolean => {
+        let moved = false;
 
         const placements = rowNodes
-            .map((node) => ({absoluteX: getAbsoluteX(node), node, width: getNodeWidth(node)}))
-            .sort((placementA, placementB) => placementA.absoluteX - placementB.absoluteX);
+            .map((node) => ({node, width: getNodeWidth(node)}))
+            .sort((placementA, placementB) => getAbsoluteX(placementA.node) - getAbsoluteX(placementB.node));
 
         for (let index = 1; index < placements.length; index++) {
             const current = placements[index];
@@ -714,6 +714,9 @@ export const getClusterElementsLayoutElements = ({
                 if (!verticallyOverlaps(previous.node, current.node)) {
                     continue;
                 }
+
+                const previousAbsoluteX = getAbsoluteX(previous.node);
+                const currentAbsoluteX = getAbsoluteX(current.node);
 
                 const previousLabelPadding = previous.node.data.clusterElementTypesCount
                     ? 0
@@ -727,19 +730,33 @@ export const getClusterElementsLayoutElements = ({
                         : overlapPadding;
 
                 const minAbsoluteX =
-                    previous.absoluteX + previous.width + previousLabelPadding + currentLabelPadding + minGap;
+                    previousAbsoluteX + previous.width + previousLabelPadding + currentLabelPadding + minGap;
 
                 const encroachmentX = containsNodePosition(current.node.data.metadata)
-                    ? previous.absoluteX + previous.width
+                    ? previousAbsoluteX + previous.width
                     : minAbsoluteX;
 
-                if (current.absoluteX < encroachmentX) {
-                    const shift = minAbsoluteX - current.absoluteX;
+                if (encroachmentX - currentAbsoluteX > positionTolerance) {
+                    current.node.position = {
+                        ...current.node.position,
+                        x: current.node.position.x + minAbsoluteX - currentAbsoluteX,
+                    };
 
-                    current.node.position = {...current.node.position, x: current.node.position.x + shift};
-                    current.absoluteX = minAbsoluteX;
+                    moved = true;
                 }
             }
+        }
+
+        return moved;
+    };
+
+    const crowdedRows = rows.filter((row) => row.length > 1);
+
+    for (let pass = 0; pass <= crowdedRows.length; pass++) {
+        const movedInPass = crowdedRows.map(sweepRow).some(Boolean);
+
+        if (!movedInPass) {
+            break;
         }
     }
 
