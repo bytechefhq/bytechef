@@ -40,6 +40,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -151,9 +152,29 @@ public class WebhookWorkflowExecutorTest {
     }
 
     @Test
-    @Disabled
-    public void testValidateAndExecuteAsync() {
-        // TODO
+    public void testValidateAndExecuteAsyncPublishesValidatedRequest() {
+        when(webhookWorkflowSyncExecutor.validate(any(), any())).thenReturn(WebhookValidateResponse.ok());
+
+        webhookWorkflowExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest);
+
+        ArgumentCaptor<TriggerWebhookEvent> triggerWebhookEventArgumentCaptor =
+            ArgumentCaptor.forClass(TriggerWebhookEvent.class);
+
+        verify(eventPublisher).publishEvent(triggerWebhookEventArgumentCaptor.capture());
+
+        TriggerWebhookEvent triggerWebhookEvent = triggerWebhookEventArgumentCaptor.getValue();
+
+        assertThat(triggerWebhookEvent.getWebhookRequest()
+            .validated()).isTrue();
+    }
+
+    @Test
+    public void testValidateAndExecuteAsyncDoesNotPublishInvalidRequest() {
+        when(webhookWorkflowSyncExecutor.validate(any(), any())).thenReturn(WebhookValidateResponse.badRequest());
+
+        webhookWorkflowExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest);
+
+        verifyNoInteractions(eventPublisher);
     }
 
     private Duration executeSyncAndCaptureTimeout(Map<String, ?> triggerParameters) {

@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
+import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.constant.PlatformType;
@@ -34,6 +35,7 @@ import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -87,7 +89,13 @@ class WebhookTriggerTestControllerTest {
         assertThat(responseEntity.getStatusCode()
             .value()).isEqualTo(200);
 
-        verify(workflowNodeTestOutputFacade).saveWorkflowNodeTestOutput(any(), eq(ENVIRONMENT_ID), any());
+        ArgumentCaptor<WebhookRequest> webhookRequestArgumentCaptor = ArgumentCaptor.forClass(WebhookRequest.class);
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeTestOutput(
+            any(), eq(ENVIRONMENT_ID), webhookRequestArgumentCaptor.capture());
+
+        assertThat(webhookRequestArgumentCaptor.getValue()
+            .validated()).isTrue();
     }
 
     private ResponseEntity<?> executeWorkflow() {

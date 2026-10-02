@@ -44,6 +44,7 @@ public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest
     private static final String CONTENT = "content";
     private static final String MIME_TYPE = "mimeType";
     private static final String RAW_CONTENT = "rawContent";
+    private static final String VALIDATED = "validated";
 
     @Override
     public WebhookRequest deserialize(JsonParser jp, DeserializationContext ctxt) {
@@ -86,7 +87,8 @@ public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest
         @SuppressWarnings("unchecked")
         Map<String, List<String>> parameters = ctxt.readTreeAsValue(jsonNode.get("parameters"), Map.class);
 
-        return new WebhookRequest(headers, parameters, webhookBody, WebhookMethod.valueOf(getMethod(jsonNode)));
+        return new WebhookRequest(
+            headers, parameters, webhookBody, WebhookMethod.valueOf(getMethod(jsonNode)), isValidated(jsonNode));
     }
 
     private static Map<String, Object> checkFormDataWebhookBodyContent(Map<String, ?> content) {
@@ -125,6 +127,12 @@ public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest
         } else {
             return MapUtils.toMap(map, Map.Entry::getKey, WebhookRequestDeserializer::checkValue);
         }
+    }
+
+    private static boolean isValidated(JsonNode jsonNode) {
+        JsonNode validatedJsonNode = jsonNode.get(VALIDATED);
+
+        return validatedJsonNode != null && validatedJsonNode.asBoolean(false);
     }
 
     private static String getMethod(JsonNode jsonNode) {

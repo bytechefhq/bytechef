@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,10 +35,15 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunction;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateFunction;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.trigger.TriggerOutput;
+import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -450,5 +456,76 @@ public class TriggerDefinitionServiceTest {
             .createTriggerContext(
                 Mockito.eq("testComponent"), Mockito.eq(1), Mockito.eq("testTrigger"), Mockito.any(), Mockito.any(),
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(false), Mockito.eq(4200L));
+    }
+
+    @Test
+    public void testExecuteTriggerValidatesWebhookRequestThatWasNotValidated() {
+        AtomicInteger validateCalls = new AtomicInteger();
+
+        TriggerOutput triggerOutput = executeWebhookTrigger(
+            validateCalls, WebhookValidateResponse.ok(), createWebhookRequest());
+
+        assertEquals(1, validateCalls.get());
+        assertEquals(Map.of("received", true), triggerOutput.value());
+    }
+
+    @Test
+    public void testExecuteTriggerSkipsValidationForValidatedWebhookRequest() {
+        AtomicInteger validateCalls = new AtomicInteger();
+
+        TriggerOutput triggerOutput = executeWebhookTrigger(
+            validateCalls, WebhookValidateResponse.ok(), createWebhookRequest().asValidated());
+
+        assertEquals(0, validateCalls.get());
+        assertEquals(Map.of("received", true), triggerOutput.value());
+    }
+
+    @Test
+    public void testExecuteTriggerRejectsWebhookRequestThatFailsValidation() {
+        AtomicInteger validateCalls = new AtomicInteger();
+
+        IllegalStateException illegalStateException = assertThrows(
+            IllegalStateException.class,
+            () -> executeWebhookTrigger(validateCalls, WebhookValidateResponse.badRequest(), createWebhookRequest()));
+
+        assertEquals("Invalid trigger signature.", illegalStateException.getMessage());
+    }
+
+    private static WebhookRequest createWebhookRequest() {
+        return new WebhookRequest(Map.of(), Map.of(), null, WebhookMethod.POST);
+    }
+
+    private TriggerOutput executeWebhookTrigger(
+        AtomicInteger validateCalls, WebhookValidateResponse webhookValidateResponse, WebhookRequest webhookRequest) {
+
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        WebhookValidateFunction webhookValidateFunction = (
+            inputParameters, headers, parameters, body, method, context) -> {
+
+            validateCalls.incrementAndGet();
+
+            return webhookValidateResponse;
+        };
+        WebhookRequestFunction webhookRequestFunction = (
+            inputParameters, connectionParameters, headers, parameters, body, method, webhookEnableOutputParameters,
+            context) -> Map.of("received", true);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.STATIC_WEBHOOK);
+        lenient().when(mockTriggerDefinition.getWebhookValidate())
+            .thenReturn(Optional.of(webhookValidateFunction));
+        lenient().when(mockTriggerDefinition.getWebhookRequest())
+            .thenReturn(Optional.of(webhookRequestFunction));
+        lenient().when(mockTriggerDefinition.getBatch())
+            .thenReturn(Optional.of(false));
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        return triggerDefinitionService.executeTrigger(
+            "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, webhookRequest, null,
+            null, PlatformType.AUTOMATION, false);
     }
 }
