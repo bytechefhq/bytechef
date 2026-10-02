@@ -111,7 +111,7 @@ it('should show the cancel button and x icon', () => {
 
     expect(screen.getByLabelText('cancel')).toBeInTheDocument();
 
-    expect(screen.getByText('Close')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
 });
 
 it('should not show the cancel button when currentType is undefined', () => {
