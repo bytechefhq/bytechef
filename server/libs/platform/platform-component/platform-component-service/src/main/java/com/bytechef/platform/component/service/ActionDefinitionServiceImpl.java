@@ -68,6 +68,7 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
+import com.bytechef.platform.component.visibility.ComponentVisibilityProvider;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
@@ -75,6 +76,7 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.PropertyUtils;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -94,12 +96,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
+    private final List<ComponentVisibilityProvider> componentVisibilityProviders;
 
+    @SuppressFBWarnings("EI2")
     public ActionDefinitionServiceImpl(
-        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        List<ComponentVisibilityProvider> componentVisibilityProviders) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
+        this.componentVisibilityProviders = componentVisibilityProviders;
     }
 
     @Override
@@ -250,6 +256,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @Nullable Map<String, ?> continueParameters, @Nullable Map<String, ?> resumeData,
         @Nullable Instant suspendExpiresAt) {
 
+        checkComponentVisible(componentName);
+
         com.bytechef.component.definition.ActionDefinition actionDefinition = componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName);
 
@@ -341,6 +349,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @ComponentNameParam String componentName, int componentVersion, String actionName,
         Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection,
         @Nullable Long environmentId, ActionContext context) {
+
+        checkComponentVisible(componentName);
 
         PerformFunction performFunction =
             (PerformFunction) componentDefinitionRegistry
@@ -922,6 +932,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
 
         return exception.getMessage();
+    }
+
+    private void checkComponentVisible(String componentName) {
+        boolean visible = componentVisibilityProviders.stream()
+            .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isVisible(componentName));
+
+        if (!visible) {
+            throw new ConfigurationException(
+                "Component '%s' is disabled by an administrator and cannot be executed.".formatted(componentName),
+                ActionDefinitionErrorType.COMPONENT_DISABLED);
+        }
     }
 
     private record ConvertResult(

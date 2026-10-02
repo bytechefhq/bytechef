@@ -50,6 +50,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamRe
 import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -75,7 +76,8 @@ public class ActionDefinitionServiceTest {
 
         contextFactory = mock(ContextFactory.class);
 
-        actionDefinitionService = new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextFactory);
+        actionDefinitionService =
+            new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextFactory, List.of());
 
         actionContext = mock(ActionContext.class, withSettings().extraInterfaces(LogEntryBufferAware.class));
         actionDefinition = mock(com.bytechef.component.definition.ActionDefinition.class);

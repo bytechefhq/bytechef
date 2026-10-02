@@ -60,6 +60,7 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ClusterElementDefinitionErrorType;
+import com.bytechef.platform.component.visibility.ComponentVisibilityProvider;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
@@ -90,14 +91,17 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
     private final ObjectProvider<MeterRegistry> meterRegistryObjectProvider;
+    private final List<ComponentVisibilityProvider> componentVisibilityProviders;
 
     @SuppressFBWarnings("EI")
     public ClusterElementDefinitionServiceImpl(
         @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        List<ComponentVisibilityProvider> componentVisibilityProviders,
         ObjectProvider<MeterRegistry> meterRegistryObjectProvider) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
+        this.componentVisibilityProviders = componentVisibilityProviders;
         this.meterRegistryObjectProvider = meterRegistryObjectProvider;
     }
 
@@ -220,6 +224,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection,
         boolean editorEnvironment) {
 
+        checkComponentVisible(componentName);
+
         ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
             componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment);
 
@@ -232,6 +238,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     public Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections, boolean editorEnvironment) {
+
+        checkComponentVisible(componentName);
 
         ComponentConnection firstConnection = componentConnections.isEmpty()
             ? null : componentConnections.values()
@@ -800,6 +808,17 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
         return SchemaUtils.toOutput(
             outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+    }
+
+    private void checkComponentVisible(String componentName) {
+        boolean visible = componentVisibilityProviders.stream()
+            .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isVisible(componentName));
+
+        if (!visible) {
+            throw new ConfigurationException(
+                "Component '%s' is disabled by an administrator and cannot be executed.".formatted(componentName),
+                ClusterElementDefinitionErrorType.COMPONENT_DISABLED);
+        }
     }
 
     record ComponentClusterElementDefinitionResult(

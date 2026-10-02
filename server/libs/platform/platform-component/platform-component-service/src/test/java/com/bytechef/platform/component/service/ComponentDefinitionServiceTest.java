@@ -109,7 +109,7 @@ public class ComponentDefinitionServiceTest {
 
         return new ComponentDefinitionServiceImpl(
             List.of(new AllComponentDefinitionFilter()), componentDefinitionRegistry,
-            Mockito.mock(ContextFactory.class));
+            Mockito.mock(ContextFactory.class), List.of());
     }
 
     private static class AllComponentDefinitionFilter implements ComponentDefinitionFilter {

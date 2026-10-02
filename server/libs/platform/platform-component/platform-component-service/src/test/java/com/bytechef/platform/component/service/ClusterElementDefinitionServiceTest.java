@@ -73,7 +73,7 @@ class ClusterElementDefinitionServiceTest {
     @BeforeEach
     void setUp() {
         clusterElementDefinitionService = new ClusterElementDefinitionServiceImpl(
-            componentDefinitionRegistry, contextFactory, mock(ObjectProvider.class));
+            componentDefinitionRegistry, contextFactory, List.of(), mock(ObjectProvider.class));
     }
 
     @Test

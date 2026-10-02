@@ -83,7 +83,8 @@ public class ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration {
         ComponentDefinitionRegistry componentDefinitionRegistry = new ComponentDefinitionRegistry(
             applicationProperties, List.of(componentHandler), List::of, List.of());
 
-        return new ClusterElementDefinitionServiceImpl(componentDefinitionRegistry, null, mock(ObjectProvider.class));
+        return new ClusterElementDefinitionServiceImpl(
+            componentDefinitionRegistry, null, List.of(), mock(ObjectProvider.class));
     }
 
     @Bean

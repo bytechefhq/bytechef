@@ -61,7 +61,8 @@ class ComponentDefinitionServiceExecuteWorkflowInputOptionsTest {
 
     @BeforeEach
     void setUp() {
-        service = new ComponentDefinitionServiceImpl(List.of(), componentDefinitionRegistry, contextFactory);
+        service = new ComponentDefinitionServiceImpl(
+            List.of(), componentDefinitionRegistry, contextFactory, List.of());
     }
 
     @Test

@@ -33,6 +33,8 @@ public class ClusterElementDefinitionErrorType extends AbstractErrorType {
     public static final ClusterElementDefinitionErrorType EXECUTE_PERFORM = new ClusterElementDefinitionErrorType(104);
     public static final ClusterElementDefinitionErrorType EXECUTE_PROCESS_ERROR_RESPONSE =
         new ClusterElementDefinitionErrorType(105);
+    public static final ClusterElementDefinitionErrorType COMPONENT_DISABLED =
+        new ClusterElementDefinitionErrorType(107);
 
     private ClusterElementDefinitionErrorType(int errorKey) {
         super(ClusterElementDefinition.class, errorKey);

@@ -150,7 +150,7 @@ public class TestWorkflowExecutorIntTestConfiguration {
     ActionDefinitionService actionDefinitionService(
         ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
 
-        return new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextFactory);
+        return new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextFactory, List.of());
     }
 
     @Bean
@@ -163,7 +163,7 @@ public class TestWorkflowExecutorIntTestConfiguration {
         ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
 
         return new ClusterElementDefinitionServiceImpl(
-            componentDefinitionRegistry, contextFactory, mock(ObjectProvider.class));
+            componentDefinitionRegistry, contextFactory, List.of(), mock(ObjectProvider.class));
     }
 
     @Bean
@@ -177,7 +177,7 @@ public class TestWorkflowExecutorIntTestConfiguration {
     ComponentDefinitionService componentDefinitionService(
         ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
 
-        return new ComponentDefinitionServiceImpl(List.of(), componentDefinitionRegistry, contextFactory);
+        return new ComponentDefinitionServiceImpl(List.of(), componentDefinitionRegistry, contextFactory, List.of());
     }
 
     @Bean
@@ -311,7 +311,8 @@ public class TestWorkflowExecutorIntTestConfiguration {
         ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
         ApplicationEventPublisher applicationEventPublisher) {
 
-        return new TriggerDefinitionServiceImpl(componentDefinitionRegistry, contextFactory, applicationEventPublisher);
+        return new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, applicationEventPublisher, List.of());
     }
 
     @Bean
