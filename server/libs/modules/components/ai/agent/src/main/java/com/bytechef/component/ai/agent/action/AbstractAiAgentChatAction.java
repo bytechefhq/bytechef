@@ -35,6 +35,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspensionStorage;
 import com.bytechef.component.ai.agent.tool.DeferredToolCallReplay;
@@ -55,6 +56,10 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
+import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
+import com.bytechef.platform.ai.guardrails.GuardrailSurface;
+import com.bytechef.platform.ai.guardrails.RestorationDestination;
+import com.bytechef.platform.ai.sensitivedata.SensitiveDataMetrics;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.ai.tool.GateDecision;
 import com.bytechef.platform.ai.tool.GatedToolSuspension;
@@ -107,6 +112,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.metadata.ToolMetadata;
+import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -127,16 +133,26 @@ public abstract class AbstractAiAgentChatAction {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ClusterElementToolCallbacks clusterElementToolCallbacks;
-    private final ToolCallingManager toolCallingManager;
+    private final AgentToolCallingManagers agentToolCallingManagers;
+    private final @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider;
 
     protected AbstractAiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        AgentToolCallingManagers agentToolCallingManagers) {
+
+        this(aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, null);
+    }
+
+    protected AbstractAiAgentChatAction(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        AgentToolCallingManagers agentToolCallingManagers,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.clusterElementToolCallbacks =
             new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService);
-        this.toolCallingManager = toolCallingManager;
+        this.agentToolCallingManagers = agentToolCallingManagers;
+        this.aiGuardrailsAdvisorProviderObjectProvider = aiGuardrailsAdvisorProviderObjectProvider;
     }
 
     protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
@@ -221,12 +237,37 @@ public abstract class AbstractAiAgentChatAction {
             deferredToolCallReplay == null ? chatModel : deferredToolCallReplay.replayingChatModel(chatModel))
             .build();
 
+        List<Advisor> workspaceAdvisors = new ArrayList<>();
+
+        SensitiveDataMetrics toolBoundaryMetrics = null;
+
+        if (aiGuardrailsAdvisorProviderObjectProvider != null
+            && context instanceof ActionContextAware actionContextAware) {
+
+            AiGuardrailsAdvisorProvider aiGuardrailsAdvisorProvider =
+                aiGuardrailsAdvisorProviderObjectProvider.getIfAvailable();
+
+            if (aiGuardrailsAdvisorProvider != null) {
+                aiGuardrailsAdvisorProvider
+                    .getAdvisor(actionContextAware.getPlatformType(), actionContextAware.getJobPrincipalId(),
+                        GuardrailSurface.AI_AGENT,
+                        isStreaming() ? RestorationDestination.CONVERSATION
+                            : RestorationDestination.WORKFLOW_OUTPUT)
+                    .ifPresent(workspaceAdvisors::add);
+
+                toolBoundaryMetrics = aiGuardrailsAdvisorProvider.getMetrics(
+                    actionContextAware.getPlatformType(), actionContextAware.getJobPrincipalId(),
+                    GuardrailSurface.AI_AGENT);
+            }
+        }
+
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = (resumedTurn
             ? chatClient.prompt() : createPrompt(chatClient, inputParameters, context))
+                .advisors(workspaceAdvisors)
                 .advisors(
                     getAdvisors(
                         clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId,
-                        resumedTurn))
+                        resumedTurn, toolBoundaryMetrics))
                 .advisors(getConversationAdvisor(conversationId))
                 .advisors(new TextGenerationFirstAdvisor())
                 .messages(messages)
@@ -801,13 +842,14 @@ public abstract class AbstractAiAgentChatAction {
         @Nullable String conversationId) {
 
         return getAdvisors(
-            clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId, false);
+            clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId, false,
+            null);
     }
 
     List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
         ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult,
-        @Nullable String conversationId, boolean resumedTurn) {
+        @Nullable String conversationId, boolean resumedTurn, @Nullable SensitiveDataMetrics toolBoundaryMetrics) {
 
         List<Advisor> advisors = new ArrayList<>();
 
@@ -819,8 +861,9 @@ public abstract class AbstractAiAgentChatAction {
 
         if (checkForViolationsCount > 1) {
             throw new IllegalStateException(
-                "Multiple CheckForViolations parent cluster elements configured — advisor order collides at " +
-                    "HIGHEST_PRECEDENCE and Spring AI ordering becomes undefined. Configure at most one.");
+                "Multiple CheckForViolations parent cluster elements configured — they would tie at " +
+                    "GuardrailAdvisorOrder.NODE_CHECK and Spring AI would run the last-registered one outermost. " +
+                    "Configure at most one.");
         }
 
         long sanitizeTextCount = guardrailClusterElements.stream()
@@ -863,10 +906,11 @@ public abstract class AbstractAiAgentChatAction {
             .map(ChatMemoryFunction.Result::supportsToolMessagePersistence)
             .orElse(false);
 
-        ToolCallingManager agentToolCallingManager = toolCallingManager;
+        ToolCallingManager agentToolCallingManager = agentToolCallingManagers.getToolCallingManager(
+            toolBoundaryMetrics);
 
         if (context instanceof ActionContextAware actionContextAware) {
-            agentToolCallingManager = new SuspendableToolCallingManager(toolCallingManager, actionContextAware);
+            agentToolCallingManager = new SuspendableToolCallingManager(agentToolCallingManager, actionContextAware);
         }
 
         ToolCallingAdvisor toolCallingAdvisor = persistToolMessagesInLoop
@@ -904,6 +948,10 @@ public abstract class AbstractAiAgentChatAction {
 
         return new ClusterElementFailureAttributingAdvisor(
             advisor, element.getWorkflowNodeName(), element.getComponentName(), clusterElementCallTarget.get());
+    }
+
+    protected boolean isStreaming() {
+        return false;
     }
 
     private static Advisor getResumedTurnChatMemoryAdvisor(ChatMemoryFunction.Result chatMemoryResult) {

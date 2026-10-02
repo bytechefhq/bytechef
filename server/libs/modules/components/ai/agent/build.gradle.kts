@@ -7,6 +7,7 @@ dependencies {
 
     implementation(project(":server:libs:modules:components:ai:llm"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-sensitive-data:platform-ai-sensitive-data-service"))
 
     testImplementation("io.micrometer:micrometer-tracing")
     testImplementation("org.awaitility:awaitility")

@@ -40,6 +40,7 @@ import static org.mockito.Mockito.withSettings;
 
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.agent.tool.ConversationState;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsApprovalGate;
@@ -54,6 +55,9 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.ai.constant.ToolSuspendConstants;
+import com.bytechef.platform.ai.sensitivedata.SensitiveDataMetrics;
+import com.bytechef.platform.ai.sensitivedata.tokenization.PiiTokenSession;
+import com.bytechef.platform.ai.sensitivedata.tokenization.PiiTokenSessionToolContext;
 import com.bytechef.platform.ai.tool.GateDecision;
 import com.bytechef.platform.ai.tool.GatedToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspension;
@@ -117,6 +121,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.model.tool.ToolExecutionResult;
 import org.springframework.ai.session.CreateSessionRequest;
 import org.springframework.ai.session.DefaultSessionService;
 import org.springframework.ai.session.InMemorySessionRepository;
@@ -1265,6 +1270,73 @@ class AbstractAiAgentChatActionTest {
         return subagentConversationIdArgumentCaptor.getValue();
     }
 
+    @Test
+    void testGetAdvisorsThreadsToolBoundaryMetricsIntoTheToolCallingManager() {
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(
+            Map.of("clusterElements", Map.of("model", buildModelClusterElement())));
+
+        ChatModel chatModel = mock(ChatModel.class);
+
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+
+        when(toolCallingManager.executeToolCalls(any(), any()))
+            .thenReturn(ToolExecutionResult.builder()
+                .conversationHistory(List.of())
+                .build());
+
+        SensitiveDataMetrics sensitiveDataMetrics = mock(SensitiveDataMetrics.class);
+
+        List<Advisor> advisors = action.getAdvisors(
+            clusterElementMap, Map.of(), chatModel, actionContext, Optional.empty(), null, false,
+            sensitiveDataMetrics);
+
+        ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
+        ToolCallingManager wiredToolCallingManager = readToolCallingManager(toolCallAdvisor);
+
+        PiiTokenSession session = PiiTokenSession.create();
+        String token = session.tokenFor("EMAIL_ADDRESS", "bob@acme.io");
+
+        wiredToolCallingManager.executeToolCalls(
+            promptWithSession(session), chatResponseWithToolCall("sendEmail", "{\"to\":\"" + token + "\"}"));
+
+        verify(sensitiveDataMetrics).recordToolArgsRestored();
+    }
+
+    private static ToolCallingManager readToolCallingManager(ToolCallingAdvisor toolCallAdvisor) {
+        try {
+            Field field = ToolCallingAdvisor.class.getDeclaredField("toolCallingManager");
+
+            field.setAccessible(true);
+
+            return (ToolCallingManager) field.get(toolCallAdvisor);
+        } catch (ReflectiveOperationException exception) {
+            throw new AssertionError(
+                "Unable to read toolCallingManager from ToolCallingAdvisor — field name changed in Spring AI?",
+                exception);
+        }
+    }
+
+    private static Prompt promptWithSession(PiiTokenSession session) {
+        return new Prompt(
+            List.of(),
+            ToolCallingChatOptions.builder()
+                .toolContext(PiiTokenSessionToolContext.into(Map.of(), session))
+                .build());
+    }
+
+    private static ChatResponse chatResponseWithToolCall(String toolName, String arguments) {
+        AssistantMessage.ToolCall toolCall = new AssistantMessage.ToolCall("call-1", "function", toolName, arguments);
+        AssistantMessage assistantMessage = AssistantMessage.builder()
+            .content("")
+            .toolCalls(List.of(toolCall))
+            .build();
+
+        return new ChatResponse(List.of(new Generation(assistantMessage)));
+    }
+
     private static Map<String, Object> buildToolClusterElement(String workflowNodeName, String type) {
         Map<String, Object> toolElement = new HashMap<>();
 
@@ -2112,7 +2184,8 @@ class AbstractAiAgentChatActionTest {
         @BeforeEach
         void setUp() {
             action = new AbstractAiAgentChatAction(
-                aiAgentToolFacade, clusterElementDefinitionService, mock(ToolCallingManager.class)) {};
+                aiAgentToolFacade, clusterElementDefinitionService,
+                new AgentToolCallingManagers(mock(ToolCallingManager.class))) {};
 
             lenient().when(context.isEditorEnvironment())
                 .thenReturn(false);
@@ -2513,7 +2586,7 @@ class AbstractAiAgentChatActionTest {
             AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
             ToolCallingManager toolCallingManager) {
 
-            super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+            super(aiAgentToolFacade, clusterElementDefinitionService, new AgentToolCallingManagers(toolCallingManager));
         }
     }
 }

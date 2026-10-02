@@ -49,6 +49,7 @@ import static org.mockito.Mockito.verify;
 
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
@@ -719,7 +720,7 @@ class AiAgentStreamChatActionTest {
                         prompts,
                         callNumber -> callNumber == 1 ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID) : finalAnswer()),
                     chatMemoryResult),
-                createToolCallingManager());
+                new AgentToolCallingManagers(createToolCallingManager()), null);
 
             SseEmitterHandler performHandler = getPerformFunction(streamChatActionDefinition).apply(
                 createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
@@ -787,7 +788,7 @@ class AiAgentStreamChatActionTest {
                             ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID)
                             : callNumber == 2 ? suspendingToolCallResponse(SECOND_TOOL_CALL_ID) : finalAnswer()),
                     chatMemoryResult),
-                createToolCallingManager());
+                new AgentToolCallingManagers(createToolCallingManager()), null);
 
             SseEmitterHandler performHandler = getPerformFunction(streamChatActionDefinition).apply(
                 createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
@@ -854,7 +855,7 @@ class AiAgentStreamChatActionTest {
             return AiAgentStreamChatAction.of(
                 mock(AiAgentToolFacade.class),
                 createClusterElementDefinitionService(createChatModel(prompts, responseFunction), null),
-                createToolCallingManager());
+                new AgentToolCallingManagers(createToolCallingManager()), null);
         }
 
         private static MultipleConnectionsStreamPerformFunction getPerformFunction(ActionDefinition actionDefinition) {
