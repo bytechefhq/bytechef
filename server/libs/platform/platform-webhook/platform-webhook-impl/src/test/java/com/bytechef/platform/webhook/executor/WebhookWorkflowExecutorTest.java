@@ -17,22 +17,26 @@
 package com.bytechef.platform.webhook.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -50,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -175,6 +180,69 @@ public class WebhookWorkflowExecutorTest {
         webhookWorkflowExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest);
 
         verifyNoInteractions(eventPublisher);
+    }
+
+    @Nested
+    class ExecuteSyncWithSuspendingTask {
+
+        @Test
+        void testExecuteSyncRejectsWorkflowWithApprovalStepBeforeRunning() {
+            givenWorkflow(workflowTask("approve", "approval/v1/requestApproval"));
+
+            assertThatThrownBy(() -> webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessage(
+                    String.format(WebhookWorkflowExecutorImpl.SUSPENDING_TASK_MESSAGE, "approve",
+                        "approval/v1/requestApproval"));
+
+            verify(webhookWorkflowSyncExecutor, never()).execute(any(), any());
+            verify(jobSyncExecutor, never()).execute(any(), any(), anyBoolean(), any(), any());
+        }
+
+        @Test
+        void testExecuteSyncRejectsWorkflowWithWaitStepAfterAnotherStep() {
+            givenWorkflow(
+                workflowTask("respond", "webhook/v1/responseToWebhookRequest"),
+                workflowTask("pause", "wait/v1/waitAfterTimeInterval"));
+
+            assertThatThrownBy(() -> webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("'pause' (wait/v1/waitAfterTimeInterval)");
+
+            verify(webhookWorkflowSyncExecutor, never()).execute(any(), any());
+        }
+
+        @Test
+        void testExecuteSyncRejectsWorkflowWithLegacyWaitForApprovalStep() {
+            givenWorkflow(workflowTask("legacy", "waitForApproval/v1"));
+
+            assertThatThrownBy(() -> webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("'legacy' (waitForApproval/v1)");
+        }
+
+        @Test
+        void testExecuteSyncRunsWorkflowWithoutSuspendingStep() {
+            givenWorkflow(workflowTask("respond", "webhook/v1/responseToWebhookRequest"));
+
+            IllegalStateException triggerRan = new IllegalStateException("trigger ran");
+
+            when(webhookWorkflowSyncExecutor.execute(any(), any())).thenThrow(triggerRan);
+
+            assertThatThrownBy(() -> webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest))
+                .isSameAs(triggerRan);
+        }
+
+        private void givenWorkflow(WorkflowTask... workflowTasks) {
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getTasks(true)).thenReturn(List.of(workflowTasks));
+            when(workflowService.getWorkflow("workflow-id")).thenReturn(workflow);
+        }
+
+        private static WorkflowTask workflowTask(String name, String type) {
+            return new WorkflowTask(Map.of("name", name, "type", type));
+        }
     }
 
     private Duration executeSyncAndCaptureTimeout(Map<String, ?> triggerParameters) {
