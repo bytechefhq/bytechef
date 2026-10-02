@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260903000002" author="Ivica Cardic">
+        <createTable tableName="ai_guardrail_custom_rule">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pattern" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score" type="NUMERIC(3,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="context_keywords" type="VARCHAR(1024)"/>
+            <column name="context_window" type="INT"/>
+            <column name="context_score" type="NUMERIC(3,2)"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP"/>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="ai_guardrail_custom_rule" columnNames="workspace_id,type"
+                             constraintName="uk_ai_guardrail_custom_rule_workspace_type"/>
+    </changeSet>
+</databaseChangeLog>
