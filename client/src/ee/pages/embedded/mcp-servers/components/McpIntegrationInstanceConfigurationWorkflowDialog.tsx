@@ -1,18 +1,17 @@
 import Button from '@/components/Button/Button';
+import {
+    Dialog,
+    DialogBody,
+    DialogCancelButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogMain,
+    DialogTrigger,
+} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Checkbox} from '@/components/ui/checkbox';
-import {
-    Dialog,
-    DialogClose,
-    DialogCloseButton,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {
@@ -176,197 +175,206 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent>
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>{`${isEditMode ? 'Edit' : 'Select'}`} Workflows</DialogTitle>
-
-                        <DialogDescription>
-                            {isEditMode
+                <DialogMain>
+                    <DialogHeader
+                        description={
+                            isEditMode
                                 ? 'Edit the MCP server workflow configuration.'
-                                : 'Select workflows to add to the MCP server.'}
-                        </DialogDescription>
-                    </div>
+                                : 'Select workflows to add to the MCP server.'
+                        }
+                        title={`${isEditMode ? 'Edit' : 'Select'} Workflows`}
+                    />
 
-                    <DialogCloseButton />
-                </DialogHeader>
-
-                <Form {...form}>
-                    <form
-                        className="flex flex-col gap-4"
-                        onSubmit={handleSubmit(saveMcpIntegrationInstanceConfiguration)}
-                    >
-                        {isEditMode && (
-                            <>
-                                <FormItem>
-                                    <FormLabel>Integration</FormLabel>
-
-                                    <Input
-                                        disabled
-                                        value={mcpIntegrationInstanceConfiguration.integration?.name || ''}
-                                    />
-                                </FormItem>
-
-                                <FormItem>
-                                    <FormLabel>Integration Version</FormLabel>
-
-                                    <Input
-                                        disabled
-                                        value={`v${mcpIntegrationInstanceConfiguration.integrationVersion}`}
-                                    />
-                                </FormItem>
-                            </>
-                        )}
-
-                        {!isEditMode && (
-                            <>
-                                <FormField
-                                    control={control}
-                                    name="mcpServerId"
-                                    render={({field}) => (
+                    <Form {...form}>
+                        <form
+                            className="flex min-h-0 flex-1 flex-col"
+                            onSubmit={handleSubmit(saveMcpIntegrationInstanceConfiguration)}
+                        >
+                            <DialogBody className="flex flex-col gap-4">
+                                {isEditMode && (
+                                    <>
                                         <FormItem>
-                                            <FormLabel>MCP Server</FormLabel>
+                                            <FormLabel>Integration</FormLabel>
 
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    disabled={!!mcpServer}
-                                                    placeholder={mcpServer ? mcpServer.name : 'Select MCP Server'}
-                                                    value={mcpServer ? mcpServer.name : field.value}
-                                                />
-                                            </FormControl>
-
-                                            <FormMessage />
+                                            <Input
+                                                disabled
+                                                value={mcpIntegrationInstanceConfiguration.integration?.name || ''}
+                                            />
                                         </FormItem>
-                                    )}
-                                />
 
-                                <FormField
-                                    control={control}
-                                    name="integrationInstanceConfigurationId"
-                                    render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>Integration Instance Configuration</FormLabel>
+                                            <FormLabel>Integration Version</FormLabel>
 
-                                            <FormControl>
-                                                <Select
-                                                    onValueChange={(value) => {
-                                                        field.onChange(value);
-
-                                                        setCurrentIntegrationInstanceConfigurationId(value);
-
-                                                        setValue('selectedWorkflowIds', []);
-                                                    }}
-                                                    value={field.value}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a configuration..." />
-                                                    </SelectTrigger>
-
-                                                    <SelectContent>
-                                                        {integrationInstanceConfigurations.map((configuration) => (
-                                                            <SelectItem
-                                                                key={configuration.id}
-                                                                value={String(configuration.id)}
-                                                            >
-                                                                <div className="flex items-center gap-x-2">
-                                                                    {configuration.integration?.icon ? (
-                                                                        <InlineSVG
-                                                                            className="size-4 flex-none"
-                                                                            src={configuration.integration.icon}
-                                                                        />
-                                                                    ) : (
-                                                                        <ComponentIcon className="size-4 flex-none text-content-neutral-secondary" />
-                                                                    )}
-
-                                                                    <span>
-                                                                        {`${configuration.name} (v${configuration.integrationVersion})`}
-                                                                    </span>
-                                                                </div>
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FormControl>
-
-                                            <FormMessage />
+                                            <Input
+                                                disabled
+                                                value={`v${mcpIntegrationInstanceConfiguration.integrationVersion}`}
+                                            />
                                         </FormItem>
-                                    )}
-                                    shouldUnregister={false}
-                                />
-                            </>
-                        )}
-
-                        {hasNoEligibleWorkflows && (
-                            <p className="text-sm text-content-neutral-secondary">
-                                No tool-eligible workflows found for this integration instance configuration. Only
-                                workflows with a New Workflow Call trigger can be added to an MCP server.
-                            </p>
-                        )}
-
-                        {eligibleWorkflows && eligibleWorkflows.length > 0 && (
-                            <FormField
-                                control={control}
-                                name="selectedWorkflowIds"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Select Workflows</FormLabel>
-
-                                        <div className="space-y-2">
-                                            {eligibleWorkflows.map((integrationWorkflow) => (
-                                                <div
-                                                    className="flex items-center space-x-2"
-                                                    key={integrationWorkflow.id}
-                                                >
-                                                    <Checkbox
-                                                        checked={field.value?.includes(integrationWorkflow.id || '')}
-                                                        onCheckedChange={(checked) => {
-                                                            const currentValues = field.value || [];
-
-                                                            if (checked) {
-                                                                field.onChange([
-                                                                    ...currentValues,
-                                                                    integrationWorkflow.id,
-                                                                ]);
-                                                            } else {
-                                                                field.onChange(
-                                                                    currentValues.filter(
-                                                                        (workflowId) =>
-                                                                            workflowId !== integrationWorkflow.id
-                                                                    )
-                                                                );
-                                                            }
-                                                        }}
-                                                    />
-
-                                                    <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                        {integrationWorkflow.label || integrationWorkflow.id}
-                                                    </label>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <FormMessage />
-                                    </FormItem>
+                                    </>
                                 )}
-                                shouldUnregister={false}
-                            />
-                        )}
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
+                                {!isEditMode && (
+                                    <>
+                                        <FormField
+                                            control={control}
+                                            name="mcpServerId"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>MCP Server</FormLabel>
 
-                            <Button
-                                disabled={
-                                    hasNoEligibleWorkflows || !selectedWorkflowIds || selectedWorkflowIds.length === 0
-                                }
-                                label={isEditMode ? 'Update' : 'Add'}
-                                type="submit"
-                            />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            disabled={!!mcpServer}
+                                                            placeholder={
+                                                                mcpServer ? mcpServer.name : 'Select MCP Server'
+                                                            }
+                                                            value={mcpServer ? mcpServer.name : field.value}
+                                                        />
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={control}
+                                            name="integrationInstanceConfigurationId"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Integration Instance Configuration</FormLabel>
+
+                                                    <FormControl>
+                                                        <Select
+                                                            onValueChange={(value) => {
+                                                                field.onChange(value);
+
+                                                                setCurrentIntegrationInstanceConfigurationId(value);
+
+                                                                setValue('selectedWorkflowIds', []);
+                                                            }}
+                                                            value={field.value}
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select a configuration..." />
+                                                            </SelectTrigger>
+
+                                                            <SelectContent>
+                                                                {integrationInstanceConfigurations.map(
+                                                                    (configuration) => (
+                                                                        <SelectItem
+                                                                            key={configuration.id}
+                                                                            value={String(configuration.id)}
+                                                                        >
+                                                                            <div className="flex items-center gap-x-2">
+                                                                                {configuration.integration?.icon ? (
+                                                                                    <InlineSVG
+                                                                                        className="size-4 flex-none"
+                                                                                        src={
+                                                                                            configuration.integration
+                                                                                                .icon
+                                                                                        }
+                                                                                    />
+                                                                                ) : (
+                                                                                    <ComponentIcon className="size-4 flex-none text-content-neutral-secondary" />
+                                                                                )}
+
+                                                                                <span>
+                                                                                    {`${configuration.name} (v${configuration.integrationVersion})`}
+                                                                                </span>
+                                                                            </div>
+                                                                        </SelectItem>
+                                                                    )
+                                                                )}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                            shouldUnregister={false}
+                                        />
+                                    </>
+                                )}
+
+                                {hasNoEligibleWorkflows && (
+                                    <p className="text-sm text-content-neutral-secondary">
+                                        No tool-eligible workflows found for this integration instance configuration.
+                                        Only workflows with a New Workflow Call trigger can be added to an MCP server.
+                                    </p>
+                                )}
+
+                                {eligibleWorkflows && eligibleWorkflows.length > 0 && (
+                                    <FormField
+                                        control={control}
+                                        name="selectedWorkflowIds"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Select Workflows</FormLabel>
+
+                                                <div className="space-y-2">
+                                                    {eligibleWorkflows.map((integrationWorkflow) => (
+                                                        <div
+                                                            className="flex items-center space-x-2"
+                                                            key={integrationWorkflow.id}
+                                                        >
+                                                            <Checkbox
+                                                                checked={field.value?.includes(
+                                                                    integrationWorkflow.id || ''
+                                                                )}
+                                                                onCheckedChange={(checked) => {
+                                                                    const currentValues = field.value || [];
+
+                                                                    if (checked) {
+                                                                        field.onChange([
+                                                                            ...currentValues,
+                                                                            integrationWorkflow.id,
+                                                                        ]);
+                                                                    } else {
+                                                                        field.onChange(
+                                                                            currentValues.filter(
+                                                                                (workflowId) =>
+                                                                                    workflowId !==
+                                                                                    integrationWorkflow.id
+                                                                            )
+                                                                        );
+                                                                    }
+                                                                }}
+                                                            />
+
+                                                            <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                                                {integrationWorkflow.label || integrationWorkflow.id}
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                        shouldUnregister={false}
+                                    />
+                                )}
+                            </DialogBody>
+
+                            <DialogFooter>
+                                <DialogCancelButton />
+
+                                <Button
+                                    disabled={
+                                        hasNoEligibleWorkflows ||
+                                        !selectedWorkflowIds ||
+                                        selectedWorkflowIds.length === 0
+                                    }
+                                    label={isEditMode ? 'Update' : 'Add'}
+                                    type="submit"
+                                />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
