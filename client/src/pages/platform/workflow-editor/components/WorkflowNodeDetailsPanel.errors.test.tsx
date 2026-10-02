@@ -6,7 +6,7 @@ import WorkflowNodeDetailsPanel from './WorkflowNodeDetailsPanel';
 import {WorkflowNodeDetailsErrorI} from './hooks/getMissingRequiredConnectionErrors';
 
 const {panelState} = vi.hoisted(() => ({
-    panelState: {errors: [] as Array<WorkflowNodeDetailsErrorI>},
+    panelState: {errors: [] as Array<WorkflowNodeDetailsErrorI>, errorsLoading: false},
 }));
 
 const OPEN_AI_NODE = {
@@ -26,7 +26,7 @@ vi.mock('./hooks/useWorkflowNodeDetailsPanel', () => ({
         currentWorkflowNode: {name: OPEN_AI_NODE.workflowNodeName},
         currentWorkflowNodeConnections: [],
         errors: panelState.errors,
-        errorsLoading: false,
+        errorsLoading: panelState.errorsLoading,
         getNodeVersion: () => '1',
         nodeTabs: [],
         propertiesLoading: false,
@@ -60,6 +60,7 @@ function renderPanel(errors: Array<WorkflowNodeDetailsErrorI>) {
 describe('WorkflowNodeDetailsPanel errors chip', () => {
     beforeEach(() => {
         panelState.errors = [];
+        panelState.errorsLoading = false;
     });
 
     it('shows no chip when the node has no errors or warnings', () => {
@@ -94,6 +95,19 @@ describe('WorkflowNodeDetailsPanel errors chip', () => {
         expect(chip).toHaveClass('border-stroke-destructive-primary');
         expect(screen.getByText('Missing required connection:')).toBeInTheDocument();
         expect(screen.getAllByLabelText('Warning')).toHaveLength(1);
+    });
+
+    it('keeps the heading as the chip name while errors are rechecked', () => {
+        panelState.errorsLoading = true;
+
+        const chip = renderPanel([
+            {kind: 'CONNECTION', name: 'OpenAI', severity: 'ERROR'},
+            {kind: 'ISSUE', name: 'Missing recommended field: label', severity: 'WARNING'},
+        ]);
+
+        expect(chip).toHaveAccessibleName('Errors (1), Warnings (1)');
+        expect(chip).toHaveAttribute('aria-busy', 'true');
+        expect(chip).toBeDisabled();
     });
 
     it('names the property an issue concerns in front of its message', () => {
