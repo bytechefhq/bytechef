@@ -70,13 +70,19 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
      * Executes a tool inside a parent action's task execution. The tool's context is derived from the parent via
      * {@link ActionContextAware#toClusterElementContext} for every call, so the tool's log entries land under the
      * parent task in the execution view and a token-refresh retry runs against the refreshed connection. The derived
-     * context also forwards {@code suspend(...)}, {@code getSuspend()}, the resume URL and the job resume id to the
-     * parent, so a suspending tool (for example an AI agent's approval tool) suspends the parent's task.
+     * context carries the parent, so an {@code ActionContext} obtained from it via {@code toActionContext} forwards
+     * {@code suspend(...)}, {@code getSuspend()}, the resume URL and the job resume id to the parent, and a suspending
+     * tool (for example an AI agent's approval tool) suspends the parent's task.
      */
     Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, ActionContextAware actionContext);
 
+    /**
+     * Executes a tool with all of its connections inside a parent action's task execution, deriving the tool's context
+     * from the parent the same way as
+     * {@link #executeTool(String, int, String, Map, ComponentConnection, ActionContextAware)}.
+     */
     Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections,

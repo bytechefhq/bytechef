@@ -17,7 +17,6 @@
 package com.bytechef.component.ai.agent.action;
 
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT_PROPERTIES;
-import static com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.commons.util.JsonUtils;
@@ -29,7 +28,8 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
-import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.tool.AiAgentToolContext;
+import com.bytechef.platform.ai.tool.AiAgentToolContext.SseTransport;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -48,11 +48,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
@@ -112,59 +109,46 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
         Parameters continueParameters, Parameters data, ActionContext context) throws Exception {
 
-        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
-        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        SseTransport sseTransport = new SseTransport();
         TurnTextSeparator turnTextSeparator = new TurnTextSeparator();
 
         ChatClientRequestSpec chatClientRequestSpec = buildResumedRequestSpec(
             inputParameters, connectionParameters, extensions, continueParameters, data,
-            createToolExecutionListener(emitterReference, bufferedEvents, turnTextSeparator, context), context);
+            createToolExecutionListener(sseTransport, turnTextSeparator, context), context);
 
-        chatClientRequestSpec.toolContext(
-            Map.of(
-                AiAgentToolContextKey.ACTION_CONTEXT, context,
-                AiAgentToolContextKey.SSE_EMITTER_REFERENCE, emitterReference,
-                AiAgentToolContextKey.SSE_BUFFERED_EVENTS, bufferedEvents));
+        chatClientRequestSpec.toolContext(new AiAgentToolContext(context, sseTransport).toMap());
 
         Flux<Object> contentFlux = withExecutionContext(
             chatClientRequestSpec.stream()
                 .chatResponse()
                 .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
 
-        return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
+        return createSseHandler(contentFlux, sseTransport, context);
     }
 
     protected SseEmitterHandler perform(
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters,
         Parameters extensions, ActionContext context) throws Exception {
 
-        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
-        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        SseTransport sseTransport = new SseTransport();
         TurnTextSeparator turnTextSeparator = new TurnTextSeparator();
 
-        ToolExecutionListener toolExecutionListener = createToolExecutionListener(
-            emitterReference, bufferedEvents, turnTextSeparator, context);
-
         ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
-            inputParameters, connectionParameters, extensions, toolExecutionListener, context);
+            inputParameters, connectionParameters, extensions,
+            createToolExecutionListener(sseTransport, turnTextSeparator, context), context);
 
-        chatClientRequestSpec.toolContext(
-            Map.of(
-                AiAgentToolContextKey.ACTION_CONTEXT, context,
-                AiAgentToolContextKey.SSE_EMITTER_REFERENCE, emitterReference,
-                AiAgentToolContextKey.SSE_BUFFERED_EVENTS, bufferedEvents));
+        chatClientRequestSpec.toolContext(new AiAgentToolContext(context, sseTransport).toMap());
 
         Flux<Object> contentFlux = withExecutionContext(
             chatClientRequestSpec.stream()
                 .chatResponse()
                 .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
 
-        return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
+        return createSseHandler(contentFlux, sseTransport, context);
     }
 
     static ToolExecutionListener createToolExecutionListener(
-        AtomicReference<@Nullable SseEmitter> emitterReference, Queue<Map<String, @Nullable Object>> bufferedEvents,
-        TurnTextSeparator turnTextSeparator, ActionContext context) {
+        SseTransport sseTransport, TurnTextSeparator turnTextSeparator, ActionContext context) {
 
         return toolExecutionEvent -> {
             turnTextSeparator.markToolExecuted();
@@ -187,40 +171,25 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             eventData.put("reasoning", toolExecutionEvent.reasoning());
             eventData.put("toolName", toolExecutionEvent.toolName());
 
-            SseEmitter sseEmitter = emitterReference.get();
-
-            if (sseEmitter == null) {
-                bufferedEvents.add(eventData);
-            } else {
-                try {
-                    sseEmitter.send(eventData);
-                } catch (Exception exception) {
-                    context.log(log -> log.warn(
-                        "Failed to send tool execution event: {}", exception.getMessage(), exception));
-                }
+            try {
+                sseTransport.send(eventData);
+            } catch (Exception exception) {
+                context.log(log -> log.warn(
+                    "Failed to send tool execution event: {}", exception.getMessage(), exception));
             }
         };
     }
 
     static SseEmitterHandler createSseHandler(
-        Flux<Object> contentFlux, AtomicReference<@Nullable SseEmitter> emitterReference,
-        Queue<Map<String, @Nullable Object>> bufferedEvents, ActionContext context) {
+        Flux<Object> contentFlux, SseTransport sseTransport, ActionContext context) {
 
         Flow.Publisher<?> effectivePublisher = FlowAdapters.toFlowPublisher(contentFlux);
 
         SseEmitterHandler sseEmitterHandler = emitter -> {
-            emitterReference.set(emitter);
-
-            Map<String, @Nullable Object> bufferedEvent;
-
-            while ((bufferedEvent = bufferedEvents.poll()) != null) {
-                try {
-                    emitter.send(bufferedEvent);
-                } catch (Exception exception) {
-                    context.log(log -> log.warn(
-                        "Failed to send buffered tool execution event: {}", exception.getMessage(), exception));
-                }
-            }
+            sseTransport.attach(
+                emitter,
+                exception -> context.log(log -> log.warn(
+                    "Failed to send buffered agent event: {}", exception.getMessage(), exception)));
 
             effectivePublisher.subscribe(
                 new Flow.Subscriber<Object>() {

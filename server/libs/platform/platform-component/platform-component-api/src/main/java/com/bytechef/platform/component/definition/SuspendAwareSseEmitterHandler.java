@@ -20,6 +20,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -27,21 +28,50 @@ import org.jspecify.annotations.Nullable;
  */
 public final class SuspendAwareSseEmitterHandler implements SseEmitterHandler {
 
-    private final SseEmitterHandler delegate;
     private final ActionContextAware actionContext;
+    private final SseEmitterHandler delegate;
     private final AtomicReference<@Nullable Throwable> failureReference = new AtomicReference<>();
+    private final Object lock = new Object();
+    private @Nullable Consumer<ActionContext.Suspend> beforeSuspendConsumer;
+    private boolean beforeSuspendInvoked;
 
     public SuspendAwareSseEmitterHandler(SseEmitterHandler delegate, ActionContextAware actionContext) {
-        this.delegate = delegate;
         this.actionContext = actionContext;
+        this.delegate = delegate;
     }
 
-    public ActionContext.@Nullable Suspend getSuspend() {
+    public SuspendAwareSseEmitterHandler withBeforeSuspend(Consumer<ActionContext.Suspend> beforeSuspendConsumer) {
+        synchronized (lock) {
+            if (this.beforeSuspendConsumer != null) {
+                throw new IllegalStateException("The before-suspend consumer is already set");
+            }
+
+            this.beforeSuspendConsumer = beforeSuspendConsumer;
+        }
+
+        return this;
+    }
+
+    private ActionContext.@Nullable Suspend resolveSuspend() {
         if (failureReference.get() != null) {
             return null;
         }
 
-        return SuspendUtils.finalizeSuspend(actionContext);
+        ActionContext.Suspend suspend = actionContext.getSuspend();
+
+        if (suspend == null) {
+            return null;
+        }
+
+        synchronized (lock) {
+            if (beforeSuspendConsumer != null && !beforeSuspendInvoked) {
+                beforeSuspendConsumer.accept(suspend);
+
+                beforeSuspendInvoked = true;
+            }
+        }
+
+        return actionContext.getSuspend();
     }
 
     public ActionContext.@Nullable Suspend getSuspendOrThrow(long jobId) {
@@ -52,7 +82,7 @@ public final class SuspendAwareSseEmitterHandler implements SseEmitterHandler {
                 "The streamed action of job " + jobId + " failed: " + failure.getMessage(), failure);
         }
 
-        return getSuspend();
+        return resolveSuspend();
     }
 
     @Override

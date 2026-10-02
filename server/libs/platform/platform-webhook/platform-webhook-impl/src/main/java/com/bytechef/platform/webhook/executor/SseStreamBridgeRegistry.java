@@ -19,19 +19,23 @@ package com.bytechef.platform.webhook.executor;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.github.benmanes.caffeine.cache.Ticker;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +60,8 @@ public class SseStreamBridgeRegistry {
     private static final Logger log = LoggerFactory.getLogger(SseStreamBridgeRegistry.class);
 
     private static final Duration PENDING_REGISTRATION_TIMEOUT = Duration.ofMinutes(2);
+    private static final int UNDELIVERED_QUESTION_MAX_ATTEMPTS = 30;
+    private static final Duration UNDELIVERED_QUESTION_RETRY_DELAY = Duration.ofSeconds(2);
 
     private final Cache<Long, CopyOnWriteArrayList<SseStreamBridge>> bridges = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.MINUTES)
@@ -65,7 +71,10 @@ public class SseStreamBridgeRegistry {
         .expireAfterAccess(30, TimeUnit.MINUTES)
         .build();
 
+    private final Executor executor;
+    private final @Nullable JobResumeFacade jobResumeFacade;
     private final Cache<Long, List<PendingRegistration>> pendingRegistrations;
+    private final Duration undeliveredQuestionRetryDelay;
 
     private final Cache<Long, Boolean> stoppedJobIds = Caffeine.newBuilder()
         .expireAfterWrite(30, TimeUnit.MINUTES)
@@ -73,10 +82,27 @@ public class SseStreamBridgeRegistry {
         .build();
 
     public SseStreamBridgeRegistry() {
-        this(PENDING_REGISTRATION_TIMEOUT, Ticker.systemTicker(), ForkJoinPool.commonPool());
+        this(null);
+    }
+
+    public SseStreamBridgeRegistry(@Nullable JobResumeFacade jobResumeFacade) {
+        this(
+            PENDING_REGISTRATION_TIMEOUT, Ticker.systemTicker(), ForkJoinPool.commonPool(), jobResumeFacade,
+            UNDELIVERED_QUESTION_RETRY_DELAY);
     }
 
     SseStreamBridgeRegistry(Duration pendingRegistrationTimeout, Ticker ticker, Executor executor) {
+        this(pendingRegistrationTimeout, ticker, executor, null, UNDELIVERED_QUESTION_RETRY_DELAY);
+    }
+
+    SseStreamBridgeRegistry(
+        Duration pendingRegistrationTimeout, Ticker ticker, Executor executor,
+        @Nullable JobResumeFacade jobResumeFacade, Duration undeliveredQuestionRetryDelay) {
+
+        this.executor = executor;
+        this.jobResumeFacade = jobResumeFacade;
+        this.undeliveredQuestionRetryDelay = undeliveredQuestionRetryDelay;
+
         pendingRegistrations = Caffeine.newBuilder()
             .expireAfterWrite(pendingRegistrationTimeout)
             .executor(executor)
@@ -114,6 +140,8 @@ public class SseStreamBridgeRegistry {
                 log.warn(
                     "The '{}' event of job {} was dropped because no SSE connection is registered for the job",
                     AiAgentSseEventType.ASK_USER_QUESTION, jobId);
+
+                resumeWithoutAnswer(jobId, sseStreamEvent.getPayload());
             }
 
             return;
@@ -121,14 +149,26 @@ public class SseStreamBridgeRegistry {
 
         switch (eventType) {
             case SseStreamEvent.EVENT_TYPE_DATA -> {
+                boolean delivered = false;
+
                 for (SseStreamBridge sseStreamBridge : sseStreamBridges) {
                     try {
                         sseStreamBridge.onEvent(sseStreamEvent.getPayload());
+
+                        delivered = true;
                     } catch (Exception exception) {
                         if (log.isTraceEnabled()) {
                             log.trace(exception.getMessage(), exception);
                         }
                     }
+                }
+
+                if (!delivered && isAskUserQuestionEvent(sseStreamEvent.getPayload())) {
+                    log.warn(
+                        "The '{}' event of job {} was not delivered to any SSE connection of the job",
+                        AiAgentSseEventType.ASK_USER_QUESTION, jobId);
+
+                    resumeWithoutAnswer(jobId, sseStreamEvent.getPayload());
                 }
             }
 
@@ -298,6 +338,52 @@ public class SseStreamBridgeRegistry {
             AiAgentSseEventType.ASK_USER_QUESTION.equals(map.get(AiAgentSseEventType.EVENT_TYPE));
     }
 
+    private void resumeWithoutAnswer(long jobId, @Nullable Object payload) {
+        if (jobResumeFacade == null || !(payload instanceof Map<?, ?> map) ||
+            !(map.get("resumeUrl") instanceof String resumeUrl) || resumeUrl.isBlank()) {
+
+            return;
+        }
+
+        resumeWithoutAnswer(jobId, resumeUrl.substring(resumeUrl.lastIndexOf('/') + 1), 1);
+    }
+
+    private void resumeWithoutAnswer(long jobId, String jobResumeId, int attempt) {
+        Executor delayedExecutor = CompletableFuture.delayedExecutor(
+            undeliveredQuestionRetryDelay.toMillis(), TimeUnit.MILLISECONDS, executor);
+
+        delayedExecutor.execute(() -> {
+            JobResumeOutcome jobResumeOutcome;
+
+            try {
+                jobResumeOutcome = Objects.requireNonNull(jobResumeFacade)
+                    .resumeExpiredJob(jobResumeId);
+            } catch (RuntimeException exception) {
+                log.warn("Unable to resume job {} after its question was not delivered", jobId, exception);
+
+                return;
+            }
+
+            if (jobResumeOutcome != JobResumeOutcome.NOT_YET_SUSPENDED) {
+                if (log.isDebugEnabled()) {
+                    log.debug(
+                        "Resumed job {} without an answer to its undelivered question: {}", jobId, jobResumeOutcome);
+                }
+
+                return;
+            }
+
+            if (attempt < UNDELIVERED_QUESTION_MAX_ATTEMPTS) {
+                resumeWithoutAnswer(jobId, jobResumeId, attempt + 1);
+            } else {
+                log.warn(
+                    "Job {} did not suspend on its undelivered question after {} attempts; it waits until the " +
+                        "question expires",
+                    jobId, attempt);
+            }
+        });
+    }
+
     private synchronized void onJobStopped(long jobId) {
         if (pendingRegistrations.getIfPresent(jobId) == null) {
             stoppedJobIds.put(jobId, Boolean.TRUE);
@@ -327,7 +413,7 @@ public class SseStreamBridgeRegistry {
 
                 Registration registration = register(jobId, sseStreamBridge);
 
-                activeHandle = registration.handle();
+                activeHandle = registration;
 
                 registration.completion()
                     .whenComplete((unused, throwable) -> completion.complete(null));
@@ -354,7 +440,36 @@ public class SseStreamBridgeRegistry {
         }
     }
 
-    @SuppressFBWarnings("EI")
-    public record Registration(AutoCloseable handle, CompletableFuture<Void> completion) {
+    /**
+     * A bridge's registration for a job's stream events. {@link #completion()} completes when the job finishes,
+     * suspends, stops or fails; {@link #close()} unregisters the bridge, at most once, and never throws.
+     */
+    public static final class Registration implements AutoCloseable {
+
+        private final AtomicBoolean closed = new AtomicBoolean();
+        private final CompletionStage<Void> completion;
+        private final AutoCloseable handle;
+
+        public Registration(AutoCloseable handle, CompletableFuture<Void> completion) {
+            this.handle = Objects.requireNonNull(handle, "handle");
+            this.completion = completion.minimalCompletionStage();
+        }
+
+        public CompletionStage<Void> completion() {
+            return completion;
+        }
+
+        @Override
+        public void close() {
+            if (!closed.compareAndSet(false, true)) {
+                return;
+            }
+
+            try {
+                handle.close();
+            } catch (Exception exception) {
+                log.warn("Failed to close the stream bridge registration", exception);
+            }
+        }
     }
 }

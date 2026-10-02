@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.constant.PlatformType;
@@ -32,6 +33,7 @@ import com.bytechef.platform.workflow.execution.JobResumeId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -349,7 +351,18 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             return suspendTarget.getSuspend();
         }
 
-        return suspend;
+        Suspend currentSuspend = suspend;
+        String currentJobResumeId = jobResumeId;
+
+        if (currentSuspend == null || currentJobResumeId == null) {
+            return currentSuspend;
+        }
+
+        Map<String, Object> continueParameters = new HashMap<>(currentSuspend.continueParameters());
+
+        continueParameters.put(MetadataConstants.JOB_RESUME_ID, currentJobResumeId);
+
+        return new Suspend(continueParameters, currentSuspend.expiresAt());
     }
 
     @Override

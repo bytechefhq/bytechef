@@ -37,6 +37,7 @@ import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.to
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toolCallResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,6 +52,9 @@ import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunc
 import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
+import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
+import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolResponses;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +64,11 @@ import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
+import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -69,13 +77,14 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 
 /**
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-class AiAgentChatActionResumeTest {
+class AiAgentChatActionTest {
 
     private static final String FINAL_ANSWER = "final answer";
     private static final String FIRST_TOOL_CALL_ID = "call_1";
@@ -178,6 +187,46 @@ class AiAgentChatActionResumeTest {
         assertThat(toolExecutions).hasSize(1);
         assertThat(toMap(toolExecutions.getFirst())).containsEntry("toolName", LOOK_UP_TOOL_NAME)
             .containsEntry("output", LOOK_UP_TOOL_RESULT);
+    }
+
+    @Test
+    void testGuardrailsBlockAViolatingHumanAnswerOnTheResumedTurn() throws Exception {
+        List<Prompt> prompts = new ArrayList<>();
+
+        ClusterElementDefinitionService clusterElementDefinitionService = createClusterElementDefinitionService(
+            createChatModel(
+                prompts,
+                callNumber -> callNumber == 1 ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID) : finalAnswer()),
+            null);
+
+        GuardrailsFunction guardrailsFunction = (
+            inputParameters, connectionParameters, extensions, componentConnections, context,
+            conversationHistory) -> new HumanAnswerBlockingAdvisor();
+
+        when(clusterElementDefinitionService.<GuardrailsFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testGuardrail"))).thenReturn(guardrailsFunction);
+
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = AiAgentChatAction.of(
+            mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager());
+
+        AtomicReference<ActionContext.Suspend> firstTurnSuspend = new AtomicReference<>();
+
+        getPerformFunction(chatActionDefinition).apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false, true),
+            createActionContext(firstTurnSuspend));
+
+        ActionContext.Suspend suspend = firstTurnSuspend.get();
+
+        assertThat(suspend).isNotNull();
+
+        Object resumeResult = getResumePerformFunction(chatActionDefinition).apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false, true),
+            toPersistedContinueParameters(suspend),
+            MockParametersFactory.create(Map.of("answer", HumanAnswerBlockingAdvisor.VIOLATION)),
+            createActionContext(new AtomicReference<>()));
+
+        assertThat(resumeResult).isEqualTo(HumanAnswerBlockingAdvisor.BLOCKED_MESSAGE);
+        assertThat(prompts).hasSize(1);
     }
 
     @Test
@@ -579,5 +628,41 @@ class AiAgentChatActionResumeTest {
 
     private static ChatResponse suspendingToolCallResponse(String toolCallId) {
         return toolCallResponse(SUSPENDING_TOOL_NAME, toolCallId);
+    }
+
+    private static final class HumanAnswerBlockingAdvisor implements CallAdvisor {
+
+        static final String BLOCKED_MESSAGE = "The answer was blocked.";
+        static final String VIOLATION = "forbidden answer";
+
+        @Override
+        public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
+            Prompt prompt = chatClientRequest.prompt();
+
+            for (Message message : prompt.getInstructions()) {
+                String humanResponseText = HumanToolResponses.getHumanResponseText(message);
+
+                if (humanResponseText != null && humanResponseText.contains(VIOLATION)) {
+                    ChatResponse chatResponse = new ChatResponse(
+                        List.of(new Generation(new AssistantMessage(BLOCKED_MESSAGE))));
+
+                    return ChatClientResponse.builder()
+                        .chatResponse(chatResponse)
+                        .build();
+                }
+            }
+
+            return callAdvisorChain.nextCall(chatClientRequest);
+        }
+
+        @Override
+        public String getName() {
+            return "humanAnswerBlocking";
+        }
+
+        @Override
+        public int getOrder() {
+            return HIGHEST_PRECEDENCE;
+        }
     }
 }

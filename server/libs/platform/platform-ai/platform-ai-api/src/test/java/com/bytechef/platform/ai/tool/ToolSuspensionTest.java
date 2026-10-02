@@ -19,37 +19,71 @@ package com.bytechef.platform.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import java.time.Instant;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Ivica Cardic
  */
 class ToolSuspensionTest {
 
-    @Test
-    void testSuspendedToolResultIsRecognized() {
-        String suspendedToolResult = ToolSuspension.suspendedToolResult(createSuspendedActionContext());
+    private static final Instant EXPIRES_AT = Instant.parse("2026-10-04T00:00:00Z");
 
-        assertThat(ToolSuspension.isSuspendedToolResult(suspendedToolResult)).isTrue();
+    @Test
+    void testSuspendedToolResultIsRecordedInTheSuspendAndRecognized() {
+        ActionContextAware actionContextAware = createSuspendedActionContext();
+
+        String suspendedToolResult = ToolSuspension.suspendedToolResult(actionContextAware);
+
+        Suspend suspend = captureSuspend(actionContextAware);
+
+        Map<String, ?> continueParameters = suspend.continueParameters();
+
+        assertThat(continueParameters.get("key")).isEqualTo("value");
+        assertThat(suspend.expiresAt()).isEqualTo(EXPIRES_AT);
+        assertThat(ToolSuspension.getSuspendedToolResult(suspend)).isEqualTo(suspendedToolResult);
+        assertThat(ToolSuspension.isSuspendedToolResult(suspendedToolResult, suspend)).isTrue();
     }
 
     @Test
     void testJsonSerializedSuspendedToolResultIsRecognized() {
-        String suspendedToolResult = ToolSuspension.suspendedToolResult(createSuspendedActionContext());
+        ActionContextAware actionContextAware = createSuspendedActionContext();
 
-        assertThat(ToolSuspension.isSuspendedToolResult("\"" + suspendedToolResult + "\"")).isTrue();
+        String suspendedToolResult = ToolSuspension.suspendedToolResult(actionContextAware);
+
+        assertThat(ToolSuspension.isSuspendedToolResult("\"" + suspendedToolResult + "\"", suspendedToolResult))
+            .isTrue();
+    }
+
+    @Test
+    void testEachSuspensionGetsItsOwnSuspendedToolResult() {
+        String firstSuspendedToolResult = ToolSuspension.suspendedToolResult(createSuspendedActionContext());
+        String secondSuspendedToolResult = ToolSuspension.suspendedToolResult(createSuspendedActionContext());
+
+        assertThat(firstSuspendedToolResult).isNotEqualTo(secondSuspendedToolResult);
+        assertThat(ToolSuspension.isSuspendedToolResult(firstSuspendedToolResult, secondSuspendedToolResult))
+            .isFalse();
     }
 
     @Test
     void testOtherToolResultsAreNotRecognized() {
-        assertThat(ToolSuspension.isSuspendedToolResult(null)).isFalse();
-        assertThat(ToolSuspension.isSuspendedToolResult("")).isFalse();
-        assertThat(ToolSuspension.isSuspendedToolResult("{\"approved\":true}")).isFalse();
+        String suspendedToolResult = ToolSuspension.suspendedToolResult(createSuspendedActionContext());
+
+        assertThat(ToolSuspension.isSuspendedToolResult(null, suspendedToolResult)).isFalse();
+        assertThat(ToolSuspension.isSuspendedToolResult("", suspendedToolResult)).isFalse();
+        assertThat(ToolSuspension.isSuspendedToolResult("{\"approved\":true}", suspendedToolResult)).isFalse();
+        assertThat(ToolSuspension.isSuspendedToolResult("__bytechef_tool_suspended__", suspendedToolResult))
+            .isFalse();
+        assertThat(ToolSuspension.isSuspendedToolResult(suspendedToolResult, (String) null)).isFalse();
+        assertThat(ToolSuspension.isSuspendedToolResult(suspendedToolResult, (Suspend) null)).isFalse();
     }
 
     @Test
@@ -68,10 +102,18 @@ class ToolSuspensionTest {
             .isInstanceOf(IllegalStateException.class);
     }
 
+    private static Suspend captureSuspend(ActionContextAware actionContextAware) {
+        ArgumentCaptor<Suspend> suspendCaptor = ArgumentCaptor.forClass(Suspend.class);
+
+        verify(actionContextAware).suspend(suspendCaptor.capture());
+
+        return suspendCaptor.getValue();
+    }
+
     private static ActionContextAware createSuspendedActionContext() {
         ActionContextAware actionContextAware = mock(ActionContextAware.class);
 
-        when(actionContextAware.getSuspend()).thenReturn(new ActionContext.Suspend(Map.of(), null));
+        when(actionContextAware.getSuspend()).thenReturn(new Suspend(Map.of("key", "value"), EXPIRES_AT));
 
         return actionContextAware;
     }

@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.agent.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -257,6 +258,75 @@ class ConversationStateTest {
 
         assertThat(toolResponseMessage.getResponses()).containsExactly(
             new ToolResponseMessage.ToolResponse("call_1", "requestApproval", "pending"));
+    }
+
+    @Test
+    void testStateStoredWithoutAVersionReadsAsTheCurrentVersion() {
+        ConversationState conversationState = JsonUtils.read(
+            """
+                {"messages":[{"kind":"system","text":"system"}],"unknownField":true}
+                """,
+            ConversationState.class);
+
+        assertThat(conversationState.version()).isEqualTo(ConversationState.CURRENT_VERSION);
+        assertThat(conversationState.messages()).hasSize(1);
+    }
+
+    @Test
+    void testStateWithANewerVersionIsRejected() {
+        int newerVersion = ConversationState.CURRENT_VERSION + 1;
+
+        assertThatThrownBy(() -> new ConversationState(newerVersion, List.of()))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("version " + newerVersion);
+    }
+
+    @Test
+    void testSystemAndUserEntriesWithoutTextGetEmptyText() {
+        assertThat(new ConversationState.SystemEntry(null, null).text()).isEmpty();
+        assertThat(new ConversationState.UserEntry(null, null, null).text()).isEmpty();
+
+        ConversationState conversationState = JsonUtils.read(
+            """
+                {"messages":[{"kind":"system"},{"kind":"user"}]}
+                """,
+            ConversationState.class);
+
+        List<Message> messages = conversationState.toMessages();
+
+        assertThat(messages.get(0)
+            .getText()).isEmpty();
+        assertThat(messages.get(1)
+            .getText()).isEmpty();
+    }
+
+    @Test
+    void testMetadataMapThatLooksLikeTheOldBytesMarkerStaysAMap() {
+        AssistantMessage originalAssistantMessage = AssistantMessage.builder()
+            .content("answer")
+            .properties(Map.of("signature", Map.of("$bytes", "AAAA")))
+            .build();
+
+        AssistantMessage assistantMessage = (AssistantMessage) roundTrip(List.of(originalAssistantMessage)).getFirst();
+
+        assertThat(assistantMessage.getMetadata()).containsEntry("signature", Map.of("$bytes", "AAAA"));
+    }
+
+    @Test
+    void testWrittenStateCarriesTheCurrentVersion() {
+        String json = JsonUtils.write(ConversationState.from(List.of(new UserMessage("hi"))));
+
+        assertThat(json).contains("\"version\":" + ConversationState.CURRENT_VERSION);
+    }
+
+    @Test
+    void testMediaEntryRequiresExactlyOneOfUrlAndData() {
+        assertThatThrownBy(() -> new ConversationState.MediaEntry("image/png", null, null, null, null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ConversationState.MediaEntry("image/png", null, null, "https://x", "AAAA"))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ConversationState.MediaEntry(null, null, null, "https://x", null))
+            .isInstanceOf(NullPointerException.class);
     }
 
     private static List<Message> roundTrip(List<Message> messages) {

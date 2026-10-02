@@ -47,9 +47,7 @@ public interface SseStreamBridge {
 
     /**
      * Invoked when a streamed job suspends, for example to wait for an approval or for an answer to a question, so the
-     * stream ends without a result. Only callers that can tell a suspend from a completion invoke it; the in-process
-     * sync path reports both through {@link #onComplete()}. The default implementation treats the suspend as a
-     * completion.
+     * stream ends without a result. The default implementation treats the suspend as a completion.
      */
     default void onSuspend() {
         onComplete();

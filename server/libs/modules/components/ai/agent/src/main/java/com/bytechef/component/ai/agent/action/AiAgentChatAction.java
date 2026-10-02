@@ -28,7 +28,7 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -118,7 +118,7 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         applyStructuredOutputValidation(chatClientRequestSpec, inputParameters, context);
 
-        chatClientRequestSpec.toolContext(Map.of(AiAgentToolContextKey.ACTION_CONTEXT, context));
+        chatClientRequestSpec.toolContext(new AiAgentToolContext(context).toMap());
 
         ChatClient.CallResponseSpec call = chatClientRequestSpec.call();
 

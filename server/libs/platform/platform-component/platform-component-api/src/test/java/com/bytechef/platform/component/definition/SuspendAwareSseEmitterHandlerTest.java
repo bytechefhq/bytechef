@@ -23,9 +23,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext.Suspend;
-import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
-import com.bytechef.platform.component.constant.MetadataConstants;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
@@ -37,11 +37,10 @@ import org.mockito.ArgumentCaptor;
 class SuspendAwareSseEmitterHandlerTest {
 
     @Test
-    void testGetSuspendReturnsTheSuspendWithTheJobResumeIdAfterACompletedStream() {
+    void testGetSuspendOrThrowReturnsTheRecordedSuspendAfterACompletedStream() {
         ActionContextAware actionContext = mock(ActionContextAware.class);
 
         when(actionContext.getSuspend()).thenReturn(new Suspend(Map.of("pendingToolCallId", "call_1"), null));
-        when(actionContext.getJobResumeId()).thenReturn("jobResumeId");
 
         SseEmitter sseEmitter = mock(SseEmitter.class);
 
@@ -57,47 +56,11 @@ class SuspendAwareSseEmitterHandlerTest {
         verify(sseEmitter).send("chunk");
         verify(sseEmitter).complete();
 
-        Suspend suspend = suspendAwareSseEmitterHandler.getSuspend();
+        Suspend suspend = suspendAwareSseEmitterHandler.getSuspendOrThrow(1L);
 
         assertThat(suspend).isNotNull();
-
-        Map<String, ?> continueParameters = suspend.continueParameters();
-
-        assertThat(continueParameters.get("pendingToolCallId")).isEqualTo("call_1");
-        assertThat(continueParameters.get(MetadataConstants.JOB_RESUME_ID)).isEqualTo("jobResumeId");
-    }
-
-    @Test
-    void testGetSuspendReturnsNullAfterAFailedStream() {
-        ActionContextAware actionContext = mock(ActionContextAware.class);
-
-        when(actionContext.getSuspend()).thenReturn(new Suspend(Map.of("pendingToolCallId", "call_1"), null));
-
-        SseEmitter sseEmitter = mock(SseEmitter.class);
-        IllegalStateException streamException = new IllegalStateException("stream failed");
-
-        SseEmitterHandler failingSseEmitterHandler = emitter -> emitter.error(streamException);
-
-        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
-            failingSseEmitterHandler, actionContext);
-
-        suspendAwareSseEmitterHandler.handle(sseEmitter);
-
-        verify(sseEmitter).error(streamException);
-
-        assertThat(suspendAwareSseEmitterHandler.getSuspend()).isNull();
-    }
-
-    @Test
-    void testGetSuspendReturnsNullWhenNothingSuspended() {
-        ActionContextAware actionContext = mock(ActionContextAware.class);
-
-        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
-            SseEmitter::complete, actionContext);
-
-        suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
-
-        assertThat(suspendAwareSseEmitterHandler.getSuspend()).isNull();
+        assertThat(suspend.continueParameters()
+            .get("pendingToolCallId")).isEqualTo("call_1");
     }
 
     @Test
@@ -113,7 +76,6 @@ class SuspendAwareSseEmitterHandlerTest {
 
         suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
 
-        assertThat(suspendAwareSseEmitterHandler.getSuspend()).isNull();
         assertThatThrownBy(() -> suspendAwareSseEmitterHandler.getSuspendOrThrow(42L))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("42")
@@ -161,32 +123,9 @@ class SuspendAwareSseEmitterHandlerTest {
 
         timeoutListener.run();
 
-        assertThat(suspendAwareSseEmitterHandler.getSuspend()).isNull();
         assertThatThrownBy(() -> suspendAwareSseEmitterHandler.getSuspendOrThrow(7L))
             .isInstanceOf(IllegalStateException.class)
             .hasCauseInstanceOf(TimeoutException.class);
-    }
-
-    @Test
-    void testGetSuspendOrThrowReturnsTheSuspendWithTheJobResumeIdAfterACompletedStream() {
-        ActionContextAware actionContext = mock(ActionContextAware.class);
-
-        when(actionContext.getSuspend()).thenReturn(new Suspend(Map.of("pendingToolCallId", "call_1"), null));
-        when(actionContext.getJobResumeId()).thenReturn("jobResumeId");
-
-        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
-            SseEmitter::complete, actionContext);
-
-        suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
-
-        Suspend suspend = suspendAwareSseEmitterHandler.getSuspendOrThrow(1L);
-
-        assertThat(suspend).isNotNull();
-
-        Map<String, ?> continueParameters = suspend.continueParameters();
-
-        assertThat(continueParameters.get("pendingToolCallId")).isEqualTo("call_1");
-        assertThat(continueParameters.get(MetadataConstants.JOB_RESUME_ID)).isEqualTo("jobResumeId");
     }
 
     @Test
@@ -199,5 +138,140 @@ class SuspendAwareSseEmitterHandlerTest {
         suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
 
         assertThat(suspendAwareSseEmitterHandler.getSuspendOrThrow(1L)).isNull();
+    }
+
+    @Test
+    void testWithBeforeSuspendInvokesTheConsumerOnceWithTheRecordedSuspend() {
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+        Suspend recordedSuspend = new Suspend(Map.of("pendingToolCallId", "call_1"), null);
+
+        when(actionContext.getSuspend()).thenReturn(recordedSuspend);
+
+        List<Suspend> beforeSuspendInvocations = new ArrayList<>();
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            SseEmitter::complete, actionContext).withBeforeSuspend(beforeSuspendInvocations::add);
+
+        suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
+
+        assertThat(beforeSuspendInvocations).isEmpty();
+
+        Suspend suspend = suspendAwareSseEmitterHandler.getSuspendOrThrow(1L);
+
+        suspendAwareSseEmitterHandler.getSuspendOrThrow(1L);
+
+        assertThat(beforeSuspendInvocations).containsExactly(recordedSuspend);
+        assertThat(suspend).isSameAs(recordedSuspend);
+    }
+
+    @Test
+    void testWithBeforeSuspendKeepsAFailureRecordedBeforeItWasSet() {
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        when(actionContext.getSuspend()).thenReturn(new Suspend(Map.of("pendingToolCallId", "call_1"), null));
+
+        List<Suspend> beforeSuspendInvocations = new ArrayList<>();
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            emitter -> emitter.error(new IllegalStateException("stream failed")), actionContext);
+
+        suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
+
+        SuspendAwareSseEmitterHandler withBeforeSuspend =
+            suspendAwareSseEmitterHandler.withBeforeSuspend(beforeSuspendInvocations::add);
+
+        assertThat(withBeforeSuspend).isSameAs(suspendAwareSseEmitterHandler);
+        assertThatThrownBy(() -> withBeforeSuspend.getSuspendOrThrow(1L))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("stream failed");
+        assertThat(beforeSuspendInvocations).isEmpty();
+    }
+
+    @Test
+    void testWithBeforeSuspendCanOnlyBeSetOnce() {
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            SseEmitter::complete, mock(ActionContextAware.class)).withBeforeSuspend(suspend -> {});
+
+        assertThatThrownBy(() -> suspendAwareSseEmitterHandler.withBeforeSuspend(suspend -> {}))
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void testWithBeforeSuspendRetriesTheConsumerAfterItFailed() {
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+        Suspend recordedSuspend = new Suspend(Map.of("pendingToolCallId", "call_1"), null);
+
+        when(actionContext.getSuspend()).thenReturn(recordedSuspend);
+
+        List<Suspend> beforeSuspendInvocations = new ArrayList<>();
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            SseEmitter::complete, actionContext).withBeforeSuspend(suspend -> {
+                beforeSuspendInvocations.add(suspend);
+
+                if (beforeSuspendInvocations.size() == 1) {
+                    throw new IllegalStateException("Notification failed");
+                }
+            });
+
+        suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
+
+        assertThatThrownBy(() -> suspendAwareSseEmitterHandler.getSuspendOrThrow(1L))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Notification failed");
+
+        assertThat(suspendAwareSseEmitterHandler.getSuspendOrThrow(1L)).isNotNull();
+        assertThat(suspendAwareSseEmitterHandler.getSuspendOrThrow(1L)).isNotNull();
+        assertThat(beforeSuspendInvocations).hasSize(2);
+    }
+
+    @Test
+    void testWithBeforeSuspendSkipsTheConsumerWhenNothingSuspended() {
+        List<Suspend> beforeSuspendInvocations = new ArrayList<>();
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            SseEmitter::complete, mock(ActionContextAware.class)).withBeforeSuspend(beforeSuspendInvocations::add);
+
+        suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
+
+        assertThat(suspendAwareSseEmitterHandler.getSuspendOrThrow(1L)).isNull();
+        assertThat(beforeSuspendInvocations).isEmpty();
+    }
+
+    @Test
+    void testWithBeforeSuspendSkipsTheConsumerAfterAFailedStream() {
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        when(actionContext.getSuspend()).thenReturn(new Suspend(Map.of("pendingToolCallId", "call_1"), null));
+
+        List<Suspend> beforeSuspendInvocations = new ArrayList<>();
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            emitter -> emitter.error(new IllegalStateException("stream failed")), actionContext)
+                .withBeforeSuspend(beforeSuspendInvocations::add);
+
+        suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
+
+        assertThatThrownBy(() -> suspendAwareSseEmitterHandler.getSuspendOrThrow(1L))
+            .isInstanceOf(IllegalStateException.class);
+        assertThat(beforeSuspendInvocations).isEmpty();
+    }
+
+    @Test
+    void testWithBeforeSuspendPropagatesTheConsumerFailure() {
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        when(actionContext.getSuspend()).thenReturn(new Suspend(Map.of("pendingToolCallId", "call_1"), null));
+
+        IllegalStateException hookException = new IllegalStateException("hook failed");
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            SseEmitter::complete, actionContext).withBeforeSuspend(suspend -> {
+                throw hookException;
+            });
+
+        suspendAwareSseEmitterHandler.handle(mock(SseEmitter.class));
+
+        assertThatThrownBy(() -> suspendAwareSseEmitterHandler.getSuspendOrThrow(1L)).isSameAs(hookException);
     }
 }

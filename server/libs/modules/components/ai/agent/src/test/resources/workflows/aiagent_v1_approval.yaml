@@ -20,4 +20,5 @@ tasks:
     - name: "requestApproval_1"
       type: "approval/v1/requestApproval"
       parameters:
+        formTitle: "Approve the refund of order 42"
         toolName: "requestApproval"

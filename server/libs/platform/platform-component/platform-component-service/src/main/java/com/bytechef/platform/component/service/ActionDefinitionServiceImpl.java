@@ -62,7 +62,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamRe
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
-import com.bytechef.platform.component.definition.SuspendUtils;
+import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.OptionsDataSourceAware;
@@ -756,29 +756,39 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             ActionContext.Suspend suspend = actionContextAware.getSuspend();
 
             if (suspend != null) {
-                Optional<BeforeSuspendConsumer> beforeSuspendOptional = actionDefinition.getBeforeSuspend();
+                invokeBeforeSuspend(actionDefinition, actionContextAware, suspend);
 
-                String resumeUrl = actionContextAware.getResumeUrl();
+                return Objects.requireNonNull(actionContextAware.getSuspend());
+            }
 
-                if (beforeSuspendOptional.isPresent()) {
-                    try {
-                        BeforeSuspendConsumer beforeSuspendConsumer = beforeSuspendOptional.get();
-
-                        beforeSuspendConsumer.apply(
-                            resumeUrl, suspend.expiresAt(), ParametersFactory.create(suspend.continueParameters()),
-                            actionContext);
-                    } catch (Exception exception) {
-                        throw new ExecutionException(
-                            toUserFriendlyMessage(exception), exception, Map.of(),
-                            EXECUTE_PERFORM);
-                    }
-                }
-
-                return Objects.requireNonNull(SuspendUtils.finalizeSuspend(actionContextAware));
+            if (performResult instanceof SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler) {
+                return suspendAwareSseEmitterHandler.withBeforeSuspend(
+                    streamSuspend -> invokeBeforeSuspend(actionDefinition, actionContextAware, streamSuspend));
             }
         }
 
         return performResult;
+    }
+
+    private void invokeBeforeSuspend(
+        com.bytechef.component.definition.ActionDefinition actionDefinition, ActionContextAware actionContextAware,
+        ActionContext.Suspend suspend) {
+
+        Optional<BeforeSuspendConsumer> beforeSuspendOptional = actionDefinition.getBeforeSuspend();
+
+        if (beforeSuspendOptional.isEmpty()) {
+            return;
+        }
+
+        try {
+            BeforeSuspendConsumer beforeSuspendConsumer = beforeSuspendOptional.get();
+
+            beforeSuspendConsumer.apply(
+                actionContextAware.getResumeUrl(), suspend.expiresAt(),
+                ParametersFactory.create(suspend.continueParameters()), actionContextAware);
+        } catch (Exception exception) {
+            throw new ExecutionException(toUserFriendlyMessage(exception), exception, Map.of(), EXECUTE_PERFORM);
+        }
     }
 
     private Object executeSingleConnectionPerform(

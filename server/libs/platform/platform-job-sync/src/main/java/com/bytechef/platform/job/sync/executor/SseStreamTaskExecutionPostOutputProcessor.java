@@ -18,14 +18,20 @@ package com.bytechef.platform.job.sync.executor;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -33,13 +39,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Streams an action's {@link ActionDefinition.SseEmitterHandler} output to the {@code SseStreamBridge}s registered for
- * the job, and waits until the stream completes, fails or times out.
+ * the job, and waits until the stream completes or fails. The emitter has no timeout, so the wait is unbounded. Events
+ * sent while no bridge is registered are dropped, except an {@code ask_user_question} event: its send fails, so the
+ * asking tool does not wait for answers nobody can give.
  *
  * <p>
  * Returns the output unchanged when it is not an {@code SseEmitterHandler}. Otherwise, for a
  * {@link SuspendAwareSseEmitterHandler} it returns the suspend the stream recorded (or {@code null}) and throws when
- * the stream failed or timed out, so the task fails; for any other handler it returns {@code null}. It must run before
- * the suspend post-output processor, which persists the returned suspend.
+ * the stream failed, so the task fails; for any other handler it returns {@code null}. It must run before the suspend
+ * post-output processor, which needs the returned suspend as its input to record the job resume id.
  *
  * @author Ivica Cardic
  */
@@ -47,10 +55,10 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
 
     private static final Logger log = LoggerFactory.getLogger(SseStreamTaskExecutionPostOutputProcessor.class);
 
-    private final Cache<String, CopyOnWriteArrayList<com.bytechef.platform.job.sync.SseStreamBridge>> sseStreamBridges;
+    private final Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges;
 
     SseStreamTaskExecutionPostOutputProcessor(
-        Cache<String, CopyOnWriteArrayList<com.bytechef.platform.job.sync.SseStreamBridge>> sseStreamBridges) {
+        Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges) {
         this.sseStreamBridges = sseStreamBridges;
     }
 
@@ -69,69 +77,60 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
         emitter.addEventListener(payload -> {
             var sseStreamBridges = this.sseStreamBridges.getIfPresent(key);
 
-            if (sseStreamBridges != null) {
-                for (var sseStreamBridge : sseStreamBridges) {
-                    try {
-                        sseStreamBridge.onEvent(payload);
-                    } catch (Exception exception) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(exception.getMessage(), exception);
-                        }
+            if (sseStreamBridges == null || sseStreamBridges.isEmpty()) {
+                if (isAskUserQuestionEvent(payload)) {
+                    throw new IllegalStateException(
+                        "No SSE connection is registered for job " + jobId + " to receive the '" +
+                            AiAgentSseEventType.ASK_USER_QUESTION + "' event");
+                }
+
+                return;
+            }
+
+            boolean delivered = false;
+
+            for (var sseStreamBridge : sseStreamBridges) {
+                try {
+                    sseStreamBridge.onEvent(payload);
+
+                    delivered = true;
+                } catch (Exception exception) {
+                    if (log.isTraceEnabled()) {
+                        log.trace(exception.getMessage(), exception);
                     }
                 }
+            }
+
+            if (!delivered && isAskUserQuestionEvent(payload)) {
+                throw new IllegalStateException(
+                    "No SSE connection of job " + jobId + " received the '" + AiAgentSseEventType.ASK_USER_QUESTION +
+                        "' event");
             }
         });
 
         CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean streamCompleted = new AtomicBoolean();
+        AtomicBoolean streamFailed = new AtomicBoolean();
 
         emitter.addCompletionListener(() -> {
-            var sseStreamBridges = this.sseStreamBridges.getIfPresent(key);
-
-            if (sseStreamBridges != null) {
-                for (var sseStreamBridge : sseStreamBridges) {
-                    try {
-                        sseStreamBridge.onComplete();
-                    } catch (Exception exception) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            }
+            streamCompleted.set(true);
 
             latch.countDown();
         });
 
         emitter.addErrorListener(throwable -> {
-            var sseStreamBridges = this.sseStreamBridges.getIfPresent(key);
+            streamFailed.set(true);
 
-            if (sseStreamBridges != null) {
-                for (var sseStreamBridge : sseStreamBridges) {
-                    try {
-                        sseStreamBridge.onError(throwable);
-                    } catch (Exception exception) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            }
+            notifySseStreamBridges(key, sseStreamBridge -> sseStreamBridge.onError(throwable));
         });
 
         emitter.addTimeoutListener(() -> {
-            var sseStreamBridges = this.sseStreamBridges.getIfPresent(key);
+            streamFailed.set(true);
 
-            if (sseStreamBridges != null) {
-                for (var sseStreamBridge : sseStreamBridges) {
-                    try {
-                        sseStreamBridge.onError(new TimeoutException("SSE stream timed out for job " + jobId));
-                    } catch (Exception exception) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            }
+            notifySseStreamBridges(
+                key,
+                sseStreamBridge -> sseStreamBridge.onError(
+                    new TimeoutException("SSE stream timed out for job " + jobId)));
 
             latch.countDown();
         });
@@ -156,10 +155,49 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
             thread.interrupt();
         }
 
+        Suspend suspend = null;
+
         if (output instanceof SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler) {
-            return suspendAwareSseEmitterHandler.getSuspendOrThrow(jobId);
+            try {
+                suspend = suspendAwareSseEmitterHandler.getSuspendOrThrow(jobId);
+            } catch (RuntimeException exception) {
+                if (!streamFailed.get()) {
+                    notifySseStreamBridges(key, sseStreamBridge -> sseStreamBridge.onError(exception));
+                }
+
+                throw exception;
+            }
         }
 
-        return null;
+        if (suspend != null) {
+            notifySseStreamBridges(key, SseStreamBridge::onSuspend);
+        } else if (streamCompleted.get() && !streamFailed.get()) {
+            notifySseStreamBridges(key, SseStreamBridge::onComplete);
+        }
+
+        return suspend;
+    }
+
+    private void notifySseStreamBridges(String key, Consumer<SseStreamBridge> sseStreamBridgeConsumer) {
+        var sseStreamBridges = this.sseStreamBridges.getIfPresent(key);
+
+        if (sseStreamBridges == null) {
+            return;
+        }
+
+        for (var sseStreamBridge : sseStreamBridges) {
+            try {
+                sseStreamBridgeConsumer.accept(sseStreamBridge);
+            } catch (Exception exception) {
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
+                }
+            }
+        }
+    }
+
+    private static boolean isAskUserQuestionEvent(@Nullable Object payload) {
+        return payload instanceof Map<?, ?> map &&
+            AiAgentSseEventType.ASK_USER_QUESTION.equals(map.get(AiAgentSseEventType.EVENT_TYPE));
     }
 }

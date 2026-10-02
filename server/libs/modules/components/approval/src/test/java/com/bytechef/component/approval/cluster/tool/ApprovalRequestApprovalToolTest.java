@@ -93,7 +93,7 @@ class ApprovalRequestApprovalToolTest {
             inputParameters, connectionParameters, extensions, Map.of(), clusterElementContextAware);
 
         assertTrue(
-            ToolSuspension.isSuspendedToolResult((String) result),
+            ToolSuspension.isSuspendedToolResult((String) result, suspendReference.get()),
             "Tool must return the suspended tool result so the agent loop can pair it with the pending tool call id.");
 
         verify(clusterElementContextAware, times(1)).toActionContext("approval", 1, "requestApproval", null);

@@ -31,7 +31,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.ComponentConnection;
@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
@@ -163,6 +164,10 @@ final class AiAgentResumeTestSupport {
     }
 
     static Parameters createExtensions(boolean withChatMemory) {
+        return createExtensions(withChatMemory, false);
+    }
+
+    static Parameters createExtensions(boolean withChatMemory, boolean withGuardrail) {
         Map<String, Object> modelElementMap = new HashMap<>();
 
         modelElementMap.put("name", "model_1");
@@ -188,6 +193,16 @@ final class AiAgentResumeTestSupport {
             chatMemoryElementMap.put("parameters", Map.of("conversationId", CONVERSATION_ID));
 
             clusterElements.put("chatMemory", chatMemoryElementMap);
+        }
+
+        if (withGuardrail) {
+            Map<String, Object> guardrailElementMap = new HashMap<>();
+
+            guardrailElementMap.put("name", "guardrail_1");
+            guardrailElementMap.put("type", "testComponent/v1/testGuardrail");
+            guardrailElementMap.put("parameters", Map.of());
+
+            clusterElements.put("guardrails", List.of(guardrailElementMap));
         }
 
         return MockParametersFactory.create(Map.of("clusterElements", clusterElements));
@@ -288,14 +303,6 @@ final class AiAgentResumeTestSupport {
         return lastToolResponseMessage;
     }
 
-    static String suspendedToolResult() {
-        ActionContextAware actionContext = mock(ActionContextAware.class);
-
-        when(actionContext.getSuspend()).thenReturn(new ActionContext.Suspend(Map.of(), Instant.now()));
-
-        return ToolSuspension.suspendedToolResult(actionContext);
-    }
-
     private static ToolCallbackProvider createToolCallbackProvider() {
         ToolDefinition suspendingToolDefinition = createToolDefinition(SUSPENDING_TOOL_NAME);
 
@@ -317,9 +324,9 @@ final class AiAgentResumeTestSupport {
                     throw new UnsupportedOperationException("must be called with ToolContext");
                 }
 
-                Map<String, Object> toolContextMap = toolContext.getContext();
+                AiAgentToolContext aiAgentToolContext = Objects.requireNonNull(AiAgentToolContext.fetch(toolContext));
 
-                ActionContext actionContext = (ActionContext) toolContextMap.get(AiAgentToolContextKey.ACTION_CONTEXT);
+                ActionContext actionContext = aiAgentToolContext.actionContext();
 
                 actionContext.suspend(
                     new ActionContext.Suspend(
@@ -383,9 +390,9 @@ final class AiAgentResumeTestSupport {
                     throw new UnsupportedOperationException("must be called with ToolContext");
                 }
 
-                Map<String, Object> toolContextMap = toolContext.getContext();
+                AiAgentToolContext aiAgentToolContext = Objects.requireNonNull(AiAgentToolContext.fetch(toolContext));
 
-                ActionContext actionContext = (ActionContext) toolContextMap.get(AiAgentToolContextKey.ACTION_CONTEXT);
+                ActionContext actionContext = aiAgentToolContext.actionContext();
 
                 actionContext.suspend(
                     new ActionContext.Suspend(

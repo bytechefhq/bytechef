@@ -17,21 +17,46 @@
 package com.bytechef.component.ai.agent.tool;
 
 import com.bytechef.platform.ai.tool.ToolSuspension;
+import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolResponses;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 
 /**
  * @author Ivica Cardic
  */
-public record AgentToolSuspension(ConversationState conversation, String pendingToolCallId) {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record AgentToolSuspension(
+    ConversationState conversation, String pendingToolCallId, String suspendedToolResult) {
 
     public static final String CONTINUE_PARAMETER_KEY = "__bytechef_agent_tool_suspension__";
 
+    public AgentToolSuspension {
+        Objects.requireNonNull(conversation, "The stored agent tool suspension has no conversation");
+        Objects.requireNonNull(pendingToolCallId, "The stored agent tool suspension has no pending tool call id");
+        Objects.requireNonNull(
+            suspendedToolResult, "The stored agent tool suspension has no suspended tool result");
+
+        int suspendedResponseCount = countSuspendedResponses(conversation, pendingToolCallId, suspendedToolResult);
+
+        if (suspendedResponseCount == 0) {
+            throw new IllegalArgumentException(
+                "No suspended tool response with id '" + pendingToolCallId + "' found in the stored conversation. " +
+                    "Continuing would send the model the suspended tool result instead of the human's answer.");
+        }
+
+        if (suspendedResponseCount > 1) {
+            throw new IllegalArgumentException(
+                "Found " + suspendedResponseCount + " suspended tool responses with id '" + pendingToolCallId +
+                    "' in the stored conversation, so the human's answer cannot be matched to a single tool call.");
+        }
+    }
+
     public List<Message> resumeConversation(String toolResult) {
         List<Message> messages = new ArrayList<>();
-        int patchedCount = 0;
 
         for (Message message : conversation.toMessages()) {
             if (!(message instanceof ToolResponseMessage toolResponseMessage)) {
@@ -41,39 +66,56 @@ public record AgentToolSuspension(ConversationState conversation, String pending
             }
 
             List<ToolResponseMessage.ToolResponse> responses = new ArrayList<>();
+            boolean carriesHumanResponse = false;
 
             for (ToolResponseMessage.ToolResponse toolResponse : toolResponseMessage.getResponses()) {
                 if (pendingToolCallId.equals(toolResponse.id()) &&
-                    ToolSuspension.isSuspendedToolResult(toolResponse.responseData())) {
+                    ToolSuspension.isSuspendedToolResult(toolResponse.responseData(), suspendedToolResult)) {
+
+                    carriesHumanResponse = true;
 
                     responses
                         .add(new ToolResponseMessage.ToolResponse(toolResponse.id(), toolResponse.name(), toolResult));
-
-                    patchedCount++;
                 } else {
                     responses.add(toolResponse);
                 }
             }
 
-            messages.add(
-                ToolResponseMessage.builder()
-                    .responses(responses)
-                    .metadata(toolResponseMessage.getMetadata())
-                    .build());
-        }
+            ToolResponseMessage patchedToolResponseMessage = ToolResponseMessage.builder()
+                .responses(responses)
+                .metadata(toolResponseMessage.getMetadata())
+                .build();
 
-        if (patchedCount == 0) {
-            throw new IllegalStateException(
-                "No suspended tool response with id '" + pendingToolCallId + "' found in the stored conversation. " +
-                    "Continuing would send the model the suspended tool result instead of the human's answer.");
-        }
+            if (carriesHumanResponse) {
+                patchedToolResponseMessage = HumanToolResponses.markHumanResponse(
+                    patchedToolResponseMessage, pendingToolCallId);
+            }
 
-        if (patchedCount > 1) {
-            throw new IllegalStateException(
-                "Found " + patchedCount + " suspended tool responses with id '" + pendingToolCallId + "' in the " +
-                    "stored conversation, so the human's answer cannot be matched to a single tool call.");
+            messages.add(patchedToolResponseMessage);
         }
 
         return messages;
+    }
+
+    private static int countSuspendedResponses(
+        ConversationState conversation, String pendingToolCallId, String suspendedToolResult) {
+
+        int suspendedResponseCount = 0;
+
+        for (ConversationState.Entry entry : conversation.messages()) {
+            if (!(entry instanceof ConversationState.ToolEntry toolEntry)) {
+                continue;
+            }
+
+            for (ConversationState.ToolResponseEntry toolResponseEntry : toolEntry.toolResponses()) {
+                if (pendingToolCallId.equals(toolResponseEntry.id()) &&
+                    ToolSuspension.isSuspendedToolResult(toolResponseEntry.responseData(), suspendedToolResult)) {
+
+                    suspendedResponseCount++;
+                }
+            }
+        }
+
+        return suspendedResponseCount;
     }
 }

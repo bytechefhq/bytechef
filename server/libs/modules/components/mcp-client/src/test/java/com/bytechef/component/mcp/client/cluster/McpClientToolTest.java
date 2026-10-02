@@ -24,18 +24,18 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.mcp.client.util.McpClientUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.spec.McpSchema;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -95,12 +95,7 @@ class McpClientToolTest {
 
         toolCallbacks[0].call(
             "{}",
-            new ToolContext(
-                Map.of(
-                    ChatMemory.CONVERSATION_ID, "conversation-1", "tenantHint", "tenant-1",
-                    AiAgentToolContextKey.ACTION_CONTEXT, new Object(),
-                    AiAgentToolContextKey.SSE_EMITTER_REFERENCE, new AtomicReference<>(),
-                    AiAgentToolContextKey.SSE_BUFFERED_EVENTS, new ConcurrentLinkedQueue<>())));
+            new ToolContext(createToolContext()));
 
         ArgumentCaptor<McpSchema.CallToolRequest> callToolRequestArgumentCaptor = ArgumentCaptor.forClass(
             McpSchema.CallToolRequest.class);
@@ -110,9 +105,17 @@ class McpClientToolTest {
         McpSchema.CallToolRequest callToolRequest = callToolRequestArgumentCaptor.getValue();
 
         assertThat(callToolRequest.meta())
-            .doesNotContainKeys(
-                ChatMemory.CONVERSATION_ID, AiAgentToolContextKey.ACTION_CONTEXT,
-                AiAgentToolContextKey.SSE_EMITTER_REFERENCE, AiAgentToolContextKey.SSE_BUFFERED_EVENTS)
+            .doesNotContainKeys(ChatMemory.CONVERSATION_ID, AiAgentToolContext.KEY)
             .containsEntry("tenantHint", "tenant-1");
+    }
+
+    private static Map<String, Object> createToolContext() {
+        Map<String, Object> toolContext = new HashMap<>(
+            new AiAgentToolContext(mock(ActionContext.class), new AiAgentToolContext.SseTransport()).toMap());
+
+        toolContext.put(ChatMemory.CONVERSATION_ID, "conversation-1");
+        toolContext.put("tenantHint", "tenant-1");
+
+        return toolContext;
     }
 }

@@ -49,7 +49,8 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
-import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.tool.AiAgentToolContext;
+import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -275,6 +276,12 @@ public abstract class AbstractAiAgentChatAction {
 
                 AgentThinking agentThinking = thinkingReference.getAndSet(null);
 
+                if (context instanceof ActionContextAware actionContextAware &&
+                    ToolSuspension.isSuspendedToolResult(result, actionContextAware.getSuspend())) {
+
+                    return result;
+                }
+
                 try {
                     toolExecutionListener.onToolExecution(
                         new ToolExecutionEvent(
@@ -303,7 +310,7 @@ public abstract class AbstractAiAgentChatAction {
 
         applyStructuredOutputValidation(chatClientRequestSpec, inputParameters, context);
 
-        chatClientRequestSpec.toolContext(Map.of(AiAgentToolContextKey.ACTION_CONTEXT, context));
+        chatClientRequestSpec.toolContext(new AiAgentToolContext(context).toMap());
 
         return ModelUtils.getChatActionResult(chatClientRequestSpec.call(), inputParameters, context);
     }
@@ -313,8 +320,18 @@ public abstract class AbstractAiAgentChatAction {
         Parameters continueParameters, Parameters data, @Nullable ToolExecutionListener toolExecutionListener,
         ActionContext context) throws Exception {
 
-        AgentToolSuspension agentToolSuspension = continueParameters.get(
-            AgentToolSuspension.CONTINUE_PARAMETER_KEY, AgentToolSuspension.class);
+        AgentToolSuspension agentToolSuspension;
+
+        try {
+            agentToolSuspension = continueParameters.get(
+                AgentToolSuspension.CONTINUE_PARAMETER_KEY, AgentToolSuspension.class);
+        } catch (RuntimeException exception) {
+            throw new IllegalStateException(
+                "The resumed task's stored agent conversation (continue parameter '" +
+                    AgentToolSuspension.CONTINUE_PARAMETER_KEY + "') could not be read, so the agent's tool-calling " +
+                    "loop cannot continue. It was most likely stored by a different version of the agent.",
+                exception);
+        }
 
         if (agentToolSuspension == null) {
             throw new IllegalStateException(
@@ -453,8 +470,9 @@ public abstract class AbstractAiAgentChatAction {
         // memory
 
         chatMemoryResult
-            .map(result -> resumedTurn && !result.supportsToolMessagePersistence()
-                ? getResumedTurnChatMemoryAdvisor(result) : result.advisor())
+            .map(result -> result.supportsToolMessagePersistence() ? result.advisor()
+                : resumedTurn ? getResumedTurnChatMemoryAdvisor(result)
+                    : new BlankReplySkippingChatMemoryAdvisor(result.advisor()))
             .ifPresent(advisors::add);
 
         // tool call

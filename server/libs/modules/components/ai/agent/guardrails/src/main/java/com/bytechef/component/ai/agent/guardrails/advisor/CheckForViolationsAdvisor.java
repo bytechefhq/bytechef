@@ -31,6 +31,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailStage;
+import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolResponses;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.MaskResult;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.PreflightMasking;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
@@ -60,7 +61,8 @@ import reactor.core.publisher.Flux;
 /**
  * Spring-AI advisor that runs every configured guardrail check over the user prompt (gated by {@code validateInput})
  * and the model response (gated by {@code validateOutput}). Aggregates violations; returns a blocked response when any
- * check fires. Any exception escaping a check becomes a fail-closed execution-failure violation.
+ * check fires. Any exception escaping a check becomes a fail-closed execution-failure violation. Input checks also
+ * cover a tool response that carries a human's answer (see {@code HumanToolResponses}), treated like a user prompt.
  *
  * <p>
  * Streaming: {@link #adviseStream} runs only PREFLIGHT (rule-based) output checks per chunk; chunks already shipped
@@ -195,7 +197,8 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
         List<Violation> aggregated = new ArrayList<>();
         MaskEntityMapUtils maskEntities = new MaskEntityMapUtils(context);
 
-        // Stage 1: PREFLIGHT (rule-based) — runs against the progressively-mutated user text and may mask.
+        // Stage 1: PREFLIGHT (rule-based) — runs against the progressively-mutated user text (including human answers)
+        // and may mask.
         for (CheckEntry entry : checkEntries) {
             if (entry.function.stage() != GuardrailStage.PREFLIGHT || !shouldRun(entry, VALIDATE_INPUT)) {
                 continue;
@@ -471,11 +474,13 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
         StringBuilder sb = new StringBuilder();
 
         for (Message message : messages) {
-            if (message.getMessageType() != MessageType.USER) {
-                continue;
-            }
+            String text;
 
-            String text = message.getText();
+            if (message.getMessageType() == MessageType.USER) {
+                text = message.getText();
+            } else {
+                text = HumanToolResponses.getHumanResponseText(message);
+            }
 
             if (text == null || text.isEmpty()) {
                 continue;

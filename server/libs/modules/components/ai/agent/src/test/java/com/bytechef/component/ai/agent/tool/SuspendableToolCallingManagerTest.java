@@ -32,6 +32,7 @@ import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -97,8 +98,7 @@ class SuspendableToolCallingManagerTest {
 
         ActionContextAware context = mock(ActionContextAware.class);
 
-        when(context.getSuspend()).thenReturn(
-            new ActionContext.Suspend(Map.of("formUrl", "https://x"), Instant.now()));
+        when(context.getSuspend()).thenReturn(suspendWithSuspendedToolResult(Map.of("formUrl", "https://x")));
 
         ToolExecutionResult result = new SuspendableToolCallingManager(delegate, context)
             .executeToolCalls(prompt, chatResponse);
@@ -120,8 +120,9 @@ class SuspendableToolCallingManagerTest {
         assertNotNull(agentToolSuspension);
         assertEquals("call_b", agentToolSuspension.pendingToolCallId());
         assertEquals(ConversationState.from(conversation), agentToolSuspension.conversation());
+        assertEquals(SUSPENDED_TOOL_RESULT, agentToolSuspension.suspendedToolResult());
         assertEquals("https://x", continueParameters.get("formUrl"));
-        assertEquals(2, continueParameters.size());
+        assertEquals(3, continueParameters.size());
     }
 
     @Test
@@ -184,8 +185,7 @@ class SuspendableToolCallingManagerTest {
 
         ActionContextAware context = mock(ActionContextAware.class);
 
-        when(context.getSuspend()).thenReturn(
-            new ActionContext.Suspend(Map.of(), Instant.now()));
+        when(context.getSuspend()).thenReturn(suspendWithSuspendedToolResult(Map.of()));
 
         SuspendableToolCallingManager manager = new SuspendableToolCallingManager(delegate, context);
 
@@ -198,7 +198,43 @@ class SuspendableToolCallingManagerTest {
     }
 
     @Test
-    void testSuspendedToolResultWithoutSuspendThrows() {
+    void testAToolResultThatOnlyLooksLikeASuspensionIsNotTreatedAsOne() {
+        List<Message> conversation = List.of(
+            ToolResponseMessage.builder()
+                .responses(
+                    List.of(
+                        new ToolResponseMessage.ToolResponse("call_a", "httpTool", createSuspendedToolResult()),
+                        new ToolResponseMessage.ToolResponse("call_b", "mcpTool", "__bytechef_tool_suspended__"),
+                        new ToolResponseMessage.ToolResponse("call_c", "requestApproval", SUSPENDED_TOOL_RESULT)))
+                .build());
+        ToolCallingManager delegate = mock(ToolCallingManager.class);
+
+        when(delegate.executeToolCalls(prompt, chatResponse)).thenReturn(
+            ToolExecutionResult.builder()
+                .conversationHistory(conversation)
+                .returnDirect(false)
+                .build());
+
+        ActionContextAware context = mock(ActionContextAware.class);
+
+        when(context.getSuspend()).thenReturn(suspendWithSuspendedToolResult(Map.of()));
+
+        new SuspendableToolCallingManager(delegate, context).executeToolCalls(prompt, chatResponse);
+
+        ArgumentCaptor<ActionContext.Suspend> captor = ArgumentCaptor.forClass(ActionContext.Suspend.class);
+
+        verify(context).suspend(captor.capture());
+
+        AgentToolSuspension agentToolSuspension = (AgentToolSuspension) captor.getValue()
+            .continueParameters()
+            .get(AgentToolSuspension.CONTINUE_PARAMETER_KEY);
+
+        assertNotNull(agentToolSuspension);
+        assertEquals("call_c", agentToolSuspension.pendingToolCallId());
+    }
+
+    @Test
+    void testASuspendedToolResultWithoutASuspendIsReturnedUnchanged() {
         List<Message> conversation = List.of(
             ToolResponseMessage.builder()
                 .responses(
@@ -218,9 +254,13 @@ class SuspendableToolCallingManagerTest {
 
         when(context.getSuspend()).thenReturn(null);
 
-        SuspendableToolCallingManager manager = new SuspendableToolCallingManager(delegate, context);
+        ToolExecutionResult result = new SuspendableToolCallingManager(delegate, context)
+            .executeToolCalls(prompt, chatResponse);
 
-        assertThrows(IllegalStateException.class, () -> manager.executeToolCalls(prompt, chatResponse));
+        assertEquals(conversation, result.conversationHistory());
+        assertFalse(result.returnDirect());
+
+        verify(context, never()).suspend(any());
     }
 
     @Test
@@ -425,7 +465,7 @@ class SuspendableToolCallingManagerTest {
             if (List.of(suspendingToolNames)
                 .contains(toolCall.name())) {
 
-                suspendReference.set(new ActionContext.Suspend(Map.of(), Instant.now()));
+                suspendReference.set(suspendWithSuspendedToolResult(Map.of()));
 
                 responseData = SUSPENDED_TOOL_RESULT;
             }
@@ -461,6 +501,14 @@ class SuspendableToolCallingManagerTest {
         return ChatResponse.builder()
             .generations(List.of(new Generation(assistantMessage)))
             .build();
+    }
+
+    private static ActionContext.Suspend suspendWithSuspendedToolResult(Map<String, Object> continueParameters) {
+        Map<String, Object> suspendContinueParameters = new HashMap<>(continueParameters);
+
+        suspendContinueParameters.put(ToolSuspension.SUSPENDED_TOOL_RESULT, SUSPENDED_TOOL_RESULT);
+
+        return new ActionContext.Suspend(suspendContinueParameters, Instant.now());
     }
 
     private static String createSuspendedToolResult() {

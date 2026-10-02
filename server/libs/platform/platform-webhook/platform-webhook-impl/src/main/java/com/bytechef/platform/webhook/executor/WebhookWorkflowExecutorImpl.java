@@ -55,19 +55,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
  */
 public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
-
-    private static final Logger log = LoggerFactory.getLogger(WebhookWorkflowExecutorImpl.class);
 
     private static final String TIMEOUT = "timeout";
 
@@ -136,19 +133,12 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
         sseStreamBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", String.valueOf(jobId))));
 
-        CompletableFuture<Void> completion = registration.completion();
+        CompletionStage<Void> completion = registration.completion();
 
-        return completion.whenComplete((result, throwable) -> {
-            try {
-                AutoCloseable handle = registration.handle();
+        CompletionStage<Void> closedCompletion = completion.whenComplete(
+            (result, throwable) -> registration.close());
 
-                handle.close();
-            } catch (Exception exception) {
-                if (log.isTraceEnabled()) {
-                    log.trace(exception.getMessage(), exception);
-                }
-            }
-        });
+        return closedCompletion.toCompletableFuture();
     }
 
     @Override

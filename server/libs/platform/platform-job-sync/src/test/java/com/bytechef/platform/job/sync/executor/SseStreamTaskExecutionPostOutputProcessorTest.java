@@ -18,18 +18,19 @@ package com.bytechef.platform.job.sync.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.component.definition.ActionContext.Suspend;
-import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.job.sync.SseStreamBridge;
-import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -67,11 +68,10 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
     }
 
     @Test
-    void testProcessWithSuspendAwareSseEmitterHandlerReturnsTheFinalizedSuspend() {
+    void testProcessWithSuspendAwareSseEmitterHandlerReturnsTheRecordedSuspend() {
         ActionContextAware actionContextAware = mock(ActionContextAware.class);
 
         when(actionContextAware.getSuspend()).thenReturn(new Suspend(Map.of("pendingToolCallId", "call_1"), null));
-        when(actionContextAware.getJobResumeId()).thenReturn("jobResumeId");
 
         SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
             emitter -> {
@@ -89,10 +89,30 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
         Map<String, ?> continueParameters = suspend.continueParameters();
 
         assertThat(continueParameters.get("pendingToolCallId")).isEqualTo("call_1");
-        assertThat(continueParameters.get(MetadataConstants.JOB_RESUME_ID)).isEqualTo("jobResumeId");
 
         verify(sseStreamBridge).onEvent("question");
+        verify(sseStreamBridge).onSuspend();
+        verify(sseStreamBridge, never()).onComplete();
+    }
+
+    @Test
+    void testProcessWithSuspendAwareSseEmitterHandlerCompletesTheBridgeWhenTheStreamDoesNotSuspend() {
+        ActionContextAware actionContextAware = mock(ActionContextAware.class);
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            emitter -> {
+                emitter.send("answer");
+                emitter.complete();
+            },
+            actionContextAware);
+
+        Object result = processor.process(createTaskExecution(), suspendAwareSseEmitterHandler);
+
+        assertThat(result).isNull();
+
+        verify(sseStreamBridge).onEvent("answer");
         verify(sseStreamBridge).onComplete();
+        verify(sseStreamBridge, never()).onSuspend();
     }
 
     @Test
@@ -113,6 +133,158 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
             .hasCause(streamException);
 
         verify(sseStreamBridge).onError(streamException);
+        verify(sseStreamBridge, never()).onComplete();
+    }
+
+    @Test
+    void testProcessWithAFailedStreamReportsOnlyTheError() {
+        RuntimeException streamException = new RuntimeException("agent failed");
+
+        ActionDefinition.SseEmitterHandler sseEmitterHandler = emitter -> {
+            emitter.send("chunk");
+            emitter.error(streamException);
+        };
+
+        Object result = processor.process(createTaskExecution(), sseEmitterHandler);
+
+        assertThat(result).isNull();
+
+        verify(sseStreamBridge).onEvent("chunk");
+        verify(sseStreamBridge).onError(streamException);
+        verify(sseStreamBridge, never()).onComplete();
+        verify(sseStreamBridge, never()).onSuspend();
+    }
+
+    @Test
+    void testSendOfAnAskUserQuestionEventFailsWhenNoBridgeIsRegistered() {
+        sseStreamBridges.invalidateAll();
+
+        List<Exception> sendFailures = new CopyOnWriteArrayList<>();
+
+        processor.process(
+            createTaskExecution(), (ActionDefinition.SseEmitterHandler) emitter -> {
+                try {
+                    emitter.send(
+                        Map.of(AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.ASK_USER_QUESTION, "questions",
+                            List.of()));
+                } catch (Exception exception) {
+                    sendFailures.add(exception);
+                }
+
+                emitter.complete();
+            });
+
+        assertThat(sendFailures).hasSize(1);
+    }
+
+    @Test
+    void testSendOfAnOrdinaryEventSucceedsWhenNoBridgeIsRegistered() {
+        sseStreamBridges.invalidateAll();
+
+        List<Exception> sendFailures = new CopyOnWriteArrayList<>();
+
+        processor.process(
+            createTaskExecution(), (ActionDefinition.SseEmitterHandler) emitter -> {
+                try {
+                    emitter.send("chunk");
+                } catch (Exception exception) {
+                    sendFailures.add(exception);
+                }
+
+                emitter.complete();
+            });
+
+        assertThat(sendFailures).isEmpty();
+    }
+
+    @Test
+    void testSendOfAnAskUserQuestionEventReachesTheRegisteredBridge() {
+        Map<String, Object> questionEvent = Map.of(
+            AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.ASK_USER_QUESTION, "questions", List.of());
+
+        processor.process(
+            createTaskExecution(), (ActionDefinition.SseEmitterHandler) emitter -> {
+                emitter.send(questionEvent);
+                emitter.complete();
+            });
+
+        verify(sseStreamBridge).onEvent(questionEvent);
+    }
+
+    @Test
+    void testSendOfAnAskUserQuestionEventFailsWhenNoRegisteredBridgeDeliversIt() {
+        Map<String, Object> questionEvent = Map.of(
+            AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.ASK_USER_QUESTION, "questions", List.of());
+
+        doThrow(new IllegalStateException("not delivered")).when(sseStreamBridge)
+            .onEvent(questionEvent);
+
+        List<Exception> sendFailures = new CopyOnWriteArrayList<>();
+
+        processor.process(
+            createTaskExecution(), (ActionDefinition.SseEmitterHandler) emitter -> {
+                try {
+                    emitter.send(questionEvent);
+                } catch (Exception exception) {
+                    sendFailures.add(exception);
+                }
+
+                emitter.complete();
+            });
+
+        assertThat(sendFailures).hasSize(1);
+    }
+
+    @Test
+    void testSendOfAnAskUserQuestionEventSucceedsWhenOneOfTheRegisteredBridgesDeliversIt() {
+        Map<String, Object> questionEvent = Map.of(
+            AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.ASK_USER_QUESTION, "questions", List.of());
+        SseStreamBridge failingSseStreamBridge = mock(SseStreamBridge.class);
+
+        doThrow(new IllegalStateException("not delivered")).when(failingSseStreamBridge)
+            .onEvent(questionEvent);
+
+        sseStreamBridges.put(
+            TenantCacheKeyUtils.getKey(JOB_ID),
+            new CopyOnWriteArrayList<>(List.of(failingSseStreamBridge, sseStreamBridge)));
+
+        List<Exception> sendFailures = new CopyOnWriteArrayList<>();
+
+        processor.process(
+            createTaskExecution(), (ActionDefinition.SseEmitterHandler) emitter -> {
+                try {
+                    emitter.send(questionEvent);
+                } catch (Exception exception) {
+                    sendFailures.add(exception);
+                }
+
+                emitter.complete();
+            });
+
+        assertThat(sendFailures).isEmpty();
+
+        verify(sseStreamBridge).onEvent(questionEvent);
+    }
+
+    @Test
+    void testSendOfAnOrdinaryEventSucceedsWhenTheRegisteredBridgeFails() {
+        doThrow(new IllegalStateException("not delivered")).when(sseStreamBridge)
+            .onEvent("chunk");
+
+        List<Exception> sendFailures = new CopyOnWriteArrayList<>();
+
+        processor.process(
+            createTaskExecution(), (ActionDefinition.SseEmitterHandler) emitter -> {
+                try {
+                    emitter.send("chunk");
+                } catch (Exception exception) {
+                    sendFailures.add(exception);
+                }
+
+                emitter.complete();
+            });
+
+        assertThat(sendFailures).isEmpty();
     }
 
     @Test
@@ -122,20 +294,6 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
         assertThat(result).isEqualTo("hello");
     }
 
-    @Test
-    void testCreateTaskExecutionPostOutputProcessorsRunsSseStreamBeforeSuspend() {
-        List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors =
-            JobSyncExecutor.createTaskExecutionPostOutputProcessors(sseStreamBridges);
-
-        int sseStreamIndex = indexOf(
-            taskExecutionPostOutputProcessors, SseStreamTaskExecutionPostOutputProcessor.class);
-        int suspendIndex = indexOf(taskExecutionPostOutputProcessors, SuspendTaskExecutionPostOutputProcessor.class);
-
-        assertThat(sseStreamIndex).isNotNegative();
-        assertThat(suspendIndex).isNotNegative();
-        assertThat(sseStreamIndex).isLessThan(suspendIndex);
-    }
-
     private static TaskExecution createTaskExecution() {
         TaskExecution taskExecution = TaskExecution.builder()
             .build();
@@ -143,17 +301,5 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
         taskExecution.setJobId(JOB_ID);
 
         return taskExecution;
-    }
-
-    private static int indexOf(
-        List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors, Class<?> processorClass) {
-
-        for (int index = 0; index < taskExecutionPostOutputProcessors.size(); index++) {
-            if (processorClass.isInstance(taskExecutionPostOutputProcessors.get(index))) {
-                return index;
-            }
-        }
-
-        return -1;
     }
 }
