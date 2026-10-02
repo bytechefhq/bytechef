@@ -1,15 +1,8 @@
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectSeparator,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/Select/Select';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import FilterableSelect from '@/components/FilterableSelect/FilterableSelect';
 import {Project} from '@/shared/middleware/automation/configuration';
-import {useCallback} from 'react';
+import {useMemo} from 'react';
+
+const ALL_PROJECTS_VALUE = '0';
 
 interface ProjectSelectProps {
     projectId: number;
@@ -19,73 +12,35 @@ interface ProjectSelectProps {
 }
 
 const ProjectSelect = ({projectId, projects, selectedProjectId, setSelectedProjectId}: ProjectSelectProps) => {
-    const getProjectName = useCallback(
-        (projectId: number) => {
-            const project = projects.find((project) => project.id === projectId);
-
-            return project ? project.name : '';
-        },
+    const items = useMemo(
+        () => projects.map((project) => ({label: project.name!, value: project.id!.toString()})),
         [projects]
     );
 
-    const currentProjectName = getProjectName(selectedProjectId);
+    const pinnedItems = useMemo(
+        () => [
+            {label: 'Current project', value: projectId.toString()},
+            {label: 'All projects', value: ALL_PROJECTS_VALUE},
+        ],
+        [projectId]
+    );
+
+    const selectedProject = projects.find((project) => project.id === selectedProjectId);
+    const currentProjectName = selectedProject ? selectedProject.name! : '';
+    const showsCurrentProject = selectedProjectId === projectId;
 
     return (
-        <Select
-            defaultValue={projectId.toString()}
+        <FilterableSelect
+            ariaLabel="Select project"
+            emptyMessage="No projects found."
+            items={items}
             onValueChange={(value) => setSelectedProjectId(+value)}
+            pinnedItems={pinnedItems}
+            searchPlaceholder="Search projects..."
+            tooltip={!showsCurrentProject && currentProjectName.length > 42 ? currentProjectName : undefined}
+            triggerLabel={showsCurrentProject ? 'Current project' : currentProjectName || 'All projects'}
             value={selectedProjectId.toString()}
-        >
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <SelectTrigger
-                        aria-label="Select project"
-                        className="w-full border-stroke-neutral-secondary bg-background px-3 py-2 shadow-none hover:bg-surface-neutral-primary-hover [&>span]:line-clamp-0 [&>span]:truncate [&>svg]:min-w-4"
-                    >
-                        <SelectValue placeholder="Select a project">
-                            {selectedProjectId === projectId ? 'Current project' : currentProjectName || 'All projects'}
-                        </SelectValue>
-                    </SelectTrigger>
-                </TooltipTrigger>
-
-                {selectedProjectId !== projectId && currentProjectName.length > 42 && (
-                    <TooltipContent>{currentProjectName}</TooltipContent>
-                )}
-            </Tooltip>
-
-            <SelectContent className="w-full">
-                <SelectItem
-                    className="cursor-pointer rounded-none hover:bg-surface-neutral-primary-hover [&>span]:truncate"
-                    value={projectId.toString()}
-                >
-                    Current project
-                </SelectItem>
-
-                <SelectItem
-                    className="cursor-pointer rounded-none hover:bg-surface-neutral-primary-hover data-[state=checked]:bg-surface-brand-secondary [&>span]:truncate"
-                    value="0"
-                >
-                    All projects
-                </SelectItem>
-
-                <SelectSeparator />
-
-                {projects && (
-                    <SelectGroup>
-                        {projects.map((project) => (
-                            <SelectItem
-                                className="cursor-pointer overflow-hidden rounded-none hover:bg-surface-neutral-primary-hover [&>span]:truncate"
-                                key={project.id!}
-                                title={project.name!.length > 40 ? project.name! : undefined}
-                                value={project.id!.toString()}
-                            >
-                                {project.name!}
-                            </SelectItem>
-                        ))}
-                    </SelectGroup>
-                )}
-            </SelectContent>
-        </Select>
+        />
     );
 };
 
