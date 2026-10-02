@@ -39,6 +39,11 @@ public class CustomComponentFileStorageImpl implements CustomComponentFileStorag
     }
 
     @Override
+    public String readCustomComponentFileContent(FileEntry componentFile) {
+        return fileStorageService.readFileToString(CUSTOM_COMPONENTS_FILES_DIR, componentFile);
+    }
+
+    @Override
     public FileEntry storeCustomComponentFile(String filename, byte[] bytes) {
         return fileStorageService.storeFileContent(CUSTOM_COMPONENTS_FILES_DIR, filename, bytes);
     }
