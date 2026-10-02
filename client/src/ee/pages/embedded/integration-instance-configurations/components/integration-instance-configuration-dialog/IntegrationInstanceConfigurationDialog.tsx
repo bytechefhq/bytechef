@@ -1,16 +1,16 @@
 import Button from '@/components/Button/Button';
-import LoadingDots from '@/components/LoadingDots';
-import LoadingIcon from '@/components/LoadingIcon';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import LoadingDots from '@/components/LoadingDots';
+import LoadingIcon from '@/components/LoadingIcon';
 import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogOauth2Step from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogOauth2Step';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
@@ -375,20 +375,22 @@ const IntegrationInstanceConfigurationDialog = ({
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className={twMerge('flex flex-col')} onInteractOutside={(event) => event.preventDefault()}>
-                <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0">
-                        <div className="flex w-full flex-col space-y-1">
-                            <DialogTitle>
-                                {updateIntegrationVersion
+            <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+                <DialogMain>
+                    <Form {...form}>
+                        <DialogHeader
+                            title={
+                                updateIntegrationVersion
                                     ? 'Upgrade Integration Version'
                                     : `${integrationInstanceConfiguration?.id ? 'Edit' : 'New'} Instance Configuration ${!integrationInstanceConfiguration?.id ? '-' : ''} ${
                                           !integrationInstanceConfiguration?.id
                                               ? integrationInstanceConfigurationDialogSteps[activeStepIndex].name
                                               : ''
-                                      }`}
-                            </DialogTitle>
+                                      }`
+                            }
+                        />
 
+                        <DialogBody>
                             {!integrationInstanceConfiguration?.id &&
                                 ((workflows && workflows.length > 0) || oAuth2Authorization) && (
                                     <nav aria-label="Progress">
@@ -408,122 +410,124 @@ const IntegrationInstanceConfigurationDialog = ({
                                         </ol>
                                     </nav>
                                 )}
-                        </div>
 
-                        <DialogCloseButton />
-                    </DialogHeader>
-
-                    <WorkflowMockProvider>
-                        <div
-                            className={twMerge(
-                                ((activeStepIndex === 1 && !oAuth2Authorization) ||
-                                    (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
-                                    (activeStepIndex === 2 && oAuth2Authorization)) &&
-                                    'max-h-integration-instance-configuration-dialog-height overflow-y-auto'
-                            )}
-                        >
-                            {((activeStepIndex === 1 && !oAuth2Authorization) ||
-                                (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
-                                (activeStepIndex === 2 && oAuth2Authorization)) &&
-                            isWorkflowsPending ? (
-                                <div className="flex justify-center py-12">
-                                    <LoadingDots />
-                                </div>
-                            ) : (
-                                integrationInstanceConfigurationDialogSteps[activeStepIndex].content
-                            )}
-                        </div>
-                    </WorkflowMockProvider>
-
-                    {integrationInstanceConfiguration?.id && connectionDefinition && !updateIntegrationVersion && (
-                        <div className="py-4">
-                            <ConnectionParameters
-                                authorizationParameters={
-                                    integrationInstanceConfiguration.connectionAuthorizationParameters
-                                }
-                                authorizationType={integrationInstanceConfiguration.authorizationType}
-                                connectionDefinition={connectionDefinition}
-                                connectionParameters={integrationInstanceConfiguration.connectionConnectionParameters}
-                            />
-                        </div>
-                    )}
-
-                    <DialogFooter>
-                        {activeStepIndex === 0 && (
-                            <>
-                                <DialogClose asChild>
-                                    <Button label="Cancel" variant="outline" />
-                                </DialogClose>
-
-                                {(!integrationInstanceConfiguration?.id || updateIntegrationVersion) &&
-                                    (updateIntegrationVersion ||
-                                        oAuth2Authorization ||
-                                        workflows === undefined ||
-                                        (workflows && workflows.length > 0)) && (
-                                        <Button label="Next" onClick={handleSubmit(handleNextClick)} />
+                            <WorkflowMockProvider>
+                                <div
+                                    className={twMerge(
+                                        ((activeStepIndex === 1 && !oAuth2Authorization) ||
+                                            (activeStepIndex === 1 &&
+                                                oAuth2Authorization &&
+                                                updateIntegrationVersion) ||
+                                            (activeStepIndex === 2 && oAuth2Authorization)) &&
+                                            'max-h-integration-instance-configuration-dialog-height overflow-y-auto'
                                     )}
+                                >
+                                    {((activeStepIndex === 1 && !oAuth2Authorization) ||
+                                        (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
+                                        (activeStepIndex === 2 && oAuth2Authorization)) &&
+                                    isWorkflowsPending ? (
+                                        <div className="flex justify-center py-12">
+                                            <LoadingDots />
+                                        </div>
+                                    ) : (
+                                        integrationInstanceConfigurationDialogSteps[activeStepIndex].content
+                                    )}
+                                </div>
+                            </WorkflowMockProvider>
 
-                                {((!updateIntegrationVersion && integrationInstanceConfiguration?.id) ||
-                                    (!integrationInstanceConfiguration?.id &&
-                                        !updateIntegrationVersion &&
-                                        connectionDefinition &&
-                                        !oAuth2Authorization &&
-                                        workflows !== undefined &&
-                                        workflows.length === 0)) && (
-                                    <Button
-                                        disabled={isSaving}
-                                        icon={isSaving ? <LoadingIcon /> : undefined}
-                                        label="Save"
-                                        onClick={handleSubmit(handleSaveClick)}
-                                    />
+                            {integrationInstanceConfiguration?.id &&
+                                connectionDefinition &&
+                                !updateIntegrationVersion && (
+                                    <div className="py-4">
+                                        <ConnectionParameters
+                                            authorizationParameters={
+                                                integrationInstanceConfiguration.connectionAuthorizationParameters
+                                            }
+                                            authorizationType={integrationInstanceConfiguration.authorizationType}
+                                            connectionDefinition={connectionDefinition}
+                                            connectionParameters={
+                                                integrationInstanceConfiguration.connectionConnectionParameters
+                                            }
+                                        />
+                                    </div>
                                 )}
-                            </>
-                        )}
+                        </DialogBody>
 
-                        {activeStepIndex === 1 && oAuth2Authorization && !updateIntegrationVersion && (
-                            <>
-                                <Button
-                                    label="Previous"
-                                    onClick={() => setActiveStepIndex(activeStepIndex - 1)}
-                                    variant="outline"
-                                />
+                        <DialogFooter>
+                            {activeStepIndex === 0 && (
+                                <>
+                                    <DialogCancelButton />
 
-                                {workflows && workflows?.length > 0 && (
-                                    <Button label="Next" onClick={handleSubmit(handleNextClick)} />
-                                )}
+                                    {(!integrationInstanceConfiguration?.id || updateIntegrationVersion) &&
+                                        (updateIntegrationVersion ||
+                                            oAuth2Authorization ||
+                                            workflows === undefined ||
+                                            (workflows && workflows.length > 0)) && (
+                                            <Button label="Next" onClick={handleSubmit(handleNextClick)} />
+                                        )}
 
-                                {!workflows ||
-                                    (workflows?.length === 0 && (
+                                    {((!updateIntegrationVersion && integrationInstanceConfiguration?.id) ||
+                                        (!integrationInstanceConfiguration?.id &&
+                                            !updateIntegrationVersion &&
+                                            connectionDefinition &&
+                                            !oAuth2Authorization &&
+                                            workflows !== undefined &&
+                                            workflows.length === 0)) && (
                                         <Button
                                             disabled={isSaving}
                                             icon={isSaving ? <LoadingIcon /> : undefined}
                                             label="Save"
                                             onClick={handleSubmit(handleSaveClick)}
                                         />
-                                    ))}
-                            </>
-                        )}
+                                    )}
+                                </>
+                            )}
 
-                        {((activeStepIndex === 1 && !oAuth2Authorization) ||
-                            (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
-                            (activeStepIndex === 2 && oAuth2Authorization)) && (
-                            <>
-                                <Button
-                                    label="Previous"
-                                    onClick={() => setActiveStepIndex(activeStepIndex - 1)}
-                                    variant="outline"
-                                />
+                            {activeStepIndex === 1 && oAuth2Authorization && !updateIntegrationVersion && (
+                                <>
+                                    <Button
+                                        label="Previous"
+                                        onClick={() => setActiveStepIndex(activeStepIndex - 1)}
+                                        variant="outline"
+                                    />
 
-                                <Button
-                                    disabled={isSaving || isWorkflowsPending}
-                                    icon={isSaving ? <LoadingIcon /> : undefined}
-                                    label="Save"
-                                    onClick={handleSubmit(handleSaveClick)}
-                                />
-                            </>
-                        )}
-                    </DialogFooter>
-                </Form>
+                                    {workflows && workflows?.length > 0 && (
+                                        <Button label="Next" onClick={handleSubmit(handleNextClick)} />
+                                    )}
+
+                                    {!workflows ||
+                                        (workflows?.length === 0 && (
+                                            <Button
+                                                disabled={isSaving}
+                                                icon={isSaving ? <LoadingIcon /> : undefined}
+                                                label="Save"
+                                                onClick={handleSubmit(handleSaveClick)}
+                                            />
+                                        ))}
+                                </>
+                            )}
+
+                            {((activeStepIndex === 1 && !oAuth2Authorization) ||
+                                (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
+                                (activeStepIndex === 2 && oAuth2Authorization)) && (
+                                <>
+                                    <Button
+                                        label="Previous"
+                                        onClick={() => setActiveStepIndex(activeStepIndex - 1)}
+                                        variant="outline"
+                                    />
+
+                                    <Button
+                                        disabled={isSaving || isWorkflowsPending}
+                                        icon={isSaving ? <LoadingIcon /> : undefined}
+                                        label="Save"
+                                        onClick={handleSubmit(handleSaveClick)}
+                                    />
+                                </>
+                            )}
+                        </DialogFooter>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
