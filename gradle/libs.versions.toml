@@ -1,6 +1,6 @@
 [versions]
 a2a-java-sdk = "0.3.3.Final"
-anthropic-java = "2.35.0"
+anthropic-java = "2.68.0"
 bootui = "1.19.0"
 checkstyle = "14.3.0"
 com-google-auto-service = "1.1.1"

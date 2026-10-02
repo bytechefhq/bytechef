@@ -36,6 +36,8 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
 import com.anthropic.models.messages.OutputConfig;
+import com.anthropic.models.messages.ThinkingConfigBetweenTools;
+import com.anthropic.models.messages.ThinkingConfigParam;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.converter.StructuredOutputUtils;
@@ -58,6 +60,8 @@ public class AnthropicChatAction {
 
     private static final List<String> ALWAYS_THINKING_MODEL_PREFIXES = List.of(
         "claude-fable-", "claude-mythos-", "claude-opus-5-5");
+
+    private static final List<String> BETWEEN_TOOLS_THINKING_MODEL_PREFIXES = List.of("claude-sonnet-5-5");
 
     private static final List<String> PROMPT_ONLY_STRUCTURED_OUTPUT_MODEL_PREFIXES = List.of(
         "claude-2", "claude-3", "claude-instant", "claude-opus-4-0", "claude-opus-4-2025", "claude-sonnet-4-0",
@@ -87,7 +91,11 @@ public class AnthropicChatAction {
             optionsBuilder.thinkingAdaptive()
                 .effort(OutputConfig.Effort.of(inputParameters.getString(REASONING_EFFORT, "medium")));
         } else {
-            if (!isAlwaysThinking(model)) {
+            if (isBetweenToolsThinking(model)) {
+                optionsBuilder.thinking(
+                    ThinkingConfigParam.ofBetweenTools(ThinkingConfigBetweenTools.builder()
+                        .build()));
+            } else if (!isAlwaysThinking(model)) {
                 optionsBuilder.thinkingDisabled();
             }
 
@@ -145,6 +153,11 @@ public class AnthropicChatAction {
         String responseSchema = inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class);
 
         return responseSchema == null || responseSchema.isBlank() ? null : responseSchema;
+    }
+
+    private static boolean isBetweenToolsThinking(String model) {
+        return BETWEEN_TOOLS_THINKING_MODEL_PREFIXES.stream()
+            .anyMatch(model::startsWith);
     }
 
     private static boolean isAlwaysThinking(String model) {
