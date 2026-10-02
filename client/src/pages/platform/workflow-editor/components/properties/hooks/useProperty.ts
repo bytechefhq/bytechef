@@ -18,6 +18,7 @@ import {
     fromFormulaValue,
     getPropertyInputMode,
     isSingleDataPill,
+    isStringSelect,
     shouldIncludeInMetadata,
     toFormulaValue,
 } from '@/pages/platform/workflow-editor/components/properties/propertyInputMode';
@@ -156,6 +157,7 @@ type UsePropertyReturnType = {
     startPillEntry: () => void;
     type?: PropertyAllType['type'];
     typeIcon: ReactNode;
+    validateMentionInputValue: (value: string | number) => boolean;
     validatePropertyValue: (value: string | number) => boolean;
     workflow: Workflow;
 };
@@ -235,6 +237,7 @@ export const useProperty = ({
     const loadedSelectOptionValuesRef = useRef<Array<string> | undefined>(undefined);
     const onValueReplacedRef = useRef(onValueReplaced);
     const parameterValueRef = useRef(parameterValue);
+    const pillEntryKeepsOptionRef = useRef(false);
 
     onValueReplacedRef.current = onValueReplaced;
     parameterValueRef.current = parameterValue;
@@ -470,10 +473,13 @@ export const useProperty = ({
                 hasControl: !!control,
                 isFromAi: !control && isFromAi,
                 pillEntry,
+                type,
                 value: control ? undefined : propertyParameterValue,
             }),
-        [control, controlType, formulaModeState, isFromAi, pillEntry, propertyParameterValue]
+        [control, controlType, formulaModeState, isFromAi, pillEntry, propertyParameterValue, type]
     );
+
+    const stringSelect = isStringSelect(controlType, type);
 
     const mentionInput = !control && inputMode.renderer === 'mentions';
     const isFormulaMode = inputMode.mode === 'formula';
@@ -954,15 +960,27 @@ export const useProperty = ({
         (value: string | number) => {
             setMentionInputValue(typeof value === 'number' ? String(value) : value);
 
-            if (inputMode.singlePill) {
-                if (value === '' && pillEntry && controlType === 'SELECT') {
-                    editorPendingSaveCancelRef.current?.();
+            if (typeof value === 'string' && value.includes('${')) {
+                pillEntryKeepsOptionRef.current = false;
+            }
+
+            if (value === '' && pillEntryKeepsOptionRef.current) {
+                editorPendingSaveCancelRef.current?.();
+
+                if (inputMode.singlePill) {
+                    pillEntryKeepsOptionRef.current = false;
 
                     setPillEntry(false);
-
-                    return;
                 }
 
+                return;
+            }
+
+            if (stringSelect && !isFormulaMode) {
+                setPillEntry(true);
+            }
+
+            if (inputMode.singlePill) {
                 if (value === '') {
                     setPillEntry(false);
 
@@ -1010,14 +1028,14 @@ export const useProperty = ({
             setErrorMessage(errorMessage);
         },
         [
-            controlType,
             INCORRECT_VALUE,
             inputMode.singlePill,
+            isFormulaMode,
             maxLength,
             minLength,
-            pillEntry,
             regex,
             setMentionInputValue,
+            stringSelect,
             VALUE_DOES_NOT_MATCH_PATTERN,
         ]
     );
@@ -1061,6 +1079,8 @@ export const useProperty = ({
         }
 
         cancelPendingSaves();
+
+        pillEntryKeepsOptionRef.current = false;
 
         setIsFormulaMode(toFormula);
         setPillEntry(false);
@@ -1109,6 +1129,8 @@ export const useProperty = ({
             const pillValue = `\${${mentionId}}`;
 
             cancelPendingSaves();
+
+            pillEntryKeepsOptionRef.current = false;
 
             setPillEntry(false);
 
@@ -1162,6 +1184,8 @@ export const useProperty = ({
 
             event.preventDefault();
 
+            pillEntryKeepsOptionRef.current = true;
+
             dispatchValueAction({type: 'mentionInputSyncedFromValue', value: ''});
 
             setPillEntry(true);
@@ -1174,14 +1198,32 @@ export const useProperty = ({
     const handleSinglePillAbandoned = useCallback(() => {
         setPillEntry(false);
 
-        if (pillEntry && controlType === 'SELECT') {
+        if (pillEntryKeepsOptionRef.current) {
+            pillEntryKeepsOptionRef.current = false;
+
             return;
         }
 
         dispatchValueAction({type: 'valueCleared'});
 
+        if (stringSelect) {
+            saveResolvedValue(null);
+
+            return;
+        }
+
         requestAnimationFrame(() => inputRef.current?.focus());
-    }, [controlType, pillEntry]);
+    }, [saveResolvedValue, stringSelect]);
+
+    const validateMentionInputValue = useCallback(
+        (value: string | number) => {
+            const holdsNoPill =
+                stringSelect && typeof value === 'string' && !value.startsWith('=') && !value.includes('${');
+
+            return !holdsNoPill && validatePropertyValue(value);
+        },
+        [stringSelect, validatePropertyValue]
+    );
 
     const handleControlledFormulaSwitch = useCallback(
         (fieldValue: unknown, fieldOnChange: (value: unknown) => void) => {
@@ -2007,6 +2049,7 @@ export const useProperty = ({
         startPillEntry,
         type,
         typeIcon,
+        validateMentionInputValue,
         validatePropertyValue,
         workflow,
     };

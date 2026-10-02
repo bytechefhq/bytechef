@@ -54,7 +54,11 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
     const selectedIndex = useSuggestionListNavigation(items, ref, selectItem, listRef);
 
     return (
-        <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto" ref={listRef}>
+        <ul
+            className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto"
+            onMouseDown={(event) => event.preventDefault()}
+            ref={listRef}
+        >
             {items.length ? (
                 items.map((item: DataPillType, index: number) => (
                     <li key={item.value}>
