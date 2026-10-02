@@ -253,6 +253,18 @@ class AnthropicChatActionTest {
         assertTrue(thinking.isDisabled());
     }
 
+    @Test
+    void testCreateChatModelUsesBetweenToolsThinkingWhenThinkingIsOffOnSonnet55() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, "claude-sonnet-5-5", MAX_TOKENS, 1000, THINKING, false));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
+        ThinkingConfigParam thinking = anthropicChatOptions.getThinking();
+
+        assertTrue(thinking.isBetweenTools());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
         "claude-fable-5-1", "claude-fable-5", "claude-mythos-5-1", "claude-opus-5-5"
