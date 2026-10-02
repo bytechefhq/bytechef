@@ -50,7 +50,7 @@ const WorkflowSelect = ({
         </Tooltip>
 
         {integrationWorkflows && (
-            <SelectContent className="w-auto max-w-lg min-w-(--radix-select-trigger-width)">
+            <SelectContent align="start" className="w-auto max-w-lg min-w-(--radix-select-trigger-width)">
                 <SelectGroup>
                     <SelectLabel>Workflows</SelectLabel>
 
