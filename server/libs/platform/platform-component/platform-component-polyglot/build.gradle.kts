@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
 
+    testImplementation("ch.qos.logback:logback-classic")
     testImplementation(rootProject.libs.org.graalvm.polyglot.js)
     testImplementation(rootProject.libs.org.graalvm.polyglot.python)
 }
