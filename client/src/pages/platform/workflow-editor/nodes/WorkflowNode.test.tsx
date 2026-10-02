@@ -192,7 +192,19 @@ describe('WorkflowNode', () => {
         expect(screen.queryByLabelText(/issue/)).not.toBeInTheDocument();
     });
 
-    it('rotates LR condition labels and keeps the pair on one vertical axis', () => {
+    it('keeps TB condition labels on the node, beside the stem', () => {
+        renderNode({
+            componentName: 'condition',
+            name: 'condition_1',
+            taskDispatcher: true,
+            workflowNodeName: 'condition_1',
+        } as unknown as NodeDataType);
+
+        expect(screen.getByText('TRUE')).toBeInTheDocument();
+        expect(screen.getByText('FALSE')).toBeInTheDocument();
+    });
+
+    it('leaves LR condition labels to the arms past the split bar', () => {
         directionStoreState.layoutDirection = 'LR';
 
         renderNode({
@@ -202,47 +214,7 @@ describe('WorkflowNode', () => {
             workflowNodeName: 'condition_1',
         } as unknown as NodeDataType);
 
-        const trueLabel = screen.getByText('TRUE');
-        const falseLabel = screen.getByText('FALSE');
-
-        // equal fixed widths + centered text are what keep the two rotated
-        // labels on the same vertical axis despite different text lengths
-        for (const label of [trueLabel, falseLabel]) {
-            expect(label.className).toContain('-rotate-90');
-            expect(label.className).toContain('w-14');
-            expect(label.className).toContain('text-center');
-        }
-    });
-
-    it('rotates LR on-error labels and keeps the pair on one vertical axis', () => {
-        directionStoreState.layoutDirection = 'LR';
-
-        renderNode({
-            componentName: 'on-error',
-            name: 'on-error_1',
-            taskDispatcher: true,
-            workflowNodeName: 'on-error_1',
-        } as unknown as NodeDataType);
-
-        const tryLabel = screen.getByText('TRY');
-        const catchLabel = screen.getByText('CATCH');
-
-        for (const label of [tryLabel, catchLabel]) {
-            expect(label.className).toContain('-rotate-90');
-            expect(label.className).toContain('w-14');
-            expect(label.className).toContain('text-center');
-        }
-    });
-
-    it('keeps TB condition labels horizontal', () => {
-        renderNode({
-            componentName: 'condition',
-            name: 'condition_1',
-            taskDispatcher: true,
-            workflowNodeName: 'condition_1',
-        } as unknown as NodeDataType);
-
-        expect(screen.getByText('TRUE').className).not.toContain('-rotate-90');
-        expect(screen.getByText('FALSE').className).not.toContain('-rotate-90');
+        expect(screen.queryByText('TRUE')).not.toBeInTheDocument();
+        expect(screen.queryByText('FALSE')).not.toBeInTheDocument();
     });
 });
