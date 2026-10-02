@@ -1,15 +1,14 @@
 import Button from '@/components/Button/Button';
-import Switch from '@/components/Switch/Switch';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import Switch from '@/components/Switch/Switch';
 import {Form} from '@/components/ui/form';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
@@ -149,59 +148,54 @@ const ProjectDeploymentEditWorkflowDialog = ({
             open={isOpen}
         >
             <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
-                <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0 p-6">
-                        <div className="flex flex-col space-y-1">
-                            <DialogTitle>Edit {workflow?.label} Workflow</DialogTitle>
-
-                            <DialogDescription>
-                                Set workflow input, trigger output values and connections.
-                            </DialogDescription>
-                        </div>
-
-                        <DialogCloseButton />
-                    </DialogHeader>
-
-                    <div className="max-h-dialog-height overflow-y-auto px-6">
-                        <ProjectDeploymentDialogWorkflowsStepItem
-                            connections={connections}
-                            connectionsGrouped={connectionsGrouped}
-                            control={control}
-                            formState={formState}
-                            key={workflow.id!}
-                            setValue={setValue}
-                            workflow={workflow}
-                            workflowIndex={0}
-                            workflows={[workflow]}
+                <DialogMain>
+                    <Form {...form}>
+                        <DialogHeader
+                            description="Set workflow input, trigger output values and connections."
+                            title={`Edit ${workflow?.label} Workflow`}
                         />
-                    </div>
 
-                    <DialogFooter className="flex items-center px-6 pt-4 pb-6">
-                        {componentConnections.length > 1 && (
-                            <div className="mr-auto flex items-center gap-2">
-                                <Switch
-                                    checked={connectionsGrouped}
-                                    label="Group Connections"
-                                    onCheckedChange={setConnectionsGrouped}
+                        <DialogBody>
+                            <div className="max-h-dialog-height overflow-y-auto px-6">
+                                <ProjectDeploymentDialogWorkflowsStepItem
+                                    connections={connections}
+                                    connectionsGrouped={connectionsGrouped}
+                                    control={control}
+                                    formState={formState}
+                                    key={workflow.id!}
+                                    setValue={setValue}
+                                    workflow={workflow}
+                                    workflowIndex={0}
+                                    workflows={[workflow]}
                                 />
-
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <InfoIcon className="size-4 cursor-default text-gray-400" />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Connections grouped by their app.</TooltipContent>
-                                </Tooltip>
                             </div>
-                        )}
+                        </DialogBody>
 
-                        <DialogClose asChild>
-                            <Button label="Cancel" variant="outline" />
-                        </DialogClose>
+                        <DialogFooter className="flex items-center px-6 pt-4 pb-6">
+                            {componentConnections.length > 1 && (
+                                <div className="mr-auto flex items-center gap-2">
+                                    <Switch
+                                        checked={connectionsGrouped}
+                                        label="Group Connections"
+                                        onCheckedChange={setConnectionsGrouped}
+                                    />
 
-                        <Button label="Save" onClick={handleSubmit(updateProjectDeploymentWorkflow)} />
-                    </DialogFooter>
-                </Form>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InfoIcon className="size-4 cursor-default text-gray-400" />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>Connections grouped by their app.</TooltipContent>
+                                    </Tooltip>
+                                </div>
+                            )}
+
+                            <DialogCancelButton />
+
+                            <Button label="Save" onClick={handleSubmit(updateProjectDeploymentWorkflow)} />
+                        </DialogFooter>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
