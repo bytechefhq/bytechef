@@ -1,9 +1,9 @@
 import {ButtonGroup} from '@/components/ui/button-group';
-import {Separator} from '@/components/ui/separator';
 import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
 import ProjectBreadcrumb from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumb';
+import ProjectItemSelect from '@/pages/automation/project/components/project-header/components/ProjectItemSelect';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import PublishPopover from '@/pages/automation/project/components/project-header/components/PublishPopover';
 import WorkflowActionsButton from '@/pages/automation/project/components/project-header/components/WorkflowActionsButton';
@@ -77,6 +77,14 @@ const ProjectHeader = ({
 
     const isOnline = onlineManager.isOnline();
 
+    const loadingIndicator = (isFetching > 0 || !isOnline) && (
+        <LoadingIndicator
+            className="absolute -top-1 -right-1 size-5 rounded-full"
+            isFetching={isFetching}
+            isOnline={isOnline}
+        />
+    );
+
     if (!project) {
         return <ProjectSkeleton />;
     }
@@ -89,29 +97,25 @@ const ProjectHeader = ({
                 !embedded && copilotLayoutShifted && 'pr-0'
             )}
         >
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
                 <LeftSidebarButton onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)} />
-
-                <Separator className="mr-4 ml-2 h-4" orientation="vertical" />
 
                 {projectWorkflows && (
                     <ProjectBreadcrumb
-                        currentWorkflow={workflow}
-                        onProjectWorkflowValueChange={handleProjectWorkflowValueChange}
+                        itemSelect={
+                            <ProjectItemSelect
+                                currentLabel={workflow?.label}
+                                currentProjectWorkflowId={projectWorkflowId}
+                                onWorkflowValueChange={handleProjectWorkflowValueChange}
+                                projectWorkflows={projectWorkflows}
+                            />
+                        }
                         project={project}
-                        projectWorkflowId={projectWorkflowId}
-                        projectWorkflows={projectWorkflows}
                     />
                 )}
             </div>
 
-            <div className="flex items-center">
-                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
-
-                <SettingsMenu project={project} updateWorkflowMutation={updateWorkflowMutation} workflow={workflow} />
-
-                <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
-
+            <div className="flex items-center gap-1">
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
@@ -129,6 +133,19 @@ const ProjectHeader = ({
 
                     <DeployButton project={project} />
                 </ButtonGroup>
+
+                <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
+
+                <div className="relative">
+                    <SettingsMenu
+                        bottomResizablePanelRef={bottomResizablePanelRef}
+                        project={project}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                        workflow={workflow}
+                    />
+
+                    {loadingIndicator}
+                </div>
             </div>
         </header>
     );
