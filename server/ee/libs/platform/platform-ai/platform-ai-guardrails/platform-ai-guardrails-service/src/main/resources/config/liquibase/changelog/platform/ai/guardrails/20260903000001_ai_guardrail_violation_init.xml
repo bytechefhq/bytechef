@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260903000001" author="Ivica Cardic">
+        <createTable tableName="ai_guardrail_violation">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="environment" type="INT"/>
+            <column name="surface" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="span_start" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="span_length" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="confidence" type="NUMERIC(3,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="principal" type="VARCHAR(256)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_guardrail_violation" indexName="idx_ai_guardrail_violation_workspace_created">
+            <column name="workspace_id"/>
+            <column name="created_date"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260905000001" author="Ivica Cardic">
+        <createTable tableName="ai_guardrail_token_session">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="conversation_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="session_id" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tokens" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="ai_guardrail_token_session" columnNames="workspace_id,user_id,conversation_id"
+                             constraintName="uk_ai_guardrail_token_session_workspace_user_conversation"/>
+
+        <createIndex tableName="ai_guardrail_token_session" indexName="idx_ai_guardrail_token_session_last_modified_date">
+            <column name="last_modified_date"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
