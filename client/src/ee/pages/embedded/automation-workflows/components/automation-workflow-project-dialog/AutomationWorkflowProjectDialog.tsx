@@ -1,16 +1,15 @@
 import Button from '@/components/Button/Button';
 import CreatableSelect, {SelectOptionType} from '@/components/CreatableSelect/CreatableSelect';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import {
@@ -103,113 +102,112 @@ const AutomationWorkflowProjectDialog = ({
             open
         >
             <DialogContent aria-label="Project Dialog" onInteractOutside={(event) => event.preventDefault()}>
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveProject)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>{`${project ? 'Edit' : 'Create'} Project`}</DialogTitle>
+                <DialogMain>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveProject)}>
+                            <DialogHeader
+                                description={`Use this to ${project ? 'edit' : 'create'} a project which will contain workflows`}
+                                title={`${project ? 'Edit' : 'Create'} Project`}
+                            />
 
-                                <DialogDescription>
-                                    {`Use this to ${project ? 'edit' : 'create'} a project which will contain workflows`}
-                                </DialogDescription>
-                            </div>
+                            <DialogBody className="flex flex-col gap-4">
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
 
-                            <DialogCloseButton />
-                        </DialogHeader>
+                                            <FormControl>
+                                                <Input placeholder="My CRM Project" {...field} />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    rules={{required: true}}
+                                />
 
-                                    <FormControl>
-                                        <Input placeholder="My CRM Project" {...field} />
-                                    </FormControl>
+                                <FormField
+                                    control={control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            rules={{required: true}}
-                        />
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Cute description of your project"
+                                                    rows={5}
+                                                    {...field}
+                                                />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <FormControl>
-                                        <Textarea placeholder="Cute description of your project" rows={5} {...field} />
-                                    </FormControl>
+                                <FormField
+                                    control={control}
+                                    name="category"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Category</FormLabel>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                            <FormControl>
+                                                <CreatableSelect
+                                                    field={field}
+                                                    isClearable
+                                                    isMulti={false}
+                                                    onCreateOption={(inputValue: string) => {
+                                                        setValue('category', {label: inputValue, value: inputValue});
+                                                    }}
+                                                    options={categoryOptions}
+                                                    placeholder="Marketing, Sales, Social Media..."
+                                                />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="category"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Category</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <FormControl>
-                                        <CreatableSelect
-                                            field={field}
-                                            isClearable
-                                            isMulti={false}
-                                            onCreateOption={(inputValue: string) => {
-                                                setValue('category', {label: inputValue, value: inputValue});
-                                            }}
-                                            options={categoryOptions}
-                                            placeholder="Marketing, Sales, Social Media..."
-                                        />
-                                    </FormControl>
+                                <FormField
+                                    control={control}
+                                    name="tags"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Tags</FormLabel>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                            <FormControl>
+                                                <CreatableSelect
+                                                    field={field}
+                                                    isMulti
+                                                    onCreateOption={(inputValue: string) => {
+                                                        setValue('tags', [
+                                                            ...(form.getValues().tags || []),
+                                                            {label: inputValue, value: inputValue},
+                                                        ]);
+                                                    }}
+                                                    options={tagOptions}
+                                                />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="tags"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Tags</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </DialogBody>
 
-                                    <FormControl>
-                                        <CreatableSelect
-                                            field={field}
-                                            isMulti
-                                            onCreateOption={(inputValue: string) => {
-                                                setValue('tags', [
-                                                    ...(form.getValues().tags || []),
-                                                    {label: inputValue, value: inputValue},
-                                                ]);
-                                            }}
-                                            options={tagOptions}
-                                        />
-                                    </FormControl>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
-
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
