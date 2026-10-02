@@ -23,9 +23,6 @@ interface AiAgentTestingChatStateI {
     setLastAssistantMessageError: (errorMessage: string) => void;
     resetMessages: () => void;
     truncateMessagesFrom: (index: number) => void;
-
-    resumeUrl: string | null;
-    setResumeUrl: (resumeUrl: string | null) => void;
 }
 
 const useAiAgentTestingChatStore = create<AiAgentTestingChatStateI>()(
@@ -73,15 +70,11 @@ const useAiAgentTestingChatStore = create<AiAgentTestingChatStateI>()(
                         ],
                     };
                 }),
-            resetMessages: () => set({messages: [], resumeUrl: null}),
+            resetMessages: () => set({messages: []}),
             truncateMessagesFrom: (index: number) =>
                 set((state) => ({
                     messages: state.messages.slice(0, Math.max(0, index)),
-                    resumeUrl: null,
                 })),
-
-            resumeUrl: null,
-            setResumeUrl: (resumeUrl) => set({resumeUrl}),
         }),
         {
             name: 'bytechef.ai-agent-testing-chat',

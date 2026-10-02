@@ -213,4 +213,204 @@ describe('useSSE', () => {
         await waitFor(() => expect(onStream).toHaveBeenCalledWith('line1\nline2'));
         await waitFor(() => expect(onStream).toHaveBeenCalledWith('line3'));
     });
+
+    it('calls onClose after the server ends the stream', async () => {
+        const rs = makeStream();
+
+        global.fetch = vi.fn<typeof fetch>().mockResolvedValue(new Response(rs.stream, {status: 200}));
+
+        const onClose = vi.fn();
+        const onStream = vi.fn();
+
+        const req: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/abc'};
+        const {result} = renderHook(() => useSSE(req, {eventHandlers: {stream: onStream}, onClose}));
+
+        act(() => {
+            rs.enqueue('event: stream\n');
+            rs.enqueue('data: "Hello"\n\n');
+        });
+
+        await waitFor(() => expect(onStream).toHaveBeenCalledWith('Hello'));
+
+        expect(onClose).not.toHaveBeenCalled();
+
+        act(() => {
+            rs.close();
+        });
+
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+        expect(result.current.connectionState).toBe('CLOSED');
+    });
+
+    it('does not call onClose when the response is not ok', async () => {
+        global.fetch = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, {status: 410}));
+
+        const onClose = vi.fn();
+
+        const req: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/abc'};
+        const {result} = renderHook(() => useSSE(req, {onClose}));
+
+        await waitFor(() => expect(result.current.connectionState).toBe('ERROR'));
+
+        expect(result.current.error).toBe('HTTP 410');
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('resets the error at the start of each request so repeated identical failures are observable', async () => {
+        const pendingResponses: Array<(response: Response) => void> = [];
+
+        global.fetch = vi.fn<typeof fetch>().mockImplementation(
+            () =>
+                new Promise<Response>((resolve) => {
+                    pendingResponses.push(resolve);
+                })
+        );
+
+        const renderedErrors: Array<string | null> = [];
+
+        const {rerender, result} = renderHook(
+            ({request}: {request: SSERequestType}) => {
+                const sseResult = useSSE(request);
+
+                renderedErrors.push(sseResult.error);
+
+                return sseResult;
+            },
+            {initialProps: {request: {init: {method: 'POST'}, url: '/job/resume/abc'}}}
+        );
+
+        await waitFor(() => expect(pendingResponses).toHaveLength(1));
+
+        await act(async () => {
+            pendingResponses[0](new Response(null, {status: 500}));
+        });
+
+        await waitFor(() => expect(result.current.error).toBe('HTTP 500'));
+
+        expect(result.current.errorStatus).toBe(500);
+
+        rerender({request: {init: {method: 'POST'}, url: '/job/resume/abc'}});
+
+        await waitFor(() => expect(pendingResponses).toHaveLength(2));
+
+        expect(result.current.error).toBeNull();
+        expect(result.current.errorStatus).toBeNull();
+
+        await act(async () => {
+            pendingResponses[1](new Response(null, {status: 500}));
+        });
+
+        await waitFor(() => expect(result.current.error).toBe('HTTP 500'));
+
+        expect(result.current.errorStatus).toBe(500);
+        expect(
+            renderedErrors.filter((renderedError, index) => index === 0 || renderedError !== renderedErrors[index - 1])
+        ).toEqual([null, 'HTTP 500', null, 'HTTP 500']);
+    });
+
+    it('reports a null errorStatus when the request fails with a network error', async () => {
+        global.fetch = vi
+            .fn<typeof fetch>()
+            .mockResolvedValueOnce(new Response(null, {status: 409}))
+            .mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+        const {rerender, result} = renderHook(({request}: {request: SSERequestType}) => useSSE(request), {
+            initialProps: {request: {init: {method: 'POST'}, url: '/job/resume/abc'}},
+        });
+
+        await waitFor(() => expect(result.current.errorStatus).toBe(409));
+
+        rerender({request: {init: {method: 'POST'}, url: '/job/resume/abc'}});
+
+        await waitFor(() => expect(result.current.error).toBe('Connection error occurred'));
+
+        expect(result.current.errorStatus).toBeNull();
+        expect(result.current.connectionState).toBe('ERROR');
+    });
+
+    it('does not call onClose when the caller aborts the stream', async () => {
+        const rs = makeStream();
+
+        global.fetch = vi.fn<typeof fetch>().mockResolvedValue(new Response(rs.stream, {status: 200}));
+
+        const onClose = vi.fn();
+
+        const req: SSERequestType = {init: {method: 'GET'}, url: '/sse'};
+        const {result} = renderHook(() => useSSE(req, {onClose}));
+
+        await waitFor(() => expect(result.current.connectionState).toBe('CONNECTED'));
+
+        act(() => {
+            result.current.close();
+        });
+
+        await waitFor(() => expect(result.current.connectionState).toBe('CLOSED'));
+
+        expect(onClose).not.toHaveBeenCalled();
+    });
+    it('does not let an earlier stream that ends after a newer request started close the newer stream', async () => {
+        const firstStream = makeStream();
+        const secondStream = makeStream();
+
+        global.fetch = vi
+            .fn<typeof fetch>()
+            .mockResolvedValueOnce(new Response(firstStream.stream, {status: 200}))
+            .mockResolvedValueOnce(new Response(secondStream.stream, {status: 200}));
+
+        const onClose = vi.fn();
+
+        const firstRequest: SSERequestType = {init: {method: 'POST'}, url: '/workflow-tests'};
+        const secondRequest: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/abc'};
+
+        const {rerender, result} = renderHook(({request}) => useSSE(request, {onClose}), {
+            initialProps: {request: firstRequest},
+        });
+
+        await waitFor(() => expect(result.current.connectionState).toBe('CONNECTED'));
+
+        act(() => {
+            firstStream.close();
+
+            rerender({request: secondRequest});
+        });
+
+        await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(2));
+        await waitFor(() => expect(result.current.connectionState).toBe('CONNECTED'));
+
+        expect(onClose).not.toHaveBeenCalled();
+    });
+    it('ignores the response of an earlier request that resolves after a newer request started', async () => {
+        const secondStream = makeStream();
+
+        let resolveFirstResponse: (response: Response) => void = () => {};
+
+        global.fetch = vi
+            .fn<typeof fetch>()
+            .mockReturnValueOnce(
+                new Promise<Response>((resolve) => {
+                    resolveFirstResponse = resolve;
+                })
+            )
+            .mockResolvedValueOnce(new Response(secondStream.stream, {status: 200}));
+
+        const firstRequest: SSERequestType = {init: {method: 'POST'}, url: '/workflow-tests'};
+        const secondRequest: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/abc'};
+
+        const {rerender, result} = renderHook(({request}) => useSSE(request), {
+            initialProps: {request: firstRequest},
+        });
+
+        await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+
+        rerender({request: secondRequest});
+
+        await waitFor(() => expect(result.current.connectionState).toBe('CONNECTED'));
+
+        await act(async () => {
+            resolveFirstResponse(new Response(null, {status: 410}));
+        });
+
+        expect(result.current.connectionState).toBe('CONNECTED');
+        expect(result.current.errorStatus).toBeNull();
+    });
 });
