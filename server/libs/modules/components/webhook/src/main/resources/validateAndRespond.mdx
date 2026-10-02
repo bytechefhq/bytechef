@@ -36,4 +36,4 @@ If you get `400 Bad Request`, make sure that:
 - The value is the same as the **CSRF Token** property, including uppercase and lowercase letters, with no extra spaces.
 - The deployed version of the workflow has the token that you send. If you change the token in the editor, publish and deploy the workflow again.
 
-The test URL does not check the token. To test the validation, use the static workflow webhook trigger URL.
+The test URL checks the token in the same way. A request with a missing or incorrect token returns `400 Bad Request` and is not recorded as sample output.
