@@ -62,8 +62,9 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
         ActionDefinition.SseEmitterHandler.SseEmitter emitter = createSseEmitter(jobId, tenantId);
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean streamCompleted = new AtomicBoolean();
+        AtomicBoolean streamFailed = new AtomicBoolean();
 
-        addListeners(emitter, latch, streamCompleted, jobId, tenantId);
+        addListeners(emitter, latch, streamCompleted, streamFailed, jobId, tenantId);
 
         sseEmitterHandler.handle(emitter);
 
@@ -71,14 +72,20 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
 
         Suspend suspend = null;
 
-        try {
-            if (output instanceof SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler) {
+        if (output instanceof SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler) {
+            try {
                 suspend = suspendAwareSseEmitterHandler.getSuspendOrThrow(jobId);
+            } catch (RuntimeException exception) {
+                if (!streamFailed.get()) {
+                    sendEvent(jobId, SseStreamEvent.EVENT_TYPE_ERROR, exception.getMessage(), tenantId);
+                }
+
+                throw exception;
             }
-        } finally {
-            if (streamCompleted.get() && suspend == null) {
-                sendEvent(jobId, SseStreamEvent.EVENT_TYPE_COMPLETE, null, tenantId);
-            }
+        }
+
+        if (streamCompleted.get() && suspend == null) {
+            sendEvent(jobId, SseStreamEvent.EVENT_TYPE_COMPLETE, null, tenantId);
         }
 
         return suspend;
@@ -86,7 +93,7 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
 
     private void addListeners(
         ActionDefinition.SseEmitterHandler.SseEmitter emitter, CountDownLatch latch, AtomicBoolean streamCompleted,
-        long jobId, String tenantId) {
+        AtomicBoolean streamFailed, long jobId, String tenantId) {
 
         if (emitter instanceof SseEmitterAdapter sseEmitterAdapter) {
             sseEmitterAdapter.addCompletionListener(() -> {
@@ -96,10 +103,14 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
             });
 
             sseEmitterAdapter.addErrorListener(throwable -> {
+                streamFailed.set(true);
+
                 sendEvent(jobId, SseStreamEvent.EVENT_TYPE_ERROR, throwable.getMessage(), tenantId);
             });
 
             sseEmitterAdapter.addTimeoutListener(() -> {
+                streamFailed.set(true);
+
                 sendEvent(
                     jobId, SseStreamEvent.EVENT_TYPE_ERROR, "SSE stream timed out for job " + jobId, tenantId);
 

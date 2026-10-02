@@ -24,8 +24,11 @@ import java.util.function.LongConsumer;
  */
 public interface JobResumeFacade {
 
+    /**
+     * The outcome of a resume. Only {@link #resumeJobStreaming} returns {@link #STREAMING_NOT_ALLOWED}.
+     */
     enum JobResumeOutcome {
-        OK, INVALID_ID, GONE, STREAMING_NOT_ALLOWED
+        OK, INVALID_ID, GONE, JOB_FAILED, NOT_YET_SUSPENDED, STREAMING_NOT_ALLOWED
     }
 
     JobResumeOutcome resumeJob(String id, Map<String, Object> data);

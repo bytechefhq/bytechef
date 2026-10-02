@@ -23,15 +23,17 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.github.benmanes.caffeine.cache.Ticker;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,14 +123,24 @@ public class SseStreamBridgeRegistry {
 
         switch (eventType) {
             case SseStreamEvent.EVENT_TYPE_DATA -> {
+                boolean delivered = false;
+
                 for (SseStreamBridge sseStreamBridge : sseStreamBridges) {
                     try {
                         sseStreamBridge.onEvent(sseStreamEvent.getPayload());
+
+                        delivered = true;
                     } catch (Exception exception) {
                         if (log.isTraceEnabled()) {
                             log.trace(exception.getMessage(), exception);
                         }
                     }
+                }
+
+                if (!delivered && isAskUserQuestionEvent(sseStreamEvent.getPayload())) {
+                    log.warn(
+                        "The '{}' event of job {} was not delivered to any SSE connection of the job",
+                        AiAgentSseEventType.ASK_USER_QUESTION, jobId);
                 }
             }
 
@@ -327,7 +339,7 @@ public class SseStreamBridgeRegistry {
 
                 Registration registration = register(jobId, sseStreamBridge);
 
-                activeHandle = registration.handle();
+                activeHandle = registration;
 
                 registration.completion()
                     .whenComplete((unused, throwable) -> completion.complete(null));
@@ -354,7 +366,36 @@ public class SseStreamBridgeRegistry {
         }
     }
 
-    @SuppressFBWarnings("EI")
-    public record Registration(AutoCloseable handle, CompletableFuture<Void> completion) {
+    /**
+     * A bridge's registration for a job's stream events. {@link #completion()} completes when the job finishes,
+     * suspends, stops or fails; {@link #close()} unregisters the bridge, at most once, and never throws.
+     */
+    public static final class Registration implements AutoCloseable {
+
+        private final AtomicBoolean closed = new AtomicBoolean();
+        private final CompletionStage<Void> completion;
+        private final AutoCloseable handle;
+
+        public Registration(AutoCloseable handle, CompletableFuture<Void> completion) {
+            this.handle = Objects.requireNonNull(handle, "handle");
+            this.completion = completion.minimalCompletionStage();
+        }
+
+        public CompletionStage<Void> completion() {
+            return completion;
+        }
+
+        @Override
+        public void close() {
+            if (!closed.compareAndSet(false, true)) {
+                return;
+            }
+
+            try {
+                handle.close();
+            } catch (Exception exception) {
+                log.warn("Failed to close the stream bridge registration", exception);
+            }
+        }
     }
 }

@@ -35,16 +35,17 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.tenant.TenantContext;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Ivica Cardic
@@ -95,9 +96,9 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
         Object result = processor.process(taskExecution, sseEmitterHandler);
 
         assertNull(result);
-
-        verify(messageBroker, atLeastOnce()).send(
-            eq(SseStreamMessageRoute.SSE_STREAM_EVENTS), any(SseStreamEvent.class));
+        assertEquals(
+            List.of(SseStreamEvent.EVENT_TYPE_DATA, SseStreamEvent.EVENT_TYPE_DATA, SseStreamEvent.EVENT_TYPE_COMPLETE),
+            getSentEventTypes());
     }
 
     @Test
@@ -117,13 +118,14 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
         Object result = processor.process(taskExecution, sseEmitterHandler);
 
         assertNull(result);
-
-        verify(messageBroker, atLeastOnce()).send(
-            eq(SseStreamMessageRoute.SSE_STREAM_EVENTS), any(SseStreamEvent.class));
+        assertEquals(
+            List.of(
+                SseStreamEvent.EVENT_TYPE_DATA, SseStreamEvent.EVENT_TYPE_ERROR, SseStreamEvent.EVENT_TYPE_COMPLETE),
+            getSentEventTypes());
     }
 
     @Test
-    void testProcessWithSuspendAwareSseEmitterHandlerReturnsTheFinalizedSuspend() {
+    void testProcessWithSuspendAwareSseEmitterHandlerReturnsTheRecordedSuspend() {
         TenantContext.setCurrentTenantId("public");
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -134,7 +136,6 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
         ActionContextAware actionContextAware = mock(ActionContextAware.class);
 
         when(actionContextAware.getSuspend()).thenReturn(new Suspend(Map.of("pendingToolCallId", "call_1"), null));
-        when(actionContextAware.getJobResumeId()).thenReturn("jobResumeId");
 
         SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
             emitter -> {
@@ -150,7 +151,6 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
         Map<String, ?> continueParameters = suspend.continueParameters();
 
         assertEquals("call_1", continueParameters.get("pendingToolCallId"));
-        assertEquals("jobResumeId", continueParameters.get(MetadataConstants.JOB_RESUME_ID));
     }
 
     @Test
@@ -225,11 +225,32 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
             IllegalStateException.class, () -> processor.process(taskExecution, suspendAwareSseEmitterHandler));
 
         assertSame(streamException, exception.getCause());
+        assertEquals(List.of(SseStreamEvent.EVENT_TYPE_ERROR), getSentEventTypes());
+    }
 
-        verify(messageBroker).send(
-            eq(SseStreamMessageRoute.SSE_STREAM_EVENTS),
-            argThat((SseStreamEvent sseStreamEvent) -> SseStreamEvent.EVENT_TYPE_ERROR.equals(
-                sseStreamEvent.getEventType())));
+    @Test
+    void testProcessWithSuspendAwareSseEmitterHandlerWhoseBeforeSuspendFailsSendsAnErrorInsteadOfComplete() {
+        TenantContext.setCurrentTenantId("public");
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .build();
+
+        taskExecution.setJobId(100L);
+
+        ActionContextAware actionContextAware = mock(ActionContextAware.class);
+
+        when(actionContextAware.getSuspend()).thenReturn(new Suspend(Map.of("pendingToolCallId", "call_1"), null));
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            ActionDefinition.SseEmitterHandler.SseEmitter::complete, actionContextAware).withBeforeSuspend(suspend -> {
+                throw new IllegalStateException("Notification failed");
+            });
+
+        IllegalStateException exception = assertThrows(
+            IllegalStateException.class, () -> processor.process(taskExecution, suspendAwareSseEmitterHandler));
+
+        assertEquals("Notification failed", exception.getMessage());
+        assertEquals(List.of(SseStreamEvent.EVENT_TYPE_ERROR), getSentEventTypes());
     }
 
     @Test
@@ -265,5 +286,17 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
 
         assertNull(result);
         assertSame(brokerException, sendFailureReference.get());
+    }
+
+    private List<String> getSentEventTypes() {
+        ArgumentCaptor<SseStreamEvent> sseStreamEventArgumentCaptor = ArgumentCaptor.forClass(SseStreamEvent.class);
+
+        verify(messageBroker, atLeastOnce()).send(
+            eq(SseStreamMessageRoute.SSE_STREAM_EVENTS), sseStreamEventArgumentCaptor.capture());
+
+        return sseStreamEventArgumentCaptor.getAllValues()
+            .stream()
+            .map(SseStreamEvent::getEventType)
+            .toList();
     }
 }

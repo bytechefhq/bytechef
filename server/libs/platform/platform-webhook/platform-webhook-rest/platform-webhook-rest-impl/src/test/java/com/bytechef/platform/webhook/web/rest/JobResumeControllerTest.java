@@ -22,9 +22,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -42,16 +45,24 @@ import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registrati
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.LongConsumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockAsyncContext;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -303,6 +314,51 @@ class JobResumeControllerTest {
     }
 
     @Test
+    void testResumeStreamingClosesTheRegistrationWhenTheClientConnectionCompletes() throws Exception {
+        AutoCloseable handle = mock(AutoCloseable.class);
+
+        MvcResult mvcResult = performStreamingResumeWithRegistration(handle);
+
+        verify(handle, never()).close();
+
+        MockAsyncContext mockAsyncContext = getMockAsyncContext(mvcResult);
+
+        mockAsyncContext.complete();
+
+        verify(handle).close();
+    }
+
+    @Test
+    void testResumeStreamingClosesTheRegistrationWhenTheEmitterTimesOut() throws Exception {
+        AutoCloseable handle = mock(AutoCloseable.class);
+
+        MvcResult mvcResult = performStreamingResumeWithRegistration(handle);
+
+        MockAsyncContext mockAsyncContext = getMockAsyncContext(mvcResult);
+
+        for (AsyncListener asyncListener : mockAsyncContext.getListeners()) {
+            asyncListener.onTimeout(new AsyncEvent(mockAsyncContext));
+        }
+
+        verify(handle, atLeastOnce()).close();
+    }
+
+    @Test
+    void testResumeStreamingClosesTheRegistrationWhenTheEmitterFails() throws Exception {
+        AutoCloseable handle = mock(AutoCloseable.class);
+
+        MvcResult mvcResult = performStreamingResumeWithRegistration(handle);
+
+        MockAsyncContext mockAsyncContext = getMockAsyncContext(mvcResult);
+
+        for (AsyncListener asyncListener : mockAsyncContext.getListeners()) {
+            asyncListener.onError(new AsyncEvent(mockAsyncContext, new IOException("Broken pipe")));
+        }
+
+        verify(handle, atLeastOnce()).close();
+    }
+
+    @Test
     void testResumeWithoutEventStreamAcceptHeaderReturnsNoContent() throws Exception {
         JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
 
@@ -321,10 +377,266 @@ class JobResumeControllerTest {
         verify(jobResumeFacade, never()).resumeJobStreaming(any(), anyMap(), any(LongConsumer.class));
     }
 
+    @Test
+    void testResumeRetriesUntilTheJobIsSuspended() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), anyMap()))
+            .thenReturn(JobResumeOutcome.NOT_YET_SUSPENDED, JobResumeOutcome.NOT_YET_SUSPENDED, JobResumeOutcome.OK);
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, new SseStreamBridgeRegistry());
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isNoContent());
+
+        verify(jobResumeFacade, times(3)).resumeJob(eq(RESUME_ID), anyMap());
+    }
+
+    @Test
+    void testResumeStreamingRetriesUntilTheJobIsSuspendedAndRegistersOnce() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+        SseStreamBridgeRegistry sseStreamBridgeRegistry = mock(SseStreamBridgeRegistry.class);
+        AutoCloseable handle = mock(AutoCloseable.class);
+
+        when(sseStreamBridgeRegistry.registerForResume(anyLong(), any(SseStreamBridge.class)))
+            .thenReturn(new Registration(handle, new CompletableFuture<>()));
+
+        doAnswer(invocation -> JobResumeOutcome.NOT_YET_SUSPENDED)
+            .doAnswer(invocation -> JobResumeOutcome.NOT_YET_SUSPENDED)
+            .doAnswer(invocation -> {
+                LongConsumer jobIdConsumer = invocation.getArgument(2);
+
+                jobIdConsumer.accept(82L);
+
+                return JobResumeOutcome.OK;
+            })
+            .when(jobResumeFacade)
+            .resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class));
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, sseStreamBridgeRegistry);
+
+        MvcResult mvcResult = mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isOk())
+            .andExpect(request().asyncStarted())
+            .andReturn();
+
+        verify(jobResumeFacade, times(3)).resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class));
+        verify(sseStreamBridgeRegistry, times(1)).registerForResume(eq(82L), any(SseStreamBridge.class));
+        verify(handle, never()).close();
+
+        MockAsyncContext mockAsyncContext = getMockAsyncContext(mvcResult);
+
+        mockAsyncContext.complete();
+
+        verify(handle, times(1)).close();
+    }
+
+    @Test
+    void testResumeOfAFailedJobReturnsUnprocessableContent() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), anyMap()))
+            .thenReturn(JobResumeOutcome.JOB_FAILED);
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, new SseStreamBridgeRegistry());
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isUnprocessableContent());
+    }
+
+    @Test
+    void testResumeStreamingOfAFailedJobReturnsUnprocessableContent() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+
+        when(jobResumeFacade.resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class)))
+            .thenReturn(JobResumeOutcome.JOB_FAILED);
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, new SseStreamBridgeRegistry());
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isUnprocessableContent())
+            .andExpect(request().asyncNotStarted());
+    }
+
+    @Test
+    void testResumeThatLosesAConcurrentResumeRaceReturnsGone() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), anyMap()))
+            .thenThrow(new OptimisticLockingFailureException("stale job version"));
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, new SseStreamBridgeRegistry());
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isGone());
+    }
+
+    @Test
+    void testResumeStreamingThatLosesAConcurrentResumeRaceReturnsGone() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+        SseStreamBridgeRegistry sseStreamBridgeRegistry = mock(SseStreamBridgeRegistry.class);
+
+        when(jobResumeFacade.resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class)))
+            .thenThrow(new OptimisticLockingFailureException("stale job version"));
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, sseStreamBridgeRegistry);
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isGone())
+            .andExpect(request().asyncNotStarted());
+
+        verify(sseStreamBridgeRegistry, never()).registerForResume(anyLong(), any(SseStreamBridge.class));
+    }
+
+    @Test
+    void testResumeThatLosesAConcurrentResumeRaceInsideTheTenantContextReturnsGone() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), anyMap()))
+            .thenThrow(new RuntimeException(new OptimisticLockingFailureException("stale job version")));
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, new SseStreamBridgeRegistry());
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isGone());
+    }
+
+    @Test
+    void testResumeStreamingThatLosesAConcurrentResumeRaceInsideTheTenantContextReturnsGone() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+        SseStreamBridgeRegistry sseStreamBridgeRegistry = mock(SseStreamBridgeRegistry.class);
+
+        when(jobResumeFacade.resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class)))
+            .thenThrow(new RuntimeException(new OptimisticLockingFailureException("stale job version")));
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, sseStreamBridgeRegistry);
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isGone())
+            .andExpect(request().asyncNotStarted());
+    }
+
+    @Test
+    void testResumeOfAJobThatIsNeverSuspendedReturnsConflict() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), anyMap()))
+            .thenReturn(JobResumeOutcome.NOT_YET_SUSPENDED);
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, new SseStreamBridgeRegistry());
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isConflict());
+
+        verify(jobResumeFacade, atLeast(2)).resumeJob(eq(RESUME_ID), anyMap());
+    }
+
+    @Test
+    void testResumeStreamingOfAJobThatIsNeverSuspendedReturnsConflict() throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+        SseStreamBridgeRegistry sseStreamBridgeRegistry = mock(SseStreamBridgeRegistry.class);
+
+        when(jobResumeFacade.resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class)))
+            .thenReturn(JobResumeOutcome.NOT_YET_SUSPENDED);
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, sseStreamBridgeRegistry);
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isConflict())
+            .andExpect(request().asyncNotStarted());
+
+        verify(jobResumeFacade, atLeast(2)).resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class));
+        verify(sseStreamBridgeRegistry, never()).registerForResume(anyLong(), any(SseStreamBridge.class));
+    }
+
+    private static MockAsyncContext getMockAsyncContext(MvcResult mvcResult) {
+        MockHttpServletRequest mockHttpServletRequest = mvcResult.getRequest();
+
+        return (MockAsyncContext) Objects.requireNonNull(mockHttpServletRequest.getAsyncContext());
+    }
+
+    private static MvcResult performStreamingResumeWithRegistration(AutoCloseable handle) throws Exception {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+        SseStreamBridgeRegistry sseStreamBridgeRegistry = mock(SseStreamBridgeRegistry.class);
+
+        when(sseStreamBridgeRegistry.registerForResume(anyLong(), any(SseStreamBridge.class)))
+            .thenReturn(new Registration(handle, new CompletableFuture<>()));
+
+        doAnswer(invocation -> {
+            LongConsumer jobIdConsumer = invocation.getArgument(2);
+
+            jobIdConsumer.accept(81L);
+
+            return JobResumeOutcome.OK;
+        })
+            .when(jobResumeFacade)
+            .resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class));
+
+        MockMvc mockMvc = createMockMvc(jobResumeFacade, sseStreamBridgeRegistry);
+
+        return mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isOk())
+            .andExpect(request().asyncStarted())
+            .andReturn();
+    }
+
     private static MockMvc createMockMvc(
         JobResumeFacade jobResumeFacade, SseStreamBridgeRegistry sseStreamBridgeRegistry) {
 
-        return MockMvcBuilders.standaloneSetup(new JobResumeController(jobResumeFacade, sseStreamBridgeRegistry))
+        JobResumeController jobResumeController = new JobResumeController(
+            jobResumeFacade, sseStreamBridgeRegistry, Duration.ofMillis(300), Duration.ofMillis(10));
+
+        return MockMvcBuilders.standaloneSetup(jobResumeController)
             .build();
     }
 }

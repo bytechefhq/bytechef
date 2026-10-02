@@ -19,6 +19,7 @@ package com.bytechef.platform.webhook.executor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.after;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -27,16 +28,26 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicLong;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
@@ -65,6 +76,35 @@ class SseStreamBridgeRegistryTest {
         verify(sseStreamBridge).onComplete();
 
         assertThat(registration.completion()).isDone();
+    }
+
+    @Test
+    void testAnAskUserQuestionEventThatNoBridgeDeliversIsLoggedAsAWarning() {
+        Map<String, Object> questionEvent = Map.of(
+            AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.ASK_USER_QUESTION, "questions", List.of());
+
+        doThrow(new IllegalStateException("not delivered")).when(sseStreamBridge)
+            .onEvent(questionEvent);
+
+        sseStreamBridgeRegistry.register(JOB_ID, sseStreamBridge);
+
+        Logger logger = (Logger) LoggerFactory.getLogger(SseStreamBridgeRegistry.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+
+        listAppender.start();
+
+        logger.addAppender(listAppender);
+
+        try {
+            sendData(questionEvent);
+            sendData("chunk");
+        } finally {
+            logger.detachAppender(listAppender);
+        }
+
+        assertThat(listAppender.list)
+            .filteredOn(loggingEvent -> loggingEvent.getLevel() == Level.WARN)
+            .hasSize(1);
     }
 
     @Test
@@ -206,9 +246,7 @@ class SseStreamBridgeRegistryTest {
     void testClosingPendingRegistrationStopsLaterEvents() throws Exception {
         Registration registration = sseStreamBridgeRegistry.registerForResume(JOB_ID, sseStreamBridge);
 
-        AutoCloseable handle = registration.handle();
-
-        handle.close();
+        registration.close();
 
         sendJobStatus("STOPPED");
         sendEvent(SseStreamEvent.EVENT_TYPE_TASK_STARTED, 7L);
@@ -219,15 +257,43 @@ class SseStreamBridgeRegistryTest {
     }
 
     @Test
+    void testRegistrationCompletionCannotBeCompletedByAHolder() {
+        Registration registration = sseStreamBridgeRegistry.register(JOB_ID, sseStreamBridge);
+
+        CompletionStage<Void> completion = registration.completion();
+
+        CompletableFuture<Void> completionFuture = completion.toCompletableFuture();
+
+        completionFuture.complete(null);
+
+        Registration otherRegistration = sseStreamBridgeRegistry.register(JOB_ID, mock(SseStreamBridge.class));
+
+        assertThat(otherRegistration.completion()).isNotDone();
+    }
+
+    @Test
+    void testRegistrationClosesItsHandleOnlyOnceAndSwallowsFailures() throws Exception {
+        AutoCloseable handle = mock(AutoCloseable.class);
+
+        doThrow(new IllegalStateException("boom")).when(handle)
+            .close();
+
+        Registration registration = new Registration(handle, new CompletableFuture<>());
+
+        registration.close();
+        registration.close();
+
+        verify(handle, times(1)).close();
+    }
+
+    @Test
     void testClosingActiveRegistrationStopsLaterEvents() throws Exception {
         Registration registration = sseStreamBridgeRegistry.registerForResume(JOB_ID, sseStreamBridge);
 
         sendJobStatus("STOPPED");
         sendData("Hello");
 
-        AutoCloseable handle = registration.handle();
-
-        handle.close();
+        registration.close();
 
         sendData("after close");
 

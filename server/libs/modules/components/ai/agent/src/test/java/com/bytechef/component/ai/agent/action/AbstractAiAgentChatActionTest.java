@@ -412,12 +412,14 @@ class AbstractAiAgentChatActionTest {
 
         // Build the chat-memory advisor exactly as the production chat-memory components do
         // (default order via the builder), so the assertion catches regressions in any of them.
+        ChatMemory chatMemory = mock(ChatMemory.class);
+
         MessageChatMemoryAdvisor productionStyleChatMemoryAdvisor = MessageChatMemoryAdvisor
-            .builder(mock(ChatMemory.class))
+            .builder(chatMemory)
             .build();
 
         when(chatMemoryFunction.apply(any(), any(), any(), any()))
-            .thenReturn(new ChatMemoryFunction.Result(productionStyleChatMemoryAdvisor, null));
+            .thenReturn(new ChatMemoryFunction.Result(productionStyleChatMemoryAdvisor, chatMemory));
 
         ComponentConnection componentConnection = new ComponentConnection(
             "testComponent", 1, 1L, Map.of(), null);
@@ -445,7 +447,7 @@ class AbstractAiAgentChatActionTest {
                 .orElseThrow(() -> new AssertionError("ToolCallingAdvisor missing from advisor chain"));
 
             Advisor chatMemoryAdvisor = advisors.stream()
-                .filter(advisor -> advisor instanceof BaseChatMemoryAdvisor)
+                .filter(BlankReplySkippingChatMemoryAdvisor.class::isInstance)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
 
@@ -570,6 +572,7 @@ class AbstractAiAgentChatActionTest {
 
         assertThat(toolCallAdvisor).isNotNull();
         assertThat(advisors).noneMatch(BaseChatMemoryAdvisor.class::isInstance);
+        assertThat(advisors).noneMatch(BlankReplySkippingChatMemoryAdvisor.class::isInstance);
         assertThat(readConversationHistoryEnabled(toolCallAdvisor)).isTrue();
     }
 
@@ -591,7 +594,7 @@ class AbstractAiAgentChatActionTest {
         ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
 
         when(chatMemoryFunction.apply(any(), any(), any(), any()))
-            .thenReturn(new ChatMemoryFunction.Result(chatMemoryAdvisor, null));
+            .thenReturn(new ChatMemoryFunction.Result(chatMemoryAdvisor, mock(ChatMemory.class)));
         when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
             eq("memoryComponent"), eq(1), eq("memoryElement"))).thenReturn(chatMemoryFunction);
 
@@ -608,7 +611,12 @@ class AbstractAiAgentChatActionTest {
 
         List<Advisor> advisors = action.getAdvisors(clusterElementMap, connectionParameters, chatModel, actionContext);
 
-        int chatMemoryIndex = advisors.indexOf(chatMemoryAdvisor);
+        Advisor wrappedChatMemoryAdvisor = advisors.stream()
+            .filter(BlankReplySkippingChatMemoryAdvisor.class::isInstance)
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
+
+        int chatMemoryIndex = advisors.indexOf(wrappedChatMemoryAdvisor);
         ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
         int toolCallIndex = advisors.indexOf(toolCallAdvisor);
 

@@ -22,7 +22,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.spec.McpSchema.CallToolRequest;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
@@ -32,8 +33,6 @@ import io.modelcontextprotocol.spec.McpSchema.ListToolsResult;
 import io.modelcontextprotocol.spec.McpSchema.Tool;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.model.ToolContext;
@@ -63,10 +62,7 @@ class McpClientToolTest {
             .getToolCallbacks();
 
         ToolContext toolContext = new ToolContext(
-            Map.of(
-                AiAgentToolContextKey.ACTION_CONTEXT, "actionContext",
-                AiAgentToolContextKey.SSE_EMITTER_REFERENCE, new AtomicReference<>(),
-                AiAgentToolContextKey.SSE_BUFFERED_EVENTS, new ConcurrentLinkedQueue<>()));
+            new AiAgentToolContext(mock(ActionContext.class), new AiAgentToolContext.SseTransport()).toMap());
 
         toolCallbacks[0].call("{}", toolContext);
 

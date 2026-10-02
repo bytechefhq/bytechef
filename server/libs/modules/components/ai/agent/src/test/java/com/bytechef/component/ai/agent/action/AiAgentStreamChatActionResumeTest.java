@@ -30,12 +30,12 @@ import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.cr
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.createInputParameters;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.createToolCallingManager;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.findLastToolResponseMessage;
-import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.suspendedToolResult;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.textResponse;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toPersistedContinueParameters;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toolCallResponse;
 import static com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
@@ -45,6 +45,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
+import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
@@ -96,11 +97,21 @@ class AiAgentStreamChatActionResumeTest {
         StreamResult performResult = driveHandlerToCompletion(performHandler);
 
         assertThat(performResult.failed()).isFalse();
-        assertThat(performResult.events()).doesNotContain(suspendedToolResult());
 
-        ActionContext.Suspend suspend = ((SuspendAwareSseEmitterHandler) performHandler).getSuspend();
+        ActionContext.Suspend suspend = ((SuspendAwareSseEmitterHandler) performHandler).getSuspendOrThrow(1L);
 
         assertThat(suspend).isNotNull();
+
+        String suspendedToolResult = ToolSuspension.getSuspendedToolResult(suspend);
+
+        assertThat(suspendedToolResult).isNotNull();
+        assertThat(performResult.events()).doesNotContain(suspendedToolResult);
+        assertThat(performResult.events())
+            .filteredOn(event -> event instanceof Map<?, ?> eventMap &&
+                AiAgentSseEventType.TOOL_EXECUTION.equals(eventMap.get(AiAgentSseEventType.EVENT_TYPE)))
+            .noneMatch(
+                event -> ToolSuspension.isSuspendedToolResult(
+                    String.valueOf(((Map<?, ?>) event).get("output")), suspendedToolResult));
         assertThat(getAgentToolSuspension(suspend).pendingToolCallId()).isEqualTo(FIRST_TOOL_CALL_ID);
 
         SseEmitterHandler resumeHandler = resume(streamChatActionDefinition, suspend, new AtomicReference<>());
@@ -111,7 +122,7 @@ class AiAgentStreamChatActionResumeTest {
 
         assertThat(resumeResult.failed()).isFalse();
         assertThat(resumeResult.events()).contains(FINAL_ANSWER);
-        assertThat(((SuspendAwareSseEmitterHandler) resumeHandler).getSuspend()).isNull();
+        assertThat(((SuspendAwareSseEmitterHandler) resumeHandler).getSuspendOrThrow(1L)).isNull();
         assertThat(prompts).hasSize(2);
 
         ToolResponseMessage resumedToolResponseMessage = findLastToolResponseMessage(prompts.get(1)
@@ -170,7 +181,7 @@ class AiAgentStreamChatActionResumeTest {
 
         assertThat(resumeResult.failed()).isFalse();
 
-        ActionContext.Suspend secondSuspend = ((SuspendAwareSseEmitterHandler) resumeHandler).getSuspend();
+        ActionContext.Suspend secondSuspend = ((SuspendAwareSseEmitterHandler) resumeHandler).getSuspendOrThrow(1L);
 
         assertThat(secondSuspend).isNotNull();
         assertThat(getAgentToolSuspension(secondSuspend).pendingToolCallId()).isEqualTo(SECOND_TOOL_CALL_ID);
@@ -207,7 +218,7 @@ class AiAgentStreamChatActionResumeTest {
 
         assertThat(driveHandlerToCompletion(performHandler).failed()).isFalse();
 
-        ActionContext.Suspend suspend = ((SuspendAwareSseEmitterHandler) performHandler).getSuspend();
+        ActionContext.Suspend suspend = ((SuspendAwareSseEmitterHandler) performHandler).getSuspendOrThrow(1L);
 
         assertThat(suspend).isNotNull();
 
@@ -246,6 +257,67 @@ class AiAgentStreamChatActionResumeTest {
     }
 
     @Test
+    void testSuspendedStreamsStoreNoBlankAssistantMessageInChatMemory() throws Exception {
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+            .chatMemoryRepository(new InMemoryChatMemoryRepository())
+            .build();
+
+        ChatMemoryFunction.Result chatMemoryResult = new ChatMemoryFunction.Result(
+            MessageChatMemoryAdvisor.builder(chatMemory)
+                .build(),
+            chatMemory);
+
+        List<Prompt> prompts = new CopyOnWriteArrayList<>();
+
+        ActionDefinition streamChatActionDefinition = AiAgentStreamChatAction.of(
+            mock(AiAgentToolFacade.class),
+            createClusterElementDefinitionService(
+                createChatModel(
+                    prompts,
+                    callNumber -> callNumber == 1
+                        ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID)
+                        : callNumber == 2 ? suspendingToolCallResponse(SECOND_TOOL_CALL_ID) : finalAnswer()),
+                chatMemoryResult),
+            createToolCallingManager());
+
+        SseEmitterHandler performHandler = getPerformFunction(streamChatActionDefinition).apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
+            createActionContext(new AtomicReference<>()));
+
+        assertThat(driveHandlerToCompletion(performHandler).failed()).isFalse();
+
+        ActionContext.Suspend suspend = ((SuspendAwareSseEmitterHandler) performHandler).getSuspendOrThrow(1L);
+
+        assertThat(suspend).isNotNull();
+        assertThat(chatMemory.get(CONVERSATION_ID))
+            .noneMatch(AiAgentStreamChatActionResumeTest::isBlankAssistantMessage);
+
+        MultipleConnectionsResumePerformFunction resumePerformFunction =
+            (MultipleConnectionsResumePerformFunction) streamChatActionDefinition.getResumePerform()
+                .orElseThrow();
+
+        SseEmitterHandler resumeHandler = (SseEmitterHandler) resumePerformFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
+            toPersistedContinueParameters(suspend), MockParametersFactory.create(Map.of("approved", true)),
+            createActionContext(new AtomicReference<>()));
+
+        assertThat(driveHandlerToCompletion(resumeHandler).failed()).isFalse();
+        assertThat(((SuspendAwareSseEmitterHandler) resumeHandler).getSuspendOrThrow(1L)).isNotNull();
+        assertThat(chatMemory.get(CONVERSATION_ID))
+            .noneMatch(AiAgentStreamChatActionResumeTest::isBlankAssistantMessage);
+    }
+
+    private static boolean isBlankAssistantMessage(Message message) {
+        if (!(message instanceof AssistantMessage assistantMessage) || assistantMessage.hasToolCalls()) {
+            return false;
+        }
+
+        String text = assistantMessage.getText();
+
+        return text == null || text.isBlank();
+    }
+
+    @Test
     void testFailedStreamDoesNotReportTheSuspend() throws Exception {
         List<Prompt> prompts = new CopyOnWriteArrayList<>();
 
@@ -262,7 +334,9 @@ class AiAgentStreamChatActionResumeTest {
 
         assertThat(performResult.failed()).isTrue();
         assertThat(suspendReference.get()).isNotNull();
-        assertThat(((SuspendAwareSseEmitterHandler) performHandler).getSuspend()).isNull();
+        assertThatThrownBy(() -> ((SuspendAwareSseEmitterHandler) performHandler).getSuspendOrThrow(1L))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("failed");
     }
 
     private static ActionDefinition createStreamChatActionDefinition(
@@ -290,7 +364,7 @@ class AiAgentStreamChatActionResumeTest {
 
         assertThat(performResult.failed()).isFalse();
 
-        ActionContext.Suspend suspend = ((SuspendAwareSseEmitterHandler) performHandler).getSuspend();
+        ActionContext.Suspend suspend = ((SuspendAwareSseEmitterHandler) performHandler).getSuspendOrThrow(1L);
 
         assertThat(suspend).isNotNull();
 

@@ -108,8 +108,8 @@ public class McpClientTool {
     }
 
     /**
-     * The agent's tool context holds the job's action context and SSE emitter, so none of it is sent to the MCP server
-     * as request metadata.
+     * The agent's tool context holds the job's action context and SSE transport, so none of it is sent to the MCP
+     * server as request metadata.
      */
     static ToolCallbackProvider createToolCallbackProvider(McpSyncClient mcpSyncClient, McpToolFilter toolFilter) {
         return SyncMcpToolCallbackProvider.builder()

@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -94,6 +96,30 @@ public class JdbcJobRepositoryIntTest {
         resultJob = jobOptional.get();
 
         Assertions.assertEquals(Job.Status.FAILED, resultJob.getStatus());
+    }
+
+    @Test
+    public void testSaveOfAStaleJobFailsWithAnOptimisticLockingFailure() {
+        long jobId = Validate.notNull(jobRepository.save(getJob(Job.Status.STOPPED))
+            .getId(), "id");
+
+        Job firstJob = jobRepository.findById(jobId)
+            .orElseThrow();
+        Job secondJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        firstJob.setMetadata(Map.of("consumedBy", "first"));
+
+        jobRepository.save(firstJob);
+
+        secondJob.setMetadata(Map.of("consumedBy", "second"));
+
+        Assertions.assertThrows(OptimisticLockingFailureException.class, () -> jobRepository.save(secondJob));
+
+        Job storedJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        Assertions.assertEquals("first", storedJob.getMetadata("consumedBy"));
     }
 
     @Test

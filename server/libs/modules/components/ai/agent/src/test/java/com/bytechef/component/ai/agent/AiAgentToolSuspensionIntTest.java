@@ -49,15 +49,20 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.test.config.ComponentTestIntConfiguration;
 import com.bytechef.platform.connection.domain.Connection;
@@ -65,6 +70,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.facade.ApprovalFormFacadeImpl;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacadeImpl;
@@ -125,6 +131,8 @@ class AiAgentToolSuspensionIntTest {
     private static final String APPROVAL_TOOL_NAME = "requestApproval";
     private static final String FINAL_ANSWER = "The refund was approved and issued.";
     private static final long MODEL_CONNECTION_ID = 1L;
+    private static final String QUESTION_WORKFLOW_ID = Base64.getEncoder()
+        .encodeToString("aiagent_v1_question".getBytes(StandardCharsets.UTF_8));
     private static final String WORKFLOW_ID = Base64.getEncoder()
         .encodeToString("aiagent_v1_approval".getBytes(StandardCharsets.UTF_8));
 
@@ -155,6 +163,7 @@ class AiAgentToolSuspensionIntTest {
     private JobResumeFacade jobResumeFacade;
     private TaskExecutionService taskExecutionService;
     private TaskFileStorage taskFileStorage;
+    private TaskStateService taskStateService;
 
     @BeforeEach
     void beforeEach() {
@@ -171,7 +180,7 @@ class AiAgentToolSuspensionIntTest {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
-        TaskStateService taskStateService = new InMemoryTaskStateService();
+        taskStateService = new InMemoryTaskStateService();
         Evaluator evaluator = SpelEvaluator.create();
 
         jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
@@ -258,6 +267,21 @@ class AiAgentToolSuspensionIntTest {
     }
 
     @Test
+    void testApprovalFormShowsTheApprovalToolParametersNotTheAgentParameters() {
+        Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
+
+        assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
+
+        ApprovalFormFacadeImpl approvalFormFacade = new ApprovalFormFacadeImpl(
+            jobService, taskExecutionService, taskStateService);
+
+        Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(getJobResumeId(suspendedJob));
+
+        assertThat(approvalForm.get("formTitle")).isEqualTo("Approve the refund of order 42");
+        assertThat(approvalForm).doesNotContainKey("userPrompt");
+    }
+
+    @Test
     void testSuspendTimeoutResumesTheAgentWithNoResponse() {
         Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
 
@@ -301,12 +325,65 @@ class AiAgentToolSuspensionIntTest {
     void testStreamingResumeOfAnApprovalIsNotAllowed() {
         Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
 
-        JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeJobStreaming(
+        JobResumeOutcome jobStreamingResumeOutcome = jobResumeFacade.resumeJobStreaming(
             getJobResumeId(suspendedJob), Map.of("approved", true), jobId -> {});
 
-        assertThat(jobResumeOutcome).isEqualTo(JobResumeOutcome.STREAMING_NOT_ALLOWED);
+        assertThat(jobStreamingResumeOutcome).isEqualTo(JobResumeOutcome.STREAMING_NOT_ALLOWED);
         assertThat(jobService.getJob(Objects.requireNonNull(suspendedJob.getId()))
             .getStatus()).isEqualTo(Job.Status.STOPPED);
+    }
+
+    @Test
+    void testStreamingResumeContinuesTheAgentAndTheResumeIdCannotBeUsedAgain() {
+        Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(QUESTION_WORKFLOW_ID, Map.of()), false);
+
+        assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
+        assertThat(suspendedJob.getMetadata(MetadataConstants.STREAMING_RESUME)).isEqualTo(true);
+
+        String jobResumeId = getJobResumeId(suspendedJob);
+        List<Long> registeredJobIds = new CopyOnWriteArrayList<>();
+
+        JobResumeOutcome jobStreamingResumeOutcome = jobResumeFacade.resumeJobStreaming(
+            jobResumeId, Map.of("message", "Blue"), registeredJobIds::add);
+
+        assertThat(jobStreamingResumeOutcome).isEqualTo(JobResumeOutcome.OK);
+        assertThat(registeredJobIds).containsExactly(suspendedJob.getId());
+
+        Job completedJob = awaitJobStatus(Objects.requireNonNull(suspendedJob.getId()), Job.Status.COMPLETED);
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(Objects.requireNonNull(completedJob.getOutputs()));
+
+        assertThat(outputs.get("answer")).isEqualTo(FINAL_ANSWER);
+        assertThat(getApprovalToolResponse(scriptedChatModel.getPrompts()
+            .get(1))).contains("Blue");
+
+        JobResumeOutcome repeatedJobResumeOutcome = jobResumeFacade.resumeJobStreaming(
+            jobResumeId, Map.of("message", "Red"), registeredJobIds::add);
+
+        assertThat(repeatedJobResumeOutcome).isEqualTo(JobResumeOutcome.GONE);
+        assertThat(registeredJobIds).hasSize(1);
+        assertThat(scriptedChatModel.getPrompts()).hasSize(2);
+    }
+
+    @Test
+    void testRepeatedResumeOfAnAnsweredApprovalIsGoneWhileTheJobRuns() {
+        Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
+
+        String jobResumeId = getJobResumeId(suspendedJob);
+
+        assertThat(jobResumeFacade.resumeJob(jobResumeId, Map.of("approved", true))).isEqualTo(JobResumeOutcome.OK);
+        assertThat(jobResumeFacade.resumeJob(jobResumeId, Map.of("approved", false)))
+            .isEqualTo(JobResumeOutcome.GONE);
+
+        awaitJobStatus(Objects.requireNonNull(suspendedJob.getId()), Job.Status.COMPLETED);
+
+        assertThat(jobResumeFacade.resumeJob(jobResumeId, Map.of("approved", false)))
+            .isEqualTo(JobResumeOutcome.GONE);
+
+        List<Prompt> prompts = scriptedChatModel.getPrompts();
+
+        assertThat(prompts).hasSize(2);
+        assertThat(getApprovalToolResponse(prompts.get(1))).isEqualTo("{\"approved\":true}");
     }
 
     private Job awaitJobStatus(long jobId, Job.Status status) {
@@ -513,6 +590,36 @@ class AiAgentToolSuspensionIntTest {
                             () -> (
                                 inputParameters, connectionParameters,
                                 responseFormatRequired) -> scriptedChatModel));
+
+            return () -> componentDefinition;
+        }
+
+        @Bean
+        ComponentHandler testQuestionComponentHandler() {
+            ComponentDefinition componentDefinition = component("testQuestion")
+                .title("Test Question")
+                .clusterElements(
+                    ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("askQuestion")
+                        .title("Ask Question")
+                        .description("Asks the user a question and waits for the answer.")
+                        .type(BaseToolFunction.TOOLS)
+                        .object(() -> (
+                            inputParameters, connectionParameters, extensions, componentConnections, context) -> {
+
+                            ClusterElementContextAware clusterElementContextAware =
+                                (ClusterElementContextAware) context;
+
+                            ActionContext actionContext = clusterElementContextAware.toActionContext(
+                                "testQuestion", 1, "askQuestion", null);
+
+                            actionContext.suspend(
+                                new ActionContext.Suspend(
+                                    Map.of(MetadataConstants.STREAMING_RESUME, true),
+                                    Instant.now()
+                                        .plus(Duration.ofDays(1))));
+
+                            return ToolSuspension.suspendedToolResult(actionContext);
+                        }));
 
             return () -> componentDefinition;
         }
