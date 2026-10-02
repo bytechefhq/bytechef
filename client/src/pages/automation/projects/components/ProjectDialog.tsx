@@ -1,17 +1,16 @@
 import Button from '@/components/Button/Button';
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -159,141 +158,142 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent aria-label="Project Dialog" onInteractOutside={(event) => event.preventDefault()}>
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveProject)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>{`${project?.id ? 'Edit' : 'Create'} Project`}</DialogTitle>
-
-                                <DialogDescription>
-                                    {`Use this to ${
-                                        project?.id ? 'edit' : 'create'
-                                    } your project which will contain workflows`}
-                                </DialogDescription>
-                            </div>
-
-                            <DialogCloseButton />
-                        </DialogHeader>
-
-                        {categoriesError && !categoriesLoading && `An error has occurred: ${categoriesError.message}`}
-
-                        {tagsError && !tagsLoading && `An error has occurred: ${tagsError.message}`}
-
-                        <FormField
-                            control={control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
-
-                                    <FormControl>
-                                        <Input placeholder="My CRM Project" {...field} />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            rules={{required: true}}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
-
-                                    <FormControl>
-                                        <Textarea placeholder="Cute description of your project" rows={5} {...field} />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {!categoriesLoading && (
-                            <FormField
-                                control={control}
-                                name="category"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Category</FormLabel>
-
-                                        <FormControl>
-                                            <CreatableSelect
-                                                field={field}
-                                                isMulti={false}
-                                                onCreateOption={(inputValue: string) => {
-                                                    setValue('category', {
-                                                        label: inputValue,
-                                                        name: inputValue,
-                                                        value: inputValue,
-                                                        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                                                    } as any);
-                                                }}
-                                                options={categories!.map((category: Category) => ({
-                                                    label: category.name,
-                                                    value: category.name.toLowerCase().replace(/\W/g, ''),
-                                                    ...category,
-                                                }))}
-                                                placeholder="Marketing, Sales, Social Media..."
-                                            />
-                                        </FormControl>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                <DialogMain>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveProject)}>
+                            <DialogHeader
+                                description={`Use this to ${
+                                    project?.id ? 'edit' : 'create'
+                                } your project which will contain workflows`}
+                                title={`${project?.id ? 'Edit' : 'Create'} Project`}
                             />
-                        )}
 
-                        {remainingTags && (
-                            <FormField
-                                control={control}
-                                name="tags"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Tags</FormLabel>
+                            <DialogBody className="flex flex-col gap-4">
+                                {categoriesError &&
+                                    !categoriesLoading &&
+                                    `An error has occurred: ${categoriesError.message}`}
 
-                                        <FormControl>
-                                            <CreatableSelect
-                                                field={field}
-                                                isMulti
-                                                onCreateOption={(inputValue: string) => {
-                                                    setValue('tags', [
-                                                        ...getValues().tags!,
-                                                        {
-                                                            label: inputValue,
-                                                            name: inputValue,
-                                                            value: inputValue,
-                                                        },
-                                                    ] as never[]);
-                                                }}
-                                                options={remainingTags!.map((tag: Tag) => {
-                                                    return {
-                                                        label: tag.name,
-                                                        value: tag.name.toLowerCase().replace(/\W/g, ''),
-                                                        ...tag,
-                                                    };
-                                                })}
-                                            />
-                                        </FormControl>
+                                {tagsError && !tagsLoading && `An error has occurred: ${tagsError.message}`}
 
-                                        <FormMessage />
-                                    </FormItem>
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
+
+                                            <FormControl>
+                                                <Input placeholder="My CRM Project" {...field} />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    rules={{required: true}}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Cute description of your project"
+                                                    rows={5}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {!categoriesLoading && (
+                                    <FormField
+                                        control={control}
+                                        name="category"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Category</FormLabel>
+
+                                                <FormControl>
+                                                    <CreatableSelect
+                                                        field={field}
+                                                        isMulti={false}
+                                                        onCreateOption={(inputValue: string) => {
+                                                            setValue('category', {
+                                                                label: inputValue,
+                                                                name: inputValue,
+                                                                value: inputValue,
+                                                                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                                                            } as any);
+                                                        }}
+                                                        options={categories!.map((category: Category) => ({
+                                                            label: category.name,
+                                                            value: category.name.toLowerCase().replace(/\W/g, ''),
+                                                            ...category,
+                                                        }))}
+                                                        placeholder="Marketing, Sales, Social Media..."
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
-                            />
-                        )}
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
+                                {remainingTags && (
+                                    <FormField
+                                        control={control}
+                                        name="tags"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Tags</FormLabel>
 
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                                <FormControl>
+                                                    <CreatableSelect
+                                                        field={field}
+                                                        isMulti
+                                                        onCreateOption={(inputValue: string) => {
+                                                            setValue('tags', [
+                                                                ...getValues().tags!,
+                                                                {
+                                                                    label: inputValue,
+                                                                    name: inputValue,
+                                                                    value: inputValue,
+                                                                },
+                                                            ] as never[]);
+                                                        }}
+                                                        options={remainingTags!.map((tag: Tag) => {
+                                                            return {
+                                                                label: tag.name,
+                                                                value: tag.name.toLowerCase().replace(/\W/g, ''),
+                                                                ...tag,
+                                                            };
+                                                        })}
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+                            </DialogBody>
+
+                            <DialogFooter>
+                                <DialogCancelButton />
+
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
