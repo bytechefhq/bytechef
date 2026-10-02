@@ -4,6 +4,8 @@ dependencies {
     api(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
 
     api("org.springframework:spring-expression")
+    api("org.springframework.ai:spring-ai-client-chat")
+    api(project(":server:libs:platform:platform-ai:platform-ai-sensitive-data:platform-ai-sensitive-data-api"))
 
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
@@ -13,4 +15,14 @@ dependencies {
 
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
     testImplementation(project(":server:libs:test:test-support"))
+}
+
+tasks.named<Test>("test") {
+    inputs.files(
+        fileTree(rootProject.file("server")) {
+            include("**/src/main/java/**/*.java")
+            exclude("**/build/**")
+        })
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+        .withPropertyName("serverMainJavaSources")
 }
