@@ -72,12 +72,12 @@ const WorkflowExecutionsTestOutput = ({
     }, [handleBreadcrumbNavigate, subflowStack.length]);
 
     return (
-        <div className="flex h-full w-full flex-col rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-primary">
+        <div className="flex h-full w-full flex-col rounded-lg border border-stroke-neutral-secondary bg-background">
             <div className="flex items-center justify-between border-b border-stroke-neutral-primary">
                 {job ? (
                     <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
                 ) : (
-                    <span className="flex w-full items-center gap-x-3 px-3 py-4 text-sm uppercase">Test Output</span>
+                    <span className="flex h-12 w-full items-center gap-x-3 px-3 text-sm uppercase">Test Output</span>
                 )}
 
                 {onCloseClick && (
