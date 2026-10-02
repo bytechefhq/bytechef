@@ -1490,6 +1490,8 @@ export type CustomComponent = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
+  publishedDate?: Maybe<Scalars['Long']['output']>;
+  status?: Maybe<CustomComponentStatus>;
   title?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
 };
@@ -1512,6 +1514,11 @@ export enum CustomComponentLanguage {
   Javascript = 'JAVASCRIPT',
   Python = 'PYTHON',
   Ruby = 'RUBY'
+}
+
+export enum CustomComponentStatus {
+  Draft = 'DRAFT',
+  Published = 'PUBLISHED'
 }
 
 export type CustomComponentTriggerDefinition = {
@@ -2363,6 +2370,7 @@ export type Mutation = {
   createAutomationWorkflowProjectConfiguration: Scalars['ID']['output'];
   createAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   createCodeWorkflow: Scalars['ID']['output'];
+  createCustomComponent: CustomComponent;
   createDataTable: Scalars['Boolean']['output'];
   createEmbeddedMcpComponent?: Maybe<McpComponent>;
   createEmbeddedMcpServer?: Maybe<McpServer>;
@@ -2488,6 +2496,7 @@ export type Mutation = {
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
+  publishCustomComponent: CustomComponent;
   /**
    * Records a user-attached reference (file / workflow / data table / knowledge base) as a chat
    * artifact so it appears in the sidebar artifact list. Idempotent - re-attaching the same resource hits
@@ -2576,6 +2585,7 @@ export type Mutation = {
    * every rule and enforces none. Admin-only.
    */
   updateComponentRuleSettings: ComponentRuleSettings;
+  updateCustomComponentSource: CustomComponent;
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
@@ -2818,6 +2828,12 @@ export type MutationCreateCodeWorkflowArgs = {
   name: Scalars['String']['input'];
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateCustomComponentArgs = {
+  language: CustomComponentLanguage;
+  name: Scalars['String']['input'];
 };
 
 
@@ -3360,6 +3376,11 @@ export type MutationPublishAutomationWorkflowProjectArgs = {
 };
 
 
+export type MutationPublishCustomComponentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationRecordReferencedAiHubChatArtifactArgs = {
   input: RecordReferencedAiHubChatArtifactInput;
 };
@@ -3724,6 +3745,12 @@ export type MutationUpdateComponentRuleSettingsArgs = {
   approvalExpiresInHours: Scalars['Int']['input'];
   observeMode: Scalars['Boolean']['input'];
   workspaceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type MutationUpdateCustomComponentSourceArgs = {
+  content: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -4362,6 +4389,7 @@ export type Query = {
   connectionDefinitions: Array<ConnectionDefinition>;
   customComponent?: Maybe<CustomComponent>;
   customComponentDefinition?: Maybe<CustomComponentDefinition>;
+  customComponentSource: Scalars['String']['output'];
   customComponents: Array<CustomComponent>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
@@ -4998,6 +5026,11 @@ export type QueryCustomComponentArgs = {
 
 
 export type QueryCustomComponentDefinitionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryCustomComponentSourceArgs = {
   id: Scalars['ID']['input'];
 };
 
