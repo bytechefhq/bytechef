@@ -1,5 +1,5 @@
-import Badge from '@/components/Badge/Badge';
 import AlertDialog from '@/components/AlertDialog';
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
