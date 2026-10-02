@@ -1975,6 +1975,101 @@ describe('getElkLayoutElements with branches', () => {
         expect(Math.abs(branchCenter - defaultCenter - (caseOneCenter - branchCenter))).toBeLessThanOrEqual(1);
     });
 
+    it('does not mirror case columns lopsided by a nested subtree', async () => {
+        // The success case holds a condition whose TRUE side nests a 4-case
+        // branch, so its column reaches far left of its entry. Mirroring that
+        // asymmetry pushed the error and not_found columns out by the whole
+        // subtree width and left the outer frame mostly empty space
+        const nodes: Node[] = [
+            branchNode('branch_1', ['success', 'error', 'not_found']),
+            ...branchGhostNodes('branch_1'),
+            branchCasePlaceholderNode('branch_1', 'default'),
+            conditionNode('condition_1'),
+            ...conditionGhostNodes('condition_1'),
+            taskNode('httpClient_2', {conditionCase: 'caseTrue', conditionId: 'condition_1'}),
+            branchNode('branch_2', ['success', 'no_transa', 'error']),
+            ...branchGhostNodes('branch_2'),
+            branchCasePlaceholderNode('branch_2', 'default'),
+            conditionNode('condition_2'),
+            ...conditionGhostNodes('condition_2'),
+            taskNode('subflow_1', {conditionCase: 'caseTrue', conditionId: 'condition_2'}),
+            taskNode('dataStorage_6', {conditionCase: 'caseFalse', conditionId: 'condition_2'}),
+            branchChildTaskNode('subflow_2', 'branch_2', 'no_transa'),
+            branchChildTaskNode('dataStorage_3', 'branch_2', 'error'),
+            taskNode('dataStorage_1', {conditionCase: 'caseFalse', conditionId: 'condition_1'}),
+            branchChildTaskNode('dataStorage_4', 'branch_1', 'error'),
+            branchChildTaskNode('dataStorage_5', 'branch_1', 'not_found'),
+        ];
+
+        const setData = (nodeId: string, extraData: Record<string, unknown>) => {
+            const targetNode = nodes.find((candidateNode) => candidateNode.id === nodeId);
+
+            targetNode!.data = {...targetNode!.data, ...extraData};
+        };
+
+        setData('condition_1', {branchData: {branchId: 'branch_1', caseKey: 'success', index: 0}});
+        setData('branch_2', {conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_1', index: 1}});
+        setData('condition_2', {branchData: {branchId: 'branch_2', caseKey: 'success', index: 0}});
+
+        const edges: Edge[] = [
+            edge('branch_1', 'branch_1-branch-top-ghost'),
+            edge('branch_1-branch-top-ghost', 'branch_1-branch-default-placeholder-0'),
+            edge('branch_1-branch-top-ghost', 'condition_1'),
+            edge('branch_1-branch-top-ghost', 'dataStorage_4'),
+            edge('branch_1-branch-top-ghost', 'dataStorage_5'),
+            edge('branch_1-branch-default-placeholder-0', 'branch_1-branch-bottom-ghost'),
+            edge('dataStorage_4', 'branch_1-branch-bottom-ghost'),
+            edge('dataStorage_5', 'branch_1-branch-bottom-ghost'),
+            edge('condition_1', 'condition_1-condition-top-ghost'),
+            edge('condition_1-condition-top-ghost', 'httpClient_2'),
+            edge('condition_1-condition-top-ghost', 'dataStorage_1'),
+            edge('httpClient_2', 'branch_2'),
+            edge('branch_2', 'branch_2-branch-top-ghost'),
+            edge('branch_2-branch-top-ghost', 'branch_2-branch-default-placeholder-0'),
+            edge('branch_2-branch-top-ghost', 'condition_2'),
+            edge('branch_2-branch-top-ghost', 'subflow_2'),
+            edge('branch_2-branch-top-ghost', 'dataStorage_3'),
+            edge('branch_2-branch-default-placeholder-0', 'branch_2-branch-bottom-ghost'),
+            edge('subflow_2', 'branch_2-branch-bottom-ghost'),
+            edge('dataStorage_3', 'branch_2-branch-bottom-ghost'),
+            edge('condition_2', 'condition_2-condition-top-ghost'),
+            edge('condition_2-condition-top-ghost', 'subflow_1'),
+            edge('condition_2-condition-top-ghost', 'dataStorage_6'),
+            edge('subflow_1', 'condition_2-condition-bottom-ghost'),
+            edge('dataStorage_6', 'condition_2-condition-bottom-ghost'),
+            edge('condition_2-condition-bottom-ghost', 'branch_2-branch-bottom-ghost'),
+            edge('branch_2-branch-bottom-ghost', 'condition_1-condition-bottom-ghost'),
+            edge('dataStorage_1', 'condition_1-condition-bottom-ghost'),
+            edge('condition_1-condition-bottom-ghost', 'branch_1-branch-bottom-ghost'),
+        ];
+
+        const result = await getElkLayoutElements({canvasWidth: 1600, direction: 'TB', edges, nodes});
+
+        const centerOf = (id: string) => positionOf(result.nodes, id).x + 36;
+
+        const outerCenter = centerOf('branch_1');
+        const successDistance = outerCenter - centerOf('condition_1');
+        const errorDistance = centerOf('dataStorage_4') - outerCenter;
+
+        // The lopsided outer pair keeps its compact repack instead of the
+        // error column being pushed out to the success column's distance
+        expect(errorDistance - successDistance).toBeGreaterThan(200);
+
+        // The nested branch's lanes are lopsided only by labels, so they still mirror
+        const innerCenter = centerOf('branch_2');
+
+        expect(
+            Math.abs(innerCenter - centerOf('condition_2') - (centerOf('subflow_2') - innerCenter))
+        ).toBeLessThanOrEqual(1);
+        expect(
+            Math.abs(
+                innerCenter -
+                    centerOf('branch_2-branch-default-placeholder-0') -
+                    (centerOf('dataStorage_3') - innerCenter)
+            )
+        ).toBeLessThanOrEqual(1);
+    });
+
     it('ranks unknown case keys last', async () => {
         const nodes: Node[] = [
             branchNode('branch_1', ['case_a']),
