@@ -69,7 +69,8 @@ public final class UrlDetectorUtils {
             return List.of();
         }
 
-        CharSequence bounded = RegexParserUtils.bounded(content);
+        CharSequence bounded = GuardrailMatchDeadline.start()
+            .bound(content);
 
         List<UrlMatch> violations = new ArrayList<>();
         List<int[]> acceptedRanges = new ArrayList<>();

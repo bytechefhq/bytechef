@@ -35,6 +35,8 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.platform.ai.sensitivedata.SensitiveKind;
+import com.bytechef.platform.ai.sensitivedata.SensitiveSpan;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction;
@@ -50,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * `Secret Keys` detects API tokens and credential shapes in the input. It runs in the **preflight stage** so the
@@ -71,7 +74,7 @@ public final class SecretKeys {
 
                 @Override
                 public Optional<Violation> apply(String text, GuardrailContext context) {
-                    return applyCheck(text, resolveConfig(context));
+                    return applyCheck(text, context);
                 }
 
                 @Override
@@ -154,26 +157,44 @@ public final class SecretKeys {
             List.copyOf(inputParameters.getList(ALLOWED_FILE_EXTENSIONS, String.class, List.of())));
     }
 
-    private static Optional<Violation> applyCheck(String text, ResolvedConfig config) {
+    private static Optional<Violation> applyCheck(String text, GuardrailContext context) {
+        ResolvedConfig config = resolveConfig(context);
+
         List<SecretMatch> matches = SecretKeyDetectorUtils.detect(
             text, config.permissiveness(), List.of(), config.allowedFileExtensions());
+        List<SensitiveSpan> published = context.publishedInputSpans()
+            .stream()
+            .filter(span -> span.kind() == SensitiveKind.SECRET)
+            .toList();
 
-        if (matches.isEmpty()) {
+        if (matches.isEmpty() && published.isEmpty()) {
             return Optional.empty();
         }
+
+        ArrayList<String> providerTypes = Stream.concat(
+            published.stream()
+                .map(SensitiveSpan::category),
+            matches.stream()
+                .map(SecretMatch::type))
+            .distinct()
+            .collect(Collectors.toCollection(ArrayList::new));
 
         List<String> values = matches.stream()
             .map(SecretMatch::value)
             .distinct()
             .toList();
 
-        ArrayList<String> providerTypes = matches.stream()
-            .map(SecretMatch::type)
-            .distinct()
-            .collect(Collectors.toCollection(ArrayList::new));
+        if (published.isEmpty()) {
+            return Optional.of(
+                Violation.ofMatches("secretKeysCheck", values, Map.of("providerTypes", providerTypes)));
+        }
+
+        List<SecretMatch> deduplicatedMatches = SecretKeyDetectorUtils.deduplicateOverlaps(matches);
 
         return Optional.of(
-            Violation.ofMatches("secretKeysCheck", values, Map.of("providerTypes", providerTypes)));
+            Violation.ofSpans(
+                "secretKeysCheck", published.size() + deduplicatedMatches.size(),
+                Map.of("providerTypes", providerTypes)));
     }
 
     private static String maskInline(String text, ResolvedConfig config, Context context) {

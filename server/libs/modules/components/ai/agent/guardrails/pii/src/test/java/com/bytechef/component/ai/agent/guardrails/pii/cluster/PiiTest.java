@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.platform.ai.sensitivedata.SensitiveKind;
+import com.bytechef.platform.ai.sensitivedata.SensitiveSpan;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
@@ -29,6 +31,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.MaskResult
 import com.bytechef.platform.component.definition.ai.agent.guardrails.PreflightSanitizerFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,7 +76,7 @@ class PiiTest {
         assertThat(((Violation.PatternViolation) violation.get()).matchedSubstrings())
             .containsExactly("a@b.com", "c@d.com");
         assertThat(violation.get()
-            .info()).containsEntry("entityTypes", new java.util.ArrayList<>(List.of("EMAIL_ADDRESS")));
+            .info()).containsEntry("entityTypes", new ArrayList<>(List.of("EMAIL_ADDRESS")));
     }
 
     @Test
@@ -88,22 +91,81 @@ class PiiTest {
     }
 
     @Test
-    void testSanitizeMaskGroupsEntitiesByType() {
+    void testSanitizeMaskReturnsTheMaskedTextRatherThanAnEntityMap() {
         PreflightSanitizerFunction function = (PreflightSanitizerFunction) Pii.ofSanitize()
             .getElement();
 
         MaskResult result = function.mask(
             "email user@example.com and phone 555-123-4567", contextOf(Map.of("type", "ALL")));
 
-        assertThat(result).isInstanceOf(MaskResult.Entities.class);
+        assertThat(result).isInstanceOf(MaskResult.Masked.class);
+        assertThat(((MaskResult.Masked) result).text())
+            .isEqualTo("email <EMAIL_ADDRESS> and phone <PHONE_NUMBER>");
+    }
 
-        Map<String, List<String>> entities = ((MaskResult.Entities) result).entities();
+    @Test
+    void testCheckUnionsPublishedSpansWithItsOwnDetection() throws Exception {
+        GuardrailCheckFunction function = Pii.ofCheck()
+            .getElement();
 
-        assertThat(entities)
-            .containsKey("EMAIL_ADDRESS")
-            .containsKey("PHONE_NUMBER");
-        assertThat(entities.get("EMAIL_ADDRESS")).contains("user@example.com");
-        assertThat(entities.get("PHONE_NUMBER")).contains("555-123-4567");
+        GuardrailContext context = contextOf(Map.of("type", "ALL"))
+            .withPublishedInputSpans(List.of(SensitiveSpan.of(SensitiveKind.PII, "EMAIL_ADDRESS", 0, 16)));
+
+        Optional<Violation> violation = function.apply("[PII_EMAIL_ADDRESS_1_abcd] or 555-123-4567", context);
+
+        assertThat(violation).isPresent();
+        assertThat(violation.get()).isInstanceOf(Violation.SpanViolation.class);
+        assertThat(((Violation.SpanViolation) violation.get()).matchCount()).isEqualTo(2);
+        assertThat(violation.get()
+            .info()).containsEntry("entityTypes", new ArrayList<>(List.of("EMAIL_ADDRESS", "PHONE_NUMBER")));
+    }
+
+    @Test
+    void testPublishedSpansAreFilteredByTheNodesOwnSelection() throws Exception {
+        GuardrailCheckFunction function = Pii.ofCheck()
+            .getElement();
+
+        GuardrailContext context = contextOf(Map.of("type", "SELECTED", "entities", List.of("US_SSN")))
+            .withPublishedInputSpans(List.of(SensitiveSpan.of(SensitiveKind.PII, "EMAIL_ADDRESS", 0, 16)));
+
+        assertThat(function.apply("[PII_EMAIL_ADDRESS_1_abcd]", context))
+            .as("a node that only asked about SSNs does not fire on the floor's e-mail span")
+            .isEmpty();
+    }
+
+    @Test
+    void testTypeAllAcceptsPublishedSpanWithCategoryOutsideTheCatalog() throws Exception {
+        GuardrailCheckFunction function = Pii.ofCheck()
+            .getElement();
+
+        GuardrailContext context = contextOf(Map.of("type", "ALL"))
+            .withPublishedInputSpans(List.of(SensitiveSpan.of(SensitiveKind.PII, "EMPLOYEE_ID", 0, 5)));
+
+        assertThat(function.apply("EMP12 works here", context)).isPresent();
+    }
+
+    @Test
+    void testTypeSelectedIgnoresPublishedSpanWithCategoryOutsideTheCatalog() throws Exception {
+        GuardrailCheckFunction function = Pii.ofCheck()
+            .getElement();
+
+        GuardrailContext context = contextOf(Map.of("type", "SELECTED", "entities", List.of("US_SSN")))
+            .withPublishedInputSpans(List.of(SensitiveSpan.of(SensitiveKind.PII, "EMPLOYEE_ID", 0, 5)));
+
+        assertThat(function.apply("EMP12 works here", context))
+            .as("a custom rule's category cannot appear in the picker, so it cannot have been selected")
+            .isEmpty();
+    }
+
+    @Test
+    void testPublishedSecretSpansNeverCountForThePiiCheck() throws Exception {
+        GuardrailCheckFunction function = Pii.ofCheck()
+            .getElement();
+
+        GuardrailContext context = contextOf(Map.of("type", "ALL"))
+            .withPublishedInputSpans(List.of(SensitiveSpan.of(SensitiveKind.SECRET, "AWS_ACCESS_KEY", 0, 20)));
+
+        assertThat(function.apply("[REDACTED_AWS_ACCESS_KEY]", context)).isEmpty();
     }
 
     @Test

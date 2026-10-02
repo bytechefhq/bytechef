@@ -5,6 +5,7 @@ dependencies {
     api(project(":server:libs:platform:platform-api"))
     api(project(":sdks:backend:java:component-api"))
     api(project(":server:libs:core:exception:exception-api"))
+    api(project(":server:libs:platform:platform-ai:platform-ai-sensitive-data:platform-ai-sensitive-data-api"))
 
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.apache.commons:commons-lang3")
