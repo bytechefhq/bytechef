@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.agent.action;
 
+import static com.bytechef.component.ai.agent.constant.AiAgentConstants.AI_AGENT;
+import static com.bytechef.component.ai.agent.constant.AiAgentConstants.SUBAGENT_CONVERSATION_ID;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
@@ -45,6 +47,7 @@ import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
+import com.bytechef.platform.component.definition.ai.agent.ConversationHistoryReader;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
@@ -130,19 +133,7 @@ public abstract class AbstractAiAgentChatAction {
             ParametersFactory.create(modelConnection.getParameters()), true);
 
         String conversationId = clusterElementMap.fetchClusterElement(CHAT_MEMORY)
-            .map(clusterElement -> {
-                Parameters chatMemoryParameters = ParametersFactory.create(clusterElement.getParameters());
-
-                String id = chatMemoryParameters.getString("conversationId");
-
-                if (id != null) {
-                    return id;
-                }
-
-                UUID uuid = UUID.randomUUID();
-
-                return uuid.toString();
-            })
+            .map(clusterElement -> resolveConversationId(inputParameters, clusterElement))
             .orElse(null);
 
         Optional<ChatMemoryFunction.Result> chatMemoryResult =
@@ -157,7 +148,9 @@ public abstract class AbstractAiAgentChatAction {
             .build();
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(chatClient, inputParameters, context)
-            .advisors(getAdvisors(clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult))
+            .advisors(
+                getAdvisors(
+                    clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId))
             .advisors(getConversationAdvisor(conversationId))
             .advisors(new TextGenerationFirstAdvisor())
             .messages(ModelUtils.getMessages(inputParameters, context))
@@ -165,15 +158,22 @@ public abstract class AbstractAiAgentChatAction {
                 concatToolCallbacks(
                     getToolCallbacks(
                         clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                        toolExecutionListener, toolSimulations, chatModel, context),
+                        toolExecutionListener, toolSimulations, chatModel, conversationId, context),
                     chatMemoryResult)
                         .toArray());
 
-        if (conversationId != null) {
-            chatClientRequestSpec.toolContext(Map.of("chat_memory_conversation_id", conversationId));
+        if (conversationId != null && hasChatMemoryToolCallbacks(chatMemoryResult)) {
+            chatClientRequestSpec.toolContext(Map.of(ChatMemory.CONVERSATION_ID, conversationId));
         }
 
         return chatClientRequestSpec;
+    }
+
+    private static boolean hasChatMemoryToolCallbacks(Optional<ChatMemoryFunction.Result> chatMemoryResult) {
+        return chatMemoryResult
+            .map(ChatMemoryFunction.Result::toolCallbacks)
+            .filter(toolCallbacks -> !toolCallbacks.isEmpty())
+            .isPresent();
     }
 
     private ChatMemoryFunction.Result buildChatMemoryResult(
@@ -188,7 +188,7 @@ public abstract class AbstractAiAgentChatAction {
             return chatMemoryFunction.apply(
                 ParametersFactory.create(clusterElement.getParameters()),
                 getConnectionParameters(componentConnections, clusterElement),
-                ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
+                ParametersFactory.create(clusterElement.getExtensions()), componentConnections, context);
         } catch (Exception e) {
             throw clusterElementInitializationException(clusterElement, "chat memory", e, context);
         }
@@ -342,7 +342,8 @@ public abstract class AbstractAiAgentChatAction {
 
     List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
-        ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult) {
+        ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult,
+        @Nullable String conversationId) {
 
         List<Advisor> advisors = new ArrayList<>();
 
@@ -371,7 +372,7 @@ public abstract class AbstractAiAgentChatAction {
 
         if (!guardrailClusterElements.isEmpty()) {
             List<Message> conversationHistory = chatMemoryResult
-                .map(result -> loadConversationHistory(result.chatMemory(), clusterElementMap))
+                .map(result -> loadConversationHistory(result.conversationHistoryReader(), conversationId, context))
                 .orElse(List.of());
 
             for (ClusterElement clusterElement : guardrailClusterElements) {
@@ -423,8 +424,6 @@ public abstract class AbstractAiAgentChatAction {
         return advisor -> {
             if (conversationId != null) {
                 advisor.param(ChatMemory.CONVERSATION_ID, conversationId);
-
-                advisor.param("chat_memory_session_id", conversationId);
             }
         };
     }
@@ -508,11 +507,7 @@ public abstract class AbstractAiAgentChatAction {
 
         chatMemoryResult
             .map(ChatMemoryFunction.Result::toolCallbacks)
-            .ifPresent(memoryToolCallbacks -> {
-                if (memoryToolCallbacks != null) {
-                    combinedToolCallbacks.addAll(Arrays.asList(memoryToolCallbacks));
-                }
-            });
+            .ifPresent(combinedToolCallbacks::addAll);
 
         return combinedToolCallbacks;
     }
@@ -520,7 +515,8 @@ public abstract class AbstractAiAgentChatAction {
     private List<ToolCallback> getToolCallbacks(
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
         @Nullable ToolExecutionListener toolExecutionListener,
-        @Nullable Map<String, Map<String, String>> toolSimulations, ChatModel chatModel, ActionContext context) {
+        @Nullable Map<String, Map<String, String>> toolSimulations, ChatModel chatModel,
+        @Nullable String conversationId, ActionContext context) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
@@ -560,7 +556,9 @@ public abstract class AbstractAiAgentChatAction {
                 }
             } else if (clusterElementFunction instanceof MultipleConnectionsToolFunction) {
                 toolCallbacks.add(
-                    aiAgentToolFacade.getFunctionToolCallback(clusterElement, connectionParameters, context));
+                    aiAgentToolFacade.getFunctionToolCallback(
+                        clusterElement, connectionParameters, getSubagentConversationId(clusterElement, conversationId),
+                        context));
             } else {
                 ComponentConnection componentConnection = connectionParameters.get(
                     clusterElement.getWorkflowNodeName());
@@ -604,36 +602,60 @@ public abstract class AbstractAiAgentChatAction {
         return Arrays.asList(augmentedToolCallbackProvider.getToolCallbacks());
     }
 
-    private List<Message> loadConversationHistory(
-        @Nullable ChatMemory chatMemory, ClusterElementMap clusterElementMap) {
+    private static List<Message> loadConversationHistory(
+        ConversationHistoryReader conversationHistoryReader, @Nullable String conversationId,
+        ActionContext context) {
 
-        if (chatMemory == null) {
+        if (conversationId == null) {
             return List.of();
         }
 
-        return clusterElementMap.fetchClusterElement(CHAT_MEMORY)
-            .map(clusterElement -> {
-                Parameters chatMemoryParameters = ParametersFactory.create(clusterElement.getParameters());
-                String conversationId = chatMemoryParameters.getString("conversationId");
+        List<Message> messages;
 
-                if (conversationId == null) {
-                    return List.<Message>of();
-                }
+        try {
+            messages = conversationHistoryReader.read(conversationId);
+        } catch (RuntimeException exception) {
+            String message = "Failed to load conversation history for guardrails, conversationId=" + conversationId;
 
-                try {
-                    List<Message> all = chatMemory.get(conversationId);
+            context.log(log -> log.error(message, exception));
 
-                    if (all.isEmpty()) {
-                        return List.<Message>of();
-                    }
+            throw new IllegalStateException(message, exception);
+        }
 
-                    int size = all.size();
+        int size = messages.size();
 
-                    return size <= 3 ? List.copyOf(all) : List.copyOf(all.subList(size - 3, size));
-                } catch (Exception exception) {
-                    return List.<Message>of();
-                }
-            })
-            .orElse(List.of());
+        return size <= 3 ? List.copyOf(messages) : List.copyOf(messages.subList(size - 3, size));
+    }
+
+    private static String resolveConversationId(Parameters inputParameters, ClusterElement chatMemoryClusterElement) {
+        String subagentConversationId = inputParameters.getString(SUBAGENT_CONVERSATION_ID);
+
+        if (subagentConversationId != null && !subagentConversationId.isBlank()) {
+            return subagentConversationId;
+        }
+
+        Parameters chatMemoryParameters = ParametersFactory.create(chatMemoryClusterElement.getParameters());
+
+        String conversationId = chatMemoryParameters.getString("conversationId");
+
+        if (conversationId != null) {
+            return conversationId;
+        }
+
+        UUID uuid = UUID.randomUUID();
+
+        return uuid.toString();
+    }
+
+    private static @Nullable String getSubagentConversationId(
+        ClusterElement clusterElement, @Nullable String parentConversationId) {
+
+        if (parentConversationId == null || !AI_AGENT.equals(clusterElement.getComponentName()) ||
+            !AI_AGENT.equals(clusterElement.getClusterElementName())) {
+
+            return null;
+        }
+
+        return parentConversationId + ":" + clusterElement.getWorkflowNodeName();
     }
 }

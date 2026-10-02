@@ -60,7 +60,7 @@ public class Neo4jChatMemory {
             .chatMemoryRepository(getChatMemoryRepository(connectionParameters))
             .build();
 
-        return new ChatMemoryFunction.Result(
+        return ChatMemoryFunction.Result.of(
             MessageChatMemoryAdvisor.builder(chatMemory)
                 .build(),
             chatMemory);

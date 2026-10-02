@@ -40,19 +40,22 @@ import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunc
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction.SESSION_REPOSITORY;
 
+import com.bytechef.component.ai.agent.chat.memory.session.compaction.ContextLoggingSessionService;
 import com.bytechef.component.ai.agent.chat.memory.session.compaction.EventCountTrigger;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
+import com.bytechef.platform.component.definition.ai.agent.SessionConversationHistoryReader;
 import com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction;
-import com.bytechef.platform.component.definition.ai.agent.SessionServiceChatMemory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import org.jspecify.annotations.Nullable;
@@ -78,7 +81,7 @@ import org.springframework.ai.tool.ToolCallback;
 /**
  * @author Ivica Cardic
  */
-public class SessionChatMemory {
+public final class SessionChatMemory {
 
     private static final int DEFAULT_MAX_EVENTS = 20;
     private static final int DEFAULT_MAX_TURNS = 10;
@@ -115,7 +118,10 @@ public class SessionChatMemory {
                     .required(false),
                 string(COMPACTION_STRATEGY)
                     .label("Compaction Strategy")
-                    .description("How to shrink history when it grows. Older events are archived, not deleted.")
+                    .description(
+                        "How to shrink history when it grows. Older events are archived; Redis and S3 storage keep " +
+                            "only the 1000 most recent archived events, or, for the Built-in Session Repository, the " +
+                            "number set by bytechef.ai.memory.session-max-archived-events.")
                     .options(
                         option("None", NONE),
                         option("Sliding window (by events)", SLIDING_WINDOW),
@@ -127,8 +133,9 @@ public class SessionChatMemory {
                 integer(MAX_EVENTS)
                     .label("Max events")
                     .description(
-                        "Compaction runs once the history has more events than this. For recursive summarization " +
-                            "it must be greater than Max events to keep.")
+                        "Compaction runs once the active history has more events than this; archived events and " +
+                            "summaries are not counted. For sliding window, it is also the number of most recent " +
+                            "events kept. For recursive summarization, it must be greater than Max events to keep.")
                     .defaultValue(DEFAULT_MAX_EVENTS)
                     .displayCondition(
                         "%s == '%s' || %s == '%s'".formatted(
@@ -162,7 +169,9 @@ public class SessionChatMemory {
                     .required(true),
                 bool(ENABLE_CONVERSATION_SEARCH)
                     .label("Enable conversation search tool")
-                    .description("Exposes a keyword search tool over the full archived event log (recall storage).")
+                    .description(
+                        "Gives the agent a tool that searches the whole conversation history by keyword, including " +
+                            "archived messages that are still retained. Summaries are not searched.")
                     .defaultValue(false)
                     .required(false),
                 integer(SEARCH_PAGE_SIZE)
@@ -172,19 +181,19 @@ public class SessionChatMemory {
                     .displayCondition("%s == true".formatted(ENABLE_CONVERSATION_SEARCH))
                     .required(false))
             .type(CHAT_MEMORY)
-            .object(() -> this::apply);
+            .object(() -> new SessionChatMemoryFunction());
     }
 
-    protected ChatMemoryFunction.Result apply(
+    ChatMemoryFunction.Result apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections) throws Exception {
+        Map<String, ComponentConnection> componentConnections, @Nullable Context context) throws Exception {
 
         SessionService sessionService = DefaultSessionService.builder()
             .sessionRepository(resolveSessionRepository(extensions, componentConnections))
             .build();
 
         SessionMemoryAdvisor.Builder builder = SessionMemoryAdvisor
-            .builder(sessionService)
+            .builder(withContextLogging(sessionService, context))
             .defaultUserId(inputParameters.getString(DEFAULT_USER_ID, DEFAULT_USER_ID_VALUE))
             .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER);
 
@@ -198,10 +207,18 @@ public class SessionChatMemory {
 
         BaseAdvisor advisor = builder.build();
 
-        ToolCallback[] toolCallbacks = resolveRecallToolCallbacks(inputParameters, sessionService);
+        List<ToolCallback> toolCallbacks = resolveRecallToolCallbacks(inputParameters, sessionService);
 
-        return new ChatMemoryFunction.Result(
-            advisor, new SessionServiceChatMemory(sessionService), toolCallbacks, true);
+        return ChatMemoryFunction.Result.persistingToolMessages(
+            advisor, new SessionConversationHistoryReader(sessionService), toolCallbacks);
+    }
+
+    static SessionService withContextLogging(SessionService sessionService, @Nullable Context context) {
+        if (context == null) {
+            return sessionService;
+        }
+
+        return new ContextLoggingSessionService(sessionService, context);
     }
 
     private SessionRepository resolveSessionRepository(
@@ -320,11 +337,9 @@ public class SessionChatMemory {
             .build();
     }
 
-    private @Nullable ToolCallback[] resolveRecallToolCallbacks(
-        Parameters inputParameters, SessionService sessionService) {
-
+    private List<ToolCallback> resolveRecallToolCallbacks(Parameters inputParameters, SessionService sessionService) {
         if (!Boolean.TRUE.equals(inputParameters.getBoolean(ENABLE_CONVERSATION_SEARCH, false))) {
-            return null;
+            return List.of();
         }
 
         SessionEventTools sessionEventTools = SessionEventTools.builder(sessionService)
@@ -332,9 +347,30 @@ public class SessionChatMemory {
                 getPositiveInteger(inputParameters, SEARCH_PAGE_SIZE, DEFAULT_SEARCH_PAGE_SIZE, "Search page size"))
             .build();
 
-        return ToolCallbacks.from(sessionEventTools);
+        return List.of(ToolCallbacks.from(sessionEventTools));
     }
 
     record Compaction(CompactionStrategy strategy, CompactionTrigger trigger) {
+    }
+
+    private final class SessionChatMemoryFunction implements ChatMemoryFunction {
+
+        @Override
+        public Result apply(
+            Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+            Map<String, ComponentConnection> componentConnections) throws Exception {
+
+            return SessionChatMemory.this.apply(
+                inputParameters, connectionParameters, extensions, componentConnections, null);
+        }
+
+        @Override
+        public Result apply(
+            Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+            Map<String, ComponentConnection> componentConnections, Context context) throws Exception {
+
+            return SessionChatMemory.this.apply(
+                inputParameters, connectionParameters, extensions, componentConnections, context);
+        }
     }
 }

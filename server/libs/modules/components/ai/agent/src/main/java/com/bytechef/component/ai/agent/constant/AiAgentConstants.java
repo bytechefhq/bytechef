@@ -27,6 +27,7 @@ public class AiAgentConstants {
 
     public static final String AI_AGENT = "aiAgent";
     public static final String CHAT = "chat";
+    public static final String SUBAGENT_CONVERSATION_ID = "subagentConversationId";
 
     public static final List<Property> CHAT_PROPERTIES = List.of(
         LLMConstants.FORMAT_PROPERTY,

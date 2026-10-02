@@ -27,6 +27,7 @@ import static com.bytechef.component.mcp.client.constant.McpClientConstants.TOOL
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.TOOLS_TO_INCLUDE;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.TOOL_FILTER_TYPE;
 import static com.bytechef.component.mcp.client.util.McpClientUtils.createMcpSyncClient;
+import static com.bytechef.component.mcp.client.util.McpClientUtils.createToolContextToMcpMetaConverter;
 import static com.bytechef.component.mcp.client.util.McpClientUtils.createToolFilter;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -106,6 +107,7 @@ public class McpClientTool {
         return SyncMcpToolCallbackProvider.builder()
             .mcpClients(mcpSyncClient)
             .toolFilter(toolFilter)
+            .toolContextToMcpMetaConverter(createToolContextToMcpMetaConverter())
             .build();
     }
 }

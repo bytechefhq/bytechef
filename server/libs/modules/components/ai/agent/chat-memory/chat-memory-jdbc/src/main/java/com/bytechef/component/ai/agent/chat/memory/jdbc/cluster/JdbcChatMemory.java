@@ -72,7 +72,7 @@ public class JdbcChatMemory {
                     clusterElementDefinitionService))
             .build();
 
-        return new ChatMemoryFunction.Result(
+        return ChatMemoryFunction.Result.of(
             MessageChatMemoryAdvisor.builder(chatMemory)
                 .build(),
             chatMemory);

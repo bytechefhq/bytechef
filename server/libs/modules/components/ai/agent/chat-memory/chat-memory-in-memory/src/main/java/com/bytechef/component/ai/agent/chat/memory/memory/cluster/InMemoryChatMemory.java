@@ -57,7 +57,7 @@ public class InMemoryChatMemory {
             .chatMemoryRepository(InMemoryChatMemoryRepositoryHolder.getInstance())
             .build();
 
-        return new ChatMemoryFunction.Result(
+        return ChatMemoryFunction.Result.of(
             MessageChatMemoryAdvisor.builder(inMemoryChatMemory)
                 .build(),
             inMemoryChatMemory);

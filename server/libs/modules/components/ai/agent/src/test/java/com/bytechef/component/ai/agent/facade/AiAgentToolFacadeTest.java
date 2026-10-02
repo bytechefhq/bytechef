@@ -16,18 +16,29 @@
 
 package com.bytechef.component.ai.agent.facade;
 
+import static com.bytechef.component.ai.agent.constant.AiAgentConstants.SUBAGENT_CONVERSATION_ID;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 
@@ -37,12 +48,16 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 class AiAgentToolFacadeTest {
 
     private static final String CLUSTER_ELEMENT_DESCRIPTION = "Sends an email through Google Mail.";
+    private static final String MODEL_TOOL_INPUT =
+        "{\"subagentConversationId\": \"someone-else:aiAgent_9\", \"subject\": \"Hello\"}";
 
     private final ClusterElementDefinitionService clusterElementDefinitionService =
         mock(ClusterElementDefinitionService.class);
 
+    private final Evaluator evaluator = mock(Evaluator.class);
+
     private final AiAgentToolFacade aiAgentToolFacade =
-        new AiAgentToolFacade(clusterElementDefinitionService, mock(Evaluator.class));
+        new AiAgentToolFacade(clusterElementDefinitionService, evaluator);
 
     @Test
     void testToolNameFallsBackToTheClusterElement() {
@@ -109,11 +124,121 @@ class AiAgentToolFacadeTest {
         assertEquals("Emails the customer", toolDefinition.description());
     }
 
+    @Test
+    void testModelSuppliedSubagentConversationIdNeverReachesTheTool() {
+        Map<String, Object> toolParameters = callTool(Map.of());
+
+        assertThat(toolParameters)
+            .doesNotContainKey(SUBAGENT_CONVERSATION_ID)
+            .containsEntry("subject", "Hello");
+    }
+
+    @Test
+    void testInjectedSubagentConversationIdWinsOverTheModelSuppliedOne() {
+        Map<String, Object> toolParameters =
+            callTool(Map.of(SUBAGENT_CONVERSATION_ID, "parent-conversation:aiAgent_1"));
+
+        assertThat(toolParameters).containsEntry(SUBAGENT_CONVERSATION_ID, "parent-conversation:aiAgent_1");
+    }
+
+    @Test
+    void testModelSuppliedSubagentConversationIdNeverReachesAMultipleConnectionsTool() {
+        Map<String, Object> toolParameters = callMultipleConnectionsTool(Map.of(), null);
+
+        assertThat(toolParameters)
+            .doesNotContainKey(SUBAGENT_CONVERSATION_ID)
+            .containsEntry("subject", "Hello");
+    }
+
+    @Test
+    void testInjectedSubagentConversationIdWinsOverTheModelSuppliedOneForAMultipleConnectionsTool() {
+        Map<String, Object> toolParameters = callMultipleConnectionsTool(Map.of(), "parent-conversation:aiAgent_1");
+
+        assertThat(toolParameters).containsEntry(SUBAGENT_CONVERSATION_ID, "parent-conversation:aiAgent_1");
+    }
+
+    @Test
+    void testSubagentConversationIdContainingFromAiReachesTheSubagentVerbatim() {
+        String subagentConversationId = "fromAi('x') != null ? 'a' : 'b':aiAgent_1";
+
+        Map<String, Object> toolParameters = callMultipleConnectionsTool(
+            Map.of("prompt", "Research the topic"), subagentConversationId);
+
+        assertThat(toolParameters)
+            .containsEntry(SUBAGENT_CONVERSATION_ID, subagentConversationId)
+            .containsEntry("prompt", "Research the topic");
+
+        verifyNoInteractions(evaluator);
+    }
+
+    @Test
+    void testSubagentConversationIdContainingFromAiStaysOutOfTheInputSchema() {
+        when(evaluator.evaluate(anyMap(), anyMap())).thenReturn(
+            Map.of("value", new FromAiResult("x", "STRING", null, null, null, false)));
+
+        ClusterElement clusterElement = createClusterElement(Map.of("prompt", "Research the topic"));
+
+        ToolCallback toolCallback = aiAgentToolFacade.getFunctionToolCallback(
+            clusterElement, Map.of(), "fromAi('x') != null ? 'a' : 'b':aiAgent_1", mock(ActionContext.class));
+
+        ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+
+        assertThat(toolDefinition.inputSchema()).doesNotContain("\"x\"");
+
+        verifyNoInteractions(evaluator);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> callMultipleConnectionsTool(
+        Map<String, ?> parameters, @Nullable String subagentConversationId) {
+
+        ClusterElement clusterElement = createClusterElement(parameters);
+
+        when(clusterElementDefinitionService.executeTool(
+            eq("googleMail"), eq(1), eq("sendEmail"), anyMap(), anyMap(), anyMap(), anyBoolean()))
+                .thenReturn("sent");
+
+        ToolCallback toolCallback = aiAgentToolFacade.getFunctionToolCallback(
+            clusterElement, Map.of(), subagentConversationId, mock(ActionContext.class));
+
+        toolCallback.call(MODEL_TOOL_INPUT);
+
+        ArgumentCaptor<Map<String, Object>> inputParametersArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(clusterElementDefinitionService).executeTool(
+            eq("googleMail"), eq(1), eq("sendEmail"), inputParametersArgumentCaptor.capture(), anyMap(), anyMap(),
+            anyBoolean());
+
+        return inputParametersArgumentCaptor.getValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> callTool(Map<String, ?> parameters) {
+        ClusterElement clusterElement = createClusterElement(parameters);
+
+        when(clusterElementDefinitionService.executeTool(
+            eq("googleMail"), eq(1), eq("sendEmail"), anyMap(), any(ComponentConnection.class), anyBoolean()))
+                .thenReturn("sent");
+
+        ToolCallback toolCallback = aiAgentToolFacade.getFunctionToolCallback(
+            clusterElement, mock(ComponentConnection.class), mock(ActionContext.class));
+
+        toolCallback.call(MODEL_TOOL_INPUT);
+
+        ArgumentCaptor<Map<String, Object>> inputParametersArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(clusterElementDefinitionService).executeTool(
+            eq("googleMail"), eq(1), eq("sendEmail"), inputParametersArgumentCaptor.capture(),
+            any(ComponentConnection.class), anyBoolean());
+
+        return inputParametersArgumentCaptor.getValue();
+    }
+
     private ToolDefinition getMultipleConnectionsToolDefinition(Map<String, ?> parameters) {
         ClusterElement clusterElement = createClusterElement(parameters);
 
         ToolCallback toolCallback = aiAgentToolFacade.getFunctionToolCallback(
-            clusterElement, Map.of(), mock(ActionContext.class));
+            clusterElement, Map.of(), null, mock(ActionContext.class));
 
         return toolCallback.getToolDefinition();
     }
