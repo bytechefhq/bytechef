@@ -248,7 +248,7 @@ If you get `400 Bad Request`, make sure that:
 - The value is the same as the **CSRF Token** property, including uppercase and lowercase letters, with no extra spaces.
 - The deployed version of the workflow has the token that you send. If you change the token in the editor, publish and deploy the workflow again.
 
-The test URL does not check the token. To test the validation, use the static workflow webhook trigger URL.
+The test URL checks the token in the same way. A request with a missing or incorrect token returns `400 Bad Request` and is not recorded as sample output.
 
 
 
@@ -328,7 +328,7 @@ The HTTP connection stays open while the workflow runs. ByteChef sends the respo
 
 If the workflow runs more than one **Response to Webhook Request** step, for example in different branches, the last step that runs sets the response.
 
-The test URL does not wait for the workflow and does not apply **Response to Webhook Request**. It always returns `200 OK` with an empty body. To test the response, use the static workflow webhook trigger URL.
+The test URL checks the token in the same way: a missing or incorrect token returns `400 Bad Request`. It does not wait for the workflow and does not apply **Response to Webhook Request**, so a request with a correct token returns `200 OK` with an empty body. To test the response, use the static workflow webhook trigger URL.
 
 ##### Example
 
@@ -375,7 +375,7 @@ Each Webhook trigger listens on a URL. You can use any HTTP client, such as [Pos
 
 | URL | Where to find it | What it does |
 |:---|:---|:---|
-| **Webhook test URL** | In the workflow editor, open the trigger, go to the **Output** tab and click **Test**. The URL is shown under **Action Required**. | Records the request as the sample output of the trigger. The workflow does **not** run. The CSRF token is **not** checked. The response is always `200 OK` with an empty body. |
+| **Webhook test URL** | In the workflow editor, open the trigger, go to the **Output** tab and click **Test**. The URL is shown under **Action Required**. | Records the request as the sample output of the trigger. The workflow does **not** run. If the trigger has a **CSRF Token**, the token is checked: a missing or incorrect token returns `400 Bad Request` and the request is not recorded. Otherwise, the response is `200 OK` with an empty body. |
 | **Static workflow webhook trigger URL** | After you publish and deploy the workflow, go to **Deployments**, find the workflow and click the **Copy static workflow webhook trigger url** icon. | Runs the deployed workflow. The response depends on the trigger type. |
 
 The production URL has the form `https://<your-bytechef-host>/webhooks/<id>`. The test URL has the form `https://<your-bytechef-host>/webhooks/<id>/test/environments/<environmentId>`. Always copy the URL from ByteChef. Do not build it manually.
@@ -412,6 +412,8 @@ The `Content-Type` header controls how ByteChef reads the body:
 | **binary** / **File** | `application/pdf`, `application/octet-stream`, other `application/*` | A file object that contains the uploaded content. |
 | **raw → Text** / **Text** | `text/plain`, other `text/*` | The body as a string. |
 | **none** / **No Body** | (none) | `body` is not included. |
+
+An empty JSON or XML body is treated as no body, so `body` is not included. A JSON or XML body that cannot be parsed returns `400 Bad Request`, and the `detail` field of the response describes the error.
 
 ### Trigger Output
 
