@@ -15,7 +15,9 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import pasteNode from '../utils/pasteNode';
 import AddBranchChip from './AddBranchChip';
+import BinaryCaseLabel from './BinaryCaseLabel';
 import BranchCaseLabel from './BranchCaseLabel';
+import computeBinaryCaseLabel from './computeBinaryCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
 import computeExitEdgeJogCenter from './computeExitEdgeJogCenter';
@@ -25,6 +27,8 @@ export default function WorkflowEdge({
     data,
     id,
     markerEnd,
+    source,
+    sourceHandleId,
     sourcePosition,
     sourceX,
     sourceY,
@@ -113,6 +117,14 @@ export default function WorkflowEdge({
     });
 
     const caseKey = (targetNode?.data as NodeDataType)?.branchData?.caseKey;
+
+    const binaryCaseLabel = computeBinaryCaseLabel({
+        layoutDirection,
+        source,
+        sourceHandleId,
+        sourceX,
+        targetY,
+    });
 
     const addBranchPlaceholderId = (data as Record<string, unknown>)?.addBranchPlaceholderId as string | undefined;
 
@@ -262,6 +274,8 @@ export default function WorkflowEdge({
                     targetY={targetY}
                 />
             )}
+
+            {binaryCaseLabel && <BinaryCaseLabel edgeId={id} label={binaryCaseLabel} />}
 
             {addBranchPlaceholderId && (
                 <AddBranchChip

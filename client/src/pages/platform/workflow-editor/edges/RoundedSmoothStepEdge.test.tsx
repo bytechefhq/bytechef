@@ -58,6 +58,7 @@ const renderFanInEdgePath = (geometry: EdgeGeometryI) => {
                 {...({
                     data: {triggerFanIn: true},
                     id: 'trigger=>task_1',
+                    source: 'trigger',
                     target: 'task_1',
                     ...geometry,
                 } as unknown as EdgeProps)}
