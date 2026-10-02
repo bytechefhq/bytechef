@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
+import com.bytechef.component.ai.llm.advisor.ToolCallAwareStructuredOutputValidationAdvisor;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -57,7 +58,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.DefaultChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
@@ -513,7 +513,7 @@ class AbstractAiAgentChatActionTest {
         List<Advisor> advisors =
             ((DefaultChatClient.DefaultChatClientRequestSpec) chatClientRequestSpec).getAdvisors();
 
-        assertThat(advisors).anyMatch(StructuredOutputValidationAdvisor.class::isInstance);
+        assertThat(advisors).anyMatch(ToolCallAwareStructuredOutputValidationAdvisor.class::isInstance);
         assertThat(advisors).anyMatch(CodeFenceStrippingAdvisor.class::isInstance);
     }
 
@@ -533,7 +533,7 @@ class AbstractAiAgentChatActionTest {
         List<Advisor> advisors =
             ((DefaultChatClient.DefaultChatClientRequestSpec) chatClientRequestSpec).getAdvisors();
 
-        assertThat(advisors).noneMatch(StructuredOutputValidationAdvisor.class::isInstance);
+        assertThat(advisors).noneMatch(ToolCallAwareStructuredOutputValidationAdvisor.class::isInstance);
         assertThat(advisors).noneMatch(CodeFenceStrippingAdvisor.class::isInstance);
 
         // No JSON schema is read for a TEXT response, so the converter (and therefore context.json) is never touched.
