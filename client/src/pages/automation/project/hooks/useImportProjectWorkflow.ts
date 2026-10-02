@@ -27,8 +27,8 @@ export const useImportProjectWorkflow = (projectId: number) => {
         onSuccess: () => {
             captureProjectWorkflowImported();
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.project(projectId)});
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.project(projectId)});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             if (workflowFileInputRef.current) {
                 workflowFileInputRef.current.value = '';
