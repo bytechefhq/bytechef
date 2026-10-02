@@ -1,0 +1,14 @@
+{
+  "label": "Sync Suspend",
+  "tasks": [ {
+    "name": "approve",
+    "label": "Pause like an approval",
+    "type": "test/v1/suspend",
+    "parameters": { }
+  }, {
+    "name": "afterApproval",
+    "label": "Runs only once approved",
+    "type": "test/v1/next",
+    "parameters": { }
+  } ]
+}
