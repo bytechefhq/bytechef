@@ -1,11 +1,12 @@
 import {NodeDataType} from '@/shared/types';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import {ReactFlowProvider} from '@xyflow/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useWorkflowIssuesStore from '../stores/useWorkflowIssuesStore';
+import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../utils/canvasDragData';
 import WorkflowNode from './WorkflowNode';
 
 // Mutable slice of the editor store so each test can toggle which node is being renamed.
@@ -150,6 +151,34 @@ describe('WorkflowNode', () => {
         expect(popoverMenuMock).toHaveBeenCalledWith(
             expect.objectContaining({hideActionComponents: true, sourceNodeName: 'trigger_3'})
         );
+    });
+
+    it('highlights a trigger as a drop target while another trigger is dragged over it', () => {
+        renderNode(MANUAL_TRIGGER_DATA, 'trigger_3');
+
+        const nodeBox = screen.getByRole('button', {name: 'trigger_3 node'});
+
+        fireEvent.dragEnter(nodeBox, {dataTransfer: {types: [CANVAS_DRAG_DATA_TYPE]}});
+
+        expect(nodeBox).not.toHaveAttribute('data-dropzone-active');
+
+        fireEvent.dragEnter(nodeBox, {dataTransfer: {types: [CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE]}});
+
+        expect(nodeBox).toHaveAttribute('data-dropzone-active');
+        expect(nodeBox).toHaveClass('bg-surface-brand-secondary-hover');
+    });
+
+    it('does not highlight a task while a trigger is dragged over it', () => {
+        renderNode(
+            {...MANUAL_TRIGGER_DATA, name: 'logger_1', trigger: false, workflowNodeName: 'logger_1'},
+            'logger_1'
+        );
+
+        const nodeBox = screen.getByRole('button', {name: 'logger_1 node'});
+
+        fireEvent.dragEnter(nodeBox, {dataTransfer: {types: [CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE]}});
+
+        expect(nodeBox).not.toHaveAttribute('data-dropzone-active');
     });
 
     it('renders a rename input for a nested cluster root that is being renamed', () => {
