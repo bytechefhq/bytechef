@@ -65,7 +65,6 @@ public class ComponentHandlerLoader {
 
     private static String getLanguageId(Language language) {
         return switch (language) {
-//            case JAVA -> "java";
             case JAVASCRIPT -> "js";
             case PYTHON -> "python";
             case RUBY -> "ruby";
