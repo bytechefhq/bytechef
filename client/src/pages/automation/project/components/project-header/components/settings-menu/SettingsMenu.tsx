@@ -10,6 +10,8 @@ import DeleteProjectAlertDialog from '@/pages/automation/project/components/proj
 import ProjectTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectTabButtons/ProjectTabButtons';
 import WorkflowTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/WorkflowTabButtons';
 import {useSettingsMenu} from '@/pages/automation/project/components/project-header/components/settings-menu/hooks/useSettingsMenu';
+import {useCreateProjectWorkflow} from '@/pages/automation/project/hooks/useCreateProjectWorkflow';
+import {useImportProjectWorkflow} from '@/pages/automation/project/hooks/useImportProjectWorkflow';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
@@ -19,18 +21,27 @@ import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {SettingsIcon} from 'lucide-react';
-import {useState} from 'react';
+import {LoaderCircleIcon, SettingsIcon} from 'lucide-react';
+import {RefObject, useState} from 'react';
+import {PanelImperativeHandle} from 'react-resizable-panels';
+import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderSettingsMenuProps {
+    bottomResizablePanelRef?: RefObject<PanelImperativeHandle | null>;
     project: Project;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
 }
 
-const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeaderSettingsMenuProps) => {
+const SettingsMenu = ({
+    bottomResizablePanelRef,
+    project,
+    updateWorkflowMutation,
+    workflow,
+}: ProjectHeaderSettingsMenuProps) => {
     const [openDropdownMenu, setOpenDropdownMenu] = useState(false);
+    const [showCreateWorkflowDialog, setShowCreateWorkflowDialog] = useState(false);
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
@@ -46,6 +57,18 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
         }))
     );
 
+    const createProjectWorkflowMutation = useCreateProjectWorkflow({bottomResizablePanelRef, projectId: project.id!});
+
+    const {
+        handleN8nWorkflowFileChange,
+        handleWorkflowFileChange,
+        importN8nWorkflowDisabled,
+        isImportingN8nWorkflow,
+        n8nWorkflowFileInputRef,
+        workflowFileInputRef,
+    } = useImportProjectWorkflow(project.id!);
+
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const {
@@ -68,14 +91,25 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                         className="cursor-pointer data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                     >
                         <TooltipTrigger asChild>
-                            <Button aria-label="Settings" icon={<SettingsIcon />} size="icon" variant="ghost" />
+                            <Button
+                                aria-label="Settings"
+                                icon={
+                                    isImportingN8nWorkflow ? (
+                                        <LoaderCircleIcon className="animate-spin text-primary" />
+                                    ) : (
+                                        <SettingsIcon />
+                                    )
+                                }
+                                size="icon"
+                                variant="ghost"
+                            />
                         </TooltipTrigger>
                     </DropdownMenuTrigger>
 
                     <TooltipContent>Project and workflow settings</TooltipContent>
                 </Tooltip>
 
-                <DropdownMenuContent className="p-0">
+                <DropdownMenuContent align="end" className="p-0">
                     <Tabs aria-label="Settings menu" defaultValue="workflow">
                         <TabsList className="rounded-none">
                             <TabsTrigger
@@ -108,9 +142,16 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
 
                         <TabsContent className="mt-0" value="project">
                             <ProjectTabButtons
+                                importN8nWorkflowDisabled={importN8nWorkflowDisabled}
                                 onCloseDropdownMenuClick={() => setOpenDropdownMenu(false)}
                                 onDeleteProjectClick={() => setShowDeleteProjectAlertDialog(true)}
                                 onDuplicateProjectClick={handleDuplicateProjectClick}
+                                onImportN8nWorkflowClick={() => n8nWorkflowFileInputRef.current?.click()}
+                                onImportWorkflowClick={() => workflowFileInputRef.current?.click()}
+                                onNewWorkflowClick={() => setShowCreateWorkflowDialog(true)}
+                                onNewWorkflowFromTemplateClick={() =>
+                                    navigate(`/automation/projects/${project.id}/templates`)
+                                }
                                 onPullProjectFromGitClick={handlePullProjectFromGitClick}
                                 onShareProject={() => setShowProjectShareDialog(true)}
                                 onShowEditProjectDialogClick={() => setShowEditProjectDialog(true)}
@@ -123,6 +164,31 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                     </Tabs>
                 </DropdownMenuContent>
             </DropdownMenu>
+
+            <input
+                accept=".json,.yaml,.yml"
+                className="hidden"
+                onChange={handleWorkflowFileChange}
+                ref={workflowFileInputRef}
+                type="file"
+            />
+
+            <input
+                accept=".json"
+                className="hidden"
+                onChange={handleN8nWorkflowFileChange}
+                ref={n8nWorkflowFileInputRef}
+                type="file"
+            />
+
+            {showCreateWorkflowDialog && (
+                <WorkflowDialog
+                    createWorkflowMutation={createProjectWorkflowMutation}
+                    onClose={() => setShowCreateWorkflowDialog(false)}
+                    parentId={project.id}
+                    useGetWorkflowQuery={useGetWorkflowQuery}
+                />
+            )}
 
             {showDeleteProjectAlertDialog && (
                 <DeleteProjectAlertDialog

@@ -25,10 +25,14 @@ afterEach(() => {
 });
 
 const mockProps = {
-    hiddenFileInputRef: {current: null} as React.RefObject<HTMLInputElement | null>,
+    importN8nWorkflowDisabled: false,
     onCloseDropdownMenuClick: vi.fn(),
     onDeleteProjectClick: vi.fn(),
     onDuplicateProjectClick: vi.fn(),
+    onImportN8nWorkflowClick: vi.fn(),
+    onImportWorkflowClick: vi.fn(),
+    onNewWorkflowClick: vi.fn(),
+    onNewWorkflowFromTemplateClick: vi.fn(),
     onPullProjectFromGitClick: vi.fn(),
     onShareProject: vi.fn(),
     onShowEditProjectDialogClick: vi.fn(),
@@ -136,6 +140,28 @@ describe('ProjectTabButtons Export Functionality', () => {
         // Test Delete button
         await userEvent.click(screen.getByText('Delete'));
         expect(mockProps.onDeleteProjectClick).toHaveBeenCalled();
+    });
+
+    it('should call the workflow creation handlers when their buttons are clicked', async () => {
+        renderProjectTabButtons();
+
+        await userEvent.click(screen.getByText('New Workflow'));
+        expect(mockProps.onNewWorkflowClick).toHaveBeenCalled();
+
+        await userEvent.click(screen.getByText('Workflow from Template'));
+        expect(mockProps.onNewWorkflowFromTemplateClick).toHaveBeenCalled();
+
+        await userEvent.click(screen.getByText('Import Workflow'));
+        expect(mockProps.onImportWorkflowClick).toHaveBeenCalled();
+
+        await userEvent.click(screen.getByText('Import n8n Workflow'));
+        expect(mockProps.onImportN8nWorkflowClick).toHaveBeenCalled();
+    });
+
+    it('should disable Import n8n Workflow when no AI provider is enabled', () => {
+        renderProjectTabButtons({...mockProps, importN8nWorkflowDisabled: true});
+
+        expect(screen.getByLabelText('Import n8n Workflow')).toBeDisabled();
     });
 
     it('should not show Git-related buttons when feature flag is disabled', () => {
