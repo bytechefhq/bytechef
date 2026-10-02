@@ -40,6 +40,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.LinkedMultiValueMap;
@@ -226,30 +228,34 @@ public class WebhookRequestUtils {
             parameters = new HashMap<>(queryParams);
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
             try (InputStream inputStream = httpServletRequest.getInputStream()) {
-                Object content;
                 String rawContent = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
 
-                if (webhookTriggerFlags.webhookRawBody()) {
-                    content = rawContent;
+                if (rawContent.isBlank()) {
+                    body = null;
                 } else {
-                    content = JsonUtils.read(rawContent);
+                    Object content = webhookTriggerFlags.webhookRawBody()
+                        ? rawContent : readContent(rawContent, JsonUtils::read, "JSON");
+
+                    body = new WebhookBodyImpl(
+                        content, ContentType.JSON, httpServletRequest.getContentType(), rawContent);
                 }
 
-                body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType(), rawContent);
                 parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
             }
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_XML)) {
             try (InputStream inputStream = httpServletRequest.getInputStream()) {
-                Object content;
                 String rawContent = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
 
-                if (webhookTriggerFlags.webhookRawBody()) {
-                    content = rawContent;
+                if (rawContent.isBlank()) {
+                    body = null;
                 } else {
-                    content = XmlUtils.read(rawContent);
+                    Object content = webhookTriggerFlags.webhookRawBody()
+                        ? rawContent : readContent(rawContent, XmlUtils::read, "XML");
+
+                    body = new WebhookBodyImpl(
+                        content, ContentType.XML, httpServletRequest.getContentType(), rawContent);
                 }
 
-                body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType(), rawContent);
                 parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
             }
         } else if (contentType.startsWith("application/")) {
@@ -270,6 +276,16 @@ public class WebhookRequestUtils {
         return new BodyAndParameters(body, parameters);
     }
 
-    private record BodyAndParameters(WebhookBodyImpl body, Map<String, List<String>> parameters) {
+    @SuppressWarnings("PMD.PreserveStackTrace")
+    private static Object readContent(String rawContent, Function<String, Object> reader, String format) {
+        try {
+            return reader.apply(rawContent);
+        } catch (RuntimeException runtimeException) {
+            throw new IllegalArgumentException(
+                "Invalid %s request body: %s".formatted(format, runtimeException.getMessage()));
+        }
+    }
+
+    private record BodyAndParameters(@Nullable WebhookBodyImpl body, Map<String, List<String>> parameters) {
     }
 }
