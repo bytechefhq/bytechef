@@ -1,12 +1,12 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
+import McpComponentToolListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolListItem';
 import {McpComponent, McpTool} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ComponentIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
 import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
-import McpComponentToolListItem from './McpComponentToolListItem';
 
 interface McpComponentToolListProps {
     componentName: string;

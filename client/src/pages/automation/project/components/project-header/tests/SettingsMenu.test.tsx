@@ -128,3 +128,39 @@ it('should close the dropdown on click of a button inside the Project tab', asyn
         expect(screen.queryByLabelText('Project tab')).not.toBeInTheDocument();
     });
 });
+
+it('should close the delete workflow dialog without deleting when cancelled', async () => {
+    renderSettingsMenu();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
+
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(
+        'This action cannot be undone. This will permanently delete the workflow.'
+    );
+
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+    await waitFor(() => {
+        expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+});
+
+it('should close the delete project dialog without deleting when cancelled', async () => {
+    renderSettingsMenu();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    await userEvent.click(screen.getByLabelText('Project tab'));
+
+    await userEvent.click(screen.getByRole('button', {name: 'Delete Project'}));
+
+    expect(screen.getByRole('button', {name: 'Confirm Project Deletion'})).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+    await waitFor(() => {
+        expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+});

@@ -12,6 +12,7 @@ interface LinkedAccountI {
 }
 
 const AccountProfileLinkedAccounts = () => {
+    const [isUnlinkPending, setIsUnlinkPending] = useState(false);
     const [linkedAccount, setLinkedAccount] = useState<LinkedAccountI | null>(null);
     const [showUnlinkDialog, setShowUnlinkDialog] = useState(false);
 
@@ -36,16 +37,25 @@ const AccountProfileLinkedAccounts = () => {
     }, [fetchLinkedAccounts]);
 
     const handleUnlink = async (provider: string) => {
-        const response = await fetch(`/api/account/linked-accounts/${provider}`, {
-            method: 'DELETE',
-        });
+        setIsUnlinkPending(true);
 
-        if (response.ok) {
-            toast('Provider has been unlinked.');
+        try {
+            const response = await fetch(`/api/account/linked-accounts/${provider}`, {
+                method: 'DELETE',
+            });
 
-            fetchLinkedAccounts();
-        } else {
+            if (response.ok) {
+                toast('Provider has been unlinked.');
+
+                await fetchLinkedAccounts();
+            } else {
+                toast.error('Failed to unlink provider.');
+            }
+        } catch {
             toast.error('Failed to unlink provider.');
+        } finally {
+            setIsUnlinkPending(false);
+            setShowUnlinkDialog(false);
         }
     };
 
@@ -91,12 +101,9 @@ const AccountProfileLinkedAccounts = () => {
                                     confirmButtonVariant="default"
                                     confirmLabel="Unlink"
                                     description={`Are you sure you want to unlink ${linkedAccount.authProvider}? You will need to use your password to log in.`}
+                                    isPending={isUnlinkPending}
                                     onCancel={() => setShowUnlinkDialog(false)}
-                                    onConfirm={() => {
-                                        setShowUnlinkDialog(false);
-
-                                        handleUnlink(linkedAccount.authProvider);
-                                    }}
+                                    onConfirm={() => void handleUnlink(linkedAccount.authProvider)}
                                     open={showUnlinkDialog}
                                     title="Unlink Provider"
                                 />

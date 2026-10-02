@@ -16,7 +16,7 @@ vi.mock('../mcp-component-dialog/McpComponentDialog', () => ({
     default: () => null,
 }));
 
-vi.mock('./McpComponentToolListItem', () => ({
+vi.mock('@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolListItem', () => ({
     default: ({connectionRequired}: {connectionRequired?: boolean}) => (
         <div data-connection-required={String(connectionRequired)} data-testid="tool-list-item" />
     ),

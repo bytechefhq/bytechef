@@ -1,9 +1,14 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {render, resetAll, screen} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+import saveWorkflowDefinitionUpdate from '../utils/saveWorkflowDefinitionUpdate';
 import WorkflowOutputsSheetTable from './WorkflowOutputsSheetTable';
+
+vi.mock('../utils/saveWorkflowDefinitionUpdate', () => ({
+    default: vi.fn(),
+}));
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
     useWorkflowEditor: () => ({
@@ -52,4 +57,34 @@ describe('WorkflowOutputsSheetTable', () => {
 
         expect(screen.getByTitle(longOutputValue)).toBeInTheDocument();
     });
+
+    it('should close the delete dialog without deleting when cancelled', async () => {
+        renderTable();
+
+        await openDeleteDialog();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+        expect(saveWorkflowDefinitionUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should delete the selected output and close the dialog when confirmed', async () => {
+        renderTable();
+
+        await openDeleteDialog();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
+
+        expect(saveWorkflowDefinitionUpdate).toHaveBeenCalledTimes(1);
+        expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
 });
+
+async function openDeleteDialog() {
+    const [, deleteButton] = within(screen.getByRole('row', {name: /longOutput/})).getAllByRole('button');
+
+    await userEvent.click(deleteButton);
+
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+}
