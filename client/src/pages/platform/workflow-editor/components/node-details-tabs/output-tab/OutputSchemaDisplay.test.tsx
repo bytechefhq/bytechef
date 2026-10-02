@@ -119,6 +119,20 @@ describe('OutputSchemaDisplay', () => {
         expect(screen.queryByText('Placeholder sample data')).not.toBeInTheDocument();
     });
 
+    it('should offer Test Action and no Upload Sample Output button for a testable action', () => {
+        renderOutputSchemaDisplay();
+
+        expect(screen.getByRole('button', {name: 'Test Action'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Upload Sample Output'})).not.toBeInTheDocument();
+    });
+
+    it('should offer Upload Sample Output instead of Test Action for a task dispatcher', () => {
+        renderOutputSchemaDisplay({currentNode: {...currentNode, taskDispatcher: true}});
+
+        expect(screen.getByRole('button', {name: 'Upload Sample Output'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Test Action'})).not.toBeInTheDocument();
+    });
+
     it('should suggest uploading a sample output when the operation cannot be tested', () => {
         renderOutputSchemaDisplay({resumePerformFunctionDefined: true, testOutputResponse: false});
 
