@@ -70,8 +70,8 @@ public class AiTextComponentHandler implements ComponentHandler {
                     .actions(
                         ClassifyTextAction.of(provider, propertyService),
                         ExtractDataAction.of(provider, propertyService),
-                        MaskAction.of(provider, propertyService),
-                        UnmaskAction.of(provider, propertyService),
+                        MaskAction.of(),
+                        UnmaskAction.of(),
                         SentimentAction.of(provider, propertyService),
                         ScoreAction.of(provider, propertyService),
                         SummarizeTextAction.of(provider, propertyService),

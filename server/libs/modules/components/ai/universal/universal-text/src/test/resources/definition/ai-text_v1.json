@@ -546,7 +546,7 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": false,
-    "description": "Uses AI to detect and redact sensitive content from text.",
+    "description": "Replaces sensitive content with reversible tokens and returns the map to restore them. Secrets are redacted irreversibly and are never in the map.",
     "help": {
       "body": "",
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#mask"
@@ -577,7 +577,7 @@
             "advancedOption": false,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": "The text with sensitive content redacted.",
+            "description": "The text with sensitive content replaced by tokens.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": true,
@@ -622,7 +622,7 @@
             "advancedOption": false,
             "controlType": "OBJECT_BUILDER",
             "defaultValue": null,
-            "description": "Mapping of mask tokens to their original values.",
+            "description": "Mapping of each token to the value it replaced.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": true,
@@ -643,11 +643,11 @@
         },
         "placeholder": null,
         "sampleOutput": {
+          "text": "Hello, my name is [PII_KEYWORD_1_k3n9] and my email is [PII_EMAIL_ADDRESS_2_k3n9].",
           "maskMap": {
-            "[EMAIL_1]": "john@example.com",
-            "[REDACTED_1]": "John Doe"
-          },
-          "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1]."
+            "[PII_EMAIL_ADDRESS_2_k3n9]": "john@example.com",
+            "[PII_KEYWORD_1_k3n9]": "John Doe"
+          }
         }
       },
       "outputSchema": {
@@ -671,7 +671,7 @@
           "advancedOption": false,
           "controlType": "TEXT",
           "defaultValue": null,
-          "description": "The text with sensitive content redacted.",
+          "description": "The text with sensitive content replaced by tokens.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": true,
@@ -716,7 +716,7 @@
           "advancedOption": false,
           "controlType": "OBJECT_BUILDER",
           "defaultValue": null,
-          "description": "Mapping of mask tokens to their original values.",
+          "description": "Mapping of each token to the value it replaced.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": true,
@@ -736,110 +736,16 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
+        "text": "Hello, my name is [PII_KEYWORD_1_k3n9] and my email is [PII_EMAIL_ADDRESS_2_k3n9].",
         "maskMap": {
-          "[EMAIL_1]": "john@example.com",
-          "[REDACTED_1]": "John Doe"
-        },
-        "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1]."
+          "[PII_EMAIL_ADDRESS_2_k3n9]": "john@example.com",
+          "[PII_KEYWORD_1_k3n9]": "John Doe"
+        }
       }
     },
     "perform": { },
     "processErrorResponse": null,
     "properties": [ {
-      "advancedOption": false,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The AI provider to use. The list only shows AI providers added and enabled in Settings > AI > Providers, so add one there first.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Provider",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "provider",
-      "options": [ ],
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ ]
-      },
-      "optionsLoadedDynamically": false,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": false,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The model name to use.",
-      "displayCondition": "contains({'ANTHROPIC','MISTRAL','OPEN_AI','VERTEX_GEMINI'}, provider)",
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Model",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "model",
-      "options": [ ],
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "provider" ]
-      },
-      "optionsLoadedDynamically": false,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": false,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Model",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "model",
-      "options": [ ],
-      "optionsDataSource": null,
-      "optionsLoadedDynamically": false,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": false,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "Url of the inference endpoint.",
-      "displayCondition": "provider == 'VERTEX_GEMINI'",
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "URL",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "model",
-      "options": [ ],
-      "optionsDataSource": null,
-      "optionsLoadedDynamically": false,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
       "advancedOption": false,
       "controlType": "TEXT",
       "defaultValue": null,
@@ -865,7 +771,7 @@
       "advancedOption": false,
       "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
-      "description": "Words or phrases to detect and redact.",
+      "description": "Words or phrases to mask, matched case-insensitively.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": true,
@@ -908,7 +814,7 @@
       "advancedOption": false,
       "controlType": "MULTI_SELECT",
       "defaultValue": null,
-      "description": "Detect personally identifiable information (email, phone, SSN, credit card, IP address).",
+      "description": "PII types to mask. Leave empty to mask every type in the curated default.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": true,
@@ -945,23 +851,147 @@
       "options": [ {
         "description": null,
         "label": "Email address",
-        "value": "EMAIL"
+        "value": "EMAIL_ADDRESS"
       }, {
         "description": null,
         "label": "Phone number",
-        "value": "PHONE"
+        "value": "PHONE_NUMBER"
       }, {
         "description": null,
         "label": "Credit card number",
         "value": "CREDIT_CARD"
       }, {
         "description": null,
-        "label": "IP address",
+        "label": "IP address (IPv4)",
         "value": "IP_ADDRESS"
       }, {
         "description": null,
+        "label": "IBAN code",
+        "value": "IBAN_CODE"
+      }, {
+        "description": null,
+        "label": "Bitcoin/crypto address",
+        "value": "CRYPTO"
+      }, {
+        "description": null,
+        "label": "Date or date-time (ISO-8601)",
+        "value": "DATE_TIME"
+      }, {
+        "description": null,
+        "label": "Street address / location",
+        "value": "LOCATION"
+      }, {
+        "description": null,
+        "label": "Medical license",
+        "value": "MEDICAL_LICENSE"
+      }, {
+        "description": null,
+        "label": "US bank account number",
+        "value": "US_BANK_NUMBER"
+      }, {
+        "description": null,
+        "label": "US driver license",
+        "value": "US_DRIVER_LICENSE"
+      }, {
+        "description": null,
+        "label": "US Individual Taxpayer Identification Number (ITIN)",
+        "value": "US_ITIN"
+      }, {
+        "description": null,
+        "label": "US passport number",
+        "value": "US_PASSPORT"
+      }, {
+        "description": null,
         "label": "US Social Security Number",
-        "value": "SSN"
+        "value": "US_SSN"
+      }, {
+        "description": null,
+        "label": "UK NHS number",
+        "value": "UK_NHS"
+      }, {
+        "description": null,
+        "label": "UK National Insurance Number",
+        "value": "UK_NINO"
+      }, {
+        "description": null,
+        "label": "Spanish NIF",
+        "value": "ES_NIF"
+      }, {
+        "description": null,
+        "label": "Spanish NIE",
+        "value": "ES_NIE"
+      }, {
+        "description": null,
+        "label": "Italian fiscal code (Codice Fiscale)",
+        "value": "IT_FISCAL_CODE"
+      }, {
+        "description": null,
+        "label": "Italian driver license",
+        "value": "IT_DRIVER_LICENSE"
+      }, {
+        "description": null,
+        "label": "Italian VAT code (Partita IVA)",
+        "value": "IT_VAT_CODE"
+      }, {
+        "description": null,
+        "label": "Italian passport",
+        "value": "IT_PASSPORT"
+      }, {
+        "description": null,
+        "label": "Italian identity card",
+        "value": "IT_IDENTITY_CARD"
+      }, {
+        "description": null,
+        "label": "Polish PESEL",
+        "value": "PL_PESEL"
+      }, {
+        "description": null,
+        "label": "Singapore NRIC/FIN",
+        "value": "SG_NRIC_FIN"
+      }, {
+        "description": null,
+        "label": "Singapore UEN (Unique Entity Number)",
+        "value": "SG_UEN"
+      }, {
+        "description": null,
+        "label": "Australian Business Number (ABN)",
+        "value": "AU_ABN"
+      }, {
+        "description": null,
+        "label": "Australian Company Number (ACN)",
+        "value": "AU_ACN"
+      }, {
+        "description": null,
+        "label": "Australian Tax File Number (TFN)",
+        "value": "AU_TFN"
+      }, {
+        "description": null,
+        "label": "Australian Medicare card number",
+        "value": "AU_MEDICARE"
+      }, {
+        "description": null,
+        "label": "Indian Permanent Account Number (PAN)",
+        "value": "IN_PAN"
+      }, {
+        "description": null,
+        "label": "Indian Aadhaar number",
+        "value": "IN_AADHAAR"
+      }, {
+        "description": null,
+        "label": "Indian vehicle registration",
+        "value": "IN_VEHICLE_REGISTRATION"
+      }, {
+        "description": null,
+        "label": "Indian voter ID (EPIC)",
+        "value": "IN_VOTER"
+      }, {
+        "description": null,
+        "label": "Indian passport number",
+        "value": "IN_PASSPORT"
+      }, {
+        "description": null,
+        "label": "Finnish Personal Identity Code (HETU)",
+        "value": "FI_PERSONAL_IDENTITY_CODE"
       } ],
       "optionsDataSource": null,
       "placeholder": null,
@@ -971,7 +1001,7 @@
       "advancedOption": false,
       "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
-      "description": "Custom patterns to detect and redact.",
+      "description": "Java regular expressions to mask.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": true,
@@ -1010,47 +1040,6 @@
       "placeholder": null,
       "required": false,
       "type": "ARRAY"
-    }, {
-      "advancedOption": true,
-      "controlType": "INTEGER",
-      "defaultValue": null,
-      "description": "The maximum number of tokens to generate in the chat completion.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Max Tokens",
-      "maxValue": null,
-      "metadata": { },
-      "minValue": null,
-      "name": "maxTokens",
-      "options": [ ],
-      "optionsDataSource": null,
-      "placeholder": null,
-      "required": false,
-      "type": "INTEGER"
-    }, {
-      "advancedOption": true,
-      "controlType": "NUMBER",
-      "defaultValue": 1.0,
-      "description": "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Temperature",
-      "maxNumberPrecision": null,
-      "maxValue": 2.0,
-      "metadata": { },
-      "minNumberPrecision": null,
-      "minValue": 0.0,
-      "name": "temperature",
-      "numberPrecision": null,
-      "options": [ ],
-      "optionsDataSource": null,
-      "placeholder": null,
-      "required": false,
-      "type": "NUMBER"
     } ],
     "resumePerform": null,
     "title": "Mask",
@@ -1061,7 +1050,7 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": false,
-    "description": "Uses AI and a map of masking entities to unmask the text.",
+    "description": "Restores the tokens in a text from the map the Mask action returned.",
     "help": {
       "body": "",
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-text_v1#unmask"
@@ -1075,7 +1064,7 @@
           "advancedOption": false,
           "controlType": "TEXT",
           "defaultValue": null,
-          "description": "The text with sensitive content redacted.",
+          "description": "The text with tokens restored.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": true,
@@ -1095,13 +1084,13 @@
           "type": "STRING"
         },
         "placeholder": null,
-        "sampleOutput": "Hello, my name is [REDACTED] and my email is [EMAIL]."
+        "sampleOutput": "Hello, my name is John Doe and my email is john@example.com."
       },
       "outputSchema": {
         "advancedOption": false,
         "controlType": "TEXT",
         "defaultValue": null,
-        "description": "The text with sensitive content redacted.",
+        "description": "The text with tokens restored.",
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": true,
@@ -1120,105 +1109,11 @@
         "required": false,
         "type": "STRING"
       },
-      "sampleOutput": "Hello, my name is [REDACTED] and my email is [EMAIL]."
+      "sampleOutput": "Hello, my name is John Doe and my email is john@example.com."
     },
     "perform": { },
     "processErrorResponse": null,
     "properties": [ {
-      "advancedOption": false,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The AI provider to use. The list only shows AI providers added and enabled in Settings > AI > Providers, so add one there first.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Provider",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "provider",
-      "options": [ ],
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ ]
-      },
-      "optionsLoadedDynamically": false,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": false,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The model name to use.",
-      "displayCondition": "contains({'ANTHROPIC','MISTRAL','OPEN_AI','VERTEX_GEMINI'}, provider)",
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Model",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "model",
-      "options": [ ],
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "provider" ]
-      },
-      "optionsLoadedDynamically": false,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": false,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Model",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "model",
-      "options": [ ],
-      "optionsDataSource": null,
-      "optionsLoadedDynamically": false,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": false,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "Url of the inference endpoint.",
-      "displayCondition": "provider == 'VERTEX_GEMINI'",
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "URL",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "model",
-      "options": [ ],
-      "optionsDataSource": null,
-      "optionsLoadedDynamically": false,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
       "advancedOption": false,
       "controlType": "TEXT",
       "defaultValue": null,
@@ -1267,7 +1162,7 @@
       "advancedOption": false,
       "controlType": "OBJECT_BUILDER",
       "defaultValue": null,
-      "description": "Map of masked entities to replace with values.",
+      "description": "Map of tokens to the values to restore.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": true,
@@ -1282,47 +1177,6 @@
       "properties": [ ],
       "required": false,
       "type": "OBJECT"
-    }, {
-      "advancedOption": true,
-      "controlType": "INTEGER",
-      "defaultValue": null,
-      "description": "The maximum number of tokens to generate in the chat completion.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Max Tokens",
-      "maxValue": null,
-      "metadata": { },
-      "minValue": null,
-      "name": "maxTokens",
-      "options": [ ],
-      "optionsDataSource": null,
-      "placeholder": null,
-      "required": false,
-      "type": "INTEGER"
-    }, {
-      "advancedOption": true,
-      "controlType": "NUMBER",
-      "defaultValue": 1.0,
-      "description": "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Temperature",
-      "maxNumberPrecision": null,
-      "maxValue": 2.0,
-      "metadata": { },
-      "minNumberPrecision": null,
-      "minValue": 0.0,
-      "name": "temperature",
-      "numberPrecision": null,
-      "options": [ ],
-      "optionsDataSource": null,
-      "placeholder": null,
-      "required": false,
-      "type": "NUMBER"
     } ],
     "resumePerform": null,
     "title": "Unmask",

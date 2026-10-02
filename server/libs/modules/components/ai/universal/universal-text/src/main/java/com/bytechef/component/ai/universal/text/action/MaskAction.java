@@ -16,179 +16,149 @@
 
 package com.bytechef.component.ai.universal.text.action;
 
-import static com.bytechef.component.ai.llm.ChatModel.Role.SYSTEM;
-import static com.bytechef.component.ai.llm.ChatModel.Role.USER;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.ROLE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.CUSTOM_PATTERNS;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MASK_MAP;
-import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MODEL_NO_OPTIONS_PROPERTY;
-import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MODEL_OPTIONS_PROPERTY;
-import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MODEL_URL_PROPERTY;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.PII_DETECTION;
-import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.SENSITIVE_KEYWORDS;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.TEXT;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.universal.text.action.definition.AiTextActionDefinition;
 import com.bytechef.component.ai.universal.text.constant.AiTextConstants;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.ai.universal.text.util.MaskSpans;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.component.definition.ParametersFactory;
-import com.bytechef.platform.configuration.service.PropertyService;
-import java.util.HashMap;
+import com.bytechef.platform.ai.sensitivedata.MatchDeadline;
+import com.bytechef.platform.ai.sensitivedata.PiiPatternCatalog;
+import com.bytechef.platform.ai.sensitivedata.PiiPatternLabels;
+import com.bytechef.platform.ai.sensitivedata.RegexPiiDetector;
+import com.bytechef.platform.ai.sensitivedata.RegexSecretDetector;
+import com.bytechef.platform.ai.sensitivedata.SensitiveDataRedactor;
+import com.bytechef.platform.ai.sensitivedata.SensitiveKind;
+import com.bytechef.platform.ai.sensitivedata.SensitiveSpan;
+import com.bytechef.platform.ai.sensitivedata.tokenization.PiiTokenSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marko Kriskovic
+ * @author Ivica Cardic
  */
-public class MaskAction implements AiTextAction {
+public final class MaskAction {
 
-    private static final String RESPONSE_SCHEMA = """
-        {
-          "type": "object",
-          "properties": {
-            "text": {
-              "type": "string"
-            },
-            "maskMap": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "required": ["text", "maskMap"]
-        }
-        """;
-    private static final String SYSTEM_PROMPT =
-        "You are a content redaction specialist. Detect and replace sensitive information in the given text with " +
-            "mask tokens. Increment the number suffix (_1, _2, ...) for each unique occurrence of the same type " +
-            "so every masking is unique. Respond with a JSON object with two fields: \"text\" (the redacted " +
-            "text) and \"maskMap\" (an object mapping each mask token to the original value it replaced).";
-
-    public static AiTextActionDefinition of(
-        ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
-
-        return new AiTextActionDefinition(
-            action(AiTextConstants.MASK)
-                .title("Mask")
-                .description("Uses AI to detect and redact sensitive content from text.")
-                .properties(
-                    PROVIDER_PROPERTY.apply(provider, propertyService),
-                    MODEL_OPTIONS_PROPERTY,
-                    MODEL_NO_OPTIONS_PROPERTY,
-                    MODEL_URL_PROPERTY,
-                    string(TEXT)
-                        .label("Text")
-                        .description("The text to process.")
-                        .required(true),
-                    array(SENSITIVE_KEYWORDS)
-                        .label("Sensitive Keywords")
-                        .description("Words or phrases to detect and redact.")
-                        .items(string()),
-                    array(PII_DETECTION)
-                        .label("PII Detection")
-                        .description(
-                            "Detect personally identifiable information (email, phone, SSN, credit card, IP address).")
-                        .items(string())
-                        .options(getPiiDetectionOptions()),
-                    array(CUSTOM_PATTERNS)
-                        .label("Custom Patterns")
-                        .description("Custom patterns to detect and redact.")
-                        .items(string()),
-                    MAX_TOKENS_PROPERTY,
-                    TEMPERATURE_PROPERTY)
-                .output(
-                    outputSchema(
-                        object()
-                            .properties(
-                                string(TEXT)
-                                    .description("The text with sensitive content redacted."),
-                                object(MASK_MAP)
-                                    .description("Mapping of mask tokens to their original values.")
-                                    .additionalProperties(string()))),
-                    sampleOutput(
-                        Map.of(
-                            TEXT, "Hello, my name is [REDACTED_1] and my email is [EMAIL_1].",
-                            MASK_MAP, Map.of("[REDACTED_1]", "John Doe", "[EMAIL_1]", "john@example.com"))))
-                .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#mask"),
-            provider, new MaskAction(), propertyService);
-    }
+    private static final Map<String, String> LEGACY_TYPE_ALIASES = Map.of(
+        "EMAIL", "EMAIL_ADDRESS",
+        "PHONE", "PHONE_NUMBER",
+        "SSN", "US_SSN");
 
     private MaskAction() {
     }
 
-    @Override
-    public Parameters createParameters(Parameters inputParameters) {
-        Map<String, Object> modelInputParametersMap = new HashMap<>();
+    public static ModifiableActionDefinition of() {
+        return action(AiTextConstants.MASK)
+            .title("Mask")
+            .description(
+                "Replaces sensitive content with reversible tokens and returns the map to restore them. Secrets are " +
+                    "redacted irreversibly and are never in the map.")
+            .properties(
+                string(TEXT)
+                    .label("Text")
+                    .description("The text to process.")
+                    .required(true),
+                array(SENSITIVE_KEYWORDS)
+                    .label("Sensitive Keywords")
+                    .description("Words or phrases to mask, matched case-insensitively.")
+                    .items(string()),
+                array(PII_DETECTION)
+                    .label("PII Detection")
+                    .description("PII types to mask. Leave empty to mask every type in the curated default.")
+                    .items(string())
+                    .options(getPiiDetectionOptions()),
+                array(CUSTOM_PATTERNS)
+                    .label("Custom Patterns")
+                    .description("Java regular expressions to mask.")
+                    .items(string()))
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            string(TEXT)
+                                .description("The text with sensitive content replaced by tokens."),
+                            object(MASK_MAP)
+                                .description("Mapping of each token to the value it replaced.")
+                                .additionalProperties(string()))),
+                sampleOutput(
+                    Map.of(
+                        TEXT, "Hello, my name is [PII_KEYWORD_1_k3n9] and my email is [PII_EMAIL_ADDRESS_2_k3n9].",
+                        MASK_MAP, Map.of(
+                            "[PII_KEYWORD_1_k3n9]", "John Doe",
+                            "[PII_EMAIL_ADDRESS_2_k3n9]", "john@example.com"))))
+            .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#mask")
+            .perform(MaskAction::perform);
+    }
 
-        StringBuilder userPrompt = new StringBuilder();
-
-        userPrompt.append("Text: ")
-            .append(inputParameters.getString(TEXT))
-            .append("\n\nInstructions:\n");
-
-        List<String> sensitiveKeywords = inputParameters.getList(SENSITIVE_KEYWORDS, String.class, List.of());
-
-        if (!sensitiveKeywords.isEmpty()) {
-            userPrompt.append("- Replace each of the following sensitive keywords with [REDACTED_N]: ")
-                .append(String.join(", ", sensitiveKeywords))
-                .append("\n");
-        }
-
-        List<String> selectedPiiTypes = inputParameters.getList(PII_DETECTION, String.class, List.of());
-
-        for (String piiType : selectedPiiTypes) {
-            userPrompt.append("- Replace all ")
-                .append(piiType.toLowerCase()
-                    .replace("_", " "))
-                .append(" values with [")
-                .append(piiType)
-                .append("_N]\n");
-        }
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        String text = inputParameters.getRequiredString(TEXT);
+        List<String> keywords = inputParameters.getList(SENSITIVE_KEYWORDS, String.class, List.of());
         List<String> customPatterns = inputParameters.getList(CUSTOM_PATTERNS, String.class, List.of());
+        MatchDeadline deadline = MatchDeadline.in(SensitiveDataRedactor.DetectionBounds.DEFAULTS.timeout());
 
-        if (!customPatterns.isEmpty()) {
-            userPrompt.append("- Replace all matches of the following patterns with [CUSTOM_N]: ")
-                .append(String.join(", ", customPatterns))
-                .append("\n");
+        List<SensitiveSpan> extraCandidates = new ArrayList<>(MaskSpans.keywordSpans(text, keywords));
+
+        extraCandidates.addAll(MaskSpans.customPatternSpans(text, customPatterns, deadline));
+
+        SensitiveDataRedactor redactor = new SensitiveDataRedactor(
+            List.of(new RegexPiiDetector(selectedPatterns(inputParameters)), new RegexSecretDetector()));
+        PiiTokenSession session = PiiTokenSession.create();
+
+        try {
+            SensitiveDataRedactor.RedactionResult result = redactor.tokenizeWithSpans(
+                text, Set.of(SensitiveKind.PII, SensitiveKind.SECRET), session,
+                SensitiveDataRedactor.DEFAULT_MIN_CONFIDENCE, null, extraCandidates);
+
+            return Map.of(TEXT, result.text(), MASK_MAP, session.tokens());
+        } finally {
+            session.close();
         }
-
-        modelInputParametersMap.put(
-            "messages",
-            List.of(
-                Map.of("content", SYSTEM_PROMPT, ROLE, SYSTEM.name()),
-                Map.of("content", userPrompt.toString(), ROLE, USER.name())));
-        modelInputParametersMap.put("model", inputParameters.getString(MODEL));
-        modelInputParametersMap.put(
-            "response",
-            Map.of(
-                "responseFormat", ChatModel.ResponseFormat.JSON,
-                "responseSchema", RESPONSE_SCHEMA));
-
-        return ParametersFactory.create(modelInputParametersMap);
     }
 
     public static List<Option<String>> getPiiDetectionOptions() {
-        return List.of(
-            ComponentDsl.option("Email address", "EMAIL"),
-            ComponentDsl.option("Phone number", "PHONE"),
-            ComponentDsl.option("Credit card number", "CREDIT_CARD"),
-            ComponentDsl.option("IP address", "IP_ADDRESS"),
-            ComponentDsl.option("US Social Security Number", "SSN"));
+        List<Option<String>> options = new ArrayList<>();
+
+        for (PiiPatternCatalog.PiiPattern pattern : PiiPatternCatalog.ALL) {
+            options.add(option(PiiPatternLabels.labelOf(pattern.type()), pattern.type()));
+        }
+
+        return options;
+    }
+
+    private static List<PiiPatternCatalog.PiiPattern> selectedPatterns(Parameters inputParameters) {
+        List<String> selected = inputParameters.getList(PII_DETECTION, String.class, List.of());
+
+        if (selected.isEmpty()) {
+            return PiiPatternCatalog.curatedDefault();
+        }
+
+        List<String> resolved = selected.stream()
+            .map(type -> LEGACY_TYPE_ALIASES.getOrDefault(type, type))
+            .toList();
+
+        List<PiiPatternCatalog.PiiPattern> patterns = PiiPatternCatalog.filterByTypes(resolved);
+
+        if (patterns.isEmpty()) {
+            throw new IllegalArgumentException(
+                "AI Text Mask 'PII Detection' selected no known type: " + resolved);
+        }
+
+        return patterns;
     }
 }

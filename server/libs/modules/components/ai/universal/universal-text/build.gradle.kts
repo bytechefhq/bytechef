@@ -3,6 +3,7 @@ version="1.0"
 dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:config:app-config"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-sensitive-data:platform-ai-sensitive-data-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
     implementation(project(":server:libs:modules:components:ai:llm"))
