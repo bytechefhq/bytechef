@@ -4,7 +4,7 @@ import {describe, expect, it} from 'vitest';
  * Tests for expressionEnabled gate behavior.
  *
  * When `expressionEnabled === false` on a property:
- * 1. Placeholder should NOT show "Use '$' for data pills and '=' for an expression"
+ * 1. Placeholder should NOT show "Use '$' for data pills and '=' for a formula"
  * 2. Formula mode should NOT activate (typing `=` treated as literal)
  * 3. Data pill suggestion (`$` trigger) should be disabled
  * 4. FromAI toggle button should be hidden
@@ -21,15 +21,15 @@ describe('expressionEnabledGate', () => {
                 return propertyPlaceholder || '';
             }
 
-            return propertyPlaceholder || "Use '$' for data pills and '=' for an expression";
+            return propertyPlaceholder || "Use '$' for data pills and '=' for a formula";
         };
 
         it('should show default expression placeholder when expressionEnabled is true', () => {
-            expect(getPlaceholder(true)).toBe("Use '$' for data pills and '=' for an expression");
+            expect(getPlaceholder(true)).toBe("Use '$' for data pills and '=' for a formula");
         });
 
         it('should show default expression placeholder when expressionEnabled is undefined', () => {
-            expect(getPlaceholder(undefined)).toBe("Use '$' for data pills and '=' for an expression");
+            expect(getPlaceholder(undefined)).toBe("Use '$' for data pills and '=' for a formula");
         });
 
         it('should show empty placeholder when expressionEnabled is false and no custom placeholder', () => {
