@@ -1,16 +1,15 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import ApiCollectionDialogTagsSelect from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialogTagsSelect';
@@ -155,203 +154,198 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent>
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveOpenApiCollection)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>{`${apiCollection?.id ? 'Edit' : 'Create'}`} API Collection</DialogTitle>
-
-                                <DialogDescription>
-                                    Create new API collection and connect it with a project.
-                                </DialogDescription>
-                            </div>
-
-                            <DialogCloseButton />
-                        </DialogHeader>
-
-                        {!apiCollection?.id && (
-                            <FormField
-                                control={control}
-                                name="projectId"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Project</FormLabel>
-
-                                        <FormControl>
-                                            <ProjectDeploymentDialogBasicStepProjectsComboBox
-                                                onBlur={field.onBlur}
-                                                onChange={(item) => {
-                                                    if (item) {
-                                                        setValue('projectId', item.value);
-                                                        resetField('projectVersion');
-
-                                                        if (!getValues('name')) {
-                                                            setValue('name', item.name!.toString());
-                                                        }
-
-                                                        setCurProjectId(item.value);
-                                                        setCurProjectVersion(undefined);
-                                                    }
-                                                }}
-                                                projects={projects}
-                                                value={field.value}
-                                            />
-                                        </FormControl>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                shouldUnregister={false}
+                <DialogMain>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveOpenApiCollection)}>
+                            <DialogHeader
+                                description="Create new API collection and connect it with a project."
+                                title={`${apiCollection?.id ? 'Edit' : 'Create'} API Collection`}
                             />
-                        )}
 
-                        {!apiCollection?.id && curProjectId && (
-                            <FormField
-                                control={control}
-                                name="projectVersion"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Project Version</FormLabel>
+                            <DialogBody className="flex flex-col gap-4">
+                                {!apiCollection?.id && (
+                                    <FormField
+                                        control={control}
+                                        name="projectId"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Project</FormLabel>
 
-                                        <FormControl>
-                                            <ProjectDeploymentDialogBasicStepProjectVersionsSelect
-                                                onChange={(value) => {
-                                                    field.onChange(value);
-                                                    setCurProjectVersion(value);
-                                                }}
-                                                projectId={curProjectId}
-                                                projectVersion={curProjectVersion}
-                                            />
-                                        </FormControl>
+                                                <FormControl>
+                                                    <ProjectDeploymentDialogBasicStepProjectsComboBox
+                                                        onBlur={field.onBlur}
+                                                        onChange={(item) => {
+                                                            if (item) {
+                                                                setValue('projectId', item.value);
+                                                                resetField('projectVersion');
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                shouldUnregister={false}
-                            />
-                        )}
+                                                                if (!getValues('name')) {
+                                                                    setValue('name', item.name!.toString());
+                                                                }
 
-                        <FormField
-                            control={control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                                                setCurProjectId(item.value);
+                                                                setCurProjectVersion(undefined);
+                                                            }
+                                                        }}
+                                                        projects={projects}
+                                                        value={field.value}
+                                                    />
+                                                </FormControl>
 
-                                    <FormControl>
-                                        <Input
-                                            name={field.name}
-                                            onBlur={field.onBlur}
-                                            onChange={field.onChange}
-                                            ref={field.ref}
-                                            value={String(field.value ?? '')}
-                                        />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
-
-                                    <FormControl>
-                                        <Textarea {...field} />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="contextPath"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Context Path</FormLabel>
-
-                                    <FormControl>
-                                        <Input
-                                            name={field.name}
-                                            onBlur={field.onBlur}
-                                            onChange={field.onChange}
-                                            ref={field.ref}
-                                            value={String(field.value ?? '')}
-                                        />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="collectionVersion"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Collection Version</FormLabel>
-
-                                    <FormControl>
-                                        <Input
-                                            name={field.name}
-                                            onBlur={field.onBlur}
-                                            onChange={field.onChange}
-                                            ref={field.ref}
-                                            type="number"
-                                            value={field.value as number | string | undefined}
-                                        />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            shouldUnregister={false}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="tags"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Tags</FormLabel>
-
-                                    <ApiCollectionDialogTagsSelect
-                                        apiCollection={apiCollection}
-                                        /* eslint-disable @typescript-eslint/no-explicit-any */
-                                        field={field as any}
-                                        onCreateOption={(inputValue: string) => {
-                                            setValue('tags', [
-                                                ...(getValues().tags ?? []),
-                                                {
-                                                    label: inputValue,
-                                                    name: inputValue,
-                                                    value: inputValue,
-                                                },
-                                            ] as never[]);
-                                        }}
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                        shouldUnregister={false}
                                     />
+                                )}
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                {!apiCollection?.id && curProjectId && (
+                                    <FormField
+                                        control={control}
+                                        name="projectVersion"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Project Version</FormLabel>
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
+                                                <FormControl>
+                                                    <ProjectDeploymentDialogBasicStepProjectVersionsSelect
+                                                        onChange={(value) => {
+                                                            field.onChange(value);
+                                                            setCurProjectVersion(value);
+                                                        }}
+                                                        projectId={curProjectId}
+                                                        projectVersion={curProjectVersion}
+                                                    />
+                                                </FormControl>
 
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                        shouldUnregister={false}
+                                    />
+                                )}
+
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
+
+                                            <FormControl>
+                                                <Input
+                                                    name={field.name}
+                                                    onBlur={field.onBlur}
+                                                    onChange={field.onChange}
+                                                    ref={field.ref}
+                                                    value={String(field.value ?? '')}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+
+                                            <FormControl>
+                                                <Textarea {...field} />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="contextPath"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Context Path</FormLabel>
+
+                                            <FormControl>
+                                                <Input
+                                                    name={field.name}
+                                                    onBlur={field.onBlur}
+                                                    onChange={field.onChange}
+                                                    ref={field.ref}
+                                                    value={String(field.value ?? '')}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="collectionVersion"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Collection Version</FormLabel>
+
+                                            <FormControl>
+                                                <Input
+                                                    name={field.name}
+                                                    onBlur={field.onBlur}
+                                                    onChange={field.onChange}
+                                                    ref={field.ref}
+                                                    type="number"
+                                                    value={field.value as number | string | undefined}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    shouldUnregister={false}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="tags"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Tags</FormLabel>
+
+                                            <ApiCollectionDialogTagsSelect
+                                                apiCollection={apiCollection}
+                                                /* eslint-disable @typescript-eslint/no-explicit-any */
+                                                field={field as any}
+                                                onCreateOption={(inputValue: string) => {
+                                                    setValue('tags', [
+                                                        ...(getValues().tags ?? []),
+                                                        {
+                                                            label: inputValue,
+                                                            name: inputValue,
+                                                            value: inputValue,
+                                                        },
+                                                    ] as never[]);
+                                                }}
+                                            />
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </DialogBody>
+
+                            <DialogFooter>
+                                <DialogCancelButton />
+
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );

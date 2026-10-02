@@ -1,17 +1,16 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {ApiCollectionEndpoint, HttpMethod} from '@/ee/shared/middleware/automation/api-platform';
 import {
@@ -127,170 +126,166 @@ const ApiCollectionEndpointDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent>
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveOpenApiEndpoint)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>{`${apiEndpoint?.id ? 'Edit' : 'Create'}`} API Endpoint</DialogTitle>
+                <DialogMain>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveOpenApiEndpoint)}>
+                            <DialogHeader
+                                description="Create new API endpoint and connect it with a workflow."
+                                title={`${apiEndpoint?.id ? 'Edit' : 'Create'} API Endpoint`}
+                            />
 
-                                <DialogDescription>
-                                    Create new API endpoint and connect it with a workflow.
-                                </DialogDescription>
-                            </div>
+                            <DialogBody className="flex flex-col gap-4">
+                                <FormField
+                                    control={control}
+                                    name="workflowUuid"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Workflow</FormLabel>
 
-                            <DialogCloseButton />
-                        </DialogHeader>
+                                            <FormControl>
+                                                <Select
+                                                    disabled={!!apiEndpoint?.id}
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
 
-                        <FormField
-                            control={control}
-                            name="workflowUuid"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Workflow</FormLabel>
+                                                        if (!getValues('name')) {
+                                                            setValue(
+                                                                'name',
+                                                                workflows?.find(
+                                                                    (workflow) => workflow.workflowUuid === value
+                                                                )?.label ?? ''
+                                                            );
+                                                        }
+                                                    }}
+                                                    value={apiEndpoint?.workflowUuid}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select Workflow" />
+                                                    </SelectTrigger>
 
-                                    <FormControl>
-                                        <Select
-                                            disabled={!!apiEndpoint?.id}
-                                            onValueChange={(value) => {
-                                                field.onChange(value);
+                                                    <SelectContent>
+                                                        {workflows &&
+                                                            workflows.map((workflow) => (
+                                                                <SelectItem
+                                                                    key={workflow.workflowUuid!}
+                                                                    value={workflow.workflowUuid!}
+                                                                >
+                                                                    {workflow.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
 
-                                                if (!getValues('name')) {
-                                                    setValue(
-                                                        'name',
-                                                        workflows?.find((workflow) => workflow.workflowUuid === value)
-                                                            ?.label ?? ''
-                                                    );
-                                                }
-                                            }}
-                                            value={apiEndpoint?.workflowUuid}
-                                        >
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select Workflow" />
-                                            </SelectTrigger>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                            <SelectContent>
-                                                {workflows &&
-                                                    workflows.map((workflow) => (
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
+
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="httpMethod"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>HTTP Method</FormLabel>
+
+                                            <FormControl>
+                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select HTTP method" />
+                                                    </SelectTrigger>
+
+                                                    <SelectContent>
                                                         <SelectItem
-                                                            key={workflow.workflowUuid!}
-                                                            value={workflow.workflowUuid!}
+                                                            key={HttpMethod.Get.toString()}
+                                                            value={HttpMethod.Get.toString()}
                                                         >
-                                                            {workflow.label}
+                                                            GET
                                                         </SelectItem>
-                                                    ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                                        <SelectItem
+                                                            key={HttpMethod.Patch.toString()}
+                                                            value={HttpMethod.Patch.toString()}
+                                                        >
+                                                            PATCH
+                                                        </SelectItem>
 
-                        <FormField
-                            control={control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                                        <SelectItem
+                                                            key={HttpMethod.Post.toString()}
+                                                            value={HttpMethod.Post.toString()}
+                                                        >
+                                                            POST
+                                                        </SelectItem>
 
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
+                                                        <SelectItem
+                                                            key={HttpMethod.Put.toString()}
+                                                            value={HttpMethod.Put.toString()}
+                                                        >
+                                                            PUT
+                                                        </SelectItem>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                                        <SelectItem
+                                                            key={HttpMethod.Delete.toString()}
+                                                            value={HttpMethod.Delete.toString()}
+                                                        >
+                                                            DELETE
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="httpMethod"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>HTTP Method</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <FormControl>
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select HTTP method" />
-                                            </SelectTrigger>
+                                <FormField
+                                    control={control}
+                                    name="path"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Path</FormLabel>
 
-                                            <SelectContent>
-                                                <SelectItem
-                                                    key={HttpMethod.Get.toString()}
-                                                    value={HttpMethod.Get.toString()}
-                                                >
-                                                    GET
-                                                </SelectItem>
+                                            <FormControl>
+                                                <div className="flex">
+                                                    <div className="flex h-9 items-center rounded-md rounded-r-none border border-r-0 border-input bg-muted px-3 py-1 text-sm shadow-xs transition-colors">
+                                                        {`/v${collectionVersion}/${contextPath}/`}
+                                                    </div>
 
-                                                <SelectItem
-                                                    key={HttpMethod.Patch.toString()}
-                                                    value={HttpMethod.Patch.toString()}
-                                                >
-                                                    PATCH
-                                                </SelectItem>
+                                                    <Input {...field} className="rounded-l-none border-l-0" />
+                                                </div>
+                                            </FormControl>
 
-                                                <SelectItem
-                                                    key={HttpMethod.Post.toString()}
-                                                    value={HttpMethod.Post.toString()}
-                                                >
-                                                    POST
-                                                </SelectItem>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </DialogBody>
 
-                                                <SelectItem
-                                                    key={HttpMethod.Put.toString()}
-                                                    value={HttpMethod.Put.toString()}
-                                                >
-                                                    PUT
-                                                </SelectItem>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                                                <SelectItem
-                                                    key={HttpMethod.Delete.toString()}
-                                                    value={HttpMethod.Delete.toString()}
-                                                >
-                                                    DELETE
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="path"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Path</FormLabel>
-
-                                    <FormControl>
-                                        <div className="flex">
-                                            <div className="flex h-9 items-center rounded-md rounded-r-none border border-r-0 border-input bg-muted px-3 py-1 text-sm shadow-xs transition-colors">
-                                                {`/v${collectionVersion}/${contextPath}/`}
-                                            </div>
-
-                                            <Input {...field} className="rounded-l-none border-l-0" />
-                                        </div>
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
-
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
