@@ -9,9 +9,9 @@ The detector combines three signals, gated by the `permissiveness` setting:
 
 1. **Named-provider tokens** (always on): exact regex matches for known token shapes.
    - `AWS_ACCESS_KEY` (`AKIA…`), `AWS_SECRET_KEY`
-   - `GITHUB_PAT` (`ghp_…`), `GITHUB_FINE_GRAINED_PAT` (`github_pat_…`)
-   - `SLACK_TOKEN` (`xox[abp]-…`)
-   - `STRIPE_KEY` (`sk_live_…`, `pk_test_…`, etc.)
+   - `GITHUB_PAT` (`ghp_…`, `gho_…`, `ghu_…`, `ghs_…`, `ghr_…`), `GITHUB_FINE_GRAINED_PAT` (`github_pat_…`)
+   - `SLACK_TOKEN` (`xox[baprs]-…`)
+   - `STRIPE_KEY` (`sk_live_…`, `pk_test_…`, `rk_live_…`, etc.)
    - `GOOGLE_API_KEY` (`AIza…`)
    - `OPENAI_KEY` (`sk-…`)
    - `JWT` (the three-segment base64 form)

@@ -18,7 +18,6 @@ package com.bytechef.component.ai.agent.guardrails.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.component.ai.agent.guardrails.util.PiiDetectorUtils.PiiMatch;
 import com.bytechef.component.ai.agent.guardrails.util.SecretKeyDetectorUtils.SecretMatch;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,26 +40,6 @@ class DetectorConcurrencyTest {
 
     private static final int THREADS = 50;
     private static final long TIMEOUT_SECONDS = 30;
-
-    @Test
-    void testPiiDetectorIsThreadSafeAcrossConcurrentInvocations() throws Exception {
-        String input = "Contact: user@example.com or call 555-123-4567";
-        List<PiiMatch> expected = PiiDetectorUtils.detect(input, PiiDetectorUtils.DEFAULT_PII_PATTERNS);
-
-        List<Callable<List<PiiMatch>>> tasks = new ArrayList<>(THREADS);
-
-        for (int i = 0; i < THREADS; i++) {
-            tasks.add(() -> PiiDetectorUtils.detect(input, PiiDetectorUtils.DEFAULT_PII_PATTERNS));
-        }
-
-        List<List<PiiMatch>> results = runAll(tasks);
-
-        for (List<PiiMatch> result : results) {
-            assertThat(result)
-                .as("every concurrent PII detection must produce the same matches as the serial baseline")
-                .containsExactlyElementsOf(expected);
-        }
-    }
 
     @Test
     void testSecretKeyDetectorIsThreadSafeAcrossConcurrentInvocations() throws Exception {

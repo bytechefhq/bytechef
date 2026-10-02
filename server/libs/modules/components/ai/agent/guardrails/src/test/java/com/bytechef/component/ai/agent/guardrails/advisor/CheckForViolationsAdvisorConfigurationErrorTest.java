@@ -20,9 +20,9 @@ import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsCons
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.ai.agent.guardrails.util.RegexParserUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.sensitivedata.DetectionTimeoutException;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
@@ -222,14 +222,9 @@ class CheckForViolationsAdvisorConfigurationErrorTest {
     }
 
     @Test
-    void regexExecutionLimitExceptionBlocksAsConfigurationError() {
-        // A pathological operator-supplied regex that hits the RegexParser DoS bound surfaces as
-        // RegexExecutionLimitException. The advisor must treat it as a configuration error (the guardrail is
-        // effectively inert — any input could trip the limit), not as a transient outage that FAIL_OPEN could waive.
-        // Pinned here so a future refactor that forgets to list RegexExecutionLimitException in isConfigurationError
-        // produces a visible failure instead of silently allowing unsafe traffic through.
+    void detectionTimeoutExceptionBlocksAsConfigurationError() {
         GuardrailCheckFunction pathological = (text, context) -> {
-            throw new RegexParserUtils.RegexExecutionLimitException("pattern exceeded DoS cap");
+            throw new DetectionTimeoutException("budget");
         };
 
         Parameters empty = ParametersFactory.create(Map.of());
@@ -240,15 +235,22 @@ class CheckForViolationsAdvisorConfigurationErrorTest {
             .context(mock(Context.class))
             .build();
 
+        CallAdvisorChain chain = mock(CallAdvisorChain.class);
         ChatClientRequest request = ChatClientRequest.builder()
             .prompt(new Prompt(new UserMessage("any text")))
             .build();
 
-        List<Violation> violations = advisor.runChecksForTesting(request);
+        ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        assertThat(violations)
-            .as("RegexExecutionLimitException always fails closed — ReDoS-bounded pathological regex is not transient")
-            .hasSize(1);
-        assertThat(violations.getFirst()).isInstanceOf(Violation.ExecutionFailureViolation.class);
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> surfaced = (List<Map<String, Object>>) chatResponse.getMetadata()
+            .get(VIOLATIONS_METADATA_KEY);
+
+        assertThat(surfaced)
+            .as("DetectionTimeoutException always fails closed — a ReDoS-bounded pathological regex is not transient")
+            .singleElement()
+            .satisfies(view -> assertThat(view.get("failureKind")).isEqualTo("DetectionTimeoutException"));
     }
 }

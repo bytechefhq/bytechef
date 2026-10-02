@@ -20,13 +20,16 @@ import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsCons
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.DEFAULT_VALIDATE_OUTPUT;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.VALIDATE_INPUT;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.VALIDATE_OUTPUT;
-import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.VIOLATIONS_METADATA_KEY;
 
 import com.bytechef.component.ai.agent.guardrails.GuardrailException;
+import com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants;
 import com.bytechef.component.ai.agent.guardrails.util.LlmClassifierUtils;
 import com.bytechef.component.ai.agent.guardrails.util.MaskEntityMapUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.guardrails.GuardrailAdvisorOrder;
+import com.bytechef.platform.ai.guardrails.PublishedInputSpans;
+import com.bytechef.platform.ai.sensitivedata.SensitiveSpan;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
@@ -88,6 +91,8 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
     private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
         .build();
 
+    static final String VIOLATIONS_METADATA_KEY = GuardrailsConstants.VIOLATIONS_METADATA_KEY;
+
     private static final Set<String> INTERNAL_INFO_KEYS = Set.of("maskEntities");
 
     private final String blockedMessage;
@@ -124,7 +129,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
 
     @Override
     public int getOrder() {
-        return HIGHEST_PRECEDENCE;
+        return GuardrailAdvisorOrder.NODE_CHECK;
     }
 
     @Override
@@ -209,6 +214,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
         List<Violation> aggregated = new ArrayList<>();
         List<CheckViolations> byCheck = new ArrayList<>();
         MaskEntityMapUtils maskEntities = new MaskEntityMapUtils(context);
+        List<SensitiveSpan> publishedInputSpans = PublishedInputSpans.from(request.context());
 
         // Stage 1: PREFLIGHT (rule-based) — runs against the progressively-mutated user text (including human answers)
         // and may mask.
@@ -218,14 +224,17 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             }
 
             List<Violation> entryViolations = new ArrayList<>();
+            GuardrailContext inputContext = publishedInputSpans.isEmpty()
+                ? entry.context
+                : entry.context.withPublishedInputSpans(publishedInputSpans);
 
             try {
-                List<Violation> results = entry.function.applyAll(textForLlm, entry.context);
+                List<Violation> results = entry.function.applyAll(textForLlm, inputContext);
 
                 entryViolations.addAll(Objects.requireNonNull(results));
 
                 if (entry.function instanceof PreflightMasking masking) {
-                    MaskResult maskResult = masking.mask(textForLlm, entry.context);
+                    MaskResult maskResult = masking.mask(textForLlm, inputContext);
 
                     switch (maskResult) {
                         case MaskResult.Entities entitiesResult -> maskEntities.merge(entitiesResult.entities());
@@ -373,6 +382,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             String confidenceScore = switch (violation) {
                 case Violation.ClassifiedViolation classified -> Double.toString(classified.confidenceScore());
                 case Violation.PatternViolation ignored -> "-";
+                case Violation.SpanViolation ignored -> "-";
                 case Violation.ExecutionFailureViolation ignored -> "-";
             };
 
@@ -582,6 +592,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
 
                 yield matchedSubstrings.size();
             }
+            case Violation.SpanViolation spans -> spans.matchCount();
             case Violation.ClassifiedViolation ignored -> 0;
             case Violation.ExecutionFailureViolation ignored -> 0;
         };
@@ -595,6 +606,8 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
                 resolveFailureKind(failure.exception()));
             case Violation.ClassifiedViolation classified -> view.put("confidenceScore", classified.confidenceScore());
             case Violation.PatternViolation ignored -> {
+            }
+            case Violation.SpanViolation ignored -> {
             }
         }
 

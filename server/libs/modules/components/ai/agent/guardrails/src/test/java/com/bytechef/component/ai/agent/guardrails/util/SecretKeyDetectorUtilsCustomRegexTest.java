@@ -21,6 +21,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.component.ai.agent.guardrails.util.SecretKeyDetectorUtils.Permissiveness;
 import com.bytechef.component.ai.agent.guardrails.util.SecretKeyDetectorUtils.SecretMatch;
+import com.bytechef.platform.ai.sensitivedata.DetectionTimeoutException;
+import com.bytechef.platform.ai.sensitivedata.MatchDeadline;
+import java.time.Duration;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
@@ -53,12 +56,7 @@ class SecretKeyDetectorUtilsCustomRegexTest {
     }
 
     @Test
-    void testCatastrophicBacktrackingCustomRegexSurfacesAsRegexExecutionLimit() {
-        // End-to-end ReDoS pin: a user-supplied pattern with catastrophic backtracking must hit the per-pattern
-        // bounded() budget and surface RegexExecutionLimitException to the advisor. The advisor then treats it as a
-        // configuration error and blocks fail-closed. PII has a sibling test; this one pins the same guarantee for
-        // SecretKeys' extraRegexes pipeline so a future refactor that routes extras around RegexParserUtils.bounded
-        // cannot regress silently.
+    void testCatastrophicBacktrackingCustomRegexSurfacesAsDetectionTimeout() {
         int n = 25;
         StringBuilder patternSource = new StringBuilder();
 
@@ -74,8 +72,8 @@ class SecretKeyDetectorUtilsCustomRegexTest {
         String pathological = "a".repeat(n);
 
         assertThatThrownBy(() -> SecretKeyDetectorUtils.detect(
-            pathological, Permissiveness.BALANCED, List.of(evil)))
-                .isInstanceOf(RegexParserUtils.RegexExecutionLimitException.class)
-                .hasMessageContaining("extraRegex[0]");
+            pathological, Permissiveness.BALANCED, List.of(evil), List.of(),
+            MatchDeadline.in(Duration.ofMillis(200))))
+                .isInstanceOf(DetectionTimeoutException.class);
     }
 }

@@ -1,7 +1,9 @@
 dependencies {
     compileOnly("com.github.spotbugs:spotbugs-annotations")
     implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation("org.springframework.ai:spring-ai-client-chat")
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-sensitive-data:platform-ai-sensitive-data-service"))
 
     testImplementation("ch.qos.logback:logback-classic")
     testImplementation("org.assertj:assertj-core")

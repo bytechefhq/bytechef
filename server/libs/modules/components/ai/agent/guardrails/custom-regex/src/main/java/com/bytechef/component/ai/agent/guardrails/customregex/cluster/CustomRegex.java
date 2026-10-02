@@ -24,11 +24,13 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.agent.guardrails.util.GuardrailMatchDeadline;
 import com.bytechef.component.ai.agent.guardrails.util.RegexParserUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.platform.ai.sensitivedata.MatchDeadline;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction;
@@ -44,9 +46,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Rule-based detection on operator-supplied regex patterns. Input is bounded via {@code RegexParser.bounded} to enforce
- * DoS caps.
- *
  * @author Ivica Cardic
  */
 public final class CustomRegex {
@@ -156,38 +155,23 @@ public final class CustomRegex {
 
         List<String> matches = new ArrayList<>();
         ArrayList<String> triggeredNames = new ArrayList<>();
-        List<RegexParserUtils.RegexExecutionLimitException> budgetFailures = new ArrayList<>();
+        MatchDeadline deadline = GuardrailMatchDeadline.start();
 
         for (NamedRegex entry : regexes) {
-            try {
-                Matcher matcher = entry.pattern()
-                    .matcher(RegexParserUtils.bounded(text));
+            Matcher matcher = entry.pattern()
+                .matcher(deadline.bound(text));
 
-                boolean anyMatch = false;
+            boolean anyMatch = false;
 
-                while (matcher.find()) {
-                    matches.add(matcher.group());
+            while (matcher.find()) {
+                matches.add(matcher.group());
 
-                    anyMatch = true;
-                }
-
-                if (anyMatch) {
-                    triggeredNames.add(entry.name());
-                }
-            } catch (RegexParserUtils.RegexExecutionLimitException exception) {
-                budgetFailures.add(new RegexParserUtils.RegexExecutionLimitException(
-                    "customRegex entry '" + entry.name() + "': " + exception.getMessage(), exception));
+                anyMatch = true;
             }
-        }
 
-        if (!budgetFailures.isEmpty()) {
-            RegexParserUtils.RegexExecutionLimitException headline = budgetFailures.getFirst();
-
-            budgetFailures.stream()
-                .skip(1)
-                .forEach(headline::addSuppressed);
-
-            throw headline;
+            if (anyMatch) {
+                triggeredNames.add(entry.name());
+            }
         }
 
         if (matches.isEmpty()) {
@@ -207,29 +191,14 @@ public final class CustomRegex {
         List<NamedRegex> regexes = namedRegexesOf(context.inputParameters());
 
         String intermediate = text;
-        List<RegexParserUtils.RegexExecutionLimitException> budgetFailures = new ArrayList<>();
+        MatchDeadline deadline = GuardrailMatchDeadline.start();
 
         for (NamedRegex entry : regexes) {
-            try {
-                String replacement = Matcher.quoteReplacement("[" + entry.name() + "]");
+            String replacement = Matcher.quoteReplacement("[" + entry.name() + "]");
 
-                intermediate = entry.pattern()
-                    .matcher(RegexParserUtils.bounded(intermediate))
-                    .replaceAll(replacement);
-            } catch (RegexParserUtils.RegexExecutionLimitException exception) {
-                budgetFailures.add(new RegexParserUtils.RegexExecutionLimitException(
-                    "customRegex entry '" + entry.name() + "': " + exception.getMessage(), exception));
-            }
-        }
-
-        if (!budgetFailures.isEmpty()) {
-            RegexParserUtils.RegexExecutionLimitException headline = budgetFailures.getFirst();
-
-            budgetFailures.stream()
-                .skip(1)
-                .forEach(headline::addSuppressed);
-
-            throw headline;
+            intermediate = entry.pattern()
+                .matcher(deadline.bound(intermediate))
+                .replaceAll(replacement);
         }
 
         return intermediate;
@@ -239,31 +208,16 @@ public final class CustomRegex {
         List<NamedRegex> regexes = namedRegexesOf(context.inputParameters());
 
         Map<String, List<String>> grouped = new LinkedHashMap<>();
-        List<RegexParserUtils.RegexExecutionLimitException> budgetFailures = new ArrayList<>();
+        MatchDeadline deadline = GuardrailMatchDeadline.start();
 
         for (NamedRegex entry : regexes) {
-            try {
-                Matcher matcher = entry.pattern()
-                    .matcher(RegexParserUtils.bounded(text));
+            Matcher matcher = entry.pattern()
+                .matcher(deadline.bound(text));
 
-                while (matcher.find()) {
-                    grouped.computeIfAbsent(entry.name(), key -> new ArrayList<>())
-                        .add(matcher.group());
-                }
-            } catch (RegexParserUtils.RegexExecutionLimitException exception) {
-                budgetFailures.add(new RegexParserUtils.RegexExecutionLimitException(
-                    "customRegex entry '" + entry.name() + "': " + exception.getMessage(), exception));
+            while (matcher.find()) {
+                grouped.computeIfAbsent(entry.name(), key -> new ArrayList<>())
+                    .add(matcher.group());
             }
-        }
-
-        if (!budgetFailures.isEmpty()) {
-            RegexParserUtils.RegexExecutionLimitException headline = budgetFailures.getFirst();
-
-            budgetFailures.stream()
-                .skip(1)
-                .forEach(headline::addSuppressed);
-
-            throw headline;
         }
 
         return grouped;

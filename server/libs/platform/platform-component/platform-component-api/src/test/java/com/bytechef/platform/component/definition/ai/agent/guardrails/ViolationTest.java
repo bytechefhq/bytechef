@@ -158,4 +158,20 @@ class ViolationTest {
 
         assertThat(violation.info()).isEmpty();
     }
+
+    @Test
+    void testSpanViolationCarriesACountAndInfoButNoValues() {
+        Violation violation = Violation.ofSpans(
+            "piiCheck", 2, Map.of("entityTypes", new ArrayList<>(List.of("EMAIL_ADDRESS"))));
+
+        assertThat(violation).isInstanceOf(Violation.SpanViolation.class);
+        assertThat(((Violation.SpanViolation) violation).matchCount()).isEqualTo(2);
+        assertThat(violation.info()).containsKey("entityTypes");
+    }
+
+    @Test
+    void testSpanViolationRejectsAZeroCount() {
+        assertThatThrownBy(() -> Violation.ofSpans("piiCheck", 0, Map.of()))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 }

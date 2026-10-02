@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.guardrails.util;
 
+import com.bytechef.platform.ai.sensitivedata.MatchDeadline;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.ArrayList;
@@ -39,14 +40,19 @@ public final class KeywordMatcherUtils {
     }
 
     public static KeywordMatchResult match(String content, List<String> keywords, boolean caseSensitive) {
+        return match(content, keywords, caseSensitive, GuardrailMatchDeadline.start());
+    }
+
+    public static KeywordMatchResult match(
+        String content, List<String> keywords, boolean caseSensitive, MatchDeadline deadline) {
+
         if (content == null || content.isEmpty() || keywords == null || keywords.isEmpty()) {
             return new KeywordMatchResult(false, Collections.emptyList());
         }
 
-        CharSequence bounded = RegexParserUtils.bounded(content);
+        CharSequence bounded = deadline.bound(content);
 
         List<String> matchedKeywords = new ArrayList<>();
-        List<RegexParserUtils.RegexExecutionLimitException> budgetFailures = new ArrayList<>();
 
         for (String keyword : keywords) {
             if (keyword == null || keyword.isEmpty()) {
@@ -54,28 +60,11 @@ public final class KeywordMatcherUtils {
             }
 
             Pattern pattern = patternFor(keyword, caseSensitive);
+            Matcher matcher = pattern.matcher(bounded);
 
-            try {
-                Matcher matcher = pattern.matcher(bounded);
-
-                if (matcher.find()) {
-                    matchedKeywords.add(keyword);
-                }
-            } catch (RegexParserUtils.RegexExecutionLimitException exception) {
-                budgetFailures.add(
-                    new RegexParserUtils.RegexExecutionLimitException(
-                        "keyword '" + keyword + "': " + exception.getMessage(), exception));
+            if (matcher.find()) {
+                matchedKeywords.add(keyword);
             }
-        }
-
-        if (!budgetFailures.isEmpty()) {
-            RegexParserUtils.RegexExecutionLimitException headline = budgetFailures.getFirst();
-
-            budgetFailures.stream()
-                .skip(1)
-                .forEach(headline::addSuppressed);
-
-            throw headline;
         }
 
         return new KeywordMatchResult(!matchedKeywords.isEmpty(), matchedKeywords);
@@ -115,14 +104,19 @@ public final class KeywordMatcherUtils {
     }
 
     public static List<String> findMatchedSubstrings(String content, List<String> keywords, boolean caseSensitive) {
+        return findMatchedSubstrings(content, keywords, caseSensitive, GuardrailMatchDeadline.start());
+    }
+
+    public static List<String> findMatchedSubstrings(
+        String content, List<String> keywords, boolean caseSensitive, MatchDeadline deadline) {
+
         if (content == null || content.isEmpty() || keywords == null || keywords.isEmpty()) {
             return List.of();
         }
 
-        CharSequence bounded = RegexParserUtils.bounded(content);
+        CharSequence bounded = deadline.bound(content);
 
         List<String> matches = new ArrayList<>();
-        List<RegexParserUtils.RegexExecutionLimitException> budgetFailures = new ArrayList<>();
 
         for (String keyword : keywords) {
             if (keyword == null || keyword.isEmpty()) {
@@ -130,28 +124,11 @@ public final class KeywordMatcherUtils {
             }
 
             Pattern pattern = patternFor(keyword, caseSensitive);
+            Matcher matcher = pattern.matcher(bounded);
 
-            try {
-                Matcher matcher = pattern.matcher(bounded);
-
-                while (matcher.find()) {
-                    matches.add(matcher.group());
-                }
-            } catch (RegexParserUtils.RegexExecutionLimitException exception) {
-                budgetFailures.add(
-                    new RegexParserUtils.RegexExecutionLimitException(
-                        "keyword '" + keyword + "': " + exception.getMessage(), exception));
+            while (matcher.find()) {
+                matches.add(matcher.group());
             }
-        }
-
-        if (!budgetFailures.isEmpty()) {
-            RegexParserUtils.RegexExecutionLimitException headline = budgetFailures.getFirst();
-
-            budgetFailures.stream()
-                .skip(1)
-                .forEach(headline::addSuppressed);
-
-            throw headline;
         }
 
         return List.copyOf(matches);
@@ -163,16 +140,14 @@ public final class KeywordMatcherUtils {
         }
 
         String result = content;
+        MatchDeadline deadline = GuardrailMatchDeadline.start();
 
-        // Each keyword pays its own RegexParserUtils.bounded() budget. This is intentional: collapsing the
-        // budget across the whole keyword list would mean a long keyword list could starve later entries
-        // even on small inputs. Keep per-keyword accounting.
         for (String keyword : keywords) {
             if (keyword != null && !keyword.isEmpty()) {
                 String mask = "*".repeat(keyword.length());
                 Pattern pattern = patternFor(keyword, caseSensitive);
 
-                result = pattern.matcher(RegexParserUtils.bounded(result))
+                result = pattern.matcher(deadline.bound(result))
                     .replaceAll(mask);
             }
         }

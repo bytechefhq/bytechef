@@ -19,22 +19,9 @@ package com.bytechef.component.ai.agent.guardrails.util;
 import java.util.regex.Pattern;
 
 /**
- * Parses regex expressions written in the JS-style literal form {@code /pattern/flags} and returns a compiled
- * {@link Pattern}. Falls back to compiling the input as a bare regex when no leading slash is present.
- *
- * <p>
- * Supported flags: {@code i}, {@code m}, {@code s}, {@code u}, {@code x}. {@code g} is accepted but ignored.
- *
- * <p>
- * DoS hardening: wrap input with {@link #bounded(CharSequence)} before matching to cap execution time;
- * {@link #compile(String)} rejects expressions longer than {@link #MAX_EXPRESSION_LENGTH} to bound compile time.
- *
  * @author Ivica Cardic
  */
 public final class RegexParserUtils {
-
-    /** Maximum input length (characters) accepted by {@link #bounded(CharSequence)}. ~1 MiB of text. */
-    public static final int MAX_INPUT_LENGTH = 1_048_576;
 
     /**
      * Maximum length (characters) of a regex expression accepted by {@link #compile(String)}. Realistic user-supplied
@@ -42,112 +29,7 @@ public final class RegexParserUtils {
      */
     public static final int MAX_EXPRESSION_LENGTH = 4_096;
 
-    /**
-     * Upper bound on total {@link CharSequence#charAt(int)} accesses during a single matching session. Catastrophic
-     * backtracking typically exceeds this in milliseconds; ordinary matching on the maximum input stays well below.
-     */
-    public static final int MAX_CHAR_ACCESSES = 10_000_000;
-
     private RegexParserUtils() {
-    }
-
-    /**
-     * Wrap {@code input} in a {@link CharSequence} that enforces DoS bounds during regex matching. The returned
-     * sequence counts {@link CharSequence#charAt(int)} calls and throws {@link RegexExecutionLimitException} once
-     * {@link #MAX_CHAR_ACCESSES} is exceeded. Rejects inputs longer than {@link #MAX_INPUT_LENGTH} immediately.
-     */
-    public static CharSequence bounded(CharSequence input) {
-        if (input == null) {
-            return null;
-        }
-
-        if (input.length() > MAX_INPUT_LENGTH) {
-            throw new RegexExecutionLimitException(
-                "Input exceeds maximum regex scan length of " + MAX_INPUT_LENGTH + " characters (got "
-                    + input.length() + ")");
-        }
-
-        return new BoundedCharSequence(input, MAX_CHAR_ACCESSES);
-    }
-
-    public static final class RegexExecutionLimitException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public RegexExecutionLimitException(String message) {
-            super(message);
-        }
-
-        public RegexExecutionLimitException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
-
-    private static final class BoundedCharSequence implements CharSequence {
-
-        private final CharSequence delegate;
-        private final Counter counter;
-
-        BoundedCharSequence(CharSequence delegate, int maxAccesses) {
-            this(delegate, new Counter(maxAccesses));
-        }
-
-        private BoundedCharSequence(CharSequence delegate, Counter counter) {
-            this.delegate = delegate;
-            this.counter = counter;
-        }
-
-        @Override
-        public int length() {
-            return delegate.length();
-        }
-
-        @Override
-        public char charAt(int index) {
-            counter.tick(1);
-
-            return delegate.charAt(index);
-        }
-
-        @Override
-        public CharSequence subSequence(int start, int end) {
-            int span = Math.max(0, end - start);
-
-            counter.tick(span);
-
-            return new BoundedCharSequence(delegate.subSequence(start, end), counter);
-        }
-
-        @Override
-        public String toString() {
-            return delegate.toString();
-        }
-    }
-
-    private static final class Counter {
-
-        private final int maxAccesses;
-        private int accesses;
-
-        Counter(int maxAccesses) {
-            this.maxAccesses = maxAccesses;
-        }
-
-        void tick(int delta) {
-            long next = (long) accesses + delta;
-
-            if (next > Integer.MAX_VALUE) {
-                accesses = Integer.MAX_VALUE;
-            } else {
-                accesses = (int) next;
-            }
-
-            if (accesses > maxAccesses) {
-                throw new RegexExecutionLimitException(
-                    "Regex execution exceeded " + maxAccesses + " character accesses (likely catastrophic "
-                        + "backtracking); aborting");
-            }
-        }
     }
 
     public static Pattern compile(String expression) {

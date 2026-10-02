@@ -26,15 +26,15 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.agent.guardrails.util.MaskEntityMapUtils;
-import com.bytechef.component.ai.agent.guardrails.util.PiiDetectorUtils;
-import com.bytechef.component.ai.agent.guardrails.util.PiiDetectorUtils.PiiMatch;
-import com.bytechef.component.ai.agent.guardrails.util.PiiDetectorUtils.PiiPattern;
+import com.bytechef.component.ai.agent.guardrails.util.PiiEntityOptions;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.platform.ai.sensitivedata.PiiPatternCatalog;
+import com.bytechef.platform.ai.sensitivedata.RegexPiiDetector;
+import com.bytechef.platform.ai.sensitivedata.SensitiveDataRedactor;
+import com.bytechef.platform.ai.sensitivedata.SensitiveKind;
+import com.bytechef.platform.ai.sensitivedata.SensitiveSpan;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction;
@@ -43,18 +43,14 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.PreflightC
 import com.bytechef.platform.component.definition.ai.agent.guardrails.PreflightSanitizerFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Rule-based PII detection: emails, phone numbers, credit cards, IPs, IBANs, SSNs, and locale-specific identifiers.
- * Configurable via the {@code entities} parameter; runs at the PREFLIGHT stage so detected spans are masked before the
- * LLM stage.
- *
  * @author Ivica Cardic
  */
 public final class Pii {
@@ -69,12 +65,12 @@ public final class Pii {
 
                 @Override
                 public Optional<Violation> apply(String text, GuardrailContext context) {
-                    return applyCheck(text, resolvePatterns(context.inputParameters()));
+                    return applyCheck(text, context);
                 }
 
                 @Override
                 public MaskResult mask(String text, GuardrailContext context) {
-                    return MaskResult.entities(collectMaskEntities(text, resolvePatterns(context.inputParameters())));
+                    return Pii.mask(text, context);
                 }
             });
     }
@@ -89,12 +85,14 @@ public final class Pii {
 
                 @Override
                 public String apply(String text, GuardrailContext context) {
-                    return maskInline(text, resolvePatterns(context.inputParameters()), context.context());
+                    MaskResult result = Pii.mask(text, context);
+
+                    return result instanceof MaskResult.Masked masked ? masked.text() : text;
                 }
 
                 @Override
                 public MaskResult mask(String text, GuardrailContext context) {
-                    return MaskResult.entities(collectMaskEntities(text, resolvePatterns(context.inputParameters())));
+                    return Pii.mask(text, context);
                 }
             });
     }
@@ -118,84 +116,78 @@ public final class Pii {
                 .label("Entities")
                 .description("Which PII types to scan for.")
                 .items(string())
-                .options(PiiDetectorUtils.getPiiDetectionOptions())
+                .options(PiiEntityOptions.getPiiDetectionOptions())
                 .displayCondition(TYPE + " == '" + TYPE_SELECTED + "'")
                 .required(false)
         };
     }
 
-    private static List<PiiPattern> resolvePatterns(Parameters params) {
-        String type = params.getString(TYPE, TYPE_ALL);
+    private static Optional<Violation> applyCheck(String text, GuardrailContext context) {
+        List<PiiPatternCatalog.PiiPattern> patterns = PiiEntityOptions.selectedPatterns(context.inputParameters());
+        Set<String> selectedTypes = patterns.stream()
+            .map(PiiPatternCatalog.PiiPattern::type)
+            .collect(Collectors.toSet());
+        String type = context.inputParameters()
+            .getString(TYPE, TYPE_ALL);
 
-        if (TYPE_SELECTED.equals(type)) {
-            List<PiiPattern> selected = PiiDetectorUtils.filterByTypes(params.getList(ENTITIES, String.class));
+        List<SensitiveSpan> own = detect(text, patterns);
+        List<SensitiveSpan> published = context.publishedInputSpans()
+            .stream()
+            .filter(span -> span.kind() == SensitiveKind.PII)
+            .filter(span -> !TYPE_SELECTED.equals(type) || selectedTypes.contains(span.category()))
+            .toList();
 
-            if (selected.isEmpty()) {
-                throw new IllegalArgumentException(
-                    "PII guardrail TYPE='SELECTED' requires at least one entity in 'Entities'.");
-            }
-
-            return selected;
-        }
-
-        return PiiDetectorUtils.DEFAULT_PII_PATTERNS;
-    }
-
-    private static Optional<Violation> applyCheck(String text, List<PiiPattern> patterns) {
-        List<PiiMatch> matches = PiiDetectorUtils.detect(text, patterns, List.of());
-
-        if (matches.isEmpty()) {
+        if (own.isEmpty() && published.isEmpty()) {
             return Optional.empty();
         }
 
-        List<String> values = matches.stream()
-            .map(PiiMatch::value)
-            .toList();
-
-        ArrayList<String> entityTypes = matches.stream()
-            .map(PiiMatch::type)
+        ArrayList<String> entityTypes = Stream.concat(published.stream(), own.stream())
+            .map(SensitiveSpan::category)
             .distinct()
             .collect(Collectors.toCollection(ArrayList::new));
 
-        return Optional.of(Violation.ofMatches("piiCheck", values, Map.of("entityTypes", entityTypes)));
+        if (published.isEmpty()) {
+            List<String> values = own.stream()
+                .map(span -> text.substring(span.start(), span.end()))
+                .toList();
+
+            return Optional.of(Violation.ofMatches("piiCheck", values, Map.of("entityTypes", entityTypes)));
+        }
+
+        return Optional.of(
+            Violation.ofSpans("piiCheck", published.size() + own.size(), Map.of("entityTypes", entityTypes)));
     }
 
-    private static String maskInline(String text, List<PiiPattern> patterns, Context context) {
+    private static MaskResult mask(String text, GuardrailContext context) {
         if (text == null || text.isEmpty()) {
-            return text;
+            return MaskResult.unchanged();
         }
 
-        Map<String, List<String>> entities = collectMaskEntities(text, patterns);
+        SensitiveDataRedactor.RedactionResult result =
+            redactor(PiiEntityOptions.selectedPatterns(context.inputParameters()))
+                .redactWithSpans(
+                    text, Set.of(SensitiveKind.PII), SensitiveDataRedactor.DEFAULT_MIN_CONFIDENCE, null, List.of(),
+                    span -> "<" + span.category() + ">");
 
-        if (entities.isEmpty()) {
-            return text;
+        if (result.accepted()
+            .isEmpty()) {
+            return MaskResult.unchanged();
         }
 
-        MaskEntityMapUtils maskEntityMap = new MaskEntityMapUtils(context);
-
-        maskEntityMap.merge(entities);
-
-        return maskEntityMap.applyTo(text);
+        return MaskResult.masked(result.text(), text);
     }
 
-    private static Map<String, List<String>> collectMaskEntities(String text, List<PiiPattern> patterns) {
-        List<PiiMatch> matches = PiiDetectorUtils.detect(text, patterns, List.of());
-
-        if (matches.isEmpty()) {
-            return Map.of();
+    private static List<SensitiveSpan> detect(String text, List<PiiPatternCatalog.PiiPattern> patterns) {
+        if (text == null || text.isEmpty()) {
+            return List.of();
         }
 
-        Map<String, LinkedHashSet<String>> grouped = new LinkedHashMap<>();
+        return redactor(patterns)
+            .redactWithSpans(text, Set.of(SensitiveKind.PII), SensitiveDataRedactor.DEFAULT_MIN_CONFIDENCE, null)
+            .accepted();
+    }
 
-        for (PiiMatch match : matches) {
-            grouped.computeIfAbsent(match.type(), key -> new LinkedHashSet<>())
-                .add(match.value());
-        }
-
-        Map<String, List<String>> result = new LinkedHashMap<>();
-
-        grouped.forEach((type, values) -> result.put(type, new ArrayList<>(values)));
-
-        return result;
+    private static SensitiveDataRedactor redactor(List<PiiPatternCatalog.PiiPattern> patterns) {
+        return new SensitiveDataRedactor(List.of(new RegexPiiDetector(patterns)));
     }
 }

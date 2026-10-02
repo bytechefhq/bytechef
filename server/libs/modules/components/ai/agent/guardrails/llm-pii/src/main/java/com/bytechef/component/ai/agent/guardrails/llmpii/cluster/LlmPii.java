@@ -25,10 +25,10 @@ import static com.bytechef.platform.component.definition.ai.agent.guardrails.Gua
 import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction.SANITIZE_TEXT;
 
 import com.bytechef.component.ai.agent.guardrails.MissingModelChildException;
+import com.bytechef.component.ai.agent.guardrails.util.GuardrailMatchDeadline;
 import com.bytechef.component.ai.agent.guardrails.util.LlmPiiDetectorUtils;
 import com.bytechef.component.ai.agent.guardrails.util.MaskEntityMapUtils;
-import com.bytechef.component.ai.agent.guardrails.util.PiiDetectorUtils;
-import com.bytechef.component.ai.agent.guardrails.util.RegexParserUtils;
+import com.bytechef.component.ai.agent.guardrails.util.PiiEntityOptions;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -122,7 +122,7 @@ public final class LlmPii {
                 .label("Entities")
                 .description("PII entity types the LLM should look for.")
                 .items(string())
-                .options(PiiDetectorUtils.getPiiDetectionOptions())
+                .options(PiiEntityOptions.getPiiDetectionOptions())
         };
     }
 
@@ -167,7 +167,8 @@ public final class LlmPii {
             Pattern pattern = MaskEntityMapUtils.boundaryAwarePattern(span.value());
             String replacement = Matcher.quoteReplacement("<" + span.type() + ">");
 
-            result = pattern.matcher(RegexParserUtils.bounded(result))
+            result = pattern.matcher(GuardrailMatchDeadline.start()
+                .bound(result))
                 .replaceAll(replacement);
         }
 

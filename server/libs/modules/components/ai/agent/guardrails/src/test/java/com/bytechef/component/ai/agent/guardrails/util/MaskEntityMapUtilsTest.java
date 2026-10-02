@@ -229,9 +229,6 @@ class MaskEntityMapUtilsTest {
         // Sanitize-stage input can be very large (long chat transcripts, document attachments). The two-phase
         // scan-then-replace must complete in reasonable time on large input — pin against an accidental
         // regression where someone reintroduces N replaceAll passes (each O(text)) instead of the single-pass
-        // span collection. We exercise ~900 KiB (just under RegexParserUtils.MAX_SCAN_LENGTH = 1 MiB so the
-        // bounded() pre-check does not reject it). Inputs above the limit are bounded and rejected upstream;
-        // see testApplyToBoundedRejectsInputAboveLimit for the regression pin on the bounded() defence.
         StringBuilder builder = new StringBuilder(900 * 1024 + 1024);
 
         for (int i = 0; i < 900; i++) {
@@ -254,23 +251,6 @@ class MaskEntityMapUtilsTest {
         assertThat(masked)
             .as("expected one <CARD> per iteration")
             .contains("<CARD>");
-    }
-
-    @Test
-    void testApplyToBoundedRejectsInputAboveLimit() {
-        // Inputs above RegexParserUtils' MAX_SCAN_LENGTH (1 MiB) must be rejected so a runaway LLM-emitted entity
-        // list combined with a very large body cannot exhaust the time budget through repeated full-text scans.
-        // The advisor catches RegexExecutionLimitException and converts it to an ExecutionFailureViolation; the
-        // request fails closed.
-        String oversized = "x".repeat(2 * 1024 * 1024) + " CARD-1234-5678-9012-3456";
-
-        MaskEntityMapUtils map = new MaskEntityMapUtils(mock(Context.class));
-
-        map.merge(Map.of("CARD", List.of("CARD-1234-5678-9012-3456")));
-
-        org.assertj.core.api.Assertions.assertThatThrownBy(() -> map.applyTo(oversized))
-            .isInstanceOf(RegexParserUtils.RegexExecutionLimitException.class)
-            .hasMessageContaining("Input exceeds maximum");
     }
 
     @Test

@@ -77,7 +77,8 @@ public final class MaskEntityMapUtils {
 
         List<Span> spans = new ArrayList<>();
         Map<String, Pattern> patternCache = new HashMap<>();
-        CharSequence bounded = RegexParserUtils.bounded(text);
+        CharSequence bounded = GuardrailMatchDeadline.start()
+            .bound(text);
 
         for (Map.Entry<String, List<String>> entry : entities.entrySet()) {
             List<String> values = entry.getValue();
@@ -172,7 +173,8 @@ public final class MaskEntityMapUtils {
 
         List<Span> spans = new ArrayList<>();
         Map<String, Pattern> patternCache = new HashMap<>();
-        CharSequence bounded = RegexParserUtils.bounded(text);
+        CharSequence bounded = GuardrailMatchDeadline.start()
+            .bound(text);
 
         for (Pair pair : pairs) {
             addSpans(spans, patternCache, bounded, pair.value(), pair.type());

@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition.ai.agent.guardrails;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.sensitivedata.SensitiveSpan;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -49,6 +50,7 @@ public final class GuardrailContext {
     private final @Nullable ChatClient chatClient;
     private final Context context;
     private final List<Message> conversationHistoryMessages;
+    private final List<SensitiveSpan> publishedInputSpans;
 
     public GuardrailContext(
         Parameters inputParameters, Parameters connectionParameters, Parameters parentParameters,
@@ -56,13 +58,14 @@ public final class GuardrailContext {
         @Nullable ChatClient chatClient, Context context) {
 
         this(inputParameters, connectionParameters, parentParameters, extensions, componentConnections, chatClient,
-            context, List.of());
+            context, List.of(), List.of());
     }
 
     private GuardrailContext(
         Parameters inputParameters, Parameters connectionParameters, Parameters parentParameters,
         Parameters extensions, Map<String, ComponentConnection> componentConnections,
-        @Nullable ChatClient chatClient, Context context, List<Message> conversationHistoryMessages) {
+        @Nullable ChatClient chatClient, Context context, List<Message> conversationHistoryMessages,
+        List<SensitiveSpan> publishedInputSpans) {
 
         this.inputParameters = inputParameters == null ? ParametersFactory.create(Map.of()) : inputParameters;
         this.connectionParameters = connectionParameters == null
@@ -75,6 +78,7 @@ public final class GuardrailContext {
         this.context = Objects.requireNonNull(context, "context");
         this.conversationHistoryMessages =
             conversationHistoryMessages == null ? List.of() : List.copyOf(conversationHistoryMessages);
+        this.publishedInputSpans = publishedInputSpans == null ? List.of() : List.copyOf(publishedInputSpans);
     }
 
     public Parameters inputParameters() {
@@ -137,11 +141,20 @@ public final class GuardrailContext {
 
     public GuardrailContext withConversationHistoryMessages(List<Message> conversationHistoryMessages) {
         return new GuardrailContext(inputParameters, connectionParameters, parentParameters, extensions,
-            componentConnections, chatClient, context, conversationHistoryMessages);
+            componentConnections, chatClient, context, conversationHistoryMessages, publishedInputSpans);
     }
 
     public Context context() {
         return context;
+    }
+
+    public List<SensitiveSpan> publishedInputSpans() {
+        return publishedInputSpans;
+    }
+
+    public GuardrailContext withPublishedInputSpans(List<SensitiveSpan> publishedInputSpans) {
+        return new GuardrailContext(inputParameters, connectionParameters, parentParameters, extensions,
+            componentConnections, chatClient, context, conversationHistoryMessages, publishedInputSpans);
     }
 
     public static final class Builder {
