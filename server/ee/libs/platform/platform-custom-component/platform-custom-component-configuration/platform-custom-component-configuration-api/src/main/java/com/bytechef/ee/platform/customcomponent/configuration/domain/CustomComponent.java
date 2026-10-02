@@ -55,6 +55,10 @@ public class CustomComponent {
         }
     }
 
+    public enum Status {
+        DRAFT, PUBLISHED
+    }
+
     @Column("component")
     private FileEntry component;
 
@@ -97,6 +101,12 @@ public class CustomComponent {
 
     @Column
     private String title;
+
+    @Column("published_date")
+    private Instant publishedDate;
+
+    @Column
+    private int status;
 
     @Version
     private int version;
@@ -171,6 +181,14 @@ public class CustomComponent {
         return title;
     }
 
+    public Instant getPublishedDate() {
+        return publishedDate;
+    }
+
+    public Status getStatus() {
+        return Status.values()[status];
+    }
+
     public int getVersion() {
         return version;
     }
@@ -211,6 +229,14 @@ public class CustomComponent {
         this.title = title;
     }
 
+    public void setPublishedDate(Instant publishedDate) {
+        this.publishedDate = publishedDate;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status.ordinal();
+    }
+
     public void setVersion(int version) {
         this.version = version;
     }
@@ -226,6 +252,7 @@ public class CustomComponent {
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
+            ", status=" + status +
             '}';
     }
 }

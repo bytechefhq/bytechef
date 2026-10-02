@@ -48,6 +48,9 @@ info:
     customerPortalUrl: ${billing.stripe.customer-portal-url:}
   application:
     edition: ${bytechef.edition:}
+  component:
+    customComponent:
+      javaEnabled: ${bytechef.component.custom-component.java-enabled}
   docs:
     changelogUrl: ${docs.changelog-url:}
     communitySupportUrl: ${docs.community-support-url:}
