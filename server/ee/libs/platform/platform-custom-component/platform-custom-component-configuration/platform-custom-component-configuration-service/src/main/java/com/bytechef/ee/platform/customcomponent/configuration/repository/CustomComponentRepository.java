@@ -25,4 +25,8 @@ public interface CustomComponentRepository
     extends ListPagingAndSortingRepository<CustomComponent, Long>, ListCrudRepository<CustomComponent, Long> {
 
     Optional<CustomComponent> findByNameAndComponentVersion(String name, int componentVersion);
+
+    Optional<CustomComponent> findByNameAndStatus(String name, int status);
+
+    Optional<CustomComponent> findFirstByNameOrderByComponentVersionDesc(String name);
 }

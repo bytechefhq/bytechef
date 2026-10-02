@@ -9,11 +9,16 @@ package com.bytechef.ee.platform.customcomponent.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
+import com.bytechef.ee.platform.customcomponent.configuration.exception.CustomComponentErrorType;
 import com.bytechef.ee.platform.customcomponent.configuration.repository.CustomComponentRepository;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -75,6 +80,32 @@ public class CustomComponentServiceImpl implements CustomComponentService {
     }
 
     @Override
+    public Optional<CustomComponent> fetchDraftCustomComponent(String name) {
+        return customComponentRepository.findByNameAndStatus(name, CustomComponent.Status.DRAFT.ordinal());
+    }
+
+    @Override
+    public Optional<CustomComponent> fetchLatestCustomComponent(String name) {
+        return customComponentRepository.findFirstByNameOrderByComponentVersionDesc(name);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public CustomComponent publishCustomComponent(long id) {
+        CustomComponent customComponent = getCustomComponent(id);
+
+        if (customComponent.getStatus() != CustomComponent.Status.DRAFT) {
+            throw new ConfigurationException(
+                "Only a draft custom component can be published", CustomComponentErrorType.COMPONENT_NOT_DRAFT);
+        }
+
+        customComponent.setPublishedDate(Instant.now());
+        customComponent.setStatus(CustomComponent.Status.PUBLISHED);
+
+        return customComponentRepository.save(customComponent);
+    }
+
+    @Override
     public CustomComponent update(CustomComponent customComponent) {
         Assert.notNull(customComponent, "'customComponent' must not be null");
         Assert.notNull(customComponent.getId(), "id");
@@ -84,6 +115,10 @@ public class CustomComponentServiceImpl implements CustomComponentService {
         curCustomComponent.setDescription(customComponent.getDescription());
         curCustomComponent.setIcon(customComponent.getIcon());
         curCustomComponent.setTitle(customComponent.getTitle());
+        curCustomComponent.setComponent(customComponent.getComponent());
+        curCustomComponent.setComponentVersion(customComponent.getComponentVersion());
+        curCustomComponent.setPublishedDate(customComponent.getPublishedDate());
+        curCustomComponent.setStatus(customComponent.getStatus());
 
         return customComponentRepository.save(curCustomComponent);
     }
