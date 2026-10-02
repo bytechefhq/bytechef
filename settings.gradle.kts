@@ -165,6 +165,8 @@ include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-au
 include("server:libs:platform:platform-ai:platform-ai-api")
 include("server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api")
 include("server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-service")
+include("server:libs:platform:platform-ai:platform-ai-sensitive-data:platform-ai-sensitive-data-api")
+include("server:libs:platform:platform-ai:platform-ai-sensitive-data:platform-ai-sensitive-data-service")
 include("server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api")
 include("server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-file-storage:platform-ai-skill-file-storage-api")
 include("server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-file-storage:platform-ai-skill-file-storage-impl")

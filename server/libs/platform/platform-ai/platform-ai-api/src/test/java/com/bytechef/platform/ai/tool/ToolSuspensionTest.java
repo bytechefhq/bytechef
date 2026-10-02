@@ -98,6 +98,17 @@ class ToolSuspensionTest {
     }
 
     @Test
+    void testSuspendedToolResultFormIsRecognizedWithoutASuspend() {
+        String suspendedToolResult = ToolSuspension.suspendedToolResult(createSuspendedActionContext());
+
+        assertThat(ToolSuspension.hasSuspendedToolResultForm(suspendedToolResult)).isTrue();
+        assertThat(ToolSuspension.hasSuspendedToolResultForm("\"" + suspendedToolResult + "\"")).isTrue();
+        assertThat(ToolSuspension.hasSuspendedToolResultForm(null)).isFalse();
+        assertThat(ToolSuspension.hasSuspendedToolResultForm("__bytechef_tool_suspended__")).isFalse();
+        assertThat(ToolSuspension.hasSuspendedToolResultForm(suspendedToolResult + " bob@acme.io")).isFalse();
+    }
+
+    @Test
     void testSuspendedToolResultRequiresASuspend() {
         ActionContextAware actionContextAware = mock(ActionContextAware.class);
 
