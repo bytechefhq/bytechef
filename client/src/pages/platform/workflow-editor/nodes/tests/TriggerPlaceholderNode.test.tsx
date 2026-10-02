@@ -1,10 +1,11 @@
 import {TRIGGER_PLACEHOLDER_NODE_ID} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import {ReactFlowProvider} from '@xyflow/react';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import useLayoutDirectionStore from '../../stores/useLayoutDirectionStore';
+import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../../utils/canvasDragData';
 import TriggerPlaceholderNode from '../TriggerPlaceholderNode';
 
 vi.mock('../../components/WorkflowNodesPopoverMenu', () => ({
@@ -51,5 +52,23 @@ describe('TriggerPlaceholderNode', () => {
         useLayoutDirectionStore.setState({layoutDirection: 'LR'});
 
         expect(renderSlotConnector()).toHaveClass('bottom-full', 'border-l-2');
+    });
+
+    it('shows the drop highlight only while a trigger is dragged over it', () => {
+        render(
+            <ReactFlowProvider>
+                <TriggerPlaceholderNode data={{label: '+'} as NodeDataType} id={TRIGGER_PLACEHOLDER_NODE_ID} />
+            </ReactFlowProvider>
+        );
+
+        const slot = screen.getByTitle('Click to add a trigger');
+
+        fireEvent.dragEnter(slot, {dataTransfer: {types: [CANVAS_DRAG_DATA_TYPE]}});
+
+        expect(screen.queryByTestId('dropzone-highlight')).not.toBeInTheDocument();
+
+        fireEvent.dragEnter(slot, {dataTransfer: {types: [CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE]}});
+
+        expect(screen.getByTestId('dropzone-highlight')).toBeInTheDocument();
     });
 });
