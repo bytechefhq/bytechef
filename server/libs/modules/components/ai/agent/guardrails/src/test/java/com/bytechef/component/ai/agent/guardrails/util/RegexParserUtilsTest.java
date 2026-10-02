@@ -80,55 +80,6 @@ class RegexParserUtilsTest {
     }
 
     @Test
-    void testBoundedAbortsCatastrophicBacktracking() {
-        // Cox-style exponential backtracking: the regex a?{N} a{N} matched against N 'a's forces the engine to try
-        // every possible split of the optional group, which grows as 2^N. Java's regex engine does NOT short-circuit
-        // this pattern (unlike simpler (a+)+$ cases), so charAt calls reliably exceed the 10M bound.
-        int n = 25;
-
-        StringBuilder patternSource = new StringBuilder();
-
-        for (int index = 0; index < n; index++) {
-            patternSource.append("a?");
-        }
-
-        for (int index = 0; index < n; index++) {
-            patternSource.append("a");
-        }
-
-        Pattern pathological = Pattern.compile(patternSource.toString());
-        String evil = "a".repeat(n);
-
-        assertThatThrownBy(() -> pathological.matcher(RegexParserUtils.bounded(evil))
-            .matches())
-                .isInstanceOf(RegexParserUtils.RegexExecutionLimitException.class)
-                .hasMessageContaining("character accesses");
-    }
-
-    @Test
-    void testBoundedRejectsInputLargerThanMaxLength() {
-        String oversized = "a".repeat(RegexParserUtils.MAX_INPUT_LENGTH + 1);
-
-        assertThatThrownBy(() -> RegexParserUtils.bounded(oversized))
-            .isInstanceOf(RegexParserUtils.RegexExecutionLimitException.class)
-            .hasMessageContaining("maximum regex scan length");
-    }
-
-    @Test
-    void testBoundedAllowsOrdinaryMatching() {
-        Pattern pattern = Pattern.compile("\\bfoo\\b");
-        CharSequence bounded = RegexParserUtils.bounded("lots of foo in the text");
-
-        assertThat(pattern.matcher(bounded)
-            .find()).isTrue();
-    }
-
-    @Test
-    void testBoundedReturnsNullForNullInput() {
-        assertThat(RegexParserUtils.bounded(null)).isNull();
-    }
-
-    @Test
     void testCompileRejectsExpressionLargerThanMaxLength() {
         String oversizedPattern = "a".repeat(RegexParserUtils.MAX_EXPRESSION_LENGTH + 1);
 

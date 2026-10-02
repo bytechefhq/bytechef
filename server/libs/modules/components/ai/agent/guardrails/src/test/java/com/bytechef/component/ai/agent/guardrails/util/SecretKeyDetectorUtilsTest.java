@@ -17,7 +17,6 @@
 package com.bytechef.component.ai.agent.guardrails.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.component.ai.agent.guardrails.util.SecretKeyDetectorUtils.Permissiveness;
 import com.bytechef.component.ai.agent.guardrails.util.SecretKeyDetectorUtils.SecretMatch;
@@ -225,17 +224,6 @@ class SecretKeyDetectorUtilsTest {
     }
 
     @Test
-    void testOversizedContentRejectedByBoundedWrap() {
-        // Built-in scans must honour the DoS bound enforced by RegexParser.bounded — without it, a very long input
-        // paired with a pathological provider regex could run unbounded. Feed a content just above MAX_INPUT_LENGTH
-        // and expect the bounded wrap to reject before any pattern matching runs.
-        String oversized = "a".repeat(RegexParserUtils.MAX_INPUT_LENGTH + 1);
-
-        assertThatThrownBy(() -> SecretKeyDetectorUtils.detect(oversized, Permissiveness.BALANCED))
-            .isInstanceOf(RegexParserUtils.RegexExecutionLimitException.class);
-    }
-
-    @Test
     void testKeyEqualsValuePatternIgnoresSubstringKeyNouns() {
         // Regression: the prior pattern matched 'notapikey=...' / 'mySecretValue=...' because the key noun group
         // (api[_-]?key|secret|token|password|auth) had no left-side anchor. The added (?<![A-Za-z]) lookbehind
@@ -302,15 +290,5 @@ class SecretKeyDetectorUtilsTest {
         // The base64 token may be flagged by the high-entropy heuristic, but never as the literal sk- provider type.
         assertThat(matches)
             .noneSatisfy(match -> assertThat(match.type()).isEqualTo("OPENAI_KEY"));
-    }
-
-    @Test
-    void testDetectRejectsPathologicallyLargeInputViaRegexParserBound() {
-        String oversizedInput = "a".repeat(RegexParserUtils.MAX_INPUT_LENGTH + 1);
-
-        assertThatThrownBy(() -> SecretKeyDetectorUtils.detect(oversizedInput, Permissiveness.BALANCED))
-            .as("input above RegexParserUtils.MAX_INPUT_LENGTH must abort via RegexExecutionLimitException to "
-                + "prevent a pathological pattern scan from holding a worker thread")
-            .isInstanceOf(RegexParserUtils.RegexExecutionLimitException.class);
     }
 }

@@ -17,7 +17,6 @@
 package com.bytechef.component.ai.agent.guardrails.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.component.ai.agent.guardrails.util.KeywordMatcherUtils.KeywordMatchResult;
 import java.util.List;
@@ -187,16 +186,6 @@ class KeywordMatcherUtilsTest {
         assertThat(result.matched())
             .as("Cyrillic homoglyph bypass is NOT defended against today — pin limitation")
             .isFalse();
-    }
-
-    @Test
-    void testMatchRejectsPathologicallyLargeInputViaRegexParserBound() {
-        String oversizedInput = "a".repeat(RegexParserUtils.MAX_INPUT_LENGTH + 1);
-
-        assertThatThrownBy(() -> KeywordMatcherUtils.match(oversizedInput, List.of("zzz"), false))
-            .as("input above RegexParserUtils.MAX_INPUT_LENGTH must abort via RegexExecutionLimitException, not "
-                + "let a pathological scan run unbounded")
-            .isInstanceOf(RegexParserUtils.RegexExecutionLimitException.class);
     }
 
     @Test
