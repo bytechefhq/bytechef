@@ -22,6 +22,7 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -38,6 +39,10 @@ public final class ToolSuspension {
     public static final String SUSPENDED_TOOL_RESULT = "__BYTECHEF_SUSPENDED_TOOL_RESULT__";
 
     private static final String SUSPENDED_TOOL_RESULT_PREFIX = "__BYTECHEF_TOOL_SUSPENDED__:";
+
+    private static final Pattern SUSPENDED_TOOL_RESULT_PATTERN = Pattern.compile(
+        "\"?" + Pattern.quote(SUSPENDED_TOOL_RESULT_PREFIX) +
+            "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\"?");
 
     private ToolSuspension() {
     }
@@ -100,5 +105,18 @@ public final class ToolSuspension {
         }
 
         return suspendedToolResult.equals(toolResult) || ("\"" + suspendedToolResult + "\"").equals(toolResult);
+    }
+
+    /**
+     * Returns whether the given tool result has the form of a suspended tool result, without checking it against the
+     * suspend that recorded it. Since the form carries nothing but a random id, it is safe to pass through unchanged.
+     */
+    public static boolean hasSuspendedToolResultForm(@Nullable String toolResult) {
+        if (toolResult == null) {
+            return false;
+        }
+
+        return SUSPENDED_TOOL_RESULT_PATTERN.matcher(toolResult)
+            .matches();
     }
 }
