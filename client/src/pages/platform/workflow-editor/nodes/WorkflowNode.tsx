@@ -450,31 +450,11 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                 </div>
             )}
 
-            {data.name.includes('condition') && effectiveDirection === 'LR' && (
-                <div className="absolute top-0 right-0 font-bold text-muted-foreground">
-                    {/* equal widths + centered text keep both rotated labels on one vertical axis */}
-
-                    <span className="absolute -top-8 -right-13 w-14 -rotate-90 text-center">TRUE</span>
-
-                    <span className="absolute top-20 -right-13 w-14 -rotate-90 text-center">FALSE</span>
-                </div>
-            )}
-
             {data.componentName === 'on-error' && effectiveDirection === 'TB' && (
                 <div className="absolute bottom-0 left-0 font-bold text-muted-foreground">
                     <span className="absolute -bottom-7 -left-16">TRY</span>
 
                     <span className="absolute -bottom-7 left-24">CATCH</span>
-                </div>
-            )}
-
-            {data.componentName === 'on-error' && effectiveDirection === 'LR' && (
-                <div className="absolute top-0 right-0 font-bold text-muted-foreground">
-                    {/* equal widths + centered text keep both rotated labels on one vertical axis */}
-
-                    <span className="absolute -top-8 -right-13 w-14 -rotate-90 text-center">TRY</span>
-
-                    <span className="absolute top-20 -right-13 w-14 -rotate-90 text-center">CATCH</span>
                 </div>
             )}
         </div>

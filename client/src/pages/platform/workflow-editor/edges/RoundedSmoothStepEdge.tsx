@@ -2,12 +2,16 @@ import {BaseEdge, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import AddBranchChip from './AddBranchChip';
+import BinaryCaseLabel from './BinaryCaseLabel';
+import computeBinaryCaseLabel from './computeBinaryCaseLabel';
 import computeExitEdgeJogCenter from './computeExitEdgeJogCenter';
 import {getTriggerFanInBusCenter} from './computeTriggerFanIn';
 
 export default function RoundedSmoothStepEdge({
     data,
     id,
+    source,
+    sourceHandleId,
     sourcePosition,
     sourceX,
     sourceY,
@@ -57,6 +61,14 @@ export default function RoundedSmoothStepEdge({
         targetY,
     });
 
+    const binaryCaseLabel = computeBinaryCaseLabel({
+        layoutDirection,
+        source,
+        sourceHandleId,
+        sourceX,
+        targetY,
+    });
+
     return (
         <>
             <BaseEdge
@@ -65,6 +77,8 @@ export default function RoundedSmoothStepEdge({
                 path={edgePath}
                 style={style}
             />
+
+            {binaryCaseLabel && <BinaryCaseLabel edgeId={id} label={binaryCaseLabel} />}
 
             {addBranchPlaceholderId && (
                 <AddBranchChip
