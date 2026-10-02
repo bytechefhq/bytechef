@@ -29,15 +29,15 @@ export const useCreateProjectWorkflow = ({
         onSuccess: (response) => {
             captureProjectWorkflowCreated();
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.workflows,
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectKeys.filteredProjects({
                     id: currentWorkspaceId!,
                 }),
@@ -47,7 +47,7 @@ export const useCreateProjectWorkflow = ({
 
             bottomResizablePanelRef?.current?.resize(0);
 
-            navigate(`/automation/projects/${projectId}/project-workflows/${response.projectWorkflowId}`);
+            void navigate(`/automation/projects/${projectId}/project-workflows/${response.projectWorkflowId}`);
         },
     });
 
