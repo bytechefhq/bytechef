@@ -19,17 +19,14 @@ package com.bytechef.component.ai.agent.utils.cluster;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static com.bytechef.platform.ai.constant.AiAgentSseEventType.ASK_USER_QUESTION;
 import static com.bytechef.platform.ai.constant.AiAgentSseEventType.EVENT_TYPE;
-import static com.bytechef.platform.ai.constant.AiAgentToolContextKey.ACTION_CONTEXT;
-import static com.bytechef.platform.ai.constant.AiAgentToolContextKey.SSE_BUFFERED_EVENTS;
-import static com.bytechef.platform.ai.constant.AiAgentToolContextKey.SSE_EMITTER_REFERENCE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
-import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.tool.AiAgentToolContext;
+import com.bytechef.platform.ai.tool.AiAgentToolContext.SseTransport;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -41,8 +38,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,17 +123,23 @@ public class AiAgentUtilsAskUserQuestionTool {
             throw new IllegalStateException("ToolContext not available");
         }
 
-        Map<String, Object> toolContextMap = toolInvocation.toolContext.getContext();
+        AiAgentToolContext aiAgentToolContext = AiAgentToolContext.fetch(toolInvocation.toolContext);
 
-        if (!(toolContextMap.get(ACTION_CONTEXT) instanceof ActionContext actionContext) ||
-            !(actionContext instanceof ActionContextAware actionContextAware)) {
+        if (aiAgentToolContext == null ||
+            !(aiAgentToolContext.actionContext() instanceof ActionContextAware actionContextAware)) {
 
             throw new IllegalStateException("ActionContext not available in ToolContext");
         }
 
         String resumeUrl = actionContextAware.isEditorEnvironment() ? null : actionContextAware.getResumeUrl();
 
-        if (!sendQuestionEvent(toolInvocation.toolContext, questions, resumeUrl)) {
+        SseTransport sseTransport = aiAgentToolContext.sseTransport();
+
+        if (sseTransport == null) {
+            throw new IllegalStateException("SseTransport not available in ToolContext");
+        }
+
+        if (!sendQuestionEvent(sseTransport, questions, resumeUrl)) {
             toolInvocation.result = QUESTIONS_NOT_DELIVERED_RESULT;
 
             return Map.of();
@@ -158,22 +159,22 @@ public class AiAgentUtilsAskUserQuestionTool {
         Instant expiresAt = Instant.now()
             .plus(SUSPEND_TIMEOUT);
 
-        actionContext.suspend(new Suspend(continueParameters, expiresAt));
+        actionContextAware.suspend(new Suspend(continueParameters, expiresAt));
 
         return Map.of();
     }
 
     private static boolean hasEventTransport(ToolContext toolContext) {
-        Map<String, Object> toolContextMap = toolContext.getContext();
+        AiAgentToolContext aiAgentToolContext = AiAgentToolContext.fetch(toolContext);
 
-        return toolContextMap.get(SSE_EMITTER_REFERENCE) instanceof AtomicReference<?> ||
-            toolContextMap.get(SSE_BUFFERED_EVENTS) instanceof Queue<?>;
+        return aiAgentToolContext != null && aiAgentToolContext.sseTransport() != null;
     }
 
     private static @Nullable ActionContextAware getSuspendedActionContext(ToolContext toolContext) {
-        Map<String, Object> toolContextMap = toolContext.getContext();
+        AiAgentToolContext aiAgentToolContext = AiAgentToolContext.fetch(toolContext);
 
-        if (toolContextMap.get(ACTION_CONTEXT) instanceof ActionContextAware actionContextAware &&
+        if (aiAgentToolContext != null &&
+            aiAgentToolContext.actionContext() instanceof ActionContextAware actionContextAware &&
             actionContextAware.getSuspend() != null) {
 
             return actionContextAware;
@@ -182,11 +183,10 @@ public class AiAgentUtilsAskUserQuestionTool {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     private static boolean sendQuestionEvent(
-        ToolContext toolContext, List<AskUserQuestionTool.Question> questions, @Nullable String resumeUrl) {
+        SseTransport sseTransport, List<AskUserQuestionTool.Question> questions, @Nullable String resumeUrl) {
 
-        Map<String, Object> eventData = new LinkedHashMap<>();
+        Map<String, @Nullable Object> eventData = new LinkedHashMap<>();
 
         eventData.put(EVENT_TYPE, ASK_USER_QUESTION);
 
@@ -215,32 +215,15 @@ public class AiAgentUtilsAskUserQuestionTool {
 
         eventData.put(QUESTIONS, questionList);
 
-        Map<String, Object> toolContextMap = toolContext.getContext();
-
-        if (toolContextMap.get(SSE_EMITTER_REFERENCE) instanceof AtomicReference<?> emitterReference &&
-            emitterReference.get() instanceof SseEmitter sseEmitter) {
-
-            try {
-                sseEmitter.send(eventData);
-
-                return true;
-            } catch (Exception exception) {
-                log.error("Failed to send the ask_user_question event", exception);
-
-                return false;
-            }
-        }
-
-        if (toolContextMap.get(SSE_BUFFERED_EVENTS) instanceof Queue<?> bufferedEvents) {
-            ((Queue<Map<String, Object>>) bufferedEvents).add(eventData);
+        try {
+            sseTransport.send(eventData);
 
             return true;
+        } catch (Exception exception) {
+            log.error("Failed to send the ask_user_question event", exception);
+
+            return false;
         }
-
-        log.error("Failed to send the ask_user_question event: neither an SSE emitter nor a buffered events queue is " +
-            "available");
-
-        return false;
     }
 
     private static final class ToolInvocation {

@@ -24,7 +24,10 @@ import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.AbstractMessage;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -37,12 +40,31 @@ import org.springframework.util.MimeTypeUtils;
 /**
  * @author Ivica Cardic
  */
-public record ConversationState(List<Entry> messages) {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record ConversationState(@Nullable Integer version, List<Entry> messages) {
 
-    private static final String BYTES_KEY = "$bytes";
+    public static final int CURRENT_VERSION = 1;
+
+    private static final Logger log = LoggerFactory.getLogger(ConversationState.class);
+
+    private static final String BYTES_KEY = "__bytechef_bytes__";
 
     public ConversationState {
+        if (version == null) {
+            version = CURRENT_VERSION;
+        }
+
+        if (version > CURRENT_VERSION) {
+            throw new IllegalArgumentException(
+                "The stored conversation has version " + version + ", but this server reads conversations up to " +
+                    "version " + CURRENT_VERSION);
+        }
+
         messages = messages == null ? List.of() : List.copyOf(messages);
+    }
+
+    public ConversationState(List<Entry> messages) {
+        this(CURRENT_VERSION, messages);
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
@@ -59,6 +81,7 @@ public record ConversationState(List<Entry> messages) {
     public record SystemEntry(String text, Map<String, Object> metadata) implements Entry {
 
         public SystemEntry {
+            text = text == null ? "" : text;
             metadata = metadata == null ? Map.of() : Map.copyOf(metadata);
         }
     }
@@ -67,6 +90,7 @@ public record ConversationState(List<Entry> messages) {
     public record UserEntry(String text, List<MediaEntry> media, Map<String, Object> metadata) implements Entry {
 
         public UserEntry {
+            text = text == null ? "" : text;
             media = media == null ? List.of() : List.copyOf(media);
             metadata = metadata == null ? Map.of() : Map.copyOf(metadata);
         }
@@ -93,14 +117,25 @@ public record ConversationState(List<Entry> messages) {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record ToolCallEntry(String id, String type, String name, String arguments) {
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record ToolResponseEntry(String id, String name, String responseData) {
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record MediaEntry(
         String mimeType, @Nullable String id, @Nullable String name, @Nullable String url, @Nullable String data) {
+
+        public MediaEntry {
+            Objects.requireNonNull(mimeType, "mimeType");
+
+            if ((url == null) == (data == null)) {
+                throw new IllegalArgumentException("Exactly one of 'url' and 'data' must be set on a media entry");
+            }
+        }
     }
 
     public static ConversationState from(List<Message> messages) {
@@ -270,6 +305,12 @@ public record ConversationState(List<Entry> messages) {
 
             if (value != null) {
                 persistableMetadata.put(entry.getKey(), value);
+            } else if (entry.getValue() != null) {
+                log.warn(
+                    "The message metadata entry '{}' of type {} is not stored with the suspended conversation",
+                    entry.getKey(), entry.getValue()
+                        .getClass()
+                        .getName());
             }
         }
 

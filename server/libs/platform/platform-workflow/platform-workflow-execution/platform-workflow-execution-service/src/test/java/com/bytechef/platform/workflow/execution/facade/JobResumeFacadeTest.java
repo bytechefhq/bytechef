@@ -109,6 +109,41 @@ public class JobResumeFacadeTest {
     }
 
     @Test
+    public void testResumeJobReturnsNotYetSuspendedWhileJobIsStillRunning() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STARTED, null);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), Map.of());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.NOT_YET_SUSPENDED);
+
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+        verify(applicationEventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    public void testResumeJobStreamingReturnsNotYetSuspendedWhileJobIsStillRunning() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STARTED, null, true);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        LongConsumer jobIdConsumer = mock(LongConsumer.class);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJobStreaming(
+            jobResumeId.toString(), Map.of(), jobIdConsumer);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.NOT_YET_SUSPENDED);
+
+        verify(jobIdConsumer, never()).accept(anyLong());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+    }
+
+    @Test
     public void testResumeJobReturnsInvalidIdWhenStoredMetadataMissing() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
@@ -174,9 +209,71 @@ public class JobResumeFacadeTest {
         JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), data);
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+        assertThat(job.getMetadata(MetadataConstants.CONSUMED_JOB_RESUME_ID)).isEqualTo(jobResumeId.toString());
 
-        verify(jobFacade).resumeJob(JOB_ID, TASK_EXECUTION_ID, data);
+        InOrder inOrder = inOrder(jobService, jobFacade);
+
+        inOrder.verify(jobService)
+            .update(job);
+        inOrder.verify(jobFacade)
+            .resumeJob(JOB_ID, TASK_EXECUTION_ID, data);
         verify(applicationEventPublisher).publishEvent(any(JobResumedEvent.class));
+    }
+
+    @Test
+    public void testResumeJobReturnsGoneForAnAlreadyConsumedResumeIdWhileTheJobRuns() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STARTED, null);
+
+        job.setMetadata(Map.of(MetadataConstants.CONSUMED_JOB_RESUME_ID, jobResumeId.toString()));
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), Map.of());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.GONE);
+
+        verify(jobService, never()).update(any());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+    }
+
+    @Test
+    public void testResumeJobReturnsGoneForAnAlreadyConsumedResumeIdAfterTheJobSuspendedAgain() {
+        JobResumeId consumedJobResumeId = JobResumeId.of(JOB_ID);
+        JobResumeId currentJobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, currentJobResumeId.toString());
+
+        Map<String, Object> metadata = new HashMap<>(job.getMetadata());
+
+        metadata.put(MetadataConstants.CONSUMED_JOB_RESUME_ID, consumedJobResumeId.toString());
+
+        job.setMetadata(metadata);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(consumedJobResumeId.toString(), Map.of());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.GONE);
+
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+    }
+
+    @Test
+    public void testResumeJobReturnsJobFailedWhenTheJobFailed() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.FAILED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), Map.of());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.JOB_FAILED);
+
+        verify(jobService, never()).update(any());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
     }
 
     @Test
@@ -207,12 +304,15 @@ public class JobResumeFacadeTest {
         LongConsumer jobIdConsumer = mock(LongConsumer.class);
         Map<String, Object> data = Map.of("foo", "bar");
 
-        JobResumeOutcome outcome = jobResumeFacade.resumeJobStreaming(jobResumeId.toString(), data, jobIdConsumer);
+        JobResumeOutcome outcome =
+            jobResumeFacade.resumeJobStreaming(jobResumeId.toString(), data, jobIdConsumer);
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
 
-        InOrder inOrder = inOrder(jobIdConsumer, jobFacade, applicationEventPublisher);
+        InOrder inOrder = inOrder(jobService, jobIdConsumer, jobFacade, applicationEventPublisher);
 
+        inOrder.verify(jobService)
+            .update(job);
         inOrder.verify(jobIdConsumer)
             .accept(JOB_ID);
         inOrder.verify(jobFacade)

@@ -36,6 +36,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
@@ -45,12 +46,17 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.SyncMessageBroker;
+import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -342,6 +348,23 @@ class JobSyncExecutorTest {
             .isLessThan(Duration.ofSeconds(10));
     }
 
+    @Test
+    void testCreateTaskExecutionPostOutputProcessorsRunsSseStreamBeforeSuspend() {
+        Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges = Caffeine.newBuilder()
+            .build();
+
+        List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors =
+            JobSyncExecutor.createTaskExecutionPostOutputProcessors(sseStreamBridges);
+
+        int sseStreamIndex = indexOf(
+            taskExecutionPostOutputProcessors, SseStreamTaskExecutionPostOutputProcessor.class);
+        int suspendIndex = indexOf(taskExecutionPostOutputProcessors, SuspendTaskExecutionPostOutputProcessor.class);
+
+        assertThat(sseStreamIndex).isNotNegative();
+        assertThat(suspendIndex).isNotNegative();
+        assertThat(sseStreamIndex).isLessThan(suspendIndex);
+    }
+
     private void stubStartedJob(long jobId) {
         Job startedJob = new Job();
 
@@ -368,5 +391,17 @@ class JobSyncExecutorTest {
 
             Thread.sleep(10);
         }
+    }
+
+    private static int indexOf(
+        List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors, Class<?> processorClass) {
+
+        for (int index = 0; index < taskExecutionPostOutputProcessors.size(); index++) {
+            if (processorClass.isInstance(taskExecutionPostOutputProcessors.get(index))) {
+                return index;
+            }
+        }
+
+        return -1;
     }
 }

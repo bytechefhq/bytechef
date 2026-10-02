@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,12 +94,6 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
         ActionContext.Suspend suspend = actionContext.getSuspend();
 
         if (suspend == null) {
-            if (hasSuspendedToolResponse(conversation)) {
-                throw new IllegalStateException(
-                    "A tool returned the suspended tool result without suspending the agent; the agent's action " +
-                        "context did not reach the tool.");
-            }
-
             return result;
         }
 
@@ -110,10 +105,15 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
                     AgentToolSuspension.CONTINUE_PARAMETER_KEY + "'.");
         }
 
+        String suspendedToolResult = ToolSuspension.getSuspendedToolResult(suspend);
+
+        String suspendedToolCallId = findSuspendedToolCallId(conversation, suspendedToolResult);
+
         continueParameters.put(
             AgentToolSuspension.CONTINUE_PARAMETER_KEY,
             new AgentToolSuspension(
-                ConversationState.from(conversation), findSuspendedToolCallId(conversation)));
+                ConversationState.from(conversation), suspendedToolCallId,
+                Objects.requireNonNull(suspendedToolResult, "suspendedToolResult")));
 
         actionContext.suspend(new ActionContext.Suspend(continueParameters, suspend.expiresAt()));
 
@@ -196,20 +196,6 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
             .build();
     }
 
-    private static boolean hasSuspendedToolResponse(List<Message> conversation) {
-        for (Message message : conversation) {
-            if (message instanceof ToolResponseMessage toolResponseMessage) {
-                for (ToolResponseMessage.ToolResponse toolResponse : toolResponseMessage.getResponses()) {
-                    if (ToolSuspension.isSuspendedToolResult(toolResponse.responseData())) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
     private static List<Message> withEmptiedLastToolResponse(List<Message> conversation) {
         if (conversation.isEmpty() || !(conversation.getLast() instanceof ToolResponseMessage toolResponseMessage)) {
             return conversation;
@@ -226,7 +212,9 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
         return messages;
     }
 
-    private static String findSuspendedToolCallId(List<Message> conversation) {
+    private static String findSuspendedToolCallId(
+        List<Message> conversation, @Nullable String suspendedToolResult) {
+
         String suspendedToolCallId = null;
         List<String> otherToolResponses = new ArrayList<>();
 
@@ -236,7 +224,7 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
             }
 
             for (ToolResponseMessage.ToolResponse toolResponse : toolResponseMessage.getResponses()) {
-                if (!ToolSuspension.isSuspendedToolResult(toolResponse.responseData())) {
+                if (!ToolSuspension.isSuspendedToolResult(toolResponse.responseData(), suspendedToolResult)) {
                     otherToolResponses.add(
                         toolResponse.name() + " (id '" + toolResponse.id() + "'): " +
                             abbreviate(toolResponse.responseData()));

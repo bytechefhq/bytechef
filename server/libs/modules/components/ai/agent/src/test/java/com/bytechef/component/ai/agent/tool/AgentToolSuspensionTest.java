@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolResponses;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,21 @@ class AgentToolSuspensionTest {
     private static final String SUSPENDED_TOOL_RESULT = createSuspendedToolResult();
 
     @Test
+    void testRequiresAConversationAndAPendingToolCallId() {
+        ConversationState conversationState = ConversationState.from(List.of(new UserMessage("hi")));
+
+        assertThatThrownBy(() -> new AgentToolSuspension(null, "call_1", SUSPENDED_TOOL_RESULT))
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining("no conversation");
+        assertThatThrownBy(() -> new AgentToolSuspension(conversationState, null, SUSPENDED_TOOL_RESULT))
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining("no pending tool call id");
+        assertThatThrownBy(() -> new AgentToolSuspension(conversationState, "call_1", null))
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining("no suspended tool result");
+    }
+
+    @Test
     void testResumeConversationReplacesOnlyTheSuspendedResponse() {
         AgentToolSuspension agentToolSuspension = new AgentToolSuspension(
             ConversationState.from(
@@ -52,7 +68,7 @@ class AgentToolSuspensionTest {
                     toolResponseMessage(
                         new ToolResponseMessage.ToolResponse("call_a", "otherTool", "kept"),
                         new ToolResponseMessage.ToolResponse("call_b", "requestApproval", SUSPENDED_TOOL_RESULT)))),
-            "call_b");
+            "call_b", SUSPENDED_TOOL_RESULT);
 
         List<Message> messages = agentToolSuspension.resumeConversation(HUMAN_ANSWER);
 
@@ -68,6 +84,23 @@ class AgentToolSuspensionTest {
     }
 
     @Test
+    void testResumeConversationMarksTheHumanResponseForTheInputGuardrails() {
+        AgentToolSuspension agentToolSuspension = new AgentToolSuspension(
+            ConversationState.from(
+                List.of(
+                    new UserMessage("please get approval"),
+                    toolResponseMessage(
+                        new ToolResponseMessage.ToolResponse("call_a", "otherTool", "kept"),
+                        new ToolResponseMessage.ToolResponse("call_b", "requestApproval", SUSPENDED_TOOL_RESULT)))),
+            "call_b", SUSPENDED_TOOL_RESULT);
+
+        List<Message> messages = agentToolSuspension.resumeConversation(HUMAN_ANSWER);
+
+        assertThat(HumanToolResponses.getHumanResponseText(messages.get(0))).isNull();
+        assertThat(HumanToolResponses.getHumanResponseText(messages.get(1))).isEqualTo(HUMAN_ANSWER);
+    }
+
+    @Test
     void testResumeConversationKeepsAnEarlierResponseWithTheSameIdThatIsNotSuspended() {
         AgentToolSuspension agentToolSuspension = new AgentToolSuspension(
             ConversationState.from(
@@ -75,7 +108,7 @@ class AgentToolSuspensionTest {
                     toolResponseMessage(new ToolResponseMessage.ToolResponse("call_a", "requestApproval", "earlier")),
                     toolResponseMessage(
                         new ToolResponseMessage.ToolResponse("call_a", "requestApproval", SUSPENDED_TOOL_RESULT)))),
-            "call_a");
+            "call_a", SUSPENDED_TOOL_RESULT);
 
         List<Message> messages = agentToolSuspension.resumeConversation(HUMAN_ANSWER);
 
@@ -102,7 +135,7 @@ class AgentToolSuspensionTest {
                         new ToolResponseMessage.ToolResponse("", "lookUpCustomer", "{\"name\":\"Ann\"}"),
                         new ToolResponseMessage.ToolResponse("", "requestApproval", SUSPENDED_TOOL_RESULT),
                         new ToolResponseMessage.ToolResponse("", "sendEmail", "sent")))),
-            "");
+            "", SUSPENDED_TOOL_RESULT);
 
         List<Message> messages = agentToolSuspension.resumeConversation(HUMAN_ANSWER);
 
@@ -115,46 +148,53 @@ class AgentToolSuspensionTest {
     }
 
     @Test
-    void testResumeConversationThrowsWhenNoResponseMatches() {
-        AgentToolSuspension agentToolSuspension = new AgentToolSuspension(
+    void testConstructionThrowsWhenNoResponseMatches() {
+        assertThatThrownBy(() -> new AgentToolSuspension(
             ConversationState.from(
                 List.of(
                     new SystemMessage("you are a helper"),
                     toolResponseMessage(
                         new ToolResponseMessage.ToolResponse("call_a", "otherTool", "kept"),
                         new ToolResponseMessage.ToolResponse("call_b", "requestApproval", SUSPENDED_TOOL_RESULT)))),
-            "missing_id");
-
-        assertThatThrownBy(() -> agentToolSuspension.resumeConversation(HUMAN_ANSWER))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("No suspended tool response with id 'missing_id'");
+            "missing_id", SUSPENDED_TOOL_RESULT))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("No suspended tool response with id 'missing_id'");
     }
 
     @Test
-    void testResumeConversationThrowsWhenTheMatchingResponseIsNotSuspended() {
-        AgentToolSuspension agentToolSuspension = new AgentToolSuspension(
+    void testConstructionThrowsWhenTheMatchingResponseIsNotSuspended() {
+        assertThatThrownBy(() -> new AgentToolSuspension(
             ConversationState.from(
                 List.of(toolResponseMessage(new ToolResponseMessage.ToolResponse("call_a", "otherTool", "kept")))),
-            "call_a");
-
-        assertThatThrownBy(() -> agentToolSuspension.resumeConversation(HUMAN_ANSWER))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("No suspended tool response with id 'call_a'");
+            "call_a", SUSPENDED_TOOL_RESULT))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("No suspended tool response with id 'call_a'");
     }
 
     @Test
-    void testResumeConversationThrowsWhenMoreThanOneResponseMatches() {
-        AgentToolSuspension agentToolSuspension = new AgentToolSuspension(
+    void testConstructionThrowsWhenMoreThanOneResponseMatches() {
+        assertThatThrownBy(() -> new AgentToolSuspension(
             ConversationState.from(
                 List.of(
                     toolResponseMessage(
                         new ToolResponseMessage.ToolResponse("", "requestApproval", SUSPENDED_TOOL_RESULT),
                         new ToolResponseMessage.ToolResponse("", "askUserQuestion", SUSPENDED_TOOL_RESULT)))),
-            "");
+            "", SUSPENDED_TOOL_RESULT))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Found 2 suspended tool responses with id ''");
+    }
 
-        assertThatThrownBy(() -> agentToolSuspension.resumeConversation(HUMAN_ANSWER))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("Found 2 suspended tool responses with id ''");
+    @Test
+    void testConstructionThrowsWhenTheResponseCarriesAnotherSuspensionsResult() {
+        assertThatThrownBy(() -> new AgentToolSuspension(
+            ConversationState.from(
+                List.of(
+                    toolResponseMessage(
+                        new ToolResponseMessage.ToolResponse(
+                            "call_a", "requestApproval", createSuspendedToolResult())))),
+            "call_a", SUSPENDED_TOOL_RESULT))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("No suspended tool response with id 'call_a'");
     }
 
     private static ToolResponseMessage toolResponseMessage(ToolResponseMessage.ToolResponse... toolResponses) {

@@ -528,8 +528,10 @@ class AbstractAiAgentChatActionTest {
 
         // Build the chat-memory advisor exactly as the production chat-memory components do
         // (default order via the builder), so the assertion catches regressions in any of them.
+        ChatMemory chatMemory = mock(ChatMemory.class);
+
         MessageChatMemoryAdvisor productionStyleChatMemoryAdvisor = MessageChatMemoryAdvisor
-            .builder(mock(ChatMemory.class))
+            .builder(chatMemory)
             .build();
 
         when(chatMemoryFunction.apply(any(), any(), any(), any(), any()))
@@ -561,7 +563,7 @@ class AbstractAiAgentChatActionTest {
                 .orElseThrow(() -> new AssertionError("ToolCallingAdvisor missing from advisor chain"));
 
             Advisor chatMemoryAdvisor = advisors.stream()
-                .filter(advisor -> advisor instanceof BaseChatMemoryAdvisor)
+                .filter(BlankReplySkippingChatMemoryAdvisor.class::isInstance)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
 
@@ -846,6 +848,7 @@ class AbstractAiAgentChatActionTest {
 
         assertThat(toolCallAdvisor).isNotNull();
         assertThat(advisors).noneMatch(BaseChatMemoryAdvisor.class::isInstance);
+        assertThat(advisors).noneMatch(BlankReplySkippingChatMemoryAdvisor.class::isInstance);
         assertThat(readConversationHistoryEnabled(toolCallAdvisor)).isTrue();
     }
 
@@ -881,7 +884,12 @@ class AbstractAiAgentChatActionTest {
         List<Advisor> advisors = action.getAdvisors(
             clusterElementMap, connectionParameters, chatModel, actionContext, chatMemoryResult, null);
 
-        int chatMemoryIndex = advisors.indexOf(chatMemoryAdvisor);
+        Advisor wrappedChatMemoryAdvisor = advisors.stream()
+            .filter(BlankReplySkippingChatMemoryAdvisor.class::isInstance)
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
+
+        int chatMemoryIndex = advisors.indexOf(wrappedChatMemoryAdvisor);
         ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
         int toolCallIndex = advisors.indexOf(toolCallAdvisor);
 

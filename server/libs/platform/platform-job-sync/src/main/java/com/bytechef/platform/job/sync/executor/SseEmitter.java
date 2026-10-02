@@ -153,14 +153,22 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
 
     @Override
     public void send(Object object) {
+        RuntimeException failure = null;
+
         for (var listener : eventListeners) {
             try {
                 listener.accept(object);
-            } catch (Exception exception) {
-                if (log.isTraceEnabled()) {
-                    log.trace(exception.getMessage(), exception);
+            } catch (RuntimeException exception) {
+                if (failure == null) {
+                    failure = exception;
+                } else {
+                    failure.addSuppressed(exception);
                 }
             }
+        }
+
+        if (failure != null) {
+            throw failure;
         }
     }
 
