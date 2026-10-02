@@ -1,19 +1,18 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import DatePicker from '@/components/DatePicker/DatePicker';
+import {
+    Dialog,
+    DialogBody,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogMain,
+    DialogTrigger,
+} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
-import {
-    Dialog,
-    DialogCloseButton,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
@@ -42,169 +41,169 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
         <Dialog onOpenChange={handleOpenChange} open={isOpen}>
             <DialogTrigger asChild>{trigger ?? <Button label="New Approval Task" />}</DialogTrigger>
 
-            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-workflow-test-configuration-dialog-width">
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>Create New Approval Task</DialogTitle>
+            <DialogContent size="md">
+                <DialogMain>
+                    <DialogHeader
+                        description="Add a new approval task to your project. Fill in the details below to get started."
+                        title="Create New Approval Task"
+                    />
 
-                        <DialogDescription>
-                            Add a new approval task to your project. Fill in the details below to get started.
-                        </DialogDescription>
-                    </div>
+                    <DialogBody>
+                        <div className="space-y-4 py-4">
+                            <fieldset className="space-y-2 border-0">
+                                <Label className="gap-0" htmlFor="approval-task-title">
+                                    Title
+                                    <RequiredMark />
+                                </Label>
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                                <Input
+                                    className={errors.title ? 'border-red-500' : ''}
+                                    id="approval-task-title"
+                                    onChange={(event) => handleFormChange('title', event.target.value)}
+                                    placeholder="Enter approval task title"
+                                    value={form.title}
+                                />
 
-                <div className="space-y-4 py-4">
-                    <fieldset className="space-y-2 border-0">
-                        <Label className="gap-0" htmlFor="approval-task-title">
-                            Title
-                            <RequiredMark />
-                        </Label>
+                                {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+                            </fieldset>
 
-                        <Input
-                            className={errors.title ? 'border-red-500' : ''}
-                            id="approval-task-title"
-                            onChange={(event) => handleFormChange('title', event.target.value)}
-                            placeholder="Enter approval task title"
-                            value={form.title}
-                        />
+                            <fieldset className="space-y-2 border-0">
+                                <Label className="gap-0" htmlFor="approval-task-description">
+                                    Description
+                                    <RequiredMark />
+                                </Label>
 
-                        {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
-                    </fieldset>
+                                <Textarea
+                                    className={`min-h-[80px] ${errors.description ? 'border-red-500' : ''}`}
+                                    id="approval-task-description"
+                                    onChange={(event) => handleFormChange('description', event.target.value)}
+                                    placeholder="Describe what needs to be done"
+                                    value={form.description}
+                                />
 
-                    <fieldset className="space-y-2 border-0">
-                        <Label className="gap-0" htmlFor="approval-task-description">
-                            Description
-                            <RequiredMark />
-                        </Label>
+                                {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
+                            </fieldset>
 
-                        <Textarea
-                            className={`min-h-[80px] ${errors.description ? 'border-red-500' : ''}`}
-                            id="approval-task-description"
-                            onChange={(event) => handleFormChange('description', event.target.value)}
-                            placeholder="Describe what needs to be done"
-                            value={form.description}
-                        />
+                            <div className="grid grid-cols-2 gap-4">
+                                <fieldset className="space-y-2 border-0">
+                                    <Label>Status</Label>
 
-                        {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
-                    </fieldset>
+                                    <Select
+                                        onValueChange={(value) => handleFormChange('status', value)}
+                                        value={form.status}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a status" />
+                                        </SelectTrigger>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <fieldset className="space-y-2 border-0">
-                            <Label>Status</Label>
+                                        <SelectContent>
+                                            <SelectItem value="open">
+                                                <span className="flex items-center gap-2">
+                                                    <CircleIcon className="size-3 text-gray-400" />
+                                                    Open
+                                                </span>
+                                            </SelectItem>
 
-                            <Select onValueChange={(value) => handleFormChange('status', value)} value={form.status}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a status" />
-                                </SelectTrigger>
+                                            <SelectItem value="in-progress">
+                                                <span className="flex items-center gap-2">
+                                                    <ClockIcon className="size-3 text-blue-600" />
+                                                    In Progress
+                                                </span>
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </fieldset>
 
-                                <SelectContent>
-                                    <SelectItem value="open">
-                                        <span className="flex items-center gap-2">
-                                            <CircleIcon className="size-3 text-gray-400" />
-                                            Open
-                                        </span>
-                                    </SelectItem>
+                                <fieldset className="space-y-2 border-0">
+                                    <Label>Priority</Label>
 
-                                    <SelectItem value="in-progress">
-                                        <span className="flex items-center gap-2">
-                                            <ClockIcon className="size-3 text-blue-600" />
-                                            In Progress
-                                        </span>
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </fieldset>
+                                    <Select
+                                        onValueChange={(value) => handleFormChange('priority', value)}
+                                        value={form.priority}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a priority" />
+                                        </SelectTrigger>
 
-                        <fieldset className="space-y-2 border-0">
-                            <Label>Priority</Label>
+                                        <SelectContent>
+                                            <SelectItem value="high">
+                                                <Badge
+                                                    className="border-red-200 bg-red-100 text-red-800"
+                                                    label="High"
+                                                    styleType="outline-outline"
+                                                />
+                                            </SelectItem>
 
-                            <Select
-                                onValueChange={(value) => handleFormChange('priority', value)}
-                                value={form.priority}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a priority" />
-                                </SelectTrigger>
+                                            <SelectItem value="medium">
+                                                <Badge
+                                                    className="border-yellow-200 bg-yellow-100 text-yellow-800"
+                                                    label="Medium"
+                                                    styleType="outline-outline"
+                                                />
+                                            </SelectItem>
 
-                                <SelectContent>
-                                    <SelectItem value="high">
-                                        <Badge
-                                            className="border-red-200 bg-red-100 text-red-800"
-                                            label="High"
-                                            styleType="outline-outline"
-                                        />
-                                    </SelectItem>
+                                            <SelectItem value="low">
+                                                <Badge
+                                                    className="border-green-200 bg-green-100 text-green-800"
+                                                    label="Low"
+                                                    styleType="outline-outline"
+                                                />
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </fieldset>
+                            </div>
 
-                                    <SelectItem value="medium">
-                                        <Badge
-                                            className="border-yellow-200 bg-yellow-100 text-yellow-800"
-                                            label="Medium"
-                                            styleType="outline-outline"
-                                        />
-                                    </SelectItem>
+                            <div className="grid grid-cols-2 gap-4">
+                                <fieldset className="space-y-2 border-0">
+                                    <Label className="gap-0">
+                                        Assignee
+                                        <RequiredMark />
+                                    </Label>
 
-                                    <SelectItem value="low">
-                                        <Badge
-                                            className="border-green-200 bg-green-100 text-green-800"
-                                            label="Low"
-                                            styleType="outline-outline"
-                                        />
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </fieldset>
-                    </div>
+                                    <Select onValueChange={handleAssigneeChange} value={form.assigneeId ?? ''}>
+                                        <SelectTrigger className={errors.assignee ? 'border-red-500' : ''}>
+                                            <SelectValue placeholder="Select an assignee" />
+                                        </SelectTrigger>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <fieldset className="space-y-2 border-0">
-                            <Label className="gap-0">
-                                Assignee
-                                <RequiredMark />
-                            </Label>
+                                        <SelectContent>
+                                            {availableAssigneeOptions.map((assigneeOption) => (
+                                                <SelectItem key={assigneeOption.id} value={assigneeOption.id}>
+                                                    <span className="flex items-center gap-2">
+                                                        <UserIcon className="size-3 text-muted-foreground" />
 
-                            <Select onValueChange={handleAssigneeChange} value={form.assigneeId ?? ''}>
-                                <SelectTrigger className={errors.assignee ? 'border-red-500' : ''}>
-                                    <SelectValue placeholder="Select an assignee" />
-                                </SelectTrigger>
+                                                        {assigneeOption.name}
+                                                    </span>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
 
-                                <SelectContent>
-                                    {availableAssigneeOptions.map((assigneeOption) => (
-                                        <SelectItem key={assigneeOption.id} value={assigneeOption.id}>
-                                            <span className="flex items-center gap-2">
-                                                <UserIcon className="size-3 text-muted-foreground" />
+                                    {errors.assignee && <p className="text-sm text-red-500">{errors.assignee}</p>}
+                                </fieldset>
 
-                                                {assigneeOption.name}
-                                            </span>
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                <fieldset className="space-y-2 border-0">
+                                    <Label>Due Date</Label>
 
-                            {errors.assignee && <p className="text-sm text-red-500">{errors.assignee}</p>}
-                        </fieldset>
+                                    <DatePicker
+                                        onChange={(date) =>
+                                            handleFormChange('dueDate', date ? date.toISOString().split('T')[0] : '')
+                                        }
+                                        value={form.dueDate ? new Date(form.dueDate) : undefined}
+                                    />
+                                </fieldset>
+                            </div>
+                        </div>
+                    </DialogBody>
 
-                        <fieldset className="space-y-2 border-0">
-                            <Label>Due Date</Label>
+                    <DialogFooter>
+                        <Button onClick={handleCloseDialog} variant="outline">
+                            Cancel
+                        </Button>
 
-                            <DatePicker
-                                onChange={(date) =>
-                                    handleFormChange('dueDate', date ? date.toISOString().split('T')[0] : '')
-                                }
-                                value={form.dueDate ? new Date(form.dueDate) : undefined}
-                            />
-                        </fieldset>
-                    </div>
-                </div>
-
-                <DialogFooter>
-                    <Button onClick={handleCloseDialog} variant="outline">
-                        Cancel
-                    </Button>
-
-                    <Button onClick={handleSubmit}>Create Approval Task</Button>
-                </DialogFooter>
+                        <Button onClick={handleSubmit}>Create Approval Task</Button>
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
