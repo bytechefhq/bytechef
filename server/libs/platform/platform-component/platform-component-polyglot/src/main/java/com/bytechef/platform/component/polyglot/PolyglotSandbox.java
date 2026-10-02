@@ -122,14 +122,24 @@ public final class PolyglotSandbox {
             }
 
             ScheduledFuture<?> watchdogFuture = WATCHDOG_SCHEDULER.schedule(
-                () -> WATCHDOG_CLOSE_EXECUTOR.execute(() -> context.close(true)), timeout.toMillis(),
-                TimeUnit.MILLISECONDS);
+                () -> submitWatchdogClose(context), timeout.toMillis(), TimeUnit.MILLISECONDS);
 
             try {
                 return guestFunction.apply(context);
             } finally {
                 watchdogFuture.cancel(false);
             }
+        }
+    }
+
+    private static void submitWatchdogClose(Context context) {
+        try {
+            WATCHDOG_CLOSE_EXECUTOR.execute(() -> context.close(true));
+        } catch (RuntimeException | Error exception) {
+            log.error(
+                "Could not schedule the guest execution's timeout close; the execution is no longer bounded by its " +
+                    "wall-clock timeout",
+                exception);
         }
     }
 
@@ -143,7 +153,7 @@ public final class PolyglotSandbox {
         boolean constrained = isConstrained(currentSettings, mode, permittedLanguages);
 
         Context.Builder builder = Context.newBuilder(permittedLanguages)
-            .engine(getEngine(constrained, permittedLanguages))
+            .engine(getEngine(constrained, mode, permittedLanguages))
             .allowHostAccess(constrained ? CONSTRAINED_HOST_ACCESS : HostAccess.NONE)
             .allowHostClassLoading(false)
             .allowHostClassLookup(className -> false)
@@ -163,8 +173,11 @@ public final class PolyglotSandbox {
 
     private static Context newTrustedContext(String... permittedLanguages) {
         return Context.newBuilder(permittedLanguages)
-            .engine(getEngine(false, permittedLanguages))
+            .engine(getEngine(false, ScriptSandboxMode.TRUSTED, permittedLanguages))
             .allowAllAccess(true)
+            .in(new ByteArrayInputStream(new byte[0]))
+            .out(newGuestOutputStream(false))
+            .err(newGuestOutputStream(true))
             .build();
     }
 
@@ -243,17 +256,17 @@ public final class PolyglotSandbox {
         return true;
     }
 
-    private static Engine getEngine(boolean constrained, String... permittedLanguages) {
+    private static Engine getEngine(boolean constrained, ScriptSandboxMode mode, String... permittedLanguages) {
         return ENGINES.computeIfAbsent(
-            toEngineKey(constrained, permittedLanguages), key -> newEngine(constrained, permittedLanguages));
+            toEngineKey(constrained, mode, permittedLanguages), key -> newEngine(constrained, permittedLanguages));
     }
 
-    private static String toEngineKey(boolean constrained, String... permittedLanguages) {
+    private static String toEngineKey(boolean constrained, ScriptSandboxMode mode, String... permittedLanguages) {
         List<String> sortedLanguages = Arrays.stream(permittedLanguages)
             .sorted()
             .toList();
 
-        return constrained + ":" + String.join(",", sortedLanguages);
+        return constrained + ":" + mode + ":" + String.join(",", sortedLanguages);
     }
 
     private static Engine newEngine(boolean constrained, String... permittedLanguages) {
