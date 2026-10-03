@@ -62,4 +62,14 @@ class McpAnonymousAuthenticationTokenTest {
         assertThat(McpAnonymousAuthenticationToken.ofAutomationMcpServer(42)
             .isManagementMcpServer()).isFalse();
     }
+
+    @Test
+    void testA2aTokenIdentifiesTheServerWithoutAuthorities() {
+        McpAnonymousAuthenticationToken token = McpAnonymousAuthenticationToken.ofAutomationA2aServer(42);
+
+        assertThat(token.isAuthenticated()).isTrue();
+        assertThat(token.getAuthorities()).isEmpty();
+        assertThat(token.getPrincipal()).isEqualTo("a2a-anonymous:automation:42");
+        assertThat(token.isManagementMcpServer()).isFalse();
+    }
 }

@@ -24,8 +24,9 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * @author Ivica Cardic
  */
-public class McpAnonymousAuthenticationToken extends AbstractAuthenticationToken {
+public final class McpAnonymousAuthenticationToken extends AbstractAuthenticationToken {
 
+    private static final String AUTOMATION_A2A_PRINCIPAL_PREFIX = "a2a-anonymous:automation:";
     private static final String AUTOMATION_PRINCIPAL_PREFIX = "mcp-anonymous:automation:";
     private static final String EMBEDDED_PRINCIPAL_PREFIX = "mcp-anonymous:embedded:";
     private static final String MANAGEMENT_PRINCIPAL = "mcp-anonymous:management";
@@ -38,6 +39,10 @@ public class McpAnonymousAuthenticationToken extends AbstractAuthenticationToken
         this.principal = principal;
 
         setAuthenticated(true);
+    }
+
+    public static McpAnonymousAuthenticationToken ofAutomationA2aServer(long a2aServerId) {
+        return new McpAnonymousAuthenticationToken(AUTOMATION_A2A_PRINCIPAL_PREFIX + a2aServerId);
     }
 
     public static McpAnonymousAuthenticationToken ofAutomationMcpServer(long mcpServerId) {
