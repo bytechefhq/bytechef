@@ -70,3 +70,48 @@ body {
     font-size: 14px;
     color: #64748b;
 }
+
+.connect-closed {
+    text-align: center;
+}
+
+.connect-closed-icon {
+    width: 48px;
+    height: 48px;
+    background: #dcfce7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 24px;
+    color: #15803d;
+}
+
+.connect-closed h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+
+.connect-closed p {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.connect-reopen-button {
+    margin-top: 24px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d4ed8;
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.connect-reopen-button:hover {
+    background: #f1f5f9;
+}

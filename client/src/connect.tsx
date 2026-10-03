@@ -74,7 +74,12 @@ function parseTokenData(jwtToken: string): ParseResultType {
     };
 }
 
-function ConnectApp({tokenData}: {tokenData: TokenDataI}) {
+interface ConnectAppPropsI {
+    onClose: () => void;
+    tokenData: TokenDataI;
+}
+
+function ConnectApp({onClose, tokenData}: ConnectAppPropsI) {
     const openDialogRef = useRef<(() => void) | null>(null);
 
     const dialog = useConnectDialog({
@@ -82,6 +87,7 @@ function ConnectApp({tokenData}: {tokenData: TokenDataI}) {
         environment: tokenData.environment,
         integrationId: String(tokenData.integrationId),
         jwtToken: tokenData.jwtToken,
+        onClose,
     });
 
     openDialogRef.current = dialog.openDialog;
@@ -93,7 +99,7 @@ function ConnectApp({tokenData}: {tokenData: TokenDataI}) {
     return null;
 }
 
-type ConnectPageStateType = 'error' | 'expired' | 'loading' | 'ready';
+type ConnectPageStateType = 'closed' | 'error' | 'expired' | 'loading' | 'ready';
 
 function ConnectPage() {
     const [pageState, setPageState] = useState<ConnectPageStateType>('loading');
@@ -152,7 +158,31 @@ function ConnectPage() {
                 </div>
             )}
 
-            {pageState === 'ready' && tokenData && <ConnectApp tokenData={tokenData} />}
+            {pageState === 'closed' && (
+                <div className="connect-container">
+                    <div className="connect-card">
+                        <div className="connect-closed">
+                            <div className="connect-closed-icon">&#10003;</div>
+
+                            <h2>You can close this tab</h2>
+
+                            <p>Return to the application that sent you here to continue.</p>
+
+                            <button
+                                className="connect-reopen-button"
+                                onClick={() => setPageState('ready')}
+                                type="button"
+                            >
+                                Manage connection again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {pageState === 'ready' && tokenData && (
+                <ConnectApp onClose={() => setPageState('closed')} tokenData={tokenData} />
+            )}
         </>
     );
 }
