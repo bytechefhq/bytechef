@@ -298,13 +298,13 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             // Data pill chips size themselves, so the editor's own text-xs does not
                             // reach them. The modifier lets the stylesheet bring them down to match.
                             isFormulaMode && 'property-mentions-editor--formula-mode',
-                            leadingIcon && 'border-0 pr-0.5 pl-10',
+                            leadingIcon && 'min-h-[34px] border-0 pr-0.5 pl-10',
                             className
                         )}
                     >
                         <PropertyMentionsInputEditor
                             autoFocus={autoFocus}
-                            className="px-2 py-2"
+                            className={twMerge('px-2 py-2', leadingIcon && 'py-[7px]')}
                             componentDefinitions={componentDefinitions}
                             controlType={controlType}
                             dataPills={dataPills}
