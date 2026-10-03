@@ -1,0 +1,5 @@
+mutation updateA2aProjectWorkflowParameters($id: ID!, $input: A2aProjectWorkflowParametersInput!) {
+    updateA2aProjectWorkflowParameters(id: $id, input: $input) {
+        id
+    }
+}
