@@ -192,7 +192,7 @@ class AiAgentToolSuspensionIntTest {
         eventPublisher = createEventPublisher(asyncMessageBroker);
 
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors = List.of(
-            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService),
+            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService, null),
             new ModelConnectionTaskDispatcherPreSendProcessor());
 
         jobSyncExecutor = new JobSyncExecutor(
@@ -301,6 +301,45 @@ class AiAgentToolSuspensionIntTest {
 
         assertThat(prompts).hasSize(2);
         assertThat(getApprovalToolResponse(prompts.get(1))).contains("NO_RESPONSE");
+    }
+
+    @Test
+    void testExpiredSuspendResumesTheAgentWithNoResponse() {
+        Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
+
+        assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
+
+        JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeExpiredJob(getJobResumeId(suspendedJob));
+
+        assertThat(jobResumeOutcome).isEqualTo(JobResumeOutcome.OK);
+
+        Job completedJob = awaitJobStatus(Objects.requireNonNull(suspendedJob.getId()), Job.Status.COMPLETED);
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(Objects.requireNonNull(completedJob.getOutputs()));
+
+        assertThat(outputs.get("answer")).isEqualTo(FINAL_ANSWER);
+        assertThat(getApprovalToolResponse(scriptedChatModel.getPrompts()
+            .get(1))).contains("NO_RESPONSE");
+    }
+
+    @Test
+    void testExpiredSuspendDoesNotResumeTheAgentAgainAfterTheApprovalWasAnswered() {
+        Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
+
+        String jobResumeId = getJobResumeId(suspendedJob);
+
+        assertThat(jobResumeFacade.resumeJob(jobResumeId, Map.of("approved", true))).isEqualTo(JobResumeOutcome.OK);
+
+        long jobId = Objects.requireNonNull(suspendedJob.getId());
+
+        awaitJobStatus(jobId, Job.Status.COMPLETED);
+
+        assertThat(jobResumeFacade.resumeExpiredJob(jobResumeId)).isEqualTo(JobResumeOutcome.GONE);
+
+        Job job = jobService.getJob(jobId);
+
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+        assertThat(scriptedChatModel.getPrompts()).hasSize(2);
     }
 
     @Test

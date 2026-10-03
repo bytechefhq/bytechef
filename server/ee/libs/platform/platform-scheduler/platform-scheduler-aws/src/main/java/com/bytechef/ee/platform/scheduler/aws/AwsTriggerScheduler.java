@@ -20,10 +20,15 @@ import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
+import software.amazon.awssdk.services.scheduler.model.ActionAfterCompletion;
 import software.amazon.awssdk.services.scheduler.model.ConflictException;
 import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindowMode;
 import software.amazon.awssdk.services.scheduler.model.ResourceNotFoundException;
@@ -79,6 +84,18 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
             .groupName(SCHEDULE_TRIGGER)
             .name(SCHEDULE_TRIGGER + workflowExecutionId.substring(0, 16)));
+    }
+
+    @Override
+    public void cancelOneTimeTask(long jobId) {
+        try {
+            schedulerClient.deleteSchedule(request -> request.groupName(ONE_TIME_TASK)
+                .name(getOneTimeTaskName(jobId)));
+        } catch (ResourceNotFoundException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("One-time task schedule already deleted: {}", jobId);
+            }
+        }
     }
 
     @Override
@@ -159,9 +176,11 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleOneTimeTask(Instant executeAt, Map<String, ?> output, long jobId) {
+        cancelOneTimeTask(jobId);
+
         String jobIdString = String.valueOf(jobId);
 
-        String input = "resume:" + jobIdString;
+        String input = AwsTriggerSchedulerConstants.ONE_TIME_TASK_MESSAGE_PREFIX + jobIdString;
 
         if (output != null && !output.isEmpty()) {
             input = input + AwsTriggerSchedulerConstants.SPLITTER + JsonUtils.write(output);
@@ -175,12 +194,14 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .input(finalInput)
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken(jobIdString)
+        schedulerClient.createSchedule(request -> request.clientToken(jobIdString + "_" + executeAt.toEpochMilli())
             .groupName(ONE_TIME_TASK)
-            .name(ONE_TIME_TASK + "_resume_" + jobIdString)
+            .name(getOneTimeTaskName(jobId))
+            .actionAfterCompletion(ActionAfterCompletion.DELETE)
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-            .startDate(executeAt));
+            .scheduleExpression(getAtExpression(executeAt))
+            .scheduleExpressionTimezone("UTC"));
     }
 
     @Override
@@ -219,5 +240,16 @@ public class AwsTriggerScheduler implements TriggerScheduler {
                 .startDate(Instant.now())
                 .scheduleExpression(cronExpression));
         }
+    }
+
+    private static String getAtExpression(Instant executeAt) {
+        LocalDateTime executeAtDateTime = LocalDateTime.ofInstant(
+            executeAt.truncatedTo(ChronoUnit.SECONDS), ZoneOffset.UTC);
+
+        return "at(" + executeAtDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + ")";
+    }
+
+    private static String getOneTimeTaskName(long jobId) {
+        return ONE_TIME_TASK + "_resume_" + jobId;
     }
 }

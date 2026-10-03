@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
@@ -38,13 +39,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.MockedStatic;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
+import software.amazon.awssdk.services.scheduler.model.ActionAfterCompletion;
 import software.amazon.awssdk.services.scheduler.model.ConflictException;
 import software.amazon.awssdk.services.scheduler.model.CreateScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.CreateScheduleResponse;
 import software.amazon.awssdk.services.scheduler.model.DeleteScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.DeleteScheduleResponse;
+import software.amazon.awssdk.services.scheduler.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.scheduler.model.UpdateScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.UpdateScheduleResponse;
 
@@ -229,6 +233,80 @@ class AwsTriggerSchedulerTest {
 
         assertNotNull(request);
         assertEquals("ScheduleTrigger", request.groupName());
+    }
+
+    @Test
+    void testCancelOneTimeTask() {
+        assertDoesNotThrow(() -> awsTriggerScheduler.cancelOneTimeTask(404L));
+
+        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+
+        verify(mockSchedulerClient).deleteSchedule(captor.capture());
+
+        DeleteScheduleRequest.Builder builder = DeleteScheduleRequest.builder();
+
+        captor.getValue()
+            .accept(builder);
+
+        DeleteScheduleRequest request = builder.build();
+
+        assertEquals("OneTimeTask", request.groupName());
+        assertEquals("OneTimeTask_resume_404", request.name());
+    }
+
+    @Test
+    void testScheduleOneTimeTaskReplacesAnyEarlierScheduleOfTheJobAndIsCancelledByTheSameName() {
+        Instant executeAt = Instant.parse("2026-10-03T12:00:00Z");
+
+        awsTriggerScheduler.scheduleOneTimeTask(executeAt, Map.of("jobResumeId", "abc"), 404L);
+        awsTriggerScheduler.cancelOneTimeTask(404L);
+
+        ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> createCaptor =
+            ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> deleteCaptor =
+            ArgumentCaptor.forClass(Consumer.class);
+
+        InOrder inOrder = inOrder(mockSchedulerClient);
+
+        inOrder.verify(mockSchedulerClient)
+            .deleteSchedule(deleteCaptor.capture());
+        inOrder.verify(mockSchedulerClient)
+            .createSchedule(createCaptor.capture());
+        inOrder.verify(mockSchedulerClient)
+            .deleteSchedule(deleteCaptor.capture());
+
+        CreateScheduleRequest.Builder createBuilder = CreateScheduleRequest.builder();
+
+        createCaptor.getValue()
+            .accept(createBuilder);
+
+        CreateScheduleRequest createRequest = createBuilder.build();
+
+        assertEquals(ActionAfterCompletion.DELETE, createRequest.actionAfterCompletion());
+        assertEquals("at(2026-10-03T12:00:00)", createRequest.scheduleExpression());
+        assertEquals("UTC", createRequest.scheduleExpressionTimezone());
+        assertEquals("404_" + executeAt.toEpochMilli(), createRequest.clientToken());
+
+        for (Consumer<DeleteScheduleRequest.Builder> deleteRequestConsumer : deleteCaptor.getAllValues()) {
+            DeleteScheduleRequest.Builder deleteBuilder = DeleteScheduleRequest.builder();
+
+            deleteRequestConsumer.accept(deleteBuilder);
+
+            DeleteScheduleRequest deleteRequest = deleteBuilder.build();
+
+            assertEquals(createRequest.groupName(), deleteRequest.groupName());
+            assertEquals(createRequest.name(), deleteRequest.name());
+        }
+    }
+
+    @Test
+    void testCancelOneTimeTaskIgnoresAnAlreadyDeletedSchedule() {
+        when(mockSchedulerClient.deleteSchedule(any(Consumer.class)))
+            .thenThrow(ResourceNotFoundException.builder()
+                .message("Schedule not found")
+                .build());
+
+        assertDoesNotThrow(() -> awsTriggerScheduler.cancelOneTimeTask(404L));
     }
 
     @Test

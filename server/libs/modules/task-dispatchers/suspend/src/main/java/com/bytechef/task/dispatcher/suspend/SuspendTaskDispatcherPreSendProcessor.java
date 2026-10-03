@@ -22,13 +22,16 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +40,21 @@ import org.slf4j.LoggerFactory;
  */
 public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreSendProcessor {
 
+    private static final AtomicBoolean CANCEL_UNSUPPORTED_WARNED = new AtomicBoolean();
+
     private static final Logger log = LoggerFactory.getLogger(SuspendTaskDispatcherPreSendProcessor.class);
 
     private final JobService jobService;
     private final TaskStateService taskStateService;
+    private final @Nullable TriggerScheduler triggerScheduler;
 
     @SuppressFBWarnings("EI")
-    public SuspendTaskDispatcherPreSendProcessor(JobService jobService, TaskStateService taskStateService) {
+    public SuspendTaskDispatcherPreSendProcessor(
+        JobService jobService, TaskStateService taskStateService, @Nullable TriggerScheduler triggerScheduler) {
+
         this.jobService = jobService;
         this.taskStateService = taskStateService;
+        this.triggerScheduler = triggerScheduler;
     }
 
     @Override
@@ -65,11 +74,19 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
 
         Optional<Suspend> suspendOptional = taskStateService.fetchValue(jobResumeId);
 
-        if (suspendOptional.isEmpty()) {
-            log.warn("No suspend state found for jobResumeId={}", jobResumeId);
-        }
+        if (suspendOptional.isPresent()) {
+            Suspend suspend = suspendOptional.get();
 
-        suspendOptional.ifPresent(suspend -> taskExecution.putMetadata(MetadataConstants.SUSPEND, suspend));
+            taskExecution.putMetadata(MetadataConstants.SUSPEND, suspend);
+
+            if (suspend.expiresAt() != null) {
+                cancelTimeoutTask(Validate.notNull(job.getId(), "id"));
+            }
+        } else {
+            log.warn("No suspend state found for jobResumeId={}", jobResumeId);
+
+            cancelTimeoutTask(Validate.notNull(job.getId(), "id"));
+        }
 
         Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
 
@@ -88,5 +105,23 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
         taskStateService.delete(jobResumeId);
 
         return taskExecution;
+    }
+
+    private void cancelTimeoutTask(long jobId) {
+        if (triggerScheduler == null) {
+            return;
+        }
+
+        try {
+            triggerScheduler.cancelOneTimeTask(jobId);
+        } catch (UnsupportedOperationException exception) {
+            if (CANCEL_UNSUPPORTED_WARNED.compareAndSet(false, true)) {
+                log.warn(
+                    "The trigger scheduler cannot cancel suspend timeout tasks; a resumed job's timeout task still " +
+                        "fires and is ignored only where the expired suspend can be checked");
+            }
+        } catch (Exception exception) {
+            log.warn("Failed to cancel the suspend timeout task of job {}", jobId, exception);
+        }
     }
 }

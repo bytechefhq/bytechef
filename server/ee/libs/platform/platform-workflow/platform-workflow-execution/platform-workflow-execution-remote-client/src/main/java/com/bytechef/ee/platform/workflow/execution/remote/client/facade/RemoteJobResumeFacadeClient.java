@@ -23,6 +23,11 @@ import org.springframework.stereotype.Component;
 public class RemoteJobResumeFacadeClient implements JobResumeFacade {
 
     @Override
+    public JobResumeOutcome resumeExpiredJob(String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
         throw new UnsupportedOperationException();
     }
