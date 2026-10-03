@@ -416,7 +416,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             "message",
             "The " + componentName + " integration is not connected for this user. " +
                 "To connect, visit: " + setupUrl + " . " +
-                "Instruct the user to visit this link to connect their account.",
+                "Instruct the user to visit this link to connect their account. Present it as a markdown link " +
+                "labelled \"Connect " + componentName + "\" instead of printing the raw URL.",
             "setupUrl", setupUrl);
     }
 
