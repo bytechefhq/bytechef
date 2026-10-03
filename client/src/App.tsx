@@ -165,7 +165,6 @@ function App() {
     useFetchInterceptor();
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
-    const ff_2446 = useFeatureFlagsStore()('ff-2446');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
@@ -191,10 +190,6 @@ function App() {
     const filteredEmbeddedNavigation = embeddedNavigation.filter((navItem) => {
         if (currentEnvironmentId !== 0 && navItem.href === '/embedded/integrations') {
             return false;
-        }
-
-        if (navItem.href === '/embedded/mcp-servers') {
-            return ff_2446;
         }
 
         return true;
