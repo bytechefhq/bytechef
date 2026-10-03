@@ -401,6 +401,39 @@ export type UpdateApprovalTaskMutationVariables = Exact<{
 
 export type UpdateApprovalTaskMutation = { updateApprovalTask: { assigneeId: string | null, description: string | null, dueDate: string | null, id: string, name: string, priority: Types.ApprovalTaskPriority, status: Types.ApprovalTaskStatus, version: number } | null };
 
+export type A2aProjectWorkflowsByA2aProjectIdQueryVariables = Exact<{
+  a2aProjectId: string | number;
+}>;
+
+
+export type A2aProjectWorkflowsByA2aProjectIdQuery = { a2aProjectWorkflowsByA2aProjectId: Array<{ id: string, skillDescription: string | null, skillName: string | null, workflowId: string | null, workflowLabel: string | null } | null> | null };
+
+export type A2aProjectsByServerIdQueryVariables = Exact<{
+  a2aServerId: string | number;
+}>;
+
+
+export type A2aProjectsByServerIdQuery = { a2aProjectsByServerId: Array<{ id: string, projectId: string | null, projectVersion: number | null, workflowIds: Array<string> } | null> | null };
+
+export type A2aServersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type A2aServersQuery = { a2aServers: Array<{ authenticationRequired: boolean, description: string | null, enabled: boolean, environmentId: string, id: string, name: string, secretKey: string | null } | null> | null };
+
+export type CreateA2aProjectMutationVariables = Exact<{
+  input: Types.CreateA2aProjectInput;
+}>;
+
+
+export type CreateA2aProjectMutation = { createA2aProject: { id: string } | null };
+
+export type CreateA2aServerMutationVariables = Exact<{
+  input: Types.CreateA2aServerInput;
+}>;
+
+
+export type CreateA2aServerMutation = { createA2aServer: { id: string } | null };
+
 export type CreateMcpProjectMutationVariables = Exact<{
   input: Types.CreateMcpProjectInput;
 }>;
@@ -423,6 +456,20 @@ export type CreateMcpServerMutationVariables = Exact<{
 
 
 export type CreateMcpServerMutation = { createWorkspaceMcpServer: { id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean } | null };
+
+export type DeleteA2aProjectMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteA2aProjectMutation = { deleteA2aProject: boolean | null };
+
+export type DeleteA2aServerMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteA2aServerMutation = { deleteA2aServer: boolean | null };
 
 export type DeleteMcpProjectMutationVariables = Exact<{
   id: string | number;
@@ -593,6 +640,30 @@ export type ToolEligibleProjectVersionWorkflowsQueryVariables = Exact<{
 
 
 export type ToolEligibleProjectVersionWorkflowsQuery = { toolEligibleProjectVersionWorkflows: Array<{ id: string, workflow: { id: string, label: string } }> };
+
+export type UpdateA2aProjectMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateA2aProjectInput;
+}>;
+
+
+export type UpdateA2aProjectMutation = { updateA2aProject: { id: string } | null };
+
+export type UpdateA2aProjectWorkflowParametersMutationVariables = Exact<{
+  id: string | number;
+  input: Types.A2aProjectWorkflowParametersInput;
+}>;
+
+
+export type UpdateA2aProjectWorkflowParametersMutation = { updateA2aProjectWorkflowParameters: { id: string } | null };
+
+export type UpdateA2aServerMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateA2aServerInput;
+}>;
+
+
+export type UpdateA2aServerMutation = { updateA2aServer: { id: string } | null };
 
 export type UpdateMcpProjectMutationVariables = Exact<{
   id: string | number;
@@ -3470,6 +3541,133 @@ export const useUpdateApprovalTaskMutation = <
   }
     )};
 
+export const A2aProjectWorkflowsByA2aProjectIdDocument = new TypedDocumentString(`
+    query a2aProjectWorkflowsByA2aProjectId($a2aProjectId: ID!) {
+  a2aProjectWorkflowsByA2aProjectId(a2aProjectId: $a2aProjectId) {
+    id
+    skillDescription
+    skillName
+    workflowId
+    workflowLabel
+  }
+}
+    `);
+
+export const useA2aProjectWorkflowsByA2aProjectIdQuery = <
+      TData = A2aProjectWorkflowsByA2aProjectIdQuery,
+      TError = unknown
+    >(
+      variables: A2aProjectWorkflowsByA2aProjectIdQueryVariables,
+      options?: Omit<UseQueryOptions<A2aProjectWorkflowsByA2aProjectIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<A2aProjectWorkflowsByA2aProjectIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<A2aProjectWorkflowsByA2aProjectIdQuery, TError, TData>(
+      {
+    queryKey: ['a2aProjectWorkflowsByA2aProjectId', variables],
+    queryFn: fetcher<A2aProjectWorkflowsByA2aProjectIdQuery, A2aProjectWorkflowsByA2aProjectIdQueryVariables>(A2aProjectWorkflowsByA2aProjectIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const A2aProjectsByServerIdDocument = new TypedDocumentString(`
+    query a2aProjectsByServerId($a2aServerId: ID!) {
+  a2aProjectsByServerId(a2aServerId: $a2aServerId) {
+    id
+    projectId
+    projectVersion
+    workflowIds
+  }
+}
+    `);
+
+export const useA2aProjectsByServerIdQuery = <
+      TData = A2aProjectsByServerIdQuery,
+      TError = unknown
+    >(
+      variables: A2aProjectsByServerIdQueryVariables,
+      options?: Omit<UseQueryOptions<A2aProjectsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<A2aProjectsByServerIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<A2aProjectsByServerIdQuery, TError, TData>(
+      {
+    queryKey: ['a2aProjectsByServerId', variables],
+    queryFn: fetcher<A2aProjectsByServerIdQuery, A2aProjectsByServerIdQueryVariables>(A2aProjectsByServerIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const A2aServersDocument = new TypedDocumentString(`
+    query a2aServers {
+  a2aServers {
+    authenticationRequired
+    description
+    enabled
+    environmentId
+    id
+    name
+    secretKey
+  }
+}
+    `);
+
+export const useA2aServersQuery = <
+      TData = A2aServersQuery,
+      TError = unknown
+    >(
+      variables?: A2aServersQueryVariables,
+      options?: Omit<UseQueryOptions<A2aServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<A2aServersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<A2aServersQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['a2aServers'] : ['a2aServers', variables],
+    queryFn: fetcher<A2aServersQuery, A2aServersQueryVariables>(A2aServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateA2aProjectDocument = new TypedDocumentString(`
+    mutation createA2aProject($input: CreateA2aProjectInput!) {
+  createA2aProject(input: $input) {
+    id
+  }
+}
+    `);
+
+export const useCreateA2aProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateA2aProjectMutation, TError, CreateA2aProjectMutationVariables, TContext>) => {
+    
+    return useMutation<CreateA2aProjectMutation, TError, CreateA2aProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['createA2aProject'],
+    mutationFn: (variables?: CreateA2aProjectMutationVariables) => fetcher<CreateA2aProjectMutation, CreateA2aProjectMutationVariables>(CreateA2aProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateA2aServerDocument = new TypedDocumentString(`
+    mutation createA2aServer($input: CreateA2aServerInput!) {
+  createA2aServer(input: $input) {
+    id
+  }
+}
+    `);
+
+export const useCreateA2aServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateA2aServerMutation, TError, CreateA2aServerMutationVariables, TContext>) => {
+    
+    return useMutation<CreateA2aServerMutation, TError, CreateA2aServerMutationVariables, TContext>(
+      {
+    mutationKey: ['createA2aServer'],
+    mutationFn: (variables?: CreateA2aServerMutationVariables) => fetcher<CreateA2aServerMutation, CreateA2aServerMutationVariables>(CreateA2aServerDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const CreateMcpProjectDocument = new TypedDocumentString(`
     mutation createMcpProject($input: CreateMcpProjectInput!) {
   createMcpProject(input: $input) {
@@ -3538,6 +3736,44 @@ export const useCreateMcpServerMutation = <
       {
     mutationKey: ['createMcpServer'],
     mutationFn: (variables?: CreateMcpServerMutationVariables) => fetcher<CreateMcpServerMutation, CreateMcpServerMutationVariables>(CreateMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteA2aProjectDocument = new TypedDocumentString(`
+    mutation deleteA2aProject($id: ID!) {
+  deleteA2aProject(id: $id)
+}
+    `);
+
+export const useDeleteA2aProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteA2aProjectMutation, TError, DeleteA2aProjectMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteA2aProjectMutation, TError, DeleteA2aProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteA2aProject'],
+    mutationFn: (variables?: DeleteA2aProjectMutationVariables) => fetcher<DeleteA2aProjectMutation, DeleteA2aProjectMutationVariables>(DeleteA2aProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteA2aServerDocument = new TypedDocumentString(`
+    mutation deleteA2aServer($id: ID!) {
+  deleteA2aServer(id: $id)
+}
+    `);
+
+export const useDeleteA2aServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteA2aServerMutation, TError, DeleteA2aServerMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteA2aServerMutation, TError, DeleteA2aServerMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteA2aServer'],
+    mutationFn: (variables?: DeleteA2aServerMutationVariables) => fetcher<DeleteA2aServerMutation, DeleteA2aServerMutationVariables>(DeleteA2aServerDocument, variables)(),
     ...options
   }
     )};
@@ -4173,6 +4409,69 @@ export const useToolEligibleProjectVersionWorkflowsQuery = <
       {
     queryKey: ['toolEligibleProjectVersionWorkflows', variables],
     queryFn: fetcher<ToolEligibleProjectVersionWorkflowsQuery, ToolEligibleProjectVersionWorkflowsQueryVariables>(ToolEligibleProjectVersionWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateA2aProjectDocument = new TypedDocumentString(`
+    mutation updateA2aProject($id: ID!, $input: UpdateA2aProjectInput!) {
+  updateA2aProject(id: $id, input: $input) {
+    id
+  }
+}
+    `);
+
+export const useUpdateA2aProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateA2aProjectMutation, TError, UpdateA2aProjectMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateA2aProjectMutation, TError, UpdateA2aProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['updateA2aProject'],
+    mutationFn: (variables?: UpdateA2aProjectMutationVariables) => fetcher<UpdateA2aProjectMutation, UpdateA2aProjectMutationVariables>(UpdateA2aProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateA2aProjectWorkflowParametersDocument = new TypedDocumentString(`
+    mutation updateA2aProjectWorkflowParameters($id: ID!, $input: A2aProjectWorkflowParametersInput!) {
+  updateA2aProjectWorkflowParameters(id: $id, input: $input) {
+    id
+  }
+}
+    `);
+
+export const useUpdateA2aProjectWorkflowParametersMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateA2aProjectWorkflowParametersMutation, TError, UpdateA2aProjectWorkflowParametersMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateA2aProjectWorkflowParametersMutation, TError, UpdateA2aProjectWorkflowParametersMutationVariables, TContext>(
+      {
+    mutationKey: ['updateA2aProjectWorkflowParameters'],
+    mutationFn: (variables?: UpdateA2aProjectWorkflowParametersMutationVariables) => fetcher<UpdateA2aProjectWorkflowParametersMutation, UpdateA2aProjectWorkflowParametersMutationVariables>(UpdateA2aProjectWorkflowParametersDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateA2aServerDocument = new TypedDocumentString(`
+    mutation updateA2aServer($id: ID!, $input: UpdateA2aServerInput!) {
+  updateA2aServer(id: $id, input: $input) {
+    id
+  }
+}
+    `);
+
+export const useUpdateA2aServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateA2aServerMutation, TError, UpdateA2aServerMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateA2aServerMutation, TError, UpdateA2aServerMutationVariables, TContext>(
+      {
+    mutationKey: ['updateA2aServer'],
+    mutationFn: (variables?: UpdateA2aServerMutationVariables) => fetcher<UpdateA2aServerMutation, UpdateA2aServerMutationVariables>(UpdateA2aServerDocument, variables)(),
     ...options
   }
     )};

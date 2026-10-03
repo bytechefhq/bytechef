@@ -12,6 +12,39 @@ export type Scalars = {
   Map: { input: any; output: any; }
 };
 
+export type A2aProject = {
+  __typename?: 'A2aProject';
+  id: Scalars['ID']['output'];
+  projectId?: Maybe<Scalars['ID']['output']>;
+  projectVersion?: Maybe<Scalars['Int']['output']>;
+  workflowIds: Array<Scalars['String']['output']>;
+};
+
+export type A2aProjectWorkflow = {
+  __typename?: 'A2aProjectWorkflow';
+  id: Scalars['ID']['output'];
+  skillDescription?: Maybe<Scalars['String']['output']>;
+  skillName?: Maybe<Scalars['String']['output']>;
+  workflowId?: Maybe<Scalars['String']['output']>;
+  workflowLabel?: Maybe<Scalars['String']['output']>;
+};
+
+export type A2aProjectWorkflowParametersInput = {
+  skillDescription?: InputMaybe<Scalars['String']['input']>;
+  skillName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type A2aServer = {
+  __typename?: 'A2aServer';
+  authenticationRequired: Scalars['Boolean']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  environmentId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  secretKey?: Maybe<Scalars['String']['output']>;
+};
+
 export type ActionDefinition = {
   __typename?: 'ActionDefinition';
   componentName: Scalars['String']['output'];
@@ -753,6 +786,20 @@ export enum ControlType {
   Time = 'TIME',
   Url = 'URL'
 }
+
+export type CreateA2aProjectInput = {
+  a2aServerId: Scalars['ID']['input'];
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  selectedWorkflowIds: Array<Scalars['String']['input']>;
+};
+
+export type CreateA2aServerInput = {
+  authenticationRequired?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  environmentId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+};
 
 export type CreateApiConnectorInput = {
   connectorVersion: Scalars['Int']['input'];
@@ -1560,6 +1607,8 @@ export type Mutation = {
   addDataTableColumn: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
+  createA2aProject?: Maybe<A2aProject>;
+  createA2aServer?: Maybe<A2aServer>;
   createAdditionalFilesInSkill: AiSkill;
   createAiAgentEvalScenario: AiAgentEvalScenario;
   createAiAgentEvalTest: AiAgentEvalTest;
@@ -1587,6 +1636,8 @@ export type Mutation = {
   createMcpTool?: Maybe<McpTool>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
+  deleteA2aProject?: Maybe<Scalars['Boolean']['output']>;
+  deleteA2aServer?: Maybe<Scalars['Boolean']['output']>;
   deleteAiAgentEvalScenario: Scalars['Boolean']['output'];
   deleteAiAgentEvalTest: Scalars['Boolean']['output'];
   deleteAiAgentJudge: Scalars['Boolean']['output'];
@@ -1663,6 +1714,9 @@ export type Mutation = {
   startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
+  updateA2aProject?: Maybe<A2aProject>;
+  updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
+  updateA2aServer?: Maybe<A2aServer>;
   updateAiAgentEvalScenario: AiAgentEvalScenario;
   updateAiAgentEvalTest: AiAgentEvalTest;
   updateAiAgentJudge: AiAgentJudge;
@@ -1730,6 +1784,16 @@ export type MutationCancelAiAgentEvalRunArgs = {
 
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationCreateA2aProjectArgs = {
+  input: CreateA2aProjectInput;
+};
+
+
+export type MutationCreateA2aServerArgs = {
+  input: CreateA2aServerInput;
 };
 
 
@@ -1904,6 +1968,16 @@ export type MutationCreateWorkspaceApiKeyArgs = {
 
 export type MutationCreateWorkspaceMcpServerArgs = {
   input: CreateWorkspaceMcpServerInput;
+};
+
+
+export type MutationDeleteA2aProjectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteA2aServerArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2300,6 +2374,24 @@ export type MutationTestWorkflowNodeScriptArgs = {
   inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateA2aProjectArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateA2aProjectInput;
+};
+
+
+export type MutationUpdateA2aProjectWorkflowParametersArgs = {
+  id: Scalars['ID']['input'];
+  input: A2aProjectWorkflowParametersInput;
+};
+
+
+export type MutationUpdateA2aServerArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateA2aServerInput;
 };
 
 
@@ -2820,6 +2912,9 @@ export enum PropertyType {
 export type Query = {
   __typename?: 'Query';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
+  a2aProjectWorkflowsByA2aProjectId?: Maybe<Array<Maybe<A2aProjectWorkflow>>>;
+  a2aProjectsByServerId?: Maybe<Array<Maybe<A2aProject>>>;
+  a2aServers?: Maybe<Array<Maybe<A2aServer>>>;
   actionDefinition: ActionDefinition;
   actionDefinitions: Array<ActionDefinition>;
   adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
@@ -2993,6 +3088,16 @@ export type Query = {
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
+};
+
+
+export type QueryA2aProjectWorkflowsByA2aProjectIdArgs = {
+  a2aProjectId: Scalars['ID']['input'];
+};
+
+
+export type QueryA2aProjectsByServerIdArgs = {
+  a2aServerId: Scalars['ID']['input'];
 };
 
 
@@ -3905,6 +4010,17 @@ export enum UnifiedApiCategory {
   MarketingAutomation = 'MARKETING_AUTOMATION',
   Ticketing = 'TICKETING'
 }
+
+export type UpdateA2aProjectInput = {
+  selectedWorkflowIds: Array<Scalars['String']['input']>;
+};
+
+export type UpdateA2aServerInput = {
+  authenticationRequired?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
 
 /**
  * A partial update. An omitted field keeps the stored value; a blank description clears it, while a blank title or
