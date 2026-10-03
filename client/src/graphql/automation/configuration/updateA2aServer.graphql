@@ -1,0 +1,5 @@
+mutation updateA2aServer($id: ID!, $input: UpdateA2aServerInput!) {
+    updateA2aServer(id: $id, input: $input) {
+        id
+    }
+}

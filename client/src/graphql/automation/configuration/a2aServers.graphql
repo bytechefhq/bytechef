@@ -1,0 +1,11 @@
+query a2aServers {
+    a2aServers {
+        authenticationRequired
+        description
+        enabled
+        environmentId
+        id
+        name
+        secretKey
+    }
+}

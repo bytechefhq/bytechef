@@ -1,0 +1,3 @@
+mutation deleteA2aProject($id: ID!) {
+    deleteA2aProject(id: $id)
+}
