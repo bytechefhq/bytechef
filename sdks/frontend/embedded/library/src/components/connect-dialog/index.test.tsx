@@ -171,6 +171,37 @@ describe('useConnectDialog - Dialog State Management', () => {
         expect(global.fetch).toHaveBeenCalledTimes(2);
     });
 
+    it('calls onClose when the dialog closes', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({id: 'integration'}),
+        });
+
+        const onClose = vi.fn();
+
+        const {result} = renderHook(() => useConnectDialog({...defaultConnectDialogProps, onClose}));
+
+        await act(async () => result.current.openDialog());
+
+        expect(onClose).not.toHaveBeenCalled();
+
+        act(() => result.current.closeDialog());
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onClose when the integration fails to load', async () => {
+        global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+
+        const onClose = vi.fn();
+
+        const {result} = renderHook(() => useConnectDialog({...defaultConnectDialogProps, onClose}));
+
+        await act(async () => result.current.openDialog());
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
     it('sets workflowsView to true when integrationInstanceId is provided', async () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: true,
