@@ -56,6 +56,20 @@ Each returned integration includes its id, title, description, and icon - plus t
 
 For an **already-connected** integration, pass the instance's id as `integrationInstanceId` alongside `integrationId` - the dialog then opens directly in the workflows view for that instance (the manage/edit path: toggle workflows, adjust inputs) instead of the first-time connect flow.
 
+When one of your [MCP Servers](/platform/embedded/configure/mcp-servers#which-tools-a-users-agent-sees) exposes tools for the integration, the manage view also shows a **Tools** tab. There the user enables the tools their AI agent may call. Tools start disabled.
+
+To react when the dialog closes, for example to refresh your integrations list, pass `onClose`. It also runs when the integration fails to load:
+
+```tsx
+const {openDialog} = useConnectDialog({
+    baseUrl: 'https://your-bytechef-host.example.com',
+    environment: 'DEVELOPMENT',
+    integrationId,
+    jwtToken,
+    onClose: () => refetchIntegrations(),
+});
+```
+
 <Callout title="The dialog can collect more than credentials">
     Beyond the account authorization step, the dialog renders any end-user-facing **workflow inputs** (including live dropdowns fetched against the user's new connection) and, when configured, a **[Field Mapping](/platform/embedded/build/workflows/field-mapping)** step where the user maps your application's fields to the integration's fields.
 </Callout>
