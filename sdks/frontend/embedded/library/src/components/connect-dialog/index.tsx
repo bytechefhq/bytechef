@@ -109,6 +109,7 @@ interface UseConnectDialogProps {
     integrationInstanceId?: string;
     jwtToken: string;
     mapObjectFields?: MapObjectFieldsType;
+    onClose?: () => void;
 }
 
 export default function useConnectDialog({
@@ -118,6 +119,7 @@ export default function useConnectDialog({
     integrationInstanceId,
     jwtToken,
     mapObjectFields,
+    onClose,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
     const [integration, setIntegration] = useState<IntegrationType | undefined>(undefined);
     const [isOAuth2, setIsOAuth2] = useState(false);
@@ -628,6 +630,8 @@ export default function useConnectDialog({
             console.error('Failed to load integration data:', error);
 
             setIsOpen(false);
+
+            onClose?.();
         } finally {
             setIsLoading(false);
         }
@@ -637,6 +641,8 @@ export default function useConnectDialog({
         setWorkflowsView(false);
 
         setIsOpen(false);
+
+        onClose?.();
     };
 
     const handleDisconnect = useCallback(async () => {

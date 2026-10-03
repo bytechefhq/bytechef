@@ -106,6 +106,19 @@ class ConnectedUserIntegrationMapperTest {
         };
 
     @Test
+    void testMcpToolInfoMapsId() {
+        ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationMapper generatedMapper =
+            new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationMapperImpl();
+
+        McpToolModel mcpToolModel = generatedMapper.map(
+            new ConnectedUserIntegrationDTO.McpToolInfo(1051L, "getEmail", "Get an email"));
+
+        assertEquals(1051L, mcpToolModel.getId());
+        assertEquals("getEmail", mcpToolModel.getName());
+        assertEquals("Get an email", mcpToolModel.getDescription());
+    }
+
+    @Test
     void testFieldMappingInputMapsTypeAndObjectName() {
         WorkflowInput input = new WorkflowInput(
             new Workflow.Input(

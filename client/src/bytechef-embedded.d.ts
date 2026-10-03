@@ -5,6 +5,7 @@ declare module '@bytechef/embedded' {
         integrationId: string;
         integrationInstanceId?: string;
         jwtToken: string;
+        onClose?: () => void;
     }
 
     interface ConnectionDialogHookReturnI {
