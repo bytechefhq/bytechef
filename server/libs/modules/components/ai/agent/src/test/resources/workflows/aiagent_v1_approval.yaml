@@ -1,0 +1,24 @@
+---
+label: "AI agent asks for approval"
+outputs:
+- name: "answer"
+  value: "${aiAgent_1}"
+tasks:
+- name: "aiAgent_1"
+  type: "aiAgent/v1/chat"
+  parameters:
+    format: "SIMPLE"
+    response:
+      responseFormat: "TEXT"
+    userPrompt: "Refund order 42"
+  clusterElements:
+    model:
+      name: "model_1"
+      type: "testModel/v1/model"
+      parameters: {}
+    tools:
+    - name: "requestApproval_1"
+      type: "approval/v1/requestApproval"
+      parameters:
+        formTitle: "Approve the refund of order 42"
+        toolName: "requestApproval"

@@ -19,15 +19,22 @@ package com.bytechef.platform.component.context;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Suspend;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.constant.PlatformType;
@@ -149,6 +156,66 @@ class ClusterElementContextImplTest {
             "newComponent", 2, "newAction", componentConnection);
 
         assertNotNull(actionContext);
+    }
+
+    @Test
+    void testToActionContextForwardsSuspendToTheParentActionContext() {
+        ActionContextImpl parentActionContext = ActionContextImpl.builder(
+            "aiAgent", 1, "chat", false, cacheManager, dataStorage, eventPublisher, httpClientExecutor,
+            tempFileStorage)
+            .environmentId(100L)
+            .jobId(200L)
+            .publicUrl("https://example.com")
+            .build();
+
+        ClusterElementContext clusterElementContext = parentActionContext.toClusterElementContext(
+            "approval", 1, "requestApproval", null);
+
+        ActionContextAware toolActionContext = (ActionContextAware) ((ClusterElementContextAware) clusterElementContext)
+            .toActionContext("approval", 1, "requestApproval", mock(ComponentConnection.class));
+
+        assertNotSame(parentActionContext, toolActionContext);
+        assertEquals(200L, toolActionContext.getJobId());
+        assertEquals(100L, toolActionContext.getEnvironmentId());
+
+        String resumeUrl = toolActionContext.getResumeUrl();
+
+        assertNotNull(resumeUrl);
+        assertEquals(parentActionContext.getResumeUrl(), resumeUrl);
+        assertEquals(parentActionContext.getJobResumeId(), toolActionContext.getJobResumeId());
+
+        Suspend suspend = new Suspend(Map.of("formUrl", "https://example.com/resume"), null);
+
+        toolActionContext.suspend(suspend);
+
+        Suspend parentSuspend = parentActionContext.getSuspend();
+
+        assertNotNull(parentSuspend);
+        assertEquals(
+            "https://example.com/resume", parentSuspend.continueParameters()
+                .get("formUrl"));
+        assertEquals(
+            parentActionContext.getJobResumeId(), parentSuspend.continueParameters()
+                .get(MetadataConstants.JOB_RESUME_ID));
+        assertEquals(parentSuspend, toolActionContext.getSuspend());
+    }
+
+    @Test
+    void testToActionContextWithoutAParentKeepsItsOwnSuspend() {
+        ClusterElementContextImpl context = ClusterElementContextImpl.builder(
+            "testComponent", 1, "testElement", false,
+            cacheManager, dataStorage, eventPublisher, httpClientExecutor, tempFileStorage)
+            .jobId(200L)
+            .build();
+
+        ActionContextAware actionContext = (ActionContextAware) context.toActionContext(
+            "newComponent", 2, "newAction", null);
+
+        Suspend suspend = new Suspend(Map.of(), null);
+
+        actionContext.suspend(suspend);
+
+        assertSame(suspend, actionContext.getSuspend());
     }
 
     @Test

@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.constant.PlatformType;
@@ -32,6 +33,7 @@ import com.bytechef.platform.workflow.execution.JobResumeId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -60,8 +62,9 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable Long jobPrincipalWorkflowId;
     private final @Nullable Long jobId;
     private final @Nullable LogFileStorageWriter logFileStorageWriter;
-    private @Nullable String jobResumeId;
-    private @Nullable Suspend suspend;
+    private volatile @Nullable String jobResumeId;
+    private volatile @Nullable Suspend suspend;
+    private final @Nullable ActionContextAware suspendTarget;
     private final @Nullable PlatformType type;
     private final @Nullable String publicUrl;
     private final long taskExecutionId;
@@ -104,6 +107,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.jobPrincipalWorkflowId = builder.jobPrincipalWorkflowId;
         this.jobId = builder.jobId;
         this.publicUrl = builder.publicUrl;
+        this.suspendTarget = builder.suspendTarget;
         this.type = builder.type;
         this.workflowId = builder.workflowId;
     }
@@ -156,6 +160,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private @Nullable Long jobPrincipalWorkflowId;
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
+        private @Nullable ActionContextAware suspendTarget;
         private long taskExecutionId;
         private @Nullable Tracer tracer;
         private final TempFileStorage tempFileStorage;
@@ -222,6 +227,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
         Builder publicUrl(@Nullable String publicUrl) {
             this.publicUrl = publicUrl;
+
+            return this;
+        }
+
+        Builder suspendTarget(@Nullable ActionContextAware suspendTarget) {
+            this.suspendTarget = suspendTarget;
 
             return this;
         }
@@ -298,33 +309,70 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Override
     @Nullable
     public String getResumeUrl() {
+        if (suspendTarget != null) {
+            return suspendTarget.getResumeUrl();
+        }
+
         if (publicUrl == null || jobId == null) {
             return null;
         }
 
-        if (this.jobResumeId == null) {
+        return publicUrl + "/job/resume/" + getOrCreateJobResumeId(jobId);
+    }
+
+    private synchronized String getOrCreateJobResumeId(long jobId) {
+        String currentJobResumeId = this.jobResumeId;
+
+        if (currentJobResumeId == null) {
             JobResumeId jobResumeId = JobResumeId.of(jobId);
 
-            this.jobResumeId = jobResumeId.toString();
+            currentJobResumeId = jobResumeId.toString();
+
+            this.jobResumeId = currentJobResumeId;
         }
 
-        return publicUrl + "/job/resume/" + this.jobResumeId;
+        return currentJobResumeId;
     }
 
     @Override
     @Nullable
     public String getJobResumeId() {
+        if (suspendTarget != null) {
+            return suspendTarget.getJobResumeId();
+        }
+
         return jobResumeId;
     }
 
     @Override
     @Nullable
     public Suspend getSuspend() {
-        return suspend;
+        if (suspendTarget != null) {
+            return suspendTarget.getSuspend();
+        }
+
+        Suspend currentSuspend = suspend;
+        String currentJobResumeId = jobResumeId;
+
+        if (currentSuspend == null || currentJobResumeId == null) {
+            return currentSuspend;
+        }
+
+        Map<String, Object> continueParameters = new HashMap<>(currentSuspend.continueParameters());
+
+        continueParameters.put(MetadataConstants.JOB_RESUME_ID, currentJobResumeId);
+
+        return new Suspend(continueParameters, currentSuspend.expiresAt());
     }
 
     @Override
     public void suspend(Suspend suspend) {
+        if (suspendTarget != null) {
+            suspendTarget.suspend(suspend);
+
+            return;
+        }
+
         this.suspend = suspend;
     }
 
@@ -391,6 +439,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
             .logFileStorageWriter(logFileStorageWriter)
             .publicUrl(publicUrl)
+            .suspendTarget(suspendTarget == null ? this : suspendTarget)
             .taskExecutionId(taskExecutionId)
             .type(type)
             .workflowId(workflowId)

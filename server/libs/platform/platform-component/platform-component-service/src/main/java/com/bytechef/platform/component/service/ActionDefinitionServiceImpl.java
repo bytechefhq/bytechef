@@ -24,6 +24,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.BaseOutputFunction;
 import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
+import com.bytechef.component.definition.ActionDefinition.BaseResumePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.BeforeResumeFunction;
 import com.bytechef.component.definition.ActionDefinition.BeforeSuspendConsumer;
 import com.bytechef.component.definition.ActionDefinition.BeforeTimeoutResumeFunction;
@@ -50,17 +51,18 @@ import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.annotation.WithTokenRefresh;
 import com.bytechef.platform.component.annotation.WithTokenRefresh.ComponentNameParam;
 import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionParam;
-import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOptionsFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamResponsePerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.OptionsDataSourceAware;
@@ -77,6 +79,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -250,7 +253,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         com.bytechef.component.definition.ActionDefinition actionDefinition = componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName);
 
-        Optional<ResumePerformFunction> resumePerformOptional = actionDefinition.getResumePerform();
+        Optional<? extends BaseResumePerformFunction> resumePerformOptional = actionDefinition.getResumePerform();
 
         ActionContext actionContext = null;
 
@@ -291,15 +294,37 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
                 return checkSuspend(actionDefinition, actionContext, result);
             } else {
-                ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+                BaseResumePerformFunction baseResumePerformFunction = resumePerformOptional.get();
 
-                actionContext = contextFactory.createActionContext(
-                    componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                    taskExecutionId, workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
+                Object result;
 
-                return executeResumePerform(
-                    actionDefinition, resumePerformOptional.get(), inputParameters, continueParameters, resumeData,
-                    suspendExpiresAt, firstComponentConnection, actionContext);
+                if (baseResumePerformFunction instanceof ResumePerformFunction resumePerformFunction) {
+                    ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+
+                    actionContext = contextFactory.createActionContext(
+                        componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                        taskExecutionId, workflowId, firstComponentConnection, environmentId, type,
+                        editorEnvironment);
+
+                    result = executeSingleConnectionResumePerform(
+                        actionDefinition, resumePerformFunction, inputParameters, continueParameters, resumeData,
+                        suspendExpiresAt, firstComponentConnection, actionContext);
+                } else if (baseResumePerformFunction instanceof MultipleConnectionsResumePerformFunction resumePerformFunction) {
+                    actionContext = contextFactory.createActionContext(
+                        componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                        taskExecutionId, workflowId, null, environmentId, type, editorEnvironment);
+
+                    result = executeMultipleConnectionsResumePerform(
+                        actionDefinition, resumePerformFunction, inputParameters, componentConnections, extensions,
+                        continueParameters, resumeData, suspendExpiresAt, actionContext);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Unsupported resume perform function type: " +
+                            baseResumePerformFunction.getClass()
+                                .getName());
+                }
+
+                return checkSuspend(actionDefinition, actionContext, result);
             }
         } finally {
             if (actionContext instanceof LogEntryBufferAware logEntryBufferAware) {
@@ -635,41 +660,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
     }
 
-    private Object executeResumePerform(
+    private Object executeSingleConnectionResumePerform(
         com.bytechef.component.definition.ActionDefinition actionDefinition,
         ResumePerformFunction resumePerformFunction, Map<String, ?> inputParameters, Map<String, ?> continueParameters,
         @Nullable Map<String, ?> resumeData, @Nullable Instant suspendExpiresAt,
         @Nullable ComponentConnection componentConnection, ActionContext context) {
 
         try {
-            Map<String, Object> mergedInputParameters = new HashMap<>(inputParameters);
-
-            if (suspendExpiresAt != null) {
-                Optional<BeforeTimeoutResumeFunction> beforeTimeoutResumeOptional =
-                    actionDefinition.getBeforeTimeoutResume();
-
-                if (beforeTimeoutResumeOptional.isPresent()) {
-                    BeforeTimeoutResumeFunction beforeTimeoutResumeFunction = beforeTimeoutResumeOptional.get();
-
-                    Optional<Map<String, ?>> additionalParameters = beforeTimeoutResumeFunction.apply(
-                        ParametersFactory.create(inputParameters), ParametersFactory.create(continueParameters),
-                        context);
-
-                    additionalParameters.ifPresent(mergedInputParameters::putAll);
-                }
-            } else {
-                Optional<BeforeResumeFunction> beforeResumeOptional = actionDefinition.getBeforeResume();
-
-                if (beforeResumeOptional.isPresent()) {
-                    BeforeResumeFunction beforeResumeFunction = beforeResumeOptional.get();
-
-                    Optional<Map<String, ?>> additionalParameters = beforeResumeFunction.apply(
-                        null, ParametersFactory.create(mergedInputParameters),
-                        ParametersFactory.create(continueParameters), context);
-
-                    additionalParameters.ifPresent(mergedInputParameters::putAll);
-                }
-            }
+            Map<String, ?> mergedInputParameters = mergeResumeInputParameters(
+                actionDefinition, inputParameters, continueParameters, suspendExpiresAt, context);
 
             return resumePerformFunction.apply(
                 ParametersFactory.create(mergedInputParameters), ParametersFactory.create(componentConnection),
@@ -686,6 +685,69 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
     }
 
+    private Object executeMultipleConnectionsResumePerform(
+        com.bytechef.component.definition.ActionDefinition actionDefinition,
+        MultipleConnectionsResumePerformFunction resumePerformFunction, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions,
+        Map<String, ?> continueParameters, @Nullable Map<String, ?> resumeData, @Nullable Instant suspendExpiresAt,
+        ActionContext context) {
+
+        try {
+            Map<String, ?> mergedInputParameters = mergeResumeInputParameters(
+                actionDefinition, inputParameters, continueParameters, suspendExpiresAt, context);
+
+            return resumePerformFunction.apply(
+                ParametersFactory.create(mergedInputParameters), componentConnections,
+                ParametersFactory.create(extensions), ParametersFactory.create(continueParameters),
+                ParametersFactory.create(resumeData), context);
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException) {
+                throw (ProviderException) exception;
+            }
+
+            throw new ExecutionException(
+                toUserFriendlyMessage(exception), exception, inputParameters,
+                EXECUTE_PERFORM);
+        }
+    }
+
+    private static Map<String, ?> mergeResumeInputParameters(
+        com.bytechef.component.definition.ActionDefinition actionDefinition, Map<String, ?> inputParameters,
+        Map<String, ?> continueParameters, @Nullable Instant suspendExpiresAt, ActionContext context)
+        throws Exception {
+
+        Map<String, Object> mergedInputParameters = new HashMap<>(inputParameters);
+
+        if (suspendExpiresAt != null) {
+            Optional<BeforeTimeoutResumeFunction> beforeTimeoutResumeOptional =
+                actionDefinition.getBeforeTimeoutResume();
+
+            if (beforeTimeoutResumeOptional.isPresent()) {
+                BeforeTimeoutResumeFunction beforeTimeoutResumeFunction = beforeTimeoutResumeOptional.get();
+
+                Optional<Map<String, ?>> additionalParameters = beforeTimeoutResumeFunction.apply(
+                    ParametersFactory.create(inputParameters), ParametersFactory.create(continueParameters),
+                    context);
+
+                additionalParameters.ifPresent(mergedInputParameters::putAll);
+            }
+        } else {
+            Optional<BeforeResumeFunction> beforeResumeOptional = actionDefinition.getBeforeResume();
+
+            if (beforeResumeOptional.isPresent()) {
+                BeforeResumeFunction beforeResumeFunction = beforeResumeOptional.get();
+
+                Optional<Map<String, ?>> additionalParameters = beforeResumeFunction.apply(
+                    null, ParametersFactory.create(mergedInputParameters),
+                    ParametersFactory.create(continueParameters), context);
+
+                additionalParameters.ifPresent(mergedInputParameters::putAll);
+            }
+        }
+
+        return mergedInputParameters;
+    }
+
     private Object checkSuspend(
         com.bytechef.component.definition.ActionDefinition actionDefinition, ActionContext actionContext,
         Object performResult) {
@@ -694,38 +756,39 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             ActionContext.Suspend suspend = actionContextAware.getSuspend();
 
             if (suspend != null) {
-                Optional<BeforeSuspendConsumer> beforeSuspendOptional = actionDefinition.getBeforeSuspend();
+                invokeBeforeSuspend(actionDefinition, actionContextAware, suspend);
 
-                String resumeUrl = actionContextAware.getResumeUrl();
-                String jobResumeId = actionContextAware.getJobResumeId();
+                return Objects.requireNonNull(actionContextAware.getSuspend());
+            }
 
-                if (beforeSuspendOptional.isPresent()) {
-                    try {
-                        BeforeSuspendConsumer beforeSuspendConsumer = beforeSuspendOptional.get();
-
-                        beforeSuspendConsumer.apply(
-                            resumeUrl, suspend.expiresAt(), ParametersFactory.create(suspend.continueParameters()),
-                            actionContext);
-                    } catch (Exception exception) {
-                        throw new ExecutionException(
-                            toUserFriendlyMessage(exception), exception, Map.of(),
-                            EXECUTE_PERFORM);
-                    }
-                }
-
-                if (jobResumeId != null) {
-                    Map<String, Object> continueParameters = new HashMap<>(suspend.continueParameters());
-
-                    continueParameters.put(MetadataConstants.JOB_RESUME_ID, jobResumeId);
-
-                    return new ActionContext.Suspend(continueParameters, suspend.expiresAt());
-                }
-
-                return suspend;
+            if (performResult instanceof SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler) {
+                return suspendAwareSseEmitterHandler.withBeforeSuspend(
+                    streamSuspend -> invokeBeforeSuspend(actionDefinition, actionContextAware, streamSuspend));
             }
         }
 
         return performResult;
+    }
+
+    private void invokeBeforeSuspend(
+        com.bytechef.component.definition.ActionDefinition actionDefinition, ActionContextAware actionContextAware,
+        ActionContext.Suspend suspend) {
+
+        Optional<BeforeSuspendConsumer> beforeSuspendOptional = actionDefinition.getBeforeSuspend();
+
+        if (beforeSuspendOptional.isEmpty()) {
+            return;
+        }
+
+        try {
+            BeforeSuspendConsumer beforeSuspendConsumer = beforeSuspendOptional.get();
+
+            beforeSuspendConsumer.apply(
+                actionContextAware.getResumeUrl(), suspend.expiresAt(),
+                ParametersFactory.create(suspend.continueParameters()), actionContextAware);
+        } catch (Exception exception) {
+            throw new ExecutionException(toUserFriendlyMessage(exception), exception, Map.of(), EXECUTE_PERFORM);
+        }
     }
 
     private Object executeSingleConnectionPerform(

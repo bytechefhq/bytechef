@@ -33,12 +33,14 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
+import com.bytechef.component.ai.llm.advisor.ToolCallAwareStructuredOutputValidationAdvisor;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -56,7 +58,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.DefaultChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
@@ -128,7 +129,7 @@ class AbstractAiAgentChatActionTest {
 
         Map<String, ComponentConnection> connectionParameters = Map.of("model_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -164,7 +165,7 @@ class AbstractAiAgentChatActionTest {
         ComponentConnection componentConnection = new ComponentConnection(
             "testComponent", 1, 1L, Map.of(), null);
         Map<String, ComponentConnection> connectionParameters = Map.of("model_1", componentConnection);
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -202,7 +203,7 @@ class AbstractAiAgentChatActionTest {
         ComponentConnection componentConnection = new ComponentConnection(
             "testComponent", 1, 1L, Map.of(), null);
         Map<String, ComponentConnection> connectionParameters = Map.of("model_1", componentConnection);
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -265,7 +266,7 @@ class AbstractAiAgentChatActionTest {
         connectionParameters.put("checkForViolations_1", componentConnection);
         connectionParameters.put("sanitizeText_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -318,7 +319,7 @@ class AbstractAiAgentChatActionTest {
         connectionParameters.put("model_1", componentConnection);
         connectionParameters.put("checkForViolations_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -355,7 +356,7 @@ class AbstractAiAgentChatActionTest {
 
         connectionParameters.put("model_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -411,12 +412,14 @@ class AbstractAiAgentChatActionTest {
 
         // Build the chat-memory advisor exactly as the production chat-memory components do
         // (default order via the builder), so the assertion catches regressions in any of them.
+        ChatMemory chatMemory = mock(ChatMemory.class);
+
         MessageChatMemoryAdvisor productionStyleChatMemoryAdvisor = MessageChatMemoryAdvisor
-            .builder(mock(ChatMemory.class))
+            .builder(chatMemory)
             .build();
 
         when(chatMemoryFunction.apply(any(), any(), any(), any()))
-            .thenReturn(new ChatMemoryFunction.Result(productionStyleChatMemoryAdvisor, null));
+            .thenReturn(new ChatMemoryFunction.Result(productionStyleChatMemoryAdvisor, chatMemory));
 
         ComponentConnection componentConnection = new ComponentConnection(
             "testComponent", 1, 1L, Map.of(), null);
@@ -424,7 +427,7 @@ class AbstractAiAgentChatActionTest {
             "model_1", componentConnection,
             "chatMemory_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -444,7 +447,7 @@ class AbstractAiAgentChatActionTest {
                 .orElseThrow(() -> new AssertionError("ToolCallingAdvisor missing from advisor chain"));
 
             Advisor chatMemoryAdvisor = advisors.stream()
-                .filter(advisor -> advisor instanceof BaseChatMemoryAdvisor)
+                .filter(BlankReplySkippingChatMemoryAdvisor.class::isInstance)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
 
@@ -512,7 +515,7 @@ class AbstractAiAgentChatActionTest {
         List<Advisor> advisors =
             ((DefaultChatClient.DefaultChatClientRequestSpec) chatClientRequestSpec).getAdvisors();
 
-        assertThat(advisors).anyMatch(StructuredOutputValidationAdvisor.class::isInstance);
+        assertThat(advisors).anyMatch(ToolCallAwareStructuredOutputValidationAdvisor.class::isInstance);
         assertThat(advisors).anyMatch(CodeFenceStrippingAdvisor.class::isInstance);
     }
 
@@ -532,7 +535,7 @@ class AbstractAiAgentChatActionTest {
         List<Advisor> advisors =
             ((DefaultChatClient.DefaultChatClientRequestSpec) chatClientRequestSpec).getAdvisors();
 
-        assertThat(advisors).noneMatch(StructuredOutputValidationAdvisor.class::isInstance);
+        assertThat(advisors).noneMatch(ToolCallAwareStructuredOutputValidationAdvisor.class::isInstance);
         assertThat(advisors).noneMatch(CodeFenceStrippingAdvisor.class::isInstance);
 
         // No JSON schema is read for a TEXT response, so the converter (and therefore context.json) is never touched.
@@ -558,7 +561,7 @@ class AbstractAiAgentChatActionTest {
 
         ChatModel chatModel = mock(ChatModel.class);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -569,6 +572,7 @@ class AbstractAiAgentChatActionTest {
 
         assertThat(toolCallAdvisor).isNotNull();
         assertThat(advisors).noneMatch(BaseChatMemoryAdvisor.class::isInstance);
+        assertThat(advisors).noneMatch(BlankReplySkippingChatMemoryAdvisor.class::isInstance);
         assertThat(readConversationHistoryEnabled(toolCallAdvisor)).isTrue();
     }
 
@@ -590,7 +594,7 @@ class AbstractAiAgentChatActionTest {
         ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
 
         when(chatMemoryFunction.apply(any(), any(), any(), any()))
-            .thenReturn(new ChatMemoryFunction.Result(chatMemoryAdvisor, null));
+            .thenReturn(new ChatMemoryFunction.Result(chatMemoryAdvisor, mock(ChatMemory.class)));
         when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
             eq("memoryComponent"), eq(1), eq("memoryElement"))).thenReturn(chatMemoryFunction);
 
@@ -598,7 +602,7 @@ class AbstractAiAgentChatActionTest {
             "memoryComponent", 1, 2L, Map.of(), null);
 
         Map<String, ComponentConnection> connectionParameters = Map.of("memory_1", memoryConnection);
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         ChatModel chatModel = mock(ChatModel.class);
 
@@ -607,7 +611,12 @@ class AbstractAiAgentChatActionTest {
 
         List<Advisor> advisors = action.getAdvisors(clusterElementMap, connectionParameters, chatModel, actionContext);
 
-        int chatMemoryIndex = advisors.indexOf(chatMemoryAdvisor);
+        Advisor wrappedChatMemoryAdvisor = advisors.stream()
+            .filter(BlankReplySkippingChatMemoryAdvisor.class::isInstance)
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
+
+        int chatMemoryIndex = advisors.indexOf(wrappedChatMemoryAdvisor);
         ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
         int toolCallIndex = advisors.indexOf(toolCallAdvisor);
 

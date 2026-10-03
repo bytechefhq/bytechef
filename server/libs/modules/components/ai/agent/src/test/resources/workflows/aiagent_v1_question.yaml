@@ -1,0 +1,23 @@
+---
+label: "AI agent asks the user a question"
+outputs:
+- name: "answer"
+  value: "${aiAgent_1}"
+tasks:
+- name: "aiAgent_1"
+  type: "aiAgent/v1/chat"
+  parameters:
+    format: "SIMPLE"
+    response:
+      responseFormat: "TEXT"
+    userPrompt: "Pick a color"
+  clusterElements:
+    model:
+      name: "model_1"
+      type: "testModel/v1/model"
+      parameters: {}
+    tools:
+    - name: "askQuestion_1"
+      type: "testQuestion/v1/askQuestion"
+      parameters:
+        toolName: "requestApproval"

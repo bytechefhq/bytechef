@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -27,14 +28,13 @@ import static org.mockito.Mockito.verify;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
+import com.bytechef.platform.ai.tool.AiAgentToolContext.SseTransport;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
@@ -48,7 +48,7 @@ class AiAgentStreamChatActionTest {
 
     @Test
     void testBufferedEventsAreReplayedOnceEmitterBinds() {
-        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        SseTransport sseTransport = new SseTransport();
 
         Map<String, @Nullable Object> firstBuffered = new LinkedHashMap<>();
         firstBuffered.put("__eventType", "tool_execution");
@@ -58,30 +58,60 @@ class AiAgentStreamChatActionTest {
         secondBuffered.put("__eventType", "tool_execution");
         secondBuffered.put("toolName", "createTicket");
 
-        bufferedEvents.add(firstBuffered);
-        bufferedEvents.add(secondBuffered);
+        sseTransport.send(firstBuffered);
+        sseTransport.send(secondBuffered);
 
-        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
         ActionContext context = mock(ActionContext.class);
         SseEmitter emitter = mock(SseEmitter.class);
 
         Flux<Object> emptyUpstream = Flux.empty();
 
         AiAgentStreamChatAction
-            .createSseHandler(emptyUpstream, emitterReference, bufferedEvents, context)
+            .createSseHandler(emptyUpstream, sseTransport, context)
             .handle(emitter);
 
-        verify(emitter).send(firstBuffered);
-        verify(emitter).send(secondBuffered);
+        InOrder inOrder = inOrder(emitter);
 
-        assertThat(emitterReference.get()).isSameAs(emitter);
-        assertThat(bufferedEvents).isEmpty();
+        inOrder.verify(emitter)
+            .send(firstBuffered);
+        inOrder.verify(emitter)
+            .send(secondBuffered);
+
+        Map<String, @Nullable Object> afterBinding = Map.of("toolName", "sendEmail");
+
+        sseTransport.send(afterBinding);
+
+        verify(emitter).send(afterBinding);
+    }
+
+    @Test
+    void testBufferedEventThatFailsToSendIsLoggedAndTheRestAreStillSent() {
+        SseTransport sseTransport = new SseTransport();
+
+        Map<String, @Nullable Object> failingBuffered = Map.of("toolName", "lookupCustomer");
+        Map<String, @Nullable Object> nextBuffered = Map.of("toolName", "createTicket");
+
+        sseTransport.send(failingBuffered);
+        sseTransport.send(nextBuffered);
+
+        ActionContext context = mock(ActionContext.class);
+        SseEmitter emitter = mock(SseEmitter.class);
+
+        doThrow(new RuntimeException("client disconnected"))
+            .when(emitter)
+            .send(failingBuffered);
+
+        AiAgentStreamChatAction
+            .createSseHandler(Flux.empty(), sseTransport, context)
+            .handle(emitter);
+
+        verify(emitter).send(nextBuffered);
+        verify(context, atLeastOnce()).log(any());
     }
 
     @Test
     void testSendFailureOnStreamItemCancelsSubscriptionAndLogsAtWarn() {
-        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
-        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
+        SseTransport sseTransport = new SseTransport();
         ActionContext context = mock(ActionContext.class);
         SseEmitter emitter = mock(SseEmitter.class);
 
@@ -94,7 +124,7 @@ class AiAgentStreamChatActionTest {
             .send("first");
 
         AiAgentStreamChatAction
-            .createSseHandler(sink.asFlux(), emitterReference, bufferedEvents, context)
+            .createSseHandler(sink.asFlux(), sseTransport, context)
             .handle(emitter);
 
         sink.tryEmitNext("first");
@@ -107,8 +137,7 @@ class AiAgentStreamChatActionTest {
 
     @Test
     void testUpstreamErrorPropagatesToEmitterError() {
-        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
-        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
+        SseTransport sseTransport = new SseTransport();
         ActionContext context = mock(ActionContext.class);
         SseEmitter emitter = mock(SseEmitter.class);
 
@@ -117,7 +146,7 @@ class AiAgentStreamChatActionTest {
         Flux<Object> failingUpstream = Flux.error(upstreamFailure);
 
         AiAgentStreamChatAction
-            .createSseHandler(failingUpstream, emitterReference, bufferedEvents, context)
+            .createSseHandler(failingUpstream, sseTransport, context)
             .handle(emitter);
 
         ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
@@ -130,8 +159,7 @@ class AiAgentStreamChatActionTest {
 
     @Test
     void testTimeoutListenerCancelsUpstreamSubscription() {
-        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
-        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
+        SseTransport sseTransport = new SseTransport();
         ActionContext context = mock(ActionContext.class);
         SseEmitter emitter = mock(SseEmitter.class);
 
@@ -142,7 +170,7 @@ class AiAgentStreamChatActionTest {
         ArgumentCaptor<Runnable> timeoutListenerCaptor = ArgumentCaptor.forClass(Runnable.class);
 
         AiAgentStreamChatAction
-            .createSseHandler(sink.asFlux(), emitterReference, bufferedEvents, context)
+            .createSseHandler(sink.asFlux(), sseTransport, context)
             .handle(emitter);
 
         verify(emitter).addTimeoutListener(timeoutListenerCaptor.capture());
@@ -162,15 +190,14 @@ class AiAgentStreamChatActionTest {
 
     @Test
     void testStreamCompletionCallsEmitterComplete() {
-        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
-        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
+        SseTransport sseTransport = new SseTransport();
         ActionContext context = mock(ActionContext.class);
         SseEmitter emitter = mock(SseEmitter.class);
 
         Flux<Object> finiteUpstream = Flux.just("chunk-1", "chunk-2");
 
         AiAgentStreamChatAction
-            .createSseHandler(finiteUpstream, emitterReference, bufferedEvents, context)
+            .createSseHandler(finiteUpstream, sseTransport, context)
             .handle(emitter);
 
         verify(emitter).send("chunk-1");

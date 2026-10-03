@@ -198,6 +198,30 @@ public class QuartzTriggerSchedulerIntTest {
     }
 
     @Test
+    public void testCancelOneTimeTask() throws Exception {
+        long jobId = 1001L;
+        Instant executeAt = LocalDateTime.now()
+            .plus(Duration.ofMinutes(5))
+            .toInstant(ZoneOffset.UTC);
+
+        quartzTriggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), jobId);
+
+        JobKey jobKey = JobKey.jobKey(String.valueOf(jobId), "OneTimeTask");
+
+        Assertions.assertTrue(scheduler.checkExists(jobKey));
+
+        quartzTriggerScheduler.cancelOneTimeTask(jobId);
+
+        Assertions.assertFalse(scheduler.checkExists(jobKey));
+        Assertions.assertFalse(scheduler.checkExists(TriggerKey.triggerKey(String.valueOf(jobId), "OneTimeTask")));
+    }
+
+    @Test
+    public void testCancelOneTimeTaskWithoutAScheduledTaskDoesNothing() {
+        Assertions.assertDoesNotThrow(() -> quartzTriggerScheduler.cancelOneTimeTask(1002L));
+    }
+
+    @Test
     public void testScheduleOneTimeTaskWithEmptyOutput() throws Exception {
         // Given
         long jobId = 1000L;

@@ -20,6 +20,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
@@ -52,6 +53,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
     private final @Nullable LogFileStorageWriter logFileStorageWriter;
     private final Nested nested;
     private final @Nullable String publicUrl;
+    private final @Nullable ActionContextAware suspendTarget;
     private final long taskExecutionId;
     private final TempFileStorage tempFileStorage;
     private final @Nullable PlatformType type;
@@ -77,6 +79,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         this.logFileStorageWriter = builder.logFileStorageWriter;
         this.nested = new NestedImpl();
         this.publicUrl = builder.publicUrl;
+        this.suspendTarget = builder.suspendTarget;
         this.taskExecutionId = builder.taskExecutionId;
         this.tempFileStorage = builder.tempFileStorage;
         this.type = builder.type;
@@ -117,6 +120,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
             .logFileStorageWriter(logFileStorageWriter)
             .publicUrl(publicUrl)
+            .suspendTarget(suspendTarget)
             .taskExecutionId(taskExecutionId)
             .type(type)
             .workflowId(workflowId)
@@ -138,6 +142,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
                 .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
                 .logFileStorageWriter(logFileStorageWriter)
                 .publicUrl(publicUrl)
+                .suspendTarget(suspendTarget)
                 .taskExecutionId(taskExecutionId)
                 .type(type)
                 .workflowId(workflowId)
@@ -307,6 +312,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         private @Nullable Long jobPrincipalWorkflowId;
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
+        private @Nullable ActionContextAware suspendTarget;
         private long taskExecutionId;
         private final TempFileStorage tempFileStorage;
         private @Nullable PlatformType type;
@@ -372,6 +378,12 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
 
         Builder publicUrl(@Nullable String publicUrl) {
             this.publicUrl = publicUrl;
+
+            return this;
+        }
+
+        Builder suspendTarget(@Nullable ActionContextAware suspendTarget) {
+            this.suspendTarget = suspendTarget;
 
             return this;
         }

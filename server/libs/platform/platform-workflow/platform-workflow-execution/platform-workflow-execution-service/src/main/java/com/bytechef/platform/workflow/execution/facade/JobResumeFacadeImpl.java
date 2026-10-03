@@ -25,9 +25,10 @@ import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.LongConsumer;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -57,34 +58,79 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     }
 
     @Override
-    @SuppressFBWarnings("CRLF_INJECTION_LOGS")
-    public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
-        JobResumeId jobResumeId;
+    public JobResumeOutcome resumeExpiredJob(String id) {
+        JobResumeId jobResumeId = parseJobResumeId(id);
 
-        try {
-            jobResumeId = JobResumeId.parse(id);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            log.warn("Invalid resume id: {}", id.replaceAll("[\\r\\n]", ""));
-
+        if (jobResumeId == null) {
             return JobResumeOutcome.INVALID_ID;
         }
 
         return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
             Job job = jobService.getJob(jobResumeId.getJobId());
 
-            if (job.getStatus() != Job.Status.STOPPED) {
-                log.warn("Cannot resume job {}; status is {}", jobResumeId.getJobId(), job.getStatus());
+            JobResumeOutcome rejectedOutcome = getRejectedOutcome(job, jobResumeId);
 
-                return JobResumeOutcome.GONE;
+            if (rejectedOutcome == JobResumeOutcome.NOT_YET_SUSPENDED) {
+                return rejectedOutcome;
             }
 
-            String storedJobResumeIdString = (String) job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+            if (rejectedOutcome != null) {
+                log.info(
+                    "Ignoring the expired suspend of job {}; the job no longer waits on it ({})",
+                    jobResumeId.getJobId(), rejectedOutcome);
 
-            if (storedJobResumeIdString == null || !tokenMatches(storedJobResumeIdString, jobResumeId)) {
-                log.warn("Resume token does not match stored value for job {}", jobResumeId.getJobId());
-
-                return JobResumeOutcome.INVALID_ID;
+                return rejectedOutcome;
             }
+
+            consumeJobResumeId(job);
+
+            jobFacade.resumeJob(jobResumeId.getJobId());
+
+            applicationEventPublisher.publishEvent(new JobResumedEvent(id));
+
+            return JobResumeOutcome.OK;
+        });
+    }
+
+    @Override
+    public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
+        return resumeJob(id, data, false, jobId -> {});
+    }
+
+    @Override
+    public JobResumeOutcome resumeJobStreaming(
+        String id, Map<String, Object> data, LongConsumer jobIdConsumer) {
+
+        return resumeJob(id, data, true, jobIdConsumer);
+    }
+
+    private JobResumeOutcome resumeJob(
+        String id, Map<String, Object> data, boolean streaming, LongConsumer jobIdConsumer) {
+
+        JobResumeId jobResumeId = parseJobResumeId(id);
+
+        if (jobResumeId == null) {
+            return JobResumeOutcome.INVALID_ID;
+        }
+
+        return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
+            Job job = jobService.getJob(jobResumeId.getJobId());
+
+            JobResumeOutcome rejectedOutcome = getRejectedOutcome(job, jobResumeId);
+
+            if (rejectedOutcome != null) {
+                return rejectedOutcome;
+            }
+
+            if (streaming && !MapUtils.getBoolean(job.getMetadata(), MetadataConstants.STREAMING_RESUME, false)) {
+                log.warn("Job {} was not suspended for a streaming resume", jobResumeId.getJobId());
+
+                return JobResumeOutcome.STREAMING_NOT_ALLOWED;
+            }
+
+            consumeJobResumeId(job);
+
+            jobIdConsumer.accept(jobResumeId.getJobId());
 
             jobFacade.resumeJob(
                 jobResumeId.getJobId(), MapUtils.getLong(job.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID),
@@ -96,30 +142,64 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         });
     }
 
-    private static boolean tokenMatches(String storedJobResumeIdString, JobResumeId suppliedJobResumeId) {
-        JobResumeId storedJobResumeId;
+    private void consumeJobResumeId(Job job) {
+        Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
 
+        jobMetadata.put(MetadataConstants.CONSUMED_JOB_RESUME_ID, job.getMetadata(MetadataConstants.JOB_RESUME_ID));
+
+        job.setMetadata(jobMetadata);
+
+        jobService.update(job);
+    }
+
+    private static @Nullable JobResumeOutcome getRejectedOutcome(Job job, JobResumeId jobResumeId) {
+        String consumedJobResumeIdString = (String) job.getMetadata(MetadataConstants.CONSUMED_JOB_RESUME_ID);
+
+        if (jobResumeId.matches(consumedJobResumeIdString)) {
+            log.debug("Job {} was already resumed with this resume id", jobResumeId.getJobId());
+
+            return JobResumeOutcome.GONE;
+        }
+
+        Job.Status status = job.getStatus();
+
+        if (status == Job.Status.CREATED || status == Job.Status.STARTED) {
+            log.debug("Job {} has not been suspended yet; status is {}", jobResumeId.getJobId(), status);
+
+            return JobResumeOutcome.NOT_YET_SUSPENDED;
+        }
+
+        if (status == Job.Status.FAILED) {
+            log.warn("Cannot resume job {}; it failed", jobResumeId.getJobId());
+
+            return JobResumeOutcome.JOB_FAILED;
+        }
+
+        if (status != Job.Status.STOPPED) {
+            log.warn("Cannot resume job {}; status is {}", jobResumeId.getJobId(), status);
+
+            return JobResumeOutcome.GONE;
+        }
+
+        String storedJobResumeIdString = (String) job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+
+        if (!jobResumeId.matches(storedJobResumeIdString)) {
+            log.warn("Resume token does not match stored value for job {}", jobResumeId.getJobId());
+
+            return JobResumeOutcome.INVALID_ID;
+        }
+
+        return null;
+    }
+
+    @SuppressFBWarnings("CRLF_INJECTION_LOGS")
+    private static @Nullable JobResumeId parseJobResumeId(String id) {
         try {
-            storedJobResumeId = JobResumeId.parse(storedJobResumeIdString);
+            return JobResumeId.parse(id);
         } catch (IllegalArgumentException illegalArgumentException) {
-            return false;
+            log.warn("Invalid resume id: {}", id.replaceAll("[\\r\\n]", ""));
+
+            return null;
         }
-
-        if (storedJobResumeId.getJobId() != suppliedJobResumeId.getJobId()) {
-            return false;
-        }
-
-        if (!storedJobResumeId.getTenantId()
-            .equals(suppliedJobResumeId.getTenantId())) {
-
-            return false;
-        }
-
-        byte[] storedUuidBytes = storedJobResumeId.getUuidAsString()
-            .getBytes(StandardCharsets.UTF_8);
-        byte[] suppliedUuidBytes = suppliedJobResumeId.getUuidAsString()
-            .getBytes(StandardCharsets.UTF_8);
-
-        return MessageDigest.isEqual(storedUuidBytes, suppliedUuidBytes);
     }
 }

@@ -26,6 +26,7 @@ import com.bytechef.platform.worker.task.WebSocketStreamTaskExecutionPostOutputP
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 /**
  * @author Ivica Cardic
@@ -35,21 +36,21 @@ import org.springframework.context.annotation.Configuration;
 public class PlatformWorkerConfiguration {
 
     @Bean
+    @Order(1)
     CallableResponseTaskExecutionPostOutputProcessor callableResponseTaskExecutionPostOutputProcessor() {
         return new CallableResponseTaskExecutionPostOutputProcessor();
     }
 
+    // The SSE stream processor must run before SuspendTaskExecutionPostOutputProcessor, which takes the suspend
+    // it returns as its input.
     @Bean
+    @Order(2)
     SseStreamTaskExecutionPostOutputProcessor sseStreamTaskExecutionPostOutputProcessor(MessageBroker messageBroker) {
         return new SseStreamTaskExecutionPostOutputProcessor(messageBroker);
     }
 
     @Bean
-    SuspendTaskExecutionPostOutputProcessor suspendTaskExecutionPostOutputProcessor(TriggerScheduler triggerScheduler) {
-        return new SuspendTaskExecutionPostOutputProcessor(triggerScheduler);
-    }
-
-    @Bean
+    @Order(3)
     WebSocketStreamTaskExecutionPostOutputProcessor webSocketStreamTaskExecutionPostOutputProcessor(
         MessageBroker messageBroker) {
 
@@ -57,6 +58,13 @@ public class PlatformWorkerConfiguration {
     }
 
     @Bean
+    @Order(4)
+    SuspendTaskExecutionPostOutputProcessor suspendTaskExecutionPostOutputProcessor(TriggerScheduler triggerScheduler) {
+        return new SuspendTaskExecutionPostOutputProcessor(triggerScheduler);
+    }
+
+    @Bean
+    @Order(5)
     WebhookResponseTaskExecutionPostOutputProcessor webhookResponseTaskExecutionPostOutputProcessor() {
         return new WebhookResponseTaskExecutionPostOutputProcessor();
     }

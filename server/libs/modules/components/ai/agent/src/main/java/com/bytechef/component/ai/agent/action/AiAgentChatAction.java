@@ -28,11 +28,13 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -73,7 +75,9 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
                     (MultipleConnectionsOutputFunction) (
                         inputParameters, componentConnections, extensions, context) -> ModelUtils.output(
                             inputParameters, null, context))
-                .help("", "https://docs.bytechef.io/reference/components/ai-agent_v1#chat"));
+                .help("", "https://docs.bytechef.io/reference/components/ai-agent_v1#chat")
+                .resumePerform(
+                    (MultipleConnectionsResumePerformFunction) this::resumePerform));
     }
 
     public class ChatActionDefinitionWrapper extends AbstractActionDefinitionWrapper {
@@ -88,6 +92,19 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         }
     }
 
+    protected @Nullable Object resumePerform(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        Parameters continueParameters, Parameters data, ActionContext context) throws Exception {
+
+        List<ToolExecutionEvent> toolExecutionEvents = new ArrayList<>();
+
+        ModelUtils.ChatActionResult chatActionResult = resumeChat(
+            inputParameters, connectionParameters, extensions, continueParameters, data,
+            createToolExecutionListener(toolExecutionEvents, context), context);
+
+        return toOutput(chatActionResult, toolExecutionEvents, context);
+    }
+
     @Nullable
     protected Object perform(
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
@@ -95,7 +112,26 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         List<ToolExecutionEvent> toolExecutionEvents = new ArrayList<>();
 
-        ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
+        ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
+            inputParameters, connectionParameters, extensions,
+            createToolExecutionListener(toolExecutionEvents, context), context);
+
+        applyStructuredOutputValidation(chatClientRequestSpec, inputParameters, context);
+
+        chatClientRequestSpec.toolContext(new AiAgentToolContext(context).toMap());
+
+        ChatClient.CallResponseSpec call = chatClientRequestSpec.call();
+
+        ModelUtils.ChatActionResult chatActionResult = ModelUtils.getChatActionResult(
+            call, inputParameters, context);
+
+        return toOutput(chatActionResult, toolExecutionEvents, context);
+    }
+
+    private static ToolExecutionListener createToolExecutionListener(
+        List<ToolExecutionEvent> toolExecutionEvents, ActionContext context) {
+
+        return toolExecutionEvent -> {
             Map<String, @Nullable Object> toolExecutionLogEntry = new LinkedHashMap<>();
 
             toolExecutionLogEntry.put("confidence", toolExecutionEvent.confidence());
@@ -113,16 +149,11 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
                 toolExecutionEvents.add(toolExecutionEvent);
             }
         };
+    }
 
-        ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
-            inputParameters, connectionParameters, extensions, toolExecutionListener, context);
-
-        applyStructuredOutputValidation(chatClientRequestSpec, inputParameters, context);
-
-        ChatClient.CallResponseSpec call = chatClientRequestSpec.call();
-
-        ModelUtils.ChatActionResult chatActionResult = ModelUtils.getChatActionResult(
-            call, inputParameters, context);
+    private static @Nullable Object toOutput(
+        ModelUtils.ChatActionResult chatActionResult, List<ToolExecutionEvent> toolExecutionEvents,
+        ActionContext context) {
 
         Object chatResponse = chatActionResult.response();
 
