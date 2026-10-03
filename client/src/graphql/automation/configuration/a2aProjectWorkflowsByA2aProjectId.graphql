@@ -1,0 +1,9 @@
+query a2aProjectWorkflowsByA2aProjectId($a2aProjectId: ID!) {
+    a2aProjectWorkflowsByA2aProjectId(a2aProjectId: $a2aProjectId) {
+        id
+        skillDescription
+        skillName
+        workflowId
+        workflowLabel
+    }
+}

@@ -1,0 +1,5 @@
+mutation createA2aServer($input: CreateA2aServerInput!) {
+    createA2aServer(input: $input) {
+        id
+    }
+}
