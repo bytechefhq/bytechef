@@ -18,6 +18,7 @@ package com.bytechef.ai.chat.memory.aws.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Memory.Aws;
+import com.bytechef.config.ApplicationProperties.Cloud;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -39,7 +40,9 @@ class AwsChatMemoryConfiguration {
             .getMemory()
             .getAws();
 
-        return AwsS3ClientFactory.create(aws);
+        Cloud cloud = applicationProperties.getCloud();
+
+        return AwsS3ClientFactory.create(aws, cloud.getAws());
     }
 
     @Bean

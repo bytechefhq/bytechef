@@ -17,7 +17,7 @@
 package com.bytechef.ai.chat.memory.inmemory.config;
 
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +31,13 @@ class InMemoryChatMemoryConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "in_memory")
-    ChatMemory inMemoryChatMemory(InMemoryChatMemoryRepository inMemoryChatMemoryRepository) {
+    ChatMemoryRepository inMemoryChatMemoryRepository() {
+        return new TenantRoutingInMemoryChatMemoryRepository();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "in_memory")
+    ChatMemory inMemoryChatMemory(ChatMemoryRepository inMemoryChatMemoryRepository) {
         return MessageWindowChatMemory.builder()
             .chatMemoryRepository(inMemoryChatMemoryRepository)
             .maxMessages(500)

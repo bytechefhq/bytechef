@@ -18,6 +18,7 @@ package com.bytechef.platform.component;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.platform.component.util.ClusterElementTypeUtils.isSameClusterElementType;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.ComponentHandler;
@@ -274,7 +275,8 @@ public class ComponentDefinitionRegistry {
             .orElse(Collections.emptyList())
             .stream()
             .filter(clusterElementDefinition -> clusterElementName.equalsIgnoreCase(clusterElementDefinition.getName()))
-            .filter(clusterElementDefinition -> clusterElementType.equals(clusterElementDefinition.getType()))
+            .filter(clusterElementDefinition -> isSameClusterElementType(
+                clusterElementType, clusterElementDefinition.getType()))
             .findFirst()
             .orElseThrow(
                 () -> new IllegalArgumentException(

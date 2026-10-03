@@ -8,8 +8,19 @@ bytechef:
     knowledge-base:
       enabled: false
     memory:
-      # Chat memory provider (inmemory | jdbc | redis | aws) default: jdbc
+      aws:
+        bucket-prefix: bytechef-chat-memory
+        key-prefix: ""
+        session-bucket-prefix: bytechef-session
+      # Chat memory provider (aws | in_memory | jdbc | redis)
       provider: jdbc
+      redis:
+        host: localhost
+        port: 6379
+        session-key-prefix: "bytechef-session:"
+      session-cleanup-interval: PT1H
+      session-max-archived-events: 1000
+      session-time-to-live: P60D
     provider:
       chat:
         anthropic:

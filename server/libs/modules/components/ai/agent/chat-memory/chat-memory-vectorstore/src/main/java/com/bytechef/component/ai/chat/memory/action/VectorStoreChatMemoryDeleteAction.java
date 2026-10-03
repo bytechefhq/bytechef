@@ -33,6 +33,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunc
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.Map;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
 /**
  * @author Ivica Cardic
@@ -75,7 +76,11 @@ public class VectorStoreChatMemoryDeleteAction {
 
         VectorStore vectorStore = getVectorStore(extensions, componentConnections, clusterElementDefinitionService);
 
-        vectorStore.delete(METADATA_CONVERSATION_ID + " == '" + conversationId + "'");
+        FilterExpressionBuilder filterExpressionBuilder = new FilterExpressionBuilder();
+
+        vectorStore.delete(
+            filterExpressionBuilder.eq(METADATA_CONVERSATION_ID, conversationId)
+                .build());
 
         return Map.of(
             CONVERSATION_ID, conversationId,

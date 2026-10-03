@@ -27,6 +27,9 @@ import static org.mockito.Mockito.verify;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.TenantContextThreadLocalAccessor;
+import io.micrometer.context.ContextRegistry;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -36,7 +39,9 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Sinks;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Tests for {@link AiAgentStreamChatAction#createSseHandler} covering buffered-event replay, cancel-on-send-failure,
@@ -45,6 +50,30 @@ import reactor.core.publisher.Sinks;
  * @author Ivica Cardic
  */
 class AiAgentStreamChatActionTest {
+
+    @Test
+    void testExecutionContextCarriesTenantToSchedulerThreads() {
+        ContextRegistry.getInstance()
+            .registerThreadLocalAccessor(new TenantContextThreadLocalAccessor());
+
+        Hooks.enableAutomaticContextPropagation();
+
+        try {
+            Flux<Object> tenantIdFlux = TenantContext.callWithTenantId(
+                "tenantA", () -> AiAgentStreamChatAction.withExecutionContext(
+                    Flux.<Object>just("event")
+                        .publishOn(Schedulers.boundedElastic())
+                        .map(event -> TenantContext.getCurrentTenantId())));
+
+            assertThat(TenantContext.getCurrentTenantId()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
+            assertThat(tenantIdFlux.blockLast()).isEqualTo("tenantA");
+        } finally {
+            Hooks.disableAutomaticContextPropagation();
+
+            ContextRegistry.getInstance()
+                .removeThreadLocalAccessor(TenantContextThreadLocalAccessor.KEY);
+        }
+    }
 
     @Test
     void testBufferedEventsAreReplayedOnceEmitterBinds() {
