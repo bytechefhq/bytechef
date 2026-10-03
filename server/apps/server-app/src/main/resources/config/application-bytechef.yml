@@ -1,5 +1,8 @@
 bytechef:
   ai:
+    auto-memory:
+      # Auto-memory storage provider (aws(ee) | filesystem | jdbc) default: jdbc
+      provider: jdbc
     copilot:
       enabled: false
     firecrawl:
@@ -8,7 +11,7 @@ bytechef:
     knowledge-base:
       enabled: false
     memory:
-      # Chat memory provider (inmemory | jdbc | redis | aws) default: jdbc
+      # Chat memory provider (in_memory | jdbc | redis | aws) default: jdbc
       provider: jdbc
     provider:
       chat:

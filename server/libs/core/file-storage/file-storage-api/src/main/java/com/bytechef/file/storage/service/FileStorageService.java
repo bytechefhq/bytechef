@@ -38,6 +38,17 @@ public interface FileStorageService {
 
     FileEntry getFileEntry(String directory, String filename) throws FileStorageException;
 
+    /**
+     * Returns the entries stored under the given directory, descending into nested directories (the AWS binding matches
+     * by key prefix, which has the same effect). Not every binding can list (the Base64 one throws
+     * {@link UnsupportedOperationException}); a binding that does must honor:
+     * <ul>
+     * <li>{@link FileEntry#getName()} is the bare filename, with no leading separator and no directory component.</li>
+     * <li>A directory that holds nothing yields an empty set; it is never an error.</li>
+     * <li>Ordering is unspecified - callers that need an order must sort. {@code FileEntry} carries no size or
+     * modification time, so ordering by recency must come from the stored content itself.</li>
+     * </ul>
+     */
     Set<FileEntry> getFileEntries(String directory) throws FileStorageException;
 
     URL getFileEntryURL(String directory, FileEntry fileEntry);

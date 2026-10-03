@@ -30,16 +30,21 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -47,6 +52,9 @@ import org.springframework.util.Assert;
  */
 public class FilesystemFileStorageService implements FileStorageService {
 
+    private static final Logger log = LoggerFactory.getLogger(FilesystemFileStorageService.class);
+
+    private static final String TEMPORARY_FILE_SUFFIX = ".bytechef-tmp";
     private static final String URL_PREFIX = "file:";
 
     private final Path baseDirPath;
@@ -85,18 +93,14 @@ public class FilesystemFileStorageService implements FileStorageService {
     public boolean fileExists(String directory, FileEntry fileEntry) throws FileStorageException {
         File file = getFile(directory, fileEntry);
 
-        return file.exists();
+        return pathExists(file.toPath());
     }
 
     @Override
     public boolean fileExists(String directory, String filename) throws FileStorageException {
-        Path directoryPath = resolveDirectoryPath(directory);
+        Path directoryPath = getTenantDirectoryPath(directory);
 
-        Path filePath = directoryPath.resolve(filename);
-
-        File file = filePath.toFile();
-
-        return file.exists();
+        return pathExists(directoryPath.resolve(filename));
     }
 
     @Override
@@ -121,15 +125,46 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     @Override
     public Set<FileEntry> getFileEntries(String directory) throws FileStorageException {
-        Path directoryPath = resolveDirectoryPath(directory);
+        Path directoryPath = getTenantDirectoryPath(directory);
+        Set<FileEntry> fileEntries = new HashSet<>();
 
-        try (Stream<Path> stream = Files.walk(directoryPath)) {
-            return stream.filter(path -> !Files.isDirectory(path))
-                .map(path -> new FileEntry(String.valueOf(path.getFileName()), getUrl(directory, directoryPath, path)))
-                .collect(Collectors.toSet());
-        } catch (IOException e) {
-            throw new FileStorageException(e.getMessage(), e);
+        if (!pathExists(directoryPath)) {
+            return fileEntries;
         }
+
+        if (!Files.isDirectory(directoryPath)) {
+            throw new FileStorageException("Not a directory: " + directory);
+        }
+
+        try {
+            Files.walkFileTree(directoryPath, new SimpleFileVisitor<>() {
+
+                @Override
+                public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) {
+                    String filename = String.valueOf(path.getFileName());
+
+                    if (!basicFileAttributes.isDirectory() && !filename.endsWith(TEMPORARY_FILE_SUFFIX)) {
+                        fileEntries.add(new FileEntry(filename, getUrl(directory, directoryPath, path)));
+                    }
+
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path path, IOException ioException) throws IOException {
+                    return skipVanished(ioException);
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path path, IOException ioException) throws IOException {
+                    return ioException == null ? FileVisitResult.CONTINUE : skipVanished(ioException);
+                }
+            });
+        } catch (IOException ioException) {
+            throw new FileStorageException(ioException.getMessage(), ioException);
+        }
+
+        return fileEntries;
     }
 
     @Override
@@ -251,7 +286,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     private File getFile(String directory, FileEntry fileEntry) {
-        Path directoryPath = resolveDirectoryPath(directory);
+        Path directoryPath = getTenantDirectoryPath(directory);
         Path filePath = resolveFilePath(directoryPath, directory, fileEntry.getUrl());
 
         return filePath.toFile();
@@ -279,9 +314,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     private FileEntry doStoreFileContent(
         String directory, String filename, InputStream inputStream, boolean generateFilename) {
 
-        directory = StringUtils.replace(directory.replaceAll("[^0-9a-zA-Z/_]", ""), " ", "");
-
-        Path directoryPath = resolveDirectoryPath(directory.toLowerCase());
+        Path directoryPath = resolveDirectoryPath(directory);
 
         Path filePath = directoryPath;
 
@@ -296,19 +329,51 @@ public class FilesystemFileStorageService implements FileStorageService {
             filePath = filePath.resolve(filename);
         }
 
-        try {
-            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ioe) {
-            throw new FileStorageException("Failed to store file " + filename, ioe);
-        }
-
-        File file = filePath.toFile();
-
-        if (file.length() == 0) {
-            throw new FileStorageException("Failed to store empty file " + filename);
-        }
+        writeAtomically(inputStream, directoryPath, filePath, filename);
 
         return new FileEntry(filename, getUrl(directory, directoryPath, filePath));
+    }
+
+    /**
+     * Writes to a temporary file in the target directory and moves it into place, so a reader never sees a partially
+     * written file and a crash mid-write leaves the previous content intact instead of a truncated file. The copy with
+     * {@code REPLACE_EXISTING} recreates the temporary file under the process umask, so the stored file does not keep
+     * the owner-only permissions {@code createTempFile} gives it. A temporary file a crash leaves behind is never
+     * listed.
+     */
+    private static void writeAtomically(InputStream inputStream, Path directoryPath, Path filePath, String filename) {
+        Path temporaryFilePath = null;
+
+        try {
+            temporaryFilePath = Files.createTempFile(directoryPath, ".", TEMPORARY_FILE_SUFFIX);
+
+            Files.copy(inputStream, temporaryFilePath, StandardCopyOption.REPLACE_EXISTING);
+
+            if (Files.size(temporaryFilePath) == 0) {
+                throw new FileStorageException("Failed to store empty file " + filename);
+            }
+
+            Files.move(
+                temporaryFilePath, filePath, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+
+            temporaryFilePath = null;
+        } catch (IOException ioException) {
+            throw new FileStorageException("Failed to store file " + filename, ioException);
+        } finally {
+            deleteQuietly(temporaryFilePath);
+        }
+    }
+
+    private static void deleteQuietly(Path path) {
+        if (path == null) {
+            return;
+        }
+
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException ioException) {
+            log.warn("Failed to delete temporary file {}", path, ioException);
+        }
     }
 
     private static String getUrl(String directory, Path directoryPath, Path filePath) {
@@ -320,19 +385,71 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     /**
+     * The directory's on-disk path, created if needed.
+     */
+    private Path resolveDirectoryPath(String directory) {
+        try {
+            return Files.createDirectories(getTenantDirectoryPath(directory));
+        } catch (IOException ioe) {
+            throw new FileStorageException("Could not initialize storage", ioe);
+        }
+    }
+
+    /**
+     * The directory's on-disk path, without creating it. Lookups and listings use this so that asking about a directory
+     * that was never written leaves no empty directory behind.
+     *
+     * <p>
      * <b>Security Note:</b> Path traversal is intentional for this component. This service manages file storage for
      * workflow artifacts and is designed to access files under a configured base directory. File paths are derived from
      * tenant context and internal directory parameters, not from untrusted user input. Access control is handled
      * through tenant isolation.
+     * </p>
      */
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
-    private Path resolveDirectoryPath(String directory) {
-        try {
-            Path tenantDirectoryPath = baseDirPath.resolve(TenantContext.getCurrentTenantId());
+    private Path getTenantDirectoryPath(String directory) {
+        Path tenantDirectoryPath = baseDirPath.resolve(TenantContext.getCurrentTenantId());
 
-            return Files.createDirectories(tenantDirectoryPath.resolve(directory));
-        } catch (IOException ioe) {
-            throw new FileStorageException("Could not initialize storage", ioe);
+        return tenantDirectoryPath.resolve(normalizeDirectory(directory));
+    }
+
+    /**
+     * Whether the path exists. Only a path reported missing counts as absent; failing to tell — a permission problem,
+     * an unmounted volume — is raised, so an unreadable store is never mistaken for an empty one.
+     */
+    private static boolean pathExists(Path path) {
+        try {
+            Files.readAttributes(path, BasicFileAttributes.class);
+
+            return true;
+        } catch (NoSuchFileException noSuchFileException) {
+            return false;
+        } catch (IOException ioException) {
+            throw new FileStorageException("Cannot access " + path, ioException);
         }
+    }
+
+    /**
+     * A path removed while a directory tree is walked — by a concurrent delete, or a temporary file a concurrent write
+     * moved into place — is simply no longer there; any other failure is real.
+     */
+    private static FileVisitResult skipVanished(IOException ioException) throws IOException {
+        if (ioException instanceof NoSuchFileException) {
+            return FileVisitResult.CONTINUE;
+        }
+
+        throw ioException;
+    }
+
+    /**
+     * Normalizes a directory to the on-disk form. Applied for every access — read and write alike — so a caller that
+     * stores into a directory always reads back from the same place. The mapping is lossy: it drops every character
+     * outside {@code [0-9a-zA-Z/_]} and lowercases the rest, so {@code a-b} and {@code ab}, or {@code A} and {@code a},
+     * name the same directory. Callers that need distinct directories must build them from that alphabet alone.
+     */
+    private static String normalizeDirectory(String directory) {
+        String normalizedDirectory = StringUtils.replace(directory.replaceAll("[^0-9a-zA-Z/_]", ""), " ", "");
+
+        return normalizedDirectory.toLowerCase();
     }
 }

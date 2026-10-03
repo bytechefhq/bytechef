@@ -18,6 +18,14 @@ Every name below is the property path uppercased with dots **and dashes** replac
 | `BYTECHEF_AI_COPILOT_EMBEDDING_PROVIDER` | Embedding provider for the Copilot vector index (OLLAMA, OPENAI) | - |
 | `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` | API key for the Copilot embedding provider - OpenAI only; Ollama runs locally and needs none (sensitive) | - |
 
+## AI Auto Memory Configuration
+
+> **Coming soon.** Auto Memory is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` | Where AI agent [Auto Memory](/platform/automation/ai/memories#storage-providers) entries are stored (`jdbc`, `filesystem`, `aws`). `filesystem` and `aws` use the configured file storage; `aws` requires the Enterprise Edition AWS file-storage module, and selecting a file-backed provider whose storage is not configured fails at startup. The JDBC store is used when unset | `jdbc` |
+
 ## AI Brave Configuration
 
 > **Coming soon.** Brave Search configuration is on the upcoming release track and is not yet available in the latest released version of ByteChef.
@@ -63,7 +71,7 @@ fragment while this heading was hidden - give it back.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_AI_MEMORY_PROVIDER` | Where AI agent chat memory is stored (`inmemory`, `jdbc`, `redis`, `aws`). The `jdbc` provider requires PostgreSQL - its table is not created on H2, so `BYTECHEF_DATABASE=h2` defaults this to `inmemory` | `jdbc` (`inmemory` on H2) |
+| `BYTECHEF_AI_MEMORY_PROVIDER` | Where chat memory - the conversation history of AI agents and Copilot - is stored (`in_memory`, `jdbc`, `redis`, `aws`; case-insensitive). `in_memory` is not persistent. The `jdbc` provider requires PostgreSQL - its table is not created on H2, so `BYTECHEF_DATABASE=h2` switches chat memory to in-memory storage | `jdbc` (in-memory on H2) |
 
 ## AI Knowledge Base Configuration
 
@@ -83,12 +91,6 @@ fragment while this heading was hidden - give it back.
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_MCP_SERVER_ENABLED` | Enable or disable the **management** MCP server. The per-server automation and embedded MCP endpoints are not gated by it. | `true` |
-
-## AI Memory Configuration
-
-| Environment Variable | Description | Default Value |
-|---|---|---|
-| `BYTECHEF_AI_MEMORY_PROVIDER` | Memory storage provider for chat-style interactions (AWS, IN_MEMORY, JDBC, REDIS) | `JDBC` |
 
 ## AI Provider API Keys
 

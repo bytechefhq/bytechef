@@ -195,6 +195,60 @@ export enum AiAgentScenarioType {
   SingleTurn = 'SINGLE_TURN'
 }
 
+export type AiAutoMemory = {
+  __typename?: 'AiAutoMemory';
+  content: Scalars['String']['output'];
+  createdAt?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  /** The Environment ordinal the memory belongs to — the value sent back as the operations' environment argument. */
+  environmentId: Scalars['Long']['output'];
+  id: Scalars['ID']['output'];
+  memoryType: AiAutoMemoryType;
+  name: Scalars['String']['output'];
+  principalId: Scalars['Long']['output'];
+  principalType: AiAutoMemoryPrincipalType;
+  title: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['Long']['output']>;
+  /** Changes on every write. Send it back as UpdateAiAutoMemoryInput.expectedVersion. */
+  version: Scalars['Long']['output'];
+  workspaceId: Scalars['Long']['output'];
+};
+
+export type AiAutoMemoryPrincipal = {
+  __typename?: 'AiAutoMemoryPrincipal';
+  /**
+   * Display name: "My memories" for the caller's own memories, otherwise the deployment's name, or "Deployment <id>"
+   * for a deployment deleted while its memories remain.
+   */
+  label: Scalars['String']['output'];
+  memoryCount: Scalars['Int']['output'];
+  principalId: Scalars['Long']['output'];
+  principalType: AiAutoMemoryPrincipalType;
+};
+
+/** The owner an operation addresses. */
+export type AiAutoMemoryPrincipalInput = {
+  principalId: Scalars['Long']['input'];
+  principalType: AiAutoMemoryPrincipalType;
+};
+
+/**
+ * The owner kind of a memory. User-owned, deployment-owned and integration-instance-owned memory share one table,
+ * so the id alone does not identify an owner — it must be read together with this discriminator.
+ */
+export enum AiAutoMemoryPrincipalType {
+  IntegrationInstance = 'INTEGRATION_INSTANCE',
+  ProjectDeployment = 'PROJECT_DEPLOYMENT',
+  User = 'USER'
+}
+
+export enum AiAutoMemoryType {
+  Feedback = 'FEEDBACK',
+  Project = 'PROJECT',
+  Reference = 'REFERENCE',
+  User = 'USER'
+}
+
 export type AiDefaultModel = {
   __typename?: 'AiDefaultModel';
   model: Scalars['String']['output'];
@@ -1521,6 +1575,13 @@ export type Mutation = {
   deleteAiAgentJudge: Scalars['Boolean']['output'];
   deleteAiAgentScenarioJudge: Scalars['Boolean']['output'];
   deleteAiAgentScenarioToolSimulation: Scalars['Boolean']['output'];
+  /**
+   * Deletes a memory by primary key, resolved within the supplied environment. Returns true on success; throws
+   * NotFound when the row does not exist, lives in another environment, or is not addressable by the caller.
+   * Deleting a PROJECT_DEPLOYMENT-owned memory requires ROLE_ADMIN; a non-admin gets NotFound, not a forbidden error.
+   * Fails with CONFLICT when another write changes the memory while it is being deleted; reload it and retry.
+   */
+  deleteAiAutoMemory: Scalars['Boolean']['output'];
   deleteAiSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
@@ -1588,6 +1649,15 @@ export type Mutation = {
   updateAiAgentJudge: AiAgentJudge;
   updateAiAgentScenarioJudge: AiAgentScenarioJudge;
   updateAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
+  /**
+   * Partial update of a memory by primary key, resolved within the supplied environment and scoped to the
+   * resolved principal. The environment identifies which row the key addresses, not a value to write — a memory's
+   * environment is immutable post-create, and a row in another environment throws NotFound. Updating a
+   * PROJECT_DEPLOYMENT-owned memory requires ROLE_ADMIN: it changes how a live agent behaves on its next run. A
+   * non-admin gets NotFound, not a forbidden error, like any other memory it may not address. Fails with CONFLICT
+   * when the memory has changed since expectedVersion, or when another write races this one; reload it and retry.
+   */
+  updateAiAutoMemory: AiAutoMemory;
   updateAiSkill: AiSkill;
   updateAiSkillContent: AiSkill;
   updateAiSkillTags: AiSkill;
@@ -1831,6 +1901,14 @@ export type MutationDeleteAiAgentScenarioJudgeArgs = {
 
 export type MutationDeleteAiAgentScenarioToolSimulationArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiAutoMemoryArgs = {
+  environment: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
+  principal?: InputMaybe<AiAutoMemoryPrincipalInput>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2224,6 +2302,11 @@ export type MutationUpdateAiAgentScenarioToolSimulationArgs = {
   responsePrompt?: InputMaybe<Scalars['String']['input']>;
   simulationModel?: InputMaybe<Scalars['String']['input']>;
   toolName?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpdateAiAutoMemoryArgs = {
+  input: UpdateAiAutoMemoryInput;
 };
 
 
@@ -2662,6 +2745,34 @@ export type Query = {
   aiAgentEvalTest?: Maybe<AiAgentEvalTest>;
   aiAgentEvalTests: Array<AiAgentEvalTest>;
   aiAgentJudges: Array<AiAgentJudge>;
+  /**
+   * Lists memories in the workspace, scoped to the supplied environment so DEVELOPMENT preferences do not bleed
+   * into PRODUCTION sessions and vice versa. The optional memoryType filter narrows results to a single category.
+   * Ordered by updatedAt DESC.
+   *
+   * Omitting principal is the All scope: every owner the caller may address — their own USER memories and every
+   * PROJECT_DEPLOYMENT memory in the workspace, except deployments of embedded connected-user projects. Note this is
+   * the OPPOSITE default to aiAutoMemory and the mutations, where omitting it means the signed-in user — there the
+   * principal decides authorization for one row rather than the breadth of a listing.
+   * A USER principal other than the caller returns an empty list rather than an error, so ids stay unenumerable.
+   * Requesting INTEGRATION_INSTANCE is rejected with BAD_REQUEST — those rows are not workspace-isolated.
+   */
+  aiAutoMemories: Array<AiAutoMemory>;
+  /**
+   * Returns a single memory by id, resolved within the supplied environment and verified against the resolved
+   * principal. Returns null when missing, in another environment, or not addressable by the caller — the same
+   * shape on every one of those so a probe cannot enumerate ids across workspaces or environments. Requesting
+   * INTEGRATION_INSTANCE is rejected with BAD_REQUEST.
+   */
+  aiAutoMemory?: Maybe<AiAutoMemory>;
+  /**
+   * The owners that actually hold memory in this workspace and environment, for the Memories page's owner picker.
+   * Applies the same per-principal rules as the read operations: only the caller's own USER entry, every
+   * PROJECT_DEPLOYMENT entry except deployments of embedded connected-user projects, and never INTEGRATION_INSTANCE.
+   *
+   * environment, here and in every operation, is the Environment ordinal (0 DEVELOPMENT, 1 STAGING, 2 PRODUCTION).
+   */
+  aiAutoMemoryPrincipals: Array<AiAutoMemoryPrincipal>;
   aiDefaultModel?: Maybe<AiDefaultModel>;
   aiProviderCatalog: Array<AiProviderCatalogItem>;
   aiSkill: AiSkill;
@@ -2852,6 +2963,28 @@ export type QueryAiAgentEvalTestsArgs = {
 export type QueryAiAgentJudgesArgs = {
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type QueryAiAutoMemoriesArgs = {
+  environment: Scalars['Int']['input'];
+  memoryType?: InputMaybe<AiAutoMemoryType>;
+  principal?: InputMaybe<AiAutoMemoryPrincipalInput>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiAutoMemoryArgs = {
+  environment: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
+  principal?: InputMaybe<AiAutoMemoryPrincipalInput>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiAutoMemoryPrincipalsArgs = {
+  environment: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3676,6 +3809,24 @@ export enum UnifiedApiCategory {
   MarketingAutomation = 'MARKETING_AUTOMATION',
   Ticketing = 'TICKETING'
 }
+
+/**
+ * A partial update. An omitted field keeps the stored value; a blank description clears it, while a blank title or
+ * content is rejected. Title and description must be a single line. At least one of title, description, memoryType and
+ * content is required.
+ */
+export type UpdateAiAutoMemoryInput = {
+  content?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  environment: Scalars['Int']['input'];
+  /** The version the edit is based on. When the memory has changed since, the update fails with CONFLICT. */
+  expectedVersion: Scalars['Long']['input'];
+  id: Scalars['ID']['input'];
+  memoryType?: InputMaybe<AiAutoMemoryType>;
+  principal?: InputMaybe<AiAutoMemoryPrincipalInput>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
 
 export type UpdateApiConnectorInput = {
   connectorVersion?: InputMaybe<Scalars['Int']['input']>;

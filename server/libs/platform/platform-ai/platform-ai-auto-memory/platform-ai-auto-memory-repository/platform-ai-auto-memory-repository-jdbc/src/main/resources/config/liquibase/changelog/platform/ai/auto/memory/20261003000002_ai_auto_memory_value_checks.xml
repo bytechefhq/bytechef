@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Defense in depth, like ck_ai_auto_memory_name_slug: AiAutoMemoryOwner rejects ids that are not positive, but a
+        write that skips it (raw SQL) would not be checked. The enum columns hold ordinals of append-only enums, so they
+        are bounded below only: an upper bound would reject a newly appended value until a migration raised it.
+    -->
+    <changeSet id="20261003000002" author="Ivica Cardic">
+        <sql>
+            ALTER TABLE ai_auto_memory
+            ADD CONSTRAINT ck_ai_auto_memory_workspace_id CHECK (workspace_id > 0)
+        </sql>
+        <sql>
+            ALTER TABLE ai_auto_memory
+            ADD CONSTRAINT ck_ai_auto_memory_principal_id CHECK (principal_id > 0)
+        </sql>
+        <sql>
+            ALTER TABLE ai_auto_memory
+            ADD CONSTRAINT ck_ai_auto_memory_ordinals
+            CHECK (principal_type >= 0 AND memory_type >= 0 AND environment >= 0)
+        </sql>
+    </changeSet>
+</databaseChangeLog>
