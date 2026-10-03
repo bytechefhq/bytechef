@@ -7,6 +7,9 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '../stores/useWorkflowTestChatStore';
+import {flattenDefinitionTasks} from '../utils/flattenDefinitionTasks';
 import {branchCaseKeysMatch} from '../utils/layoutUtils';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
@@ -123,6 +126,26 @@ function getRecursivelyUpdatedRootTaskDispatcherNodeData(
     }
 
     return currentTaskNodeData;
+}
+
+/**
+ * Closes the node details panel when the node it shows lives inside the tasks being removed (including tasks nested
+ * in task dispatchers within them). Otherwise the panel keeps editing a task that no longer exists in the workflow.
+ */
+function closePanelIfCurrentNodeDeleted(deletedTasks: WorkflowTask[]) {
+    const {currentNode, reset} = useWorkflowNodeDetailsPanelStore.getState();
+
+    if (!currentNode?.name || currentNode.trigger) {
+        return;
+    }
+
+    const deletedTaskNames = new Set(flattenDefinitionTasks(deletedTasks).map((task) => task.name));
+
+    if (deletedTaskNames.has(currentNode.name)) {
+        reset();
+
+        useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
+    }
 }
 
 interface UseBranchCaseLabelProps {
@@ -284,6 +307,12 @@ export default function useBranchCaseLabel({
             const newCases = parentBranchCases.filter(
                 (branchCase) => !branchCaseKeysMatch(branchCase.key, caseKeyToDelete)
             );
+
+            const deletedCase = parentBranchCases.find((branchCase) =>
+                branchCaseKeysMatch(branchCase.key, caseKeyToDelete)
+            );
+
+            closePanelIfCurrentNodeDeleted(deletedCase?.tasks || []);
 
             saveBranchChange({
                 ...parentBranchNodeData.parameters,
