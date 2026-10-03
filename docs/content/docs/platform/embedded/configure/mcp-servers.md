@@ -96,6 +96,30 @@ The **Require authentication** toggle (set when creating or editing the server) 
 
 Servers created before this setting existed default to off, so they keep working unchanged.
 
+### When a tool needs the user's account
+
+A tool that needs a connection does not run until the ConnectedUser has connected that integration in the request's environment. Until then, calling it returns a `connection_required` result instead:
+
+```json
+{
+  "error": "connection_required",
+  "message": "The googleMail integration is not connected for this user. To connect, visit: ...",
+  "setupUrl": "https://your-bytechef-host.example.com/connect.html?token=..."
+}
+```
+
+The message asks the agent to show the link to the user as a markdown link labelled **Connect &lt;component&gt;** rather than as the raw URL. A host that renders tool results itself can read `setupUrl` directly, for example to show a Connect button.
+
+`setupUrl` opens ByteChef's hosted connect page, which shows the same [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) your app uses. Its token identifies the user, the integration and the environment, and is valid for 10 minutes. An expired link shows **Link Expired**, and the next call to the tool returns a fresh one. When the user closes the dialog, the page tells them they can close the tab and return to the application that sent them there.
+
+### Which tools a user's agent sees
+
+Before a user connects an integration, the server lists every tool it exposes for that integration, and each one returns `connection_required` when called.
+
+Once the user has connected, the server lists only the tools that user has enabled. Tools start disabled. The user enables them on the **Tools** tab of the Connect dialog, which lists the server's component tools and workflow tools for that integration. The tab appears only when an MCP server exposes something for the integration.
+
+To switch a server's tools off for a single user, use the **MCP Servers** tab in [Connected Users](/platform/embedded/monitor/connected-users#user-details).
+
 ### Tenant scoping
 
 A session only exposes the tenant's own workflows, connections, and execution history.
