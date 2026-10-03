@@ -139,13 +139,13 @@ describe('PropertyMentionsInput', () => {
         });
     });
 
-    // The control is 36px tall and the editor's line box is 20px, so 8px of padding fills it exactly. Anything
-    // less left the text sitting above centre.
+    // The control is 36px tall including its 1px border, matching the plain inputs, and the editor's line box is
+    // 20px, so 7px of padding fills the 34px inside exactly.
     it('pads the editor content to fill the control', async () => {
         const {container} = render(<Wrapper />);
 
         await settle();
 
-        expect(container.querySelector('.ProseMirror')).toHaveClass('py-2');
+        expect(container.querySelector('.ProseMirror')).toHaveClass('py-[7px]');
     });
 });

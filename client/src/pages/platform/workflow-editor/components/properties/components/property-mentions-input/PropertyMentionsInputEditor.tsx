@@ -745,7 +745,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         return (
             <>
                 {isFromAi ? (
-                    <div className="flex w-full items-center px-2 py-2 text-sm font-medium text-muted-foreground italic">
+                    <div
+                        className={twMerge(
+                            'flex w-full items-center px-2 py-2 text-sm font-medium text-muted-foreground italic',
+                            className
+                        )}
+                    >
                         Automatically defined by the model
                     </div>
                 ) : (
