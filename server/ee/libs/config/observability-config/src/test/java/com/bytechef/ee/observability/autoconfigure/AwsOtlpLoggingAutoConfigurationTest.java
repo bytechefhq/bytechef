@@ -12,6 +12,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.config.ApplicationProperties;
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter;
+import java.util.Map;
+import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -39,11 +41,61 @@ class AwsOtlpLoggingAutoConfigurationTest {
 
     @Test
     void testAwsExporterReplacesSpringBootExporter() {
-        applicationContextRunner.withPropertyValues("bytechef.observability.logging.aws.enabled=true")
+        applicationContextRunner.withPropertyValues(
+            "bytechef.observability.logging.aws.enabled=true", "bytechef.observability.logging.aws.log-group=bytechef",
+            "bytechef.observability.logging.aws.log-stream=server-app")
             .run(context -> {
                 assertThat(context).hasSingleBean(OtlpHttpLogRecordExporter.class)
                     .hasBean("awsOtlpHttpLogRecordExporter");
+
+                // the exporter prints its header names, the values are obfuscated
+                assertThat(context.getBean(OtlpHttpLogRecordExporter.class)
+                    .toString()).contains("x-aws-log-group=", "x-aws-log-stream=");
             });
+    }
+
+    @Test
+    void testStartupFailsWhenLogGroupIsMissing() {
+        applicationContextRunner.withPropertyValues(
+            "bytechef.observability.logging.aws.enabled=true",
+            "bytechef.observability.logging.aws.log-stream=server-app")
+            .run(context -> assertThat(context).getFailure()
+                .rootCause()
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("bytechef.observability.logging.aws.log-group"));
+    }
+
+    @Test
+    void testStartupFailsWhenLogStreamIsMissing() {
+        applicationContextRunner.withPropertyValues(
+            "bytechef.observability.logging.aws.enabled=true", "bytechef.observability.logging.aws.log-group=bytechef")
+            .run(context -> assertThat(context).getFailure()
+                .rootCause()
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("bytechef.observability.logging.aws.log-stream"));
+    }
+
+    @Test
+    void testLogHeadersConfiguredAsOtlpHeadersAreAccepted() {
+        applicationContextRunner.withPropertyValues(
+            "bytechef.observability.logging.aws.enabled=true",
+            "management.opentelemetry.logging.export.otlp.headers.X-Aws-Log-Group=bytechef",
+            "management.opentelemetry.logging.export.otlp.headers.X-Aws-Log-Stream=server-app")
+            .run(context -> assertThat(context).hasSingleBean(OtlpHttpLogRecordExporter.class)
+                .hasBean("awsOtlpHttpLogRecordExporter"));
+    }
+
+    @Test
+    void testResolveLogHeaderPrefersProperty() {
+        Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        headers.put("X-AWS-LOG-GROUP", "from-header");
+
+        assertThat(AwsOtlpLoggingAutoConfiguration.resolveLogHeader(
+            " from-property ", headers, AwsOtlpLoggingAutoConfiguration.LOG_GROUP_HEADER, "log-group"))
+                .isEqualTo("from-property");
+        assertThat(AwsOtlpLoggingAutoConfiguration.resolveLogHeader(
+            null, headers, AwsOtlpLoggingAutoConfiguration.LOG_GROUP_HEADER, "log-group")).isEqualTo("from-header");
     }
 
     @Test
@@ -57,7 +109,8 @@ class AwsOtlpLoggingAutoConfigurationTest {
     @Test
     void testNoExporterWhenLoggingExportIsDisabled() {
         applicationContextRunner.withPropertyValues(
-            "bytechef.observability.logging.aws.enabled=true", "management.logging.export.enabled=false")
+            "bytechef.observability.logging.aws.enabled=true", "bytechef.observability.logging.aws.log-group=bytechef",
+            "bytechef.observability.logging.aws.log-stream=server-app", "management.logging.export.enabled=false")
             .run(context -> assertThat(context).doesNotHaveBean(OtlpHttpLogRecordExporter.class));
     }
 
