@@ -18,6 +18,14 @@ Every name below is the property path uppercased with dots **and dashes** replac
 | `BYTECHEF_AI_COPILOT_EMBEDDING_PROVIDER` | Embedding provider for the Copilot vector index (OLLAMA, OPENAI) | - |
 | `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` | API key for the Copilot embedding provider - OpenAI only; Ollama runs locally and needs none (sensitive) | - |
 
+## AI Auto Memory Configuration
+
+> **Coming soon.** Auto Memory is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` | Where AI agent [Auto Memory](/platform/automation/ai/memories#storage-providers) entries are stored (`jdbc`, `filesystem`, `aws`). `filesystem` and `aws` use the configured file storage; `aws` requires the Enterprise Edition AWS file-storage module, and selecting a file-backed provider whose storage is not configured fails at startup. The JDBC store is used when unset | `jdbc` |
+
 ## AI Brave Configuration
 
 > **Coming soon.** Brave Search configuration is on the upcoming release track and is not yet available in the latest released version of ByteChef.
