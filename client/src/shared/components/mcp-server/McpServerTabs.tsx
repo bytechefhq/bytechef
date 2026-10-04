@@ -1,13 +1,20 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {ReactNode, useState} from 'react';
 
-interface McpServerTabsProps {
-    addToolsButton: ReactNode;
+import McpServerAddToolsButton, {McpServerAddToolsButtonProps} from './McpServerAddToolsButton';
+
+export interface McpServerTabsProps extends McpServerAddToolsButtonProps {
     connectContent: ReactNode;
     toolsContent: ReactNode;
 }
 
-const McpServerTabs = ({addToolsButton, connectContent, toolsContent}: McpServerTabsProps) => {
+const McpServerTabs = ({
+    connectContent,
+    mcpComponentDialog,
+    mcpServer,
+    toolsContent,
+    workflowDialog,
+}: McpServerTabsProps) => {
     const [activeTab, setActiveTab] = useState('tools');
 
     return (
@@ -19,7 +26,13 @@ const McpServerTabs = ({addToolsButton, connectContent, toolsContent}: McpServer
                     <TabsTrigger value="connect">Connect</TabsTrigger>
                 </TabsList>
 
-                {activeTab === 'tools' && addToolsButton}
+                {activeTab === 'tools' && (
+                    <McpServerAddToolsButton
+                        mcpComponentDialog={mcpComponentDialog}
+                        mcpServer={mcpServer}
+                        workflowDialog={workflowDialog}
+                    />
+                )}
             </div>
 
             <TabsContent className="pt-2" value="tools">

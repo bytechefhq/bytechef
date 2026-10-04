@@ -1,10 +1,8 @@
-import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import McpIntegrationInstanceConfigurationWorkflowDialog from '@/ee/pages/embedded/mcp-servers/components/McpIntegrationInstanceConfigurationWorkflowDialog';
 import McpComponentDialog from '@/ee/pages/embedded/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import McpServerAddToolsButton from '@/shared/components/mcp-server/McpServerAddToolsButton';
+import McpServerCollapsibleItem from '@/shared/components/mcp-server/McpServerCollapsibleItem';
 import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
-import McpServerTabs from '@/shared/components/mcp-server/McpServerTabs';
 import {McpServer, Tag, useMcpIntegrationInstanceConfigurationsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 
@@ -56,42 +54,24 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                     const handleRefresh = createHandleRefresh(mcpServer.id!);
 
                     return (
-                        <Collapsible className="group mb-2 rounded border border-border/50" key={mcpServer.id}>
-                            <McpServerListItemWithWorkflows key={mcpServer.id} mcpServer={mcpServer} tags={tags} />
+                        <McpServerCollapsibleItem
+                            connectContent={
+                                <div className="flex-1 space-y-4">
+                                    <h2 className="font-semibold text-foreground">Server URL</h2>
 
-                            <CollapsibleContent className="mx-3 mt-1 mb-3">
-                                <McpServerTabs
-                                    addToolsButton={
-                                        <McpServerAddToolsButton
-                                            renderMcpComponentDialog={(onClose) => (
-                                                <McpComponentDialog
-                                                    mcpServerId={mcpServer.id}
-                                                    onOpenChange={(open) => !open && onClose()}
-                                                    open
-                                                />
-                                            )}
-                                            renderWorkflowDialog={(onClose) => (
-                                                <McpIntegrationInstanceConfigurationWorkflowDialog
-                                                    mcpServer={mcpServer}
-                                                    onClose={onClose}
-                                                />
-                                            )}
-                                        />
-                                    }
-                                    connectContent={
-                                        <div className="flex-1 space-y-4">
-                                            <h2 className="font-semibold text-foreground">Server URL</h2>
-
-                                            <McpServerConfigurationCode
-                                                codeSnippet={mcpServer.url || ''}
-                                                onRefresh={handleRefresh}
-                                            />
-                                        </div>
-                                    }
-                                    toolsContent={<McpServerToolsContent mcpServer={mcpServer} />}
-                                />
-                            </CollapsibleContent>
-                        </Collapsible>
+                                    <McpServerConfigurationCode
+                                        codeSnippet={mcpServer.url || ''}
+                                        onRefresh={handleRefresh}
+                                    />
+                                </div>
+                            }
+                            header={<McpServerListItemWithWorkflows mcpServer={mcpServer} tags={tags} />}
+                            key={mcpServer.id}
+                            mcpComponentDialog={McpComponentDialog}
+                            mcpServer={mcpServer}
+                            toolsContent={<McpServerToolsContent mcpServer={mcpServer} />}
+                            workflowDialog={McpIntegrationInstanceConfigurationWorkflowDialog}
+                        />
                     );
                 })}
             </WorkflowReadOnlyProvider>
