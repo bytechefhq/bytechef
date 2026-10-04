@@ -412,6 +412,131 @@ public class JobResumeFacadeTest {
         verify(applicationEventPublisher, never()).publishEvent(any());
     }
 
+    @Test
+    public void testResumeExpiredJobResumesAJobStillWaitingOnTheSuspendAndConsumesTheResumeId() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeExpiredJob(jobResumeId.toString());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+        assertThat(job.getMetadata(MetadataConstants.CONSUMED_JOB_RESUME_ID)).isEqualTo(jobResumeId.toString());
+
+        InOrder inOrder = inOrder(jobService, jobFacade, applicationEventPublisher);
+
+        inOrder.verify(jobService)
+            .update(job);
+        inOrder.verify(jobFacade)
+            .resumeJob(JOB_ID);
+        inOrder.verify(applicationEventPublisher)
+            .publishEvent(new JobResumedEvent(jobResumeId.toString()));
+    }
+
+    @Test
+    public void testResumeExpiredJobReturnsNotYetSuspendedWhileTheJobIsStillRunning() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.STARTED, null));
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeExpiredJob(jobResumeId.toString());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.NOT_YET_SUSPENDED);
+
+        verify(jobService, never()).update(any());
+        verify(jobFacade, never()).resumeJob(anyLong());
+        verify(applicationEventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    public void testResumeExpiredJobDoesNotRestartAFailedJob() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.FAILED, jobResumeId.toString()));
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeExpiredJob(jobResumeId.toString());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.JOB_FAILED);
+
+        verify(jobService, never()).update(any());
+        verify(jobFacade, never()).resumeJob(anyLong());
+    }
+
+    @Test
+    public void testResumeExpiredJobReturnsInvalidIdForAStoppedJobWithoutAStoredResumeId() {
+        JobResumeId expiredJobResumeId = JobResumeId.of(JOB_ID);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.STOPPED, null));
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeExpiredJob(expiredJobResumeId.toString());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
+
+        verify(jobService, never()).update(any());
+        verify(jobFacade, never()).resumeJob(anyLong());
+    }
+
+    @Test
+    public void testResumeExpiredJobDoesNotResumeAJobSuspendedAgainOnANewResumeId() {
+        JobResumeId expiredJobResumeId = JobResumeId.of(JOB_ID);
+        JobResumeId currentJobResumeId = JobResumeId.of(JOB_ID);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.STOPPED, currentJobResumeId.toString()));
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeExpiredJob(expiredJobResumeId.toString());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
+
+        verify(jobFacade, never()).resumeJob(anyLong());
+    }
+
+    @Test
+    public void testResumeExpiredJobDoesNotResumeAnAlreadyAnsweredSuspend() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STARTED, null);
+
+        job.setMetadata(Map.of(MetadataConstants.CONSUMED_JOB_RESUME_ID, jobResumeId.toString()));
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeExpiredJob(jobResumeId.toString());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.GONE);
+
+        verify(jobFacade, never()).resumeJob(anyLong());
+    }
+
+    @Test
+    public void testResumeJobReturnsGoneForAnAnswerAfterTheSuspendExpired() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        jobResumeFacade.resumeExpiredJob(jobResumeId.toString());
+
+        job.setStatus(Job.Status.STARTED);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), Map.of("answer", "late"));
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.GONE);
+
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+    }
+
+    @Test
+    public void testResumeExpiredJobReturnsInvalidIdForAnUnparseableId() {
+        JobResumeOutcome outcome = jobResumeFacade.resumeExpiredJob("not-a-token");
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
+
+        verify(jobService, never()).getJob(anyLong());
+    }
+
     private static Job jobOf(Job.Status status, String storedJobResumeIdString, boolean streamingResume) {
         Job job = jobOf(status, storedJobResumeIdString);
 

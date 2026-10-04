@@ -31,6 +31,15 @@ public interface JobResumeFacade {
         OK, INVALID_ID, GONE, JOB_FAILED, NOT_YET_SUSPENDED, STREAMING_NOT_ALLOWED
     }
 
+    /**
+     * Resumes a job whose suspend deadline passed, without resume data. Does nothing unless the job is still stopped on
+     * the suspend this resume id belongs to, so a deadline that outlived its suspend (answered, failed or stopped job)
+     * cannot restart the job. Returns {@link JobResumeOutcome#NOT_YET_SUSPENDED} while the job has not reached the
+     * suspend yet, which a deadline that passes before the suspend is stored can hit; the caller retries later. On
+     * success the resume id is consumed, so a later answer gets {@link JobResumeOutcome#GONE}.
+     */
+    JobResumeOutcome resumeExpiredJob(String id);
+
     JobResumeOutcome resumeJob(String id, Map<String, Object> data);
 
     JobResumeOutcome resumeJobStreaming(String id, Map<String, Object> data, LongConsumer jobIdConsumer);
