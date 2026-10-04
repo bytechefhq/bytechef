@@ -111,8 +111,9 @@ class JsonSchemaValidationAdvisorTest {
     @Test
     void testSpringValidationAdvisorRetriesToolCallReply() {
         // Pins why JsonSchemaValidationAdvisor replaces Spring AI's advisor: behind ToolCallingAdvisor, Spring AI's
-        // advisor asks for the tool call 1 + maxRepeatAttempts times before the tool runs. If a Spring AI release
-        // fixes this, this test fails and the replacement can be revisited.
+        // advisor asks for the tool call 1 + maxRepeatAttempts times before the tool runs. Once a Spring AI release
+        // ships the fix, this test fails and the replacement can be removed. Upstream fix:
+        // https://github.com/spring-projects/spring-ai/pull/6588
         ScriptedChatModel chatModel = new ScriptedChatModel(
             toolCallReply(), toolCallReply(), toolCallReply(), toolCallReply(), textReply(VALID_JSON));
 
