@@ -130,7 +130,7 @@ public record ConnectedUserIntegrationDTO(
     public record OAuth2(OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
     }
 
-    public record McpToolInfo(Long id, String name, String description) {
+    public record McpToolInfo(Long id, String name, String label, String description) {
     }
 
     public record McpWorkflowInfo(
