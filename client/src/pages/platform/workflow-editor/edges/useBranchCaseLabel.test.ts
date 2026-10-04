@@ -4,7 +4,9 @@ import {Node} from '@xyflow/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '../stores/useWorkflowTestChatStore';
 import useBranchCaseLabel from './useBranchCaseLabel';
 
 const {saveWorkflowDefinitionMock} = vi.hoisted(() => ({
@@ -65,11 +67,19 @@ function deleteCase(result: {current: ReturnType<typeof useBranchCaseLabel>}) {
     });
 }
 
-function openPanelFor(nodeName: string) {
+function openPanelFor(nodeName: string, nodeData: Partial<NodeDataType> = {}) {
     useWorkflowNodeDetailsPanelStore.setState({
-        currentNode: {name: nodeName, workflowNodeName: nodeName} as NodeDataType,
+        currentNode: {name: nodeName, workflowNodeName: nodeName, ...nodeData} as NodeDataType,
         workflowNodeDetailsPanelOpen: true,
     });
+
+    useWorkflowTestChatStore.setState({workflowTestChatPanelOpen: true});
+}
+
+function expectPanelsClosed() {
+    expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(false);
+    expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBeUndefined();
+    expect(useWorkflowTestChatStore.getState().workflowTestChatPanelOpen).toBe(false);
 }
 
 describe('useBranchCaseLabel', () => {
@@ -77,6 +87,8 @@ describe('useBranchCaseLabel', () => {
         vi.clearAllMocks();
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
+
+        useWorkflowEditorStore.setState({rootClusterElementNodeData: undefined});
 
         useWorkflowDataStore.setState({
             nodes: [
@@ -102,8 +114,8 @@ describe('useBranchCaseLabel', () => {
         deleteCase(result);
 
         expect(saveWorkflowDefinitionMock).toHaveBeenCalledOnce();
-        expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(false);
-        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBeUndefined();
+
+        expectPanelsClosed();
     });
 
     it('closes the details panel when the open node is nested inside a task dispatcher in the deleted case', () => {
@@ -113,8 +125,19 @@ describe('useBranchCaseLabel', () => {
 
         deleteCase(result);
 
-        expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(false);
-        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBeUndefined();
+        expectPanelsClosed();
+    });
+
+    it('closes the details panel when the open cluster element belongs to a task in the deleted case', () => {
+        useWorkflowEditorStore.setState({rootClusterElementNodeData: {name: 'taskA'} as NodeDataType});
+
+        openPanelFor('openAiModel', {clusterElementType: 'model', workflowNodeName: 'openAiModel'});
+
+        const {result} = renderBranchCaseLabel('caseA', 'taskA');
+
+        deleteCase(result);
+
+        expectPanelsClosed();
     });
 
     it('keeps the details panel open when the open node is in another case', () => {
@@ -127,5 +150,6 @@ describe('useBranchCaseLabel', () => {
         expect(saveWorkflowDefinitionMock).toHaveBeenCalledOnce();
         expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(true);
         expect(useWorkflowNodeDetailsPanelStore.getState().currentNode?.name).toBe('taskB');
+        expect(useWorkflowTestChatStore.getState().workflowTestChatPanelOpen).toBe(true);
     });
 });
