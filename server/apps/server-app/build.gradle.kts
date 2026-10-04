@@ -129,6 +129,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-config"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-a2a:automation-ai-a2a-graphql"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp-server"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-graphql"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
