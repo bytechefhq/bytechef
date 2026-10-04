@@ -34,4 +34,6 @@ public interface McpProjectRepository extends ListCrudRepository<McpProject, Lon
      * @return list of projects associated with the specified server
      */
     List<McpProject> findAllByMcpServerId(Long mcpServerId);
+
+    List<McpProject> findAllByProjectDeploymentId(Long projectDeploymentId);
 }

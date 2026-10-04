@@ -52,6 +52,8 @@ public interface McpProjectWorkflowService {
      */
     void delete(long mcpProjectWorkflowId);
 
+    void deleteInCascade(long mcpProjectWorkflowId);
+
     /**
      * Fetches an MCP project workflow by ID.
      *
@@ -59,13 +61,6 @@ public interface McpProjectWorkflowService {
      * @return the MCP project workflow, or empty if not found
      */
     Optional<McpProjectWorkflow> fetchMcpProjectWorkflow(long mcpProjectWorkflowId);
-
-    /**
-     * Gets all MCP project workflows.
-     *
-     * @return a list of all MCP project workflows
-     */
-    List<McpProjectWorkflow> getMcpProjectWorkflows();
 
     /**
      * Gets MCP project workflows filtered by MCP project ID.
@@ -98,7 +93,7 @@ public interface McpProjectWorkflowService {
      * @param mcpProjectId                the ID of the MCP project (can be null if not updating)
      * @param projectDeploymentWorkflowId the ID of the project deployment workflow (can be null if not updating)
      * @return the updated MCP project workflow
-     * @throws IllegalArgumentException if the MCP project workflow with the given ID is not found
+     * @throws IllegalArgumentException if the MCP project workflow with the given ID is not found, or if the resulting
      */
     McpProjectWorkflow update(long id, Long mcpProjectId, Long projectDeploymentWorkflowId);
 
