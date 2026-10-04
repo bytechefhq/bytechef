@@ -1,14 +1,20 @@
 dependencies {
     implementation(libs.org.springaicommunity.spring.ai.agent.utils)
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":spring-ai:spring-ai-agent-utils:auto-memory"))
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
     implementation(project(":server:libs:modules:components:ai:llm"))
     implementation(project(":server:libs:modules:components:script"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("org.mockito:mockito-core")
+    testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-file-storage"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-service"))
 }
