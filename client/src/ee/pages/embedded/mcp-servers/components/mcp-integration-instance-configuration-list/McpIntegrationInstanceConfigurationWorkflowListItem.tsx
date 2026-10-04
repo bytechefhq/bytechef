@@ -3,7 +3,7 @@ import Button from '@/components/Button/Button';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {BoltIcon, PencilIcon, Trash2Icon, WorkflowIcon} from 'lucide-react';
+import {BoltIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 
 import McpIntegrationInstanceConfigurationWorkflowPropertiesPopover from './McpIntegrationInstanceConfigurationWorkflowPropertiesPopover';
 import {McpIntegrationInstanceConfigurationWorkflowItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
@@ -43,8 +43,6 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
             <Popover onOpenChange={(open) => !open && closePopover()} open={isPopoverOpen}>
                 <PopoverAnchor asChild>
                     <div className="flex items-center gap-2 py-0.5">
-                        <WorkflowIcon className="size-4 shrink-0 text-content-neutral-secondary" />
-
                         <span className="min-w-0 flex-1 truncate text-sm font-medium">{workflowLabel}</span>
 
                         <Button
