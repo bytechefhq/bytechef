@@ -8,7 +8,7 @@ The **Memories** page is the management surface for **Auto Memory** - the durabl
 
 Agents create memory entries on their own; there is no manual "new memory" button on this page. You come here to audit what an agent has learned, fix a fact that drifted, retype a mis-classified entry, or delete something the agent should no longer act on.
 
-{/* TODO screenshot: Memories page showing the AI sidebar, the Type filter, and the memories table with Title, Type, Description, Updated, and Actions columns */}
+{/* TODO screenshot: Settings > AI > Memories page showing the "AI Memories" header with the search box and the "Filter Memories" button, above the memories table with Title, Type, Description, Updated, and Actions columns (a ⋮ menu button on each row) */}
 
 ---
 
@@ -17,83 +17,101 @@ Agents create memory entries on their own; there is no manual "new memory" butto
 | | Where it happens | Who acts |
 |---|---|---|
 | **Writing a memory** | An agent calls the [Auto Memory tool](/platform/automation/build/workflows/ai/agent/agent-utils#auto-memory) mid-run | The agent, automatically |
-| **Managing memories** | The Memories page (`/automation/ai/memories`) | You, by hand |
+| **Managing memories** | The Memories page (**Settings → AI → Memories**, `/automation/settings/ai/memories`) | You, by hand |
 
 Auto Memory complements chat memory: chat memory replays the *current* conversation, while Auto Memory persists facts across *all* future conversations of the same scope. See [Chat memory vs Auto Memory](/platform/automation/build/workflows/ai/agent#chat-memory-vs-auto-memory) for the distinction.
 
-The name of each entry is set by the agent when it first stores the memory and is **immutable** on this page - everything else (title, description, type, and content) is editable.
+The name of each entry is set by the agent when it first stores the memory and is **immutable** on this page - everything else (title, description, type, and content) is editable. To rename an entry, ask an agent that uses the Auto Memory tool to rename it (its `MemoryRename` tool).
 
 ---
 
 ## Accessing Memories
 
-Memories live under **AI → Memories** in the automation navigation, alongside [Skills](skills). The page has two regions in the left sidebar:
+Memories live under **Settings → AI → Memories**, alongside **Providers** and [Skills](skills) in the **AI** group of the settings navigation. The page opens at `/automation/settings/ai/memories`; the older `/automation/ai/memories` address redirects there.
 
-- The **AI section nav** - switch between **Skills** and **Memories**.
-- The **Type** filter - narrow the table to a single memory type (see [Filtering by type](#filtering-by-type)).
+The page has no left sidebar of its own. Its header shows the title **AI Memories** with the description "Facts the agent has stored while working in this workspace.", and on the right:
 
-At the top of the page a header shows the active filter as the title, the total memory count, and a **search** box.
+- A **Search by title or description...** box (see [Searching](#searching)).
+- A **Filter Memories** button that opens a dropdown with two filter groups, **Owner** and **Type** (see [Filtering](#filtering)).
 
-{/* TODO screenshot: Left sidebar with the AI section nav (Skills, Memories) above the Type filter (All, User, Feedback, Project, Reference) */}
+When a filter other than **All** is active, its selection is shown as a badge above the table.
+
+{/* TODO screenshot: The open "Filter Memories" dropdown showing the Owner group (All, My memories, deployment names) and the Type group (All, User, Feedback, Project, Reference) */}
 
 ### Selecting an environment
 
-Memories are **environment-scoped** so that facts learned in one environment do not bleed into another (for example, DEVELOPMENT preferences do not surface in PRODUCTION). Use the **environment selector** in the left sidebar header to switch environments; the table reloads to show only the memories stored for that environment.
+Memories are **environment-scoped** so that facts learned in one environment do not bleed into another (for example, DEVELOPMENT preferences do not surface in PRODUCTION). The page has no environment control of its own: it follows the environment chosen in the **environment selector** at the top of the main navigation sidebar, next to the ByteChef logo (shown in the Enterprise Edition). Switching environments there reloads the table and the Owner filter with the memories stored for that environment.
 
 ---
 
 ## Memory types
 
-Every memory carries a **type** that classifies the kind of fact it holds. The type controls how entries are grouped in this UI and which slice of the index the agent sees at runtime.
+Every memory carries a **type** that classifies the kind of fact it holds. The type is shown next to each entry in the agent's memory index and lets you [filter](#filtering) this page; it does not limit which memories the agent sees - the agent's index lists entries of every type.
 
 | Type | What it holds |
 |---|---|
 | **User** | User profile and preferences - role, tone, default choices. |
 | **Feedback** | Corrections or confirmed approaches the user asked the agent to apply in future turns. |
-| **Project** | Decisions, deadlines, or domain constraints tied to the current workspace. |
+| **Project** | Decisions, deadlines, or domain constraints of the ongoing work. |
 | **Reference** | Pointers to external systems - dashboards, boards, external docs. |
 
 ---
 
 ## Viewing the memories table
 
-The table lists every memory in the current workspace and environment (optionally narrowed by the [type filter](#filtering-by-type) and [search](#searching)). Each row shows:
+With the Owner filter on **All**, the table lists the memories you can address in the current workspace and environment: your own memories plus the memories of the workspace's project deployments (deployments of embedded connected-user projects are excluded). Memories are ordered by most recently updated, and the list can be narrowed with the [filters](#filtering) and [search](#searching). Each row shows:
 
 | Column | Description |
 |---|---|
 | **Title** | The memory's human-readable title, with the immutable **name** shown beneath it in smaller text. |
-| **Type** | A badge showing the memory type (**USER**, **FEEDBACK**, **PROJECT**, or **REFERENCE**). |
+| **Type** | A badge showing the memory type (**User**, **Feedback**, **Project**, or **Reference**). |
 | **Description** | The short one-line summary, truncated to two lines. |
 | **Updated** | When the memory was last changed, shown as a relative time (for example, "3 days ago"). |
-| **Actions** | The **View**, **Edit**, and **Delete** icon buttons for that row. |
+| **Actions** | A **⋮** menu button that opens the row's actions: **View**, **Edit**, and **Delete**. |
 
-When no memories exist for the current workspace and environment, the page shows an **empty state** explaining that the agent stores facts here as you chat with it - user preferences, project decisions, corrections, and external reference pointers - and that entries appear once the agent learns something worth keeping.
+### Who can edit and delete
+
+Your own memories can always be edited and deleted. Memories owned by a project deployment change how a live agent behaves on its next run, so **Edit** and **Delete** are offered on those rows only to users with the administrator role (`ROLE_ADMIN`). Other users see only **View** in the row's menu.
+
+### Empty states
+
+- When no memories exist for the current workspace and environment and no filter is active, the page shows **No memories yet**: "AI Agents that use the Auto Memory tool write memories here when their workflows run - user preferences, project decisions, corrections, and external reference pointers. Once an agent stores something worth keeping, it shows up on this page and you can inspect, edit, or delete it."
+- When a filter is active and nothing matches, the page shows "No memories match the selected filters."
+- If the memories cannot be loaded, the page shows **Could not load memories** with a **Retry** button. If only the owner list fails to load, a notice reads "Could not load memory owners, so the Owner filter is unavailable." with its own **Retry** button.
 
 ---
 
-## Filtering by type
+## Filtering
 
-Use the **Type** filter in the left sidebar to show only one kind of memory. The options are:
+Open the **Filter Memories** dropdown in the header. Owner and Type are independent, so you can pick one value in each group at the same time. Both filters are applied on the server, so changing either one reloads the table.
 
-1. **All** (default) - show every memory.
+### Owner
+
+1. **All** (default) - your own memories plus the memories of the workspace's project deployments.
+2. **My memories** - only your own memories.
+3. One entry per project deployment that holds memories in this environment, labelled with the deployment's name (or `Deployment <id>` if the deployment was deleted while its memories remain).
+
+Only owners that actually hold memories in the current environment are listed. The Owner group is not shown at all when no owner holds any memories.
+
+### Type
+
+1. **All** (default) - show every memory type.
 2. **User**
 3. **Feedback**
 4. **Project**
 5. **Reference**
 
-The selected type becomes the page title, and the memory count updates to reflect the filtered set. The filter is applied on the server, so switching types reloads the table.
-
 ---
 
 ## Searching
 
-Type into the **Search by title or description...** box in the header to filter the visible rows. Search matches against both the **title** and the **description** of each memory and runs on top of the active type filter. Clearing the box restores the full (type-filtered) list. If the search matches nothing, the table shows "No memories match your search."
+Type into the **Search by title or description...** box in the header to filter the visible rows. Search matches against both the **title** and the **description** of each memory and runs on top of the active filters. Clearing the box restores the full (filtered) list. If the search matches nothing, the table shows "No memories match your search."
 
 ---
 
 ## Viewing a memory
 
-1. Click the **View** (eye) icon on a memory's row.
+1. Click the **⋮** button on a memory's row and choose **View**.
 2. The **detail dialog** opens, showing:
    - The memory **title** and its **type** badge in the header.
    - The **name** and the last-**updated** timestamp beneath the title.
@@ -101,43 +119,45 @@ Type into the **Search by title or description...** box in the header to filter 
    - The full **content**, rendered from Markdown.
 3. Click **Close** to dismiss the dialog.
 
-{/* TODO screenshot: Memory detail dialog showing the title, type badge, name/updated line, description, and rendered Markdown content */}
+{/* TODO screenshot: Memory detail dialog (opened from the row's ⋮ menu > View) showing the title, type badge, "Name: ... - Updated ..." line, description, and rendered Markdown content */}
 
 ---
 
 ## Editing a memory
 
-1. Click the **Edit** (pencil) icon on a memory's row.
+1. Click the **⋮** button on a memory's row and choose **Edit**. (Edit is not offered on deployment-owned memories unless you are an administrator - see [Who can edit and delete](#who-can-edit-and-delete).)
 2. The **Edit memory** dialog opens, pre-filled with the memory's current values.
 3. Change any of the editable fields:
 
    | Field | Editable | Notes |
    |---|---|---|
-   | **Name** | No | Immutable here. To rename a memory, use the agent's rename tool. Shown disabled for reference. |
-   | **Title** | Yes | Required - **Save** stays disabled while the title is empty. Up to 255 characters. |
+   | **Name** | No | Immutable here. To rename a memory, ask an agent that uses the Auto Memory tool to rename it (`MemoryRename`). Shown disabled for reference. |
+   | **Title** | Yes | Required - **Save** stays disabled while the title is empty. Single line, up to 255 characters. |
    | **Description** | Yes | Optional one-line summary. Up to 1024 characters. |
-   | **Type** | Yes | Choose **USER**, **FEEDBACK**, **PROJECT**, or **REFERENCE**. |
+   | **Type** | Yes | Choose **User**, **Feedback**, **Project**, or **Reference**. |
    | **Content (Markdown)** | Yes | The full memory body, edited as Markdown in a monospace text area. Up to 65,536 characters. |
 
 4. Click **Save** to persist your changes, or **Cancel** to discard them. If you make no changes, the dialog simply closes without a write.
 
 On success a "Memory updated" confirmation appears and the table refreshes.
 
-{/* TODO screenshot: Edit memory dialog showing the disabled Name field, the editable Title, Description, Type select, and Content (Markdown) text area, with Cancel and Save buttons */}
+If an agent changes the memory while the dialog is open, the dialog says so, holds back **Save**, and offers a **Reload** button that loads the newer version (discarding your unsaved changes). If the memory is deleted while the dialog is open, the dialog stays open and says your changes cannot be saved.
+
+{/* TODO screenshot: Edit memory dialog (opened from the row's ⋮ menu > Edit) showing the disabled Name field, the editable Title, Description, Type select, and Content (Markdown) text area, with Cancel and Save buttons */}
 
 ---
 
 ## Deleting a memory
 
-1. Click the **Delete** (trash) icon on a memory's row.
+1. Click the **⋮** button on a memory's row and choose **Delete**. (Delete is not offered on deployment-owned memories unless you are an administrator - see [Who can edit and delete](#who-can-edit-and-delete).)
 2. The **Delete this memory permanently?** confirmation dialog opens, warning that the entry will be removed from the agent's long-term memory.
 3. Click **Delete permanently** to remove the memory, or **Cancel** to keep it.
 
 On success a "Memory ... deleted" confirmation appears and the row disappears from the table.
 
-> **Deletions here are permanent.** Deleting a memory from this page bypasses the 30-minute agent-undo window used on the Artifact History page and **cannot be reversed**. If you only want to correct a fact, [edit](#editing-a-memory) it instead of deleting it.
+> **Deletions here are permanent and cannot be reversed.** If you only want to correct a fact, [edit](#editing-a-memory) it instead of deleting it.
 
-{/* TODO screenshot: Delete confirmation dialog with the permanent-deletion warning and the Cancel / Delete permanently buttons */}
+{/* TODO screenshot: Delete confirmation dialog (opened from the row's ⋮ menu > Delete) with the permanent-deletion warning and the Cancel / Delete permanently buttons */}
 
 ---
 
@@ -149,14 +169,21 @@ where they live with the `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` environment variable
 
 | Provider | Where memories live |
 |---|---|
-| `JDBC` (default) | The ByteChef database. Existing deployments are unaffected. |
-| `FILESYSTEM` | One JSON file per memory on the server's file system, via the configured file storage. |
-| `AWS` | The same file-based layout on S3. Requires the Enterprise Edition AWS file-storage module. |
+| `jdbc` (default) | The ByteChef database. Existing deployments are unaffected. |
+| `filesystem` | One JSON file per memory on the server's file system, via the configured file storage. |
+| `aws` | The same file-based layout on S3. Requires the Enterprise Edition AWS file-storage module. |
 
 Selecting a provider whose file-storage backend is not configured fails fast at startup rather than
-falling back - a silent fallback would write memories to storage the operator did not choose. File
-backends are best-effort single-writer: concurrent edits of the same memory resolve last-write-wins,
-and there is no migration path between providers - switching does not move existing memories.
+falling back - a silent fallback would write memories to storage the operator did not choose. On every
+provider an edit based on an outdated copy of a memory is rejected rather than overwriting the newer
+one. File backends check this before writing rather than atomically, so two writes racing at the same
+moment can both land, and two agents creating a memory with the same name at the same moment can both
+succeed. There is no migration path between providers - switching does not move existing memories.
+
+Memory is stored only by the ByteChef server application. In a microservices (Enterprise Edition)
+deployment the Auto Memory tool is still offered to agents, but every call returns an error explaining
+that the installation runs as microservices, which do not store memory, and that memory requires the
+ByteChef server application.
 
 ---
 
@@ -171,19 +198,25 @@ Memories are written by agents, not by hand. An agent stores a fact by calling t
 
 <Accordion title="Why don't I see any memories?">
 
-Memories are scoped to a workspace **and** an environment. Confirm you have the right environment selected in the left sidebar header, and clear the type filter and search box. During editor test runs the Auto Memory tool is inert - nothing is written until the workflow runs under a real deployment.
+Memories are scoped to a workspace **and** an environment. Confirm you have the right environment selected in the environment selector at the top of the main navigation sidebar, and reset the Owner and Type filters to **All** and clear the search box. During editor test runs the Auto Memory tool is still offered to the agent, but every call returns an error explaining that memory works only once the workflow is deployed - nothing is written until the workflow runs under a real deployment. Memories of embedded connected-user projects are not shown on this page.
 
 </Accordion>
 
 <Accordion title="Why is the Name field greyed out when I edit?">
 
-The name is the stable identifier the agent assigned when it first stored the memory, so it stays fixed on this page. Use the agent's rename tool to change a name; the title, description, type, and content remain fully editable here.
+The name is the stable identifier the agent assigned when it first stored the memory, so it stays fixed on this page. To change a name, ask an agent that uses the Auto Memory tool to rename it (`MemoryRename`); the title, description, type, and content remain fully editable here.
+
+</Accordion>
+
+<Accordion title="Why can't I edit or delete some memories?">
+
+Memories owned by a project deployment can be edited or deleted only by administrators, because a change alters how a live agent behaves on its next run. For other users those rows offer only **View**. Your own memories are always editable.
 
 </Accordion>
 
 <Accordion title="How is this different from the AI Hub Memories page?">
 
-Both surfaces manage the same underlying Auto Memory capability. On the [AI Hub](/platform/automation/build/hub) the assistant saves facts per user; inside a deployed [AI Agent](/platform/automation/build/workflows/ai/agent) the facts belong to the deployed workflow. This page manages the workspace-and-environment-scoped set for automation.
+Both surfaces manage the same underlying Auto Memory capability. On the [AI Hub](/platform/automation/build/hub) the assistant saves facts per user; inside a deployed [AI Agent](/platform/automation/build/workflows/ai/agent) the facts belong to the deployed workflow. This page shows, per environment, your own memories plus the memories of the workspace's project deployments.
 
 </Accordion>
 
