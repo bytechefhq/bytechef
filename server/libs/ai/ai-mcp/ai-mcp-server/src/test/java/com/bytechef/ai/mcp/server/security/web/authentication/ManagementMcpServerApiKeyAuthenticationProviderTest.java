@@ -17,32 +17,33 @@
 package com.bytechef.ai.mcp.server.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
-import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
-import com.bytechef.platform.user.domain.Authority;
+import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
+import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springaicommunity.mcp.security.server.apikey.ApiKeyImpl;
+import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * @author Ivica Cardic
@@ -50,150 +51,142 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 @SuppressFBWarnings("HARD_CODE_PASSWORD")
 class ManagementMcpServerApiKeyAuthenticationProviderTest {
 
-    private static final String AUTH_SECRET_KEY = "api-secret";
-    private static final long AUTHORITY_ID = 1L;
-    private static final String MCP_SERVER_SECRET_KEY = "mcp-server-secret";
-    private static final long USER_ID = 7L;
+    private final ApiKeyService apiKeyService = mock(ApiKeyService.class);
+    private final AuthorityService authorityService = mock(AuthorityService.class);
+    private final PropertyService propertyService = mock(PropertyService.class);
+    private final UserService userService = mock(UserService.class);
 
-    private ApiKeyService apiKeyService;
-    private AuthorityService authorityService;
-    private PropertyService propertyService;
-    private ManagementMcpServerApiKeyAuthenticationProvider provider;
-    private UserService userService;
+    private final ManagementMcpServerApiKeyAuthenticationProvider managementMcpServerApiKeyAuthenticationProvider =
+        new ManagementMcpServerApiKeyAuthenticationProvider(
+            apiKeyService, authorityService, propertyService, userService);
 
     @BeforeEach
     void beforeEach() {
-        apiKeyService = mock(ApiKeyService.class);
-        authorityService = mock(AuthorityService.class);
-        propertyService = mock(PropertyService.class);
-        userService = mock(UserService.class);
+        Property property = mock(Property.class);
 
-        provider = new ManagementMcpServerApiKeyAuthenticationProvider(
-            apiKeyService, authorityService, propertyService, userService);
-    }
-
-    @Test
-    void testAuthenticateRejectsWhenMcpServerPropertyIsMissing() {
-        when(propertyService.fetchProperty(eq("mcp.server"), eq(Property.Scope.PLATFORM), isNull()))
-            .thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> provider.authenticate(token(MCP_SERVER_SECRET_KEY, null)))
-            .isInstanceOf(BadCredentialsException.class);
-
-        verifyNoInteractions(apiKeyService);
-    }
-
-    @Test
-    void testAuthenticateRejectsWhenMcpServerSecretKeyDoesNotMatch() {
-        stubMcpServerProperty(MCP_SERVER_SECRET_KEY);
-
-        assertThatThrownBy(() -> provider.authenticate(token("wrong-secret", null)))
-            .isInstanceOf(BadCredentialsException.class);
-
-        verifyNoInteractions(apiKeyService);
-    }
-
-    @Test
-    void testAuthenticateReturnsAuthenticatedTokenWhenOnlyMcpServerSecretKeyMatches() {
-        stubMcpServerProperty(MCP_SERVER_SECRET_KEY);
-
-        Authentication authentication = provider.authenticate(token(MCP_SERVER_SECRET_KEY, null));
-
-        assertThat(authentication.isAuthenticated()).isTrue();
-
-        verifyNoInteractions(apiKeyService);
-    }
-
-    @Test
-    void testAuthenticateReturnsUserTokenWhenApiKeyIsValid() {
-        stubMcpServerProperty(MCP_SERVER_SECRET_KEY);
-        stubApiKey();
-        stubUser(true);
-
-        Authority authority = new Authority();
-
-        authority.setId(AUTHORITY_ID);
-        authority.setName("ROLE_ADMIN");
-
-        when(authorityService.fetchAuthority(AUTHORITY_ID)).thenReturn(Optional.of(authority));
-
-        Authentication authentication = provider.authenticate(token(MCP_SERVER_SECRET_KEY, AUTH_SECRET_KEY));
-
-        assertThat(authentication.isAuthenticated()).isTrue();
-        assertThat(authentication.getPrincipal())
-            .isInstanceOfSatisfying(
-                org.springframework.security.core.userdetails.User.class,
-                user -> assertThat(user.getUsername()).isEqualTo("admin"));
-        assertThat(authentication.getAuthorities())
-            .extracting(GrantedAuthority::getAuthority)
-            .containsExactly("ROLE_ADMIN");
-    }
-
-    @Test
-    void testAuthenticateRejectsWhenApiKeyIsInvalid() {
-        stubMcpServerProperty(MCP_SERVER_SECRET_KEY);
-
-        when(apiKeyService.getApiKey(AUTH_SECRET_KEY)).thenThrow(new IllegalArgumentException("unknown"));
-
-        assertThatThrownBy(() -> provider.authenticate(token(MCP_SERVER_SECRET_KEY, AUTH_SECRET_KEY)))
-            .isInstanceOf(BadCredentialsException.class);
-
-        verifyNoInteractions(userService);
-    }
-
-    @Test
-    void testAuthenticateRejectsWhenApiKeyUserDoesNotExist() {
-        stubMcpServerProperty(MCP_SERVER_SECRET_KEY);
-        stubApiKey();
-
-        when(userService.fetchUser(USER_ID)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> provider.authenticate(token(MCP_SERVER_SECRET_KEY, AUTH_SECRET_KEY)))
-            .isInstanceOf(UsernameNotFoundException.class);
-    }
-
-    @Test
-    void testAuthenticateRejectsWhenApiKeyUserIsNotActivated() {
-        stubMcpServerProperty(MCP_SERVER_SECRET_KEY);
-        stubApiKey();
-        stubUser(false);
-
-        assertThatThrownBy(() -> provider.authenticate(token(MCP_SERVER_SECRET_KEY, AUTH_SECRET_KEY)))
-            .isInstanceOf(UserNotActivatedException.class);
-
-        verifyNoInteractions(authorityService);
-    }
-
-    private void stubApiKey() {
-        ApiKey apiKey = new ApiKey();
-
-        apiKey.setUserId(USER_ID);
-
-        when(apiKeyService.getApiKey(AUTH_SECRET_KEY)).thenReturn(apiKey);
-    }
-
-    private void stubMcpServerProperty(String secretKey) {
-        Property property = new Property();
-
-        property.setValue(Map.of("secretKey", secretKey));
-
-        when(propertyService.fetchProperty(eq("mcp.server"), eq(Property.Scope.PLATFORM), isNull()))
+        when(property.get("secretKey")).thenReturn("server-secret");
+        when(property.get("authenticationRequired")).thenReturn(true);
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
             .thenReturn(Optional.of(property));
     }
 
-    private void stubUser(boolean activated) {
-        User user = new User();
+    @Test
+    void testAuthenticateWithValidAdminApiKeySucceeds() {
+        mockApiKey(null, Environment.PRODUCTION);
 
-        user.setId(USER_ID);
-        user.setLogin("admin");
-        user.setPassword("password");
-        user.setActivated(activated);
-        user.setAuthorityIds(List.of(AUTHORITY_ID));
+        Authentication authentication = managementMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.PRODUCTION, "server-secret"));
 
-        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(user));
+        assertThat(authentication.isAuthenticated()).isTrue();
+        verify(apiKeyService).updateLastUsedDate(7L);
     }
 
-    private static ManagementMcpServerApiKeyAuthenticationToken token(String mcpServerSecretKey, String authSecretKey) {
-        return new ManagementMcpServerApiKeyAuthenticationToken(mcpServerSecretKey, authSecretKey, "public");
+    @Test
+    void testAuthenticateWithTypedApiKeyFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(
+                getUnauthenticatedToken(Environment.PRODUCTION, "server-secret")));
+    }
+
+    @Test
+    void testAuthenticateWithWrongMcpServerSecretKeyFails() {
+        mockApiKey(null, Environment.PRODUCTION);
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(
+                getUnauthenticatedToken(Environment.PRODUCTION, "wrong-server-secret")));
+    }
+
+    @Test
+    void testAuthenticateWithEnvironmentMismatchFails() {
+        mockApiKey(null, Environment.PRODUCTION);
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(
+                getUnauthenticatedToken(Environment.STAGING, "server-secret")));
+    }
+
+    @Test
+    void testAuthenticateWithoutAuthenticationRequiredReturnsAnonymous() {
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn("server-secret");
+        when(property.get("authenticationRequired")).thenReturn(false);
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
+            .thenReturn(Optional.of(property));
+
+        Authentication authentication = managementMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.PRODUCTION, "server-secret"));
+
+        assertThat(authentication).isInstanceOf(McpAnonymousAuthenticationToken.class);
+        assertThat(authentication.isAuthenticated()).isTrue();
+        assertThat(authentication.getAuthorities()).isEmpty();
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithMissingAuthenticationRequiredKeyReturnsAnonymous() {
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn("server-secret");
+        when(property.get("authenticationRequired")).thenReturn(null);
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
+            .thenReturn(Optional.of(property));
+
+        Authentication authentication = managementMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.PRODUCTION, "server-secret"));
+
+        assertThat(authentication).isInstanceOf(McpAnonymousAuthenticationToken.class);
+        assertThat(authentication.isAuthenticated()).isTrue();
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithMissingMcpServerPropertyFails() {
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(
+                getUnauthenticatedToken(Environment.PRODUCTION, "server-secret")));
+    }
+
+    @Test
+    void testAuthenticateWithForeignApiKeyCredentialsFails() {
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken = ApiKeyAuthenticationToken.unauthenticated(
+            ApiKeyImpl.from("key-id.api-secret"));
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(apiKeyAuthenticationToken));
+    }
+
+    private ApiKeyAuthenticationToken getUnauthenticatedToken(Environment environment, String mcpServerSecretKey) {
+        return ApiKeyAuthenticationToken.unauthenticated(
+            new McpApiKeyCredentials(environment, mcpServerSecretKey, "api-secret"));
+    }
+
+    private void mockApiKey(PlatformType type, Environment environment) {
+        ApiKey apiKey = new ApiKey();
+
+        apiKey.setId(7L);
+        apiKey.setName("test");
+        apiKey.setSecretKey("api-secret");
+
+        if (type != null) {
+            apiKey.setType(type);
+        }
+
+        apiKey.setEnvironment(environment);
+        apiKey.setUserId(100L);
+
+        when(apiKeyService.fetchApiKey("api-secret")).thenReturn(Optional.of(apiKey));
+
+        User user = mock(User.class);
+
+        when(user.isActivated()).thenReturn(true);
+        when(user.getLogin()).thenReturn("admin@localhost.com");
+        when(user.getAuthorityIds()).thenReturn(List.of());
+        when(userService.fetchUser(100L)).thenReturn(Optional.of(user));
     }
 }

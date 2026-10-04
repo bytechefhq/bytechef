@@ -16,7 +16,6 @@
 
 package com.bytechef.ai.mcp.server.config;
 
-import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
@@ -25,11 +24,6 @@ import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
-import com.bytechef.platform.configuration.service.PropertyService;
-import com.bytechef.platform.security.service.ApiKeyService;
-import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
-import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
@@ -44,8 +38,6 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -61,6 +53,40 @@ import org.springframework.web.servlet.function.ServerResponse;
 @Configuration
 @ConditionalOnProperty(name = "bytechef.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class ManagementMcpServerConfiguration {
+
+    private static final String INSTRUCTIONS =
+        """
+            ByteChef management server. Two kinds of tools: ordinary tools are deterministic CRUD — call them \
+            directly; intelligent tools (buildWorkflow, importWorkflow, configureClusterElement, \
+            writeScript, authorSkill, debugWorkflowExecution, configureMcpServer) run an inner AI agent and \
+            may take minutes — call them for judgment work, not for CRUD.
+            To build a workflow: createProject (if needed) → createProjectWorkflow → buildWorkflow with \
+            the workflowId and a plain-language instruction. To import an external workflow (n8n, Make, \
+            Zapier, Workato): createProject (if needed) → createProjectWorkflow → importWorkflow with the \
+            workflowId and the source definition — it has no project/workflow-creation tools of its own. \
+            Each intelligent-tool call is independent and re-reads current state (e.g. the workflow) rather \
+            than remembering earlier calls, so iterate by \
+            calling the tool again with the next instruction and restate any context it still needs.
+            To expose workflows over MCP: createMcpServer(name, environment, enabled?) — leave enabled unset \
+            or false, since a server with any unmapped attached workflow cannot be enabled — then \
+            createMcpProject(mcpServerId, projectId, projectVersion, workflowIds) to attach a published \
+            project version's workflows (the server must already exist; this tool does not create one), then \
+            configureMcpServer(mcpServerId) to synthesize each attached workflow's tool mapping (tool name, \
+            tool description, fromAi(...) input expressions), then updateMcpServer(mcpServerId, enabled=true) \
+            to bring it online. That last call FAILS with a typed error naming the still-unmapped workflows \
+            if any attached workflow lacks a toolName or a required fromAi mapping — that is the enable-guard \
+            working as intended, not a bug; complete the mapping and retry. listMcpServers resolves a \
+            user-named server to its numeric id, cloneMcpProject(mcpProjectId, targetMcpServerId) duplicates \
+            an existing MCP project's exposed workflows onto another server, and \
+            listMcpProjectWorkflows(mcpServerId) shows each attached workflow's current mapping state. \
+            configureMcpServer never creates the server, attaches workflows to it, or enables it — those are \
+            the flat tools above.
+            listMcpServers and createMcpServer additionally accept an optional workspaceId (and \
+            environment) since MCP servers are workspace-scoped: omit it when the account has exactly one \
+            workspace, otherwise retry with an explicit workspaceId from the workspace_required error's \
+            'workspaces' field.
+            Most tools require workspace context: if a tool returns a workspace_required error, retry with one \
+            of the workspaceId values listed in its 'workspaces' field.""";
 
     private final ComponentTools componentTools;
     private final ProjectTools projectTools;
@@ -104,6 +130,7 @@ public class ManagementMcpServerConfiguration {
     McpAsyncServer mcpAsyncServer() {
         return McpServer.async(webMvcStreamableHttpServerTransportProvider())
             .serverInfo("mcp-server", "1.0.0")
+            .instructions(INSTRUCTIONS)
             .capabilities(
                 McpSchema.ServerCapabilities.builder()
                     .resources(false, true)
@@ -127,23 +154,5 @@ public class ManagementMcpServerConfiguration {
         }
 
         return ToolCallbackProvider.from(toolCallbacks);
-    }
-
-    @Bean
-    SecurityConfigurerContributor mcpServerSecurityConfigurerContributor(
-        ApiKeyService apiKeyService, AuthorityService authorityService, PropertyService propertyService,
-        UserService userService) {
-
-        return new SecurityConfigurerContributor() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T
-                getSecurityConfigurerAdapter() {
-
-                return (T) new ManagementMcpServerSecurityConfigurer(
-                    apiKeyService, authorityService, propertyService, userService);
-            }
-        };
     }
 }

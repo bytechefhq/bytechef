@@ -17,24 +17,20 @@
 package com.bytechef.ai.mcp.server.security.web.configurer;
 
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpServerApiKeyAuthenticationProvider;
-import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpServerApiKeyAuthenticationToken;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
-import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
-import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
+import com.bytechef.platform.security.web.mcp.McpApiKeyAuthenticationConverter;
+import com.bytechef.platform.security.web.mcp.McpApiKeyHttpConfigurer;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
-import com.bytechef.tenant.domain.TenantKey;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ivica Cardic
  */
-public class ManagementMcpServerSecurityConfigurer extends AbstractApiKeyHttpConfigurer {
+public class ManagementMcpServerSecurityConfigurer extends McpApiKeyHttpConfigurer {
 
+    private static final Pattern MCP_SERVER_SECRET_PATTERN = Pattern.compile("/api/management/(.+)/mcp");
     private static final String PATH_PATTERN = "^/api/management/.+/mcp";
 
     public ManagementMcpServerSecurityConfigurer(
@@ -42,30 +38,8 @@ public class ManagementMcpServerSecurityConfigurer extends AbstractApiKeyHttpCon
         UserService userService) {
 
         super(
-            PATH_PATTERN, new McpServerApiKeyAuthenticationConverter(),
-            new ManagementMcpServerApiKeyAuthenticationProvider(apiKeyService, authorityService, propertyService,
-                userService));
-    }
-
-    @Override
-    protected void registerCsrfOverride(CsrfConfigurer<?> csrf) {
-        csrf.ignoringRequestMatchers(RegexRequestMatcher.regexMatcher(PATH_PATTERN));
-    }
-
-    private static class McpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
-
-        @Override
-        public Authentication convert(HttpServletRequest request) {
-            String authToken = fetchAuthToken(request);
-            String servletPath = request.getServletPath();
-
-            String mcpServerSecretKey = servletPath.replace("/api/management/", "")
-                .replace("/mcp", "");
-
-            TenantKey tenantKey = TenantKey.parse(mcpServerSecretKey);
-
-            return new ManagementMcpServerApiKeyAuthenticationToken(mcpServerSecretKey, authToken,
-                tenantKey.getTenantId());
-        }
+            PATH_PATTERN, MCP_SERVER_SECRET_PATTERN, new McpApiKeyAuthenticationConverter("/api/management/"),
+            new ManagementMcpServerApiKeyAuthenticationProvider(
+                apiKeyService, authorityService, propertyService, userService));
     }
 }
