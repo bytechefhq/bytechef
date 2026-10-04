@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -82,6 +83,7 @@ public class McpToolGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_VIEW')")
     public List<McpTool> mcpToolsByComponentId(@Argument long mcpComponentId) {
         checkMcpComponentNotEmbedded(mcpComponentId);
 
@@ -128,6 +130,19 @@ public class McpToolGraphQlController {
         }
 
         return mcpToolService.update(mcpTool);
+    }
+
+    @MutationMapping
+    public McpTool updateMcpToolEnabled(@Argument long id, @Argument boolean enabled) {
+        McpTool mcpTool = mcpToolService.fetchMcpTool(id)
+            .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
+
+        checkMcpComponentNotEmbedded(mcpTool.getMcpComponentId());
+
+        mcpToolService.updateEnabled(id, enabled);
+
+        return mcpToolService.fetchMcpTool(id)
+            .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
     }
 
     private void checkMcpComponentNotEmbedded(long mcpComponentId) {

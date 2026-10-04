@@ -18,7 +18,10 @@ package com.bytechef.platform.mcp.domain;
 
 import com.bytechef.platform.connection.domain.Connection;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -28,6 +31,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -46,6 +50,9 @@ public final class McpComponent {
 
     @Column("connection_id")
     private AggregateReference<Connection, Long> connectionId;
+
+    @MappedCollection(idColumn = "mcp_component_id")
+    private Set<McpComponentAuthority> mcpComponentAuthorities = new HashSet<>();
 
     @Column("component_name")
     private String componentName;
@@ -128,6 +135,12 @@ public final class McpComponent {
         return connectionId != null ? connectionId.getId() : null;
     }
 
+    public Set<String> getRequiredAuthorities() {
+        return mcpComponentAuthorities.stream()
+            .map(McpComponentAuthority::getAuthority)
+            .collect(Collectors.toSet());
+    }
+
     public int getVersion() {
         return version;
     }
@@ -166,6 +179,14 @@ public final class McpComponent {
 
     public void setConnectionId(Long connectionId) {
         this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
+    }
+
+    public void setRequiredAuthorities(Set<String> requiredAuthorities) {
+        this.mcpComponentAuthorities = new HashSet<>();
+
+        if (requiredAuthorities != null) {
+            requiredAuthorities.forEach(authority -> mcpComponentAuthorities.add(new McpComponentAuthority(authority)));
+        }
     }
 
     public void setId(Long id) {

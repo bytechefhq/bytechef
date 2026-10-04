@@ -17,26 +17,41 @@
 package com.bytechef.platform.mcp.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.mcp.config.PlatformMcpIntTestConfiguration;
+import com.bytechef.platform.mcp.config.PlatformMcpMethodSecurityTestConfiguration;
+import com.bytechef.platform.mcp.config.PlatformMcpMethodSecurityTestConfiguration.TenantAdminCheck;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -167,5 +182,77 @@ class McpToolServiceIntTest {
 
     private McpTool getMcpTool() {
         return new McpTool("test-tool", Map.of("param1", "value1"), mcpComponent.getId());
+    }
+
+    @Nested
+    @Import(PlatformMcpMethodSecurityTestConfiguration.class)
+    class MethodSecurity {
+
+        @Autowired
+        private PermissionEvaluator permissionEvaluator;
+
+        @Autowired
+        private TenantAdminCheck tenantAdminCheck;
+
+        @BeforeEach
+        void setAuthentication() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+        }
+
+        @AfterEach
+        void clearAuthentication() {
+            SecurityContextHolder.clearContext();
+
+            reset(permissionEvaluator, tenantAdminCheck);
+        }
+
+        @Test
+        void testCreateMcpToolRequiresComponentEditor() {
+            McpTool mcpTool = new McpTool("tool", Map.of(), 5L);
+
+            assertThatThrownBy(() -> mcpToolService.create(mcpTool))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(5L), eq("McpComponent"), eq("MCP_EDIT"));
+        }
+
+        @Test
+        void testFetchMcpToolRequiresViewer() {
+            assertThatThrownBy(() -> mcpToolService.fetchMcpTool(9L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(9L), eq("McpTool"), eq("MCP_VIEW"));
+        }
+
+        @Test
+        void testGetMcpToolsRequiresTenantAdmin() {
+            assertThatThrownBy(() -> mcpToolService.getMcpTools())
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(tenantAdminCheck).isTenantAdmin();
+        }
+
+        @Test
+        void testUpdateMcpToolRequiresEditor() {
+            McpTool mcpTool = new McpTool(9L, "tool", Map.of(), 5L);
+
+            assertThatThrownBy(() -> mcpToolService.update(mcpTool))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(9L), eq("McpTool"), eq("MCP_EDIT"));
+        }
+
+        @Test
+        void testDeleteMcpToolRequiresEditor() {
+            McpTool mcpTool = new McpTool(9L, "tool", Map.of(), 5L);
+
+            assertThatThrownBy(() -> mcpToolService.delete(mcpTool))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(9L), eq("McpTool"), eq("MCP_EDIT"));
+        }
     }
 }

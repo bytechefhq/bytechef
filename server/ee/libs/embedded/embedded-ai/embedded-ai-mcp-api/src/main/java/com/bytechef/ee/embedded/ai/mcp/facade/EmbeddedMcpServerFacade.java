@@ -44,7 +44,9 @@ public interface EmbeddedMcpServerFacade {
 
     McpComponent updateEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools);
 
-    McpServer updateEmbeddedMcpServer(long mcpServerId, String name, Boolean enabled);
+    McpServer updateEmbeddedMcpServer(
+        long mcpServerId, String name, Boolean enabled, Boolean enforceToolAuthorization,
+        Boolean authenticationRequired);
 
     McpServer updateEmbeddedMcpServerSecretKey(long mcpServerId);
 
