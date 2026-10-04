@@ -1,16 +1,33 @@
 import Button from '@/components/Button/Button';
-import {ButtonGroup} from '@/components/ui/button-group';
+import {ButtonGroup, ButtonGroupSeparator} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
+import {McpServer} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, ComponentIcon, WorkflowIcon} from 'lucide-react';
-import {ReactNode, useState} from 'react';
+import {ComponentType, useState} from 'react';
 
-interface McpServerAddToolsButtonProps {
-    renderMcpComponentDialog: (onClose: () => void) => ReactNode;
-    renderWorkflowDialog: (onClose: () => void) => ReactNode;
+export interface McpServerComponentDialogProps {
+    mcpServerId: string;
+    onOpenChange: (open: boolean) => void;
+    open: boolean;
 }
 
-const McpServerAddToolsButton = ({renderMcpComponentDialog, renderWorkflowDialog}: McpServerAddToolsButtonProps) => {
+export interface McpServerWorkflowDialogProps {
+    mcpServer: McpServer;
+    onClose: () => void;
+}
+
+export interface McpServerAddToolsButtonProps {
+    mcpComponentDialog: ComponentType<McpServerComponentDialogProps>;
+    mcpServer: McpServer;
+    workflowDialog: ComponentType<McpServerWorkflowDialogProps>;
+}
+
+const McpServerAddToolsButton = ({
+    mcpComponentDialog: McpComponentDialog,
+    mcpServer,
+    workflowDialog: WorkflowDialog,
+}: McpServerAddToolsButtonProps) => {
     const [showMcpComponentDialog, setShowMcpComponentDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
@@ -19,7 +36,14 @@ const McpServerAddToolsButton = ({renderMcpComponentDialog, renderWorkflowDialog
     return (
         <>
             <ButtonGroup ref={buttonGroupRef}>
-                <Button label="Add Component" onClick={() => setShowMcpComponentDialog(true)} size="sm" />
+                <Button
+                    label="Add Component"
+                    onClick={() => setShowMcpComponentDialog(true)}
+                    size="sm"
+                    variant="secondary"
+                />
+
+                <ButtonGroupSeparator />
 
                 <DropdownMenu onOpenChange={handleOpenChange}>
                     <DropdownMenuTrigger asChild>
@@ -28,6 +52,7 @@ const McpServerAddToolsButton = ({renderMcpComponentDialog, renderWorkflowDialog
                             icon={<ChevronDownIcon />}
                             ref={dropdownMenuTriggerRef}
                             size="iconSm"
+                            variant="secondary"
                         />
                     </DropdownMenuTrigger>
 
@@ -43,9 +68,17 @@ const McpServerAddToolsButton = ({renderMcpComponentDialog, renderWorkflowDialog
                 </DropdownMenu>
             </ButtonGroup>
 
-            {showMcpComponentDialog && renderMcpComponentDialog(() => setShowMcpComponentDialog(false))}
+            {showMcpComponentDialog && (
+                <McpComponentDialog
+                    mcpServerId={mcpServer.id}
+                    onOpenChange={setShowMcpComponentDialog}
+                    open={showMcpComponentDialog}
+                />
+            )}
 
-            {showWorkflowDialog && renderWorkflowDialog(() => setShowWorkflowDialog(false))}
+            {showWorkflowDialog && (
+                <WorkflowDialog mcpServer={mcpServer} onClose={() => setShowWorkflowDialog(false)} />
+            )}
         </>
     );
 };
