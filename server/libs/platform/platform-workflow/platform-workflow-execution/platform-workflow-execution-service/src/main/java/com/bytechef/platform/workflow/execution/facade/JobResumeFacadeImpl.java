@@ -28,6 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Map;
+import java.util.function.LongConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -57,8 +58,19 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     }
 
     @Override
-    @SuppressFBWarnings("CRLF_INJECTION_LOGS")
     public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
+        return resumeJob(id, data, false, jobId -> {});
+    }
+
+    @Override
+    public JobResumeOutcome resumeJobStreaming(String id, Map<String, Object> data, LongConsumer jobIdConsumer) {
+        return resumeJob(id, data, true, jobIdConsumer);
+    }
+
+    @SuppressFBWarnings("CRLF_INJECTION_LOGS")
+    private JobResumeOutcome resumeJob(
+        String id, Map<String, Object> data, boolean streaming, LongConsumer jobIdConsumer) {
+
         JobResumeId jobResumeId;
 
         try {
@@ -85,6 +97,14 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
                 return JobResumeOutcome.INVALID_ID;
             }
+
+            if (streaming && !MapUtils.getBoolean(job.getMetadata(), MetadataConstants.STREAMING_RESUME, false)) {
+                log.warn("Job {} was not suspended for a streaming resume", jobResumeId.getJobId());
+
+                return JobResumeOutcome.STREAMING_NOT_ALLOWED;
+            }
+
+            jobIdConsumer.accept(jobResumeId.getJobId());
 
             jobFacade.resumeJob(
                 jobResumeId.getJobId(), MapUtils.getLong(job.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID),
