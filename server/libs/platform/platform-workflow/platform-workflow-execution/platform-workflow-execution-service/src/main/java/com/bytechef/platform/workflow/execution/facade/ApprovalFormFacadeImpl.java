@@ -21,12 +21,15 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,11 +44,15 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
+    private final TaskStateService taskStateService;
 
     @SuppressFBWarnings("EI")
-    public ApprovalFormFacadeImpl(JobService jobService, TaskExecutionService taskExecutionService) {
+    public ApprovalFormFacadeImpl(
+        JobService jobService, TaskExecutionService taskExecutionService, TaskStateService taskStateService) {
+
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
+        this.taskStateService = taskStateService;
     }
 
     @Override
@@ -62,10 +69,16 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
             Map<String, ?> jobMetadata = job.getMetadata();
 
+            if (!jobResumeId.matches((String) jobMetadata.get(MetadataConstants.JOB_RESUME_ID))) {
+                throw new IllegalStateException(
+                    "Approval form is no longer available; the resume id of job " + jobResumeId.getJobId() +
+                        " does not match");
+            }
+
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(
                 MapUtils.getLong(jobMetadata, MetadataConstants.TASK_EXECUTION_RESUME_ID));
 
-            Map<String, Object> result = new HashMap<>(taskExecution.getParameters());
+            Map<String, Object> result = new HashMap<>(getFormParameters(jobResumeId, taskExecution));
 
             Map<String, ?> taskExecutionMetadata = taskExecution.getMetadata();
 
@@ -77,5 +90,22 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
             return result;
         });
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, ?> getFormParameters(JobResumeId jobResumeId, TaskExecution taskExecution) {
+        Optional<Suspend> suspendOptional = taskStateService.fetchValue(jobResumeId);
+
+        if (suspendOptional.isPresent()) {
+            Suspend suspend = suspendOptional.get();
+
+            if (suspend.continueParameters()
+                .get(MetadataConstants.APPROVAL_FORM_PARAMETERS) instanceof Map<?, ?> formParameters) {
+
+                return (Map<String, ?>) formParameters;
+            }
+        }
+
+        return taskExecution.getParameters();
     }
 }
