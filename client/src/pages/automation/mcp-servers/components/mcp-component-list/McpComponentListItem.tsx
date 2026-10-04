@@ -52,7 +52,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                         <Badge
                             className="relative z-10"
                             label={`v${mcpComponent.componentVersion}`}
-                            styleType="secondary-filled"
+                            styleType="outline-outline"
                             weight="semibold"
                         />
                     </TooltipTrigger>
