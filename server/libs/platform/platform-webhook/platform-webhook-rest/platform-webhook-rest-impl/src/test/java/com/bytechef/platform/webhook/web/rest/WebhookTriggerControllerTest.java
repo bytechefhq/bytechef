@@ -25,15 +25,12 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,8 +38,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * @author Ivica Cardic
@@ -170,78 +165,6 @@ class WebhookTriggerControllerTest {
 
         assertThat(webhookRequestArgumentCaptor.getValue()
             .validated()).isTrue();
-    }
-
-    @Test
-    void testStreamBridgeSendsEventTypeAsNamedEventWithoutDiscriminator() throws IOException {
-        SseEmitter sseEmitter = mock(SseEmitter.class);
-
-        WebhookTriggerController.WebhookSseStreamBridge webhookSseStreamBridge =
-            new WebhookTriggerController.WebhookSseStreamBridge(sseEmitter);
-
-        webhookSseStreamBridge.onEvent(
-            Map.of(
-                AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.ASK_USER_QUESTION,
-                "questions", List.of(Map.of("question", "Which library?")),
-                "resumeUrl", "https://example.com/api/job/resume/abc"));
-
-        List<Object> sentParts = getSentParts(sseEmitter);
-
-        assertThat(sentParts.getFirst()).asString()
-            .contains("event:" + AiAgentSseEventType.ASK_USER_QUESTION);
-        assertThat(sentParts.get(1)).isEqualTo(
-            Map.of(
-                "questions", List.of(Map.of("question", "Which library?")),
-                "resumeUrl", "https://example.com/api/job/resume/abc"));
-    }
-
-    @Test
-    void testStreamBridgeSendsToolExecutionAsNamedEvent() throws IOException {
-        SseEmitter sseEmitter = mock(SseEmitter.class);
-
-        WebhookTriggerController.WebhookSseStreamBridge webhookSseStreamBridge =
-            new WebhookTriggerController.WebhookSseStreamBridge(sseEmitter);
-
-        webhookSseStreamBridge.onEvent(
-            Map.of(AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.TOOL_EXECUTION, "toolName", "search"));
-
-        List<Object> sentParts = getSentParts(sseEmitter);
-
-        assertThat(sentParts.getFirst()).asString()
-            .contains("event:" + AiAgentSseEventType.TOOL_EXECUTION);
-        assertThat(sentParts.get(1)).isEqualTo(Map.of("toolName", "search"));
-    }
-
-    @Test
-    void testStreamBridgeSendsNonStringEventTypeAsStream() throws IOException {
-        SseEmitter sseEmitter = mock(SseEmitter.class);
-
-        WebhookTriggerController.WebhookSseStreamBridge webhookSseStreamBridge =
-            new WebhookTriggerController.WebhookSseStreamBridge(sseEmitter);
-
-        Map<String, Object> payload = Map.of(AiAgentSseEventType.EVENT_TYPE, 42, "text", "hello");
-
-        webhookSseStreamBridge.onEvent(payload);
-
-        List<Object> sentParts = getSentParts(sseEmitter);
-
-        assertThat(sentParts.getFirst()).asString()
-            .contains("event:stream");
-        assertThat(sentParts.get(1)).isEqualTo(payload);
-    }
-
-    private static List<Object> getSentParts(SseEmitter sseEmitter) throws IOException {
-        ArgumentCaptor<SseEmitter.SseEventBuilder> sseEventBuilderArgumentCaptor =
-            ArgumentCaptor.forClass(SseEmitter.SseEventBuilder.class);
-
-        verify(sseEmitter).send(sseEventBuilderArgumentCaptor.capture());
-
-        SseEmitter.SseEventBuilder sseEventBuilder = sseEventBuilderArgumentCaptor.getValue();
-
-        return sseEventBuilder.build()
-            .stream()
-            .map(ResponseBodyEmitter.DataWithMediaType::getData)
-            .toList();
     }
 
     private ResponseEntity<?> executeWorkflow(String method) {

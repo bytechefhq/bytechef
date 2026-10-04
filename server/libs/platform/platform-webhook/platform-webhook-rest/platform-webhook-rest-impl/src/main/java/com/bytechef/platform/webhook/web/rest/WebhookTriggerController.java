@@ -17,14 +17,11 @@
 package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -32,13 +29,9 @@ import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,8 +53,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @CrossOrigin
 @ConditionalOnCoordinator
 public class WebhookTriggerController extends AbstractWebhookTriggerController {
-
-    private static final Logger log = LoggerFactory.getLogger(WebhookTriggerController.class);
 
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
 
@@ -156,7 +147,7 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
-            WebhookSseStreamBridge bridge = new WebhookSseStreamBridge(emitter);
+            SseEmitterStreamBridge bridge = new SseEmitterStreamBridge(emitter);
 
             WebhookTriggerFlags webhookTriggerFlags = webhookWorkflowExecutor.getWebhookTriggerFlags(
                 workflowExecutionId);
@@ -180,109 +171,5 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
                     ? null
                     : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
             .body(response.body());
-    }
-
-    private static void sendEvent(SseEmitter emitter, String name, Object data) {
-        try {
-            emitter.send(
-                SseEmitter.event()
-                    .name(name)
-                    .data(data instanceof String ? JsonUtils.write(data) : data));
-        } catch (Exception exception) {
-            if (AiAgentSseEventType.ASK_USER_QUESTION.equals(name)) {
-                log.warn("Failed to send the '{}' SSE event", name, exception);
-            } else if (log.isTraceEnabled()) {
-                log.trace(exception.getMessage(), exception);
-            }
-        }
-    }
-
-    /**
-     * Bridge that broadcasts streamed payloads to SSE clients for webhook workflow execution. Events arrive on
-     * message-broker threads concurrently with job-status events and client-initiated disconnects, so callbacks must be
-     * idempotent and skip sends once the emitter is closed.
-     */
-    static class WebhookSseStreamBridge implements SseStreamBridge {
-
-        private final AtomicBoolean completed = new AtomicBoolean();
-        private final SseEmitter emitter;
-
-        WebhookSseStreamBridge(SseEmitter emitter) {
-            this.emitter = emitter;
-
-            emitter.onCompletion(() -> completed.set(true));
-            emitter.onTimeout(() -> completed.set(true));
-            emitter.onError(throwable -> completed.set(true));
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public void onEvent(Object payload) {
-            if (completed.get()) {
-                return;
-            }
-
-            if (payload instanceof Map<?, ?> map) {
-                if (map.get(AiAgentSseEventType.EVENT_TYPE) instanceof String eventType) {
-                    Map<String, Object> eventData = new LinkedHashMap<>((Map<String, Object>) map);
-
-                    eventData.remove(AiAgentSseEventType.EVENT_TYPE);
-
-                    sendEvent(emitter, eventType, eventData);
-
-                    return;
-                }
-
-                if (map.containsKey("event")) {
-                    String event = (String) map.get("event");
-                    Object data = map.entrySet()
-                        .stream()
-                        .filter(entry -> !"event".equals(entry.getKey()))
-                        .findFirst()
-                        .map(Map.Entry::getValue)
-                        .orElse(null);
-
-                    sendEvent(emitter, event, data);
-
-                    return;
-                }
-            }
-
-            sendEvent(emitter, "stream", payload);
-        }
-
-        @Override
-        public void onComplete() {
-            if (!completed.compareAndSet(false, true)) {
-                return;
-            }
-
-            try {
-                emitter.complete();
-            } catch (Exception exception) {
-                if (log.isTraceEnabled()) {
-                    log.trace(exception.getMessage(), exception);
-                }
-            }
-        }
-
-        @Override
-        public void onError(Throwable throwable) {
-            if (!completed.compareAndSet(false, true)) {
-                return;
-            }
-
-            try {
-                sendEvent(emitter, "error", Objects.toString(throwable.getMessage(), "An error occurred"));
-            } finally {
-                try {
-                    emitter.complete();
-                } catch (Exception exception) {
-                    if (log.isTraceEnabled()) {
-                        log.trace(exception.getMessage(), exception);
-                    }
-                }
-            }
-        }
     }
 }
