@@ -31,9 +31,12 @@ import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RA
 import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction.CHECK_FOR_VIOLATIONS;
 import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction.SANITIZE_TEXT;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
+import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
+import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
@@ -46,7 +49,10 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
+import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ConversationHistoryReader;
@@ -83,6 +89,7 @@ import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.metadata.ToolMetadata;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -95,6 +102,10 @@ public abstract class AbstractAiAgentChatAction {
     private static final JsonMapper JSON_MAPPER = new JsonMapper();
 
     private static final String TOOL_SIMULATION_UNAVAILABLE = "[tool simulation unavailable]";
+
+    static final String NO_HUMAN_RESPONSE_TOOL_RESULT = "{\"status\":\"NO_RESPONSE\",\"message\":\"No response was " +
+        "received from the user: the request expired or the response was empty. Treat any requested approval as not " +
+        "granted and any questions as unanswered, and do not perform actions that depended on this response.\"}";
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ClusterElementToolCallbacks clusterElementToolCallbacks;
@@ -113,6 +124,16 @@ public abstract class AbstractAiAgentChatAction {
     protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
         @Nullable ToolExecutionListener toolExecutionListener, ActionContext context) throws Exception {
+
+        return getChatClientRequestSpec(
+            inputParameters, connectionParameters, extensions, toolExecutionListener, context,
+            ModelUtils.getMessages(inputParameters, context), false);
+    }
+
+    protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
+        List<Message> messages, boolean resumedTurn) throws Exception {
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
@@ -146,20 +167,22 @@ public abstract class AbstractAiAgentChatAction {
         ChatClient chatClient = ChatClient.builder(chatModel)
             .build();
 
-        ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(chatClient, inputParameters, context)
-            .advisors(
-                getAdvisors(
-                    clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId))
-            .advisors(getConversationAdvisor(conversationId))
-            .advisors(new TextGenerationFirstAdvisor())
-            .messages(ModelUtils.getMessages(inputParameters, context))
-            .tools(
-                concatToolCallbacks(
-                    getToolCallbacks(
-                        clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                        toolExecutionListener, toolSimulations, chatModel, conversationId, context),
-                    chatMemoryResult)
-                        .toArray());
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = (resumedTurn
+            ? chatClient.prompt() : createPrompt(chatClient, inputParameters, context))
+                .advisors(
+                    getAdvisors(
+                        clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId,
+                        resumedTurn))
+                .advisors(getConversationAdvisor(conversationId))
+                .advisors(new TextGenerationFirstAdvisor())
+                .messages(messages)
+                .tools(
+                    concatToolCallbacks(
+                        getToolCallbacks(
+                            clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
+                            toolExecutionListener, toolSimulations, chatModel, conversationId, context),
+                        chatMemoryResult)
+                            .toArray());
 
         if (conversationId != null && hasChatMemoryToolCallbacks(chatMemoryResult)) {
             chatClientRequestSpec.toolContext(Map.of(ChatMemory.CONVERSATION_ID, conversationId));
@@ -269,6 +292,47 @@ public abstract class AbstractAiAgentChatAction {
         };
     }
 
+    protected ModelUtils.ChatActionResult resumeChat(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        Parameters continueParameters, Parameters data, @Nullable ToolExecutionListener toolExecutionListener,
+        ActionContext context) throws Exception {
+
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = buildResumedRequestSpec(
+            inputParameters, connectionParameters, extensions, continueParameters, data, toolExecutionListener,
+            context);
+
+        applyStructuredOutputValidation(chatClientRequestSpec, inputParameters, context);
+
+        chatClientRequestSpec.toolContext(Map.of(AiAgentToolContextKey.ACTION_CONTEXT, context));
+
+        return ModelUtils.getChatActionResult(chatClientRequestSpec.call(), inputParameters, context);
+    }
+
+    protected ChatClient.ChatClientRequestSpec buildResumedRequestSpec(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        Parameters continueParameters, Parameters data, @Nullable ToolExecutionListener toolExecutionListener,
+        ActionContext context) throws Exception {
+
+        AgentToolSuspension agentToolSuspension = continueParameters.get(
+            AgentToolSuspension.CONTINUE_PARAMETER_KEY, AgentToolSuspension.class);
+
+        if (agentToolSuspension == null) {
+            throw new IllegalStateException(
+                "The resumed task has no stored agent conversation (continue parameter '" +
+                    AgentToolSuspension.CONTINUE_PARAMETER_KEY + "'), so the agent's tool-calling loop cannot " +
+                    "continue. The task was suspended by something other than an agent tool, or by a build that " +
+                    "did not store the conversation.");
+        }
+
+        Map<String, ?> resumeData = data.toMap();
+
+        String toolResult = resumeData.isEmpty() ? NO_HUMAN_RESPONSE_TOOL_RESULT : JsonUtils.write(resumeData);
+
+        return getChatClientRequestSpec(
+            inputParameters, connectionParameters, extensions, toolExecutionListener, context,
+            agentToolSuspension.resumeConversation(toolResult), true);
+    }
+
     private static ChatClient.ChatClientRequestSpec createPrompt(
         ChatClient chatClient, Parameters inputParameters, ActionContext context) {
 
@@ -342,6 +406,15 @@ public abstract class AbstractAiAgentChatAction {
         ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult,
         @Nullable String conversationId) {
 
+        return getAdvisors(
+            clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId, false);
+    }
+
+    List<Advisor> getAdvisors(
+        ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
+        ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult,
+        @Nullable String conversationId, boolean resumedTurn) {
+
         List<Advisor> advisors = new ArrayList<>();
 
         List<ClusterElement> guardrailClusterElements = clusterElementMap.getClusterElements(GUARDRAILS);
@@ -380,7 +453,8 @@ public abstract class AbstractAiAgentChatAction {
         // memory
 
         chatMemoryResult
-            .map(ChatMemoryFunction.Result::advisor)
+            .map(result -> resumedTurn && !result.supportsToolMessagePersistence()
+                ? getResumedTurnChatMemoryAdvisor(result) : result.advisor())
             .ifPresent(advisors::add);
 
         // tool call
@@ -389,13 +463,19 @@ public abstract class AbstractAiAgentChatAction {
             .map(ChatMemoryFunction.Result::supportsToolMessagePersistence)
             .orElse(false);
 
+        ToolCallingManager agentToolCallingManager = toolCallingManager;
+
+        if (context instanceof ActionContextAware actionContextAware) {
+            agentToolCallingManager = new SuspendableToolCallingManager(toolCallingManager, actionContextAware);
+        }
+
         ToolCallingAdvisor toolCallingAdvisor = persistToolMessagesInLoop
             ? ToolCallingAdvisor.builder()
-                .toolCallingManager(toolCallingManager)
+                .toolCallingManager(agentToolCallingManager)
                 .disableInternalConversationHistory()
                 .build()
             : ToolCallingAdvisor.builder()
-                .toolCallingManager(toolCallingManager)
+                .toolCallingManager(agentToolCallingManager)
                 .build();
 
         advisors.add(toolCallingAdvisor);
@@ -407,6 +487,10 @@ public abstract class AbstractAiAgentChatAction {
         advisors.add(new ContextLoggerAdvisor(context));
 
         return advisors;
+    }
+
+    private static Advisor getResumedTurnChatMemoryAdvisor(ChatMemoryFunction.Result chatMemoryResult) {
+        return new ResumedTurnChatMemoryAdvisor(chatMemoryResult.advisor());
     }
 
     private static Parameters getConnectionParameters(
@@ -536,7 +620,9 @@ public abstract class AbstractAiAgentChatAction {
         }
 
         if (toolExecutionListener == null) {
-            return toolCallbacks;
+            return toolCallbacks.stream()
+                .map(AbstractAiAgentChatAction::createToolSuspensionFailurePropagatingToolCallback)
+                .toList();
         }
 
         AtomicReference<@Nullable AgentThinking> thinkingReference = new AtomicReference<>();
@@ -555,7 +641,52 @@ public abstract class AbstractAiAgentChatAction {
                 .removeExtraArgumentsAfterProcessing(true)
                 .build();
 
-        return Arrays.asList(augmentedToolCallbackProvider.getToolCallbacks());
+        return Arrays.stream(augmentedToolCallbackProvider.getToolCallbacks())
+            .map(AbstractAiAgentChatAction::createToolSuspensionFailurePropagatingToolCallback)
+            .toList();
+    }
+
+    private static ToolCallback createToolSuspensionFailurePropagatingToolCallback(ToolCallback delegate) {
+        return new ToolCallback() {
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return delegate.getToolDefinition();
+            }
+
+            @Override
+            public ToolMetadata getToolMetadata() {
+                return delegate.getToolMetadata();
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return propagateToolSuspensionFailure(() -> delegate.call(toolInput));
+            }
+
+            @Override
+            public String call(String toolInput, @Nullable ToolContext toolContext) {
+                return propagateToolSuspensionFailure(() -> delegate.call(toolInput, toolContext));
+            }
+        };
+    }
+
+    private static String propagateToolSuspensionFailure(Supplier<String> toolCall) {
+        try {
+            return toolCall.get();
+        } catch (RuntimeException exception) {
+            Throwable cause = exception;
+
+            while (cause != null) {
+                if (cause instanceof ToolSuspensionException toolSuspensionException) {
+                    throw toolSuspensionException;
+                }
+
+                cause = cause.getCause();
+            }
+
+            throw exception;
+        }
     }
 
     private static List<Message> loadConversationHistory(
