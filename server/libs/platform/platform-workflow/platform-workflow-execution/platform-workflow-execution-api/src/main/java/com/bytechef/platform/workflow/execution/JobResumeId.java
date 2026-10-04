@@ -30,6 +30,12 @@ import org.jspecify.annotations.Nullable;
  */
 public class JobResumeId implements Serializable {
 
+    /**
+     * The key of the resume id in the parameters of the one-time task that resumes a job when its suspend deadline
+     * passes.
+     */
+    public static final String TIMEOUT_TASK_PARAMETER = "jobResumeId";
+
     private final long jobId;
     private final String tenantId;
     private final String uuid;
