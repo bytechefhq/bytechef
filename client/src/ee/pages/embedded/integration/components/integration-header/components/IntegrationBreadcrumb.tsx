@@ -1,40 +1,28 @@
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator} from '@/components/ui/breadcrumb';
 import IntegrationTitle from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationTitle';
-import WorkflowSelect from '@/ee/pages/embedded/integration/components/integration-header/components/WorkflowSelect';
-import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import {Integration} from '@/ee/shared/middleware/embedded/configuration';
+import {ReactNode} from 'react';
 
 export interface IntegrationBreadcrumbProps {
-    currentWorkflow: Workflow;
     integration: Integration;
-    integrationWorkflowId: number;
-    integrationWorkflows: Workflow[];
-    onIntegrationWorkflowValueChange: (integrationWorkflowId: number) => void;
+    /** The current-item switcher (e.g. IntegrationItemSelect) shown after the integration title, if any. */
+    itemSelect?: ReactNode;
 }
 
-const IntegrationBreadcrumb = ({
-    currentWorkflow,
-    integration,
-    integrationWorkflowId,
-    integrationWorkflows,
-    onIntegrationWorkflowValueChange,
-}: IntegrationBreadcrumbProps) => (
+const IntegrationBreadcrumb = ({integration, itemSelect}: IntegrationBreadcrumbProps) => (
     <Breadcrumb>
         <BreadcrumbList>
             <BreadcrumbItem>
                 <IntegrationTitle integration={integration} />
             </BreadcrumbItem>
 
-            <BreadcrumbSeparator />
+            {itemSelect && (
+                <>
+                    <BreadcrumbSeparator />
 
-            <BreadcrumbItem>
-                <WorkflowSelect
-                    currentWorkflowLabel={currentWorkflow.label}
-                    integrationId={integration.id!}
-                    integrationWorkflowId={integrationWorkflowId}
-                    integrationWorkflows={integrationWorkflows}
-                    onValueChange={onIntegrationWorkflowValueChange}
-                />
-            </BreadcrumbItem>
+                    <BreadcrumbItem>{itemSelect}</BreadcrumbItem>
+                </>
+            )}
         </BreadcrumbList>
     </Breadcrumb>
 );
