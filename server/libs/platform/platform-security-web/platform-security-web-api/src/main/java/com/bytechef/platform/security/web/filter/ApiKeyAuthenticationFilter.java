@@ -18,6 +18,7 @@ package com.bytechef.platform.security.web.filter;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import com.bytechef.tenant.TenantContext;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -74,6 +75,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     protected void doFilterInternal(
         HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain)
         throws ServletException, IOException {
