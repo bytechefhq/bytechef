@@ -67,7 +67,9 @@ import tools.jackson.databind.ObjectMapper;
         @Filter(
             type = FilterType.REGEX,
             pattern = "com\\.bytechef\\.automation\\.configuration\\.facade\\.AutomationSearchFacadeImpl"),
-        @Filter(type = FilterType.REGEX, pattern = "com\\.bytechef\\.automation\\.ai\\.a2a\\.security\\..*IntTest.*")
+        @Filter(
+            type = FilterType.REGEX,
+            pattern = "com\\.bytechef\\.automation\\.ai\\.a2a\\.config\\.A2aMethodSecurityIntTestConfiguration")
     })
 @EnableAutoConfiguration
 @EnableCaching
