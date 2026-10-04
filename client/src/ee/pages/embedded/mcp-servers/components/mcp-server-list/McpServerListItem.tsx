@@ -1,7 +1,7 @@
 import AlertDialog from '@/components/AlertDialog';
 import LoadingIcon from '@/components/LoadingIcon';
+import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
-import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpIntegrationInstanceConfigurationWorkflowDialog from '@/ee/pages/embedded/mcp-servers/components/McpIntegrationInstanceConfigurationWorkflowDialog';
 import McpServerDialog from '@/ee/pages/embedded/mcp-servers/components/McpServerDialog';
