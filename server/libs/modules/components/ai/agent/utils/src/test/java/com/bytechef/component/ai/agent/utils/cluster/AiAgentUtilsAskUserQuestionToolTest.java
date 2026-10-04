@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -41,6 +42,8 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.tool.ToolSuspension;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import java.time.Duration;
 import java.time.Instant;
@@ -54,6 +57,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @author Ivica Cardic
@@ -137,7 +141,9 @@ class AiAgentUtilsAskUserQuestionToolTest {
 
         Instant before = Instant.now();
 
-        toolCallback.call(TOOL_INPUT, createStreamingToolContext(bufferedEvents));
+        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(bufferedEvents));
+
+        assertTrue(ToolSuspension.isSuspendedToolResult(result));
 
         Map<String, Object> event = bufferedEvents.poll();
 
@@ -151,14 +157,36 @@ class AiAgentUtilsAskUserQuestionToolTest {
         Suspend suspend = suspendReference.get();
 
         assertNotNull(suspend);
-        assertEquals(1, ((List<?>) suspend.continueParameters()
-            .get("questions")).size());
+        Map<String, ?> continueParameters = suspend.continueParameters();
+
+        assertEquals(1, ((List<?>) continueParameters.get("questions")).size());
+        assertEquals(true, continueParameters.get(MetadataConstants.STREAMING_RESUME));
 
         Instant expectedExpiresAt = before.plus(AiAgentUtilsAskUserQuestionTool.SUSPEND_TIMEOUT);
         Duration drift = Duration.between(expectedExpiresAt, suspend.expiresAt());
 
         assertFalse(drift.isNegative());
         assertTrue(drift.compareTo(Duration.ofMinutes(1)) < 0);
+    }
+
+    @Test
+    void testCallInEditorEnvironmentSendsQuestionWithoutResumeUrlAndDoesNotSuspend() {
+        when(((ActionContextAware) actionContext).isEditorEnvironment()).thenReturn(true);
+        when(((ActionContextAware) actionContext).getResumeUrl()).thenReturn(RESUME_URL);
+
+        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+
+        String result = toolCallback.call(TOOL_INPUT, createStreamingToolContext(bufferedEvents));
+
+        assertEquals(AiAgentUtilsAskUserQuestionTool.NO_RESUME_URL_RESULT, result);
+
+        Map<String, Object> event = bufferedEvents.poll();
+
+        assertNotNull(event);
+        assertFalse(event.containsKey("resumeUrl"));
+        assertEquals(EXPECTED_QUESTIONS, event.get("questions"));
+
+        verify(actionContext, never()).suspend(any());
     }
 
     @Test
@@ -187,8 +215,10 @@ class AiAgentUtilsAskUserQuestionToolTest {
         SseEmitter sseEmitter = mock(SseEmitter.class);
         Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
 
-        toolCallback.call(TOOL_INPUT, createStreamingToolContext(bufferedEvents, new AtomicReference<>(sseEmitter)));
+        String result = toolCallback.call(
+            TOOL_INPUT, createStreamingToolContext(bufferedEvents, new AtomicReference<>(sseEmitter)));
 
+        assertTrue(ToolSuspension.isSuspendedToolResult(result));
         verify(sseEmitter, times(1)).send(any(Map.class));
         assertTrue(bufferedEvents.isEmpty());
     }
@@ -208,6 +238,20 @@ class AiAgentUtilsAskUserQuestionToolTest {
             TOOL_INPUT, createStreamingToolContext(bufferedEvents, new AtomicReference<>(sseEmitter)));
 
         assertEquals(AiAgentUtilsAskUserQuestionTool.QUESTIONS_NOT_DELIVERED_RESULT, result);
+        assertTrue(bufferedEvents.isEmpty());
+        verify(actionContext, never()).suspend(any());
+    }
+
+    @Test
+    void testMalformedInputFailsWithoutSendingAQuestionOrSuspending() {
+        when(((ActionContextAware) actionContext).getResumeUrl()).thenReturn(RESUME_URL);
+
+        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+
+        ToolContext toolContext = createStreamingToolContext(bufferedEvents);
+
+        assertThrows(RuntimeException.class, () -> toolCallback.call("not json", toolContext));
+
         assertTrue(bufferedEvents.isEmpty());
         verify(actionContext, never()).suspend(any());
     }
@@ -244,6 +288,84 @@ class AiAgentUtilsAskUserQuestionToolTest {
         assertEquals(AiAgentUtilsAskUserQuestionTool.NO_RESUME_URL_RESULT, result);
     }
 
+    @Test
+    void testReturnsSuspendedToolResultWhenSuspendObservedOnActionContext() {
+        ToolCallback delegate = mock(ToolCallback.class);
+        ActionContextAware actionContextAware = mock(ActionContextAware.class);
+
+        when(delegate.getToolDefinition()).thenReturn(createToolDefinition());
+        when(delegate.call(eq("input"), any(ToolContext.class))).thenReturn("real-delegate-result");
+        when(actionContextAware.getSuspend())
+            .thenReturn(new ActionContext.Suspend(Map.of("questions", "q1"), null));
+
+        ToolContext toolContext = new ToolContext(
+            Map.of(ACTION_CONTEXT, actionContextAware, SSE_EMITTER_REFERENCE, new AtomicReference<>()));
+
+        AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback callback =
+            new AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback(delegate);
+
+        String result = callback.call("input", toolContext);
+
+        assertTrue(
+            ToolSuspension.isSuspendedToolResult(result),
+            "When the tool sets a suspend on the agent context, the callback must replace the delegate's result with " +
+                "the suspended tool result so the agent loop can locate the pending tool call on resume.");
+
+        verify(delegate, times(1)).call("input", toolContext);
+    }
+
+    @Test
+    void testPassesThroughDelegateResultWhenNoSuspendObserved() {
+        ToolCallback delegate = mock(ToolCallback.class);
+        ActionContextAware actionContextAware = mock(ActionContextAware.class);
+
+        when(delegate.getToolDefinition()).thenReturn(createToolDefinition());
+        when(delegate.call(eq("input"), any(ToolContext.class))).thenReturn("real-delegate-result");
+        when(actionContextAware.getSuspend()).thenReturn(null);
+
+        ToolContext toolContext = new ToolContext(
+            Map.of(ACTION_CONTEXT, actionContextAware, SSE_EMITTER_REFERENCE, new AtomicReference<>()));
+
+        AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback callback =
+            new AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback(delegate);
+
+        String result = callback.call("input", toolContext);
+
+        assertEquals("real-delegate-result", result,
+            "Without a suspend, the delegate's real result must pass through.");
+    }
+
+    @Test
+    void testPassesThroughDelegateResultWhenActionContextMissing() {
+        ToolCallback delegate = mock(ToolCallback.class);
+
+        when(delegate.getToolDefinition()).thenReturn(createToolDefinition());
+        when(delegate.call(eq("input"), any(ToolContext.class))).thenReturn("real-delegate-result");
+
+        ToolContext toolContext = new ToolContext(Map.of(SSE_EMITTER_REFERENCE, new AtomicReference<>()));
+
+        AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback callback =
+            new AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback(delegate);
+
+        String result = callback.call("input", toolContext);
+
+        assertEquals("real-delegate-result", result);
+    }
+
+    @Test
+    void testGetToolDefinitionDelegates() {
+        ToolCallback delegate = mock(ToolCallback.class);
+
+        ToolDefinition toolDefinition = createToolDefinition();
+
+        when(delegate.getToolDefinition()).thenReturn(toolDefinition);
+
+        AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback callback =
+            new AiAgentUtilsAskUserQuestionTool.ToolContextAwareToolCallback(delegate);
+
+        assertEquals(toolDefinition, callback.getToolDefinition());
+    }
+
     private ToolContext createStreamingToolContext(Queue<Map<String, Object>> bufferedEvents) {
         return createStreamingToolContext(bufferedEvents, new AtomicReference<>());
     }
@@ -256,6 +378,14 @@ class AiAgentUtilsAskUserQuestionToolTest {
                 ACTION_CONTEXT, actionContext,
                 SSE_BUFFERED_EVENTS, bufferedEvents,
                 SSE_EMITTER_REFERENCE, emitterReference));
+    }
+
+    private static ToolDefinition createToolDefinition() {
+        return ToolDefinition.builder()
+            .name("askUserQuestionTool")
+            .description("ask")
+            .inputSchema("{}")
+            .build();
     }
 
     private static String getRootCauseMessage(Throwable throwable) {

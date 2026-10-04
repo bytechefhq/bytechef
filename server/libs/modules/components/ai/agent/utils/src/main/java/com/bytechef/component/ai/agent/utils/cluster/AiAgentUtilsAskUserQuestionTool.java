@@ -30,6 +30,8 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.tool.ToolSuspension;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import java.time.Duration;
@@ -56,15 +58,19 @@ import org.springframework.ai.tool.definition.ToolDefinition;
  * tool sends an {@code ask_user_question} SSE event to the chat client.
  *
  * <p>
- * When the action context has a resume URL, the event carries it and the tool requests a suspend of the agent's
- * workflow task, so the client can POST the user's answers to the resume URL.
+ * When the action context has a resume URL, the event carries it and the tool suspends the agent's workflow task. The
+ * tool call then returns the suspended tool result (see {@link ToolSuspension}), which halts the agent's tool-calling
+ * loop; when the client POSTs the user's answers to the resume URL, the agent re-enters the loop with those answers as
+ * the tool call's result. The suspend allows a streaming resume, so the client can stream the agent's continued answer
+ * from that request.
  *
  * <p>
- * Without a resume URL (for example, an editor test run that has no job) the questions are still shown, but nothing can
- * carry the answers back to this tool call, so the model is told to end its turn and read the answers from the user's
- * next message. When the questions cannot be delivered, or no SSE transport is present in the {@link ToolContext} (for
- * example, the non-streaming chat action), the tool neither suspends nor waits, and tells the model to proceed without
- * asking.
+ * Without a resume URL (for example, the AI agent testing panel, which runs the action without a job) or in a workflow
+ * editor test run (whose in-memory job cannot be resumed through the resume URL), the questions are still shown, but
+ * nothing can carry the answers back to this tool call, so the model is told to end its turn and read the answers from
+ * the user's next message. When the questions cannot be delivered, or no SSE transport is present in the
+ * {@link ToolContext} (for example, the non-streaming chat action), the tool does not suspend and tells the model to
+ * proceed without asking.
  *
  * @author Ivica Cardic
  */
@@ -76,12 +82,14 @@ public class AiAgentUtilsAskUserQuestionTool {
         ComponentDsl.<ToolCallbackProviderFunction>clusterElement("askUserQuestionTool")
             .title("Ask User Question Tool")
             .description(
-                "Ask the user clarifying questions to gather preferences, clarify instructions, or get decisions.")
+                "Ask the user clarifying questions to gather preferences, clarify instructions, or get decisions. " +
+                    "Requires the Chat Stream action; with the non-streaming Chat action the agent proceeds " +
+                    "without asking.")
             .type(TOOLS)
             .object(() -> AiAgentUtilsAskUserQuestionTool::apply);
 
     static final String NO_EVENT_TRANSPORT_RESULT =
-        "The user cannot be asked questions in this context because the conversation is not streamed. Do not call " +
+        "The user cannot be asked questions in this context. Do not call " +
             "this tool again; proceed using your best judgment and state the assumptions you made in your response.";
 
     static final String NO_RESUME_URL_RESULT =
@@ -128,7 +136,7 @@ public class AiAgentUtilsAskUserQuestionTool {
             throw new IllegalStateException("ActionContext not available in ToolContext");
         }
 
-        String resumeUrl = actionContextAware.getResumeUrl();
+        String resumeUrl = actionContextAware.isEditorEnvironment() ? null : actionContextAware.getResumeUrl();
 
         if (!sendQuestionEvent(toolInvocation.toolContext, questions, resumeUrl)) {
             toolInvocation.result = QUESTIONS_NOT_DELIVERED_RESULT;
@@ -145,6 +153,7 @@ public class AiAgentUtilsAskUserQuestionTool {
         Map<String, Object> continueParameters = new HashMap<>();
 
         continueParameters.put(QUESTIONS, questions);
+        continueParameters.put(MetadataConstants.STREAMING_RESUME, true);
 
         Instant expiresAt = Instant.now()
             .plus(SUSPEND_TIMEOUT);
@@ -159,6 +168,18 @@ public class AiAgentUtilsAskUserQuestionTool {
 
         return toolContextMap.get(SSE_EMITTER_REFERENCE) instanceof AtomicReference<?> ||
             toolContextMap.get(SSE_BUFFERED_EVENTS) instanceof Queue<?>;
+    }
+
+    private static @Nullable ActionContextAware getSuspendedActionContext(ToolContext toolContext) {
+        Map<String, Object> toolContextMap = toolContext.getContext();
+
+        if (toolContextMap.get(ACTION_CONTEXT) instanceof ActionContextAware actionContextAware &&
+            actionContextAware.getSuspend() != null) {
+
+            return actionContextAware;
+        }
+
+        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -262,6 +283,12 @@ public class AiAgentUtilsAskUserQuestionTool {
 
             try {
                 String result = delegate.call(toolInput, toolContext);
+
+                ActionContextAware suspendedActionContext = getSuspendedActionContext(toolContext);
+
+                if (suspendedActionContext != null) {
+                    return ToolSuspension.suspendedToolResult(suspendedActionContext);
+                }
 
                 if (toolInvocation.result != null) {
                     return toolInvocation.result;
