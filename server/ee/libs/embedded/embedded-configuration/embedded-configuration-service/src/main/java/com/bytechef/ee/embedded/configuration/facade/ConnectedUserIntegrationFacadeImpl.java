@@ -419,7 +419,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                             mcpComponent.getComponentName(), mcpComponent.getComponentVersion(), mcpTool.getName());
 
                     return new ConnectedUserIntegrationDTO.McpToolInfo(
-                        mcpTool.getId(), mcpTool.getName(), clusterElementDefinition.getDescription());
+                        mcpTool.getId(), mcpTool.getName(), clusterElementDefinition.getTitle(),
+                        clusterElementDefinition.getDescription());
                 }))
             .toList();
     }

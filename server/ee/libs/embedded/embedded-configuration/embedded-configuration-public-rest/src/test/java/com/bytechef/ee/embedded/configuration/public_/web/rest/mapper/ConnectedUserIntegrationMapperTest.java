@@ -106,15 +106,16 @@ class ConnectedUserIntegrationMapperTest {
         };
 
     @Test
-    void testMcpToolInfoMapsId() {
+    void testMcpToolInfoMapsIdAndLabel() {
         ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationMapper generatedMapper =
             new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationMapperImpl();
 
         McpToolModel mcpToolModel = generatedMapper.map(
-            new ConnectedUserIntegrationDTO.McpToolInfo(1051L, "getEmail", "Get an email"));
+            new ConnectedUserIntegrationDTO.McpToolInfo(1051L, "getEmail", "Get Email", "Get an email"));
 
         assertEquals(1051L, mcpToolModel.getId());
         assertEquals("getEmail", mcpToolModel.getName());
+        assertEquals("Get Email", mcpToolModel.getLabel());
         assertEquals("Get an email", mcpToolModel.getDescription());
     }
 

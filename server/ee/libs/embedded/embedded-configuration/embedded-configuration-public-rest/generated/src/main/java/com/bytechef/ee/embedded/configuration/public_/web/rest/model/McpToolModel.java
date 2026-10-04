@@ -29,6 +29,8 @@ public class McpToolModel {
 
   private @Nullable Long id;
 
+  private @Nullable String label;
+
   private @Nullable String name;
 
   public McpToolModel description(@Nullable String description) {
@@ -73,6 +75,27 @@ public class McpToolModel {
     this.id = id;
   }
 
+  public McpToolModel label(@Nullable String label) {
+    this.label = label;
+    return this;
+  }
+
+  /**
+   * The label of the MCP tool.
+   * @return label
+   */
+  
+  @Schema(name = "label", description = "The label of the MCP tool.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
+  public @Nullable String getLabel() {
+    return label;
+  }
+
+  @JsonProperty("label")
+  public void setLabel(@Nullable String label) {
+    this.label = label;
+  }
+
   public McpToolModel name(@Nullable String name) {
     this.name = name;
     return this;
@@ -105,12 +128,13 @@ public class McpToolModel {
     McpToolModel mcpTool = (McpToolModel) o;
     return Objects.equals(this.description, mcpTool.description) &&
         Objects.equals(this.id, mcpTool.id) &&
+        Objects.equals(this.label, mcpTool.label) &&
         Objects.equals(this.name, mcpTool.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, id, name);
+    return Objects.hash(description, id, label, name);
   }
 
   @Override
@@ -119,6 +143,7 @@ public class McpToolModel {
     sb.append("class McpToolModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
