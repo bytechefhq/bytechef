@@ -1,25 +1,34 @@
+import {McpServer} from '@/shared/middleware/graphql';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import McpServerAddToolsButton from '../McpServerAddToolsButton';
+import McpServerAddToolsButton, {
+    McpServerComponentDialogProps,
+    McpServerWorkflowDialogProps,
+} from '../McpServerAddToolsButton';
+
+const FakeMcpComponentDialog = ({mcpServerId, onOpenChange}: McpServerComponentDialogProps) => (
+    <div role="dialog">
+        <span>Component dialog for {mcpServerId}</span>
+
+        <button onClick={() => onOpenChange(false)}>Close component dialog</button>
+    </div>
+);
+
+const FakeWorkflowDialog = ({mcpServer, onClose}: McpServerWorkflowDialogProps) => (
+    <div role="dialog">
+        <span>Workflow dialog for {mcpServer.name}</span>
+
+        <button onClick={onClose}>Close workflow dialog</button>
+    </div>
+);
 
 const renderButton = () =>
     render(
         <McpServerAddToolsButton
-            renderMcpComponentDialog={(onClose) => (
-                <div role="dialog">
-                    <span>Component dialog</span>
-
-                    <button onClick={onClose}>Close component dialog</button>
-                </div>
-            )}
-            renderWorkflowDialog={(onClose) => (
-                <div role="dialog">
-                    <span>Workflow dialog</span>
-
-                    <button onClick={onClose}>Close workflow dialog</button>
-                </div>
-            )}
+            mcpComponentDialog={FakeMcpComponentDialog}
+            mcpServer={{id: '1', name: 'mcpserver1'} as McpServer}
+            workflowDialog={FakeWorkflowDialog}
         />
     );
 
@@ -48,7 +57,7 @@ describe('McpServerAddToolsButton', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'Add Component'}));
 
-        expect(screen.getByText('Component dialog')).toBeInTheDocument();
+        expect(screen.getByText('Component dialog for 1')).toBeInTheDocument();
     });
 
     it('lists Add Component and Add Workflows in the menu', async () => {
@@ -67,7 +76,7 @@ describe('McpServerAddToolsButton', () => {
         await openMenu();
         await userEvent.click(screen.getByRole('menuitem', {name: 'Add Component'}));
 
-        expect(screen.getByText('Component dialog')).toBeInTheDocument();
+        expect(screen.getByText('Component dialog for 1')).toBeInTheDocument();
     });
 
     it('opens the workflow dialog from the menu and closes it again', async () => {
@@ -76,11 +85,11 @@ describe('McpServerAddToolsButton', () => {
         await openMenu();
         await userEvent.click(screen.getByRole('menuitem', {name: 'Add Workflows'}));
 
-        expect(screen.getByText('Workflow dialog')).toBeInTheDocument();
+        expect(screen.getByText('Workflow dialog for mcpserver1')).toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('button', {name: 'Close workflow dialog'}));
 
-        expect(screen.queryByText('Workflow dialog')).not.toBeInTheDocument();
+        expect(screen.queryByText('Workflow dialog for mcpserver1')).not.toBeInTheDocument();
     });
 
     it('closes the component dialog when it reports closed', async () => {
@@ -89,6 +98,6 @@ describe('McpServerAddToolsButton', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Add Component'}));
         await userEvent.click(screen.getByRole('button', {name: 'Close component dialog'}));
 
-        expect(screen.queryByText('Component dialog')).not.toBeInTheDocument();
+        expect(screen.queryByText('Component dialog for 1')).not.toBeInTheDocument();
     });
 });
