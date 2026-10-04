@@ -147,6 +147,7 @@ include("server:libs:core:tenant:tenant-api")
 include("server:libs:core:tenant:tenant-single-service")
 
 include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-api")
+include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-graphql")
 include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-api")
 include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-file-storage")
 include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-jdbc")
