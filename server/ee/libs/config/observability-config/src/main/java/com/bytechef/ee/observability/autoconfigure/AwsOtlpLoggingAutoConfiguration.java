@@ -15,6 +15,8 @@ import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter;
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporterBuilder;
 import java.net.URI;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Supplier;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -47,6 +49,10 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
  * the AWS SDK default chain (environment variables, system properties, web identity token, ECS container and EC2
  * instance profile credentials). They are resolved on every request, so rotated credentials are picked up.
  *
+ * <p>
+ * CloudWatch requires the target log group and log stream, which must already exist, as request headers; they come from
+ * {@code bytechef.observability.logging.aws.log-group} and {@code log-stream}.
+ *
  * @version ee
  *
  * @author Igor Beslic
@@ -61,6 +67,9 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
     name = "management.opentelemetry.logging.export.otlp.transport", havingValue = "http", matchIfMissing = true)
 @EnableConfigurationProperties(OtlpLoggingProperties.class)
 public class AwsOtlpLoggingAutoConfiguration {
+
+    static final String LOG_GROUP_HEADER = "x-aws-log-group";
+    static final String LOG_STREAM_HEADER = "x-aws-log-stream";
 
     @Bean
     OtlpHttpLogRecordExporter awsOtlpHttpLogRecordExporter(
@@ -96,12 +105,37 @@ public class AwsOtlpLoggingAutoConfiguration {
                 .toLowerCase(Locale.US))
             .setComponentLoader(AwsHttpSender.componentLoader(signer, credentialsSupplier));
 
-        otlpLoggingProperties.getHeaders()
-            .forEach(builder::addHeader);
+        Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        headers.putAll(otlpLoggingProperties.getHeaders());
+
+        headers.put(LOG_GROUP_HEADER, resolveLogHeader(aws.getLogGroup(), headers, LOG_GROUP_HEADER, "log-group"));
+        headers.put(
+            LOG_STREAM_HEADER, resolveLogHeader(aws.getLogStream(), headers, LOG_STREAM_HEADER, "log-stream"));
+
+        headers.forEach(builder::addHeader);
 
         meterProviderObjectProvider.ifAvailable(builder::setMeterProvider);
 
         return builder.build();
+    }
+
+    /**
+     * CloudWatch rejects every request without the log group and log stream headers with HTTP 400, so a missing value
+     * fails the startup instead of every export.
+     */
+    static String resolveLogHeader(
+        String propertyValue, Map<String, String> headers, String headerName, String propertyName) {
+
+        String value = StringUtils.hasText(propertyValue) ? propertyValue : headers.get(headerName);
+
+        Assert.state(
+            StringUtils.hasText(value),
+            "'bytechef.observability.logging.aws." + propertyName + "' must be set when " +
+                "'bytechef.observability.logging.aws.enabled' is true, CloudWatch requires the " + headerName +
+                " request header");
+
+        return value.trim();
     }
 
     static String resolveRegion(String region, String endpoint) {
