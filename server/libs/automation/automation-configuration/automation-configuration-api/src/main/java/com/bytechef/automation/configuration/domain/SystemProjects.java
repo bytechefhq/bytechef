@@ -23,6 +23,8 @@ public final class SystemProjects {
 
     public static final String EMBEDDED_AUTOMATION_NAME_PREFIX = "__EMBEDDED_AUTOMATION__";
 
+    public static final String A2A_SERVER_DEPLOYMENT_NAME_PREFIX = "__A2A_SERVER__";
+
     private SystemProjects() {
     }
 

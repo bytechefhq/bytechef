@@ -64,6 +64,8 @@ include("server:libs:atlas:atlas-worker:atlas-worker-api")
 include("server:libs:atlas:atlas-worker:atlas-worker-config")
 include("server:libs:atlas:atlas-worker:atlas-worker-impl")
 
+include("server:libs:automation:automation-ai:automation-ai-a2a:automation-ai-a2a-api")
+include("server:libs:automation:automation-ai:automation-ai-a2a:automation-ai-a2a-service")
 include("server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api")
 include("server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-graphql")
 include("server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-service")
