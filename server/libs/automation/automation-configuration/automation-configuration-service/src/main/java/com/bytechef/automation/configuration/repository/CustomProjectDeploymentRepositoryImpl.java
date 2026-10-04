@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -25,6 +26,10 @@ import org.springframework.jdbc.core.simple.JdbcClient;
  * @author Ivica Cardic
  */
 public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeploymentRepository {
+
+    private static final String API_COLLECTION_NAME_PREFIX = "__API_COLLECTION__";
+    private static final String EMBEDDED_NAME_PREFIX = "__EMBEDDED__";
+    private static final String MCP_SERVER_NAME_PREFIX = "__MCP_SERVER__";
 
     private final JdbcClient jdbcClient;
 
@@ -52,9 +57,9 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
             query += "WHERE ";
 
             if (embedded) {
-                query += "project.name LIKE '__EMBEDDED__%' ";
+                query += startsWith("project.name", EMBEDDED_NAME_PREFIX) + " ";
             } else {
-                query += "project.name NOT LIKE '__EMBEDDED__%' ";
+                query += "NOT " + startsWith("project.name", EMBEDDED_NAME_PREFIX) + " ";
             }
         }
 
@@ -103,8 +108,9 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
         }
 
         // __MCP_SERVER__% matches McpServer.MCP_SERVER_NAME_PREFIX in platform-mcp-api
-        query += "AND (project_deployment.name NOT LIKE '__API_COLLECTION__%' AND " +
-            "project_deployment.name NOT LIKE '__MCP_SERVER__%' )";
+        query += "AND (NOT " + startsWith("project_deployment.name", API_COLLECTION_NAME_PREFIX) + " AND NOT " +
+            startsWith("project_deployment.name", MCP_SERVER_NAME_PREFIX) + " AND NOT " +
+            startsWith("project_deployment.name", SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX) + ") ";
 
         query += "ORDER BY LOWER(project_deployment.name) ASC, project_deployment.project_version ASC, " +
             "project_deployment.environment ASC";
@@ -125,5 +131,13 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
         }
 
         return projectDeployments;
+    }
+
+    private static String startsWith(String column, String prefix) {
+        String escapedPrefix = prefix.replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
+
+        return column + " LIKE '" + escapedPrefix + "%' ESCAPE '\\'";
     }
 }
