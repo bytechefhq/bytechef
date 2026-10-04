@@ -76,6 +76,12 @@ function openPanelFor(nodeName: string, nodeData: Partial<NodeDataType> = {}) {
     useWorkflowTestChatStore.setState({workflowTestChatPanelOpen: true});
 }
 
+function expectPanelsOpen(nodeName: string) {
+    expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(true);
+    expect(useWorkflowNodeDetailsPanelStore.getState().currentNode?.name).toBe(nodeName);
+    expect(useWorkflowTestChatStore.getState().workflowTestChatPanelOpen).toBe(true);
+}
+
 function expectPanelsClosed() {
     expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(false);
     expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBeUndefined();
@@ -140,6 +146,35 @@ describe('useBranchCaseLabel', () => {
         expectPanelsClosed();
     });
 
+    it('saves the deletion without touching the panels when no node is open', () => {
+        const {result} = renderBranchCaseLabel('caseA', 'taskA');
+
+        deleteCase(result);
+
+        expect(saveWorkflowDefinitionMock).toHaveBeenCalledOnce();
+        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBeUndefined();
+    });
+
+    it('keeps the details panel open when a trigger is open', () => {
+        openPanelFor('trigger_1', {trigger: true});
+
+        const {result} = renderBranchCaseLabel('caseA', 'taskA');
+
+        deleteCase(result);
+
+        expectPanelsOpen('trigger_1');
+    });
+
+    it('keeps the details panel open on a cluster element whose root task is unknown', () => {
+        openPanelFor('taskA', {clusterElementType: 'model'});
+
+        const {result} = renderBranchCaseLabel('caseA', 'taskA');
+
+        deleteCase(result);
+
+        expectPanelsOpen('taskA');
+    });
+
     it('keeps the details panel open when the open node is in another case', () => {
         openPanelFor('taskB');
 
@@ -148,8 +183,7 @@ describe('useBranchCaseLabel', () => {
         deleteCase(result);
 
         expect(saveWorkflowDefinitionMock).toHaveBeenCalledOnce();
-        expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(true);
-        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode?.name).toBe('taskB');
-        expect(useWorkflowTestChatStore.getState().workflowTestChatPanelOpen).toBe(true);
+
+        expectPanelsOpen('taskB');
     });
 });
