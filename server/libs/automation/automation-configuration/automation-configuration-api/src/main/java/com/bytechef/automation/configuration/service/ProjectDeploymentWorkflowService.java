@@ -55,6 +55,9 @@ public interface ProjectDeploymentWorkflowService {
 
     List<ProjectDeploymentWorkflow> getProjectDeploymentWorkflows(List<Long> projectDeploymentIds);
 
+    @Transactional(readOnly = true)
+    List<ProjectDeploymentWorkflow> getWorkflowProjectDeploymentWorkflows(String workflowId);
+
     boolean isConnectionUsed(long connectionId);
 
     boolean isProjectDeploymentWorkflowEnabled(long projectDeploymentId, String workflowId);

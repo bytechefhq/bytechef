@@ -158,6 +158,14 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
 
     @Override
     @Transactional(readOnly = true)
+    public List<ProjectDeploymentWorkflow> getWorkflowProjectDeploymentWorkflows(String workflowId) {
+        Assert.notNull(workflowId, "'workflowId' must not be null");
+
+        return projectDeploymentWorkflowRepository.findAllByWorkflowId(workflowId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public boolean isConnectionUsed(long connectionId) {
         return projectDeploymentWorkflowRepository.countByConnectionId(connectionId) > 0;
     }

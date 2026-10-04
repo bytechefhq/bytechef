@@ -151,7 +151,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_DELETE')")
     public void deleteProject(long id) {
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(id);
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getAllProjectDeployments(id);
 
         for (ProjectDeployment projectDeployment : projectDeployments) {
             projectDeploymentFacade.deleteProjectDeployment(projectDeployment.getId());
