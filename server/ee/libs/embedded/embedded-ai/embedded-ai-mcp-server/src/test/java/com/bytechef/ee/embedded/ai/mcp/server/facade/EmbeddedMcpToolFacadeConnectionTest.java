@@ -39,10 +39,8 @@ class EmbeddedMcpToolFacadeConnectionTest {
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
         when(componentDefinition.getConnection()).thenReturn(null);
-        when(componentDefinitionService.getComponentDefinition("embeddedWorkflowBuilder", 1))
-            .thenReturn(componentDefinition);
+        when(componentDefinitionService.getComponentDefinition("logger", 1)).thenReturn(componentDefinition);
 
-        assertFalse(
-            EmbeddedMcpToolFacade.isConnectionRequired(componentDefinitionService, "embeddedWorkflowBuilder", 1));
+        assertFalse(EmbeddedMcpToolFacade.isConnectionRequired(componentDefinitionService, "logger", 1));
     }
 }
