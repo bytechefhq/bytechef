@@ -7,6 +7,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '../stores/useWorkflowTestChatStore';
 import {flattenDefinitionTasks} from '../utils/flattenDefinitionTasks';
@@ -131,13 +132,21 @@ function getRecursivelyUpdatedRootTaskDispatcherNodeData(
 function closePanelIfCurrentNodeDeleted(deletedTasks: WorkflowTask[]) {
     const {currentNode, reset} = useWorkflowNodeDetailsPanelStore.getState();
 
-    if (!currentNode?.name || currentNode.trigger) {
+    if (!currentNode || currentNode.trigger) {
+        return;
+    }
+
+    const currentTaskName = currentNode.clusterElementType
+        ? useWorkflowEditorStore.getState().rootClusterElementNodeData?.name
+        : currentNode.name;
+
+    if (!currentTaskName) {
         return;
     }
 
     const deletedTaskNames = new Set(flattenDefinitionTasks(deletedTasks).map((task) => task.name));
 
-    if (deletedTaskNames.has(currentNode.name)) {
+    if (deletedTaskNames.has(currentTaskName)) {
         reset();
 
         useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
