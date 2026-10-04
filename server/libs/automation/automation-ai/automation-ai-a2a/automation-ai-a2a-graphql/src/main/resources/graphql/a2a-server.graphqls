@@ -1,0 +1,33 @@
+extend type Query {
+    a2aServers: [A2aServer]
+}
+
+extend type Mutation {
+    createA2aServer(input: CreateA2aServerInput!): A2aServer
+    updateA2aServer(id: ID!, input: UpdateA2aServerInput!): A2aServer
+    deleteA2aServer(id: ID!): Boolean
+}
+
+type A2aServer {
+    id: ID!
+    name: String!
+    description: String
+    environmentId: ID!
+    enabled: Boolean!
+    authenticationRequired: Boolean!
+    secretKey: String
+}
+
+input CreateA2aServerInput {
+    name: String!
+    description: String
+    environmentId: ID!
+    authenticationRequired: Boolean
+}
+
+input UpdateA2aServerInput {
+    name: String
+    description: String
+    enabled: Boolean
+    authenticationRequired: Boolean
+}
