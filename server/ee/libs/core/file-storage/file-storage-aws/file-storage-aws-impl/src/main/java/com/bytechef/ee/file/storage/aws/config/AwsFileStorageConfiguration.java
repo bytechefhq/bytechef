@@ -44,11 +44,12 @@ public class AwsFileStorageConfiguration {
     }
 
     @Bean
-    AwsFileStorageService awsFileStorageService(S3Template s3Template, ApplicationProperties applicationProperties) {
+    AwsFileStorageService awsFileStorageService(
+        S3Client s3Client, S3Template s3Template, ApplicationProperties applicationProperties) {
         Aws aws = applicationProperties.getFileStorage()
             .getAws();
 
-        return new AwsFileStorageServiceImpl(s3Template, aws.getBucket());
+        return new AwsFileStorageServiceImpl(s3Client, s3Template, aws.getBucket());
     }
 
     @Bean

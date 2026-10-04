@@ -28,6 +28,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
+import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
  * @version ee
@@ -39,11 +44,13 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     private static final Base64.Decoder MIME_DECODER = Base64.getMimeDecoder();
     private static final String URL_PREFIX = "s3://";
 
+    private final S3Client s3Client;
     private final S3Template s3Template;
     private final String bucketName;
 
     @SuppressFBWarnings("EI")
-    public AwsFileStorageServiceImpl(S3Template s3Template, String bucketName) {
+    public AwsFileStorageServiceImpl(S3Client s3Client, S3Template s3Template, String bucketName) {
+        this.s3Client = s3Client;
         this.s3Template = s3Template;
         this.bucketName = bucketName;
     }
@@ -51,10 +58,22 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     @Override
     @SuppressWarnings("PMD.UnusedFormalParameter")
     public void deleteFile(String directory, FileEntry fileEntry) {
-        if (fileEntry != null) {
+        if (fileEntry == null) {
+            return;
+        }
+
+        String key = toKey(fileEntry, directory);
+
+        if (key == null) {
             findObject(directory, fileEntry.getName())
                 .ifPresent(s3Resource -> s3Template.deleteObject(
                     bucketName, Objects.requireNonNull(s3Resource.getFilename())));
+
+            return;
+        }
+
+        if (s3Template.objectExists(bucketName, key)) {
+            s3Template.deleteObject(bucketName, key);
         }
     }
 
@@ -91,14 +110,21 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public Set<FileEntry> getFileEntries(String directory) throws FileStorageException {
-        String prefix = combinePaths(directory, null);
+        String prefix = StringUtils.stripEnd(combinePaths(directory, null), "/") + "/";
 
-        return s3Template.listObjects(bucketName, prefix)
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+            .bucket(bucketName)
+            .prefix(prefix)
+            .build();
+
+        return s3Client.listObjectsV2Paginator(listObjectsV2Request)
+            .contents()
             .stream()
-            .map(S3Resource::getFilename)
+            .map(S3Object::key)
             .filter(Objects::nonNull)
-            .map(filename -> new FileEntry(
-                filename.substring(filename.lastIndexOf('/')), URL_PREFIX + bucketName + "/" + filename))
+            .filter(key -> !key.endsWith("/"))
+            .map(key -> new FileEntry(
+                key.substring(key.lastIndexOf('/') + 1), URL_PREFIX + bucketName + "/" + key))
             .collect(Collectors.toSet());
     }
 
@@ -136,16 +162,12 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
         S3Resource s3Resource = resolveResource(fileEntry);
 
-        byte[] bytes;
-
         try (InputStream inputStream = s3Resource.getInputStream()) {
-            bytes = inputStream.readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException(
-                "Unable to read file %s in directory %s".formatted(fileEntry.getName(), directory), e);
+            return MIME_DECODER.decode(inputStream.readAllBytes());
+        } catch (IOException | SdkException | IllegalArgumentException exception) {
+            throw new FileStorageException(
+                "Unable to read file %s in directory %s".formatted(fileEntry.getName(), directory), exception);
         }
-
-        return MIME_DECODER.decode(bytes);
     }
 
     @Override
@@ -232,6 +254,20 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         }
 
         return s3Template.download(bucketName, key);
+    }
+
+    private @Nullable String toKey(FileEntry fileEntry, String directory) {
+        String url = fileEntry.getUrl();
+        String urlPrefix = URL_PREFIX + bucketName + "/";
+
+        if (!url.startsWith(urlPrefix)) {
+            return null;
+        }
+
+        String key = url.substring(urlPrefix.length());
+        String directoryPrefix = StringUtils.stripEnd(combinePaths(directory, null), "/") + "/";
+
+        return key.startsWith(directoryPrefix) ? key : null;
     }
 
     private String resolveKey(FileEntry fileEntry) {
