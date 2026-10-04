@@ -14,10 +14,22 @@ import com.bytechef.automation.configuration.security.constant.PermissionScopeTy
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -104,5 +116,118 @@ class PermissionScopeRegistryTest {
         BETA_VIEW,
         BETA_DELETE,
         X_SCOPE
+    }
+
+    @Nested
+    class ShippedCatalog {
+
+        private static final Pattern HAS_PERMISSION_PATTERN = Pattern.compile(
+            "hasPermission\\([^)]*,\\s*'[A-Za-z]+'\\s*,\\s*'([A-Z][A-Z0-9_]{2,})'\\s*\\)");
+
+        private static final Pattern PROGRAMMATIC_SCOPE_CHECK_PATTERN = Pattern.compile(
+            "\\.(?:hasWorkspaceScope|hasWorkspaceScopeForProject|hasResourceScope)\\(([^)]*)\\)");
+
+        private static final Pattern SCOPE_NAME_LITERAL_PATTERN = Pattern.compile("\"([A-Z][A-Z0-9_]{2,})\"");
+
+        private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
+            List.<PermissionScopeProvider>of(
+                new DeploymentPermissionScopeProvider(), new McpPermissionScopeProvider(),
+                new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider()));
+
+        @Test
+        void testEveryScopeNamedByAGateIsRegistered() {
+            Set<String> registeredScopeNames = shippedPermissionScopeRegistry.getAllScopeNames();
+            Set<String> gatedScopeNames = readScopeNamesNamedByGates();
+
+            assertThat(gatedScopeNames)
+                .as("no @PreAuthorize gate may name a scope that no PermissionScopeProvider declares")
+                .isNotEmpty();
+            assertThat(registeredScopeNames).containsAll(gatedScopeNames);
+        }
+
+        @Test
+        void testEveryRegisteredScopeIsNamedByAGate() {
+            Set<String> registeredScopeNames = shippedPermissionScopeRegistry.getAllScopeNames();
+            Set<String> gatedScopeNames = readScopeNamesNamedByGates();
+
+            assertThat(gatedScopeNames)
+                .as("no PermissionScopeProvider may declare a scope that no @PreAuthorize gate or permission check enforces")
+                .containsAll(registeredScopeNames);
+        }
+
+        @Test
+        void testMcpScopesAreGrantedFromViewerAndEditor() {
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).contains("MCP_VIEW");
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR)).contains(
+                "MCP_VIEW", "MCP_CREATE", "MCP_EDIT");
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).doesNotContain(
+                "MCP_CREATE", "MCP_EDIT");
+        }
+
+        @Test
+        void testViewerSubsetEditorSubsetAdmin() {
+            Set<String> viewerScopeNames = shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER);
+            Set<String> editorScopeNames = shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR);
+            Set<String> adminScopeNames = shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.ADMIN);
+
+            assertThat(editorScopeNames).containsAll(viewerScopeNames);
+            assertThat(adminScopeNames).containsAll(editorScopeNames);
+        }
+
+        private static Set<String> readScopeNamesNamedByGates() {
+            Path serverPath = findRepositoryRootPath().resolve("server");
+            Set<String> scopeNames = new TreeSet<>();
+
+            try (Stream<Path> paths = Files.walk(serverPath)) {
+                List<Path> javaPaths = paths.filter(Files::isRegularFile)
+                    .filter(path -> {
+                        String pathString = path.toString();
+
+                        return pathString.endsWith(".java") && pathString.contains("/src/main/") &&
+                            !pathString.contains("/build/");
+                    })
+                    .toList();
+
+                for (Path javaPath : javaPaths) {
+                    String source = Files.readString(javaPath);
+
+                    Matcher hasPermissionMatcher = HAS_PERMISSION_PATTERN.matcher(source);
+
+                    while (hasPermissionMatcher.find()) {
+                        scopeNames.add(hasPermissionMatcher.group(1));
+                    }
+
+                    Matcher programmaticScopeCheckMatcher = PROGRAMMATIC_SCOPE_CHECK_PATTERN.matcher(source);
+
+                    while (programmaticScopeCheckMatcher.find()) {
+                        Matcher scopeNameLiteralMatcher = SCOPE_NAME_LITERAL_PATTERN.matcher(
+                            programmaticScopeCheckMatcher.group(1));
+
+                        while (scopeNameLiteralMatcher.find()) {
+                            scopeNames.add(scopeNameLiteralMatcher.group(1));
+                        }
+                    }
+                }
+            } catch (IOException ioException) {
+                throw new UncheckedIOException(ioException);
+            }
+
+            return scopeNames;
+        }
+
+        private static Path findRepositoryRootPath() {
+            Path path = Path.of("")
+                .toAbsolutePath();
+
+            while (path != null && !Files.exists(path.resolve("settings.gradle.kts"))) {
+                path = path.getParent();
+            }
+
+            assertThat(path)
+                .as("repository root containing settings.gradle.kts must be locatable from the test working directory")
+                .isNotNull();
+
+            return path;
+        }
     }
 }
