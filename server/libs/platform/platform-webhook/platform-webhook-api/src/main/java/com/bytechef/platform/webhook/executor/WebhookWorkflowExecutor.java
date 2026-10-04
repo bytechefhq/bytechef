@@ -53,8 +53,7 @@ public interface WebhookWorkflowExecutor {
      *                            execution
      * @param sseStreamBridge     the server-sent events (SSE) stream bridge used to facilitate real-time event
      *                            handling, such as events, errors, and stream completion
-     * @return a {@code CompletableFuture<Void>} that completes when the workflow execution is finished or encounters an
-     *         error
+     * @return a {@code CompletableFuture<Void>} that completes when the workflow run finishes, suspends, stops or fails
      */
     CompletableFuture<Void> executeAsync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge);
@@ -77,7 +76,10 @@ public interface WebhookWorkflowExecutor {
 
     /**
      * Executes a workflow with streaming output. Events are pushed to {@code sseStreamBridge} as the workflow runs;
-     * completion / error are signalled via {@link SseStreamBridge#onComplete()} / {@link SseStreamBridge#onError}.
+     * completion, suspension and errors are signalled via {@link SseStreamBridge#onComplete()},
+     * {@link SseStreamBridge#onSuspend()} and {@link SseStreamBridge#onError}. The bridge also receives
+     * {@link SseStreamBridge#onComplete()} when the returned future completes, after a suspension or error has already
+     * been signalled, so a bridge must act only on the first of these terminal calls.
      *
      * <p>
      * When the workflow is disabled the bridge receives a synchronous {@link SseStreamBridge#onError} call with an
@@ -88,7 +90,7 @@ public interface WebhookWorkflowExecutor {
      * @param workflowExecutionId the workflow execution to invoke
      * @param webhookRequest      the request payload
      * @param sseStreamBridge     the transport-specific event sink (SSE emitter wrap, AG-UI bridge, etc.)
-     * @return a future that completes when the workflow run finishes or errors
+     * @return a future that completes when the workflow run finishes, suspends, stops or fails
      */
     CompletableFuture<Void> stream(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge);
