@@ -27,6 +27,13 @@ public interface TriggerScheduler {
 
     void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId);
 
+    /**
+     * Cancels the one-time task scheduled with {@link #scheduleOneTimeTask(Instant, Map, long)} for the job, if it has
+     * not run yet. Does nothing when no such task exists. Implementations that cannot cancel one-time tasks, such as
+     * the remote scheduler client, throw {@link UnsupportedOperationException}.
+     */
+    void cancelOneTimeTask(long jobId);
+
     void cancelScheduleTrigger(String workflowExecutionId);
 
     void cancelPollingTrigger(String workflowExecutionId);
