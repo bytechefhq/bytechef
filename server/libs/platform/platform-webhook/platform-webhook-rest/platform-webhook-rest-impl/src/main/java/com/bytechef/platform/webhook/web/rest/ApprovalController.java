@@ -19,8 +19,11 @@ package com.bytechef.platform.webhook.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.workflow.execution.ApprovalId;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,10 +41,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Deprecated
 public class ApprovalController {
 
+    private final ObjectProvider<ApprovalTokens> approvalTokensProvider;
     private final JobFacade jobFacade;
 
     @SuppressFBWarnings("EI")
-    public ApprovalController(JobFacade jobFacade) {
+    public ApprovalController(ObjectProvider<ApprovalTokens> approvalTokensProvider, JobFacade jobFacade) {
+        this.approvalTokensProvider = approvalTokensProvider;
         this.jobFacade = jobFacade;
     }
 
@@ -55,7 +60,21 @@ public class ApprovalController {
         RequestMethod.GET, RequestMethod.POST
     }, value = "/approvals/{id}")
     public ResponseEntity<Void> approve(@PathVariable String id) {
-        ApprovalId approvalId = ApprovalId.parse(id);
+        Optional<String> innerTokenOptional = resolveInnerToken(id);
+
+        if (innerTokenOptional.isEmpty()) {
+            return ResponseEntity.badRequest()
+                .build();
+        }
+
+        ApprovalId approvalId;
+
+        try {
+            approvalId = ApprovalId.parse(innerTokenOptional.get());
+        } catch (IllegalArgumentException | IndexOutOfBoundsException exception) {
+            return ResponseEntity.badRequest()
+                .build();
+        }
 
         return TenantContext.callWithTenantId(approvalId.getTenantId(), () -> {
             jobFacade.resumeApproval(approvalId.getJobId(), approvalId.getUuidAsString(), approvalId.isApproved());
@@ -63,5 +82,15 @@ public class ApprovalController {
             return ResponseEntity.noContent()
                 .build();
         });
+    }
+
+    private Optional<String> resolveInnerToken(String id) {
+        ApprovalTokens approvalTokens = approvalTokensProvider.getIfAvailable();
+
+        if (approvalTokens == null) {
+            return Optional.of(id);
+        }
+
+        return approvalTokens.resolveInnerToken(id);
     }
 }

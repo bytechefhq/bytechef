@@ -31,9 +31,11 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.tracing.Tracer;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
@@ -46,6 +48,7 @@ import org.springframework.stereotype.Component;
 public class ContextFactoryImpl implements ContextFactory {
 
     private final ApplicationContext applicationContext;
+    private final ObjectProvider<ApprovalTokens> approvalTokensProvider;
     private final CacheManager cacheManager;
     private final DataStorage dataStorage;
     private final EditorLogFileStorage editorLogFileStorage;
@@ -61,10 +64,12 @@ public class ContextFactoryImpl implements ContextFactory {
     public ContextFactoryImpl(
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
         DataStorage dataStorage, EditorLogFileStorage editorLogFileStorage, EditorTempFileStorage editorTempFileStorage,
-        ApplicationEventPublisher eventPublisher, LogFileStorage logFileStorage,
-        TempFileStorage tempFileStorage, Tracer tracer, TriggerLogFileStorage triggerLogFileStorage) {
+        ApplicationEventPublisher eventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
+        LogFileStorage logFileStorage, TempFileStorage tempFileStorage, Tracer tracer,
+        TriggerLogFileStorage triggerLogFileStorage) {
 
         this.applicationContext = applicationContext;
+        this.approvalTokensProvider = approvalTokensProvider;
         this.cacheManager = cacheManager;
         this.dataStorage = dataStorage;
         this.editorLogFileStorage = editorLogFileStorage;
@@ -87,7 +92,8 @@ public class ContextFactoryImpl implements ContextFactory {
         return ActionContextImpl
             .builder(
                 componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
-                eventPublisher, getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment))
+                eventPublisher, getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment),
+                approvalTokensProvider.getIfAvailable())
             .componentConnection(componentConnection)
             .environmentId(environmentId)
             .jobId(jobId)

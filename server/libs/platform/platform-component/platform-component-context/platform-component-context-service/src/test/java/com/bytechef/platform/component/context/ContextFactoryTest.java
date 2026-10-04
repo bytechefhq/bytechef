@@ -19,18 +19,14 @@ package com.bytechef.platform.component.context;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.file.storage.FileStorageServiceRegistry;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
@@ -39,9 +35,11 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import io.micrometer.tracing.Tracer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
@@ -60,17 +58,15 @@ class ContextFactoryTest {
     @BeforeEach
     void beforeEach() {
         ApplicationProperties applicationProperties = mock(ApplicationProperties.class);
-        ApplicationProperties.FileStorage fileStorage = mock(ApplicationProperties.FileStorage.class);
-        FileStorageServiceRegistry fileStorageServiceRegistry = mock(FileStorageServiceRegistry.class);
 
-        when(applicationProperties.getFileStorage()).thenReturn(fileStorage);
-        when(fileStorage.getProvider()).thenReturn(ApplicationProperties.FileStorage.Provider.values()[0]);
-        when(fileStorageServiceRegistry.getFileStorageService(anyString())).thenReturn(mock(FileStorageService.class));
+        @SuppressWarnings("unchecked")
+        ObjectProvider<ApprovalTokens> approvalTokensProvider = mock(ObjectProvider.class);
 
         contextFactory = new ContextFactoryImpl(
             mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class), mock(DataStorage.class),
             editorLogFileStorage, mock(EditorTempFileStorage.class), mock(ApplicationEventPublisher.class),
-            logFileStorage, mock(TempFileStorage.class), mock(Tracer.class), triggerLogFileStorage);
+            approvalTokensProvider, logFileStorage, mock(TempFileStorage.class), mock(Tracer.class),
+            triggerLogFileStorage);
     }
 
     @Test

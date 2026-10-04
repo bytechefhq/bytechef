@@ -171,7 +171,7 @@ class ClusterElementContextImplTest {
     void testToActionContextForwardsSuspendToTheParentActionContext() {
         ActionContextImpl parentActionContext = ActionContextImpl.builder(
             "aiAgent", 1, "chat", false, cacheManager, dataStorage, eventPublisher, httpClientExecutor,
-            tempFileStorage)
+            tempFileStorage, null)
             .environmentId(100L)
             .jobId(200L)
             .publicUrl("https://example.com")

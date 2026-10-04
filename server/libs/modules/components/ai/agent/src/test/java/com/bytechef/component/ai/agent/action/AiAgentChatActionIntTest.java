@@ -76,6 +76,7 @@ import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacadeImpl;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcherPreSendProcessor;
 import com.bytechef.task.dispatcher.suspend.completion.SuspendTaskCompletionHandler;
 import com.bytechef.tenant.TenantContext;
@@ -104,6 +105,7 @@ import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.resolution.DelegatingToolCallbackResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
@@ -231,7 +233,7 @@ class AiAgentChatActionIntTest {
             });
 
         jobResumeFacade = new JobResumeFacadeImpl(
-            event -> {},
+            event -> {}, new StaticListableBeanFactory().getBeanProvider(ApprovalTokens.class),
             new JobFacadeImpl(
                 eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService),
             jobService, TransactionOperations.withoutTransaction());
@@ -275,7 +277,8 @@ class AiAgentChatActionIntTest {
         assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
 
         ApprovalFormFacadeImpl approvalFormFacade = new ApprovalFormFacadeImpl(
-            jobService, taskExecutionService, taskStateService, TransactionOperations.withoutTransaction());
+            new StaticListableBeanFactory().getBeanProvider(ApprovalTokens.class), jobService, taskExecutionService,
+            taskStateService, TransactionOperations.withoutTransaction());
 
         Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(getJobResumeId(suspendedJob));
 

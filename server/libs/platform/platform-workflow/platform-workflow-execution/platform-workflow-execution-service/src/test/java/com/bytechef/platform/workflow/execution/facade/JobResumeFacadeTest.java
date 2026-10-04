@@ -35,8 +35,14 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
 import com.bytechef.tenant.TenantContext;
+import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +54,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.support.SimpleTransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -63,7 +71,12 @@ public class JobResumeFacadeTest {
 
     private static final long JOB_ID = 42L;
     private static final long TASK_EXECUTION_ID = 7L;
+    private static final String SIGNING_SECRET = Base64.getEncoder()
+        .encodeToString("0123456789abcdef0123456789abcdef".getBytes(StandardCharsets.UTF_8));
     private static final String TENANT_ID = "000001";
+
+    private final ApprovalTokens approvalTokens = new ApprovalTokensImpl(
+        Clock.systemUTC(), SIGNING_SECRET, List.of(), Duration.ofHours(1), Duration.ofSeconds(30), false);
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
@@ -98,7 +111,94 @@ public class JobResumeFacadeTest {
     @BeforeEach
     void setUp() {
         jobResumeFacade = new JobResumeFacadeImpl(
-            applicationEventPublisher, jobFacade, jobService, transactionOperations);
+            applicationEventPublisher, approvalTokensProvider(approvalTokens), jobFacade, jobService,
+            transactionOperations);
+    }
+
+    @Test
+    public void testResumeJobReturnsOkForSignedToken() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        String signedToken = approvalTokens.toSignedToken(jobResumeId.toString(), Duration.ofHours(1));
+        Map<String, Object> data = Map.of("foo", "bar");
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(signedToken, data);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+
+        verify(jobFacade).resumeJob(JOB_ID, TASK_EXECUTION_ID, data);
+        verify(applicationEventPublisher).publishEvent(new JobResumedEvent(signedToken));
+    }
+
+    @Test
+    public void testResumeJobReturnsInvalidIdForTamperedSignedToken() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        String tamperedToken =
+            tamperSignature(approvalTokens.toSignedToken(jobResumeId.toString(), Duration.ofHours(1)));
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(tamperedToken, Map.of());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
+
+        verify(jobService, never()).getJob(anyLong());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+        verify(applicationEventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    public void testResumeJobReturnsInvalidIdForUnsignedTokenWhenSigningRequired() {
+        ApprovalTokens requiredApprovalTokens = new ApprovalTokensImpl(
+            Clock.systemUTC(), SIGNING_SECRET, List.of(), Duration.ofHours(1), Duration.ofSeconds(30), true);
+
+        JobResumeFacadeImpl requiredJobResumeFacade = new JobResumeFacadeImpl(
+            applicationEventPublisher, approvalTokensProvider(requiredApprovalTokens), jobFacade, jobService,
+            transactionOperations);
+
+        JobResumeOutcome outcome = requiredJobResumeFacade.resumeJob(JobResumeId.of(JOB_ID)
+            .toString(), Map.of());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
+
+        verify(jobService, never()).getJob(anyLong());
+    }
+
+    @Test
+    public void testResumeExpiredJobAcceptsTheStoredUnsignedIdWhenSigningRequired() {
+        ApprovalTokens requiredApprovalTokens = new ApprovalTokensImpl(
+            Clock.systemUTC(), SIGNING_SECRET, List.of(), Duration.ofHours(1), Duration.ofSeconds(30), true);
+
+        JobResumeFacadeImpl requiredJobResumeFacade = new JobResumeFacadeImpl(
+            applicationEventPublisher, approvalTokensProvider(requiredApprovalTokens), jobFacade, jobService,
+            transactionOperations);
+
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.STOPPED, jobResumeId.toString()));
+
+        JobResumeOutcome outcome = requiredJobResumeFacade.resumeExpiredJob(jobResumeId.toString());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+    }
+
+    @Test
+    public void testResumeJobAcceptsRawTokenWhenApprovalTokensAbsent() {
+        JobResumeFacadeImpl unsignedJobResumeFacade = new JobResumeFacadeImpl(
+            applicationEventPublisher, approvalTokensProvider(null), jobFacade, jobService, transactionOperations);
+
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = unsignedJobResumeFacade.resumeJob(jobResumeId.toString(), Map.of());
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
     }
 
     @Test
@@ -630,5 +730,22 @@ public class JobResumeFacadeTest {
 
     private static String encodeToken(String tenantId, long jobId, UUID uuid) {
         return EncodingUtils.base64EncodeToString(tenantId + ":" + jobId + ":" + uuid);
+    }
+
+    private static ObjectProvider<ApprovalTokens> approvalTokensProvider(ApprovalTokens approvalTokens) {
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        if (approvalTokens != null) {
+            beanFactory.addBean("approvalTokens", approvalTokens);
+        }
+
+        return beanFactory.getBeanProvider(ApprovalTokens.class);
+    }
+
+    private static String tamperSignature(String signedToken) {
+        int signatureStart = signedToken.lastIndexOf('.') + 1;
+        char replacement = signedToken.charAt(signatureStart) == 'A' ? 'B' : 'A';
+
+        return signedToken.substring(0, signatureStart) + replacement + signedToken.substring(signatureStart + 1);
     }
 }
