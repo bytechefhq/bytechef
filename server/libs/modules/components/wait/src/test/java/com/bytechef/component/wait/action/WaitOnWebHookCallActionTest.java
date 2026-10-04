@@ -94,7 +94,7 @@ public class WaitOnWebHookCallActionTest {
 
         ModifiableActionDefinition actionDefinition = WaitOnWebHookCallAction.ACTION_DEFINITION;
 
-        ResumePerformFunction resumePerformFunction = actionDefinition.getResumePerform()
+        ResumePerformFunction resumePerformFunction = (ResumePerformFunction) actionDefinition.getResumePerform()
             .orElseThrow();
 
         Map<String, Object> result = resumePerformFunction.apply(

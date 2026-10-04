@@ -97,7 +97,7 @@ public class WaitAtSpecifiedTimeActionTest {
 
         ModifiableActionDefinition actionDefinition = WaitAtSpecifiedTimeAction.ACTION_DEFINITION;
 
-        ResumePerformFunction resumePerformFunction = actionDefinition.getResumePerform()
+        ResumePerformFunction resumePerformFunction = (ResumePerformFunction) actionDefinition.getResumePerform()
             .orElseThrow();
 
         Parameters data = Mockito.mock(Parameters.class);

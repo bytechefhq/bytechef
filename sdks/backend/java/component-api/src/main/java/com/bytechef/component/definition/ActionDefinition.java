@@ -132,7 +132,7 @@ public interface ActionDefinition {
      */
     Optional<List<? extends Property>> getProperties();
 
-    Optional<ResumePerformFunction> getResumePerform();
+    Optional<? extends BaseResumePerformFunction> getResumePerform();
 
     /**
      *
@@ -167,6 +167,14 @@ public interface ActionDefinition {
      * of business processes, workflows, or other operations.
      */
     interface BasePerformFunction {
+
+    }
+
+    /**
+     * Marker for the functions that resume a suspended action, with a single connection or with all of the action's
+     * connections.
+     */
+    interface BaseResumePerformFunction {
 
     }
 
@@ -498,14 +506,14 @@ public interface ActionDefinition {
 
     /**
      * Represents a functional interface intended for performing a continuation or resume operation with a single
-     * connection within a workflow or procedural execution context. This interface extends {@code PerformFunction},
-     * adding support for actions that require input parameters, connection-related parameters, continuation parameters,
-     * and an action context. <br>
+     * connection within a workflow or procedural execution context. This interface extends
+     * {@code BaseResumePerformFunction}, adding support for actions that require input parameters, connection-related
+     * parameters, continuation parameters, and an action context. <br>
      * Implementations of this interface are designed to handle operations that resume from a specific state or context
      * during workflow execution.
      */
     @FunctionalInterface
-    interface ResumePerformFunction {
+    interface ResumePerformFunction extends BaseResumePerformFunction {
 
         /**
          * Executes an action using the provided parameters and context. This method is designed for continuation or
