@@ -22,6 +22,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEM
 
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
+import com.bytechef.component.ai.llm.advisor.JsonSchemaValidationAdvisor;
 import com.bytechef.component.ai.llm.advisor.TextGenerationFirstAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.util.ModelUtils;
@@ -35,7 +36,6 @@ import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.StreamResponseSpec;
-import org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import reactor.core.publisher.Flux;
@@ -158,9 +158,7 @@ public interface ChatModel {
 
             if (validateStructuredOutput) {
                 chatClientRequestSpec = chatClientRequestSpec.advisors(
-                    StructuredOutputValidationAdvisor.builder()
-                        .outputJsonSchema(converter.getJsonSchema())
-                        .build(),
+                    new JsonSchemaValidationAdvisor(converter.getJsonSchema()),
                     new CodeFenceStrippingAdvisor());
             }
 
