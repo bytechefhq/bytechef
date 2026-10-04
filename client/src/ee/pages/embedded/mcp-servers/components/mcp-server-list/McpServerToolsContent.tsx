@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import useMcpComponentList from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList';
 import useMcpIntegrationInstanceConfigurationList from '@/ee/pages/embedded/mcp-servers/components/mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList';
+import McpServerToolsSections from '@/shared/components/mcp-server/McpServerToolsSections';
 import {McpActivePopoverProvider} from '@/shared/contexts/McpActivePopoverContext';
 import {McpServer} from '@/shared/middleware/graphql';
 import {WrenchIcon} from 'lucide-react';
@@ -50,11 +51,12 @@ const McpServerToolsContent = ({mcpServer}: {mcpServer: McpServer}) => {
 
     return (
         <McpActivePopoverProvider>
-            <div className="flex flex-col gap-1.5">
-                <McpComponentList mcpServer={mcpServer} />
-
-                <McpIntegrationInstanceConfigurationList mcpServer={mcpServer} />
-            </div>
+            <McpServerToolsSections
+                componentList={<McpComponentList mcpServer={mcpServer} />}
+                showComponentList={isMcpComponentsLoading || !hasNoComponents}
+                showWorkflowList={isIntegrationsLoading || !hasNoIntegrations}
+                workflowList={<McpIntegrationInstanceConfigurationList mcpServer={mcpServer} />}
+            />
         </McpActivePopoverProvider>
     );
 };
