@@ -34,6 +34,12 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const handleMcpServerListItemClick = useCallback((event: React.MouseEvent) => {
         const target = event.target as HTMLElement;
 
+        // Clicks from portaled content (dropdown menu items, dialogs) bubble through the React tree but are not
+        // DOM descendants of the list item, so they must not toggle the tools collapsible.
+        if (!event.currentTarget.contains(target)) {
+            return;
+        }
+
         const interactiveSelectors = [
             '[data-interactive]',
             '.dropdown-menu-item',
