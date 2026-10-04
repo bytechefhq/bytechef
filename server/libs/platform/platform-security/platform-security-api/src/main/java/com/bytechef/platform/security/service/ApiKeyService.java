@@ -19,6 +19,7 @@ package com.bytechef.platform.security.service;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -32,6 +33,8 @@ public interface ApiKeyService {
 
     boolean exists(String secretKey, long environmentId);
 
+    Optional<ApiKey> fetchApiKey(String secretKey);
+
     ApiKey getApiKey(String secretKey);
 
     ApiKey getApiKey(String secretKey, long environmentId);
@@ -42,4 +45,5 @@ public interface ApiKeyService {
 
     ApiKey update(ApiKey apiKey);
 
+    void updateLastUsedDate(long id);
 }
