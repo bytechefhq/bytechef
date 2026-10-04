@@ -579,6 +579,18 @@ public class ApplicationProperties {
                 private boolean enabled;
 
                 /**
+                 * Name of the existing CloudWatch log group the logs are written to, sent as the x-aws-log-group
+                 * request header
+                 */
+                private String logGroup;
+
+                /**
+                 * Name of the existing CloudWatch log stream the logs are written to, sent as the x-aws-log-stream
+                 * request header
+                 */
+                private String logStream;
+
+                /**
                  * AWS region used in the signature scope; derived from the endpoint host when not set
                  */
                 private String region;
@@ -587,6 +599,14 @@ public class ApplicationProperties {
                  * AWS service name used in the signature scope
                  */
                 private String service = "logs";
+
+                public String getLogGroup() {
+                    return logGroup;
+                }
+
+                public String getLogStream() {
+                    return logStream;
+                }
 
                 public String getRegion() {
                     return region;
@@ -602,6 +622,14 @@ public class ApplicationProperties {
 
                 public void setEnabled(boolean enabled) {
                     this.enabled = enabled;
+                }
+
+                public void setLogGroup(String logGroup) {
+                    this.logGroup = logGroup;
+                }
+
+                public void setLogStream(String logStream) {
+                    this.logStream = logStream;
                 }
 
                 public void setRegion(String region) {
