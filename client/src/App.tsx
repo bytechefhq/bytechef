@@ -10,6 +10,7 @@ import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
+import {isStandaloneRoute} from '@/shared/navigation/standaloneRoutes';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -207,6 +208,8 @@ function App() {
         navigation = filteredEmbeddedNavigation;
     }
 
+    const standaloneRoute = isStandaloneRoute(location.pathname);
+
     useEffect(() => {
         if (account) {
             helpHub.boot(account);
@@ -282,10 +285,10 @@ function App() {
                 anchoring to the viewport top and overlapping it. */}
 
             <SidebarProvider className="min-h-0 flex-1 transform-gpu" defaultOpen={false}>
-                <AppSidebar navigation={navigation} />
+                {!standaloneRoute && <AppSidebar navigation={navigation} />}
 
                 <SidebarInset className="flex h-full min-w-0 flex-col">
-                    <MobileTopNavigation />
+                    {!standaloneRoute && <MobileTopNavigation />}
 
                     <div className="flex size-full">
                         <div className="flex h-full min-w-0 flex-1">
