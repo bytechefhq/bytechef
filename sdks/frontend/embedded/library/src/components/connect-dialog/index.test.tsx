@@ -190,14 +190,28 @@ describe('useConnectDialog - Dialog State Management', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onClose when the integration fails to load', async () => {
+    it('keeps the dialog open with the load error when the integration fails to load', async () => {
         global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
 
         const onClose = vi.fn();
 
         const {result} = renderHook(() => useConnectDialog({...defaultConnectDialogProps, onClose}));
 
         await act(async () => result.current.openDialog());
+
+        const lastRenderCall = renderMock.mock.calls[renderMock.mock.calls.length - 1];
+
+        expect(lastRenderCall[0].props).toMatchObject({integration: undefined, isOpen: true, loading: false});
+        expect(onClose).not.toHaveBeenCalled();
+
+        act(() => result.current.closeDialog());
 
         expect(onClose).toHaveBeenCalledTimes(1);
     });

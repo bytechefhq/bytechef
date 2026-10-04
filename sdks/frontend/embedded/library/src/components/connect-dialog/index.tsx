@@ -628,10 +628,6 @@ export default function useConnectDialog({
             setIntegration(integrationData);
         } catch (error) {
             console.error('Failed to load integration data:', error);
-
-            setIsOpen(false);
-
-            onClose?.();
         } finally {
             setIsLoading(false);
         }
@@ -980,6 +976,7 @@ export default function useConnectDialog({
         handleWorkflowInputChange,
         integration,
         integrationInstanceId,
+        isLoading,
         isOAuth2,
         mapObjectFields,
         mergedMcpTools,
