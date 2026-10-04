@@ -17,7 +17,6 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
-    CircleIcon,
     FolderIcon,
     Layers3Icon,
     LayoutTemplateIcon,
@@ -85,7 +84,6 @@ const automationNavigation: NavigationType[] = [
         name: 'Knowledge Base',
     },
     {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
-    {href: '/automation/approval-tasks', icon: CircleIcon, name: 'Approval Tasks'},
 ];
 
 const embeddedNavigation: NavigationType[] = [

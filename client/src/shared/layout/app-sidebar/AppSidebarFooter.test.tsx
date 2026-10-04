@@ -6,6 +6,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {AppSidebarFooter} from './AppSidebarFooter';
 
 const hoisted = vi.hoisted(() => ({
+    currentType: 0,
     edition: 'CE',
     logoutMock: vi.fn(() => Promise.resolve()),
     workspaces: [] as {id: number; name: string}[],
@@ -50,7 +51,7 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 vi.mock('@/pages/home/stores/usePlatformTypeStore', () => ({
     PlatformType: {AUTOMATION: 0, EMBEDDED: 1},
     usePlatformTypeStore: vi.fn((selector: (state: {currentType: number; setCurrentType: () => void}) => unknown) =>
-        selector({currentType: 0, setCurrentType: vi.fn()})
+        selector({currentType: hoisted.currentType, setCurrentType: vi.fn()})
     ),
 }));
 
@@ -69,6 +70,7 @@ describe('AppSidebarFooter', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        hoisted.currentType = 0;
         hoisted.edition = 'CE';
         hoisted.workspaces = [];
     });
@@ -98,6 +100,37 @@ describe('AppSidebarFooter', () => {
         expect(screen.getByText('Log Out')).toBeInTheDocument();
         // Email appears in both the trigger and the open menu.
         expect(screen.getAllByText('user@localhost.com').length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('offers Approval Tasks in automation mode', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter>
+                <AppSidebarFooter />
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+
+        expect(screen.getByText('Approval Tasks')).toBeInTheDocument();
+    });
+
+    it('hides Approval Tasks in embedded mode', async () => {
+        hoisted.currentType = 1;
+
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter>
+                <AppSidebarFooter />
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+
+        expect(screen.getByText('Log Out')).toBeInTheDocument();
+        expect(screen.queryByText('Approval Tasks')).not.toBeInTheDocument();
     });
 
     it('drops the query cache on log out without refetching anything', async () => {
