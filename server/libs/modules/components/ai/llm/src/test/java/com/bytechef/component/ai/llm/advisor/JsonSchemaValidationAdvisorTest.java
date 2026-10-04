@@ -23,7 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor;
@@ -31,6 +33,9 @@ import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.metadata.ChatResponseMetadata;
+import org.springframework.ai.chat.metadata.DefaultUsage;
+import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
@@ -40,6 +45,7 @@ import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import tools.jackson.core.JacksonException;
 
 /**
  * @author Ivica Cardic
@@ -130,6 +136,118 @@ class JsonSchemaValidationAdvisorTest {
         assertThrows(IllegalArgumentException.class, () -> new JsonSchemaValidationAdvisor(JSON_SCHEMA, -1));
     }
 
+    @Test
+    void testRetryPromptCarriesOnlyLatestValidationError() {
+        ScriptedChatModel chatModel = new ScriptedChatModel(
+            textReply("{\"name\":\"x\"}"), textReply("not json"), textReply(VALID_JSON));
+
+        String content = call(chatModel, new JsonSchemaValidationAdvisor(JSON_SCHEMA));
+
+        assertEquals(VALID_JSON, content);
+        assertEquals(3, chatModel.prompts.size());
+
+        UserMessage lastRetryUserMessage = chatModel.prompts.get(2)
+            .getUserMessage();
+
+        String text = lastRetryUserMessage.getText();
+
+        assertTrue(text.startsWith("List the items"));
+        assertTrue(text.contains("Invalid JSON"));
+        assertEquals(1, text.split("Output JSON validation failed because of:", -1).length - 1);
+    }
+
+    @Test
+    void testEmptyReplyIsRetried() {
+        ScriptedChatModel chatModel = new ScriptedChatModel(textReply(" "), textReply(VALID_JSON));
+
+        String content = call(chatModel, new JsonSchemaValidationAdvisor(JSON_SCHEMA));
+
+        assertEquals(VALID_JSON, content);
+        assertEquals(2, chatModel.prompts.size());
+
+        UserMessage retryUserMessage = chatModel.prompts.get(1)
+            .getUserMessage();
+
+        assertTrue(retryUserMessage.getText()
+            .contains("Empty JSON output."));
+    }
+
+    @Test
+    void testZeroMaxRepeatAttemptsCallsModelOnce() {
+        ScriptedChatModel chatModel = new ScriptedChatModel(textReply("not json"), textReply(VALID_JSON));
+
+        String content = call(chatModel, new JsonSchemaValidationAdvisor(JSON_SCHEMA, 0));
+
+        assertEquals("not json", content);
+        assertEquals(1, chatModel.prompts.size());
+    }
+
+    @Test
+    void testUsageIsSummedAcrossAttempts() {
+        ScriptedChatModel chatModel = new ScriptedChatModel(
+            textReply("not json", new DefaultUsage(10, 5)), textReply(VALID_JSON, new DefaultUsage(12, 7)));
+
+        ChatResponse chatResponse = ChatClient.create(chatModel)
+            .prompt()
+            .user("List the items")
+            .advisors(new JsonSchemaValidationAdvisor(JSON_SCHEMA))
+            .call()
+            .chatResponse();
+
+        Usage usage = Objects.requireNonNull(chatResponse, "chatResponse")
+            .getMetadata()
+            .getUsage();
+
+        assertEquals(22, usage.getPromptTokens());
+        assertEquals(12, usage.getCompletionTokens());
+    }
+
+    @Test
+    void testToolRunsOnceWhenFinalAnswerIsRetried() {
+        ScriptedChatModel chatModel = new ScriptedChatModel(
+            toolCallReply(), textReply("{\"name\":\"x\"}"), textReply(VALID_JSON));
+        ListItemsToolCallback listItemsToolCallback = new ListItemsToolCallback();
+
+        String content = callWithTool(chatModel, listItemsToolCallback, new JsonSchemaValidationAdvisor(JSON_SCHEMA));
+
+        assertEquals(VALID_JSON, content);
+        assertEquals(3, chatModel.prompts.size());
+
+        // The retry repeats only the final answer, so the tool is not executed again.
+        assertEquals(1, listItemsToolCallback.callCount.get());
+    }
+
+    @Test
+    void testFencedReplyAfterToolRoundIsAcceptedWithoutRetry() {
+        ScriptedChatModel chatModel = new ScriptedChatModel(
+            toolCallReply(), textReply("```json\n" + VALID_JSON + "\n```"));
+
+        String content = callWithTool(
+            chatModel, new ListItemsToolCallback(), new JsonSchemaValidationAdvisor(JSON_SCHEMA),
+            new CodeFenceStrippingAdvisor());
+
+        assertEquals(VALID_JSON, content);
+        assertEquals(2, chatModel.prompts.size());
+    }
+
+    @Test
+    void testOrderRunsInsideToolCalling() {
+        ToolCallingAdvisor toolCallingAdvisor = ToolCallingAdvisor.builder()
+            .build();
+
+        assertTrue(toolCallingAdvisor.getOrder() < new JsonSchemaValidationAdvisor(JSON_SCHEMA).getOrder());
+    }
+
+    @Test
+    void testInvalidSchemaIsRejected() {
+        assertThrows(JacksonException.class, () -> new JsonSchemaValidationAdvisor("not a schema"));
+    }
+
+    @Test
+    void testGetName() {
+        assertEquals("JsonSchemaValidationAdvisor", new JsonSchemaValidationAdvisor(JSON_SCHEMA).getName());
+    }
+
     private static String call(ChatModel chatModel, Advisor validationAdvisor) {
         return ChatClient.create(chatModel)
             .prompt()
@@ -140,20 +258,36 @@ class JsonSchemaValidationAdvisorTest {
     }
 
     private static String callWithTool(ChatModel chatModel, Advisor validationAdvisor) {
+        return callWithTool(chatModel, new ListItemsToolCallback(), validationAdvisor);
+    }
+
+    private static String callWithTool(ChatModel chatModel, ToolCallback toolCallback, Advisor... advisors) {
+        List<Advisor> chatAdvisors = new ArrayList<>();
+
+        chatAdvisors.add(
+            ToolCallingAdvisor.builder()
+                .build());
+        chatAdvisors.addAll(List.of(advisors));
+
         return ChatClient.create(chatModel)
             .prompt()
             .user("List the items")
-            .advisors(
-                ToolCallingAdvisor.builder()
-                    .build(),
-                validationAdvisor)
-            .toolCallbacks(new ListItemsToolCallback())
+            .advisors(chatAdvisors)
+            .toolCallbacks(toolCallback)
             .call()
             .content();
     }
 
     private static ChatResponse textReply(String text) {
         return new ChatResponse(List.of(new Generation(new AssistantMessage(text))));
+    }
+
+    private static ChatResponse textReply(String text, Usage usage) {
+        return new ChatResponse(
+            List.of(new Generation(new AssistantMessage(text))),
+            ChatResponseMetadata.builder()
+                .usage(usage)
+                .build());
     }
 
     private static ChatResponse toolCallReply() {
@@ -193,6 +327,8 @@ class JsonSchemaValidationAdvisorTest {
 
     private static final class ListItemsToolCallback implements ToolCallback {
 
+        private final AtomicInteger callCount = new AtomicInteger();
+
         @Override
         public ToolDefinition getToolDefinition() {
             return DefaultToolDefinition.builder()
@@ -204,6 +340,8 @@ class JsonSchemaValidationAdvisorTest {
 
         @Override
         public String call(String toolInput) {
+            callCount.incrementAndGet();
+
             return "[\"a\",\"b\"]";
         }
     }
