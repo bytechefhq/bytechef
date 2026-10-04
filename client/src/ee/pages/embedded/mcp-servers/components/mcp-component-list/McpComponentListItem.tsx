@@ -4,6 +4,7 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useMcpComponentListItem from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/hooks/useMcpComponentListItem';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
+import {createCollapsibleRowClickHandler} from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {McpComponent, McpServer} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, ChevronRightIcon, ComponentIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -22,7 +23,10 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
 
     return (
         <Collapsible className="group rounded-md border border-border/50" onOpenChange={setExpanded} open={expanded}>
-            <div className="flex items-center gap-2.5 px-3 py-2.5">
+            <div
+                className="flex cursor-pointer items-center gap-2.5 px-3 py-2.5"
+                onClick={createCollapsibleRowClickHandler(setExpanded)}
+            >
                 <CollapsibleTrigger asChild>
                     <button
                         aria-label={expanded ? 'Hide tools' : 'Show tools'}
@@ -60,7 +64,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                 </Tooltip>
 
                 <Tooltip>
-                    <TooltipTrigger className="flex items-center text-xs text-content-neutral-secondary">
+                    <TooltipTrigger className="flex min-w-56 items-center justify-end text-xs text-content-neutral-secondary tabular-nums">
                         {mcpComponent.lastModifiedDate
                             ? `Modified at ${new Date(mcpComponent.lastModifiedDate).toLocaleDateString()} ${new Date(mcpComponent.lastModifiedDate).toLocaleTimeString()}`
                             : '-'}

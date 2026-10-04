@@ -2,6 +2,7 @@ import Badge from '@/components/Badge/Badge';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import {createCollapsibleRowClickHandler} from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {ChevronDownIcon, ChevronRightIcon, WorkflowIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -35,7 +36,10 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                 onOpenChange={setExpanded}
                 open={expanded}
             >
-                <div className="flex items-center gap-2.5 px-3 py-2.5">
+                <div
+                    className="flex cursor-pointer items-center gap-2.5 px-3 py-2.5"
+                    onClick={createCollapsibleRowClickHandler(setExpanded)}
+                >
                     <CollapsibleTrigger asChild>
                         <button
                             aria-label={expanded ? 'Collapse project' : 'Expand project'}
@@ -75,7 +79,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                     )}
 
                     <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                        <TooltipTrigger className="flex min-w-56 items-center justify-end text-sm text-content-neutral-secondary tabular-nums">
                             {mcpProject.lastModifiedDate ? (
                                 <span className="text-xs">
                                     {`Modified at ${new Date(mcpProject.lastModifiedDate).toLocaleDateString()} ${new Date(mcpProject.lastModifiedDate).toLocaleTimeString()}`}
