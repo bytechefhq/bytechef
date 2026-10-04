@@ -274,7 +274,7 @@ class JsonSchemaValidationAdvisorTest {
             .prompt()
             .user("List the items")
             .advisors(chatAdvisors)
-            .toolCallbacks(toolCallback)
+            .tools(toolCallback)
             .call()
             .content();
     }
