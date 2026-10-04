@@ -18,12 +18,16 @@ vi.mock('@/shared/components/mcp-server/McpServerConfigurationCode', () => ({
     default: () => <div>Server configuration</div>,
 }));
 
-vi.mock('./McpServerListItem', () => ({
-    default: ({mcpServer}: {mcpServer: McpServer}) => <div>{mcpServer.name}</div>,
+vi.mock('@/ee/pages/embedded/mcp-servers/components/mcp-component-dialog/McpComponentDialog', () => ({
+    default: ({mcpServerId}: {mcpServerId: string}) => <div role="dialog">Component dialog for {mcpServerId}</div>,
 }));
 
-vi.mock('./McpServerToolsAddButton', () => ({
-    default: ({mcpServer}: {mcpServer: McpServer}) => <button>Add tools to {mcpServer.name}</button>,
+vi.mock('@/ee/pages/embedded/mcp-servers/components/McpIntegrationInstanceConfigurationWorkflowDialog', () => ({
+    default: ({mcpServer}: {mcpServer: McpServer}) => <div role="dialog">Workflow dialog for {mcpServer.name}</div>,
+}));
+
+vi.mock('./McpServerListItem', () => ({
+    default: ({mcpServer}: {mcpServer: McpServer}) => <div>{mcpServer.name}</div>,
 }));
 
 vi.mock('./McpServerToolsContent', () => ({
@@ -34,7 +38,7 @@ vi.mock('./hooks/useMcpServerList', () => ({
     default: (mcpServers: McpServer[]) => ({createHandleRefresh: () => vi.fn(), sortedMcpServers: mcpServers}),
 }));
 
-const mcpServers = [{id: '1', name: 'mcpserver1'} as McpServer, {id: '2', name: 'mcpserver2'} as McpServer];
+const mcpServers = [{id: '1', name: 'mcpserver1'} as McpServer];
 
 beforeEach(() => {
     windowResizeObserver();
@@ -46,33 +50,29 @@ afterEach(() => {
 });
 
 describe('McpServerList', () => {
-    it('shows the Add button next to the tabs while the Tools tab is active', () => {
+    it('opens the integration component dialog from the Tools tab Add Component button', async () => {
         render(<McpServerList mcpServers={mcpServers} />);
 
-        expect(screen.getByRole('button', {name: 'Add tools to mcpserver1'})).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Add tools to mcpserver2'})).toBeInTheDocument();
+        await userEvent.click(screen.getByRole('button', {name: 'Add Component'}));
+
+        expect(screen.getByText('Component dialog for 1')).toBeInTheDocument();
     });
 
-    it('hides the Add button only for the server whose Connect tab is selected', async () => {
+    it('opens the integration workflow dialog from the Tools tab Add Workflows menu item', async () => {
         render(<McpServerList mcpServers={mcpServers} />);
 
-        const [firstConnectTab] = screen.getAllByRole('tab', {name: 'Connect'});
+        await userEvent.click(screen.getByRole('button', {name: 'Add Tools'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Add Workflows'}));
 
-        await userEvent.click(firstConnectTab);
-
-        expect(screen.queryByRole('button', {name: 'Add tools to mcpserver1'})).not.toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Add tools to mcpserver2'})).toBeInTheDocument();
+        expect(screen.getByText('Workflow dialog for mcpserver1')).toBeInTheDocument();
     });
 
-    it('shows the Add button again when switching back to the Tools tab', async () => {
+    it('shows the server configuration on the Connect tab', async () => {
         render(<McpServerList mcpServers={mcpServers} />);
 
-        const [firstConnectTab] = screen.getAllByRole('tab', {name: 'Connect'});
-        const [firstToolsTab] = screen.getAllByRole('tab', {name: 'Tools'});
+        await userEvent.click(screen.getByRole('tab', {name: 'Connect'}));
 
-        await userEvent.click(firstConnectTab);
-        await userEvent.click(firstToolsTab);
-
-        expect(screen.getByRole('button', {name: 'Add tools to mcpserver1'})).toBeInTheDocument();
+        expect(screen.getByText('Server configuration')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Add Component'})).not.toBeInTheDocument();
     });
 });
