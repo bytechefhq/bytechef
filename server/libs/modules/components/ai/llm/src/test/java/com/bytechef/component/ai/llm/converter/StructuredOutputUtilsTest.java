@@ -56,7 +56,15 @@ class StructuredOutputUtilsTest {
         "'```json\r\n{\"a\":1}\r\n```'|{\"a\":1}",
         "'```{\"a\":1}```'|{\"a\":1}",
         "'```json\n{\"a\":\"```\"}\n```'|{\"a\":\"```\"}",
-        "'Result:\n```json\n{\"a\":1}\n```'|'Result:\n```json\n{\"a\":1}\n```'"
+        "'Result:\n```json\n{\"a\":1}\n```'|'Result:\n```json\n{\"a\":1}\n```'",
+        "'```json\n{\"a\":1}\n```\nDone.'|'```json\n{\"a\":1}\n```\nDone.'",
+        "'```json\n{\"a\":1}'|'```json\n{\"a\":1}'",
+        "'```json\n{\n  \"a\": 1\n}\n```'|'{\n  \"a\": 1\n}'",
+        "'```JSON {\"a\":1}```'|{\"a\":1}",
+        "'```json5\n{\"a\":1}\n```'|{\"a\":1}",
+        "'```json\n[1,2]\n```'|[1,2]",
+        "'```json\n```'|''",
+        "'``````'|''"
     })
     void testStripCodeFence(String text, String expected) {
         assertEquals(expected, StructuredOutputUtils.stripCodeFence(text));

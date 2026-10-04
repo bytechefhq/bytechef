@@ -477,6 +477,21 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Test
+    void testStructuredOutputAdvisorsOrderedInsideToolCallingAdvisor() {
+        // JsonSchemaValidationAdvisor must sit inside ToolCallingAdvisor so a validation retry repeats only the final
+        // answer, never the tool calls, and CodeFenceStrippingAdvisor must sit inside the validation so every attempt
+        // is unwrapped before it is validated.
+        ToolCallingAdvisor toolCallingAdvisor = ToolCallingAdvisor.builder()
+            .build();
+
+        JsonSchemaValidationAdvisor jsonSchemaValidationAdvisor = new JsonSchemaValidationAdvisor(
+            "{\"type\":\"object\"}");
+
+        assertThat(toolCallingAdvisor.getOrder()).isLessThan(jsonSchemaValidationAdvisor.getOrder());
+        assertThat(jsonSchemaValidationAdvisor.getOrder()).isLessThan(new CodeFenceStrippingAdvisor().getOrder());
+    }
+
+    @Test
     void testApplyStructuredOutputValidationAddsAdvisorForJsonResponseFormat() {
         Parameters inputParameters = MockParametersFactory.create(
             Map.of(
