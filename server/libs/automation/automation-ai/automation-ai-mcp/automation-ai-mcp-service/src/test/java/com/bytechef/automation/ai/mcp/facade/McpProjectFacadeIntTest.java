@@ -17,7 +17,13 @@
 package com.bytechef.automation.ai.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
@@ -42,10 +48,14 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * @author Ivica Cardic
@@ -138,6 +148,21 @@ public class McpProjectFacadeIntTest {
         assertThat(mcpProject.getMcpServerId()).isEqualTo(mcpServer.getId());
         assertThat(mcpProject.getProjectDeploymentId()).isNotNull();
         assertThat(mcpProjectRepository.findById(mcpProject.getId())).isPresent();
+    }
+
+    @Test
+    public void testCreateMcpProjectUsesMcpServerEnvironment() {
+        McpServer productionMcpServer = mcpServerRepository.save(
+            new McpServer("production-server", PlatformType.AUTOMATION, Environment.PRODUCTION));
+
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            productionMcpServer.getId(), project.getId(), 1, List.of("workflow1"));
+
+        ProjectDeployment mcpProjectDeployment = projectDeploymentRepository
+            .findById(mcpProject.getProjectDeploymentId())
+            .orElseThrow();
+
+        assertThat(mcpProjectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
     }
 
     @Test
@@ -263,5 +288,60 @@ public class McpProjectFacadeIntTest {
         List<McpProjectWorkflow> remainingWorkflows =
             mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
         assertThat(remainingWorkflows).isEmpty();
+    }
+
+    @Nested
+    @Import({
+        McpMethodSecurityTestConfiguration.class, PostgreSQLContainerConfiguration.class
+    })
+    @WithMockUser
+    class MethodSecurity {
+
+        @Autowired
+        private PermissionEvaluator permissionEvaluator;
+
+        @AfterEach
+        void resetPermissionEvaluator() {
+            reset(permissionEvaluator);
+        }
+
+        @Test
+        void testCreateRequiresServerEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(3L, 4L, 1, List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testDeleteRequiresProjectEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectFacade.deleteMcpProject(5L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateRequiresProjectEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectFacade.updateMcpProject(5L, List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testCloneRequiresProjectEditorAndTargetServerEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectFacade.cloneMcpProject(5L, 6L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            reset(permissionEvaluator);
+
+            when(permissionEvaluator.hasPermission(any(), eq(6L), eq("McpServer"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectFacade.cloneMcpProject(5L, 6L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
     }
 }

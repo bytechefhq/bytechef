@@ -16,10 +16,16 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.domain.WorkspaceMcpServer;
@@ -34,10 +40,14 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Integration tests for {@link WorkspaceMcpServerFacadeImpl}.
@@ -94,9 +104,9 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testGetWorkspaceMcpServers() {
         // Given - Create and assign servers to workspace
         McpServer createdServer1 = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server 1", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server 1", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, testWorkspaceId);
         McpServer createdServer2 = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, testWorkspaceId);
 
         // When
         List<McpServer> result = workspaceMcpServerFacade.getWorkspaceMcpServers(testWorkspaceId);
@@ -122,7 +132,7 @@ public class WorkspaceMcpServerFacadeIntTest {
 
         // When
         McpServer result = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            name, type, environment, enabled, testWorkspaceId);
+            name, type, environment, enabled, null, testWorkspaceId);
 
         // Then
         assertNotNull(result);
@@ -150,7 +160,7 @@ public class WorkspaceMcpServerFacadeIntTest {
 
         // When
         McpServer result = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            name, type, environment, enabled, testWorkspaceId);
+            name, type, environment, enabled, null, testWorkspaceId);
 
         // Then
         assertNotNull(result);
@@ -170,7 +180,7 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testDeleteWorkspaceMcpServer() {
         // Given - Create server and assign to workspace
         McpServer createdServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, testWorkspaceId);
 
         // Verify server exists
         assertEquals(1, workspaceMcpServerRepository.findAllByWorkspaceId(testWorkspaceId)
@@ -190,11 +200,11 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testDeleteWorkspaceMcpServerButKeepIfUsedByOtherWorkspaces() {
         // Given - Create server and assign to two workspaces
         McpServer createdServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, testWorkspaceId);
 
         Long otherWorkspaceId = 1050L;
         workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, otherWorkspaceId);
+            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, otherWorkspaceId);
 
         // Manually assign the first server to the second workspace to simulate shared usage
         WorkspaceMcpServer additionalAssignment = new WorkspaceMcpServer(createdServer.getId(), otherWorkspaceId);
@@ -215,5 +225,62 @@ public class WorkspaceMcpServerFacadeIntTest {
         assertEquals(0, assignments1.size()); // Removed from first workspace
         assertEquals(1, assignments2.size()); // Only the second server remains in second workspace
         assertEquals(1, mcpServerRepository.count()); // Only the second server still exists
+    }
+
+    @Nested
+    @Import({
+        McpMethodSecurityTestConfiguration.class, PostgreSQLContainerConfiguration.class
+    })
+    @WithMockUser
+    class MethodSecurity {
+
+        @Autowired
+        private PermissionEvaluator permissionEvaluator;
+
+        @AfterEach
+        void resetPermissionEvaluator() {
+            reset(permissionEvaluator);
+        }
+
+        @Test
+        void testGetWorkspaceMcpServersRequiresViewer() {
+            when(permissionEvaluator.hasPermission(any(), eq(2L), eq("Workspace"), eq("MCP_VIEW"))).thenReturn(false);
+
+            assertThatThrownBy(() -> workspaceMcpServerFacade.getWorkspaceMcpServers(2L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkspaceMcpServerTagsRequiresViewer() {
+            when(permissionEvaluator.hasPermission(any(), eq(2L), eq("Workspace"), eq("MCP_VIEW"))).thenReturn(false);
+
+            assertThatThrownBy(() -> workspaceMcpServerFacade.getWorkspaceMcpServerTags(2L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkspaceMcpProjectsRequiresViewer() {
+            when(permissionEvaluator.hasPermission(any(), eq(2L), eq("Workspace"), eq("MCP_VIEW"))).thenReturn(false);
+
+            assertThatThrownBy(() -> workspaceMcpServerFacade.getWorkspaceMcpProjects(2L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testCreateRequiresEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(2L), eq("Workspace"), eq("MCP_CREATE"))).thenReturn(false);
+
+            assertThatThrownBy(() -> workspaceMcpServerFacade.createWorkspaceMcpServer(
+                "server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, 2L))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testDeleteRequiresServerEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> workspaceMcpServerFacade.deleteWorkspaceMcpServer(3L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
     }
 }

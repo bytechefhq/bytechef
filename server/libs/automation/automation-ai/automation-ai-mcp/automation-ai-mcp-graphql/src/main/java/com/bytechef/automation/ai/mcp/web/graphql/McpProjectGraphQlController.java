@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
@@ -47,18 +48,20 @@ public class McpProjectGraphQlController {
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectService projectService;
+    private final WorkspaceMcpServerFacade workspaceMcpServerFacade;
 
     @SuppressFBWarnings("EI")
     public McpProjectGraphQlController(
         McpProjectFacade mcpProjectFacade, McpProjectService mcpProjectService,
         McpProjectWorkflowService mcpProjectWorkflowService, ProjectDeploymentService projectDeploymentService,
-        ProjectService projectService) {
+        ProjectService projectService, WorkspaceMcpServerFacade workspaceMcpServerFacade) {
 
         this.mcpProjectFacade = mcpProjectFacade;
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
+        this.workspaceMcpServerFacade = workspaceMcpServerFacade;
     }
 
     @MutationMapping
@@ -74,8 +77,8 @@ public class McpProjectGraphQlController {
     }
 
     @QueryMapping
-    public List<McpProject> mcpProjects() {
-        return mcpProjectService.getMcpProjects();
+    public List<McpProject> mcpProjects(@Argument Long workspaceId) {
+        return workspaceMcpServerFacade.getWorkspaceMcpProjects(workspaceId);
     }
 
     @QueryMapping

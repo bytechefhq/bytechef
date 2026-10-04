@@ -54,4 +54,6 @@ public interface McpProjectFacade {
      * @return the updated MCP project
      */
     McpProject updateMcpProject(long mcpProjectId, List<String> selectedWorkflowIds);
+
+    McpProject cloneMcpProject(long mcpProjectId, long targetMcpServerId);
 }

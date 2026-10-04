@@ -21,6 +21,7 @@ import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -49,6 +50,11 @@ public class WorkspaceMcpServerGraphQlController {
         return workspaceMcpServerFacade.getWorkspaceMcpServers(workspaceId);
     }
 
+    @QueryMapping
+    public List<Tag> workspaceMcpServerTags(@Argument Long workspaceId) {
+        return workspaceMcpServerFacade.getWorkspaceMcpServerTags(workspaceId);
+    }
+
     @MutationMapping
     public McpServer createWorkspaceMcpServer(@Argument CreateWorkspaceMcpServerInput input) {
         return workspaceMcpServerFacade.createWorkspaceMcpServer(
@@ -56,6 +62,7 @@ public class WorkspaceMcpServerGraphQlController {
             input.type(),
             Environment.values()[(int) input.environmentId()],
             input.enabled(),
+            input.authenticationRequired(),
             input.workspaceId());
     }
 
@@ -67,6 +74,7 @@ public class WorkspaceMcpServerGraphQlController {
     }
 
     public record CreateWorkspaceMcpServerInput(
-        String name, PlatformType type, long environmentId, Boolean enabled, Long workspaceId) {
+        String name, PlatformType type, long environmentId, Boolean enabled, Boolean authenticationRequired,
+        Long workspaceId) {
     }
 }

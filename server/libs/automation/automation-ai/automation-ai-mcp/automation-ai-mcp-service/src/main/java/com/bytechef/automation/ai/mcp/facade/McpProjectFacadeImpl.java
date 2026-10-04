@@ -16,6 +16,8 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvent;
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditPublisher;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
@@ -24,9 +26,10 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,34 +46,42 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class McpProjectFacadeImpl implements McpProjectFacade {
 
+    private final McpProjectAuditPublisher mcpProjectAuditPublisher;
     private final McpProjectService mcpProjectService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
+    private final McpServerService mcpServerService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
     public McpProjectFacadeImpl(
-        McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
+        McpProjectAuditPublisher mcpProjectAuditPublisher, McpProjectService mcpProjectService,
+        McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
+        this.mcpProjectAuditPublisher = mcpProjectAuditPublisher;
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
+        this.mcpServerService = mcpServerService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
 
     @Override
-    @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT') and " +
+        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
+
+        McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setName(McpServer.MCP_SERVER_NAME_PREFIX + projectId + "_v" + projectVersion);
         projectDeployment.setProjectId(projectId);
         projectDeployment.setProjectVersion(projectVersion);
-        projectDeployment.setEnvironment(Environment.DEVELOPMENT);
+        projectDeployment.setEnvironment(mcpServer.getEnvironment());
         projectDeployment.setEnabled(true);
 
         projectDeployment = projectDeploymentService.create(projectDeployment);
@@ -92,10 +103,17 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
             mcpProjectWorkflowService.create(mcpProject.getId(), projectDeploymentWorkflow.getId());
         }
 
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("projectId", String.valueOf(projectId));
+
+        mcpProjectAuditPublisher.publish(McpProjectAuditEvent.MCP_PROJECT_CREATED, mcpProject.getId(), data);
+
         return mcpProject;
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public void deleteMcpProject(long mcpProjectId) {
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
@@ -116,9 +134,12 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         if (projectDeploymentId != null) {
             projectDeploymentService.delete(projectDeploymentId);
         }
+
+        mcpProjectAuditPublisher.publish(McpProjectAuditEvent.MCP_PROJECT_DELETED, mcpProjectId);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProject updateMcpProject(long mcpProjectId, List<String> selectedWorkflowIds) {
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
@@ -174,5 +195,49 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         }
 
         return mcpProject;
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT') and " +
+        "hasPermission(#targetMcpServerId, 'McpServer', 'MCP_EDIT')")
+    public McpProject cloneMcpProject(long mcpProjectId, long targetMcpServerId) {
+        McpProject source = mcpProjectService.fetchMcpProject(mcpProjectId)
+            .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
+
+        Long sourceProjectDeploymentId = source.getProjectDeploymentId();
+
+        if (sourceProjectDeploymentId == null) {
+            throw new IllegalStateException(
+                "Source McpProject " + mcpProjectId + " has no project deployment to clone from");
+        }
+
+        ProjectDeployment sourceDeployment = projectDeploymentService.getProjectDeployment(sourceProjectDeploymentId);
+
+        List<McpProjectWorkflow> sourceMcpProjectWorkflows =
+            mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId);
+
+        List<ProjectDeploymentWorkflow> sourceDeploymentWorkflows =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(sourceProjectDeploymentId);
+
+        Map<Long, ProjectDeploymentWorkflow> deploymentWorkflowById = new HashMap<>();
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : sourceDeploymentWorkflows) {
+            deploymentWorkflowById.put(projectDeploymentWorkflow.getId(), projectDeploymentWorkflow);
+        }
+
+        List<String> selectedWorkflowIds = new ArrayList<>(sourceMcpProjectWorkflows.size());
+
+        for (McpProjectWorkflow mcpProjectWorkflow : sourceMcpProjectWorkflows) {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow =
+                deploymentWorkflowById.get(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+
+            if (projectDeploymentWorkflow != null) {
+                selectedWorkflowIds.add(projectDeploymentWorkflow.getWorkflowId());
+            }
+        }
+
+        return createMcpProject(
+            targetMcpServerId, sourceDeployment.getProjectId(), sourceDeployment.getProjectVersion(),
+            selectedWorkflowIds);
     }
 }

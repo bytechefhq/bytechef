@@ -16,10 +16,18 @@
 
 package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
+import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
+import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
+import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
+import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Objects;
+import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -30,33 +38,73 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class AutomationMcpServerApiKeyAuthenticationProvider implements AuthenticationProvider {
 
+    private final ApiKeyService apiKeyService;
+    private final McpApiKeyEntityRepository mcpApiKeyEntityRepository;
     private final McpServerService mcpServerService;
 
     @SuppressFBWarnings("EI")
-    public AutomationMcpServerApiKeyAuthenticationProvider(McpServerService mcpServerService) {
+    public AutomationMcpServerApiKeyAuthenticationProvider(
+        ApiKeyService apiKeyService, AuthorityService authorityService, McpServerService mcpServerService,
+        UserService userService) {
+
+        this.apiKeyService = apiKeyService;
+        this.mcpApiKeyEntityRepository = new McpApiKeyEntityRepository(apiKeyService, authorityService, userService);
         this.mcpServerService = mcpServerService;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        AutomationMcpServerApiKeyAuthenticationToken automationMcpServerApiKeyAuthenticationToken =
-            (AutomationMcpServerApiKeyAuthenticationToken) authentication;
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
 
-        McpServer mcpServer = mcpServerService.getMcpServer(
-            automationMcpServerApiKeyAuthenticationToken.getMcpServerSecretKey());
-
-        if (!Objects.equals(
-            mcpServer.getSecretKey(), automationMcpServerApiKeyAuthenticationToken.getMcpServerSecretKey())) {
-
-            throw new BadCredentialsException("Invalid secret key");
+        if (!(apiKeyAuthenticationToken.getCredentials() instanceof McpApiKeyCredentials mcpApiKeyCredentials)) {
+            throw new BadCredentialsException("Credentials do not exist");
         }
 
-        return new AutomationMcpServerApiKeyAuthenticationToken(
-            automationMcpServerApiKeyAuthenticationToken.getAuthSecretKey());
+        McpServer mcpServer = getMcpServer(mcpApiKeyCredentials.getMcpServerSecretKey());
+
+        if (!mcpServer.isEnabled()) {
+            throw new BadCredentialsException("MCP server is disabled");
+        }
+
+        if (!mcpServer.isAuthenticationRequired()) {
+            return McpAnonymousAuthenticationToken.ofAutomationMcpServer(mcpServer.getId());
+        }
+
+        String secretKey = mcpApiKeyCredentials.getSecret();
+
+        if (secretKey == null) {
+            throw new BadCredentialsException("Authorization token does not exist");
+        }
+
+        McpApiKeyEntity mcpApiKeyEntity = mcpApiKeyEntityRepository.findByKeyId(secretKey);
+
+        if (mcpApiKeyEntity == null) {
+            throw new BadCredentialsException("Invalid API key");
+        }
+
+        if (mcpApiKeyEntity.getType() != PlatformType.AUTOMATION) {
+            throw new BadCredentialsException("Invalid API key");
+        }
+
+        if (mcpServer.getEnvironment() != mcpApiKeyEntity.getEnvironment()) {
+            throw new BadCredentialsException("Invalid API key");
+        }
+
+        apiKeyService.updateLastUsedDate(mcpApiKeyEntity.getApiKeyId());
+
+        return ApiKeyAuthenticationToken.authenticated(mcpApiKeyEntity, mcpApiKeyEntity.getAuthorities());
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(AutomationMcpServerApiKeyAuthenticationToken.class);
+        return ApiKeyAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+
+    private McpServer getMcpServer(String mcpServerSecretKey) {
+        try {
+            return mcpServerService.getMcpServer(mcpServerSecretKey);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new BadCredentialsException("Invalid MCP server secret key", illegalArgumentException);
+        }
     }
 }
