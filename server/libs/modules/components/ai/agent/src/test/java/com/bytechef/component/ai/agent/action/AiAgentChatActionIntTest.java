@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent;
+package com.bytechef.component.ai.agent.action;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
@@ -47,6 +47,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.agent.AiAgentComponentHandler;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
@@ -120,13 +121,13 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootTest(
     classes = {
         ComponentTestIntConfiguration.class,
-        AiAgentToolSuspensionIntTest.AiAgentToolSuspensionIntTestConfiguration.class
+        AiAgentChatActionIntTest.AiAgentChatActionIntTestConfiguration.class
     },
     properties = {
         "bytechef.file-storage.provider=jdbc", "bytechef.public-url=http://localhost:9555",
         "bytechef.workflow.repository.classpath.enabled=true"
     })
-class AiAgentToolSuspensionIntTest {
+class AiAgentChatActionIntTest {
 
     private static final String APPROVAL_TOOL_NAME = "requestApproval";
     private static final String FINAL_ANSWER = "The refund was approved and issued.";
@@ -192,7 +193,7 @@ class AiAgentToolSuspensionIntTest {
         eventPublisher = createEventPublisher(asyncMessageBroker);
 
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors = List.of(
-            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService),
+            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService, null),
             new ModelConnectionTaskDispatcherPreSendProcessor());
 
         jobSyncExecutor = new JobSyncExecutor(
@@ -301,6 +302,45 @@ class AiAgentToolSuspensionIntTest {
 
         assertThat(prompts).hasSize(2);
         assertThat(getApprovalToolResponse(prompts.get(1))).contains("NO_RESPONSE");
+    }
+
+    @Test
+    void testExpiredSuspendResumesTheAgentWithNoResponse() {
+        Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
+
+        assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
+
+        JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeExpiredJob(getJobResumeId(suspendedJob));
+
+        assertThat(jobResumeOutcome).isEqualTo(JobResumeOutcome.OK);
+
+        Job completedJob = awaitJobStatus(Objects.requireNonNull(suspendedJob.getId()), Job.Status.COMPLETED);
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(Objects.requireNonNull(completedJob.getOutputs()));
+
+        assertThat(outputs.get("answer")).isEqualTo(FINAL_ANSWER);
+        assertThat(getApprovalToolResponse(scriptedChatModel.getPrompts()
+            .get(1))).contains("NO_RESPONSE");
+    }
+
+    @Test
+    void testExpiredSuspendDoesNotResumeTheAgentAgainAfterTheApprovalWasAnswered() {
+        Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
+
+        String jobResumeId = getJobResumeId(suspendedJob);
+
+        assertThat(jobResumeFacade.resumeJob(jobResumeId, Map.of("approved", true))).isEqualTo(JobResumeOutcome.OK);
+
+        long jobId = Objects.requireNonNull(suspendedJob.getId());
+
+        awaitJobStatus(jobId, Job.Status.COMPLETED);
+
+        assertThat(jobResumeFacade.resumeExpiredJob(jobResumeId)).isEqualTo(JobResumeOutcome.GONE);
+
+        Job job = jobService.getJob(jobId);
+
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+        assertThat(scriptedChatModel.getPrompts()).hasSize(2);
     }
 
     @Test
@@ -558,7 +598,7 @@ class AiAgentToolSuspensionIntTest {
         "com.bytechef.component.ai.agent.task", "com.bytechef.component.approval"
     })
     @TestConfiguration
-    static class AiAgentToolSuspensionIntTestConfiguration {
+    static class AiAgentChatActionIntTestConfiguration {
 
         @Bean
         AiAgentComponentHandler aiAgentComponentHandler(
