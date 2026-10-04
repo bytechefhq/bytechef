@@ -88,7 +88,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
 
         @Test
         void testUpdateEmbeddedMcpServer() {
-            when(embeddedMcpServerFacade.updateEmbeddedMcpServer(1L, "Renamed", false))
+            when(embeddedMcpServerFacade.updateEmbeddedMcpServer(1L, "Renamed", false, null, null))
                 .thenReturn(createMcpServer("Renamed"));
 
             graphQlTester.document("""
@@ -104,12 +104,33 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
                 .entity(String.class)
                 .isEqualTo("Renamed");
 
-            verify(embeddedMcpServerFacade).updateEmbeddedMcpServer(1L, "Renamed", false);
+            verify(embeddedMcpServerFacade).updateEmbeddedMcpServer(1L, "Renamed", false, null, null);
+        }
+
+        @Test
+        void testUpdateEmbeddedMcpServerAuthenticationSwitches() {
+            when(embeddedMcpServerFacade.updateEmbeddedMcpServer(1L, null, null, true, true))
+                .thenReturn(createMcpServer("Server"));
+
+            graphQlTester.document("""
+                mutation {
+                    updateEmbeddedMcpServer(
+                        id: "1", input: {enforceToolAuthorization: true, authenticationRequired: true}) {
+                        id
+                    }
+                }
+                """)
+                .execute()
+                .path("updateEmbeddedMcpServer.id")
+                .entity(String.class)
+                .isEqualTo("1");
+
+            verify(embeddedMcpServerFacade).updateEmbeddedMcpServer(1L, null, null, true, true);
         }
 
         @Test
         void testUpdateEmbeddedMcpServerReportsDeniedAccess() {
-            when(embeddedMcpServerFacade.updateEmbeddedMcpServer(1L, null, true))
+            when(embeddedMcpServerFacade.updateEmbeddedMcpServer(1L, null, true, null, null))
                 .thenThrow(new AccessDeniedException("denied"));
 
             graphQlTester.document("""

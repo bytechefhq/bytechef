@@ -27,7 +27,6 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Set;
@@ -187,20 +186,35 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
-    public McpServer updateEmbeddedMcpServer(long mcpServerId, String name, Boolean enabled) {
+    public McpServer updateEmbeddedMcpServer(
+        long mcpServerId, String name, Boolean enabled, Boolean enforceToolAuthorization,
+        Boolean authenticationRequired) {
+
         getEmbeddedMcpServer(mcpServerId);
 
-        return mcpServerService.update(mcpServerId, name, enabled);
+        McpServer mcpServer = mcpServerService.update(mcpServerId, name, enabled);
+
+        if (enforceToolAuthorization != null || authenticationRequired != null) {
+            if (enforceToolAuthorization != null) {
+                mcpServer.setEnforceToolAuthorization(enforceToolAuthorization);
+            }
+
+            if (authenticationRequired != null) {
+                mcpServer.setAuthenticationRequired(authenticationRequired);
+            }
+
+            mcpServer = mcpServerService.update(mcpServer);
+        }
+
+        return mcpServer;
     }
 
     @Override
     @PreAuthorize("isTenantAdmin()")
     public McpServer updateEmbeddedMcpServerSecretKey(long mcpServerId) {
-        McpServer mcpServer = getEmbeddedMcpServer(mcpServerId);
+        getEmbeddedMcpServer(mcpServerId);
 
-        mcpServer.setSecretKey(String.valueOf(TenantKey.of()));
-
-        return mcpServerService.update(mcpServer);
+        return mcpServerService.rotateSecretKey(mcpServerId);
     }
 
     @Override

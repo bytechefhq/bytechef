@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -40,7 +41,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
+import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -110,64 +113,50 @@ public class McpServerGraphQlControllerIntTest {
     }
 
     @Test
-    void testGetMcpServers() {
-        // Given
-        List<McpServer> mockServers = List.of(
-            createMockMcpServer(1L, "Server 1", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true),
-            createMockMcpServer(2L, "Server 2", PlatformType.AUTOMATION, Environment.PRODUCTION, false));
+    void testUrlMasksTheSecretKeyWhenTheCallerMayNotReadIt() {
+        McpServer mockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        when(mcpServerService.getMcpServers(PlatformType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC))
-            .thenReturn(mockServers);
+        when(mcpServerService.getMcpServer(1L)).thenReturn(mockServer);
+        when(mcpServerService.getMcpServerSecretKey(1L)).thenThrow(new AccessDeniedException("Access Denied"));
 
-        // When & Then
         this.graphQlTester
             .document("""
                 query {
-                    mcpServers(type: AUTOMATION, orderBy: NAME_ASC) {
-                        id
-                        name
+                    mcpServer(id: "1") {
+                        url
                     }
                 }
                 """)
             .execute()
-            .path("mcpServers")
-            .entityList(Object.class)
-            .hasSize(2);
+            .path("mcpServer.url")
+            .entity(String.class)
+            .satisfies(url -> {
+                assertThat(url).doesNotContain("secret-key-1");
+                assertThat(url).endsWith("/mcp");
+            });
     }
 
     @Test
-    void testCreateMcpServer() {
-        // Given
+    void testUrlCarriesTheSecretKeyForATenantAdmin() {
         McpServer mockServer = createMockMcpServer(
-            1L, "New Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        when(mcpServerService.create(eq("New Server"), eq(PlatformType.AUTOMATION),
-            eq(Environment.DEVELOPMENT), eq(true))).thenReturn(mockServer);
+        when(mcpServerService.getMcpServer(1L)).thenReturn(mockServer);
+        when(mcpServerService.getMcpServerSecretKey(1L)).thenReturn("secret-key-1");
 
-        // When & Then
         this.graphQlTester
             .document("""
-                mutation {
-                    createMcpServer(input: {
-                        name: "New Server",
-                        type: AUTOMATION,
-                        environmentId: "0",
-                        enabled: true
-                    }) {
-                        id
-                        name
-                        type
-                        enabled
+                query {
+                    mcpServer(id: "1") {
+                        url
                     }
                 }
                 """)
             .execute()
-            .path("createMcpServer.id")
+            .path("mcpServer.url")
             .entity(String.class)
-            .isEqualTo("1")
-            .path("createMcpServer.name")
-            .entity(String.class)
-            .isEqualTo("New Server");
+            .satisfies(url -> assertThat(url).contains("secret-key-1"));
     }
 
     @Test
@@ -202,6 +191,135 @@ public class McpServerGraphQlControllerIntTest {
             .path("updateMcpServer.enabled")
             .entity(Boolean.class)
             .isEqualTo(false);
+    }
+
+    @Test
+    void testUpdateMcpServerAuthenticationRequired() {
+        McpServer mockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        when(mcpServerService.update(eq(1L), eq("Test Server"), eq(true))).thenReturn(mockServer);
+
+        McpServer updatedMockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        updatedMockServer.setAuthenticationRequired(false);
+
+        when(mcpServerService.update(argThat(server -> server != null && !server.isAuthenticationRequired())))
+            .thenReturn(updatedMockServer);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpServer(id: "1", input: {
+                        name: "Test Server",
+                        enabled: true,
+                        authenticationRequired: false
+                    }) {
+                        id
+                        authenticationRequired
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpServer.id")
+            .entity(String.class)
+            .isEqualTo("1")
+            .path("updateMcpServer.authenticationRequired")
+            .entity(Boolean.class)
+            .isEqualTo(false);
+
+        verify(mcpServerService).update(argThat(server -> server != null && !server.isAuthenticationRequired()));
+    }
+
+    @Test
+    void testUpdateMcpServerRejectsInvariantViolation() {
+        McpServer mockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        when(mcpServerService.update(eq(1L), eq("Test Server"), eq(true))).thenReturn(mockServer);
+
+        when(mcpServerService.update(argThat(
+            server -> server != null && server.isEnforceToolAuthorization() && !server.isAuthenticationRequired())))
+                .thenThrow(new IllegalArgumentException(
+                    "enforceToolAuthorization requires authenticationRequired to be enabled"));
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpServer(id: "1", input: {
+                        name: "Test Server",
+                        enabled: true,
+                        enforceToolAuthorization: true,
+                        authenticationRequired: false
+                    }) {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .satisfy(errors -> {
+                assertThat(errors).hasSize(1);
+
+                assertThat(errors.get(0)
+                    .getErrorType()).isEqualTo(ErrorType.INTERNAL_ERROR);
+            })
+            .path("updateMcpServer")
+            .valueIsNull();
+    }
+
+    @Test
+    void testUpdateMcpServerEnablesBothFlagsInSingleUpdate() {
+        McpServer mockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        mockServer.setAuthenticationRequired(false);
+        mockServer.setEnforceToolAuthorization(false);
+
+        when(mcpServerService.update(eq(1L), eq("Test Server"), eq(true))).thenReturn(mockServer);
+
+        McpServer updatedMockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        updatedMockServer.setAuthenticationRequired(true);
+        updatedMockServer.setEnforceToolAuthorization(true);
+
+        when(mcpServerService.update(argThat(
+            server -> server != null && server.isAuthenticationRequired() && server.isEnforceToolAuthorization())))
+                .thenReturn(updatedMockServer);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpServer(id: "1", input: {
+                        name: "Test Server",
+                        enabled: true,
+                        authenticationRequired: true,
+                        enforceToolAuthorization: true
+                    }) {
+                        id
+                        authenticationRequired
+                        enforceToolAuthorization
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .verify()
+            .path("updateMcpServer.id")
+            .entity(String.class)
+            .isEqualTo("1")
+            .path("updateMcpServer.authenticationRequired")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path("updateMcpServer.enforceToolAuthorization")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(mcpServerService).update(
+            argThat(server -> server != null && server.isAuthenticationRequired()
+                && server.isEnforceToolAuthorization()));
     }
 
     @Test
@@ -257,7 +375,7 @@ public class McpServerGraphQlControllerIntTest {
             1L, "Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
         when(mcpServerService.getMcpServer(1L)).thenReturn(mcpServer);
-        when(mcpServerService.update(mcpServer)).thenReturn(mcpServer);
+        when(mcpServerService.rotateSecretKey(1L)).thenReturn(mcpServer);
 
         this.graphQlTester
             .document("""
@@ -268,9 +386,9 @@ public class McpServerGraphQlControllerIntTest {
             .execute()
             .path("updateMcpServerUrl")
             .entity(String.class)
-            .satisfies(url -> assertThat(url).contains("/api/automation/"));
+            .satisfies(url -> assertThat(url).endsWith("/api/automation/" + mcpServer.getSecretKey() + "/mcp"));
 
-        verify(mcpServerService).update(mcpServer);
+        verify(mcpServerService).rotateSecretKey(1L);
     }
 
     @Nested
@@ -305,7 +423,7 @@ public class McpServerGraphQlControllerIntTest {
                 }
                 """);
 
-            verify(mcpServerService, never()).getMcpServers(any(), any());
+            verify(mcpServerService, never()).getMcpServers(any());
         }
 
         @Test
@@ -355,7 +473,7 @@ public class McpServerGraphQlControllerIntTest {
                 }
                 """);
 
-            verify(mcpServerService, never()).update(any(McpServer.class));
+            verify(mcpServerService, never()).rotateSecretKey(anyLong());
         }
 
         @Test

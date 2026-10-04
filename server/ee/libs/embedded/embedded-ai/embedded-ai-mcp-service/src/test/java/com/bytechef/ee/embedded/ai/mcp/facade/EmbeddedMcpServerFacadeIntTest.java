@@ -278,25 +278,38 @@ class EmbeddedMcpServerFacadeIntTest {
 
             when(mcpServerService.update(EMBEDDED_MCP_SERVER_ID, "Renamed", false)).thenReturn(mcpServer);
 
-            assertThat(embeddedMcpServerFacade.updateEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID, "Renamed", false))
-                .isSameAs(mcpServer);
+            assertThat(
+                embeddedMcpServerFacade.updateEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID, "Renamed", false, null, null))
+                    .isSameAs(mcpServer);
+
+            verify(mcpServerService, never()).update(any(McpServer.class));
+        }
+
+        @Test
+        void testUpdateEmbeddedMcpServerAuthenticationSwitches() {
+            McpServer mcpServer = createMcpServer(EMBEDDED_MCP_SERVER_ID, PlatformType.EMBEDDED);
+
+            when(mcpServerService.update(EMBEDDED_MCP_SERVER_ID, null, null)).thenReturn(mcpServer);
+            when(mcpServerService.update(mcpServer)).thenReturn(mcpServer);
+
+            embeddedMcpServerFacade.updateEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID, null, null, true, true);
+
+            assertThat(mcpServer.isAuthenticationRequired()).isTrue();
+            assertThat(mcpServer.isEnforceToolAuthorization()).isTrue();
+
+            verify(mcpServerService).update(mcpServer);
         }
 
         @Test
         void testUpdateEmbeddedMcpServerSecretKey() {
-            McpServer mcpServer = createMcpServer(EMBEDDED_MCP_SERVER_ID, PlatformType.EMBEDDED);
+            McpServer rotatedMcpServer = createMcpServer(EMBEDDED_MCP_SERVER_ID, PlatformType.EMBEDDED);
 
-            String previousSecretKey = mcpServer.getSecretKey();
+            when(mcpServerService.rotateSecretKey(EMBEDDED_MCP_SERVER_ID)).thenReturn(rotatedMcpServer);
 
-            when(mcpServerService.getMcpServer(EMBEDDED_MCP_SERVER_ID)).thenReturn(mcpServer);
-            when(mcpServerService.update(mcpServer)).thenReturn(mcpServer);
+            assertThat(embeddedMcpServerFacade.updateEmbeddedMcpServerSecretKey(EMBEDDED_MCP_SERVER_ID))
+                .isSameAs(rotatedMcpServer);
 
-            McpServer updatedMcpServer = embeddedMcpServerFacade.updateEmbeddedMcpServerSecretKey(
-                EMBEDDED_MCP_SERVER_ID);
-
-            assertThat(updatedMcpServer.getSecretKey())
-                .isNotBlank()
-                .isNotEqualTo(previousSecretKey);
+            verify(mcpServerService).rotateSecretKey(EMBEDDED_MCP_SERVER_ID);
         }
 
         @Test
@@ -399,8 +412,9 @@ class EmbeddedMcpServerFacadeIntTest {
         @Test
         void testUpdateEmbeddedMcpServerRejectsAutomationMcpServer() {
             assertThatThrownBy(
-                () -> embeddedMcpServerFacade.updateEmbeddedMcpServer(AUTOMATION_MCP_SERVER_ID, "Renamed", true))
-                    .isInstanceOf(IllegalArgumentException.class);
+                () -> embeddedMcpServerFacade.updateEmbeddedMcpServer(
+                    AUTOMATION_MCP_SERVER_ID, "Renamed", true, null, null))
+                        .isInstanceOf(IllegalArgumentException.class);
 
             verify(mcpServerService, never()).update(anyLong(), any(), any());
         }
@@ -411,7 +425,7 @@ class EmbeddedMcpServerFacadeIntTest {
                 () -> embeddedMcpServerFacade.updateEmbeddedMcpServerSecretKey(AUTOMATION_MCP_SERVER_ID))
                     .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerService, never()).update(any(McpServer.class));
+            verify(mcpServerService, never()).rotateSecretKey(anyLong());
         }
 
         @Test
@@ -471,7 +485,7 @@ class EmbeddedMcpServerFacadeIntTest {
                     createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID), List.of())),
             operation(
                 "updateEmbeddedMcpServer",
-                facade -> facade.updateEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID, "Renamed", false)),
+                facade -> facade.updateEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID, "Renamed", false, null, null)),
             operation(
                 "updateEmbeddedMcpServerSecretKey",
                 facade -> facade.updateEmbeddedMcpServerSecretKey(EMBEDDED_MCP_SERVER_ID)),

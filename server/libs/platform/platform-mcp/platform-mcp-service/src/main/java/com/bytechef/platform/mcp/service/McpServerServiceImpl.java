@@ -20,8 +20,10 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
-import java.util.Comparator;
+import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,14 +36,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class McpServerServiceImpl implements McpServerService {
 
+    private final List<McpServerEnablementValidator> mcpServerEnablementValidators;
     private final McpServerRepository mcpServerRepository;
 
-    public McpServerServiceImpl(McpServerRepository mcpServerRepository) {
+    public McpServerServiceImpl(
+        ObjectProvider<McpServerEnablementValidator> mcpServerEnablementValidatorProvider,
+        McpServerRepository mcpServerRepository) {
+
+        this.mcpServerEnablementValidators = mcpServerEnablementValidatorProvider.orderedStream()
+            .toList();
         this.mcpServerRepository = mcpServerRepository;
     }
 
     @Override
     public McpServer create(McpServer mcpServer) {
+        checkAuthenticationRequiredForEnforcement(mcpServer);
+
         return mcpServerRepository.save(mcpServer);
     }
 
@@ -51,15 +61,25 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')")
     public McpServer getMcpServer(long mcpServerId) {
         return mcpServerRepository.findById(mcpServerId)
             .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public String getMcpServerSecretKey(long mcpServerId) {
+        return mcpServerRepository.findById(mcpServerId)
+            .map(McpServer::getSecretKey)
+            .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
+    }
+
+    @Override
     public McpServer getMcpServer(String secretKey) {
         return mcpServerRepository.findBySecretKey(secretKey)
-            .orElseThrow(() -> new IllegalArgumentException("MCP server with secret key " + secretKey + " not found"));
+            .orElseThrow(() -> new IllegalArgumentException("MCP server for the given secret key not found"));
     }
 
     @Override
@@ -78,49 +98,29 @@ public class McpServerServiceImpl implements McpServerService {
     @Override
     @Transactional(readOnly = true)
     public List<McpServer> getMcpServers(PlatformType type) {
-        return getMcpServers(type, null);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<McpServer> getMcpServers(PlatformType type, McpServerOrderBy orderBy) {
-        List<McpServer> servers = mcpServerRepository.findAll()
+        return mcpServerRepository.findAll()
             .stream()
-            .filter(server -> server.getType() == type)
-            .toList();
-
-        if (orderBy == null) {
-            return servers;
-        }
-
-        Comparator<McpServer> comparator = switch (orderBy) {
-            case NAME_ASC -> Comparator.comparing(McpServer::getName, String.CASE_INSENSITIVE_ORDER);
-            case NAME_DESC -> Comparator.comparing(McpServer::getName, String.CASE_INSENSITIVE_ORDER)
-                .reversed();
-            case CREATED_DATE_ASC ->
-                Comparator.comparing(McpServer::getCreatedDate, Comparator.nullsLast(Comparator.naturalOrder()));
-            case CREATED_DATE_DESC ->
-                Comparator.comparing(McpServer::getCreatedDate, Comparator.nullsLast(Comparator.naturalOrder()))
-                    .reversed();
-            case LAST_MODIFIED_DATE_ASC ->
-                Comparator.comparing(McpServer::getLastModifiedDate, Comparator.nullsLast(Comparator.naturalOrder()));
-            case LAST_MODIFIED_DATE_DESC ->
-                Comparator.comparing(McpServer::getLastModifiedDate, Comparator.nullsLast(Comparator.naturalOrder()))
-                    .reversed();
-        };
-
-        return servers.stream()
-            .sorted(comparator)
+            .filter(mcpServer -> mcpServer.getType() == type)
             .toList();
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServer.id, 'McpServer', 'MCP_EDIT')")
     public McpServer update(McpServer mcpServer) {
-        McpServer currentMcpServer = getMcpServer(mcpServer.getId());
+        checkAuthenticationRequiredForEnforcement(mcpServer);
+
+        McpServer currentMcpServer = mcpServerRepository.findById(mcpServer.getId())
+            .orElseThrow(
+                () -> new IllegalArgumentException("MCP server with id " + mcpServer.getId() + " not found"));
+
+        if (mcpServer.isEnabled() && !currentMcpServer.isEnabled()) {
+            checkEnablement(mcpServer.getId());
+        }
 
         currentMcpServer.setName(mcpServer.getName());
         currentMcpServer.setEnabled(mcpServer.isEnabled());
-        currentMcpServer.setSecretKey(mcpServer.getSecretKey());
+        currentMcpServer.setAuthenticationRequired(mcpServer.isAuthenticationRequired());
+        currentMcpServer.setEnforceToolAuthorization(mcpServer.isEnforceToolAuthorization());
         currentMcpServer.setTagIds(mcpServer.getTagIds());
         currentMcpServer.setVersion(mcpServer.getVersion());
 
@@ -128,11 +128,40 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
+    public McpServer rotateSecretKey(long mcpServerId) {
+        McpServer mcpServer = mcpServerRepository.findById(mcpServerId)
+            .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
+
+        mcpServer.setSecretKey(String.valueOf(TenantKey.of()));
+
+        return mcpServerRepository.save(mcpServer);
+    }
+
+    private void checkAuthenticationRequiredForEnforcement(McpServer mcpServer) {
+        if (!mcpServer.isAuthenticationRequired() && mcpServer.isEnforceToolAuthorization()) {
+            throw new IllegalArgumentException(
+                "enforceToolAuthorization requires authenticationRequired to be enabled");
+        }
+    }
+
+    private void checkEnablement(long mcpServerId) {
+        for (McpServerEnablementValidator mcpServerEnablementValidator : mcpServerEnablementValidators) {
+            mcpServerEnablementValidator.validateEnablement(mcpServerId);
+        }
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
     public McpServer update(long id, String name, Boolean enabled) {
         McpServer existingMcpServer = getMcpServer(id);
 
         if (name != null) {
             existingMcpServer.setName(name);
+        }
+
+        if (Boolean.TRUE.equals(enabled)) {
+            checkEnablement(id);
         }
 
         if (enabled != null) {

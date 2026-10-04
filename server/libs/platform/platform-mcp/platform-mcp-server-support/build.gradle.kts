@@ -3,4 +3,7 @@ dependencies {
     implementation("org.springframework.ai:mcp-spring-webmvc")
     implementation("org.slf4j:slf4j-api")
     implementation("io.projectreactor:reactor-core")
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
 }

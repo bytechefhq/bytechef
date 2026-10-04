@@ -17,11 +17,15 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.configuration.domain.Environment;
@@ -33,16 +37,23 @@ import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationSharedMocks;
+import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlMethodSecurityTestConfiguration;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -292,20 +303,31 @@ class McpToolGraphQlControllerIntTest {
     }
 
     @Test
-    void testUpdateMcpToolEnabledIsNotExposed() {
+    void testUpdateMcpToolEnabled() {
+        McpTool mcpTool = createMockMcpTool(1L, "test-tool", Map.of("param1", "value1"), 1L);
+
+        mcpTool.setEnabled(false);
+
+        when(mcpToolService.fetchMcpTool(1L)).thenReturn(Optional.of(mcpTool));
+
         this.graphQlTester
             .document("""
                 mutation {
                     updateMcpToolEnabled(id: "1", enabled: false) {
                         id
+                        enabled
                     }
                 }
                 """)
             .execute()
-            .errors()
-            .satisfy(errors -> assertThat(errors).hasSize(1));
+            .path("updateMcpToolEnabled.id")
+            .entity(String.class)
+            .isEqualTo("1")
+            .path("updateMcpToolEnabled.enabled")
+            .entity(Boolean.class)
+            .isEqualTo(false);
 
-        verify(mcpToolService, never()).updateEnabled(anyLong(), anyBoolean());
+        verify(mcpToolService).updateEnabled(1L, false);
     }
 
     @Nested
@@ -429,6 +451,19 @@ class McpToolGraphQlControllerIntTest {
             verify(mcpToolService, never()).delete(any(McpTool.class));
         }
 
+        @Test
+        void testUpdateMcpToolEnabledRejectsEmbeddedMcpTool() {
+            assertRejected("""
+                mutation {
+                    updateMcpToolEnabled(id: "2", enabled: false) {
+                        id
+                    }
+                }
+                """);
+
+            verify(mcpToolService, never()).updateEnabled(anyLong(), anyBoolean());
+        }
+
         private void assertRejected(String document) {
             graphQlTester.document(document)
                 .execute()
@@ -461,5 +496,40 @@ class McpToolGraphQlControllerIntTest {
         tool.setVersion(1);
 
         return tool;
+    }
+
+    @Nested
+    @ContextConfiguration(classes = McpGraphQlMethodSecurityTestConfiguration.class)
+    class MethodSecurity {
+
+        @Autowired
+        private PermissionEvaluator permissionEvaluator;
+
+        @Autowired
+        private McpToolGraphQlController mcpToolGraphQlController;
+
+        @BeforeEach
+        void setAuthentication() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+        }
+
+        @AfterEach
+        void clearAuthentication() {
+            SecurityContextHolder.clearContext();
+
+            reset(permissionEvaluator);
+        }
+
+        @Test
+        void testMcpToolsByComponentIdDeniedWithoutComponentViewPermission() {
+            assertThatThrownBy(() -> mcpToolGraphQlController.mcpToolsByComponentId(5L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(5L), eq("McpComponent"), eq("MCP_VIEW"));
+            verifyNoInteractions(mcpToolService);
+        }
     }
 }

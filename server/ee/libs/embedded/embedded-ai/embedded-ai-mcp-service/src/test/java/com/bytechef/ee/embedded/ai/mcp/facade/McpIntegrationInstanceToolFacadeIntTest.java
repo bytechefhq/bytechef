@@ -15,6 +15,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
@@ -248,9 +249,8 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
     @Test
     void testEnableMcpIntegrationInstanceToolDeniesForeignInstance() {
-        assertThatThrownBy(() -> mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(
-            foreignIntegrationInstanceId, mcpToolId, true))
-                .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
+        assertThatThrownBy(() -> enableMcpIntegrationInstanceTool(foreignIntegrationInstanceId, mcpToolId, true))
+            .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
 
         verifyNoInteractions(mcpIntegrationInstanceToolService);
 
@@ -258,8 +258,8 @@ class McpIntegrationInstanceToolFacadeIntTest {
     }
 
     @Test
-    void testEnableMcpIntegrationInstanceToolChecksOwnershipOfOwnInstance() {
-        mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId, true);
+    void testEnableMcpIntegrationInstanceToolChecksOwnershipOfOwnInstance() throws Throwable {
+        enableMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId, true);
 
         verify(connectedUserIntegrationInstanceFacade).validateCurrentPrincipalIntegrationInstanceOwnership(
             integrationInstanceId);
@@ -280,9 +280,8 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
         mcpToolRepository.save(mcpTool);
 
-        assertThatThrownBy(() -> mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(
-            integrationInstanceId, mcpToolId, true))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> enableMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId, true))
+            .isInstanceOf(IllegalArgumentException.class);
 
         assertThat(countMcpIntegrationInstanceTools()).isZero();
     }
@@ -300,10 +299,9 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
         long foreignMcpToolId = Objects.requireNonNull(foreignMcpTool.getId());
 
-        assertThatThrownBy(() -> mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(
-            integrationInstanceId, foreignMcpToolId, true))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("does not belong to integration instance");
+        assertThatThrownBy(() -> enableMcpIntegrationInstanceTool(integrationInstanceId, foreignMcpToolId, true))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("does not belong to integration instance");
 
         verify(mcpIntegrationInstanceToolService, never()).createMcpIntegrationInstanceTool(
             integrationInstanceId, foreignMcpToolId, true);
@@ -324,12 +322,21 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
         long automationMcpToolId = Objects.requireNonNull(automationMcpTool.getId());
 
-        assertThatThrownBy(() -> mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(
-            integrationInstanceId, automationMcpToolId, true))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("does not belong to integration instance");
+        assertThatThrownBy(() -> enableMcpIntegrationInstanceTool(integrationInstanceId, automationMcpToolId, true))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("does not belong to integration instance");
 
         assertThat(countMcpIntegrationInstanceTools()).isZero();
+    }
+
+    private void enableMcpIntegrationInstanceTool(long integrationInstanceId, long mcpToolId, boolean enable)
+        throws Throwable {
+
+        AutomationAuthorizationContext.callSkippingChecks(() -> {
+            mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId, enable);
+
+            return null;
+        });
     }
 
     private int countMcpIntegrationInstanceTools() {

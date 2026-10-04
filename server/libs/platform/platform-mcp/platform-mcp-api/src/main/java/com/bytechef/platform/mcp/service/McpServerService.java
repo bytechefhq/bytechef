@@ -28,19 +28,6 @@ import java.util.List;
 public interface McpServerService {
 
     /**
-     * Enum for ordering MCP servers.
-     */
-    enum McpServerOrderBy {
-
-        NAME_ASC,
-        NAME_DESC,
-        CREATED_DATE_ASC,
-        CREATED_DATE_DESC,
-        LAST_MODIFIED_DATE_ASC,
-        LAST_MODIFIED_DATE_DESC
-    }
-
-    /**
      * Creates a new MCP server.
      *
      * @param mcpServer the MCP server to create
@@ -74,6 +61,8 @@ public interface McpServerService {
      */
     McpServer getMcpServer(long mcpServerId);
 
+    String getMcpServerSecretKey(long mcpServerId);
+
     /**
      * Retrieves an MCP server by its secret key.
      *
@@ -90,14 +79,7 @@ public interface McpServerService {
      */
     List<McpServer> getMcpServers(PlatformType type);
 
-    /**
-     * Gets MCP servers filtered by type with ordering.
-     *
-     * @param type    the type to filter by
-     * @param orderBy the ordering criteria (can be null for default ordering)
-     * @return a list of MCP servers with the given type, ordered as specified
-     */
-    List<McpServer> getMcpServers(PlatformType type, McpServerOrderBy orderBy);
+    McpServer rotateSecretKey(long mcpServerId);
 
     /**
      * Updates an existing MCP server.

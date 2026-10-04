@@ -17,13 +17,20 @@
 package com.bytechef.platform.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.mcp.config.PlatformMcpIntTestConfiguration;
+import com.bytechef.platform.mcp.config.PlatformMcpMethodSecurityTestConfiguration;
+import com.bytechef.platform.mcp.config.PlatformMcpMethodSecurityTestConfiguration.TenantAdminCheck;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -40,9 +47,17 @@ import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -267,5 +282,93 @@ class McpServerFacadeIntTest {
 
     private McpTool getMcpTool(String name, long mcpComponentId) {
         return new McpTool(name, Map.of(), mcpComponentId);
+    }
+
+    @Nested
+    @Import({
+        PlatformMcpMethodSecurityTestConfiguration.class, McpServerFacadeIntTest.MethodSecurityFacadeConfiguration.class
+    })
+    class MethodSecurity {
+
+        @Autowired
+        private PermissionEvaluator permissionEvaluator;
+
+        @Autowired
+        private TenantAdminCheck tenantAdminCheck;
+
+        @Autowired
+        private McpServerFacade securedMcpServerFacade;
+
+        @BeforeEach
+        void setAuthentication() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+        }
+
+        @AfterEach
+        void clearAuthentication() {
+            SecurityContextHolder.clearContext();
+
+            reset(permissionEvaluator, tenantAdminCheck);
+        }
+
+        @Test
+        void testDeleteMcpServerRequiresEditor() {
+            assertThatThrownBy(() -> securedMcpServerFacade.deleteMcpServer(3L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"));
+        }
+
+        @Test
+        void testUpdateMcpServerTagsRequiresEditor() {
+            assertThatThrownBy(() -> securedMcpServerFacade.updateMcpServerTags(3L, List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"));
+        }
+
+        @Test
+        void testCreateMcpComponentRequiresServerEditor() {
+            McpComponent mcpComponent = new McpComponent("component", 1, 3L, null);
+
+            assertThatThrownBy(() -> securedMcpServerFacade.create(mcpComponent, List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"));
+        }
+
+        @Test
+        void testUpdateMcpComponentRequiresEditor() {
+            McpComponent mcpComponent = new McpComponent("component", 1, 3L, null);
+
+            mcpComponent.setId(4L);
+
+            assertThatThrownBy(() -> securedMcpServerFacade.update(mcpComponent, List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(4L), eq("McpComponent"), eq("MCP_EDIT"));
+        }
+
+        @Test
+        void testDeleteMcpComponentRequiresEditor() {
+            assertThatThrownBy(() -> securedMcpServerFacade.deleteMcpComponent(4L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(4L), eq("McpComponent"), eq("MCP_EDIT"));
+        }
+    }
+
+    static class MethodSecurityFacadeConfiguration {
+
+        @Bean
+        McpServerFacade securedMcpServerFacade(
+            McpComponentService mcpComponentService, McpServerService mcpServerService, McpToolService mcpToolService,
+            TagService tagService) {
+
+            return new McpServerFacadeImpl(mcpComponentService, mcpServerService, mcpToolService, tagService);
+        }
     }
 }

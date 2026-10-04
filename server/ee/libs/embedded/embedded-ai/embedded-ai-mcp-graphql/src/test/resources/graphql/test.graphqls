@@ -62,6 +62,7 @@ input McpComponentWithToolsInput {
     componentVersion: Int!
     mcpServerId: ID!
     connectionId: ID
+    requiredAuthorities: [String!]
     tools: [McpToolInputForComponent!]!
     version: Int
 }
@@ -82,6 +83,8 @@ type McpServer {
 input McpServerUpdateInput {
     name: String
     enabled: Boolean
+    enforceToolAuthorization: Boolean
+    authenticationRequired: Boolean
 }
 
 type McpTool {
