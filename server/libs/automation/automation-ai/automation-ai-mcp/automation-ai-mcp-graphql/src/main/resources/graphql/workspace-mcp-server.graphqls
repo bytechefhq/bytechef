@@ -1,5 +1,6 @@
 extend type Query {
     workspaceMcpServers(workspaceId: ID!): [McpServer]
+    workspaceMcpServerTags(workspaceId: ID!): [Tag]
 }
 
 extend type Mutation {
@@ -12,5 +13,6 @@ input CreateWorkspaceMcpServerInput {
     type: PlatformType!
     environmentId: ID!
     enabled: Boolean
+    authenticationRequired: Boolean
     workspaceId: ID!
 }

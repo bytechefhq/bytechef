@@ -59,17 +59,12 @@ public interface McpProjectService {
     Optional<McpProject> fetchMcpProject(long mcpProjectId);
 
     /**
-     * Gets all MCP projects.
-     *
-     * @return a list of all MCP projects
-     */
-    List<McpProject> getMcpProjects();
-
-    /**
      * Gets all MCP projects for a specific MCP server.
      *
      * @param mcpServerId the ID of the MCP server
      * @return a list of MCP projects for the specified server
      */
     List<McpProject> getMcpServerMcpProjects(long mcpServerId);
+
+    List<McpProject> getProjectDeploymentMcpProjects(long projectDeploymentId);
 }

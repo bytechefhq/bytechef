@@ -173,15 +173,6 @@ public class McpProjectServiceIntTest {
     }
 
     @Test
-    public void testGetMcpProjects() {
-        McpProject mcpProject = mcpProjectRepository.save(getMcpProject());
-
-        assertThat(mcpProjectService.getMcpProjects()).hasSize(1);
-        assertThat(mcpProjectService.getMcpProjects()
-            .getFirst()).isEqualTo(mcpProject);
-    }
-
-    @Test
     public void testGetMcpServerMcpProjects() {
         McpProject mcpProject = mcpProjectRepository.save(getMcpProject());
 

@@ -16,9 +16,11 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 
 /**
@@ -38,6 +40,10 @@ public interface WorkspaceMcpServerFacade {
      */
     List<McpServer> getWorkspaceMcpServers(Long workspaceId);
 
+    List<Tag> getWorkspaceMcpServerTags(Long workspaceId);
+
+    List<McpProject> getWorkspaceMcpProjects(Long workspaceId);
+
     /**
      * Creates a new MCP server and assigns it to the specified workspace.
      *
@@ -49,7 +55,10 @@ public interface WorkspaceMcpServerFacade {
      * @return the created MCP server
      */
     McpServer createWorkspaceMcpServer(
-        String name, PlatformType type, Environment environment, Boolean enabled, Long workspaceId);
+        String name, PlatformType type, Environment environment, Boolean enabled, Boolean authenticationRequired,
+        Long workspaceId);
+
+    McpServer updateWorkspaceMcpServer(Long mcpServerId, String name, Boolean enabled);
 
     /**
      * Deletes an MCP server and removes it from all workspaces.

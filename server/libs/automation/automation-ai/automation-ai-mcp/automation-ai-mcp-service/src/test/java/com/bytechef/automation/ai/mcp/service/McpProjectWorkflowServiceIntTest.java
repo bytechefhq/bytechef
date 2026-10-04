@@ -17,7 +17,13 @@
 package com.bytechef.automation.ai.mcp.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
@@ -39,14 +45,19 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * @author Ivica Cardic
@@ -55,6 +66,9 @@ import org.springframework.context.annotation.Import;
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
 public class McpProjectWorkflowServiceIntTest {
+
+    private static final String INVALID_PROJECT_DEPLOYMENT_WORKFLOW =
+        "Invalid projectDeploymentWorkflowId for the given MCP project";
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -83,6 +97,7 @@ public class McpProjectWorkflowServiceIntTest {
     @Autowired
     private McpServerRepository mcpServerRepository;
 
+    private ProjectDeploymentWorkflow foreignProjectDeploymentWorkflow;
     private McpProject mcpProject;
     private McpProject mcpProject2;
     private ProjectDeploymentWorkflow projectDeploymentWorkflow;
@@ -128,6 +143,24 @@ public class McpProjectWorkflowServiceIntTest {
         projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
         projectDeploymentWorkflow.setWorkflowId("test-workflow");
         projectDeploymentWorkflow = projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
+
+        ProjectDeployment foreignProjectDeployment = new ProjectDeployment();
+
+        foreignProjectDeployment.setName("test-foreign-deployment");
+        foreignProjectDeployment.setDescription("test foreign deployment");
+        foreignProjectDeployment.setEnabled(true);
+        foreignProjectDeployment.setEnvironment(Environment.STAGING);
+        foreignProjectDeployment.setProjectId(project.getId());
+        foreignProjectDeployment.setProjectVersion(1);
+
+        foreignProjectDeployment = projectDeploymentRepository.save(foreignProjectDeployment);
+
+        foreignProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        foreignProjectDeploymentWorkflow.setProjectDeploymentId(foreignProjectDeployment.getId());
+        foreignProjectDeploymentWorkflow.setWorkflowId("test-foreign-workflow");
+
+        foreignProjectDeploymentWorkflow = projectDeploymentWorkflowRepository.save(foreignProjectDeploymentWorkflow);
 
         mcpProject = new McpProject(projectDeployment.getId(), mcpServerId);
         mcpProject = mcpProjectRepository.save(mcpProject);
@@ -220,15 +253,6 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testGetMcpProjectWorkflows() {
-        McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
-
-        assertThat(mcpProjectWorkflowService.getMcpProjectWorkflows()).hasSize(1);
-        assertThat(mcpProjectWorkflowService.getMcpProjectWorkflows()
-            .get(0)).isEqualTo(mcpProjectWorkflow);
-    }
-
-    @Test
     public void testGetMcpProjectMcpProjectWorkflows() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
@@ -256,7 +280,145 @@ public class McpProjectWorkflowServiceIntTest {
             .hasSize(0);
     }
 
+    @Test
+    public void testCreateRejectsProjectDeploymentWorkflowOfAnotherDeployment() {
+        Long mcpProjectId = mcpProject.getId();
+        Long foreignProjectDeploymentWorkflowId = foreignProjectDeploymentWorkflow.getId();
+
+        assertThatThrownBy(() -> mcpProjectWorkflowService.create(mcpProjectId, foreignProjectDeploymentWorkflowId))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
+
+        assertThat(mcpProjectWorkflowRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    public void testCreateRejectsUnknownProjectDeploymentWorkflowIndistinguishably() {
+        Long mcpProjectId = mcpProject.getId();
+
+        assertThatThrownBy(() -> mcpProjectWorkflowService.create(mcpProjectId, Long.MAX_VALUE))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
+
+        assertThat(mcpProjectWorkflowRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    public void testUpdateRejectsProjectDeploymentWorkflowOfAnotherDeployment() {
+        McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
+
+        long mcpProjectWorkflowId = Validate.notNull(mcpProjectWorkflow.getId(), "id");
+        Long foreignProjectDeploymentWorkflowId = foreignProjectDeploymentWorkflow.getId();
+
+        assertThatThrownBy(
+            () -> mcpProjectWorkflowService.update(mcpProjectWorkflowId, null, foreignProjectDeploymentWorkflowId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
+
+        assertThat(mcpProjectWorkflowRepository.findById(mcpProjectWorkflowId))
+            .get()
+            .extracting(McpProjectWorkflow::getProjectDeploymentWorkflowId)
+            .isEqualTo(projectDeploymentWorkflow.getId());
+    }
+
     private McpProjectWorkflow getMcpProjectWorkflow() {
         return new McpProjectWorkflow(mcpProject.getId(), projectDeploymentWorkflow.getId());
+    }
+
+    @Nested
+    @Import({
+        McpMethodSecurityTestConfiguration.class, PostgreSQLContainerConfiguration.class
+    })
+    @WithMockUser
+    class MethodSecurity {
+
+        @Autowired
+        private PermissionEvaluator permissionEvaluator;
+
+        @AfterEach
+        void resetPermissionEvaluator() {
+            reset(permissionEvaluator);
+        }
+
+        @Test
+        void testCreateRequiresProjectEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.create(5L, 6L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testCreateFromEntityRequiresProjectEditor() {
+            McpProjectWorkflow mcpProjectWorkflow = new McpProjectWorkflow(5L, 6L);
+
+            when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.create(mcpProjectWorkflow))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testFetchRequiresViewer() {
+            when(permissionEvaluator.hasPermission(any(), eq(8L), eq("McpProjectWorkflow"), eq("MCP_VIEW")))
+                .thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.fetchMcpProjectWorkflow(8L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testDeleteServiceRequiresEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(8L), eq("McpProjectWorkflow"), eq("MCP_EDIT")))
+                .thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.delete(8L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateRequiresEditorAndTargetProjectEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(8L), eq("McpProjectWorkflow"), eq("MCP_EDIT")))
+                .thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.update(8L, 5L, 6L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            reset(permissionEvaluator);
+
+            when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.update(8L, 5L, 6L))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateFromEntityRequiresEditorAndTargetProjectEditor() {
+            McpProjectWorkflow mcpProjectWorkflow = new McpProjectWorkflow(5L, 6L);
+
+            mcpProjectWorkflow.setId(8L);
+
+            when(permissionEvaluator.hasPermission(any(), eq(8L), eq("McpProjectWorkflow"), eq("MCP_EDIT")))
+                .thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.update(mcpProjectWorkflow))
+                .isInstanceOf(AccessDeniedException.class);
+
+            reset(permissionEvaluator);
+
+            when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.update(mcpProjectWorkflow))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateParametersRequiresEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(8L), eq("McpProjectWorkflow"), eq("MCP_EDIT")))
+                .thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.updateParameters(8L, Map.of()))
+                .isInstanceOf(AccessDeniedException.class);
+        }
     }
 }

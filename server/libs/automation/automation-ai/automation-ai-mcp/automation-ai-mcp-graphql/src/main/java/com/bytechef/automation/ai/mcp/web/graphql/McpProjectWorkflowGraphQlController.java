@@ -48,6 +48,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -85,23 +86,15 @@ public class McpProjectWorkflowGraphQlController {
     }
 
     @QueryMapping
-    List<McpProjectWorkflow> mcpProjectWorkflows() {
-        return mcpProjectWorkflowService.getMcpProjectWorkflows();
-    }
-
-    @QueryMapping
-    List<McpProjectWorkflow> mcpProjectWorkflowsByMcpProjectId(@Argument long mcpProjectId) {
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_VIEW')")
+    public List<McpProjectWorkflow> mcpProjectWorkflowsByMcpProjectId(@Argument long mcpProjectId) {
         return mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId);
     }
 
     @QueryMapping
-    List<McpProjectWorkflow>
-        mcpProjectWorkflowsByProjectDeploymentWorkflowId(@Argument long projectDeploymentWorkflowId) {
-        return mcpProjectWorkflowService.getProjectDeploymentWorkflowMcpProjectWorkflows(projectDeploymentWorkflowId);
-    }
-
-    @QueryMapping
-    List<ProjectWorkflow> toolEligibleProjectVersionWorkflows(@Argument long projectId, @Argument int projectVersion) {
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
+    public List<ProjectWorkflow> toolEligibleProjectVersionWorkflows(
+        @Argument long projectId, @Argument int projectVersion) {
         return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
             .stream()
             .filter(projectWorkflow -> {
@@ -154,9 +147,10 @@ public class McpProjectWorkflowGraphQlController {
         }
 
         if (inputProperty instanceof com.bytechef.component.definition.Property.ObjectProperty objectProperty) {
-            for (com.bytechef.component.definition.Property childProperty : objectProperty.getProperties()
-                .orElse(List.of())) {
+            var childProperties = objectProperty.getProperties()
+                .orElseGet(List::of);
 
+            for (com.bytechef.component.definition.Property childProperty : childProperties) {
                 properties.add(Property.toProperty(childProperty));
             }
 

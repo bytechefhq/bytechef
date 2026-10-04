@@ -32,6 +32,7 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
@@ -82,6 +83,11 @@ public class McpProjectIntTestConfiguration {
     @Bean
     Evaluator evaluator() {
         return SpelEvaluator.create();
+    }
+
+    @Bean
+    WebhookTriggerTestFacade webhookTriggerTestFacade() {
+        return mock(WebhookTriggerTestFacade.class);
     }
 
     @Bean

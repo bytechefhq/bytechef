@@ -19,14 +19,12 @@ type Query {
 
     # McpProject queries
     mcpProject(id: ID): McpProject
-    mcpProjects: [McpProject]
+    mcpProjects(workspaceId: ID!): [McpProject]
     mcpProjectsByServerId(mcpServerId: ID): [McpProject]
 
     # McpProjectWorkflow queries
     mcpProjectWorkflow(id: ID): McpProjectWorkflow
-    mcpProjectWorkflows: [McpProjectWorkflow]
     mcpProjectWorkflowsByMcpProjectId(mcpProjectId: ID): [McpProjectWorkflow]
-    mcpProjectWorkflowsByProjectDeploymentWorkflowId(projectDeploymentWorkflowId: ID): [McpProjectWorkflow]
     toolEligibleProjectVersionWorkflows(projectId: ID!, projectVersion: Int!): [ProjectWorkflow!]!
     mcpProjectWorkflowProperties(mcpProjectWorkflowId: ID!): [Property]
 }
