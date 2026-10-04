@@ -1824,6 +1824,9 @@ components:
           type: "integer"
           format: "int64"
           readOnly: true
+        label:
+          description: "The label of the MCP tool."
+          type: "string"
         name:
           description: "The display name of the MCP tool, formatted as 'MCP Component name - McpTool name'."
           type: "string"
