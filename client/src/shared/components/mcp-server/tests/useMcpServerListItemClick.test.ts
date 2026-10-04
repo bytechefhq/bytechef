@@ -1,27 +1,14 @@
-import {McpServer} from '@/shared/middleware/graphql';
 import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import useMcpServerListItem from './useMcpServerListItem';
+import useMcpServerListItemClick from '../hooks/useMcpServerListItemClick';
 
 import type {MouseEvent} from 'react';
-
-vi.mock('@/shared/middleware/graphql', () => ({
-    useDeleteEmbeddedMcpServerMutation: () => ({mutate: vi.fn()}),
-    useUpdateMcpServerMutation: () => ({mutate: vi.fn()}),
-    useUpdateMcpServerTagsMutation: () => ({mutate: vi.fn()}),
-}));
-
-vi.mock('@tanstack/react-query', () => ({
-    useQueryClient: () => ({invalidateQueries: vi.fn()}),
-}));
-
-const mcpServer = {id: '1', name: 'mcpserver1'} as McpServer;
 
 const createClickEvent = (currentTarget: HTMLElement, target: HTMLElement) =>
     ({currentTarget, target}) as unknown as MouseEvent;
 
-describe('useMcpServerListItem', () => {
+describe('useMcpServerListItemClick', () => {
     let listItemElement: HTMLDivElement;
     let toolsCollapsibleTriggerElement: HTMLButtonElement;
 
@@ -33,7 +20,7 @@ describe('useMcpServerListItem', () => {
     });
 
     it('toggles the tools collapsible when the list item itself is clicked', () => {
-        const {result} = renderHook(() => useMcpServerListItem(mcpServer));
+        const {result} = renderHook(() => useMcpServerListItemClick());
 
         result.current.toolsCollapsibleTriggerRef.current = toolsCollapsibleTriggerElement;
 
@@ -44,7 +31,7 @@ describe('useMcpServerListItem', () => {
 
     // Dropdown menu items are portaled outside the list item, but their clicks still bubble through the React tree.
     it('does not toggle the tools collapsible when a portaled dropdown menu item is clicked', () => {
-        const {result} = renderHook(() => useMcpServerListItem(mcpServer));
+        const {result} = renderHook(() => useMcpServerListItemClick());
 
         result.current.toolsCollapsibleTriggerRef.current = toolsCollapsibleTriggerElement;
 
@@ -53,6 +40,20 @@ describe('useMcpServerListItem', () => {
         dropdownMenuItemElement.setAttribute('role', 'menuitem');
 
         result.current.handleMcpServerListItemClick(createClickEvent(listItemElement, dropdownMenuItemElement));
+
+        expect(toolsCollapsibleTriggerElement.click).not.toHaveBeenCalled();
+    });
+
+    it('does not toggle the tools collapsible when an interactive element inside the list item is clicked', () => {
+        const {result} = renderHook(() => useMcpServerListItemClick());
+
+        result.current.toolsCollapsibleTriggerRef.current = toolsCollapsibleTriggerElement;
+
+        const switchElement = document.createElement('button');
+
+        listItemElement.appendChild(switchElement);
+
+        result.current.handleMcpServerListItemClick(createClickEvent(listItemElement, switchElement));
 
         expect(toolsCollapsibleTriggerElement.click).not.toHaveBeenCalled();
     });

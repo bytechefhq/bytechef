@@ -1,14 +1,16 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/McpProjectWorkflowDialog';
+import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItem from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItem';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import McpServerAddToolsButton from '@/shared/components/mcp-server/McpServerAddToolsButton';
 import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConfiguration';
+import McpServerTabs from '@/shared/components/mcp-server/McpServerTabs';
 import {McpServer, Tag, useMcpProjectsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 
 import {McpProjectWorkflowItemType} from '../mcp-project-workflow-list/hooks/useMcpProjectList';
-import McpServerToolsAddButton from './McpServerToolsAddButton';
 import McpServerToolsContent from './McpServerToolsContent';
 import useMcpServerList from './hooks/useMcpServerList';
 
@@ -31,37 +33,6 @@ const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer
     return <McpServerListItem mcpProjectWorkflows={mcpProjectWorkflows} mcpServer={mcpServer} tags={tags} />;
 };
 
-interface McpServerListItemTabsProps {
-    mcpServer: McpServer;
-    onRefresh: () => void;
-}
-
-const McpServerListItemTabs = ({mcpServer, onRefresh}: McpServerListItemTabsProps) => {
-    const [activeTab, setActiveTab] = useState('tools');
-
-    return (
-        <Tabs onValueChange={setActiveTab} value={activeTab}>
-            <div className="flex items-center justify-between">
-                <TabsList>
-                    <TabsTrigger value="tools">Tools</TabsTrigger>
-
-                    <TabsTrigger value="connect">Connect</TabsTrigger>
-                </TabsList>
-
-                {activeTab === 'tools' && <McpServerToolsAddButton mcpServer={mcpServer} />}
-            </div>
-
-            <TabsContent className="pt-2" value="tools">
-                <McpServerToolsContent mcpServer={mcpServer} />
-            </TabsContent>
-
-            <TabsContent className="max-w-(--breakpoint-lg) pt-3" value="connect">
-                <McpServerConfiguration mcpServerUrl={mcpServer.url} onRefresh={onRefresh} />
-            </TabsContent>
-        </Tabs>
-    );
-};
-
 const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
     const {createHandleRefresh, sortedMcpServers} = useMcpServerList(mcpServers);
 
@@ -78,7 +49,29 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                             <McpServerListItemWithWorkflows key={mcpServer.id} mcpServer={mcpServer} tags={tags} />
 
                             <CollapsibleContent className="mx-3 mt-1 mb-3">
-                                <McpServerListItemTabs mcpServer={mcpServer} onRefresh={handleRefresh} />
+                                <McpServerTabs
+                                    addToolsButton={
+                                        <McpServerAddToolsButton
+                                            renderMcpComponentDialog={(onClose) => (
+                                                <McpComponentDialog
+                                                    mcpServerId={mcpServer.id}
+                                                    onOpenChange={(open) => !open && onClose()}
+                                                    open
+                                                />
+                                            )}
+                                            renderWorkflowDialog={(onClose) => (
+                                                <McpProjectWorkflowDialog mcpServer={mcpServer} onClose={onClose} />
+                                            )}
+                                        />
+                                    }
+                                    connectContent={
+                                        <McpServerConfiguration
+                                            mcpServerUrl={mcpServer.url}
+                                            onRefresh={handleRefresh}
+                                        />
+                                    }
+                                    toolsContent={<McpServerToolsContent mcpServer={mcpServer} />}
+                                />
                             </CollapsibleContent>
                         </Collapsible>
                     );
