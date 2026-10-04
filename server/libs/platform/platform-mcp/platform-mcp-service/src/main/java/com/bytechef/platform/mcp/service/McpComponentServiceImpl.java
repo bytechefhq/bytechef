@@ -20,6 +20,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,15 +40,18 @@ public class McpComponentServiceImpl implements McpComponentService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent) {
         return mcpComponentRepository.save(mcpComponent);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent update(McpComponent mcpComponent) {
         McpComponent currentMcpComponent = OptionalUtils.get(mcpComponentRepository.findById(mcpComponent.getId()));
 
         currentMcpComponent.setConnectionId(mcpComponent.getConnectionId());
+        currentMcpComponent.setRequiredAuthorities(mcpComponent.getRequiredAuthorities());
         currentMcpComponent.setVersion(mcpComponent.getVersion());
 
         return mcpComponentRepository.save(currentMcpComponent);
@@ -70,6 +74,7 @@ public class McpComponentServiceImpl implements McpComponentService {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public List<McpComponent> getMcpComponents() {
         return mcpComponentRepository.findAll();
     }

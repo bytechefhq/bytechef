@@ -18,6 +18,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -72,6 +73,10 @@ class EmbeddedMcpServerGraphQlController {
         McpComponent mcpComponent = new McpComponent(
             input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId());
 
+        if (input.requiredAuthorities() != null) {
+            mcpComponent.setRequiredAuthorities(new HashSet<>(input.requiredAuthorities()));
+        }
+
         return embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, toMcpTools(input.tools()));
     }
 
@@ -123,12 +128,17 @@ class EmbeddedMcpServerGraphQlController {
 
         mcpComponent.setId(id);
 
+        if (input.requiredAuthorities() != null) {
+            mcpComponent.setRequiredAuthorities(new HashSet<>(input.requiredAuthorities()));
+        }
+
         return embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, toMcpTools(input.tools()));
     }
 
     @MutationMapping
     McpServer updateEmbeddedMcpServer(@Argument long id, @Argument McpServerUpdateInput input) {
-        return embeddedMcpServerFacade.updateEmbeddedMcpServer(id, input.name(), input.enabled());
+        return embeddedMcpServerFacade.updateEmbeddedMcpServer(
+            id, input.name(), input.enabled(), input.enforceToolAuthorization(), input.authenticationRequired());
     }
 
     @MutationMapping
@@ -185,10 +195,11 @@ class EmbeddedMcpServerGraphQlController {
     @SuppressFBWarnings("EI")
     record McpComponentWithToolsInput(
         String componentName, int componentVersion, Long mcpServerId, Long connectionId,
-        List<McpToolInputForComponent> tools, Integer version) {
+        List<String> requiredAuthorities, List<McpToolInputForComponent> tools, Integer version) {
     }
 
-    record McpServerUpdateInput(String name, Boolean enabled) {
+    record McpServerUpdateInput(
+        String name, Boolean enabled, Boolean enforceToolAuthorization, Boolean authenticationRequired) {
     }
 
     @SuppressFBWarnings("EI")

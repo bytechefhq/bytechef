@@ -19,6 +19,7 @@ type McpComponent {
     mcpServerId: ID!
     connectionId: ID
     mcpTools: [McpTool]
+    requiredAuthorities: [String!]!
     createdBy: String
     createdDate: Long
     lastModifiedBy: String
@@ -38,6 +39,7 @@ input McpComponentWithToolsInput {
     componentVersion: Int!
     mcpServerId: ID!
     connectionId: ID
+    requiredAuthorities: [String!]
     tools: [McpToolInputForComponent!]!
     version: Int
 }

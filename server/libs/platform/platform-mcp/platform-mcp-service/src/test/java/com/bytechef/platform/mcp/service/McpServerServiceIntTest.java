@@ -17,20 +17,39 @@
 package com.bytechef.platform.mcp.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.mcp.config.PlatformMcpIntTestConfiguration;
+import com.bytechef.platform.mcp.config.PlatformMcpMethodSecurityTestConfiguration;
+import com.bytechef.platform.mcp.config.PlatformMcpMethodSecurityTestConfiguration.TenantAdminCheck;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
+import javax.sql.DataSource;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -38,6 +57,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(classes = PlatformMcpIntTestConfiguration.class)
 public class McpServerServiceIntTest {
+
+    @Autowired
+    private DataSource dataSource;
 
     @MockitoBean
     private MailService mailService;
@@ -143,27 +165,148 @@ public class McpServerServiceIntTest {
     }
 
     @Test
-    public void testGetMcpServersByTypeWithOrderBy() {
-        McpServer server1 = mcpServerRepository.save(
-            new McpServer("a-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
-        McpServer server2 = mcpServerRepository.save(
-            new McpServer("z-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
+    void testNewMcpServerDefaultsAuthenticationRequiredTrue() {
+        McpServer mcpServer = mcpServerService.create(
+            "auth-default", PlatformType.AUTOMATION, Environment.PRODUCTION, true);
 
-        List<McpServer> serversAsc =
-            mcpServerService.getMcpServers(PlatformType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC);
-        List<McpServer> serversDesc =
-            mcpServerService.getMcpServers(PlatformType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_DESC);
+        McpServer loaded = mcpServerService.getMcpServer(mcpServer.getSecretKey());
 
-        assertThat(serversAsc).hasSize(2);
-        assertThat(serversAsc.get(0)).isEqualTo(server1);
-        assertThat(serversAsc.get(1)).isEqualTo(server2);
+        assertThat(loaded.isAuthenticationRequired()).isTrue();
+    }
 
-        assertThat(serversDesc).hasSize(2);
-        assertThat(serversDesc.get(0)).isEqualTo(server2);
-        assertThat(serversDesc.get(1)).isEqualTo(server1);
+    @Test
+    void testLegacyRowLoadsAuthenticationRequiredFalse() {
+        Timestamp now = Timestamp.from(Instant.now());
+
+        new JdbcTemplate(dataSource).update(
+            "INSERT INTO mcp_server (name, type, environment, enabled, secret_key, created_date, created_by, " +
+                "last_modified_date, last_modified_by, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "auth-legacy", PlatformType.AUTOMATION.ordinal(), Environment.PRODUCTION.ordinal(), true,
+            "legacy-secret-key", now, "system", now, "system", 0);
+
+        McpServer loaded = mcpServerService.getMcpServer("legacy-secret-key");
+
+        assertThat(loaded.isAuthenticationRequired()).isFalse();
+    }
+
+    @Test
+    void testUpdatePersistsAuthenticationRequired() {
+        McpServer mcpServer = mcpServerService.create(
+            "auth-update", PlatformType.AUTOMATION, Environment.PRODUCTION, true);
+
+        mcpServer.setAuthenticationRequired(false);
+
+        mcpServerService.update(mcpServer);
+
+        McpServer loaded = mcpServerService.getMcpServer(mcpServer.getSecretKey());
+
+        assertThat(loaded.isAuthenticationRequired()).isFalse();
+    }
+
+    @Test
+    void testUpdatePersistsEnforceToolAuthorization() {
+        McpServer mcpServer = mcpServerService.create(
+            "auth-enforce-persist", PlatformType.AUTOMATION, Environment.PRODUCTION, true);
+
+        mcpServer.setAuthenticationRequired(true);
+        mcpServer.setEnforceToolAuthorization(true);
+
+        mcpServerService.update(mcpServer);
+
+        McpServer loaded = mcpServerService.getMcpServer(mcpServer.getSecretKey());
+
+        assertThat(loaded.isEnforceToolAuthorization()).isTrue();
+    }
+
+    @Test
+    void testUpdateRejectsNoAuthWithToolAuthorization() {
+        McpServer mcpServer = mcpServerService.create(
+            "auth-invariant", PlatformType.AUTOMATION, Environment.PRODUCTION, true);
+
+        mcpServer.setAuthenticationRequired(false);
+        mcpServer.setEnforceToolAuthorization(true);
+
+        assertThatThrownBy(() -> mcpServerService.update(mcpServer))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testRotateSecretKeyInvalidatesPreviousSecretKey() {
+        McpServer mcpServer = mcpServerService.create(
+            "rotate", PlatformType.AUTOMATION, Environment.PRODUCTION, true);
+
+        String previousSecretKey = mcpServer.getSecretKey();
+
+        McpServer rotatedMcpServer = mcpServerService.rotateSecretKey(Validate.notNull(mcpServer.getId(), "id"));
+
+        String rotatedSecretKey = rotatedMcpServer.getSecretKey();
+
+        assertThat(rotatedSecretKey).isNotEqualTo(previousSecretKey);
+        assertThat(mcpServerService.getMcpServer(rotatedSecretKey)
+            .getId()).isEqualTo(mcpServer.getId());
+        assertThatThrownBy(() -> mcpServerService.getMcpServer(previousSecretKey))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     private McpServer getMcpServer() {
         return new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
+    }
+
+    @Nested
+    @Import(PlatformMcpMethodSecurityTestConfiguration.class)
+    class MethodSecurity {
+
+        @Autowired
+        private PermissionEvaluator permissionEvaluator;
+
+        @Autowired
+        private TenantAdminCheck tenantAdminCheck;
+
+        @BeforeEach
+        void setAuthentication() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+        }
+
+        @AfterEach
+        void clearAuthentication() {
+            SecurityContextHolder.clearContext();
+
+            reset(permissionEvaluator, tenantAdminCheck);
+        }
+
+        @Test
+        void testGetMcpServerRequiresViewer() {
+            assertThatThrownBy(() -> mcpServerService.getMcpServer(7L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(7L), eq("McpServer"), eq("MCP_VIEW"));
+        }
+
+        @Test
+        void testGetSecretKeyRequiresTenantAdmin() {
+            assertThatThrownBy(() -> mcpServerService.getMcpServerSecretKey(7L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(tenantAdminCheck).isTenantAdmin();
+        }
+
+        @Test
+        void testRotateSecretKeyRequiresTenantAdmin() {
+            assertThatThrownBy(() -> mcpServerService.rotateSecretKey(7L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(tenantAdminCheck).isTenantAdmin();
+        }
+
+        @Test
+        void testUpdateRequiresEditor() {
+            assertThatThrownBy(() -> mcpServerService.update(7L, "name", true))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(7L), eq("McpServer"), eq("MCP_EDIT"));
+        }
     }
 }

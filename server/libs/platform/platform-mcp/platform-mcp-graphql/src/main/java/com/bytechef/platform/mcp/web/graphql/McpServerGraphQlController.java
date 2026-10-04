@@ -18,14 +18,12 @@ package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +32,8 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -44,6 +44,8 @@ import org.springframework.stereotype.Controller;
 @Controller
 @ConditionalOnCoordinator
 public class McpServerGraphQlController {
+
+    private static final String MASKED_SECRET_KEY = "********";
 
     private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
@@ -59,32 +61,35 @@ public class McpServerGraphQlController {
         this.publicUrl = applicationProperties.getPublicUrl();
     }
 
+    @SchemaMapping(typeName = "McpServer", field = "secretKey")
+    public String secretKey(McpServer mcpServer) {
+        return mcpServerService.getMcpServerSecretKey(mcpServer.getId());
+    }
+
     @QueryMapping
     public McpServer mcpServer(@Argument long id) {
         return getNonEmbeddedMcpServer(id);
-    }
-
-    @QueryMapping
-    public List<McpServer>
-        mcpServers(@Argument PlatformType type, @Argument McpServerService.McpServerOrderBy orderBy) {
-        McpServerTypeUtils.checkNotEmbedded(type);
-
-        return mcpServerService.getMcpServers(type, orderBy);
-    }
-
-    @MutationMapping
-    public McpServer createMcpServer(@Argument McpServerInput input) {
-        McpServerTypeUtils.checkNotEmbedded(input.type());
-
-        return mcpServerService.create(
-            input.name(), input.type(), Environment.values()[(int) input.environmentId], input.enabled());
     }
 
     @MutationMapping
     public McpServer updateMcpServer(@Argument long id, @Argument McpServerUpdateInput input) {
         getNonEmbeddedMcpServer(id);
 
-        return mcpServerService.update(id, input.name(), input.enabled());
+        McpServer mcpServer = mcpServerService.update(id, input.name(), input.enabled());
+
+        if (input.enforceToolAuthorization() != null || input.authenticationRequired() != null) {
+            if (input.enforceToolAuthorization() != null) {
+                mcpServer.setEnforceToolAuthorization(input.enforceToolAuthorization());
+            }
+
+            if (input.authenticationRequired() != null) {
+                mcpServer.setAuthenticationRequired(input.authenticationRequired());
+            }
+
+            mcpServer = mcpServerService.update(mcpServer);
+        }
+
+        return mcpServer;
     }
 
     @MutationMapping
@@ -132,13 +137,11 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public String updateMcpServerUrl(@Argument long id) {
-        McpServer mcpServer = getNonEmbeddedMcpServer(id);
+        getNonEmbeddedMcpServer(id);
 
-        mcpServer.setSecretKey(String.valueOf(TenantKey.of()));
+        McpServer mcpServer = mcpServerService.rotateSecretKey(id);
 
-        mcpServer = mcpServerService.update(mcpServer);
-
-        return getMcpServerUrl(mcpServer);
+        return buildMcpServerUrl(mcpServer, mcpServer.getSecretKey());
     }
 
     private McpServer getNonEmbeddedMcpServer(long id) {
@@ -150,19 +153,29 @@ public class McpServerGraphQlController {
     }
 
     private String getMcpServerUrl(McpServer mcpServer) {
-        if (mcpServer.getType() == PlatformType.EMBEDDED) {
-            return publicUrl + "/api/embedded/" + mcpServer.getSecretKey() + "/mcp";
+        String secretKey;
+
+        try {
+            secretKey = mcpServerService.getMcpServerSecretKey(mcpServer.getId());
+        } catch (AccessDeniedException accessDeniedException) {
+            secretKey = MASKED_SECRET_KEY;
         }
 
-        return publicUrl + "/api/automation/" + mcpServer.getSecretKey() + "/mcp";
+        return buildMcpServerUrl(mcpServer, secretKey);
+    }
+
+    private String buildMcpServerUrl(McpServer mcpServer, String secretKey) {
+        if (mcpServer.getType() == PlatformType.EMBEDDED) {
+            return publicUrl + "/api/embedded/" + secretKey + "/mcp";
+        }
+
+        return publicUrl + "/api/automation/" + secretKey + "/mcp";
     }
 
     public record TagInput(Long id, String name) {
     }
 
-    public record McpServerInput(String name, PlatformType type, long environmentId, Boolean enabled) {
-    }
-
-    public record McpServerUpdateInput(String name, Boolean enabled) {
+    public record McpServerUpdateInput(
+        String name, Boolean enabled, Boolean enforceToolAuthorization, Boolean authenticationRequired) {
     }
 }
