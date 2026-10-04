@@ -55,6 +55,38 @@ class SecurityUtilsTest {
     }
 
     @Test
+    void testFetchCurrentUserAuthoritiesReturnsGrantedAuthorityNames() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+
+        authorities.add(new SimpleGrantedAuthority("ROLE_X"));
+        authorities.add(new SimpleGrantedAuthority(AuthorityConstants.USER));
+
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("user", "user", authorities));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        assertThat(SecurityUtils.fetchCurrentUserAuthorities())
+            .containsExactlyInAnyOrder("ROLE_X", AuthorityConstants.USER);
+    }
+
+    @Test
+    void testFetchCurrentUserAuthoritiesIsEmptyWithoutAuthentication() {
+        assertThat(SecurityUtils.fetchCurrentUserAuthorities()).isEmpty();
+    }
+
+    @Test
+    void testFetchCurrentUserAuthoritiesIsEmptyWhenAuthenticationHasNoAuthorities() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("user", "user"));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        assertThat(SecurityUtils.fetchCurrentUserAuthorities()).isEmpty();
+    }
+
+    @Test
     void testIsAuthenticated() {
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("admin", "admin"));
