@@ -543,7 +543,6 @@ include("server:libs:modules:task-dispatchers:subflow")
 include("server:libs:modules:task-dispatchers:suspend")
 include("server:libs:modules:task-dispatchers:terminate")
 
-
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
 
@@ -711,6 +710,7 @@ include("server:ee:libs:modules:components:code-workflow")
 include("server:ee:libs:modules:components:field-mapping")
 include("server:ee:libs:modules:components:request")
 
+include("spring-ai:spring-ai-agent-utils:auto-memory")
 include("spring-ai:spring-ai-model-chat-memory-repository-aws")
 include("spring-ai:spring-ai-session-aws")
 include("spring-ai:spring-ai-session-redis")
