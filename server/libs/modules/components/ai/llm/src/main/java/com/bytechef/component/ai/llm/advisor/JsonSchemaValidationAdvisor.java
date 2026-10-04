@@ -50,6 +50,11 @@ import tools.jackson.databind.json.JsonMapper;
  * {@code 1 + maxRepeatAttempts} model calls. This advisor returns a tool-call reply as is, so the tool-calling advisor
  * can run the tools, and validates only the final answer.
  *
+ * <p>
+ * The upstream fix is
+ * <a href="https://github.com/spring-projects/spring-ai/pull/6588">spring-projects/spring-ai#6588</a>. Once a Spring AI
+ * release includes it, remove this class and go back to Spring AI's advisor.
+ *
  * @author Ivica Cardic
  */
 public final class JsonSchemaValidationAdvisor implements CallAdvisor {
