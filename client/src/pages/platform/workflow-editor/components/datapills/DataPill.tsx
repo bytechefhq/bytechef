@@ -288,7 +288,7 @@ const DataPill = ({
                 </TooltipTrigger>
 
                 {property?.description && (
-                    <TooltipContent className="mr-2 max-w-72 break-normal whitespace-normal">
+                    <TooltipContent className="max-w-72 break-normal whitespace-normal" side="right" sideOffset={8}>
                         <span className="block">{property.description}</span>
                     </TooltipContent>
                 )}
