@@ -4,7 +4,6 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
 import useMcpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentListItem';
-import {createCollapsibleRowClickHandler} from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {McpComponent, McpServer} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, ChevronRightIcon, ComponentIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -23,14 +22,11 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
 
     return (
         <Collapsible className="group rounded-md border border-border/50" onOpenChange={setExpanded} open={expanded}>
-            <div
-                className="flex cursor-pointer items-center gap-2.5 px-3 py-2.5"
-                onClick={createCollapsibleRowClickHandler(setExpanded)}
-            >
+            <div className="relative flex items-center gap-2.5 px-3 py-2.5">
                 <CollapsibleTrigger asChild>
                     <button
                         aria-label={expanded ? 'Hide tools' : 'Show tools'}
-                        className="shrink-0 text-muted-foreground hover:text-foreground"
+                        className="shrink-0 text-muted-foreground after:absolute after:inset-0 hover:text-foreground"
                         type="button"
                     >
                         {expanded ? <ChevronDownIcon className="size-4" /> : <ChevronRightIcon className="size-4" />}
@@ -54,6 +50,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Badge
+                            className="relative z-10"
                             label={`v${mcpComponent.componentVersion}`}
                             styleType="secondary-filled"
                             weight="semibold"
@@ -64,7 +61,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                 </Tooltip>
 
                 <Tooltip>
-                    <TooltipTrigger className="flex min-w-56 items-center justify-end text-xs text-content-neutral-secondary tabular-nums">
+                    <TooltipTrigger className="relative z-10 flex min-w-56 items-center justify-end text-xs text-content-neutral-secondary tabular-nums">
                         {mcpComponent.lastModifiedDate
                             ? `Modified at ${new Date(mcpComponent.lastModifiedDate).toLocaleDateString()} ${new Date(mcpComponent.lastModifiedDate).toLocaleTimeString()}`
                             : '-'}

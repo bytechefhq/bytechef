@@ -1,4 +1,4 @@
-import type {Dispatch, MouseEvent, SetStateAction} from 'react';
+import type {MouseEvent} from 'react';
 
 const ROW_INTERACTIVE_SELECTORS = [
     '[data-interactive]',
@@ -27,17 +27,6 @@ const isCollapsibleRowClick = (event: MouseEvent, interactiveSelectors: string[]
     return !target.closest(interactiveSelectors.join(', '));
 };
 
-/**
- * Creates a row click handler that flips a collapsible's expanded state when {@link isCollapsibleRowClick} allows it.
- */
-const createCollapsibleRowClickHandler =
-    (setExpanded: Dispatch<SetStateAction<boolean>>) =>
-    (event: MouseEvent): void => {
-        if (isCollapsibleRowClick(event)) {
-            setExpanded((expanded) => !expanded);
-        }
-    };
-
-export {createCollapsibleRowClickHandler, ROW_INTERACTIVE_SELECTORS};
+export {ROW_INTERACTIVE_SELECTORS};
 
 export default isCollapsibleRowClick;
