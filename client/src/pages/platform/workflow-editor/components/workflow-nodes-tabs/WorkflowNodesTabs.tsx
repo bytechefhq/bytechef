@@ -44,7 +44,6 @@ const HELPER_COMPONENT_NAMES = new Set([
     'dataStream',
     'dataTable',
     'dateHelper',
-    'embeddedWorkflowBuilder',
     'fileStorage',
     'filesystem',
     'imageHelper',
