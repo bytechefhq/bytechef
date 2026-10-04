@@ -21,10 +21,12 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcherPreSendProcessor;
 import com.bytechef.task.dispatcher.suspend.completion.SuspendTaskCompletionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,7 +66,10 @@ public class SuspendTaskDispatcherConfiguration {
     }
 
     @Bean
-    SuspendTaskDispatcherPreSendProcessor suspendTaskDispatcherPreSendProcessor() {
-        return new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService);
+    SuspendTaskDispatcherPreSendProcessor suspendTaskDispatcherPreSendProcessor(
+        ObjectProvider<TriggerScheduler> triggerSchedulerProvider) {
+
+        return new SuspendTaskDispatcherPreSendProcessor(
+            jobService, taskStateService, triggerSchedulerProvider.getIfAvailable());
     }
 }

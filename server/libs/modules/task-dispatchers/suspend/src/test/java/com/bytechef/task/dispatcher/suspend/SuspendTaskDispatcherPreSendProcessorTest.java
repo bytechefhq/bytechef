@@ -20,7 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,8 +33,10 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,9 +49,10 @@ class SuspendTaskDispatcherPreSendProcessorTest {
 
     private final JobService jobService = mock(JobService.class);
     private final TaskStateService taskStateService = mock(TaskStateService.class);
+    private final TriggerScheduler triggerScheduler = mock(TriggerScheduler.class);
 
     private final SuspendTaskDispatcherPreSendProcessor preSendProcessor =
-        new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService);
+        new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService, triggerScheduler);
 
     @Test
     void testCanProcessReturnsTrueWhenJobHasResumeId() {
@@ -118,7 +124,64 @@ class SuspendTaskDispatcherPreSendProcessorTest {
     }
 
     @Test
-    void testProcessHandlesMissingSuspendState() {
+    void testProcessCancelsTheTimeoutTaskOfASuspendWithADeadline() {
+        processSuspend(new Suspend(Map.of(), Instant.now()
+            .plusSeconds(3600)));
+
+        verify(triggerScheduler).cancelOneTimeTask(100L);
+    }
+
+    @Test
+    void testProcessDoesNotCancelATimeoutTaskForASuspendWithoutADeadline() {
+        processSuspend(new Suspend(Map.of(), null));
+
+        verify(triggerScheduler, never()).cancelOneTimeTask(anyLong());
+    }
+
+    @Test
+    void testProcessResumesTheTaskWhenCancellingTheTimeoutTaskFails() {
+        doThrow(new IllegalStateException("Scheduler unavailable")).when(triggerScheduler)
+            .cancelOneTimeTask(100L);
+
+        TaskExecution result = processSuspend(new Suspend(Map.of(), Instant.now()
+            .plusSeconds(3600)));
+
+        assertNotNull(result.getMetadata()
+            .get(MetadataConstants.SUSPEND));
+
+        verify(taskStateService).delete(any(JobResumeId.class));
+    }
+
+    @Test
+    void testProcessResumesTheTaskWhenTheTriggerSchedulerCannotCancelTheTimeoutTask() {
+        doThrow(new UnsupportedOperationException()).when(triggerScheduler)
+            .cancelOneTimeTask(100L);
+
+        TaskExecution result = processSuspend(new Suspend(Map.of(), Instant.now()
+            .plusSeconds(3600)));
+
+        assertNotNull(result.getMetadata()
+            .get(MetadataConstants.SUSPEND));
+
+        verify(taskStateService).delete(any(JobResumeId.class));
+    }
+
+    @Test
+    void testProcessWithoutATriggerSchedulerStillResumesTheTask() {
+        SuspendTaskDispatcherPreSendProcessor preSendProcessorWithoutTriggerScheduler =
+            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService, null);
+
+        TaskExecution taskExecution = createSuspendedTaskExecution(new Suspend(Map.of(), Instant.now()
+            .plusSeconds(3600)));
+
+        TaskExecution result = preSendProcessorWithoutTriggerScheduler.process(taskExecution);
+
+        assertNotNull(result.getMetadata()
+            .get(MetadataConstants.SUSPEND));
+    }
+
+    @Test
+    void testProcessHandlesMissingSuspendStateAndCancelsTheTimeoutTask() {
         String jobResumeIdString = createJobResumeIdString(100L);
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -144,9 +207,33 @@ class SuspendTaskDispatcherPreSendProcessorTest {
 
         verify(jobService).update(any(Job.class));
         verify(taskStateService).delete(any(JobResumeId.class));
+        verify(triggerScheduler).cancelOneTimeTask(100L);
     }
 
     private static String createJobResumeIdString(long jobId) {
         return EncodingUtils.base64EncodeToString("public:" + jobId + ":" + UUID.randomUUID());
+    }
+
+    private TaskExecution processSuspend(Suspend suspend) {
+        return preSendProcessor.process(createSuspendedTaskExecution(suspend));
+    }
+
+    private TaskExecution createSuspendedTaskExecution(Suspend suspend) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .build();
+
+        taskExecution.setJobId(100L);
+
+        Job job = new Job();
+
+        job.setId(100L);
+        job.setMetadata(Map.of(MetadataConstants.JOB_RESUME_ID, createJobResumeIdString(100L)));
+
+        when(jobService.getJob(100L))
+            .thenReturn(job);
+        when(taskStateService.fetchValue(any(JobResumeId.class)))
+            .thenReturn(Optional.of(suspend));
+
+        return taskExecution;
     }
 }
