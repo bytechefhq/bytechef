@@ -714,6 +714,7 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
+        private AutoMemory autoMemory = new AutoMemory();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
@@ -721,6 +722,10 @@ public class ApplicationProperties {
         private Memory memory = new Memory();
         private Provider provider = new Provider();
         private Vectorstore vectorstore = new Vectorstore();
+
+        public AutoMemory getAutoMemory() {
+            return autoMemory;
+        }
 
         public Copilot getCopilot() {
             return copilot;
@@ -750,6 +755,10 @@ public class ApplicationProperties {
             return vectorstore;
         }
 
+        public void setAutoMemory(AutoMemory autoMemory) {
+            this.autoMemory = autoMemory;
+        }
+
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
         }
@@ -776,6 +785,25 @@ public class ApplicationProperties {
 
         public void setVectorstore(Vectorstore vectorstore) {
             this.vectorstore = vectorstore;
+        }
+
+        public static class AutoMemory {
+
+            public enum Provider {
+                AWS,
+                FILESYSTEM,
+                JDBC
+            }
+
+            private Provider provider;
+
+            public Provider getProvider() {
+                return provider;
+            }
+
+            public void setProvider(Provider provider) {
+                this.provider = provider;
+            }
         }
 
         /**
