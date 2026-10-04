@@ -31,6 +31,7 @@ import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
+import com.bytechef.automation.configuration.listener.ProjectDeploymentDeleteEventListener;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -96,6 +97,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final PrincipalJobService principalJobService;
     private final JobFacade jobFacade;
     private final JobService jobService;
+    private final List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
@@ -117,7 +119,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
-        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
+        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
+        List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners) {
 
         this.connectionService = connectionService;
         this.evaluator = evaluator;
@@ -126,6 +129,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
+        this.projectDeploymentDeleteEventListeners = projectDeploymentDeleteEventListeners;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
@@ -216,6 +220,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @Override
     public void deleteProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
+
+        for (ProjectDeploymentDeleteEventListener projectDeploymentDeleteEventListener : projectDeploymentDeleteEventListeners) {
+
+            projectDeploymentDeleteEventListener.onBeforeDeleteProjectDeployment(id);
+        }
 
         if (projectDeployment.isEnabled()) {
             enableProjectDeployment(projectDeployment.getId(), false);
