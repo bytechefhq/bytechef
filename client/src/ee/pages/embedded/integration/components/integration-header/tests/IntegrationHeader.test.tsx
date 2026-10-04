@@ -1,12 +1,14 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationHeader from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeader';
+import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {act, render, screen} from '@/shared/util/test-utils';
+import {act, render, screen, userEvent} from '@/shared/util/test-utils';
 import {onlineManager} from '@tanstack/react-query';
 import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    integration: {current: {id: 5, name: 'Gmail'} as {id: number; name: string} | undefined},
     isMutating: vi.fn(() => 0),
 }));
 
@@ -22,7 +24,7 @@ vi.mock('@/ee/pages/embedded/integration/components/integration-header/hooks/use
         handleRunClick: vi.fn(),
         handleShowOutputClick: vi.fn(),
         handleStopClick: vi.fn(),
-        integration: {id: 5, name: 'Gmail'},
+        integration: hoisted.integration.current,
         integrationWorkflows: [{integrationWorkflowId: 11, label: 'Workflow 1'}],
         publishIntegrationMutationIsPending: false,
     }),
@@ -66,7 +68,10 @@ const renderIntegrationHeader = () =>
     );
 
 beforeEach(() => {
+    hoisted.integration.current = {id: 5, name: 'Gmail'};
     hoisted.isMutating.mockReturnValue(0);
+
+    useIntegrationsLeftSidebarStore.setState({leftSidebarOpen: false});
 
     onlineManager.setOnline(true);
 });
@@ -124,4 +129,24 @@ it('shows the save indicator as soon as the app goes offline', () => {
     });
 
     expect(screen.queryByLabelText('Loading indicator')).not.toBeInTheDocument();
+});
+
+it('shows a skeleton until the integration loads', () => {
+    hoisted.integration.current = undefined;
+
+    renderIntegrationHeader();
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+});
+
+it('toggles the integrations sidebar from the sidebar button', async () => {
+    renderIntegrationHeader();
+
+    await userEvent.click(screen.getAllByRole('button')[0]);
+
+    expect(useIntegrationsLeftSidebarStore.getState().leftSidebarOpen).toBe(true);
+
+    await userEvent.click(screen.getAllByRole('button')[0]);
+
+    expect(useIntegrationsLeftSidebarStore.getState().leftSidebarOpen).toBe(false);
 });
