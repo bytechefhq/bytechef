@@ -51,7 +51,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                     <TooltipTrigger asChild>
                         <Badge
                             label={`v${mcpComponent.componentVersion}`}
-                            styleType="secondary-filled"
+                            styleType="outline-outline"
                             weight="semibold"
                         />
                     </TooltipTrigger>
