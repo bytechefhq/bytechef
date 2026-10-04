@@ -21,6 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.ai.util.JacksonUtils;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
@@ -32,6 +34,12 @@ import tools.jackson.databind.json.JsonMapper;
  * @author Ivica Cardic
  */
 public final class StructuredOutputUtils {
+
+    /**
+     * An opening fence with an optional language tag, the content, and a closing fence.
+     */
+    private static final Pattern CODE_FENCE_PATTERN = Pattern.compile(
+        "```[ \\t]*[\\w+.-]*[ \\t]*\\R?(.*)```", Pattern.DOTALL);
 
     private static final JsonMapper JSON_MAPPER = JacksonUtils.getDefaultJsonMapper();
 
@@ -54,7 +62,8 @@ public final class StructuredOutputUtils {
     }
 
     /**
-     * Removes a surrounding markdown code fence (```json ... ``` or ``` ... ```) from an LLM reply.
+     * Removes a surrounding markdown code fence from an LLM reply. The opening fence may carry any language tag
+     * (```json, ``` json, ```jsonc, ...) or none, and the content may start on the same line or the next one.
      *
      * @param text the LLM reply
      * @return the reply without the fence, trimmed
@@ -62,22 +71,16 @@ public final class StructuredOutputUtils {
     public static String stripCodeFence(String text) {
         text = text.trim();
 
-        if (text.startsWith("```") && text.endsWith("```") && text.length() >= 6) {
-            String[] lines = text.split("\n", 2);
+        if (!text.startsWith("```") || !text.endsWith("```")) {
+            return text;
+        }
 
-            String line = lines[0].trim();
+        Matcher matcher = CODE_FENCE_PATTERN.matcher(text);
 
-            if (line.equalsIgnoreCase("```json")) {
-                text = lines.length > 1 ? lines[1] : "";
-            } else {
-                text = text.substring(3);
-            }
+        if (matcher.matches()) {
+            String content = matcher.group(1);
 
-            if (text.endsWith("```")) {
-                text = text.substring(0, text.length() - 3);
-            }
-
-            text = text.trim();
+            text = content.trim();
         }
 
         return text;
