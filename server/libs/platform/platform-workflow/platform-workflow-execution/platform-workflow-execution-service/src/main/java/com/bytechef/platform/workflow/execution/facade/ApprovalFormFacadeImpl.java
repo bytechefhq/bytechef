@@ -25,12 +25,14 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -45,6 +47,7 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
     private static final String ENVIRONMENT_ID_METADATA_KEY = "environmentId";
 
+    private final ObjectProvider<ApprovalTokens> approvalTokensProvider;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final TaskStateService taskStateService;
@@ -53,18 +56,22 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
     @Autowired
     @SuppressFBWarnings("EI")
     public ApprovalFormFacadeImpl(
-        JobService jobService, TaskExecutionService taskExecutionService, TaskStateService taskStateService,
+        ObjectProvider<ApprovalTokens> approvalTokensProvider, JobService jobService,
+        TaskExecutionService taskExecutionService, TaskStateService taskStateService,
         PlatformTransactionManager platformTransactionManager) {
 
-        this(jobService, taskExecutionService, taskStateService,
+        this(
+            approvalTokensProvider, jobService, taskExecutionService, taskStateService,
             createReadOnlyTransactionTemplate(platformTransactionManager));
     }
 
     @SuppressFBWarnings("EI")
     public ApprovalFormFacadeImpl(
-        JobService jobService, TaskExecutionService taskExecutionService, TaskStateService taskStateService,
+        ObjectProvider<ApprovalTokens> approvalTokensProvider, JobService jobService,
+        TaskExecutionService taskExecutionService, TaskStateService taskStateService,
         TransactionOperations transactionOperations) {
 
+        this.approvalTokensProvider = approvalTokensProvider;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskStateService = taskStateService;
@@ -73,7 +80,10 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
     @Override
     public Map<String, ?> getApprovalForm(String id) {
-        JobResumeId jobResumeId = JobResumeId.parse(id);
+        String innerToken = resolveInnerToken(id)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid approval form id"));
+
+        JobResumeId jobResumeId = JobResumeId.parse(innerToken);
 
         return TenantContext.callWithTenantId(
             jobResumeId.getTenantId(),
@@ -136,5 +146,15 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
         }
 
         return taskExecution.getParameters();
+    }
+
+    private Optional<String> resolveInnerToken(String id) {
+        ApprovalTokens approvalTokens = approvalTokensProvider.getIfAvailable();
+
+        if (approvalTokens == null) {
+            return Optional.of(id);
+        }
+
+        return approvalTokens.resolveInnerToken(id);
     }
 }

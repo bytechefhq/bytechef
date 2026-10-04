@@ -130,7 +130,7 @@ class ActionContextImplTest {
     private static ActionContextImpl createActionContext() {
         return ActionContextImpl.builder(
             "approval", 1, "requestApproval", false, mock(CacheManager.class), mock(DataStorage.class),
-            mock(ApplicationEventPublisher.class), mock(HttpClientExecutor.class), mock(TempFileStorage.class))
+            mock(ApplicationEventPublisher.class), mock(HttpClientExecutor.class), mock(TempFileStorage.class), null)
             .jobId(200L)
             .publicUrl("https://example.com")
             .build();

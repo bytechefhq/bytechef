@@ -13,4 +13,5 @@ dependencies {
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
 
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
 }

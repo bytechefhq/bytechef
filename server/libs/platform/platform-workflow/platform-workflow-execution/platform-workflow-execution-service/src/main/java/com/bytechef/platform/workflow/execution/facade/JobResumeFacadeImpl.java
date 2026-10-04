@@ -23,15 +23,18 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.LongConsumer;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -49,6 +52,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     private static final Logger log = LoggerFactory.getLogger(JobResumeFacadeImpl.class);
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ObjectProvider<ApprovalTokens> approvalTokensProvider;
     private final JobFacade jobFacade;
     private final JobService jobService;
     private final TransactionOperations transactionOperations;
@@ -56,18 +60,21 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     @Autowired
     @SuppressFBWarnings("EI")
     public JobResumeFacadeImpl(
-        ApplicationEventPublisher applicationEventPublisher, JobFacade jobFacade, JobService jobService,
-        PlatformTransactionManager platformTransactionManager) {
+        ApplicationEventPublisher applicationEventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
+        JobFacade jobFacade, JobService jobService, PlatformTransactionManager platformTransactionManager) {
 
-        this(applicationEventPublisher, jobFacade, jobService, new TransactionTemplate(platformTransactionManager));
+        this(
+            applicationEventPublisher, approvalTokensProvider, jobFacade, jobService,
+            new TransactionTemplate(platformTransactionManager));
     }
 
     @SuppressFBWarnings("EI")
     public JobResumeFacadeImpl(
-        ApplicationEventPublisher applicationEventPublisher, JobFacade jobFacade, JobService jobService,
-        TransactionOperations transactionOperations) {
+        ApplicationEventPublisher applicationEventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
+        JobFacade jobFacade, JobService jobService, TransactionOperations transactionOperations) {
 
         this.applicationEventPublisher = applicationEventPublisher;
+        this.approvalTokensProvider = approvalTokensProvider;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.transactionOperations = transactionOperations;
@@ -127,10 +134,19 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         return resumeJob(id, data, true, jobIdConsumer);
     }
 
+    @SuppressFBWarnings("CRLF_INJECTION_LOGS")
     private JobResumeOutcome resumeJob(
         String id, Map<String, Object> data, boolean streaming, LongConsumer jobIdConsumer) {
 
-        JobResumeId jobResumeId = parseJobResumeId(id);
+        Optional<String> innerTokenOptional = resolveInnerToken(id);
+
+        if (innerTokenOptional.isEmpty()) {
+            log.warn("Invalid resume token: {}", id.replaceAll("[\\r\\n]", ""));
+
+            return JobResumeOutcome.INVALID_ID;
+        }
+
+        JobResumeId jobResumeId = parseJobResumeId(innerTokenOptional.get());
 
         if (jobResumeId == null) {
             return JobResumeOutcome.INVALID_ID;
@@ -169,6 +185,16 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         return TenantContext.callWithTenantId(
             jobResumeId.getTenantId(),
             () -> Objects.requireNonNull(transactionOperations.execute(transactionCallback)));
+    }
+
+    private Optional<String> resolveInnerToken(String id) {
+        ApprovalTokens approvalTokens = approvalTokensProvider.getIfAvailable();
+
+        if (approvalTokens == null) {
+            return Optional.of(id);
+        }
+
+        return approvalTokens.resolveInnerToken(id);
     }
 
     private void consumeJobResumeId(Job job) {
