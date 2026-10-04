@@ -106,7 +106,7 @@ public record AgentToolInvocationContext(
         String tenantId = asString(map.get(TOOL_CONTEXT_TENANT_ID_KEY));
         Authentication authentication = map.get(TOOL_CONTEXT_AUTHENTICATION_KEY) instanceof Authentication value
             ? value : null;
-        boolean skipAutomationAuthorization = asBoolean(map.get(TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY));
+        boolean skipAutomationAuthorization = Boolean.TRUE.equals(map.get(TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY));
 
         if (workspaceId == null && userId == null && environmentId == null && conversationId == null
             && tenantId == null && authentication == null && !skipAutomationAuthorization) {
@@ -153,14 +153,6 @@ public record AgentToolInvocationContext(
         }
 
         return map;
-    }
-
-    private static boolean asBoolean(@Nullable Object value) {
-        if (value instanceof Boolean bool) {
-            return bool;
-        }
-
-        return value instanceof String string && Boolean.parseBoolean(string);
     }
 
     private static @Nullable Long asLong(@Nullable Object value) {

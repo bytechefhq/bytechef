@@ -24,7 +24,6 @@ import com.bytechef.exception.AbstractErrorType;
 public class SkillToolErrorType extends AbstractErrorType {
 
     public static final SkillToolErrorType CREATE_SKILL = new SkillToolErrorType(100);
-    public static final SkillToolErrorType DELETE_SKILL = new SkillToolErrorType(101);
     public static final SkillToolErrorType GET_SKILL = new SkillToolErrorType(102);
     public static final SkillToolErrorType GET_SKILL_FILE_CONTENT = new SkillToolErrorType(103);
     public static final SkillToolErrorType GET_SKILL_FILE_PATHS = new SkillToolErrorType(104);

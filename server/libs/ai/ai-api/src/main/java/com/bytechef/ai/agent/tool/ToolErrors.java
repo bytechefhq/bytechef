@@ -20,6 +20,7 @@ import com.bytechef.commons.util.JsonUtils;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -72,5 +73,29 @@ public final class ToolErrors {
         Class<? extends RuntimeException> exceptionClass = exception.getClass();
 
         return toolError(toolName + " failed (" + exceptionClass.getSimpleName() + ")");
+    }
+
+    public static String toolError(JsonMapper jsonMapper, String message) {
+        try {
+            return jsonMapper.writeValueAsString(Map.of("error", message));
+        } catch (RuntimeException exception) {
+            log.error(
+                "Failed to serialise tool error response for message '{}': {}", message, exception.toString(),
+                exception);
+
+            return "{\"error\":\"serialization failure\"}";
+        }
+    }
+
+    public static String runtimeFailure(
+        JsonMapper jsonMapper, Class<?> sourceClass, String toolName, RuntimeException exception) {
+
+        Logger sourceLogger = LoggerFactory.getLogger(sourceClass);
+
+        sourceLogger.warn("{} failed: {}", toolName, exception.toString(), exception);
+
+        Class<? extends RuntimeException> exceptionClass = exception.getClass();
+
+        return toolError(jsonMapper, toolName + " failed (" + exceptionClass.getSimpleName() + ")");
     }
 }
