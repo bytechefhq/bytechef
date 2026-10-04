@@ -1,51 +1,6 @@
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
-import {useCreateIntegrationWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
-import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
-import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
-import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {useQueryClient} from '@tanstack/react-query';
-import {RefObject} from 'react';
-import {PanelImperativeHandle} from 'react-resizable-panels';
-import {useNavigate} from 'react-router-dom';
 
-export const useIntegrationsLeftSidebar = ({
-    bottomResizablePanelRef,
-    integrationId,
-}: {
-    bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
-    integrationId: number;
-}) => {
-    const setShowBottomPanelOpen = useWorkflowEditorStore((state) => state.setShowBottomPanelOpen);
-
-    const {captureIntegrationWorkflowCreated} = useAnalytics();
-
-    const queryClient = useQueryClient();
-
-    const navigate = useNavigate();
-
-    const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
-        onSuccess: (createdIntegrationWorkflowId) => {
-            captureIntegrationWorkflowCreated();
-
-            queryClient.invalidateQueries({
-                queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: IntegrationKeys.integrations,
-            });
-
-            setShowBottomPanelOpen(false);
-
-            if (bottomResizablePanelRef.current) {
-                bottomResizablePanelRef.current.resize(0);
-            }
-
-            navigate(`/embedded/integrations/${integrationId}/integration-workflows/${createdIntegrationWorkflowId}`);
-        },
-    });
-
+export const useIntegrationsLeftSidebar = () => {
     const getWorkflowsIntegrationId = (integrations: Integration[]) => {
         const workflowToIntegrationMap: Record<number, number> = {};
 
@@ -92,7 +47,7 @@ export const useIntegrationsLeftSidebar = ({
         const days = Math.floor(hours / 24);
 
         if (days > 7) {
-            return `Edited on ${workflowLastModifiedDate.toLocaleDateString()}`;
+            return `on ${workflowLastModifiedDate.toLocaleDateString()}`;
         }
 
         if (days > 0) {
@@ -112,7 +67,6 @@ export const useIntegrationsLeftSidebar = ({
 
     return {
         calculateTimeDifference,
-        createIntegrationWorkflowMutation,
         getFilteredWorkflows,
         getWorkflowsIntegrationId,
     };
