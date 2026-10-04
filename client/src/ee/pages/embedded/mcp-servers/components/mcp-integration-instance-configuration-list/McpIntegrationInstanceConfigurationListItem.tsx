@@ -2,6 +2,7 @@ import Badge from '@/components/Badge/Badge';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
+import {createCollapsibleRowClickHandler} from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ChevronDownIcon, ChevronRightIcon, ComponentIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -47,7 +48,10 @@ const McpIntegrationInstanceConfigurationListItem = ({
                 onOpenChange={setExpanded}
                 open={expanded}
             >
-                <div className="flex items-center gap-2.5 px-3 py-2.5">
+                <div
+                    className="flex cursor-pointer items-center gap-2.5 px-3 py-2.5"
+                    onClick={createCollapsibleRowClickHandler(setExpanded)}
+                >
                     <CollapsibleTrigger asChild>
                         <button
                             aria-label={expanded ? 'Collapse integration' : 'Expand integration'}
@@ -88,7 +92,7 @@ const McpIntegrationInstanceConfigurationListItem = ({
                     )}
 
                     <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                        <TooltipTrigger className="flex min-w-56 items-center justify-end text-sm text-content-neutral-secondary tabular-nums">
                             {mcpIntegrationInstanceConfiguration.lastModifiedDate ? (
                                 <span className="text-xs">
                                     {`Modified at ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleDateString()} ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleTimeString()}`}
