@@ -633,13 +633,13 @@ export default function useConnectDialog({
         }
     };
 
-    const closeDialog = () => {
+    const closeDialog = useCallback(() => {
         setWorkflowsView(false);
 
         setIsOpen(false);
 
         onClose?.();
-    };
+    }, [onClose]);
 
     const handleDisconnect = useCallback(async () => {
         if (!currentIntegrationInstanceId || isNaN(currentIntegrationInstanceId)) {
@@ -683,7 +683,7 @@ export default function useConnectDialog({
                 handleSubmit();
             }
         },
-        [isOAuth2, handleDisconnect, getAuth, handleSubmit]
+        [closeDialog, isOAuth2, handleDisconnect, getAuth, handleSubmit]
     );
 
     const debouncedFetchesRef = useRef<Record<string, (...args: unknown[]) => void>>({});
@@ -962,6 +962,7 @@ export default function useConnectDialog({
         );
     }, [
         isOpen,
+        closeDialog,
         executeAction,
         fetch,
         form,
