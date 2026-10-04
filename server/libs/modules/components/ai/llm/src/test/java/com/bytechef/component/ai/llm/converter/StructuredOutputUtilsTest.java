@@ -64,7 +64,11 @@ class StructuredOutputUtilsTest {
         "'```json5\n{\"a\":1}\n```'|{\"a\":1}",
         "'```json\n[1,2]\n```'|[1,2]",
         "'```json\n```'|''",
-        "'``````'|''"
+        "'``````'|''",
+        "'```c#\n{\"a\":1}\n```'|{\"a\":1}",
+        "'```application/json\n{\"a\":1}\n```'|{\"a\":1}",
+        "'```application/json {\"a\":1}```'|{\"a\":1}",
+        "'```application/json[1,2]```'|[1,2]"
     })
     void testStripCodeFence(String text, String expected) {
         assertEquals(expected, StructuredOutputUtils.stripCodeFence(text));

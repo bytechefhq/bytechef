@@ -36,10 +36,11 @@ import tools.jackson.databind.json.JsonMapper;
 public final class StructuredOutputUtils {
 
     /**
-     * An opening fence with an optional language tag, the content, and a closing fence.
+     * An opening fence with an optional language tag, the content, and a closing fence. The tag is any run of
+     * non-whitespace characters up to a JSON object or array opener, so JSON on the same line as the fence is kept.
      */
     private static final Pattern CODE_FENCE_PATTERN = Pattern.compile(
-        "```[ \\t]*[\\w+.-]*[ \\t]*\\R?(.*)```", Pattern.DOTALL);
+        "```[ \\t]*[^\\s{\\[]*[ \\t]*\\R?(.*)```", Pattern.DOTALL);
 
     private static final JsonMapper JSON_MAPPER = JacksonUtils.getDefaultJsonMapper();
 
@@ -63,7 +64,8 @@ public final class StructuredOutputUtils {
 
     /**
      * Removes a surrounding markdown code fence from an LLM reply. The opening fence may carry any language tag
-     * (```json, ``` json, ```jsonc, ...) or none, and the content may start on the same line or the next one.
+     * (```json, ``` json, ```jsonc, ```application/json, ...) or none, and the content may start on the same line or
+     * the next one.
      *
      * @param text the LLM reply
      * @return the reply without the fence, trimmed
