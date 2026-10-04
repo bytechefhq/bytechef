@@ -1,7 +1,9 @@
 extend type Query {
   managementMcpServerUrl: String
+  managementMcpServerAuthenticationRequired: Boolean!
 }
 
 extend type Mutation {
   updateManagementMcpServerUrl: String!
+  updateManagementMcpServerAuthenticationRequired(authenticationRequired: Boolean!): Boolean!
 }
