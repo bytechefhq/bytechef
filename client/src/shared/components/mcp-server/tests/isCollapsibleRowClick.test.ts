@@ -1,6 +1,6 @@
-import {describe, expect, it, vi} from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import isCollapsibleRowClick, {createCollapsibleRowClickHandler} from '../utils/isCollapsibleRowClick';
+import isCollapsibleRowClick from '../utils/isCollapsibleRowClick';
 
 import type {MouseEvent} from 'react';
 
@@ -49,30 +49,5 @@ describe('isCollapsibleRowClick', () => {
         const {iconElement, rowElement} = createRow();
 
         expect(isCollapsibleRowClick(createClickEvent(rowElement, iconElement), ['svg'])).toBe(false);
-    });
-});
-
-describe('createCollapsibleRowClickHandler', () => {
-    it('flips the expanded state when the row is clicked', () => {
-        const {labelElement, rowElement} = createRow();
-        const setExpanded = vi.fn();
-
-        createCollapsibleRowClickHandler(setExpanded)(createClickEvent(rowElement, labelElement));
-
-        expect(setExpanded).toHaveBeenCalledTimes(1);
-
-        const toggle = setExpanded.mock.calls[0][0] as (expanded: boolean) => boolean;
-
-        expect(toggle(false)).toBe(true);
-        expect(toggle(true)).toBe(false);
-    });
-
-    it('leaves the expanded state alone when a button inside the row is clicked', () => {
-        const {buttonElement, rowElement} = createRow();
-        const setExpanded = vi.fn();
-
-        createCollapsibleRowClickHandler(setExpanded)(createClickEvent(rowElement, buttonElement));
-
-        expect(setExpanded).not.toHaveBeenCalled();
     });
 });

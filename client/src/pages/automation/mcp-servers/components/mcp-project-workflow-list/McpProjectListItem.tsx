@@ -2,7 +2,6 @@ import Badge from '@/components/Badge/Badge';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
-import {createCollapsibleRowClickHandler} from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {ChevronDownIcon, ChevronRightIcon, WorkflowIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -36,14 +35,11 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                 onOpenChange={setExpanded}
                 open={expanded}
             >
-                <div
-                    className="flex cursor-pointer items-center gap-2.5 px-3 py-2.5"
-                    onClick={createCollapsibleRowClickHandler(setExpanded)}
-                >
+                <div className="relative flex items-center gap-2.5 px-3 py-2.5">
                     <CollapsibleTrigger asChild>
                         <button
                             aria-label={expanded ? 'Collapse project' : 'Expand project'}
-                            className="shrink-0 text-muted-foreground hover:text-foreground"
+                            className="shrink-0 text-muted-foreground after:absolute after:inset-0 hover:text-foreground"
                             type="button"
                         >
                             {expanded ? (
@@ -68,6 +64,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Badge
+                                    className="relative z-10"
                                     label={`v${mcpProject.projectVersion}`}
                                     styleType="secondary-filled"
                                     weight="semibold"
@@ -79,7 +76,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                     )}
 
                     <Tooltip>
-                        <TooltipTrigger className="flex min-w-56 items-center justify-end text-sm text-content-neutral-secondary tabular-nums">
+                        <TooltipTrigger className="relative z-10 flex min-w-56 items-center justify-end text-sm text-content-neutral-secondary tabular-nums">
                             {mcpProject.lastModifiedDate ? (
                                 <span className="text-xs">
                                     {`Modified at ${new Date(mcpProject.lastModifiedDate).toLocaleDateString()} ${new Date(mcpProject.lastModifiedDate).toLocaleTimeString()}`}
