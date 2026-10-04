@@ -1,19 +1,21 @@
 import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {Separator} from '@/components/ui/separator';
-import {EditIcon, HistoryIcon, Trash2Icon, UploadIcon} from 'lucide-react';
+import {EditIcon, HistoryIcon, PlusIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 import {ChangeEvent, MouseEvent, useRef} from 'react';
 
 const IntegrationTabButtons = ({
     onCloseDropdownMenuClick,
     onDeleteIntegrationClick,
     onImportWorkflow,
+    onNewWorkflowClick,
     onShowEditIntegrationDialogClick,
     onShowIntegrationVersionHistorySheet,
 }: {
     onCloseDropdownMenuClick: () => void;
     onDeleteIntegrationClick: () => void;
     onImportWorkflow: (workflowDefinition: string) => void;
+    onNewWorkflowClick: () => void;
     onShowEditIntegrationDialogClick: () => void;
     onShowIntegrationVersionHistorySheet: () => void;
 }) => {
@@ -44,6 +46,17 @@ const IntegrationTabButtons = ({
                     icon={<EditIcon />}
                     label="Edit"
                     onClick={() => onShowEditIntegrationDialogClick()}
+                    variant="ghost"
+                />
+
+                <Separator />
+
+                <Button
+                    aria-label="New Workflow"
+                    className="dropdown-menu-item"
+                    icon={<PlusIcon />}
+                    label="New Workflow"
+                    onClick={onNewWorkflowClick}
                     variant="ghost"
                 />
 
