@@ -113,9 +113,10 @@ bytechef:
     logging:
       aws:
         # Sign OTLP log export requests with AWS SigV4 (CloudWatch OTLP endpoint https://logs.{region}.amazonaws.com/v1/logs).
-        # CloudWatch also requires the management.opentelemetry.logging.export.otlp.headers.x-aws-log-group and
-        # x-aws-log-stream headers.
         enabled: false
+        # Existing CloudWatch log group and log stream the logs are written to; both are required when enabled
+        log-group:
+        log-stream:
         # region: derived from the endpoint host when not set
         service: logs
       enabled: false
