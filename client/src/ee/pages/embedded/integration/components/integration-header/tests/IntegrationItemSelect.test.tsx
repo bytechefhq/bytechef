@@ -83,3 +83,41 @@ it('shows a skeleton while the current workflow label is loading', () => {
 
     expect(screen.queryByText('Workflow 1')).not.toBeInTheDocument();
 });
+
+it('shows the full label of a long current workflow in a tooltip', async () => {
+    const longLabel = 'A workflow label that is long enough to be truncated';
+
+    renderIntegrationItemSelect({currentLabel: longLabel});
+
+    await userEvent.hover(screen.getByLabelText('Integration item select'));
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(longLabel);
+});
+
+it('titles long workflow labels in the menu with their full text', async () => {
+    const longLabel = 'A workflow label that is long enough to overflow the content-sized menu width';
+
+    renderIntegrationItemSelect({
+        integrationWorkflows: [...mockIntegrationWorkflows, {integrationWorkflowId: 3333, label: longLabel}],
+    });
+
+    await userEvent.click(screen.getByLabelText('Integration item select'));
+
+    const menu = screen.getByRole('menu');
+
+    expect(within(menu).getByText(longLabel).closest('[role="menuitemradio"]')).toHaveAttribute('title', longLabel);
+    expect(within(menu).getByText('Workflow 2').closest('[role="menuitemradio"]')).not.toHaveAttribute('title');
+});
+
+it('checks no workflow without a current integration workflow', async () => {
+    renderIntegrationItemSelect({currentIntegrationWorkflowId: undefined});
+
+    await userEvent.click(screen.getByLabelText('Integration item select'));
+
+    const menu = screen.getByRole('menu');
+
+    expect(within(menu).getByText('Workflow 1').closest('[role="menuitemradio"]')).toHaveAttribute(
+        'aria-checked',
+        'false'
+    );
+});
