@@ -26,15 +26,17 @@ import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
+import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.context.EnvironmentContextThreadLocalAccessor;
@@ -42,7 +44,6 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.TenantContextThreadLocalAccessor;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                         inputParameters, componentConnections, extensions, context) -> ModelUtils.output(
                             inputParameters, null, context))
                 .help("", "https://docs.bytechef.io/reference/components/ai-agent_v1#chat-stream")
-                .resumePerform(this::resumePerform));
+                .resumePerform((MultipleConnectionsResumePerformFunction) this::resumePerform));
     }
 
     public class ChatActionDefinitionWrapper extends AbstractActionDefinitionWrapper {
@@ -107,12 +108,30 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         }
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    protected ResumeResponse resumePerform(
-        Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters, Parameters data,
-        ActionContext context) {
+    protected SseEmitterHandler resumePerform(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        Parameters continueParameters, Parameters data, ActionContext context) throws Exception {
 
-        return ResumeResponse.of(new HashMap<>(data.toMap()));
+        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
+        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        TurnTextSeparator turnTextSeparator = new TurnTextSeparator();
+
+        ChatClientRequestSpec chatClientRequestSpec = buildResumedRequestSpec(
+            inputParameters, connectionParameters, extensions, continueParameters, data,
+            createToolExecutionListener(emitterReference, bufferedEvents, turnTextSeparator, context), context);
+
+        chatClientRequestSpec.toolContext(
+            Map.of(
+                AiAgentToolContextKey.ACTION_CONTEXT, context,
+                AiAgentToolContextKey.SSE_EMITTER_REFERENCE, emitterReference,
+                AiAgentToolContextKey.SSE_BUFFERED_EVENTS, bufferedEvents));
+
+        Flux<Object> contentFlux = withExecutionContext(
+            chatClientRequestSpec.stream()
+                .chatResponse()
+                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
+
+        return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
     }
 
     protected SseEmitterHandler perform(
@@ -189,7 +208,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
         Flow.Publisher<?> effectivePublisher = FlowAdapters.toFlowPublisher(contentFlux);
 
-        return emitter -> {
+        SseEmitterHandler sseEmitterHandler = emitter -> {
             emitterReference.set(emitter);
 
             Map<String, @Nullable Object> bufferedEvent;
@@ -229,11 +248,15 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                             if (subscription != null) {
                                 subscription.cancel();
                             }
+
+                            emitter.error(exception);
                         }
                     }
 
                     @Override
                     public void onError(Throwable throwable) {
+                        context.log(log -> log.error("AI agent stream failed", throwable));
+
                         emitter.error(throwable);
                     }
 
@@ -243,6 +266,12 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                     }
                 });
         };
+
+        if (context instanceof ActionContextAware actionContextAware) {
+            return new SuspendAwareSseEmitterHandler(sseEmitterHandler, actionContextAware);
+        }
+
+        return sseEmitterHandler;
     }
 
     static Flux<Object> withExecutionContext(Flux<Object> flux) {
