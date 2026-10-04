@@ -1,5 +1,5 @@
-import {Separator} from '@/components/ui/separator';
 import IntegrationBreadcrumb from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationBreadcrumb';
+import IntegrationItemSelect from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationItemSelect';
 import IntegrationSkeleton from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationSkeleton';
 import LeftSidebarButton from '@/ee/pages/embedded/integration/components/integration-header/components/LeftSidebarButton';
 import OutputPanelButton from '@/ee/pages/embedded/integration/components/integration-header/components/OutputButton';
@@ -14,11 +14,15 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {onlineManager, useIsFetching} from '@tanstack/react-query';
-import {RefObject} from 'react';
+import {onlineManager, useIsMutating} from '@tanstack/react-query';
+import {RefObject, useSyncExternalStore} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
+
+const getOnlineStatus = () => onlineManager.isOnline();
+
+const subscribeToOnlineStatus = (onOnlineStatusChange: () => void) => onlineManager.subscribe(onOnlineStatusChange);
 
 interface IntegrationHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
@@ -55,7 +59,8 @@ const IntegrationHeader = ({
         }))
     );
 
-    const isFetching = useIsFetching();
+    const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
+    const isSaving = useIsMutating();
     const {
         handleIntegrationWorkflowValueChange,
         handlePublishIntegrationSubmit,
@@ -70,7 +75,13 @@ const IntegrationHeader = ({
         integrationId,
     });
 
-    const isOnline = onlineManager.isOnline();
+    const loadingIndicator = (isSaving > 0 || !isOnline) && (
+        <LoadingIndicator
+            className="absolute -top-1 -right-1 size-5 rounded-full"
+            isFetching={isSaving}
+            isOnline={isOnline}
+        />
+    );
 
     if (!integration) {
         return <IntegrationSkeleton />;
@@ -84,33 +95,25 @@ const IntegrationHeader = ({
                 copilotLayoutShifted && 'pr-0'
             )}
         >
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
                 <LeftSidebarButton onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)} />
-
-                <Separator className="mr-4 ml-2 h-4" orientation="vertical" />
 
                 {integrationWorkflows && (
                     <IntegrationBreadcrumb
-                        currentWorkflow={workflow as Workflow}
                         integration={integration}
-                        integrationWorkflowId={integrationWorkflowId}
-                        integrationWorkflows={integrationWorkflows}
-                        onIntegrationWorkflowValueChange={handleIntegrationWorkflowValueChange}
+                        itemSelect={
+                            <IntegrationItemSelect
+                                currentIntegrationWorkflowId={integrationWorkflowId}
+                                currentLabel={workflow?.label}
+                                integrationWorkflows={integrationWorkflows}
+                                onWorkflowValueChange={handleIntegrationWorkflowValueChange}
+                            />
+                        }
                     />
                 )}
             </div>
 
-            <div className="flex items-center">
-                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
-
-                <SettingsMenu
-                    integration={integration}
-                    updateWorkflowMutation={updateWorkflowMutation}
-                    workflow={workflow as Workflow}
-                />
-
-                <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
-
+            <div className="flex items-center gap-1">
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
@@ -123,6 +126,19 @@ const IntegrationHeader = ({
                     isPending={publishIntegrationMutationIsPending}
                     onPublishIntegrationSubmit={handlePublishIntegrationSubmit}
                 />
+
+                <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
+
+                <div className="relative">
+                    <SettingsMenu
+                        bottomResizablePanelRef={bottomResizablePanelRef}
+                        integration={integration}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                        workflow={workflow as Workflow}
+                    />
+
+                    {loadingIndicator}
+                </div>
             </div>
         </header>
     );
