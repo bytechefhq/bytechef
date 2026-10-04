@@ -128,10 +128,6 @@ function getRecursivelyUpdatedRootTaskDispatcherNodeData(
     return currentTaskNodeData;
 }
 
-/**
- * Closes the node details panel when the node it shows lives inside the tasks being removed (including tasks nested
- * in task dispatchers within them). Otherwise the panel keeps editing a task that no longer exists in the workflow.
- */
 function closePanelIfCurrentNodeDeleted(deletedTasks: WorkflowTask[]) {
     const {currentNode, reset} = useWorkflowNodeDetailsPanelStore.getState();
 
