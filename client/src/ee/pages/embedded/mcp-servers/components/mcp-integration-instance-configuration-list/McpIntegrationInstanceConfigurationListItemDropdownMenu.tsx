@@ -30,7 +30,7 @@ const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button icon={<EllipsisVerticalIcon />} size="iconSm" variant="ghost" />
+                    <Button className="relative z-10" icon={<EllipsisVerticalIcon />} size="iconSm" variant="ghost" />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
