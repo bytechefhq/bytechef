@@ -1,3 +1,4 @@
+import useMcpServerListItemClick from '@/shared/components/mcp-server/hooks/useMcpServerListItemClick';
 import {
     McpServer,
     useDeleteWorkspaceMcpServerMutation,
@@ -5,7 +6,7 @@ import {
     useUpdateMcpServerTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useCallback, useRef, useState} from 'react';
+import {useState} from 'react';
 
 const useMcpServerListItem = (mcpServer: McpServer) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -15,11 +16,11 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const [isPending, setIsPending] = useState(false);
     const [isEnablePending, setIsEnablePending] = useState(false);
 
-    const toolsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
-
     const mcpServerTagIds = mcpServer.tags?.map((tag) => tag?.id);
 
     const queryClient = useQueryClient();
+
+    const {handleMcpServerListItemClick, toolsCollapsibleTriggerRef} = useMcpServerListItemClick();
 
     const updateMcpServerMutation = useUpdateMcpServerMutation();
     const deleteWorkspaceMcpServerMutation = useDeleteWorkspaceMcpServerMutation();
@@ -30,37 +31,6 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
             queryClient.invalidateQueries({queryKey: ['mcpServerTags']});
         },
     });
-
-    const handleMcpServerListItemClick = useCallback((event: React.MouseEvent) => {
-        const target = event.target as HTMLElement;
-
-        // Clicks from portaled content (dropdown menu items, dialogs) bubble through the React tree but are not
-        // DOM descendants of the list item, so they must not toggle the tools collapsible.
-        if (!event.currentTarget.contains(target)) {
-            return;
-        }
-
-        const interactiveSelectors = [
-            '[data-interactive]',
-            '.dropdown-menu-item',
-            '[data-radix-dropdown-menu-item]',
-            '[data-radix-dropdown-menu-trigger]',
-            '[data-radix-collapsible-trigger]',
-            'button',
-            'input',
-            'svg',
-        ].join(', ');
-
-        if (target.closest(interactiveSelectors)) {
-            return;
-        }
-
-        if (toolsCollapsibleTriggerRef.current?.contains(target)) {
-            return;
-        }
-
-        toolsCollapsibleTriggerRef.current?.click();
-    }, []);
 
     const handleOnCheckedChange = async (value: boolean) => {
         setIsEnablePending(true);

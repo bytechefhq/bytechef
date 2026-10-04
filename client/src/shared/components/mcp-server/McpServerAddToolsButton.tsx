@@ -1,18 +1,16 @@
 import Button from '@/components/Button/Button';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/McpProjectWorkflowDialog';
-import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
-import {McpServer} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, ComponentIcon, WorkflowIcon} from 'lucide-react';
-import {useState} from 'react';
+import {ReactNode, useState} from 'react';
 
-interface McpServerToolsAddButtonProps {
-    mcpServer: McpServer;
+interface McpServerAddToolsButtonProps {
+    renderMcpComponentDialog: (onClose: () => void) => ReactNode;
+    renderWorkflowDialog: (onClose: () => void) => ReactNode;
 }
 
-const McpServerToolsAddButton = ({mcpServer}: McpServerToolsAddButtonProps) => {
+const McpServerAddToolsButton = ({renderMcpComponentDialog, renderWorkflowDialog}: McpServerAddToolsButtonProps) => {
     const [showMcpComponentDialog, setShowMcpComponentDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
@@ -45,19 +43,11 @@ const McpServerToolsAddButton = ({mcpServer}: McpServerToolsAddButtonProps) => {
                 </DropdownMenu>
             </ButtonGroup>
 
-            {showMcpComponentDialog && (
-                <McpComponentDialog
-                    mcpServerId={mcpServer.id}
-                    onOpenChange={setShowMcpComponentDialog}
-                    open={showMcpComponentDialog}
-                />
-            )}
+            {showMcpComponentDialog && renderMcpComponentDialog(() => setShowMcpComponentDialog(false))}
 
-            {showWorkflowDialog && (
-                <McpProjectWorkflowDialog mcpServer={mcpServer} onClose={() => setShowWorkflowDialog(false)} />
-            )}
+            {showWorkflowDialog && renderWorkflowDialog(() => setShowWorkflowDialog(false))}
         </>
     );
 };
 
-export default McpServerToolsAddButton;
+export default McpServerAddToolsButton;
