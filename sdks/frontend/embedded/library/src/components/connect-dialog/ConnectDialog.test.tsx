@@ -382,6 +382,37 @@ describe('ConnectDialog', () => {
         });
     });
 
+    describe('MCP Tools Tests', () => {
+        it('displays the MCP tool label instead of its name', () => {
+            render(
+                <ConnectDialog
+                    {...editConnectionProps}
+                    mergedMcpTools={[{enabled: true, id: 1051, label: 'Send Email', name: 'sendEmail'}]}
+                    mergedWorkflows={[]}
+                />
+            );
+
+            const toolsContainer = screen.getByTestId('tools-container');
+
+            expect(within(toolsContainer).getByText('Send Email')).toBeInTheDocument();
+            expect(within(toolsContainer).queryByText('sendEmail')).not.toBeInTheDocument();
+        });
+
+        it('falls back to the MCP tool name when it has no label', () => {
+            render(
+                <ConnectDialog
+                    {...editConnectionProps}
+                    mergedMcpTools={[{enabled: true, id: 1051, name: 'sendEmail'}]}
+                    mergedWorkflows={[]}
+                />
+            );
+
+            const toolsContainer = screen.getByTestId('tools-container');
+
+            expect(within(toolsContainer).getByText('sendEmail')).toBeInTheDocument();
+        });
+    });
+
     describe('Form Submission Tests', () => {
         it('calls handleSubmit when form is submitted', () => {
             const handleClickMock = vi.fn();
