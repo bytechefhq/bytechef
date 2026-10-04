@@ -15,9 +15,9 @@ The visual canvas itself (adding triggers and actions, wiring nodes, configuring
 
 | Area | What it is |
 |---|---|
-| **Workflows sidebar** (left) | Switch between the workflows in the integration, search and sort them, and add a new workflow. Toggle it with the sidebar button at the far left of the header. |
+| **Workflows sidebar** (left) | Switch between the workflows in the integration and search and sort them. Toggle it with the sidebar button at the far left of the header. |
 | **Breadcrumb** (header, left) | Shows the integration name and a **workflow selector** dropdown for switching workflows. |
-| **Header actions** (header, right) | Settings menu, output panel, test/chat, and publish. |
+| **Header actions** (header, right) | Test/chat, publish, output panel, and settings menu - in that order. |
 | **Canvas** (center) | The visual workflow editor - same as the [automation workflow editor](/platform/automation/build/workflows/projects). |
 
 ---
@@ -31,10 +31,10 @@ An integration can contain many workflows. There are two ways to move between th
 
 ### Using the workflows sidebar
 
-{/* TODO screenshot: the left workflows sidebar showing the integration selector, search box, sort menu, New Workflow button, and workflow cards */}
+{/* TODO screenshot: the left workflows sidebar showing the integration selector, search box, sort menu, and workflow cards */}
 
 1. Open the sidebar with the sidebar toggle button at the far left of the header (if it is collapsed).
-2. Use the **integration selector** at the top of the sidebar to change which integration's workflows are listed. Selecting the "all" option lists workflows across every integration, grouped by integration.
+2. Use the **integration selector** at the top of the sidebar to change which integration's workflows are listed. Type to filter the integrations by name. Selecting **All integrations** lists workflows across every integration, grouped by integration.
 3. Type in the **Search workflows** box to filter the list by name.
 4. Click the **sort** button (funnel icon) to reorder the list:
 
@@ -49,13 +49,13 @@ An integration can contain many workflows. There are two ways to move between th
 
 ### Adding a workflow
 
-Click **New Workflow** in the sidebar (or **New Workflow** from the integration's menu on the Integrations list). In the dialog, provide a workflow **Label** and an optional **Description**, then save. ByteChef adds the workflow to the current integration and opens it in the editor.
+Click **New Workflow** in the settings menu's **Integration** tab (or **New Workflow** from the integration's menu on the Integrations list). In the dialog, provide a workflow **Label** and an optional **Description**, then save. ByteChef adds the workflow to the current integration and opens it in the editor.
 
 ---
 
 ## Settings menu
 
-Click the **settings** (gear) button in the header to open the settings menu. It has two tabs: **Workflow** and **Integration**.
+Click the **settings** (gear) button at the right end of the header to open the settings menu. It has two tabs: **Workflow** and **Integration**. A small indicator on the gear shows while changes are being saved, and turns red when you're offline.
 
 {/* TODO screenshot: the settings menu open, showing the Workflow and Integration tabs */}
 
@@ -72,6 +72,7 @@ Click the **settings** (gear) button in the header to open the settings menu. It
 | Action | Description |
 |---|---|
 | **Edit** | Open the integration dialog to change the integration's name, category, tags, or [permission expression](/platform/embedded/build/permission-expressions). |
+| **New Workflow** | Add a new, empty workflow to the integration and open it in the editor. |
 | **Import Workflow** | Add a workflow to the integration by uploading a `.json`, `.yaml`, or `.yml` workflow definition file. |
 | **Integration History** | Open the version history panel (see [below](#integration-version-history)). |
 | **Delete** | Permanently delete the integration and every workflow it contains. |
@@ -88,9 +89,9 @@ Use the header action buttons on the right to run and inspect the workflow you a
 |---|---|
 | **Test** | Run the current workflow once for testing. The label changes based on the trigger - for a chat-based trigger the button reads **Chat** instead and starts the chat. |
 | **Stop** | Appears while a test run is in progress. Click it to stop the running workflow. |
-| **Output** (chevron icon) | Toggle the output panel that shows the current workflow's most recent test execution output. |
+| **Output** (icon button after **Publish**) | Toggle the output panel that shows the current workflow's most recent test execution output. |
 
-{/* TODO screenshot: the header action buttons - Output, Test/Chat, and Publish - with the output panel open below the canvas */}
+{/* TODO screenshot: the header action buttons - Test/Chat, Publish, Output, and Settings - with the output panel open below the canvas */}
 
 The **Test** button is disabled until every required workflow input parameter, connection, and component property is set. Hover the button to see why it is disabled.
 
