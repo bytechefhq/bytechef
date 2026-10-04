@@ -4,9 +4,11 @@ import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/provide
 import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
 import {McpServer, Tag, useMcpIntegrationInstanceConfigurationsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {useState} from 'react';
 
 import {McpIntegrationInstanceConfigurationWorkflowItemType} from '../mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList';
 import McpServerListItem from './McpServerListItem';
+import McpServerToolsAddButton from './McpServerToolsAddButton';
 import McpServerToolsContent from './McpServerToolsContent';
 import useMcpServerList from './hooks/useMcpServerList';
 
@@ -39,6 +41,41 @@ const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer
     );
 };
 
+interface McpServerListItemTabsProps {
+    mcpServer: McpServer;
+    onRefresh: () => void;
+}
+
+const McpServerListItemTabs = ({mcpServer, onRefresh}: McpServerListItemTabsProps) => {
+    const [activeTab, setActiveTab] = useState('tools');
+
+    return (
+        <Tabs onValueChange={setActiveTab} value={activeTab}>
+            <div className="flex items-center justify-between">
+                <TabsList>
+                    <TabsTrigger value="tools">Tools</TabsTrigger>
+
+                    <TabsTrigger value="connect">Connect</TabsTrigger>
+                </TabsList>
+
+                {activeTab === 'tools' && <McpServerToolsAddButton mcpServer={mcpServer} />}
+            </div>
+
+            <TabsContent className="pt-2" value="tools">
+                <McpServerToolsContent mcpServer={mcpServer} />
+            </TabsContent>
+
+            <TabsContent className="max-w-(--breakpoint-lg) pt-3" value="connect">
+                <div className="flex-1 space-y-4">
+                    <h2 className="font-semibold text-foreground">Server URL</h2>
+
+                    <McpServerConfigurationCode codeSnippet={mcpServer.url || ''} onRefresh={onRefresh} />
+                </div>
+            </TabsContent>
+        </Tabs>
+    );
+};
+
 const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
     const {createHandleRefresh, sortedMcpServers} = useMcpServerList(mcpServers);
 
@@ -57,28 +94,7 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                             <McpServerListItemWithWorkflows key={mcpServer.id} mcpServer={mcpServer} tags={tags} />
 
                             <CollapsibleContent className="mx-3 mt-1 mb-3">
-                                <Tabs defaultValue="tools">
-                                    <TabsList>
-                                        <TabsTrigger value="tools">Tools</TabsTrigger>
-
-                                        <TabsTrigger value="connect">Connect</TabsTrigger>
-                                    </TabsList>
-
-                                    <TabsContent className="pt-2" value="tools">
-                                        <McpServerToolsContent mcpServer={mcpServer} />
-                                    </TabsContent>
-
-                                    <TabsContent className="max-w-(--breakpoint-lg) pt-3" value="connect">
-                                        <div className="flex-1 space-y-4">
-                                            <h2 className="font-semibold text-foreground">Server URL</h2>
-
-                                            <McpServerConfigurationCode
-                                                codeSnippet={mcpServer.url || ''}
-                                                onRefresh={handleRefresh}
-                                            />
-                                        </div>
-                                    </TabsContent>
-                                </Tabs>
+                                <McpServerListItemTabs mcpServer={mcpServer} onRefresh={handleRefresh} />
                             </CollapsibleContent>
                         </Collapsible>
                     );
