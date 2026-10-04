@@ -22,7 +22,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,16 +38,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.chat.client.ChatClientRequest;
-import org.springframework.ai.chat.client.ChatClientResponse;
-import org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor;
-import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import reactor.core.publisher.Flux;
 
 /**
  * @author Marko Kriskovic
@@ -104,7 +98,7 @@ class ChatModelActionTest extends AbstractActionTest {
 
         Object response = mockedChat.getResponse(mockedParameters, mockedParameters, mockedActionContext);
 
-        // TEXT responses carry no schema, so no StructuredOutputValidationAdvisor is attached: the model is called
+        // TEXT responses carry no schema, so no JsonSchemaValidationAdvisor is attached: the model is called
         // exactly once, with no re-prompt.
         verify(mockedChatModelModel, times(1)).call(any(Prompt.class));
 
@@ -123,7 +117,7 @@ class ChatModelActionTest extends AbstractActionTest {
             .thenReturn("{\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\"}}}");
 
         // Wire context.json so JsonSchemaStructuredOutputConverter can read the schema map and serialize it. The
-        // serialized schema is what the StructuredOutputValidationAdvisor validates the model output against.
+        // serialized schema is what the JsonSchemaValidationAdvisor validates the model output against.
         Context.Json json = mock(Context.Json.class);
 
         Map<String, Object> schemaMap = new LinkedHashMap<>();
@@ -162,21 +156,6 @@ class ChatModelActionTest extends AbstractActionTest {
         verify(mockedChatModelModel, times(2)).call(any(Prompt.class));
 
         assertEquals(Map.of("answer", "hello"), response);
-    }
-
-    @Test
-    void testStructuredOutputValidationAdvisorDoesNotSupportStreaming() {
-        // Pins WHY ChatModel.stream() omits the validation advisor: the advisor cannot operate on a streaming
-        // response. If a future Spring AI release adds streaming support, this fails and the stream() wiring can be
-        // revisited.
-        StructuredOutputValidationAdvisor advisor = StructuredOutputValidationAdvisor.builder()
-            .outputJsonSchema("{\"type\":\"object\"}")
-            .build();
-
-        Flux<ChatClientResponse> flux = advisor.adviseStream(
-            mock(ChatClientRequest.class), mock(StreamAdvisorChain.class));
-
-        assertThrows(UnsupportedOperationException.class, flux::blockLast);
     }
 
     private static class MockChatModel implements ChatModel {

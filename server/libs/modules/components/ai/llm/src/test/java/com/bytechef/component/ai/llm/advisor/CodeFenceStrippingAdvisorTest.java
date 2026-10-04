@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
-import org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
@@ -111,12 +110,9 @@ class CodeFenceStrippingAdvisorTest {
 
     @Test
     void testOrderRunsInsideValidation() {
-        StructuredOutputValidationAdvisor structuredOutputValidationAdvisor = StructuredOutputValidationAdvisor
-            .builder()
-            .outputJsonSchema(JSON_SCHEMA)
-            .build();
+        JsonSchemaValidationAdvisor jsonSchemaValidationAdvisor = new JsonSchemaValidationAdvisor(JSON_SCHEMA);
 
-        assertTrue(codeFenceStrippingAdvisor.getOrder() > structuredOutputValidationAdvisor.getOrder());
+        assertTrue(codeFenceStrippingAdvisor.getOrder() > jsonSchemaValidationAdvisor.getOrder());
     }
 
     @Test
@@ -129,9 +125,7 @@ class CodeFenceStrippingAdvisorTest {
             .prompt()
             .user("List the items")
             .advisors(
-                StructuredOutputValidationAdvisor.builder()
-                    .outputJsonSchema(JSON_SCHEMA)
-                    .build(),
+                new JsonSchemaValidationAdvisor(JSON_SCHEMA),
                 codeFenceStrippingAdvisor)
             .call()
             .content();
@@ -150,9 +144,7 @@ class CodeFenceStrippingAdvisorTest {
             .prompt()
             .user("List the items")
             .advisors(
-                StructuredOutputValidationAdvisor.builder()
-                    .outputJsonSchema(JSON_SCHEMA)
-                    .build())
+                new JsonSchemaValidationAdvisor(JSON_SCHEMA))
             .call()
             .content();
 
