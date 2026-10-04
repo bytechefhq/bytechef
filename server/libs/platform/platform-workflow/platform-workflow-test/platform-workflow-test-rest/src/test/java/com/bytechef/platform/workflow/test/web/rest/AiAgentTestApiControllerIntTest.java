@@ -29,10 +29,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -104,6 +107,53 @@ class AiAgentTestApiControllerIntTest {
         // The streaming handler is subscribed after the perform's own binding is restored, so the request
         // environment (ordinal 0 == DEVELOPMENT) must still be bound here rather than the PRODUCTION fallback.
         assertThat(environmentDuringHandle.get()).isEqualTo(Environment.DEVELOPMENT);
+    }
+
+    @Test
+    void testAiAgentRoutesEventTypesAndAccumulatesStringChunks() throws Exception {
+        ActionDefinition.SseEmitterHandler sseEmitterHandler = sseEmitter -> {
+            sseEmitter.send("Hello ");
+            sseEmitter.send(
+                Map.of(
+                    AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.ASK_USER_QUESTION,
+                    "questions", List.of(Map.of("question", "Which library?"))));
+            sseEmitter.send(
+                Map.of(AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.TOOL_EXECUTION, "toolName", "search"));
+            sseEmitter.send(Map.of("text", "plain-map"));
+            sseEmitter.send("world");
+
+            sseEmitter.complete();
+        };
+
+        when(aiAgentTestFacade.executeAiAgentAction(anyString(), anyString(), anyLong(), anyString(), anyString(),
+            anyList())).thenReturn(sseEmitterHandler);
+
+        MvcResult mvcResult = mockMvc.perform(
+            post("/internal/ai-agent-tests")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .content(createRequestJson("wf-1", "node-1", 0L, "conv-1", "Hello")))
+            .andExpect(status().isOk())
+            .andExpect(request().asyncStarted())
+            .andReturn();
+
+        mvcResult.getAsyncResult(10000);
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+            .andExpect(status().isOk());
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        String body = response.getContentAsString(StandardCharsets.UTF_8);
+
+        assertThat(body).contains("event:" + AiAgentSseEventType.ASK_USER_QUESTION);
+        assertThat(body).contains("Which library?");
+        assertThat(body).contains("event:" + AiAgentSseEventType.TOOL_EXECUTION);
+        assertThat(body).contains("\"toolName\":\"search\"");
+        assertThat(body).contains("plain-map");
+        assertThat(body).doesNotContain("\"" + AiAgentSseEventType.EVENT_TYPE + "\"");
+        assertThat(body).contains("event:result");
+        assertThat(body).contains("Hello world");
     }
 
     @Test

@@ -37,6 +37,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
@@ -162,6 +163,63 @@ class WorkflowTestApiControllerIntTest {
         assertThat(body).contains("event:start");
         assertThat(body).contains("\"jobId\":\"123\"");
         assertThat(body).contains("event:result");
+    }
+
+    @Test
+    void testStartStreamSendsEventTypeAsNamedEventWithoutDiscriminator() throws Exception {
+        doAnswer(inv -> {
+            Consumer<String> afterStartCallback = inv.getArgument(3);
+            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(4);
+            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(5);
+            Consumer<String> whenCompleteCallback = inv.getArgument(6);
+
+            String key = "test-key-event-type";
+
+            afterStartCallback.accept(key);
+
+            SseStreamBridge bridge = sseStreamBridgeFactory.apply(key);
+
+            CompletableFuture<WorkflowTestExecutionDTO> future = CompletableFuture.completedFuture(
+                new WorkflowTestExecutionDTO(new JobDTO(new Job()), null));
+
+            afterFutureCallback.accept(key, future);
+            bridge.onEvent(
+                Map.of(
+                    AiAgentSseEventType.EVENT_TYPE, AiAgentSseEventType.ASK_USER_QUESTION,
+                    "questions", List.of(Map.of("question", "Which library?")),
+                    "resumeUrl", "https://example.com/api/job/resume/abc"));
+            bridge.onEvent(Map.of(AiAgentSseEventType.EVENT_TYPE, 42, "text", "non-string-event-type"));
+            whenCompleteCallback.accept(key);
+
+            return null;
+        }).when(testWorkflowExecutor)
+            .executeAsync(eq("wf-event-type"), any(), eq(1L), any(), any(), any(), any());
+
+        MvcResult mvcResult = mockMvc.perform(
+            post("/internal/workflows/{id}/tests", "wf-event-type")
+                .queryParam("environmentId", "1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .content("{}"))
+            .andExpect(status().isOk())
+            .andExpect(request().asyncStarted())
+            .andReturn();
+
+        mvcResult.getAsyncResult(10000);
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+            .andExpect(status().isOk());
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        String body = response.getContentAsString(StandardCharsets.UTF_8);
+
+        assertThat(body).contains("event:" + AiAgentSseEventType.ASK_USER_QUESTION);
+        assertThat(body).contains("\"resumeUrl\":\"https://example.com/api/job/resume/abc\"");
+        assertThat(body).contains("Which library?");
+        assertThat(body).contains("event:stream");
+        assertThat(body).contains("non-string-event-type");
+        assertThat(body).doesNotContain("\"" + AiAgentSseEventType.EVENT_TYPE + "\":\"");
     }
 
     @Test
