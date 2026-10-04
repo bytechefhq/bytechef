@@ -17,7 +17,7 @@
 package com.bytechef.ai.copilot.config;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Copilot.Docs.Embedding.Provider;
+import com.bytechef.config.ApplicationProperties.Ai.Copilot.Embedding.Provider;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import io.micrometer.observation.ObservationRegistry;
 import java.time.Duration;
@@ -64,7 +64,7 @@ public class CopilotPgVectorConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.docs.embedding", name = "provider")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.embedding", name = "provider")
     public VectorStore copilotDocsLoaderVectorStore(
         @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
         PgVectorStoreProperties properties, ObjectProvider<ObservationRegistry> observationRegistry,
@@ -102,8 +102,7 @@ public class CopilotPgVectorConfiguration {
     private static EmbeddingModel copilotDocsEmbeddingModel(ApplicationProperties applicationProperties) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
-        ApplicationProperties.Ai.Copilot.Docs.Embedding embedding = ai.getCopilot()
-            .getDocs()
+        ApplicationProperties.Ai.Copilot.Embedding embedding = ai.getCopilot()
             .getEmbedding();
 
         if (embedding.getProvider() == Provider.OLLAMA) {
@@ -128,7 +127,7 @@ public class CopilotPgVectorConfiguration {
 
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException(
-                "Copilot docs embedding provider is set to OPENAI but 'bytechef.ai.copilot.docs.embedding.api-key' " +
+                "Copilot docs embedding provider is set to OPENAI but 'bytechef.ai.copilot.embedding.api-key' " +
                     "is not configured");
         }
 

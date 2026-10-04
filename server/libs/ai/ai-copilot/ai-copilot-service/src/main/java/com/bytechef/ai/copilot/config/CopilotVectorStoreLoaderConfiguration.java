@@ -87,7 +87,7 @@ class CopilotVectorStoreLoaderConfiguration {
         if (vectorStore == null) {
             log.info(
                 "Skipping copilot documentation indexing: no internal Copilot embedding key " +
-                    "(bytechef.ai.copilot.docs.embedding.api-key) is set. Set it and restart to index copilot docs.");
+                    "(bytechef.ai.copilot.embedding.api-key) is set. Set it and restart to index copilot docs.");
 
             return;
         }

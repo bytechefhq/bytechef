@@ -20,6 +20,7 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -47,7 +48,8 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
             Use this for requests that write, edit, debug, or explain JavaScript / Python / Ruby script
             embedded inside a workflow task. The subagent owns the canonical behaviour for this domain;
             prefer calling it over generating script code directly. Returns the updated script (BUILD)
-            or an explanation (ASK).""";
+            or an explanation (ASK). Include the workflow's ID and the Script task's name in the request —
+            the workflow and its Script task must already exist.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -62,17 +64,17 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient codeEditorChatClient;
+    private final IntelligentToolChatClientFactory chatClientFactory;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public CodeEditorAgentToolCallback(ChatClient codeEditorChatClient) {
-        this.codeEditorChatClient = codeEditorChatClient;
+    public CodeEditorAgentToolCallback(IntelligentToolChatClientFactory chatClientFactory) {
+        this.chatClientFactory = chatClientFactory;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("code_editor_agent")
+            .name("writeScript")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -97,12 +99,14 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
             AgentBinding parent = CurrentAgentContext.current();
             AgentType parentAgent = parent != null ? parent.agentName() : null;
 
-            Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
+            Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
+
+            ChatClient codeEditorChatClient = chatClientFactory.get();
 
             String result = CurrentAgentContext.callWith(
-                CopilotAgentType.CODE_EDITOR_AGENT, parentAgent,
+                CopilotAgentType.WRITE_SCRIPT, parentAgent,
                 () -> codeEditorChatClient.prompt(request)
-                    .toolContext(forwardedContext)
+                    .toolContext(parentContext)
                     .call()
                     .content());
 
@@ -115,14 +119,14 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "code_editor_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "writeScript rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                CodeEditorAgentToolCallback.class, "code_editor_agent", exception);
+                CodeEditorAgentToolCallback.class, "writeScript", exception);
         }
     }
 
