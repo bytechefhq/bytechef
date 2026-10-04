@@ -16,7 +16,7 @@ import PropertyMentionsInput from '../PropertyMentionsInput';
 
 let editor: Editor | null = null;
 
-const Wrapper = ({autoFocus}: {autoFocus?: boolean}) => {
+const Wrapper = ({autoFocus, isFromAi}: {autoFocus?: boolean; isFromAi?: boolean}) => {
     const [isFormulaMode, setIsFormulaMode] = useState(false);
 
     return (
@@ -25,6 +25,7 @@ const Wrapper = ({autoFocus}: {autoFocus?: boolean}) => {
                 autoFocus={autoFocus}
                 controlType="TEXT"
                 isFormulaMode={isFormulaMode}
+                isFromAi={isFromAi}
                 label="Editor"
                 leadingIcon="📄"
                 path="parameters.uri"
@@ -147,5 +148,13 @@ describe('PropertyMentionsInput', () => {
         await settle();
 
         expect(container.querySelector('.ProseMirror')).toHaveClass('py-[7px]');
+    });
+
+    it('pads the model-defined row like the editor so toggling AI keeps the height', async () => {
+        const {getByText} = render(<Wrapper isFromAi />);
+
+        await settle();
+
+        expect(getByText('Automatically defined by the model')).toHaveClass('py-[7px]');
     });
 });
