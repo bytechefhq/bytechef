@@ -19,8 +19,11 @@ package com.bytechef.platform.workflow.execution;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.tenant.TenantContext;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Objects;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -74,6 +77,30 @@ public class JobResumeId implements Serializable {
 
     public String getUuidAsString() {
         return uuid;
+    }
+
+    /**
+     * Compares this resume id with a stored one in constant time over the UUID component.
+     */
+    public boolean matches(@Nullable String storedJobResumeIdString) {
+        if (storedJobResumeIdString == null) {
+            return false;
+        }
+
+        JobResumeId storedJobResumeId;
+
+        try {
+            storedJobResumeId = parse(storedJobResumeIdString);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return false;
+        }
+
+        if (storedJobResumeId.jobId != jobId || !Objects.equals(storedJobResumeId.tenantId, tenantId)) {
+            return false;
+        }
+
+        return MessageDigest.isEqual(
+            storedJobResumeId.uuid.getBytes(StandardCharsets.UTF_8), uuid.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override

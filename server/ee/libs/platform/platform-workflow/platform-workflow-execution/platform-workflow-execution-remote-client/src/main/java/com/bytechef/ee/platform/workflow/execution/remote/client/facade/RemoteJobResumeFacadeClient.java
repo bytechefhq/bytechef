@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import java.util.Map;
+import java.util.function.LongConsumer;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,6 +24,11 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
 
     @Override
     public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public JobResumeOutcome resumeJobStreaming(String id, Map<String, Object> data, LongConsumer jobIdConsumer) {
         throw new UnsupportedOperationException();
     }
 }

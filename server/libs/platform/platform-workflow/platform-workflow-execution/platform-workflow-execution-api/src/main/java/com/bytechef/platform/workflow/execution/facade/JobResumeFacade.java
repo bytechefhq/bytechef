@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.facade;
 
 import java.util.Map;
+import java.util.function.LongConsumer;
 
 /**
  * @author Ivica Cardic
@@ -24,8 +25,10 @@ import java.util.Map;
 public interface JobResumeFacade {
 
     enum JobResumeOutcome {
-        OK, INVALID_ID, GONE
+        OK, INVALID_ID, GONE, STREAMING_NOT_ALLOWED
     }
 
     JobResumeOutcome resumeJob(String id, Map<String, Object> data);
+
+    JobResumeOutcome resumeJobStreaming(String id, Map<String, Object> data, LongConsumer jobIdConsumer);
 }

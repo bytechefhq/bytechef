@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,9 +39,11 @@ import com.bytechef.tenant.TenantContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.LongConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
@@ -173,6 +177,151 @@ public class JobResumeFacadeTest {
 
         verify(jobFacade).resumeJob(JOB_ID, TASK_EXECUTION_ID, data);
         verify(applicationEventPublisher).publishEvent(any(JobResumedEvent.class));
+    }
+
+    @Test
+    public void testResumeJobIgnoresTheStreamingResumeFlag() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString(), false);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        Map<String, Object> data = Map.of("foo", "bar");
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(jobResumeId.toString(), data);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+
+        verify(jobFacade).resumeJob(JOB_ID, TASK_EXECUTION_ID, data);
+    }
+
+    @Test
+    public void testResumeJobStreamingCallsJobIdConsumerBeforeResumingTheJob() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString(), true);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        LongConsumer jobIdConsumer = mock(LongConsumer.class);
+        Map<String, Object> data = Map.of("foo", "bar");
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJobStreaming(jobResumeId.toString(), data, jobIdConsumer);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
+
+        InOrder inOrder = inOrder(jobIdConsumer, jobFacade, applicationEventPublisher);
+
+        inOrder.verify(jobIdConsumer)
+            .accept(JOB_ID);
+        inOrder.verify(jobFacade)
+            .resumeJob(JOB_ID, TASK_EXECUTION_ID, data);
+        inOrder.verify(applicationEventPublisher)
+            .publishEvent(any(JobResumedEvent.class));
+    }
+
+    @Test
+    public void testResumeJobStreamingDoesNotCallJobIdConsumerForAnInvalidId() {
+        LongConsumer jobIdConsumer = mock(LongConsumer.class);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJobStreaming("not-a-token", Map.of(), jobIdConsumer);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
+
+        verify(jobIdConsumer, never()).accept(anyLong());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+    }
+
+    @Test
+    public void testResumeJobStreamingDoesNotCallJobIdConsumerForATokenMismatch() {
+        JobResumeId suppliedJobResumeId = JobResumeId.of(JOB_ID);
+        JobResumeId storedJobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, storedJobResumeId.toString(), true);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        LongConsumer jobIdConsumer = mock(LongConsumer.class);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJobStreaming(
+            suppliedJobResumeId.toString(), Map.of(), jobIdConsumer);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
+
+        verify(jobIdConsumer, never()).accept(anyLong());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+    }
+
+    @Test
+    public void testResumeJobStreamingDoesNotCallJobIdConsumerWhenJobIsGone() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.COMPLETED, jobResumeId.toString(), true);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        LongConsumer jobIdConsumer = mock(LongConsumer.class);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJobStreaming(
+            jobResumeId.toString(), Map.of(), jobIdConsumer);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.GONE);
+
+        verify(jobIdConsumer, never()).accept(anyLong());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+    }
+
+    @Test
+    public void testResumeJobStreamingReturnsStreamingNotAllowedWithoutStreamingResumeMetadata() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        LongConsumer jobIdConsumer = mock(LongConsumer.class);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJobStreaming(
+            jobResumeId.toString(), Map.of(), jobIdConsumer);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.STREAMING_NOT_ALLOWED);
+
+        verify(jobIdConsumer, never()).accept(anyLong());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+        verify(applicationEventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    public void testResumeJobStreamingReturnsStreamingNotAllowedWhenStreamingResumeIsFalse() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString(), false);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        LongConsumer jobIdConsumer = mock(LongConsumer.class);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJobStreaming(
+            jobResumeId.toString(), Map.of(), jobIdConsumer);
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.STREAMING_NOT_ALLOWED);
+
+        verify(jobIdConsumer, never()).accept(anyLong());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+        verify(applicationEventPublisher, never()).publishEvent(any());
+    }
+
+    private static Job jobOf(Job.Status status, String storedJobResumeIdString, boolean streamingResume) {
+        Job job = jobOf(status, storedJobResumeIdString);
+
+        Map<String, Object> metadata = new HashMap<>(job.getMetadata());
+
+        metadata.put(MetadataConstants.STREAMING_RESUME, streamingResume);
+
+        job.setMetadata(metadata);
+
+        return job;
     }
 
     private static Job jobOf(Job.Status status, String storedJobResumeIdString) {
