@@ -58,7 +58,7 @@ For an **already-connected** integration, pass the instance's id as `integration
 
 When one of your [MCP Servers](/platform/embedded/configure/mcp-servers#which-tools-a-users-agent-sees) exposes tools for the integration, the manage view also shows a **Tools** tab. There the user enables the tools their AI agent may call. Tools start disabled.
 
-To react when the dialog closes, for example to refresh your integrations list, pass `onClose`. It also runs when the integration fails to load:
+To react when the dialog closes, for example to refresh your integrations list, pass `onClose`. It runs whenever the dialog closes. If the integration fails to load, the dialog stays open and shows the error, and `onClose` runs once the user closes it:
 
 ```tsx
 const {openDialog} = useConnectDialog({
