@@ -407,7 +407,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         return mcpServer.getType() == PlatformType.EMBEDDED && mcpServer.isEnabled();
     }
 
-    private List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools(String componentName) {
+    List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools(String componentName) {
         return mcpComponentService.getMcpComponentsByComponentName(componentName)
             .stream()
             .filter(mcpComponent -> isEmbeddedMcpServerEnabled(mcpComponent.getMcpServerId()))
