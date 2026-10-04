@@ -60,6 +60,7 @@ import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
+import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.commons.util.CollectionUtils;
@@ -178,13 +179,7 @@ public class JobSyncExecutor {
 
         TaskWorker taskWorker = new TaskWorker(
             null, evaluator, coordinatorEventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain,
-            taskFileStorage,
-            List.of(
-                new CallableResponseTaskExecutionPostOutputProcessor(),
-                new SuspendTaskExecutionPostOutputProcessor(null),
-                new WebhookResponseTaskExecutionPostOutputProcessor(),
-                new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
-                new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges)));
+            taskFileStorage, createTaskExecutionPostOutputProcessors(sseStreamBridges));
 
         receive(
             memoryMessageBroker, TaskWorkerMessageRoute.CONTROL_EVENTS, event -> {
@@ -1001,4 +996,16 @@ public class JobSyncExecutor {
         MemoryMessageBroker get(Role role);
     }
 
+    static List<TaskExecutionPostOutputProcessor> createTaskExecutionPostOutputProcessors(
+        Cache<String, CopyOnWriteArrayList<com.bytechef.platform.job.sync.SseStreamBridge>> sseStreamBridges) {
+
+        // The SSE stream processor must run before SuspendTaskExecutionPostOutputProcessor, which takes the suspend
+        // it returns as its input.
+        return List.of(
+            new CallableResponseTaskExecutionPostOutputProcessor(),
+            new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
+            new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
+            new SuspendTaskExecutionPostOutputProcessor(null),
+            new WebhookResponseTaskExecutionPostOutputProcessor());
+    }
 }
