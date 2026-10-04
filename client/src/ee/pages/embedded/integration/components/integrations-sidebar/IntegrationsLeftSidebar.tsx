@@ -1,4 +1,3 @@
-import Button from '@/components/Button/Button';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationSelect from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationSelect';
@@ -7,22 +6,16 @@ import IntegrationWorkflowsListFilter from '@/ee/pages/embedded/integration/comp
 import IntegrationWorkflowsListItem from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListItem';
 import IntegrationWorkflowsListSkeleton from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListSkeleton';
 import {useIntegrationsLeftSidebar} from '@/ee/pages/embedded/integration/components/integrations-sidebar/hooks/useIntegrationsLeftSidebar';
-import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import {WorkflowApi} from '@/ee/shared/middleware/embedded/configuration';
 import {
     IntegrationWorkflowKeys,
     useGetIntegrationWorkflowsQuery,
 } from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
-import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
-import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useQueries} from '@tanstack/react-query';
-import {PlusIcon} from 'lucide-react';
-import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
-import {PanelImperativeHandle} from 'react-resizable-panels';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 interface IntegrationsLeftSidebarProps {
-    bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     currentWorkflowId: string;
     integrationId: number;
     onIntegrationClick: (integrationId: number, integrationWorkflowId: number) => void;
@@ -31,7 +24,6 @@ interface IntegrationsLeftSidebarProps {
 const workflowApi = new WorkflowApi();
 
 const IntegrationsLeftSidebar = ({
-    bottomResizablePanelRef,
     currentWorkflowId,
     integrationId,
     onIntegrationClick,
@@ -40,7 +32,6 @@ const IntegrationsLeftSidebar = ({
     const [sortBy, setSortBy] = useState('last-edited');
     const [searchValue, setSearchValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -74,15 +65,7 @@ const IntegrationsLeftSidebar = ({
 
     const workflows = selectedIntegrationWorkflows || allIntegrationsWorkflows;
 
-    const {
-        calculateTimeDifference,
-        createIntegrationWorkflowMutation,
-        getFilteredWorkflows,
-        getWorkflowsIntegrationId,
-    } = useIntegrationsLeftSidebar({
-        bottomResizablePanelRef,
-        integrationId: selectedIntegrationId === 0 ? integrationId : selectedIntegrationId,
-    });
+    const {calculateTimeDifference, getFilteredWorkflows, getWorkflowsIntegrationId} = useIntegrationsLeftSidebar();
 
     const findIntegrationIdByWorkflow = getWorkflowsIntegrationId(integrations || []);
 
@@ -123,11 +106,7 @@ const IntegrationsLeftSidebar = ({
         <aside className="flex h-full min-w-[355px] flex-col items-center gap-2 bg-surface-main px-4 pt-3">
             <div className="flex w-full flex-col gap-2">
                 {integrationsLoading ? (
-                    <div className="flex items-center gap-2">
-                        <Skeleton className="h-9 flex-1 rounded-md" />
-
-                        <Skeleton className="size-9 rounded-md" />
-                    </div>
+                    <Skeleton className="h-9 w-full rounded-md" />
                 ) : (
                     integrations && (
                         <div className="flex items-center gap-2">
@@ -136,19 +115,6 @@ const IntegrationsLeftSidebar = ({
                                 integrations={integrations}
                                 selectedIntegrationId={selectedIntegrationId}
                                 setSelectedIntegrationId={setSelectedIntegrationId}
-                            />
-
-                            <IntegrationDialog
-                                integration={undefined}
-                                triggerNode={
-                                    <Button
-                                        aria-label="New integration"
-                                        className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
-                                        icon={<PlusIcon />}
-                                        size="icon"
-                                        variant="outline"
-                                    />
-                                }
                             />
                         </div>
                     )
@@ -160,14 +126,6 @@ const IntegrationsLeftSidebar = ({
                     setSearchValue={setSearchValue}
                     setSortBy={setSortBy}
                     sortBy={sortBy}
-                />
-
-                <Button
-                    className="w-full [&_svg]:size-5"
-                    icon={<PlusIcon />}
-                    label="Workflow"
-                    onClick={() => setShowWorkflowDialog(true)}
-                    variant="secondary"
                 />
             </div>
 
@@ -191,7 +149,7 @@ const IntegrationsLeftSidebar = ({
                                     />
                                 ))
                             ) : (
-                                <span className="text-sm text-muted-foreground">No workflows found</span>
+                                <span className="w-full py-2 text-sm text-muted-foreground">No workflows found</span>
                             ))}
 
                         {selectedIntegrationId !== 0 && filteredWorkflowsList.length > 0 ? (
@@ -208,20 +166,11 @@ const IntegrationsLeftSidebar = ({
                                 />
                             ))
                         ) : (
-                            <span className="text-sm text-muted-foreground">No workflows found</span>
+                            <span className="w-full py-2 text-sm text-muted-foreground">No workflows found</span>
                         )}
                     </ul>
                 )}
             </ScrollArea>
-
-            {showWorkflowDialog && (
-                <WorkflowDialog
-                    createWorkflowMutation={createIntegrationWorkflowMutation}
-                    onClose={() => setShowWorkflowDialog(false)}
-                    parentId={selectedIntegrationId === 0 ? integrationId : selectedIntegrationId}
-                    useGetWorkflowQuery={useGetWorkflowQuery}
-                />
-            )}
         </aside>
     );
 };
