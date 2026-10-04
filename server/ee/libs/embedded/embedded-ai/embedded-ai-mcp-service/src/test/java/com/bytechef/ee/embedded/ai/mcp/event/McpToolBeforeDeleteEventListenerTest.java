@@ -9,12 +9,11 @@ package com.bytechef.ee.embedded.ai.mcp.event;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.platform.mcp.domain.McpTool;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.relational.core.conversion.MutableAggregateChange;
 import org.springframework.data.relational.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.Identifier;
 
@@ -31,14 +30,15 @@ class McpToolBeforeDeleteEventListenerTest {
         new McpToolBeforeDeleteEventListener(mcpIntegrationInstanceToolService);
 
     @Test
+    @SuppressWarnings("unchecked")
     void testOnBeforeDeleteRemovesIntegrationInstanceTools() {
-        McpTool mcpTool = new McpTool("sendEmail", Map.of(), 1L);
+        BeforeDeleteEvent<McpTool> beforeDeleteEvent = mock(BeforeDeleteEvent.class);
+        Identifier identifier = mock(Identifier.class);
 
-        mcpTool.setId(1052L);
+        when(identifier.getValue()).thenReturn(1052L);
+        when(beforeDeleteEvent.getId()).thenReturn(identifier);
 
-        mcpToolBeforeDeleteEventListener.onApplicationEvent(
-            new BeforeDeleteEvent<>(
-                Identifier.of(1052L), mcpTool, MutableAggregateChange.forDelete(McpTool.class)));
+        mcpToolBeforeDeleteEventListener.onBeforeDelete(beforeDeleteEvent);
 
         verify(mcpIntegrationInstanceToolService).deleteByMcpToolId(1052L);
     }
