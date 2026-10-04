@@ -151,6 +151,7 @@ include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-au
 include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-file-storage")
 include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-jdbc")
 include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-test-support")
+include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-service")
 include("server:libs:platform:platform-ai:platform-ai-api")
 include("server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api")
 include("server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-service")
