@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
-import {ListFilterIcon} from 'lucide-react';
+import {ArrowLeftIcon, ListFilterIcon} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useApprovalTasksStore} from '../stores/useApprovalTasksStore';
@@ -32,11 +33,23 @@ export default function ApprovalTaskList() {
         totalApprovalTaskCount,
     } = useApprovalTaskList();
 
+    const navigate = useNavigate();
+
     return (
         <div className="flex w-96 shrink-0 flex-col border-r border-border bg-background">
             <div className="shrink-0 border-b border-border p-4">
                 <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-foreground">{headerText}</h2>
+                    <div className="flex items-center gap-1">
+                        <Button
+                            aria-label="Back"
+                            icon={<ArrowLeftIcon className="size-5" />}
+                            onClick={() => navigate('/automation')}
+                            size="icon"
+                            variant="ghost"
+                        />
+
+                        <h2 className="text-lg font-semibold text-foreground">{headerText}</h2>
+                    </div>
 
                     <div className="flex items-center gap-1">
                         <ApprovalTaskSortMenu
