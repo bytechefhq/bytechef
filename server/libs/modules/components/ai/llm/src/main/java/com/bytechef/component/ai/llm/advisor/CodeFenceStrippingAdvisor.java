@@ -28,9 +28,8 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 
 /**
- * Removes a markdown code fence around a structured output reply before
- * {@link org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor} parses it. Ordered between that
- * advisor and the model, so each attempt is unwrapped before it is validated.
+ * Removes a markdown code fence around a structured output reply before {@link JsonSchemaValidationAdvisor} parses it.
+ * Ordered between that advisor and the model, so each attempt is unwrapped before it is validated.
  *
  * @author Ivica Cardic
  */
