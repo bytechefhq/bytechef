@@ -35,21 +35,10 @@ public interface ActionContext extends Context {
      */
     String getTraceId();
 
-    /**
-     * @param approvalFunction
-     */
     Links approval(ContextFunction<Approval, Links> approvalFunction);
 
-    /**
-     * @param dataFunction
-     * @param <R>
-     * @return
-     */
     <R> R data(ContextFunction<Data, R> dataFunction);
 
-    /**
-     * @param eventConsumer
-     */
     void event(Consumer<Event> eventConsumer);
 
     /**
@@ -60,32 +49,18 @@ public interface ActionContext extends Context {
      */
     void suspend(Suspend suspend);
 
-    /**
-     *
-     */
     @Deprecated
     interface Approval {
-        /**
-         */
         Links generateLinks();
 
         record Links(String approvalLink, String disapprovalLink) {
         }
     }
 
-    /**
-     *
-     */
     interface Event {
-        /**
-         * @param progress
-         */
         void publishActionProgressEvent(int progress);
     }
 
-    /**
-     *
-     */
     interface Data {
 
         enum Scope {
@@ -105,40 +80,14 @@ public interface ActionContext extends Context {
             }
         }
 
-        /**
-         * @param <T>
-         * @param scope
-         * @param key
-         * @return
-         */
         <T> Optional<T> fetch(Data.Scope scope, String key);
 
-        /**
-         * @param <T>
-         * @param scope
-         * @param key
-         * @return
-         */
         <T> T get(Data.Scope scope, String key);
 
-        /**
-         * @param <T>
-         * @param scope
-         * @return
-         */
         <T> Map<String, T> getAll(Data.Scope scope);
 
-        /**
-         * @param scope
-         * @param key
-         * @param data
-         */
         Void put(Data.Scope scope, String key, Object data);
 
-        /**
-         * @param scope
-         * @param key
-         */
         Void remove(Data.Scope scope, String key);
     }
 
