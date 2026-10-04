@@ -44,6 +44,11 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
+    public void cancelOneTimeTask(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
