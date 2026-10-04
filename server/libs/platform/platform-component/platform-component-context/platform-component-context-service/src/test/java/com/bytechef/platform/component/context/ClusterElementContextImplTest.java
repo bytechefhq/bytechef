@@ -18,6 +18,7 @@ package com.bytechef.platform.component.context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -148,6 +149,7 @@ class ClusterElementContextImplTest {
             cacheManager, dataStorage, eventPublisher, httpClientExecutor, tempFileStorage)
             .environmentId(100L)
             .jobId(200L)
+            .jobPrincipalId(300L)
             .type(PlatformType.AUTOMATION)
             .workflowId("workflow-123")
             .build();
@@ -155,7 +157,14 @@ class ClusterElementContextImplTest {
         ActionContext actionContext = context.toActionContext(
             "newComponent", 2, "newAction", componentConnection);
 
-        assertNotNull(actionContext);
+        ActionContextAware actionContextAware = assertInstanceOf(ActionContextAware.class, actionContext);
+
+        assertEquals("newAction", actionContextAware.getActionName());
+        assertEquals(100L, actionContextAware.getEnvironmentId());
+        assertEquals(200L, actionContextAware.getJobId());
+        assertEquals(300L, actionContextAware.getJobPrincipalId());
+        assertEquals(PlatformType.AUTOMATION, actionContextAware.getPlatformType());
+        assertEquals("workflow-123", actionContextAware.getWorkflowId());
     }
 
     @Test
