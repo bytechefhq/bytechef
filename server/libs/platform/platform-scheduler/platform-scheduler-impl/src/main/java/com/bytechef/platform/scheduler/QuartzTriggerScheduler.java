@@ -71,6 +71,11 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
     }
 
     @Override
+    public void cancelOneTimeTask(long jobId) {
+        deleteJob(String.valueOf(jobId), ONE_TIME_TASK);
+    }
+
+    @Override
     public void cancelScheduleTrigger(String workflowExecutionId) {
         deleteJob(workflowExecutionId, SCHEDULE_TRIGGER);
     }
@@ -147,7 +152,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
             .usingJobData("jobId", jobId);
 
         if (output != null && !output.isEmpty()) {
-            jobBuilder.usingJobData("continueParameters", JsonUtils.write(output));
+            jobBuilder.usingJobData(OneTimeSchedulerJob.CONTINUE_PARAMETERS, JsonUtils.write(output));
         }
 
         JobDetail jobDetail = jobBuilder.build();
@@ -160,23 +165,19 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
         schedule(jobDetail, trigger);
     }
 
-    private void deleteJob(String workflowExecutionId, String jobGroup) {
+    private void deleteJob(String jobName, String jobGroup) {
         try {
-            JobKey jobKey = JobKey.jobKey(workflowExecutionId, jobGroup);
+            JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
 
             if (scheduler.checkExists(jobKey) && scheduler.deleteJob(jobKey)) {
-                log.trace(
-                    "Trigger job removed for workflowExecutionId: {}, jobGroup: {}", workflowExecutionId, jobGroup);
+                log.trace("Trigger job removed for jobName: {}, jobGroup: {}", jobName, jobGroup);
 
                 return;
             }
 
-            log.debug(
-                "Trigger job not found for workflowExecutionId: {}, jobGroup: {}", workflowExecutionId, jobGroup);
+            log.debug("Trigger job not found for jobName: {}, jobGroup: {}", jobName, jobGroup);
         } catch (SchedulerException e) {
-            log.error(
-                "Unable to delete trigger job for workflowExecutionId: {}, jobGroup: {}", workflowExecutionId,
-                jobGroup, e);
+            log.error("Unable to delete trigger job for jobName: {}, jobGroup: {}", jobName, jobGroup, e);
         }
     }
 

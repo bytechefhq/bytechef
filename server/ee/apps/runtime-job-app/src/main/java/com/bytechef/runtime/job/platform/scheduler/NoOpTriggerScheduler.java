@@ -28,6 +28,10 @@ public class NoOpTriggerScheduler implements TriggerScheduler {
     }
 
     @Override
+    public void cancelOneTimeTask(long jobId) {
+    }
+
+    @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
     }
 
