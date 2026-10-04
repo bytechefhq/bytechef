@@ -10,4 +10,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
 }
