@@ -32,6 +32,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.scheduler.TriggerScheduler;
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.tenant.TenantContext;
 import java.time.Instant;
 import java.util.Map;
@@ -73,7 +74,11 @@ class SuspendTaskExecutionPostOutputProcessorTest {
         assertTrue(taskExecution.getMetadata()
             .containsKey(MetadataConstants.JOB_RESUME_ID));
 
-        verify(triggerScheduler).scheduleOneTimeTask(expiresAt, Map.of(), 100L);
+        verify(triggerScheduler).scheduleOneTimeTask(
+            expiresAt,
+            Map.of(JobResumeId.TIMEOUT_TASK_PARAMETER, taskExecution.getMetadata()
+                .get(MetadataConstants.JOB_RESUME_ID)),
+            100L);
     }
 
     @Test

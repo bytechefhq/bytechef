@@ -57,7 +57,8 @@ public class SuspendTaskExecutionPostOutputProcessor implements TaskExecutionPos
             Instant expiresAt = suspend.expiresAt();
 
             if (expiresAt != null && triggerScheduler != null) {
-                triggerScheduler.scheduleOneTimeTask(expiresAt, Map.of(), jobId);
+                triggerScheduler.scheduleOneTimeTask(
+                    expiresAt, Map.of(JobResumeId.TIMEOUT_TASK_PARAMETER, jobResumeIdString), jobId);
             }
 
             taskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, jobResumeIdString);
