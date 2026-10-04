@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:libs:platform:platform-worker"))
