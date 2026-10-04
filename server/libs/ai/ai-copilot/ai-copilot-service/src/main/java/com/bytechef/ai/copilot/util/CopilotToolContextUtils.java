@@ -19,6 +19,7 @@ package com.bytechef.ai.copilot.util;
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -57,13 +58,6 @@ public final class CopilotToolContextUtils {
         Authentication authentication = state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication value
             ? value : null;
 
-        // An embedded run carries a connected-user Authentication (no backing platform user) and is authorized by the
-        // embedded request layer, so its @PreAuthorize-gated tools must skip the platform automation RBAC check. This
-        // mirrors WorkflowEditorSpringAIAgent, which bypasses the workflow-scope gate on the same STATE_AUTHENTICATION
-        // signal — but the request thread's skip-checks ThreadLocal does not reach the tool-execution worker threads,
-        // so the flag is carried through the tool context and re-armed by RehydrateContextToolCallback.
-        boolean skipAutomationAuthorization = authentication != null;
-
         toolContext.putAll(
             AgentToolInvocationContext.builder()
                 .workspaceId(workspaceId)
@@ -71,10 +65,19 @@ public final class CopilotToolContextUtils {
                 .environmentId(environmentId)
                 .tenantId(tenantId)
                 .authentication(authentication)
-                .skipAutomationAuthorization(skipAutomationAuthorization)
+                .skipAutomationAuthorization(authentication != null && userId == null)
                 .build()
                 .toToolContext());
 
+        putIfNotNull(toolContext, AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, workspaceId);
+        putIfNotNull(toolContext, AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, environmentId);
+
         return toolContext;
+    }
+
+    private static void putIfNotNull(Map<String, Object> toolContext, String key, @Nullable Object value) {
+        if (value != null) {
+            toolContext.put(key, value);
+        }
     }
 }

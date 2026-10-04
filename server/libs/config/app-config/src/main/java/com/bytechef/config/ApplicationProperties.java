@@ -18,6 +18,7 @@ package com.bytechef.config;
 
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -717,6 +718,7 @@ public class ApplicationProperties {
         private AutoMemory autoMemory = new AutoMemory();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
+        private Hub hub = new Hub();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
         private Mcp mcp = new Mcp();
         private Memory memory = new Memory();
@@ -733,6 +735,10 @@ public class ApplicationProperties {
 
         public Firecrawl getFirecrawl() {
             return firecrawl;
+        }
+
+        public Hub getHub() {
+            return hub;
         }
 
         public KnowledgeBase getKnowledgeBase() {
@@ -765,6 +771,10 @@ public class ApplicationProperties {
 
         public void setFirecrawl(Firecrawl firecrawl) {
             this.firecrawl = firecrawl;
+        }
+
+        public void setHub(Hub hub) {
+            this.hub = hub;
         }
 
         public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
@@ -807,8 +817,8 @@ public class ApplicationProperties {
         }
 
         /**
-         * AI memory configuration. Cross-cutting concern shared by copilot and agents — not owned by any single product
-         * surface. Stores conversation history for chat-style interactions.
+         * AI memory configuration. Cross-cutting concern shared by copilot, agents, and hub surfaces — not owned by any
+         * single product surface. Stores conversation history for chat-style interactions.
          */
         public static class Memory {
 
@@ -1037,6 +1047,19 @@ public class ApplicationProperties {
             }
         }
 
+        public static class Hub {
+
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+        }
+
         public static class Copilot {
 
             /**
@@ -1045,9 +1068,9 @@ public class ApplicationProperties {
             private boolean enabled;
 
             /**
-             * Copilot documentation configuration
+             * Copilot embedding configuration
              */
-            private Docs docs = new Docs();
+            private Embedding embedding = new Embedding();
 
             /**
              * Explicit chat-model provider to prefer for Copilot — accepts the short provider name (e.g. openAi) or the
@@ -1067,12 +1090,12 @@ public class ApplicationProperties {
                 this.enabled = enabled;
             }
 
-            public Docs getDocs() {
-                return docs;
+            public Embedding getEmbedding() {
+                return embedding;
             }
 
-            public void setDocs(Docs docs) {
-                this.docs = docs;
+            public void setEmbedding(Embedding embedding) {
+                this.embedding = embedding;
             }
 
             public String getProvider() {
@@ -1084,58 +1107,35 @@ public class ApplicationProperties {
             }
 
             /**
-             * Copilot documentation configuration.
+             * Copilot embedding configuration.
              */
-            public static class Docs {
+            public static class Embedding {
 
-                /**
-                 * Copilot documentation embedding configuration
-                 */
-                private Embedding embedding = new Embedding();
-
-                public Embedding getEmbedding() {
-                    return embedding;
-                }
-
-                public void setEmbedding(Embedding embedding) {
-                    this.embedding = embedding;
+                public enum Provider {
+                    OLLAMA, OPENAI
                 }
 
                 /**
-                 * Copilot documentation embedding configuration.
+                 * The embedding provider key (e.g. openAi).
                  */
-                public static class Embedding {
+                private Provider provider;
 
-                    public enum Provider {
-                        OLLAMA, OPENAI
-                    }
+                private String apiKey;
 
-                    /**
-                     * The embedding provider key (e.g. openAi).
-                     */
-                    private Provider provider;
+                public Provider getProvider() {
+                    return provider;
+                }
 
-                    /**
-                     * The API key used to authenticate with the Copilot documentation embedding provider. Applies only
-                     * to the OpenAI provider; Ollama runs locally and does not require a key.
-                     */
-                    private String apiKey;
+                public String getApiKey() {
+                    return apiKey;
+                }
 
-                    public Provider getProvider() {
-                        return provider;
-                    }
+                public void setProvider(Provider provider) {
+                    this.provider = provider;
+                }
 
-                    public String getApiKey() {
-                        return apiKey;
-                    }
-
-                    public void setProvider(Provider provider) {
-                        this.provider = provider;
-                    }
-
-                    public void setApiKey(String apiKey) {
-                        this.apiKey = apiKey;
-                    }
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
                 }
             }
         }
@@ -3963,6 +3963,8 @@ public class ApplicationProperties {
          */
         private String redirectUri;
 
+        private ResourceServer resourceServer = new ResourceServer();
+
         public Map<String, OAuth2App> getPredefinedApps() {
             return predefinedApps;
         }
@@ -3971,12 +3973,96 @@ public class ApplicationProperties {
             return redirectUri;
         }
 
+        public ResourceServer getResourceServer() {
+            return resourceServer;
+        }
+
+        public void setResourceServer(ResourceServer resourceServer) {
+            this.resourceServer = resourceServer;
+        }
+
         public void setPredefinedApps(Map<String, OAuth2App> predefinedApps) {
             this.predefinedApps = predefinedApps;
         }
 
         public void setRedirectUri(String redirectUri) {
             this.redirectUri = redirectUri;
+        }
+
+        public static class ResourceServer {
+
+            private List<Issuer> issuers = new ArrayList<>();
+
+            public List<Issuer> getIssuers() {
+                return issuers;
+            }
+
+            public void setIssuers(List<Issuer> issuers) {
+                this.issuers = issuers;
+            }
+
+            public static class Issuer {
+
+                private String uri;
+
+                private String tenantClaim;
+
+                private String authoritiesClaim;
+
+                private List<String> authorities = new ArrayList<>();
+
+                private boolean self;
+
+                private String audience;
+
+                public String getUri() {
+                    return uri;
+                }
+
+                public String getTenantClaim() {
+                    return tenantClaim;
+                }
+
+                public String getAuthoritiesClaim() {
+                    return authoritiesClaim;
+                }
+
+                public List<String> getAuthorities() {
+                    return authorities;
+                }
+
+                public boolean isSelf() {
+                    return self;
+                }
+
+                public String getAudience() {
+                    return audience;
+                }
+
+                public void setUri(String uri) {
+                    this.uri = uri;
+                }
+
+                public void setTenantClaim(String tenantClaim) {
+                    this.tenantClaim = tenantClaim;
+                }
+
+                public void setAuthoritiesClaim(String authoritiesClaim) {
+                    this.authoritiesClaim = authoritiesClaim;
+                }
+
+                public void setAuthorities(List<String> authorities) {
+                    this.authorities = authorities;
+                }
+
+                public void setSelf(boolean self) {
+                    this.self = self;
+                }
+
+                public void setAudience(String audience) {
+                    this.audience = audience;
+                }
+            }
         }
 
         /**

@@ -16,18 +16,282 @@
 
 package com.bytechef.automation.ai.tool;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.automation.ai.tool.model.WorkflowInfo;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Marko Kriskovic
+ * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class ProjectWorkflowToolsTest {
 
+    private static final String DEFINITION = """
+        {"label": "My Flow", "triggers": [], "tasks": []}""";
+
+    private static final String WORKFLOW_DTO_DEFINITION = """
+        {"label": "My Flow", "tasks": []}""";
+
+    @Mock
+    private ProjectService projectService;
+
+    @Mock
+    private ProjectWorkflowFacade projectWorkflowFacade;
+
+    @Mock
+    private ProjectWorkflowService projectWorkflowService;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private WorkspaceFacade workspaceFacade;
+
+    @Mock
+    private ObjectProvider<WorkflowTestConfigurationFacade> testConfigurationFacadeProvider;
+
+    @Mock
+    private WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
+
+    @Mock
+    private ToolContext toolContext;
+
     @Test
-    void instantiatesSuccessfully() {
-        new ProjectWorkflowTools(null);
+    void testCreateProjectWorkflowCapturesPersistedIds() {
+        List<Map<String, Object>> captures = Collections.synchronizedList(new ArrayList<>());
+
+        when(toolContext.getContext())
+            .thenReturn(Map.of("bytechef.workflowEditor.persistedWorkflows", captures));
+
+        ProjectWorkflow projectWorkflow = buildProjectWorkflow(55L, 7L, "wf-uuid-1");
+
+        when(projectWorkflowFacade.addWorkflow(7L, DEFINITION)).thenReturn(projectWorkflow);
+
+        ProjectWorkflowTools tools = newTools();
+
+        tools.createProjectWorkflow(7L, DEFINITION, toolContext);
+
+        assertThat(captures).hasSize(1);
+        assertThat(captures.get(0))
+            .containsEntry("created", true)
+            .containsEntry("workflowId", "wf-uuid-1")
+            .containsEntry("projectId", 7L)
+            .containsEntry("projectWorkflowId", 55L)
+            .containsEntry("name", "My Flow");
+    }
+
+    @Test
+    void testUpdateWorkflowCapturesPersistedIds() {
+        List<Map<String, Object>> captures = Collections.synchronizedList(new ArrayList<>());
+
+        when(toolContext.getContext())
+            .thenReturn(Map.of("bytechef.workflowEditor.persistedWorkflows", captures));
+
+        ProjectWorkflowDTO dto = buildDto("wf-uuid-2", 88L, 3);
+
+        when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(dto);
+
+        ProjectWorkflow projectWorkflow = buildProjectWorkflow(88L, 9L, "wf-uuid-2");
+
+        when(projectWorkflowService.getProjectWorkflow(88L)).thenReturn(projectWorkflow);
+
+        ProjectWorkflowTools tools = newTools();
+
+        tools.updateWorkflow("wf-uuid-2", DEFINITION, toolContext);
+
+        assertThat(captures).hasSize(1);
+        assertThat(captures.get(0))
+            .containsEntry("created", false)
+            .containsEntry("workflowId", "wf-uuid-2")
+            .containsEntry("projectId", 9L)
+            .containsEntry("projectWorkflowId", 88L);
+    }
+
+    @Test
+    void testUpdateWorkflowSucceedsWhenProjectIdLookupThrows() {
+        ProjectWorkflowDTO dto = buildDto("wf-uuid-2", 88L, "Updated Flow", 3);
+
+        when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(dto);
+        when(projectWorkflowService.getProjectWorkflow(88L)).thenThrow(new RuntimeException("lookup boom"));
+
+        ProjectWorkflowTools tools = newTools();
+
+        assertThatCode(() -> tools.updateWorkflow("wf-uuid-2", DEFINITION, toolContext))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testSearchWorkflowsScopesToAccessibleProjects() {
+        mockAccessibleProjects(7L, 1L, 10L);
+
+        when(projectWorkflowFacade.getProjectWorkflows(10L)).thenReturn(List.of(buildDto("wf-1", 1L, 1)));
+
+        ProjectWorkflowTools tools = newTools();
+
+        List<WorkflowInfo> result = tools.searchWorkflows("flow", null);
+
+        assertThat(result).hasSize(1);
+
+        verify(projectWorkflowFacade, never()).getProjectWorkflows();
+    }
+
+    @Test
+    void testSearchWorkflowsRejectsInaccessibleProjectId() {
+        mockAccessibleProjects(7L, 1L, 10L);
+
+        ProjectWorkflowTools tools = newTools();
+
+        assertThatCode(() -> tools.searchWorkflows("flow", 99L))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("99");
+
+        verify(projectWorkflowFacade, never()).getProjectWorkflows(99L);
+        verify(projectWorkflowFacade, never()).getProjectWorkflows();
+    }
+
+    @Test
+    void testSearchWorkflowsFailsClosedWhenNoUser() {
+        when(userService.fetchCurrentUser()).thenReturn(Optional.empty());
+
+        ProjectWorkflowTools tools = newTools();
+
+        assertThatCode(() -> tools.searchWorkflows("flow", null))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("No authenticated user");
+
+        verify(projectWorkflowFacade, never()).getProjectWorkflows();
+        verify(projectWorkflowFacade, never()).getProjectWorkflows(anyLong());
+    }
+
+    private void mockAccessibleProjects(long userId, long workspaceId, long projectId) {
+        User user = org.mockito.Mockito.mock(User.class);
+
+        when(user.getId()).thenReturn(userId);
+        when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
+
+        Workspace workspace = org.mockito.Mockito.mock(Workspace.class);
+
+        when(workspace.getId()).thenReturn(workspaceId);
+        when(workspaceFacade.getUserWorkspaces(userId)).thenReturn(List.of(workspace));
+        when(projectService.getWorkspaceProjectIds(workspaceId)).thenReturn(List.of(projectId));
+    }
+
+    @Test
+    void testSaveWorkflowTestConnectionDelegatesToFacadeWithAutomationToolEnvironment() {
+        when(testConfigurationFacadeProvider.getIfAvailable()).thenReturn(workflowTestConfigurationFacade);
+        when(toolContext.getContext())
+            .thenReturn(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, 2L));
+
+        ProjectWorkflowTools tools = newTools();
+
+        String result = tools.saveWorkflowTestConnection("wf-uuid-1", "sendChannelMessage_1", "slack", 1107L,
+            toolContext);
+
+        verify(workflowTestConfigurationFacade)
+            .saveWorkflowTestConfigurationConnection("wf-uuid-1", "sendChannelMessage_1", "slack", 1107L, 2L);
+        assertThat(result).contains("1107", "sendChannelMessage_1");
+    }
+
+    @Test
+    void testSaveWorkflowTestConnectionFallsBackToAgentToolEnvironmentKey() {
+        when(testConfigurationFacadeProvider.getIfAvailable()).thenReturn(workflowTestConfigurationFacade);
+        when(toolContext.getContext()).thenReturn(Map.of("bytechef.agentTool.environmentId", 1L));
+
+        ProjectWorkflowTools tools = newTools();
+
+        tools.saveWorkflowTestConnection("wf-uuid-1", "sendChannelMessage_1", "slack", 1107L, toolContext);
+
+        verify(workflowTestConfigurationFacade)
+            .saveWorkflowTestConfigurationConnection("wf-uuid-1", "sendChannelMessage_1", "slack", 1107L, 1L);
+    }
+
+    @Test
+    void testSaveWorkflowTestConnectionFailsWhenNoEnvironmentIsResolvable() {
+        when(testConfigurationFacadeProvider.getIfAvailable()).thenReturn(workflowTestConfigurationFacade);
+        when(toolContext.getContext()).thenReturn(Map.of());
+
+        ProjectWorkflowTools tools = newTools();
+
+        assertThatCode(
+            () -> tools.saveWorkflowTestConnection("wf-uuid-1", "sendChannelMessage_1", "slack", 1107L, toolContext))
+                .isInstanceOf(ExecutionException.class);
+
+        verify(workflowTestConfigurationFacade, never())
+            .saveWorkflowTestConfigurationConnection(any(), any(), any(), anyLong(), anyLong());
+    }
+
+    @Test
+    void testSaveWorkflowTestConnectionThrowsWhenFacadeAbsent() {
+        when(testConfigurationFacadeProvider.getIfAvailable()).thenReturn(null);
+
+        ProjectWorkflowTools tools = newTools();
+
+        assertThatCode(
+            () -> tools.saveWorkflowTestConnection("wf-uuid-1", "sendChannelMessage_1", "slack", 1107L, toolContext))
+                .isInstanceOf(ExecutionException.class);
+    }
+
+    private ProjectWorkflowTools newTools() {
+        return new ProjectWorkflowTools(
+            projectService, projectWorkflowFacade, projectWorkflowService, userService, workspaceFacade,
+            testConfigurationFacadeProvider);
+    }
+
+    private static ProjectWorkflow buildProjectWorkflow(long id, long projectId, String workflowId) {
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(projectId, 1, workflowId);
+
+        ReflectionTestUtils.setField(projectWorkflow, "id", id);
+
+        return projectWorkflow;
+    }
+
+    private static ProjectWorkflowDTO buildDto(String workflowUuid, long projectWorkflowId, int version) {
+        return buildDto(workflowUuid, projectWorkflowId, null, version);
+    }
+
+    private static ProjectWorkflowDTO buildDto(
+        String workflowUuid, long projectWorkflowId, @SuppressWarnings("unused") String label, int version) {
+
+        Workflow workflow = new Workflow(workflowUuid, WORKFLOW_DTO_DEFINITION, Workflow.Format.JSON);
+
+        workflow.setVersion(version);
+
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(projectWorkflowId);
+
+        return new ProjectWorkflowDTO(workflow, projectWorkflow, false);
     }
 }

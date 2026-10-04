@@ -17,15 +17,31 @@
 package com.bytechef.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
@@ -38,44 +54,240 @@ class McpServerToolCallbackContributorConfigurationTest {
 
     @Test
     void contributesAgentCallbacksWhenChatClientsPresent() {
-        ChatClient converterChatClient = mock(ChatClient.class);
-
-        Supplier<ChatClient> converterChatClientSupplier = () -> converterChatClient;
+        IntelligentToolCatalog intelligentToolCatalog = catalogOf(
+            intelligentDefinition("buildWorkflow"), intelligentDefinition("writeScript"),
+            intelligentDefinition("configureClusterElement"), intelligentDefinition("authorSkill"),
+            intelligentDefinition("debugWorkflowExecution"), intelligentDefinition("importWorkflow"));
 
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
-            present(mock(ChatClient.class)), present(mock(ChatClient.class)),
-            present(converterChatClientSupplier));
+            emptyProvider(), intelligentToolCatalog, mock(WorkspaceScopeResolver.class));
 
-        assertThat(contributor.getToolCallbacks()).hasSize(5);
+        assertThat(contributor.getToolCallbacks())
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactlyInAnyOrder(
+                "buildWorkflow", "writeScript", "configureClusterElement", "authorSkill",
+                "debugWorkflowExecution", "importWorkflow");
     }
 
     @Test
     void contributesNothingWhenAllAbsent() {
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider());
+            emptyProvider(), catalogOf(), mock(WorkspaceScopeResolver.class));
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
     }
 
+    @Test
+    void contributedAgentToolsAcceptWorkspaceId() {
+        IntelligentToolCatalog intelligentToolCatalog = catalogOf(
+            intelligentDefinition("buildWorkflow"), intelligentDefinition("writeScript"),
+            intelligentDefinition("configureClusterElement"), intelligentDefinition("authorSkill"),
+            intelligentDefinition("debugWorkflowExecution"), intelligentDefinition("importWorkflow"));
+
+        McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
+            emptyProvider(), intelligentToolCatalog, mock(WorkspaceScopeResolver.class));
+
+        assertThat(contributor.getToolCallbacks())
+            .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
+                .inputSchema()).contains("workspaceId"));
+    }
+
+    @Test
+    void contributesTheSevenFlatKnowledgeBaseToolsWhenFactoryPresent() {
+        KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = new KnowledgeBaseToolCallbacksFactory(
+            mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
+            mock(KnowledgeBaseDocumentFacade.class),
+            mock(KnowledgeBaseDocumentService.class));
+
+        McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
+            presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), mock(WorkspaceScopeResolver.class));
+
+        assertThat(contributor.getToolCallbacks())
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactlyInAnyOrder(
+                "listKnowledgeBases", "queryKnowledgeBase", "createKnowledgeBase", "addKnowledgeBaseDocument",
+                "deleteKnowledgeBaseDocument", "cloneKnowledgeBase", "deleteKnowledgeBase");
+    }
+
+    @Test
+    void knowledgeBaseContributorSkipsWhenFactoryAbsent() {
+        McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
+            absentKnowledgeBaseFactory(), mock(WorkspaceScopeResolver.class));
+
+        assertThat(contributor.getToolCallbacks()).isEmpty();
+    }
+
+    @Test
+    void everyKnowledgeBaseToolAcceptsWorkspaceId() {
+        KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = new KnowledgeBaseToolCallbacksFactory(
+            mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
+            mock(KnowledgeBaseDocumentFacade.class),
+            mock(KnowledgeBaseDocumentService.class));
+
+        McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
+            presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), mock(WorkspaceScopeResolver.class));
+
+        assertThat(contributor.getToolCallbacks())
+            .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
+                .inputSchema()).contains("workspaceId"));
+    }
+
+    @Test
+    void contributesTheSevenFlatDeploymentToolsWhenFactoryPresent() {
+        DeploymentToolCallbacksFactory deploymentToolCallbacksFactory = new DeploymentToolCallbacksFactory(
+            mock(ProjectDeploymentFacade.class));
+
+        McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
+            presentFactory(deploymentToolCallbacksFactory), mock(WorkspaceScopeResolver.class));
+
+        assertThat(contributor.getToolCallbacks())
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactlyInAnyOrder(
+                "listProjectDeployments", "createProjectDeployment", "updateProjectDeployment",
+                "deleteProjectDeployment", "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow");
+    }
+
+    @Test
+    void deploymentContributorSkipsWhenFactoryAbsent() {
+        McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
+            absentFactory(), mock(WorkspaceScopeResolver.class));
+
+        assertThat(contributor.getToolCallbacks()).isEmpty();
+    }
+
+    @Test
+    void onlyListProjectDeploymentsAcceptsWorkspaceId() {
+        DeploymentToolCallbacksFactory deploymentToolCallbacksFactory = new DeploymentToolCallbacksFactory(
+            mock(ProjectDeploymentFacade.class));
+
+        McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
+            presentFactory(deploymentToolCallbacksFactory), mock(WorkspaceScopeResolver.class));
+
+        List<ToolCallback> toolCallbacks = contributor.getToolCallbacks();
+
+        ToolCallback listToolCallback = toolCallbacks.stream()
+            .filter(toolCallback -> "listProjectDeployments".equals(
+                toolCallback.getToolDefinition()
+                    .name()))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(listToolCallback.getToolDefinition()
+            .inputSchema()).contains("workspaceId");
+
+        List<ToolCallback> otherToolCallbacks = toolCallbacks.stream()
+            .filter(toolCallback -> !"listProjectDeployments".equals(
+                toolCallback.getToolDefinition()
+                    .name()))
+            .toList();
+
+        assertThat(otherToolCallbacks)
+            .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
+                .inputSchema()).doesNotContain("workspaceId"));
+    }
+
     @SuppressWarnings("unchecked")
-    private static <T> ObjectProvider<T> present(T value) {
-        ObjectProvider<T> provider = mock(ObjectProvider.class);
+    private static ObjectProvider<DeploymentToolCallbacksFactory> presentFactory(
+        DeploymentToolCallbacksFactory deploymentToolCallbacksFactory) {
 
-        doAnswer(invocation -> {
-            Consumer<T> consumer = invocation.getArgument(0);
+        ObjectProvider<DeploymentToolCallbacksFactory> provider = mock(ObjectProvider.class);
 
-            consumer.accept(value);
-
-            return null;
-        }).when(provider)
-            .ifAvailable(any());
+        when(provider.getIfAvailable()).thenReturn(deploymentToolCallbacksFactory);
 
         return provider;
     }
 
     @SuppressWarnings("unchecked")
+    private static ObjectProvider<DeploymentToolCallbacksFactory> absentFactory() {
+        return mock(ObjectProvider.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<KnowledgeBaseToolCallbacksFactory> presentKnowledgeBaseFactory(
+        KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory) {
+
+        ObjectProvider<KnowledgeBaseToolCallbacksFactory> provider = mock(ObjectProvider.class);
+
+        when(provider.getIfAvailable()).thenReturn(knowledgeBaseToolCallbacksFactory);
+
+        return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<KnowledgeBaseToolCallbacksFactory> absentKnowledgeBaseFactory() {
+        return mock(ObjectProvider.class);
+    }
+
+    private static IntelligentToolDefinition intelligentDefinition(String name) {
+        ChatClient chatClient = mock(ChatClient.class);
+        ToolCallback toolCallback = mock(ToolCallback.class);
+
+        when(toolCallback.getToolDefinition())
+            .thenReturn(ToolDefinition.builder()
+                .name(name)
+                .description(name)
+                .inputSchema("{}")
+                .build());
+
+        return new FakeIntelligentToolDefinition(
+            name, Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) () -> chatClient),
+            toolCallback);
+    }
+
+    private static IntelligentToolCatalog catalogOf(IntelligentToolDefinition... definitions) {
+        IntelligentToolContributor contributor = () -> List.of(definitions);
+
+        return new IntelligentToolCatalog(fixedObjectProvider(contributor));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<IntelligentToolContributor> fixedObjectProvider(
+        IntelligentToolContributor contributor) {
+
+        ObjectProvider<IntelligentToolContributor> objectProvider = mock(ObjectProvider.class);
+
+        when(objectProvider.orderedStream()).thenReturn(Stream.of(contributor));
+
+        return objectProvider;
+    }
+
+    @SuppressWarnings("unchecked")
     private static <T> ObjectProvider<T> emptyProvider() {
         return mock(ObjectProvider.class);
+    }
+
+    private static final class FakeIntelligentToolDefinition implements IntelligentToolDefinition {
+
+        private final String name;
+        private final Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant;
+        private final ToolCallback toolCallback;
+
+        private FakeIntelligentToolDefinition(
+            String name, Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant,
+            ToolCallback toolCallback) {
+
+            this.name = name;
+            this.chatClientFactoriesByVariant = chatClientFactoriesByVariant;
+            this.toolCallback = toolCallback;
+        }
+
+        @Override
+        public String name() {
+            return name;
+        }
+
+        @Override
+        @Nullable
+        public IntelligentToolChatClientFactory chatClientFactory(IntelligentToolVariant variant) {
+            return chatClientFactoriesByVariant.get(variant);
+        }
+
+        @Override
+        public ToolCallback create(IntelligentToolChatClientFactory chatClientFactory) {
+            return toolCallback;
+        }
     }
 }

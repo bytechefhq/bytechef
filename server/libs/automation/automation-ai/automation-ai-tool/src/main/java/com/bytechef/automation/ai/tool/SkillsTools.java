@@ -110,26 +110,6 @@ public class SkillsTools {
         }
     }
 
-    @Tool(description = "Delete an AI skill by its ID. Returns a confirmation message.")
-    public String deleteAiSkill(
-        @ToolParam(description = "The ID of the skill to delete") long id) {
-
-        try {
-            aiSkillFacade.deleteAiSkill(id);
-
-            if (log.isDebugEnabled()) {
-                log.debug("deleteAiSkill({}): Deleted skill", id);
-            }
-
-            return "Deleted skill " + id + ".";
-        } catch (Exception e) {
-            log.error("deleteAiSkill({}): Failed to delete skill", id, e);
-
-            throw new ExecutionException(
-                "Failed to delete skill: " + e.getMessage(), e, SkillToolErrorType.DELETE_SKILL);
-        }
-    }
-
     @Tool(description = "Get an AI skill by its ID. Returns the skill metadata.")
     public AiSkill getAiSkill(
         @ToolParam(description = "The ID of the skill to retrieve") long id) {
