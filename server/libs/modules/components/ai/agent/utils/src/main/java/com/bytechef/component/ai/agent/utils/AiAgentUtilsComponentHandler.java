@@ -22,6 +22,8 @@ import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static com.bytechef.component.definition.ai.agent.SubagentFunction.SUBAGENT;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsAppendFilesToAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsCreateAiSkillAction;
@@ -29,6 +31,7 @@ import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsDeleteAiSkillAct
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsRemoveFileFromAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsUpdateAiSkillAction;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAskUserQuestionTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAutoMemoryTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsFileSystemTools;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGlobTool;
@@ -44,6 +47,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
@@ -69,8 +73,11 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
     public AiAgentUtilsComponentHandler(
         AiAgentToolFacade aiAgentToolFacade, AiSkillFacade aiSkillFacade,
         List<AiAgentUtilsClusterElementContributor> clusterElementContributors,
-        ClusterElementDefinitionService clusterElementDefinitionService) {
+        ClusterElementDefinitionService clusterElementDefinitionService, AiAutoMemoryService aiAutoMemoryService,
+        ProjectDeploymentService projectDeploymentService, ProjectService projectService) {
 
+        AiAgentUtilsAutoMemoryTool agentUtilsAutoMemoryTool = new AiAgentUtilsAutoMemoryTool(
+            aiAutoMemoryService, projectDeploymentService, projectService);
         AiAgentUtilsTaskTool agentUtilsTaskTool = new AiAgentUtilsTaskTool(
             aiAgentToolFacade, clusterElementDefinitionService);
 
@@ -82,6 +89,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             AiAgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
+            agentUtilsAutoMemoryTool.clusterElementDefinition,
             AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
             agentUtilsTaskTool.clusterElementDefinition,
             AiAgentUtilsSubagentTool.CLUSTER_ELEMENT_DEFINITION,

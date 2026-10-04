@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "updateAiSkill": [ ],
-    "deleteAiSkill": [ ],
-    "createAiSkill": [ ],
     "appendFilesToAiSkill": [ ],
+    "createAiSkill": [ ],
+    "deleteAiSkill": [ ],
+    "updateAiSkill": [ ],
     "removeFileFromAiSkill": [ ]
   },
   "actions": [ {
@@ -1286,21 +1286,22 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "askUserQuestionTool": [ ],
-    "updateAiSkill": [ ],
-    "grepTool": [ ],
-    "deleteAiSkill": [ ],
-    "removeFileFromAiSkill": [ ],
-    "globTool": [ ],
     "braveWebSearchTool": [ ],
-    "smartWebFetchTool": [ "MODEL" ],
-    "taskTool": [ "MODEL", "SUBAGENT" ],
-    "appendFilesToAiSkill": [ ],
-    "createAiSkill": [ ],
     "fileSystemTools": [ ],
+    "appendFilesToAiSkill": [ ],
     "todoWriteTool": [ ],
+    "globTool": [ ],
+    "grepTool": [ ],
+    "createAiSkill": [ ],
+    "shellTools": [ ],
+    "autoMemoryTool": [ ],
+    "smartWebFetchTool": [ "MODEL" ],
+    "askUserQuestionTool": [ ],
     "subagentTool": [ "MODEL", "TOOLS" ],
-    "shellTools": [ ]
+    "updateAiSkill": [ ],
+    "removeFileFromAiSkill": [ ],
+    "deleteAiSkill": [ ],
+    "taskTool": [ "MODEL", "SUBAGENT" ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",
@@ -1436,6 +1437,23 @@
       "name": "CLAUDE_CODE_TOOLS",
       "key": "claudeCodeTools",
       "label": "Claude Code Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "autoMemoryTool",
+    "description": "Persistent long-term memory for the agent, shared by all workflows of a project deployment (or kept per integration instance for embedded integrations) and per environment. Not available in editor test runs.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Auto Memory Tool",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
