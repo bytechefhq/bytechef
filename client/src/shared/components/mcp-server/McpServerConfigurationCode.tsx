@@ -1,3 +1,4 @@
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import {Card} from '@/components/ui/card';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -8,6 +9,7 @@ import {twMerge} from 'tailwind-merge';
 const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: string; onRefresh: () => void}) => {
     const [copied, setCopied] = useState(false);
     const [refreshed, setRefreshed] = useState(false);
+    const [showRefreshDialog, setShowRefreshDialog] = useState(false);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(codeSnippet);
@@ -17,7 +19,8 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleRefresh = () => {
+    const handleRefreshConfirm = () => {
+        setShowRefreshDialog(false);
         setRefreshed(true);
 
         setTimeout(() => setRefreshed(false), 300);
@@ -46,13 +49,23 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <button className="rounded p-1 hover:bg-muted" disabled={refreshed} onClick={handleRefresh}>
+                    <button
+                        aria-label="Regenerate server URL"
+                        className="rounded p-1 hover:bg-muted"
+                        disabled={refreshed}
+                        onClick={() => setShowRefreshDialog(true)}
+                    >
                         <RefreshCwIcon
                             className={twMerge('size-4 text-muted-foreground', refreshed && 'animate-spin')}
                         />
                     </button>
 
-                    <button className="rounded p-1 hover:bg-muted" disabled={refreshed} onClick={handleCopy}>
+                    <button
+                        aria-label="Copy server URL"
+                        className="rounded p-1 hover:bg-muted"
+                        disabled={refreshed}
+                        onClick={handleCopy}
+                    >
                         {copied ? (
                             <CheckIcon className="size-4" />
                         ) : (
@@ -67,6 +80,15 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
                     <code className="font-mono text-sm leading-relaxed text-foreground">{codeSnippet}</code>
                 </div>
             </pre>
+
+            <AlertDialog
+                confirmLabel="Regenerate"
+                description="The current URL stops working immediately. Every application that uses it must be updated with the new URL."
+                onCancel={() => setShowRefreshDialog(false)}
+                onConfirm={handleRefreshConfirm}
+                open={showRefreshDialog}
+                title="Regenerate server URL?"
+            />
         </Card>
     );
 };
