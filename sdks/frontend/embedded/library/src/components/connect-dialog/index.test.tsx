@@ -2,6 +2,7 @@ import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import {renderHook, act} from '@testing-library/react';
 import useConnectDialog from './index';
 import {createRoot} from 'react-dom/client';
+import useOAuth2 from './useOAuth2';
 
 vi.mock('react-dom/client', () => ({
     createRoot: vi.fn(() => ({
@@ -188,6 +189,45 @@ describe('useConnectDialog - Dialog State Management', () => {
         act(() => result.current.closeDialog());
 
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('closes the dialog through the latest onClose after the host re-renders with a new one', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({id: 'integration'}),
+        });
+
+        vi.mocked(useOAuth2).mockReturnValue({getAuth: vi.fn()});
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const firstOnClose = vi.fn();
+        const secondOnClose = vi.fn();
+
+        try {
+            const {rerender, result} = renderHook(
+                ({onClose}) => useConnectDialog({...defaultConnectDialogProps, onClose}),
+                {initialProps: {onClose: firstOnClose}}
+            );
+
+            await act(async () => result.current.openDialog());
+
+            rerender({onClose: secondOnClose});
+
+            const lastRenderCall = renderMock.mock.calls[renderMock.mock.calls.length - 1];
+
+            act(() => lastRenderCall[0].props.closeDialog());
+
+            expect(secondOnClose).toHaveBeenCalledTimes(1);
+            expect(firstOnClose).not.toHaveBeenCalled();
+        } finally {
+            vi.mocked(useOAuth2).mockReset();
+        }
     });
 
     it('keeps the dialog open with the load error when the integration fails to load', async () => {
