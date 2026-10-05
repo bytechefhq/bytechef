@@ -16,6 +16,8 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.EncryptionImpl;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
@@ -44,7 +46,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 @EnableAutoConfiguration
 @Import({
-    JacksonConfiguration.class, LiquibaseConfiguration.class, McpComponentServiceImpl.class,
+    EncryptionImpl.class, JacksonConfiguration.class, LiquibaseConfiguration.class, McpComponentServiceImpl.class,
     McpServerServiceImpl.class, McpToolServiceImpl.class
 })
 @Configuration
@@ -75,6 +77,11 @@ public class ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration {
             applicationProperties, List.of(componentHandler), List::of, List.of());
 
         return new ClusterElementDefinitionServiceImpl(componentDefinitionRegistry, null);
+    }
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
     }
 
     @Bean
