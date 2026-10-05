@@ -37,12 +37,11 @@ const McpServerTabs = ({
     toolsContent,
     workflowDialog: WorkflowDialog,
 }: McpServerTabsProps) => {
-    const [activeTab, setActiveTab] = useState('tools');
-    const [activeToolsTab, setActiveToolsTab] = useState<McpServerToolsTabType>('components');
+    const [activeTab, setActiveTab] = useState<McpServerToolsTabType | 'connect'>('components');
     const [showMcpComponentDialog, setShowMcpComponentDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
-    const isComponentsTab = activeToolsTab === 'components';
+    const isComponentsTab = activeTab === 'components';
 
     const handleAddClick = () => {
         if (isComponentsTab) {
@@ -54,40 +53,35 @@ const McpServerTabs = ({
 
     return (
         <>
-            <Tabs onValueChange={setActiveTab} value={activeTab}>
-                <TabsList>
-                    <TabsTrigger value="tools">Tools</TabsTrigger>
+            <Tabs onValueChange={(value) => setActiveTab(value as McpServerToolsTabType | 'connect')} value={activeTab}>
+                <div className="flex items-center justify-between">
+                    <TabsList>
+                        <TabsTrigger value="components">Components</TabsTrigger>
 
-                    <TabsTrigger value="connect">Connect</TabsTrigger>
-                </TabsList>
+                        <TabsTrigger value="workflows">Workflows</TabsTrigger>
 
-                <TabsContent className="flex flex-col gap-3 pt-2" value="tools">
-                    <div className="flex items-center justify-between">
-                        <Tabs
-                            onValueChange={(value) => setActiveToolsTab(value as McpServerToolsTabType)}
-                            value={activeToolsTab}
-                        >
-                            <TabsList aria-label="Tool type">
-                                <TabsTrigger value="components">Components</TabsTrigger>
+                        <TabsTrigger value="connect">Connect</TabsTrigger>
+                    </TabsList>
 
-                                <TabsTrigger value="workflows">Workflows</TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-
+                    {activeTab !== 'connect' && (
                         <Button
                             label={isComponentsTab ? 'Add Component' : 'Add Workflows'}
                             onClick={handleAddClick}
                             size="sm"
                             variant="secondary"
                         />
-                    </div>
+                    )}
+                </div>
 
-                    {toolsContent({
-                        activeToolsTab,
-                        onAddComponentClick: () => setShowMcpComponentDialog(true),
-                        onAddWorkflowsClick: () => setShowWorkflowDialog(true),
-                    })}
-                </TabsContent>
+                {(['components', 'workflows'] as const).map((toolsTab) => (
+                    <TabsContent className="pt-2" key={toolsTab} value={toolsTab}>
+                        {toolsContent({
+                            activeToolsTab: toolsTab,
+                            onAddComponentClick: () => setShowMcpComponentDialog(true),
+                            onAddWorkflowsClick: () => setShowWorkflowDialog(true),
+                        })}
+                    </TabsContent>
+                ))}
 
                 <TabsContent className="max-w-(--breakpoint-lg) pt-3" value="connect">
                     {connectContent}
