@@ -30,9 +30,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Deletes an MCP tool that a connected user's integration instance has enabled, which used to fail with
- * {@code fk_mcp_integration_instance_tool_mcp_tool}.
- *
  * @version ee
  *
  * @author Ivica Cardic

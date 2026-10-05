@@ -17,10 +17,6 @@ import org.springframework.data.relational.core.mapping.event.Identifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Removes the per-integration-instance enablement rows of an MCP tool before the tool itself is deleted, so deleting a
- * tool, its component, or replacing a component's tools does not violate the
- * {@code fk_mcp_integration_instance_tool_mcp_tool} constraint.
- *
  * @version ee
  *
  * @author Ivica Cardic
