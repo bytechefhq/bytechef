@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Panel} from '@xyflow/react';
 import {AlertTriangleIcon} from 'lucide-react';
-import {ReactNode, useCallback} from 'react';
+import {ReactNode, useCallback, useLayoutEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import useFlowCenterOffset from '../hooks/useFlowCenterOffset';
@@ -15,11 +15,35 @@ interface WorkflowIssuesNoteProps {
 }
 
 const WorkflowIssuesNote = ({fallback}: WorkflowIssuesNoteProps) => {
+    const [noteWidth, setNoteWidth] = useState(0);
+
+    const noteRef = useRef<HTMLDivElement>(null);
+
     const readOnly = useWorkflowEditorReadOnly();
-    const flowCenterOffset = useFlowCenterOffset();
+    const flowCenterOffset = useFlowCenterOffset(noteWidth);
     const issues = useWorkflowIssues();
 
+    const showsNote = !readOnly && issues.length > 0;
+
     const handleViewClick = useCallback(() => openIssuesSidebar(), []);
+
+    useLayoutEffect(() => {
+        const noteElement = noteRef.current;
+
+        if (!showsNote || !noteElement) {
+            return;
+        }
+
+        const updateNoteWidth = () => setNoteWidth(noteElement.offsetWidth);
+
+        updateNoteWidth();
+
+        const resizeObserver = new ResizeObserver(updateNoteWidth);
+
+        resizeObserver.observe(noteElement);
+
+        return () => resizeObserver.disconnect();
+    }, [showsNote]);
 
     if (readOnly) {
         return null;
@@ -45,6 +69,7 @@ const WorkflowIssuesNote = ({fallback}: WorkflowIssuesNoteProps) => {
                         ? 'border-stroke-destructive-secondary bg-surface-destructive-secondary'
                         : 'border-stroke-warning-secondary bg-surface-warning-secondary'
                 )}
+                ref={noteRef}
             >
                 <AlertTriangleIcon
                     className={twMerge(

@@ -1,5 +1,7 @@
 import useFlowCenterOffset from '@/pages/platform/workflow-editor/hooks/useFlowCenterOffset';
 import useLayoutDirectionStore from '@/pages/platform/workflow-editor/stores/useLayoutDirectionStore';
+import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -48,6 +50,8 @@ describe('useFlowCenterOffset', () => {
         vi.clearAllMocks();
 
         useLayoutDirectionStore.setState({layoutDirection: 'TB'});
+        useWorkflowIssuesStore.setState({issuesSidebarOpen: false});
+        useWorkflowNodeDetailsPanelStore.setState({workflowNodeDetailsPanelOpen: false});
     });
 
     it('is zero before the flow has a container', () => {
@@ -107,5 +111,78 @@ describe('useFlowCenterOffset', () => {
         const {result} = renderHook(() => useFlowCenterOffset());
 
         expect(result.current).toBe(-50);
+    });
+
+    it('centers on the visible part of a row that overflows the container left to right', () => {
+        useLayoutDirectionStore.setState({layoutDirection: 'LR'});
+
+        mockStore(
+            createDomNode([
+                {left: 200, top: 100, width: 100},
+                {left: 2300, top: 100, width: 100},
+            ])
+        );
+
+        const {result} = renderHook(() => useFlowCenterOffset());
+
+        expect(result.current).toBe(100);
+    });
+
+    it('is zero when the flow is scrolled out of the container', () => {
+        mockStore(createDomNode([{left: 1200, top: 20, width: 100}]));
+
+        const {result} = renderHook(() => useFlowCenterOffset());
+
+        expect(result.current).toBe(0);
+    });
+
+    it('centers on the part of the row left uncovered by an open overlay panel', () => {
+        useLayoutDirectionStore.setState({layoutDirection: 'LR'});
+        useWorkflowIssuesStore.setState({issuesSidebarOpen: true});
+
+        mockStore(
+            createDomNode([
+                {left: 200, top: 100, width: 100},
+                {left: 2300, top: 100, width: 100},
+            ])
+        );
+
+        const {result} = renderHook(() => useFlowCenterOffset());
+
+        expect(result.current).toBe(-92);
+    });
+
+    it('falls back to the uncovered canvas center when the flow is hidden by an overlay panel', () => {
+        useWorkflowIssuesStore.setState({issuesSidebarOpen: true});
+
+        mockStore(createDomNode([{left: 700, top: 20, width: 100}]));
+
+        const {result} = renderHook(() => useFlowCenterOffset());
+
+        expect(result.current).toBe(-192);
+    });
+
+    it('keeps the whole note clear of an open overlay panel', () => {
+        useLayoutDirectionStore.setState({layoutDirection: 'LR'});
+        useWorkflowNodeDetailsPanelStore.setState({workflowNodeDetailsPanelOpen: true});
+
+        mockStore(
+            createDomNode([
+                {left: 200, top: 100, width: 100},
+                {left: 2300, top: 100, width: 100},
+            ])
+        );
+
+        const {result} = renderHook(() => useFlowCenterOffset(400));
+
+        expect(result.current).toBe(-160);
+    });
+
+    it('keeps the whole note inside the canvas left edge', () => {
+        mockStore(createDomNode([{left: 0, top: 20, width: 100}]));
+
+        const {result} = renderHook(() => useFlowCenterOffset(400));
+
+        expect(result.current).toBe(-300);
     });
 });
