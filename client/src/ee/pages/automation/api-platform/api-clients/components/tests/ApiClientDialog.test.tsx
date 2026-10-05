@@ -1,15 +1,22 @@
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {act, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ApiClientDialog from '../ApiClientDialog';
 
 const hoisted = vi.hoisted(() => ({
     createMutate: vi.fn(),
+    revealSecretKey: undefined as ((result: {secretKey?: string}) => void) | undefined,
     updateMutate: vi.fn(),
 }));
 
 vi.mock('@/shared/mutations/platform/apiClients.mutations', () => ({
-    useCreateApiClientMutation: () => ({mutate: hoisted.createMutate, reset: vi.fn()}),
+    // The dialog only reaches its reveal screen through the create mutation's onSuccess, so the mock hands that
+    // callback back to the test instead of discarding it.
+    useCreateApiClientMutation: (options: {onSuccess: (result: {secretKey?: string}) => void}) => {
+        hoisted.revealSecretKey = options.onSuccess;
+
+        return {mutate: hoisted.createMutate, reset: vi.fn()};
+    },
     useUpdateApiClientMutation: () => ({mutate: hoisted.updateMutate, reset: vi.fn()}),
 }));
 
@@ -61,6 +68,39 @@ describe('ApiClientDialog', () => {
             expect(screen.getByRole('heading', {name: 'Edit API Client'})).toBeInTheDocument();
             expect(screen.getByLabelText('Name')).toHaveValue('Existing');
             expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
+        });
+    });
+
+    // The secret is shown exactly once, and this screen was untested: a regression here loses the only copy the user
+    // will ever be offered.
+    describe('secret key reveal', () => {
+        const revealSecretKey = async (secretKey: string) => {
+            const onSuccess = hoisted.revealSecretKey;
+
+            if (!onSuccess) {
+                throw new Error('The create mutation never received an onSuccess handler.');
+            }
+
+            await act(async () => onSuccess({secretKey}));
+        };
+
+        it('should show the secret key once the client is created', async () => {
+            render(<ApiClientDialog onClose={onClose} />);
+
+            await revealSecretKey('sk-created');
+
+            expect(screen.getByRole('heading', {name: 'Save your secret API key'})).toBeInTheDocument();
+            expect(screen.getByDisplayValue('sk-created')).toBeInTheDocument();
+        });
+
+        it('should swap the actions for a single Done control', async () => {
+            render(<ApiClientDialog onClose={onClose} />);
+
+            await revealSecretKey('sk-created');
+
+            expect(screen.getByRole('button', {name: 'Done'})).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Cancel'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Create API Client'})).not.toBeInTheDocument();
         });
     });
 

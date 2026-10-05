@@ -112,4 +112,21 @@ describe('ResponseEditor', () => {
             expect(screen.queryByText('Add Response')).not.toBeInTheDocument();
         });
     });
+
+    describe('edit dialog', () => {
+        // Only the add path was covered, so the editing half of the dialog title never ran.
+        it('should open with the edit title when a response row is clicked', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <FormHarness>
+                    <ResponseEditor onChange={onChange} responses={[response]} />
+                </FormHarness>
+            );
+
+            await user.click(screen.getByRole('button', {name: /200/}));
+
+            expect(await screen.findByText('Edit Response')).toBeInTheDocument();
+        });
+    });
 });
