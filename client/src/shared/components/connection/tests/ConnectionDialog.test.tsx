@@ -1,8 +1,10 @@
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {ReactNode} from 'react';
-import {beforeAll, describe, expect, it, vi} from 'vitest';
+import {ComponentProps, ReactNode} from 'react';
+import {MemoryRouter} from 'react-router-dom';
+import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
@@ -15,7 +17,7 @@ vi.mock('@/shared/queries/platform/oauth2.queries', () => ({
 }));
 
 vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () => ({
-    default: () => null,
+    default: () => <div data-testid="connection-properties" />,
 }));
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
@@ -50,18 +52,32 @@ const COMPONENT_DEFINITIONS = [
     {name: 'slack', title: 'Slack'},
 ];
 
-const renderDialog = () =>
+// The documentation link renders a react-router Link, so the harness needs a router even though nothing navigates.
+const renderDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = {}) =>
     render(
-        <ConnectionDialog
-            componentDefinitions={COMPONENT_DEFINITIONS as never}
-            connectionTagsQueryKey={['connectionTags']}
-            connectionsQueryKey={['connections']}
-            useCreateConnectionMutation={(() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never}
-            useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
-        />
+        <MemoryRouter>
+            <ConnectionDialog
+                componentDefinitions={COMPONENT_DEFINITIONS as never}
+                connectionTagsQueryKey={['connectionTags']}
+                connectionsQueryKey={['connections']}
+                useCreateConnectionMutation={
+                    (() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never
+                }
+                useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
+                {...props}
+            />
+        </MemoryRouter>
     );
 
 describe('ConnectionDialog', () => {
+    beforeEach(() => {
+        vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+            data: undefined,
+            error: null,
+            isLoading: false,
+        } as never);
+    });
+
     beforeAll(() => {
         Element.prototype.scrollIntoView = Element.prototype.scrollIntoView || vi.fn();
         Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || vi.fn();
@@ -97,5 +113,56 @@ describe('ConnectionDialog', () => {
         await user.click(await screen.findByRole('option', {name: 'ActiveCampaign'}));
 
         await waitFor(() => expect(componentLabel).not.toHaveClass('text-destructive'));
+    });
+
+    // Only the create path was exercised, so the whole edit branch of the header and body went unrun.
+    describe('edit mode', () => {
+        const connection = {
+            componentName: 'slack',
+            connectionVersion: 1,
+            id: 1,
+            name: 'Existing',
+        };
+
+        it('should title itself for editing', () => {
+            renderDialog({connection: connection as never});
+
+            expect(screen.getByRole('heading', {name: 'Edit Connection'})).toBeInTheDocument();
+        });
+
+        it('should drop the create-only description', () => {
+            renderDialog({connection: connection as never});
+
+            expect(
+                screen.queryByText('Create your connection to connect to the chosen service')
+            ).not.toBeInTheDocument();
+        });
+    });
+
+    it('should render the connection properties when the definition declares some', () => {
+        vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+            data: {properties: [{name: 'subdomain', type: 'STRING'}]},
+            error: null,
+            isLoading: false,
+        } as never);
+
+        renderDialog();
+
+        expect(screen.getByTestId('connection-properties')).toBeInTheDocument();
+    });
+
+    it('should offer a documentation link when the connection definition has one', () => {
+        vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+            data: {help: {learnMoreUrl: 'https://docs.example.com/slack'}},
+            error: null,
+            isLoading: false,
+        } as never);
+
+        renderDialog();
+
+        expect(screen.getByRole('link', {name: /Documentation/})).toHaveAttribute(
+            'href',
+            'https://docs.example.com/slack'
+        );
     });
 });

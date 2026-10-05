@@ -1,15 +1,22 @@
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {act, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import SigningKeyDialog from '../SigningKeyDialog';
 
 const hoisted = vi.hoisted(() => ({
     createMutate: vi.fn(),
+    revealPrivateKey: undefined as ((result: {privateKey?: string}) => void) | undefined,
     updateMutate: vi.fn(),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/signingKeys.mutations', () => ({
-    useCreateSigningKeyMutation: () => ({mutate: hoisted.createMutate, reset: vi.fn()}),
+    // The dialog only reaches its reveal screen through the create mutation's onSuccess, so the mock hands that
+    // callback back to the test instead of discarding it.
+    useCreateSigningKeyMutation: (options: {onSuccess: (result: {privateKey?: string}) => void}) => {
+        hoisted.revealPrivateKey = options.onSuccess;
+
+        return {mutate: hoisted.createMutate, reset: vi.fn()};
+    },
     useUpdateSigningKeyMutation: () => ({mutate: hoisted.updateMutate, reset: vi.fn()}),
 }));
 
@@ -61,6 +68,39 @@ describe('SigningKeyDialog', () => {
             expect(screen.getByRole('heading', {name: 'Edit Signing Key'})).toBeInTheDocument();
             expect(screen.getByLabelText('Name')).toHaveValue('Existing');
             expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
+        });
+    });
+
+    // The key is shown exactly once, and this screen was untested: a regression here loses the only copy the user
+    // will ever be offered.
+    describe('private key reveal', () => {
+        const revealPrivateKey = async (privateKey: string) => {
+            const onSuccess = hoisted.revealPrivateKey;
+
+            if (!onSuccess) {
+                throw new Error('The create mutation never received an onSuccess handler.');
+            }
+
+            await act(async () => onSuccess({privateKey}));
+        };
+
+        it('should show the private key once the signing key is created', async () => {
+            render(<SigningKeyDialog onClose={onClose} />);
+
+            await revealPrivateKey('-----BEGIN PRIVATE KEY-----');
+
+            expect(screen.getByRole('heading', {name: 'Save your private Signing Key'})).toBeInTheDocument();
+            expect(screen.getByDisplayValue('-----BEGIN PRIVATE KEY-----')).toBeInTheDocument();
+        });
+
+        it('should swap the actions for a single Done control', async () => {
+            render(<SigningKeyDialog onClose={onClose} />);
+
+            await revealPrivateKey('-----BEGIN PRIVATE KEY-----');
+
+            expect(screen.getByRole('button', {name: 'Done'})).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Cancel'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Create Signing Key'})).not.toBeInTheDocument();
         });
     });
 
