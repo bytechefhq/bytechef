@@ -3,9 +3,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import McpIntegrationInstanceConfigurationWorkflowDialog from '@/ee/pages/embedded/mcp-servers/components/McpIntegrationInstanceConfigurationWorkflowDialog';
 import McpServerDialog from '@/ee/pages/embedded/mcp-servers/components/McpServerDialog';
-import McpComponentDialog from '@/ee/pages/embedded/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItemDropdownMenu from '@/ee/pages/embedded/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
 import TagList from '@/shared/components/TagList';
 import {McpServer, Tag} from '@/shared/middleware/graphql';
@@ -30,12 +28,8 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
         mcpServerTagIds,
         setShowDeleteDialog,
         setShowEditDialog,
-        setShowMcpComponentDialog,
-        setShowWorkflowDialog,
         showDeleteDialog,
         showEditDialog,
-        showMcpComponentDialog,
-        showWorkflowDialog,
         toolsCollapsibleTriggerRef,
         updateMcpServerTagsMutation,
     } = useMcpServerListItem(mcpServer);
@@ -132,8 +126,6 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
 
                         <McpServerListItemDropdownMenu
                             mcpServer={mcpServer}
-                            onAddComponentClick={() => setShowMcpComponentDialog(true)}
-                            onAddWorkflowsClick={() => setShowWorkflowDialog(true)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
                         />
@@ -154,21 +146,6 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                     onOpenChange={setShowEditDialog}
                     open={showEditDialog}
                     triggerNode={<></>}
-                />
-            )}
-
-            {showMcpComponentDialog && (
-                <McpComponentDialog
-                    mcpServerId={mcpServer.id}
-                    onOpenChange={setShowMcpComponentDialog}
-                    open={showMcpComponentDialog}
-                />
-            )}
-
-            {showWorkflowDialog && (
-                <McpIntegrationInstanceConfigurationWorkflowDialog
-                    mcpServer={mcpServer}
-                    onClose={() => setShowWorkflowDialog(false)}
                 />
             )}
         </>

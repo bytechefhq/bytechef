@@ -13,16 +13,9 @@ interface McpServerListItemDropdownMenuProps {
     mcpServer: McpServer;
     onDeleteClick: () => void;
     onEditClick: () => void;
-    onAddComponentClick: () => void;
-    onAddWorkflowsClick: () => void;
 }
 
-const McpServerListItemDropdownMenu = ({
-    onAddComponentClick,
-    onAddWorkflowsClick,
-    onDeleteClick,
-    onEditClick,
-}: McpServerListItemDropdownMenuProps) => {
+const McpServerListItemDropdownMenu = ({onDeleteClick, onEditClick}: McpServerListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -30,12 +23,6 @@ const McpServerListItemDropdownMenu = ({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onAddComponentClick}>Add Component</DropdownMenuItem>
-
-                <DropdownMenuItem onClick={onAddWorkflowsClick}>Add Workflows</DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
                 <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
 
                 <DropdownMenuSeparator />
