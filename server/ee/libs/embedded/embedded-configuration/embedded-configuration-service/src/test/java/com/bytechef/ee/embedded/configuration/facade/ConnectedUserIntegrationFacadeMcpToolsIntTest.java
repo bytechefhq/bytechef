@@ -44,13 +44,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests how the connected-user integration facade builds the MCP tools shown in the embedded ConnectDialog.
- *
  * @version ee
  *
  * @author Ivica Cardic
  */
-class ConnectedUserIntegrationFacadeMcpToolsTest {
+class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService =
         mock(ClusterElementDefinitionService.class);
