@@ -58,16 +58,10 @@ public interface VectorStore {
             documents = documentTransformer.transform(documents);
         }
 
-        List<Map<String, Object>> metadataList = inputParameters.getList(
+        Map<String, Object> additionalMetadata = inputParameters.getMap(
             ADDITIONAL_METADATA, new TypeReference<>() {});
 
-        if (!metadataList.isEmpty()) {
-            Map<String, Object> additionalMetadata = new HashMap<>();
-
-            for (Map<String, Object> metadataEntry : metadataList) {
-                additionalMetadata.putAll(metadataEntry);
-            }
-
+        if (additionalMetadata != null && !additionalMetadata.isEmpty()) {
             documents = documents.stream()
                 .map(document -> {
                     Map<String, Object> mergedMetadata = new HashMap<>(document.getMetadata());
