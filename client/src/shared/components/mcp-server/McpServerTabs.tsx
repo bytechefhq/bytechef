@@ -44,6 +44,14 @@ const McpServerTabs = ({
 
     const isComponentsTab = activeToolsTab === 'components';
 
+    const handleAddClick = () => {
+        if (isComponentsTab) {
+            setShowMcpComponentDialog(true);
+        } else {
+            setShowWorkflowDialog(true);
+        }
+    };
+
     return (
         <>
             <Tabs onValueChange={setActiveTab} value={activeTab}>
@@ -69,9 +77,7 @@ const McpServerTabs = ({
 
                             <Button
                                 label={isComponentsTab ? 'Add Component' : 'Add Workflows'}
-                                onClick={() =>
-                                    isComponentsTab ? setShowMcpComponentDialog(true) : setShowWorkflowDialog(true)
-                                }
+                                onClick={handleAddClick}
                                 size="sm"
                                 variant="secondary"
                             />
