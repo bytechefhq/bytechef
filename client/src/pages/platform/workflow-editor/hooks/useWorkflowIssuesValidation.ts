@@ -23,8 +23,11 @@ export default function useWorkflowIssuesValidation(): void {
 
     useEffect(() => {
         clearLiveIssues();
+    }, [clearLiveIssues, workflow.definition]);
+
+    useEffect(() => {
         setValidatorIssues([]);
-    }, [clearLiveIssues, setValidatorIssues, workflow.definition]);
+    }, [setValidatorIssues, workflow.id]);
 
     useEffect(() => {
         if (!data) {
