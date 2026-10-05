@@ -1,12 +1,8 @@
-import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
-import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
-import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useReactFlow, useStoreApi} from '@xyflow/react';
 import {useCallback, useEffect, useRef} from 'react';
 
+import useOverlayPanelsState from '../hooks/useOverlayPanelsState';
 import {easeOutCubic} from '../utils/animateNodePositions';
 import {computeOverlayViewportOffset} from '../utils/overlayPanelViewport';
 
@@ -22,16 +18,17 @@ export default function useOverlayPanelsViewport({enabled}: UseOverlayPanelsView
     const pendingTimeoutRef = useRef<number | undefined>(undefined);
 
     const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
-    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
-    const issuesSidebarOpen = useWorkflowIssuesStore((state) => state.issuesSidebarOpen);
-    const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
-    const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
-    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
-        (state) => state.workflowNodeDetailsPanelOpen
-    );
 
     const storeApi = useStoreApi();
     const {setViewport} = useReactFlow();
+
+    const {
+        dataPillPanelOpen,
+        issuesSidebarOpen,
+        rightSidebarOpen,
+        workflowNodeDetailsPanelOpen,
+        workflowTestChatPanelOpen,
+    } = useOverlayPanelsState();
 
     const getViewportOffsetX = useCallback(() => appliedOffsetRef.current ?? 0, []);
 
