@@ -1,17 +1,41 @@
 import {McpServer} from '@/shared/middleware/graphql';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
-import {afterEach, beforeEach, describe, expect, it} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import McpServerTabs from '../McpServerTabs';
+import McpServerTabs, {McpServerComponentDialogProps, McpServerWorkflowDialogProps} from '../McpServerTabs';
+
+const FakeMcpComponentDialog = ({mcpServerId, onOpenChange}: McpServerComponentDialogProps) => (
+    <div role="dialog">
+        <span>Component dialog for {mcpServerId}</span>
+
+        <button onClick={() => onOpenChange(false)}>Close component dialog</button>
+    </div>
+);
+
+const FakeWorkflowDialog = ({mcpServer, onClose}: McpServerWorkflowDialogProps) => (
+    <div role="dialog">
+        <span>Workflow dialog for {mcpServer.name}</span>
+
+        <button onClick={onClose}>Close workflow dialog</button>
+    </div>
+);
 
 const renderTabs = () =>
     render(
         <McpServerTabs
             connectContent={<div>Connect content</div>}
-            mcpComponentDialog={() => null}
+            mcpComponentDialog={FakeMcpComponentDialog}
             mcpServer={{id: '1', name: 'mcpserver1'} as McpServer}
-            toolsContent={<div>Tools content</div>}
-            workflowDialog={() => null}
+            toolsContent={({activeToolsTab, onAddComponentClick, onAddWorkflowsClick}) => (
+                <div>
+                    <span>{`Showing ${activeToolsTab}`}</span>
+
+                    <button onClick={onAddComponentClick}>Empty state Add Component</button>
+
+                    <button onClick={onAddWorkflowsClick}>Empty state Add Workflows</button>
+                </div>
+            )}
+            workflowDialog={FakeWorkflowDialog}
         />
     );
 
@@ -21,31 +45,67 @@ beforeEach(() => {
 
 afterEach(() => {
     resetAll();
+    vi.clearAllMocks();
 });
 
 describe('McpServerTabs', () => {
-    it('opens on the Tools tab with the Add Component button', () => {
+    it('opens on the Components tool tab with an Add Component button', () => {
         renderTabs();
 
-        expect(screen.getByText('Tools content')).toBeInTheDocument();
+        expect(screen.getByText('Showing components')).toBeInTheDocument();
+        expect(screen.getByRole('tab', {name: 'Components', selected: true})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Add Component'})).toBeInTheDocument();
     });
 
-    it('hides the Add Component button on the Connect tab', async () => {
+    it('opens the component dialog from the Add Component button and closes it again', async () => {
+        renderTabs();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Add Component'}));
+
+        expect(screen.getByText('Component dialog for 1')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Close component dialog'}));
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('switches the button to Add Workflows on the Workflows tool tab', async () => {
+        renderTabs();
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Workflows'}));
+
+        expect(screen.getByText('Showing workflows')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Add Component'})).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Add Workflows'}));
+
+        expect(screen.getByText('Workflow dialog for mcpserver1')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Close workflow dialog'}));
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('lets the tools content open both dialogs', async () => {
+        renderTabs();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Empty state Add Component'}));
+
+        expect(screen.getByText('Component dialog for 1')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Close component dialog'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Empty state Add Workflows'}));
+
+        expect(screen.getByText('Workflow dialog for mcpserver1')).toBeInTheDocument();
+    });
+
+    it('hides the tool tabs and the Add button on the Connect tab', async () => {
         renderTabs();
 
         await userEvent.click(screen.getByRole('tab', {name: 'Connect'}));
 
         expect(screen.getByText('Connect content')).toBeInTheDocument();
+        expect(screen.queryByRole('tab', {name: 'Components'})).not.toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Add Component'})).not.toBeInTheDocument();
-    });
-
-    it('shows the Add Component button again when switching back to the Tools tab', async () => {
-        renderTabs();
-
-        await userEvent.click(screen.getByRole('tab', {name: 'Connect'}));
-        await userEvent.click(screen.getByRole('tab', {name: 'Tools'}));
-
-        expect(screen.getByRole('button', {name: 'Add Component'})).toBeInTheDocument();
     });
 });

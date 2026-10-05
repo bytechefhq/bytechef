@@ -11,8 +11,6 @@ import {useState} from 'react';
 const useMcpServerListItem = (mcpServer: McpServer) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
-    const [showMcpComponentDialog, setShowMcpComponentDialog] = useState(false);
-    const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [isEnablePending, setIsEnablePending] = useState(false);
 
@@ -85,12 +83,8 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
         mcpServerTagIds,
         setShowDeleteDialog,
         setShowEditDialog,
-        setShowMcpComponentDialog,
-        setShowWorkflowDialog,
         showDeleteDialog,
         showEditDialog,
-        showMcpComponentDialog,
-        showWorkflowDialog,
         toolsCollapsibleTriggerRef,
         updateMcpServerTagsMutation,
     };

@@ -120,11 +120,11 @@ describe.each(editions)(
             expect(screen.getByText(componentDialogLabel)).toBeInTheDocument();
         });
 
-        it('opens its own workflow dialog from the Tools tab Add Workflows menu item', async () => {
+        it('opens its own workflow dialog from the Workflows tab Add Workflows button', async () => {
             render(<McpServerList mcpServers={mcpServers} />);
 
-            await userEvent.click(screen.getByRole('button', {name: 'Add Tools'}));
-            await userEvent.click(screen.getByRole('menuitem', {name: 'Add Workflows'}));
+            await userEvent.click(screen.getByRole('tab', {name: 'Workflows'}));
+            await userEvent.click(screen.getByRole('button', {name: 'Add Workflows'}));
 
             expect(screen.getByText(workflowDialogLabel)).toBeInTheDocument();
         });
