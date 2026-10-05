@@ -10,23 +10,24 @@ package com.bytechef.ee.observability.autoconfigure;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.observability.aws.AwsHttpSender;
 import com.bytechef.ee.observability.aws.AwsSigV4Signer;
-import io.opentelemetry.api.metrics.MeterProvider;
-import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter;
-import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporterBuilder;
+import io.opentelemetry.common.ComponentLoader;
 import java.net.URI;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Supplier;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.opentelemetry.autoconfigure.logging.ConditionalOnEnabledLoggingExport;
+import org.springframework.boot.opentelemetry.autoconfigure.logging.otlp.OtlpHttpLogRecordExporterBuilderCustomizer;
 import org.springframework.boot.opentelemetry.autoconfigure.logging.otlp.OtlpLoggingAutoConfiguration;
+import org.springframework.boot.opentelemetry.autoconfigure.logging.otlp.OtlpLoggingConnectionDetails;
 import org.springframework.boot.opentelemetry.autoconfigure.logging.otlp.OtlpLoggingProperties;
+import org.springframework.boot.opentelemetry.autoconfigure.logging.otlp.Transport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -36,13 +37,13 @@ import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 
 /**
- * Replaces Spring Boot's {@link OtlpHttpLogRecordExporter} with one whose requests are signed with AWS Signature
- * Version 4, so logs can be sent straight to the CloudWatch OTLP endpoint without a collector or signing proxy.
+ * Makes Spring Boot's {@code OtlpHttpLogRecordExporter} sign its requests with AWS Signature Version 4, so logs can be
+ * sent straight to the CloudWatch OTLP endpoint without a collector or signing proxy.
  *
  * <p>
- * The exporter is built exactly like Spring Boot builds it, from {@code management.opentelemetry.logging.export.otlp.*}
- * properties; the only difference is the {@link AwsHttpSender} plugged in through the builder's component loader.
- * Running before {@link OtlpLoggingAutoConfiguration} makes its {@code @ConditionalOnMissingBean} exporter back off.
+ * The exporter stays the one Spring Boot builds from the {@code management.opentelemetry.logging.export.otlp.*}
+ * properties; the {@link OtlpHttpLogRecordExporterBuilderCustomizer} only plugs the {@link AwsHttpSender} in through
+ * the builder's component loader and adds the CloudWatch headers.
  *
  * <p>
  * Credentials come from the application's {@link AwsCredentialsProvider} bean when there is exactly one, otherwise from
@@ -57,37 +58,33 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
  *
  * @author Igor Beslic
  */
-@AutoConfiguration(before = OtlpLoggingAutoConfiguration.class)
+@AutoConfiguration(after = OtlpLoggingAutoConfiguration.class)
 @ConditionalOnBooleanProperty("bytechef.observability.logging.aws.enabled")
 @ConditionalOnClass({
-    AwsCredentialsProvider.class, OtlpHttpLogRecordExporter.class
+    AwsCredentialsProvider.class, OtlpHttpLogRecordExporterBuilderCustomizer.class
 })
 @ConditionalOnEnabledLoggingExport("otlp")
 @ConditionalOnProperty(
     name = "management.opentelemetry.logging.export.otlp.transport", havingValue = "http", matchIfMissing = true)
-@EnableConfigurationProperties(OtlpLoggingProperties.class)
 public class AwsOtlpLoggingAutoConfiguration {
 
     static final String LOG_GROUP_HEADER = "x-aws-log-group";
     static final String LOG_STREAM_HEADER = "x-aws-log-stream";
 
     @Bean
-    OtlpHttpLogRecordExporter awsOtlpHttpLogRecordExporter(
+    @ConditionalOnBean(OtlpLoggingConnectionDetails.class)
+    OtlpHttpLogRecordExporterBuilderCustomizer awsOtlpHttpLogRecordExporterBuilderCustomizer(
         ApplicationProperties applicationProperties, OtlpLoggingProperties otlpLoggingProperties,
-        ObjectProvider<AwsCredentialsProvider> awsCredentialsProviderObjectProvider,
-        ObjectProvider<MeterProvider> meterProviderObjectProvider) {
-
-        String endpoint = otlpLoggingProperties.getEndpoint();
-
-        Assert.state(
-            StringUtils.hasText(endpoint), "'management.opentelemetry.logging.export.otlp.endpoint' must be set");
+        OtlpLoggingConnectionDetails otlpLoggingConnectionDetails,
+        ObjectProvider<AwsCredentialsProvider> awsCredentialsProviderObjectProvider) {
 
         ApplicationProperties.Observability observability = applicationProperties.getObservability();
 
         ApplicationProperties.Observability.Logging.Aws aws = observability.getLogging()
             .getAws();
 
-        AwsSigV4Signer signer = new AwsSigV4Signer(resolveRegion(aws.getRegion(), endpoint), aws.getService());
+        AwsSigV4Signer signer = new AwsSigV4Signer(
+            resolveRegion(aws.getRegion(), otlpLoggingConnectionDetails.getUrl(Transport.HTTP)), aws.getService());
 
         AwsCredentialsProvider awsCredentialsProvider = awsCredentialsProviderObjectProvider.getIfUnique(
             () -> DefaultCredentialsProvider.builder()
@@ -96,46 +93,59 @@ public class AwsOtlpLoggingAutoConfiguration {
         Supplier<AwsSigV4Signer.Credentials> credentialsSupplier = () -> toCredentials(
             awsCredentialsProvider.resolveCredentials());
 
-        OtlpHttpLogRecordExporterBuilder builder = OtlpHttpLogRecordExporter.builder()
-            .setEndpoint(endpoint)
-            .setTimeout(otlpLoggingProperties.getTimeout())
-            .setConnectTimeout(otlpLoggingProperties.getConnectTimeout())
-            .setCompression(otlpLoggingProperties.getCompression()
-                .name()
-                .toLowerCase(Locale.US))
-            .setComponentLoader(AwsHttpSender.componentLoader(signer, credentialsSupplier));
+        ComponentLoader componentLoader = AwsHttpSender.componentLoader(signer, credentialsSupplier);
 
-        Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        // Resolved here, not in the customizer, so a missing value fails the startup
+        Map<String, String> otlpHeaders = otlpLoggingProperties.getHeaders();
 
-        headers.putAll(otlpLoggingProperties.getHeaders());
+        Optional<String> logGroup = resolveLogHeader(aws.getLogGroup(), otlpHeaders, LOG_GROUP_HEADER, "log-group");
+        Optional<String> logStream = resolveLogHeader(
+            aws.getLogStream(), otlpHeaders, LOG_STREAM_HEADER, "log-stream");
 
-        headers.put(LOG_GROUP_HEADER, resolveLogHeader(aws.getLogGroup(), headers, LOG_GROUP_HEADER, "log-group"));
-        headers.put(
-            LOG_STREAM_HEADER, resolveLogHeader(aws.getLogStream(), headers, LOG_STREAM_HEADER, "log-stream"));
+        return builder -> {
+            builder.setComponentLoader(componentLoader);
 
-        headers.forEach(builder::addHeader);
-
-        meterProviderObjectProvider.ifAvailable(builder::setMeterProvider);
-
-        return builder.build();
+            logGroup.ifPresent(value -> builder.addHeader(LOG_GROUP_HEADER, value));
+            logStream.ifPresent(value -> builder.addHeader(LOG_STREAM_HEADER, value));
+        };
     }
 
     /**
+     * Returns the header value to add to the exporter, or empty when the header is already one of the
+     * {@code management.opentelemetry.logging.export.otlp.headers}, which Spring Boot adds itself.
+     *
+     * <p>
      * CloudWatch rejects every request without the log group and log stream headers with HTTP 400, so a missing value
-     * fails the startup instead of every export.
+     * fails the startup instead of every export. A value configured in both places must be the same: sending the header
+     * twice would break the request signature.
      */
-    static String resolveLogHeader(
-        String propertyValue, Map<String, String> headers, String headerName, String propertyName) {
+    static Optional<String> resolveLogHeader(
+        String propertyValue, Map<String, String> otlpHeaders, String headerName, String propertyName) {
 
-        String value = StringUtils.hasText(propertyValue) ? propertyValue : headers.get(headerName);
+        Map<String, String> caseInsensitiveOtlpHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        caseInsensitiveOtlpHeaders.putAll(otlpHeaders);
+
+        String otlpHeaderValue = caseInsensitiveOtlpHeaders.get(headerName);
+
+        String property = "'bytechef.observability.logging.aws." + propertyName + "'";
+
+        if (StringUtils.hasText(otlpHeaderValue)) {
+            Assert.state(
+                !StringUtils.hasText(propertyValue) || otlpHeaderValue.trim()
+                    .equals(propertyValue.trim()),
+                property + " and the 'management.opentelemetry.logging.export.otlp.headers." + headerName +
+                    "' header have different values, set only one of them");
+
+            return Optional.empty();
+        }
 
         Assert.state(
-            StringUtils.hasText(value),
-            "'bytechef.observability.logging.aws." + propertyName + "' must be set when " +
-                "'bytechef.observability.logging.aws.enabled' is true, CloudWatch requires the " + headerName +
-                " request header");
+            StringUtils.hasText(propertyValue),
+            property + " must be set when 'bytechef.observability.logging.aws.enabled' is true, CloudWatch requires " +
+                "the " + headerName + " request header");
 
-        return value.trim();
+        return Optional.of(propertyValue.trim());
     }
 
     static String resolveRegion(String region, String endpoint) {
