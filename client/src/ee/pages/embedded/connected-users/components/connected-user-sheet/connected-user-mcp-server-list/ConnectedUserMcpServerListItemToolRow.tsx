@@ -1,5 +1,5 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import {Switch} from '@/components/ui/switch';
+import Switch from '@/components/Switch/Switch';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserMcpServerTool, useEnableConnectedUserMcpToolMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
