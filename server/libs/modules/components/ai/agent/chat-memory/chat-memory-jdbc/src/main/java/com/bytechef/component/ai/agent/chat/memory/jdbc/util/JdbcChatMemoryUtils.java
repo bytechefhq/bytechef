@@ -30,6 +30,9 @@ import com.bytechef.platform.component.definition.ai.agent.DataSourceFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +46,9 @@ import org.springframework.ai.chat.memory.repository.jdbc.MysqlChatMemoryReposit
 import org.springframework.ai.chat.memory.repository.jdbc.OracleChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.memory.repository.jdbc.SqlServerChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -58,12 +63,18 @@ public class JdbcChatMemoryUtils {
     }
 
     public static ChatMemoryRepository getChatMemoryRepository(
-        Parameters extensions, Map<String, ComponentConnection> componentConnections,
+        Parameters inputParameters, Parameters extensions, Map<String, ComponentConnection> componentConnections,
         ClusterElementDefinitionService clusterElementDefinitionService) throws Exception {
 
         DataSource dataSource = getDataSource(extensions, componentConnections, clusterElementDefinitionService);
 
-        initializeSchema(dataSource);
+        return createChatMemoryRepository(dataSource, JdbcChatMemoryTable.of(inputParameters));
+    }
+
+    private static ChatMemoryRepository createChatMemoryRepository(
+        DataSource dataSource, JdbcChatMemoryTable chatMemoryTable) {
+
+        initializeSchema(dataSource, chatMemoryTable);
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
@@ -71,11 +82,14 @@ public class JdbcChatMemoryUtils {
 
         ChatMemoryRepository delegate = JdbcChatMemoryRepository.builder()
             .jdbcTemplate(jdbcTemplate)
-            .dialect(dialect)
+            .dialect(
+                chatMemoryTable.isDefault()
+                    ? dialect : new TableAwareChatMemoryRepositoryDialect(dialect, chatMemoryTable))
             .build();
 
         return new OrderedJdbcChatMemoryRepository(
-            delegate, jdbcTemplate, getSelectConversationIdsOrderedSql(dialect));
+            delegate, jdbcTemplate,
+            chatMemoryTable.rewriteSql(getSelectConversationIdsOrderedSql(dialect)));
     }
 
     public static String getSelectConversationIdsOrderedSql(JdbcChatMemoryRepositoryDialect dialect) {
@@ -92,10 +106,24 @@ public class JdbcChatMemoryUtils {
         return "SELECT conversation_id FROM SPRING_AI_CHAT_MEMORY GROUP BY conversation_id ORDER BY MAX(\"timestamp\") DESC";
     }
 
-    private static void initializeSchema(DataSource dataSource) {
-        String schemaScript = resolveSchemaScript(dataSource);
+    private static void initializeSchema(DataSource dataSource, JdbcChatMemoryTable chatMemoryTable) {
+        ClassPathResource schemaScriptResource = new ClassPathResource(resolveSchemaScript(dataSource));
 
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(new ClassPathResource(schemaScript));
+        Resource resource = schemaScriptResource;
+
+        if (!chatMemoryTable.isDefault()) {
+            try {
+                String schemaScript = schemaScriptResource.getContentAsString(StandardCharsets.UTF_8);
+
+                resource = new ByteArrayResource(
+                    chatMemoryTable.rewriteSchemaScript(schemaScript)
+                        .getBytes(StandardCharsets.UTF_8));
+            } catch (IOException ioException) {
+                throw new UncheckedIOException(ioException);
+            }
+        }
+
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(resource);
 
         populator.setContinueOnError(true);
 
@@ -161,17 +189,8 @@ public class JdbcChatMemoryUtils {
                 return List.of();
             }
 
-            initializeSchema(dataSource);
-
-            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-            JdbcChatMemoryRepositoryDialect dialect = JdbcChatMemoryRepositoryDialect.from(dataSource);
-            JdbcChatMemoryRepository jdbcChatMemoryRepository = JdbcChatMemoryRepository.builder()
-                .jdbcTemplate(jdbcTemplate)
-                .dialect(dialect)
-                .build();
-
-            ChatMemoryRepository chatMemoryRepository = new OrderedJdbcChatMemoryRepository(
-                jdbcChatMemoryRepository, jdbcTemplate, getSelectConversationIdsOrderedSql(dialect));
+            ChatMemoryRepository chatMemoryRepository = createChatMemoryRepository(
+                dataSource, JdbcChatMemoryTable.of(inputParameters));
 
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
@@ -192,7 +211,7 @@ public class JdbcChatMemoryUtils {
         getFirstMessages(ClusterElementDefinitionService clusterElementDefinitionService) {
         return (inputParameters, componentConnections, extensions, context) -> {
             ChatMemoryRepository chatMemoryRepository = getChatMemoryRepository(
-                extensions, componentConnections, clusterElementDefinitionService);
+                inputParameters, extensions, componentConnections, clusterElementDefinitionService);
 
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
 
