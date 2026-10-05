@@ -13,7 +13,7 @@ import {
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
-import {Node, NodeChange, XYPosition, useReactFlow} from '@xyflow/react';
+import {Node, NodeChange, XYPosition} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -22,6 +22,7 @@ import PlaceholderEdge from '../edges/PlaceholderEdge';
 import RoundedSmoothStepEdge from '../edges/RoundedSmoothStepEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
+import useInitialViewport from '../hooks/useInitialViewport';
 import useLayout from '../hooks/useLayout';
 import useOverlayPanelsViewport from '../hooks/useOverlayPanelsViewport';
 import useStickyNotes from '../hooks/useStickyNotes';
@@ -45,7 +46,6 @@ import {
     buildDraggingPlaceholderState,
     computePlaceholderDragPosition,
 } from '../utils/dragTrailingPlaceholder';
-import getInitialViewportPosition from '../utils/getInitialViewportPosition';
 import {extractLayoutDirection} from '../utils/layoutDirectionDefinitionUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
 import saveWorkflowNodesPosition from '../utils/saveWorkflowNodesPosition';
@@ -97,8 +97,6 @@ const useWorkflowEditorCanvas = ({
         );
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const resetWorkflowLayout = useWorkflowEditorStore((state) => state.resetWorkflowLayout);
-
-    const {setViewport} = useReactFlow();
 
     const {invalidateWorkflowQueries: editorInvalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
@@ -461,28 +459,10 @@ const useWorkflowEditorCanvas = ({
         if (workflowUuid && !readOnlyWorkflow) {
             setCurrentWorkflowUuid(workflowUuid, extractLayoutDirection(workflow.definition));
         }
-
-        if (fitViewOnLoad) {
-            return;
-        }
-
-        const {x, y} = getInitialViewportPosition({
-            layoutDirection: useLayoutDirectionStore.getState().layoutDirection,
-            offsetX: getViewportOffsetX(),
-        });
-
-        setViewport(
-            {
-                x,
-                y,
-                zoom: 1,
-            },
-            {
-                duration: 500,
-            }
-        );
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowUuid]);
+
+    useInitialViewport({canvasHeight, enabled: !fitViewOnLoad, getViewportOffsetX, workflowUuid});
 
     return {
         edgeTypes,
