@@ -3,15 +3,11 @@ import useMcpProjectList from '@/pages/automation/mcp-servers/components/mcp-pro
 import {McpServerToolsContentProps} from '@/shared/components/mcp-server/McpServerTabs';
 import McpServerToolsPanel from '@/shared/components/mcp-server/McpServerToolsPanel';
 import {McpActivePopoverProvider} from '@/shared/contexts/McpActivePopoverContext';
-import {McpServer} from '@/shared/middleware/graphql';
 
 import McpComponentList from '../mcp-component-list/McpComponentList';
 import McpProjectList from '../mcp-project-workflow-list/McpProjectList';
 
-const McpServerToolsContent = ({
-    mcpServer,
-    ...toolsContentProps
-}: McpServerToolsContentProps & {mcpServer: McpServer}) => {
+const McpServerToolsContent = ({mcpServer, ...toolsContentProps}: McpServerToolsContentProps) => {
     const {data: componentData, isMcpComponentsLoading} = useMcpComponentList(mcpServer.id!);
     const {isLoading: isProjectsLoading, mcpProjects} = useMcpProjectList(mcpServer.id!);
 

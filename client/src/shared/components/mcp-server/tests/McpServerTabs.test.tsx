@@ -2,7 +2,11 @@ import {McpServer} from '@/shared/middleware/graphql';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import McpServerTabs, {McpServerComponentDialogProps, McpServerWorkflowDialogProps} from '../McpServerTabs';
+import McpServerTabs, {
+    McpServerComponentDialogProps,
+    McpServerToolsContentProps,
+    McpServerWorkflowDialogProps,
+} from '../McpServerTabs';
 
 const FakeMcpComponentDialog = ({mcpServerId, onOpenChange}: McpServerComponentDialogProps) => (
     <div role="dialog">
@@ -20,21 +24,23 @@ const FakeWorkflowDialog = ({mcpServer, onClose}: McpServerWorkflowDialogProps) 
     </div>
 );
 
+const FakeToolsContent = ({activeToolsTab, onAddComponentClick, onAddWorkflowsClick}: McpServerToolsContentProps) => (
+    <div>
+        <span>{`Showing ${activeToolsTab}`}</span>
+
+        <button onClick={onAddComponentClick}>Empty state Add Component</button>
+
+        <button onClick={onAddWorkflowsClick}>Empty state Add Workflows</button>
+    </div>
+);
+
 const renderTabs = () =>
     render(
         <McpServerTabs
             connectContent={<div>Connect content</div>}
             mcpComponentDialog={FakeMcpComponentDialog}
             mcpServer={{id: '1', name: 'mcpserver1'} as McpServer}
-            toolsContent={({activeToolsTab, onAddComponentClick, onAddWorkflowsClick}) => (
-                <div>
-                    <span>{`Showing ${activeToolsTab}`}</span>
-
-                    <button onClick={onAddComponentClick}>Empty state Add Component</button>
-
-                    <button onClick={onAddWorkflowsClick}>Empty state Add Workflows</button>
-                </div>
-            )}
+            toolsContent={FakeToolsContent}
             workflowDialog={FakeWorkflowDialog}
         />
     );

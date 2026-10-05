@@ -69,9 +69,7 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                             key={mcpServer.id}
                             mcpComponentDialog={McpComponentDialog}
                             mcpServer={mcpServer}
-                            toolsContent={(toolsContentProps) => (
-                                <McpServerToolsContent mcpServer={mcpServer} {...toolsContentProps} />
-                            )}
+                            toolsContent={McpServerToolsContent}
                             workflowDialog={McpIntegrationInstanceConfigurationWorkflowDialog}
                         />
                     );

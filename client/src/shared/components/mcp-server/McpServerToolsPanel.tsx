@@ -5,7 +5,7 @@ import {ReactNode} from 'react';
 
 import {McpServerToolsContentProps} from './McpServerTabs';
 
-interface McpServerToolsPanelProps extends McpServerToolsContentProps {
+interface McpServerToolsPanelProps extends Omit<McpServerToolsContentProps, 'mcpServer'> {
     componentList: ReactNode;
     isComponentListEmpty: boolean;
     isWorkflowListEmpty: boolean;
