@@ -13,10 +13,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.bytechef.config.ApplicationProperties;
 import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter;
 import java.util.Map;
-import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.opentelemetry.autoconfigure.logging.otlp.OtlpHttpLogRecordExporterBuilderCustomizer;
 import org.springframework.boot.opentelemetry.autoconfigure.logging.otlp.OtlpLoggingAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
@@ -40,17 +40,18 @@ class AwsOtlpLoggingAutoConfigurationTest {
             "management.opentelemetry.logging.export.otlp.endpoint=https://logs.eu-central-1.amazonaws.com/v1/logs");
 
     @Test
-    void testAwsExporterReplacesSpringBootExporter() {
+    void testSpringBootExporterIsCustomizedWithAwsSenderAndLogHeaders() {
         applicationContextRunner.withPropertyValues(
             "bytechef.observability.logging.aws.enabled=true", "bytechef.observability.logging.aws.log-group=bytechef",
             "bytechef.observability.logging.aws.log-stream=server-app")
             .run(context -> {
                 assertThat(context).hasSingleBean(OtlpHttpLogRecordExporter.class)
-                    .hasBean("awsOtlpHttpLogRecordExporter");
+                    .hasBean("otlpHttpLogRecordExporter")
+                    .hasSingleBean(OtlpHttpLogRecordExporterBuilderCustomizer.class);
 
-                // the exporter prints its header names, the values are obfuscated
+                // the exporter prints its component loader and header names, the header values are obfuscated
                 assertThat(context.getBean(OtlpHttpLogRecordExporter.class)
-                    .toString()).contains("x-aws-log-group=", "x-aws-log-stream=");
+                    .toString()).contains("AwsHttpSender", "x-aws-log-group=", "x-aws-log-stream=");
             });
     }
 
@@ -81,37 +82,48 @@ class AwsOtlpLoggingAutoConfigurationTest {
             "bytechef.observability.logging.aws.enabled=true",
             "management.opentelemetry.logging.export.otlp.headers.X-Aws-Log-Group=bytechef",
             "management.opentelemetry.logging.export.otlp.headers.X-Aws-Log-Stream=server-app")
-            .run(context -> assertThat(context).hasSingleBean(OtlpHttpLogRecordExporter.class)
-                .hasBean("awsOtlpHttpLogRecordExporter"));
+            .run(context -> assertThat(context.getBean(OtlpHttpLogRecordExporter.class)
+                .toString()).contains("AwsHttpSender", "X-Aws-Log-Group=", "X-Aws-Log-Stream=")
+                    .doesNotContain("x-aws-log-group=", "x-aws-log-stream="));
     }
 
     @Test
-    void testResolveLogHeaderPrefersProperty() {
-        Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-
-        headers.put("X-AWS-LOG-GROUP", "from-header");
-
+    void testResolveLogHeader() {
         assertThat(AwsOtlpLoggingAutoConfiguration.resolveLogHeader(
-            " from-property ", headers, AwsOtlpLoggingAutoConfiguration.LOG_GROUP_HEADER, "log-group"))
-                .isEqualTo("from-property");
+            " from-property ", Map.of(), AwsOtlpLoggingAutoConfiguration.LOG_GROUP_HEADER, "log-group"))
+                .contains("from-property");
+
+        Map<String, String> otlpHeaders = Map.of("X-AWS-LOG-GROUP", "from-header");
+
+        // already added by Spring Boot, adding it again would send the header twice
         assertThat(AwsOtlpLoggingAutoConfiguration.resolveLogHeader(
-            null, headers, AwsOtlpLoggingAutoConfiguration.LOG_GROUP_HEADER, "log-group")).isEqualTo("from-header");
+            null, otlpHeaders, AwsOtlpLoggingAutoConfiguration.LOG_GROUP_HEADER, "log-group")).isEmpty();
+        assertThat(AwsOtlpLoggingAutoConfiguration.resolveLogHeader(
+            "from-header", otlpHeaders, AwsOtlpLoggingAutoConfiguration.LOG_GROUP_HEADER, "log-group")).isEmpty();
+        assertThatThrownBy(() -> AwsOtlpLoggingAutoConfiguration.resolveLogHeader(
+            "from-property", otlpHeaders, AwsOtlpLoggingAutoConfiguration.LOG_GROUP_HEADER, "log-group"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("set only one of them");
     }
 
     @Test
-    void testSpringBootExporterIsUsedWhenAwsIsDisabled() {
+    void testSpringBootExporterIsNotCustomizedWhenAwsIsDisabled() {
         applicationContextRunner.run(context -> {
             assertThat(context).hasSingleBean(OtlpHttpLogRecordExporter.class)
-                .doesNotHaveBean("awsOtlpHttpLogRecordExporter");
+                .doesNotHaveBean(OtlpHttpLogRecordExporterBuilderCustomizer.class);
+
+            assertThat(context.getBean(OtlpHttpLogRecordExporter.class)
+                .toString()).doesNotContain("AwsHttpSender", "x-aws-log-group");
         });
     }
 
     @Test
     void testNoExporterWhenLoggingExportIsDisabled() {
         applicationContextRunner.withPropertyValues(
-            "bytechef.observability.logging.aws.enabled=true", "bytechef.observability.logging.aws.log-group=bytechef",
-            "bytechef.observability.logging.aws.log-stream=server-app", "management.logging.export.enabled=false")
-            .run(context -> assertThat(context).doesNotHaveBean(OtlpHttpLogRecordExporter.class));
+            "bytechef.observability.logging.aws.enabled=true", "management.logging.export.enabled=false")
+            .run(context -> assertThat(context).hasNotFailed()
+                .doesNotHaveBean(OtlpHttpLogRecordExporter.class)
+                .doesNotHaveBean(OtlpHttpLogRecordExporterBuilderCustomizer.class));
     }
 
     @Test
