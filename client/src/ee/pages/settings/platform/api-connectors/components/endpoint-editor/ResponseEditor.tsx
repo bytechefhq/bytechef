@@ -11,15 +11,11 @@ import {
 import {Input} from '@/components/Input/Input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {PlusIcon, Trash2Icon} from 'lucide-react';
-
-const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
-
-import {Suspense, lazy} from 'react';
 
 import {ResponseDefinitionI} from '../../types/api-connector-wizard.types';
 import {getStatusCodeColor} from '../../utils/endpointEditor-utils';
+import JsonSchemaFormField from './JsonSchemaFormField';
 import useResponseEditor from './hooks/useResponseEditor';
 
 interface ResponseEditorProps {
@@ -201,40 +197,7 @@ const ResponseEditor = ({onChange, responses}: ResponseEditorProps) => {
                                     rules={{required: 'Description is required'}}
                                 />
 
-                                <FormField
-                                    control={control}
-                                    name="schema"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>JSON Schema (optional)</FormLabel>
-
-                                            <FormControl>
-                                                <div className="h-48 overflow-hidden rounded-md border">
-                                                    <Suspense fallback={<MonacoEditorLoader />}>
-                                                        <MonacoEditorWrapper
-                                                            defaultLanguage="json"
-                                                            onChange={(value) => field.onChange(value || '')}
-                                                            onMount={() => {}}
-                                                            options={{
-                                                                automaticLayout: true,
-                                                                folding: true,
-                                                                fontSize: 12,
-                                                                lineNumbers: 'on',
-                                                                minimap: {enabled: false},
-                                                                scrollBeyondLastLine: false,
-                                                                tabSize: 2,
-                                                                wordWrap: 'on',
-                                                            }}
-                                                            value={field.value}
-                                                        />
-                                                    </Suspense>
-                                                </div>
-                                            </FormControl>
-
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <JsonSchemaFormField control={control} label="JSON Schema (optional)" name="schema" />
                             </DialogBody>
 
                             <DialogFooter>

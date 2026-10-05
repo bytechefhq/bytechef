@@ -12,14 +12,10 @@ import {Input} from '@/components/Input/Input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Checkbox} from '@/components/ui/checkbox';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {EditIcon, PlusIcon, Trash2Icon} from 'lucide-react';
 
-const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
-
-import {Suspense, lazy} from 'react';
-
 import {RequestBodyDefinitionI} from '../../types/api-connector-wizard.types';
+import JsonSchemaFormField from './JsonSchemaFormField';
 import useRequestBodyEditor from './hooks/useRequestBodyEditor';
 
 interface RequestBodyEditorProps {
@@ -151,39 +147,10 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
                                     )}
                                 />
 
-                                <FormField
+                                <JsonSchemaFormField
                                     control={control}
+                                    label="JSON Schema"
                                     name="schema"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>JSON Schema</FormLabel>
-
-                                            <FormControl>
-                                                <div className="h-48 overflow-hidden rounded-md border">
-                                                    <Suspense fallback={<MonacoEditorLoader />}>
-                                                        <MonacoEditorWrapper
-                                                            defaultLanguage="json"
-                                                            onChange={(value) => field.onChange(value || '')}
-                                                            onMount={() => {}}
-                                                            options={{
-                                                                automaticLayout: true,
-                                                                folding: true,
-                                                                fontSize: 12,
-                                                                lineNumbers: 'on',
-                                                                minimap: {enabled: false},
-                                                                scrollBeyondLastLine: false,
-                                                                tabSize: 2,
-                                                                wordWrap: 'on',
-                                                            }}
-                                                            value={field.value}
-                                                        />
-                                                    </Suspense>
-                                                </div>
-                                            </FormControl>
-
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
                                     rules={{
                                         required: 'Schema is required',
                                         validate: (value: string) => {

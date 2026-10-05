@@ -9,9 +9,9 @@ import {
     DialogHeader,
     DialogMain,
 } from '@/components/Dialog';
-import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Textarea} from '@/components/ui/textarea';
+import DescriptionFormField from '@/shared/components/entity-form/DescriptionFormField';
+import NameFormField from '@/shared/components/entity-form/NameFormField';
 import {
     AutomationWorkflowProjectCategoriesQuery,
     AutomationWorkflowProjectTagsQuery,
@@ -111,42 +111,9 @@ const AutomationWorkflowProjectDialog = ({
                             />
 
                             <DialogBody>
-                                <FormField
-                                    control={control}
-                                    name="name"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                <NameFormField placeholder="My CRM Project" />
 
-                                            <FormControl>
-                                                <Input placeholder="My CRM Project" {...field} />
-                                            </FormControl>
-
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                    rules={{required: true}}
-                                />
-
-                                <FormField
-                                    control={control}
-                                    name="description"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Description</FormLabel>
-
-                                            <FormControl>
-                                                <Textarea
-                                                    placeholder="Cute description of your project"
-                                                    rows={5}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <DescriptionFormField placeholder="Cute description of your project" />
 
                                 <FormField
                                     control={control}
