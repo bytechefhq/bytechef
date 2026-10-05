@@ -20,6 +20,10 @@ import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChat
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.MESSAGES;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.MESSAGE_CONTENT;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.MESSAGE_ROLE;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.SCHEMA;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.TABLE;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.TABLE_PROPERTY;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils.getChatMemoryRepository;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -55,10 +59,13 @@ public class JdbcChatMemoryAddMessagesAction {
             .title("Add Messages")
             .description("Adds messages to the chat memory for a conversation.")
             .properties(
+                SCHEMA_PROPERTY,
+                TABLE_PROPERTY,
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
                     .options(JdbcChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
+                    .optionsLookupDependsOn(SCHEMA, TABLE)
                     .required(true),
                 array(MESSAGES)
                     .label("Messages")
@@ -102,7 +109,7 @@ public class JdbcChatMemoryAddMessagesAction {
         Object[] messagesArray = inputParameters.getRequiredArray(MESSAGES);
 
         ChatMemoryRepository repository = getChatMemoryRepository(
-            extensions, componentConnections, clusterElementDefinitionService);
+            inputParameters, extensions, componentConnections, clusterElementDefinitionService);
 
         List<Message> existingMessages = new ArrayList<>(repository.findByConversationId(conversationId));
 

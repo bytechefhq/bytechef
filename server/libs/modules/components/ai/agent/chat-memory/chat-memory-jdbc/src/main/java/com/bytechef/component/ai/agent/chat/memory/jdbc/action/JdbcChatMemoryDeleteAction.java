@@ -17,6 +17,10 @@
 package com.bytechef.component.ai.agent.chat.memory.jdbc.action;
 
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.CONVERSATION_ID;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.SCHEMA;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.TABLE;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.TABLE_PROPERTY;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils.getChatMemoryRepository;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -45,10 +49,13 @@ public class JdbcChatMemoryDeleteAction {
             .title("Delete Conversation")
             .description("Deletes all messages for a conversation.")
             .properties(
+                SCHEMA_PROPERTY,
+                TABLE_PROPERTY,
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation to delete.")
                     .options(JdbcChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
+                    .optionsLookupDependsOn(SCHEMA, TABLE)
                     .required(true))
             .output(
                 outputSchema(
@@ -73,7 +80,7 @@ public class JdbcChatMemoryDeleteAction {
         String conversationId = inputParameters.getRequiredString(CONVERSATION_ID);
 
         ChatMemoryRepository repository = getChatMemoryRepository(
-            extensions, componentConnections, clusterElementDefinitionService);
+            inputParameters, extensions, componentConnections, clusterElementDefinitionService);
 
         repository.deleteByConversationId(conversationId);
 
