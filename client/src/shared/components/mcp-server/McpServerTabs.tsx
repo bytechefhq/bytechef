@@ -55,37 +55,33 @@ const McpServerTabs = ({
     return (
         <>
             <Tabs onValueChange={setActiveTab} value={activeTab}>
-                <div className="flex items-center justify-between">
-                    <TabsList>
-                        <TabsTrigger value="tools">Tools</TabsTrigger>
+                <TabsList>
+                    <TabsTrigger value="tools">Tools</TabsTrigger>
 
-                        <TabsTrigger value="connect">Connect</TabsTrigger>
-                    </TabsList>
+                    <TabsTrigger value="connect">Connect</TabsTrigger>
+                </TabsList>
 
-                    {activeTab === 'tools' && (
-                        <div className="flex items-center gap-2">
-                            <Tabs
-                                onValueChange={(value) => setActiveToolsTab(value as McpServerToolsTabType)}
-                                value={activeToolsTab}
-                            >
-                                <TabsList aria-label="Tool type">
-                                    <TabsTrigger value="components">Components</TabsTrigger>
+                <TabsContent className="flex flex-col gap-3 pt-2" value="tools">
+                    <div className="flex items-center justify-between">
+                        <Tabs
+                            onValueChange={(value) => setActiveToolsTab(value as McpServerToolsTabType)}
+                            value={activeToolsTab}
+                        >
+                            <TabsList aria-label="Tool type">
+                                <TabsTrigger value="components">Components</TabsTrigger>
 
-                                    <TabsTrigger value="workflows">Workflows</TabsTrigger>
-                                </TabsList>
-                            </Tabs>
+                                <TabsTrigger value="workflows">Workflows</TabsTrigger>
+                            </TabsList>
+                        </Tabs>
 
-                            <Button
-                                label={isComponentsTab ? 'Add Component' : 'Add Workflows'}
-                                onClick={handleAddClick}
-                                size="sm"
-                                variant="secondary"
-                            />
-                        </div>
-                    )}
-                </div>
+                        <Button
+                            label={isComponentsTab ? 'Add Component' : 'Add Workflows'}
+                            onClick={handleAddClick}
+                            size="sm"
+                            variant="secondary"
+                        />
+                    </div>
 
-                <TabsContent className="pt-2" value="tools">
                     {toolsContent({
                         activeToolsTab,
                         onAddComponentClick: () => setShowMcpComponentDialog(true),
