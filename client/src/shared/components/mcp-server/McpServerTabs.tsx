@@ -18,6 +18,7 @@ export interface McpServerWorkflowDialogProps {
 
 export interface McpServerToolsContentProps {
     activeToolsTab: McpServerToolsTabType;
+    mcpServer: McpServer;
     onAddComponentClick: () => void;
     onAddWorkflowsClick: () => void;
 }
@@ -26,7 +27,7 @@ export interface McpServerTabsProps {
     connectContent: ReactNode;
     mcpComponentDialog: ComponentType<McpServerComponentDialogProps>;
     mcpServer: McpServer;
-    toolsContent: (toolsContentProps: McpServerToolsContentProps) => ReactNode;
+    toolsContent: ComponentType<McpServerToolsContentProps>;
     workflowDialog: ComponentType<McpServerWorkflowDialogProps>;
 }
 
@@ -34,7 +35,7 @@ const McpServerTabs = ({
     connectContent,
     mcpComponentDialog: McpComponentDialog,
     mcpServer,
-    toolsContent,
+    toolsContent: ToolsContent,
     workflowDialog: WorkflowDialog,
 }: McpServerTabsProps) => {
     const [activeTab, setActiveTab] = useState<McpServerToolsTabType | 'connect'>('components');
@@ -75,11 +76,12 @@ const McpServerTabs = ({
 
                 {(['components', 'workflows'] as const).map((toolsTab) => (
                     <TabsContent className="pt-2" key={toolsTab} value={toolsTab}>
-                        {toolsContent({
-                            activeToolsTab: toolsTab,
-                            onAddComponentClick: () => setShowMcpComponentDialog(true),
-                            onAddWorkflowsClick: () => setShowWorkflowDialog(true),
-                        })}
+                        <ToolsContent
+                            activeToolsTab={toolsTab}
+                            mcpServer={mcpServer}
+                            onAddComponentClick={() => setShowMcpComponentDialog(true)}
+                            onAddWorkflowsClick={() => setShowWorkflowDialog(true)}
+                        />
                     </TabsContent>
                 ))}
 

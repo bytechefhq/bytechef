@@ -3,15 +3,11 @@ import useMcpIntegrationInstanceConfigurationList from '@/ee/pages/embedded/mcp-
 import {McpServerToolsContentProps} from '@/shared/components/mcp-server/McpServerTabs';
 import McpServerToolsPanel from '@/shared/components/mcp-server/McpServerToolsPanel';
 import {McpActivePopoverProvider} from '@/shared/contexts/McpActivePopoverContext';
-import {McpServer} from '@/shared/middleware/graphql';
 
 import McpComponentList from '../mcp-component-list/McpComponentList';
 import McpIntegrationInstanceConfigurationList from '../mcp-integration-instance-configuration-list/McpIntegrationInstanceConfigurationList';
 
-const McpServerToolsContent = ({
-    mcpServer,
-    ...toolsContentProps
-}: McpServerToolsContentProps & {mcpServer: McpServer}) => {
+const McpServerToolsContent = ({mcpServer, ...toolsContentProps}: McpServerToolsContentProps) => {
     const {data: componentData, isMcpComponentsLoading} = useMcpComponentList(mcpServer.id!);
     const {isLoading: isIntegrationsLoading, mcpIntegrationInstanceConfigurations} =
         useMcpIntegrationInstanceConfigurationList(mcpServer.id!);
