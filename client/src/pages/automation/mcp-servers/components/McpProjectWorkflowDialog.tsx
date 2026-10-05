@@ -16,6 +16,7 @@ import {Textarea} from '@/components/ui/textarea';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import McpServerFormField from '@/shared/components/mcp-server/McpServerFormField';
 import {
     McpServer,
     useCreateMcpProjectMutation,
@@ -211,27 +212,10 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
 
                                 {!isEditMode && (
                                     <>
-                                        <FormField
+                                        <McpServerFormField
                                             control={control}
+                                            mcpServer={mcpServer}
                                             name="mcpServerId"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>MCP Server</FormLabel>
-
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            disabled={!!mcpServer}
-                                                            placeholder={
-                                                                mcpServer ? mcpServer.name : 'Select MCP Server'
-                                                            }
-                                                            value={mcpServer ? mcpServer.name : field.value}
-                                                        />
-                                                    </FormControl>
-
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
                                         />
 
                                         <FormField
