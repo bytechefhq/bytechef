@@ -1,5 +1,4 @@
 import Button from '@/components/Button/Button';
-import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {
     Dialog,
     DialogBody,
@@ -10,12 +9,14 @@ import {
     DialogMain,
     DialogTrigger,
 } from '@/components/Dialog';
-import {Input} from '@/components/Input/Input';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Textarea} from '@/components/ui/textarea';
+import {Form} from '@/components/ui/form';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import CategoryFormField from '@/shared/components/entity-form/CategoryFormField';
+import DescriptionFormField from '@/shared/components/entity-form/DescriptionFormField';
+import NameFormField from '@/shared/components/entity-form/NameFormField';
+import TagsFormField from '@/shared/components/entity-form/TagsFormField';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {Category, Project, Tag} from '@/shared/middleware/automation/configuration';
+import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useCreateProjectMutation, useUpdateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {ProjectTagKeys, useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
@@ -57,7 +58,7 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
         } as Project,
     });
 
-    const {control, getValues, handleSubmit, reset, setValue} = form;
+    const {getValues, handleSubmit, reset} = form;
 
     const {
         data: categories,
@@ -175,115 +176,13 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
 
                                 {tagsError && !tagsLoading && `An error has occurred: ${tagsError.message}`}
 
-                                <FormField
-                                    control={control}
-                                    name="name"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                <NameFormField placeholder="My CRM Project" />
 
-                                            <FormControl>
-                                                <Input placeholder="My CRM Project" {...field} />
-                                            </FormControl>
+                                <DescriptionFormField placeholder="Cute description of your project" />
 
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                    rules={{required: true}}
-                                />
+                                <CategoryFormField categories={categories} categoriesLoading={categoriesLoading} />
 
-                                <FormField
-                                    control={control}
-                                    name="description"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Description</FormLabel>
-
-                                            <FormControl>
-                                                <Textarea
-                                                    placeholder="Cute description of your project"
-                                                    rows={5}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {!categoriesLoading && (
-                                    <FormField
-                                        control={control}
-                                        name="category"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Category</FormLabel>
-
-                                                <FormControl>
-                                                    <CreatableSelect
-                                                        field={field}
-                                                        isMulti={false}
-                                                        onCreateOption={(inputValue: string) => {
-                                                            setValue('category', {
-                                                                label: inputValue,
-                                                                name: inputValue,
-                                                                value: inputValue,
-                                                                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                                                            } as any);
-                                                        }}
-                                                        options={categories!.map((category: Category) => ({
-                                                            label: category.name,
-                                                            value: category.name.toLowerCase().replace(/\W/g, ''),
-                                                            ...category,
-                                                        }))}
-                                                        placeholder="Marketing, Sales, Social Media..."
-                                                    />
-                                                </FormControl>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
-
-                                {remainingTags && (
-                                    <FormField
-                                        control={control}
-                                        name="tags"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Tags</FormLabel>
-
-                                                <FormControl>
-                                                    <CreatableSelect
-                                                        field={field}
-                                                        isMulti
-                                                        onCreateOption={(inputValue: string) => {
-                                                            setValue('tags', [
-                                                                ...getValues().tags!,
-                                                                {
-                                                                    label: inputValue,
-                                                                    name: inputValue,
-                                                                    value: inputValue,
-                                                                },
-                                                            ] as never[]);
-                                                        }}
-                                                        options={remainingTags!.map((tag: Tag) => {
-                                                            return {
-                                                                label: tag.name,
-                                                                value: tag.name.toLowerCase().replace(/\W/g, ''),
-                                                                ...tag,
-                                                            };
-                                                        })}
-                                                    />
-                                                </FormControl>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
+                                <TagsFormField remainingTags={remainingTags} />
                             </DialogBody>
 
                             <DialogFooter>
