@@ -222,7 +222,7 @@ const WorkflowNodeDetailsPanel = ({
                                     <PopoverContent
                                         align="end"
                                         className={twMerge(
-                                            'w-80 overflow-hidden p-0',
+                                            'w-[28rem] max-w-[calc(100vw-2rem)] overflow-hidden p-0',
                                             errorsWarningOnly
                                                 ? 'border-stroke-warning-secondary bg-surface-warning-secondary'
                                                 : 'border-stroke-destructive-primary bg-surface-destructive-secondary'
