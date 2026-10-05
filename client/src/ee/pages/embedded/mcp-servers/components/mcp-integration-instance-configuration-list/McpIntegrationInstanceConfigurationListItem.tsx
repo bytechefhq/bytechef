@@ -20,7 +20,7 @@ interface McpIntegrationInstanceConfigurationListItemProps {
 const McpIntegrationInstanceConfigurationListItem = ({
     mcpIntegrationInstanceConfiguration,
 }: McpIntegrationInstanceConfigurationListItemProps) => {
-    const [expanded, setExpanded] = useState(true);
+    const [expanded, setExpanded] = useState(false);
 
     const {
         handleOnIntegrationInstanceConfigurationDialogClose,
