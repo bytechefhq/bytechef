@@ -16,12 +16,14 @@
 
 package com.bytechef.component.ai.vectorstore.action;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_COLUMNS_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_METADATA_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
+import com.bytechef.component.ai.vectorstore.JdbcVectorStore;
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.ai.vectorstore.util.VectorStoreUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -74,11 +76,15 @@ public abstract class AbstractLoadAction {
             .title("Load Documents")
             .description("Loads documents into the vector store using LLM embeddings.")
             .properties(
-                Stream.of(properties.stream(), Stream.of(ADDITIONAL_METADATA_PROPERTY))
+                Stream.of(properties.stream(), Stream.of(ADDITIONAL_METADATA_PROPERTY), getJdbcProperties(vectorStore))
                     .flatMap(stream -> stream)
                     .toList())
             .help("", "https://docs.bytechef.io/reference/components/" + componentName + "_v1#load-documents")
             .perform((MultipleConnectionsPerformFunction) loadAction::perform);
+    }
+
+    private static Stream<Property> getJdbcProperties(VectorStore vectorStore) {
+        return vectorStore instanceof JdbcVectorStore ? Stream.of(ADDITIONAL_COLUMNS_PROPERTY) : Stream.empty();
     }
 
     protected Object perform(
