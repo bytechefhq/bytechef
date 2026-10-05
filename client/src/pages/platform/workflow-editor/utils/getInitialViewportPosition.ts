@@ -2,16 +2,24 @@ import {CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET, CANVAS_TOP_OFFSET, LayoutDirectionType
 import {XYPosition} from '@xyflow/react';
 
 interface GetInitialViewportPositionProps {
+    canvasHeight: number;
+    flowHeight: number;
     layoutDirection: LayoutDirectionType;
     offsetX: number;
 }
 
 export default function getInitialViewportPosition({
+    canvasHeight,
+    flowHeight,
     layoutDirection,
     offsetX,
 }: GetInitialViewportPositionProps): XYPosition {
-    return {
-        x: layoutDirection === 'LR' ? offsetX + CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET : offsetX,
-        y: CANVAS_TOP_OFFSET,
-    };
+    if (layoutDirection === 'LR') {
+        return {
+            x: offsetX + CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET,
+            y: flowHeight ? Math.round((flowHeight - canvasHeight) / 2) : 0,
+        };
+    }
+
+    return {x: offsetX, y: CANVAS_TOP_OFFSET};
 }
