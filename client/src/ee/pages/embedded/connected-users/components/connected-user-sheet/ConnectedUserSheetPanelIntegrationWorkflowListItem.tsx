@@ -1,5 +1,5 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import {Switch} from '@/components/ui/switch';
+import Switch from '@/components/Switch/Switch';
 import {
     IntegrationInstance,
     IntegrationInstanceConfigurationWorkflow,
