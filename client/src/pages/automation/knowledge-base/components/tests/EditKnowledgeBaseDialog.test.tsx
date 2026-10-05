@@ -67,6 +67,13 @@ describe('EditKnowledgeBaseDialog', () => {
         expect(screen.getByText('Edit Knowledge Base')).toBeInTheDocument();
     });
 
+    // Every other case here passes a knowledge base, so the create half of the title went unexercised.
+    it('renders the create title when no knowledge base is given', () => {
+        renderComponent({knowledgeBase: undefined});
+
+        expect(screen.getByText('Create Knowledge Base')).toBeInTheDocument();
+    });
+
     it('renders dialog description', () => {
         renderComponent();
 
