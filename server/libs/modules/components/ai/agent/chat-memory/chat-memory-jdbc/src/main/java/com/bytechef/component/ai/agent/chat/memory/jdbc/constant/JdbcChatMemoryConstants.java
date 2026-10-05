@@ -16,7 +16,14 @@
 
 package com.bytechef.component.ai.agent.chat.memory.jdbc.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 
 import com.bytechef.component.definition.Property;
 
@@ -25,6 +32,7 @@ import com.bytechef.component.definition.Property;
  */
 public class JdbcChatMemoryConstants {
 
+    public static final String ADDITIONAL_COLUMNS = "additionalColumns";
     public static final String CONVERSATION_ID = "conversationId";
     public static final String DATABASE = "database";
     public static final String DATABASE_TYPE = "databaseType";
@@ -39,6 +47,14 @@ public class JdbcChatMemoryConstants {
     public static final String SERVICE_NAME = "serviceName";
     public static final String TABLE = "table";
     public static final String USERNAME = "username";
+
+    public static final Property ADDITIONAL_COLUMNS_PROPERTY = object(ADDITIONAL_COLUMNS)
+        .label("Additional Columns")
+        .description(
+            "Column name/value pairs written to every stored message row, for extra columns in the chat memory " +
+                "table (e.g. required foreign keys).")
+        .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time())
+        .required(false);
 
     public static final Property SCHEMA_PROPERTY = string(SCHEMA)
         .label("Schema")

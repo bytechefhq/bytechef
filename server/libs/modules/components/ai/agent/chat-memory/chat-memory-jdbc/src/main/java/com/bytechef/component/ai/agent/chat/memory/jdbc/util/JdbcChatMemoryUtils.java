@@ -16,12 +16,14 @@
 
 package com.bytechef.component.ai.agent.chat.memory.jdbc.util;
 
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.ADDITIONAL_COLUMNS;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.platform.component.definition.ai.agent.DataSourceFunction.DATA_SOURCE;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOptionsFunction;
@@ -68,11 +70,13 @@ public class JdbcChatMemoryUtils {
 
         DataSource dataSource = getDataSource(extensions, componentConnections, clusterElementDefinitionService);
 
-        return createChatMemoryRepository(dataSource, JdbcChatMemoryTable.of(inputParameters));
+        return createChatMemoryRepository(
+            dataSource, JdbcChatMemoryTable.of(inputParameters),
+            inputParameters.getMap(ADDITIONAL_COLUMNS, new TypeReference<>() {}, Map.of()));
     }
 
     private static ChatMemoryRepository createChatMemoryRepository(
-        DataSource dataSource, JdbcChatMemoryTable chatMemoryTable) {
+        DataSource dataSource, JdbcChatMemoryTable chatMemoryTable, Map<String, Object> additionalColumns) {
 
         initializeSchema(dataSource, chatMemoryTable);
 
@@ -86,6 +90,11 @@ public class JdbcChatMemoryUtils {
                 chatMemoryTable.isDefault()
                     ? dialect : new TableAwareChatMemoryRepositoryDialect(dialect, chatMemoryTable))
             .build();
+
+        if (!additionalColumns.isEmpty()) {
+            delegate = new AdditionalColumnsJdbcChatMemoryRepository(
+                delegate, jdbcTemplate, dialect, chatMemoryTable, additionalColumns);
+        }
 
         return new OrderedJdbcChatMemoryRepository(
             delegate, jdbcTemplate,
@@ -190,7 +199,7 @@ public class JdbcChatMemoryUtils {
             }
 
             ChatMemoryRepository chatMemoryRepository = createChatMemoryRepository(
-                dataSource, JdbcChatMemoryTable.of(inputParameters));
+                dataSource, JdbcChatMemoryTable.of(inputParameters), Map.of());
 
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
             List<String> conversationIds = chatMemoryRepository.findConversationIds();

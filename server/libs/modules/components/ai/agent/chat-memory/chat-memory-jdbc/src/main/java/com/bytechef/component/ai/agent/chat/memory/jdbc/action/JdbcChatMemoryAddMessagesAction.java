@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.chat.memory.jdbc.action;
 
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.ADDITIONAL_COLUMNS_PROPERTY;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.CONVERSATION_ID;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.MESSAGES;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.MESSAGE_CONTENT;
@@ -61,6 +62,7 @@ public class JdbcChatMemoryAddMessagesAction {
             .properties(
                 SCHEMA_PROPERTY,
                 TABLE_PROPERTY,
+                ADDITIONAL_COLUMNS_PROPERTY,
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
