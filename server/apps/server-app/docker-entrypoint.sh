@@ -2,7 +2,8 @@
 
 JAVA_BASE_OPTS="-Dfile.encoding=UTF-8 -Duser.timezone=GMT \
   -Djava.io.tmpdir=/opt/bytechef/server/tmp \
-  -Dloader.path=/opt/bytechef/external_jars"
+  -Dloader.path=/opt/bytechef/external_jars \
+  --enable-native-access=ALL-UNNAMED"
 
 JAVA_SERVER_OPTS="-Dserver.tomcat.basedir=/opt/bytechef/server \
   -Dserver.tomcat.accesslog.directory=/opt/bytechef/server/logs"
