@@ -44,6 +44,11 @@ const ELK_LAYER_SPACING = 52;
 
 const ANCHOR_MAIN_FOOTPRINT = 100;
 
+const ROOT_MAIN_AXIS_PADDING: Record<LayoutDirectionType, number> = {
+    LR: 10,
+    TB: 36,
+};
+
 // ReadOnlyPlaceholderNode renders a 2px dot, so a read-only placeholder anchors
 // like a ghost bar rather than like an editable placeholder.
 const READ_ONLY_PLACEHOLDER_RENDERED_SIZE = 2;
@@ -721,7 +726,13 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
         children: buildScopeChildren(ELK_ROOT_ID),
         edges: elkEdgesByScope.get(ELK_ROOT_ID) || [],
         id: ELK_ROOT_ID,
-        layoutOptions: getElkLayoutOptions(direction),
+        layoutOptions: {
+            ...getElkLayoutOptions(direction),
+            'elk.padding':
+                direction === 'TB'
+                    ? `[top=${ROOT_MAIN_AXIS_PADDING.TB},left=0,bottom=0,right=0]`
+                    : `[top=0,left=${ROOT_MAIN_AXIS_PADDING.LR},bottom=0,right=0]`,
+        },
     };
 }
 

@@ -3,7 +3,7 @@ import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import {buildElkGraph, getElkLayoutElements, getFrameId} from './elkLayoutUtils';
-import {NODE_LABEL_MAX_CROSS_OVERHANG, getLabelCrossOverhang} from './layoutUtils';
+import {NODE_LABEL_MAX_CROSS_OVERHANG, getLabelCrossOverhang, getLayoutElements} from './layoutUtils';
 
 import type {ElkNode} from 'elkjs/lib/elk-api';
 
@@ -419,6 +419,23 @@ describe('read-only and trigger sizing', () => {
 });
 
 describe('getElkLayoutElements', () => {
+    it.each(['TB', 'LR'] as const)('starts the chain where dagre does on the main axis (%s)', async (direction) => {
+        const layoutProps = {
+            canvasHeight: 800,
+            canvasWidth: 1000,
+            direction,
+            edges: [edge('task1', 'task2')],
+            nodes: [taskNode('task1'), taskNode('task2')],
+        };
+
+        const dagreResult = await getLayoutElements(layoutProps);
+        const elkResult = await getElkLayoutElements(layoutProps);
+
+        const mainAxis = direction === 'TB' ? 'y' : 'x';
+
+        expect(positionOf(elkResult.nodes, 'task1')[mainAxis]).toBe(positionOf(dagreResult.nodes, 'task1')[mainAxis]);
+    });
+
     it('spaces a TB chain uniformly (footprint gap = 50)', async () => {
         const nodes = [taskNode('task1'), taskNode('task2'), taskNode('task3')];
         const edges = [edge('task1', 'task2'), edge('task2', 'task3')];
