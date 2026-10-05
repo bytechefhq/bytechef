@@ -19,7 +19,9 @@ package com.bytechef.component.ai.vectorstore.pgvector.constant;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 
-import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.JdbcVectorStore;
+import com.bytechef.component.ai.vectorstore.pgvector.util.AdditionalColumnsPgVectorStore;
+import java.util.Map;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -39,7 +41,7 @@ public class PgVectorConstants {
     public static final String TABLE_NAME = "tableName";
     public static final String URL = "url";
 
-    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
+    public static final JdbcVectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
         dataSource.setUrl(connectionParameters.getRequiredString(URL));
@@ -48,7 +50,7 @@ public class PgVectorConstants {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
-        return PgVectorStore.builder(jdbcTemplate, embeddingModel)
+        PgVectorStore.PgVectorStoreBuilder builder = PgVectorStore.builder(jdbcTemplate, embeddingModel)
             .dimensions(connectionParameters.getRequiredInteger(DIMENSIONS))
             .distanceType(
                 PgVectorStore.PgDistanceType.valueOf(connectionParameters.getRequiredString(DISTANCE_TYPE)))
@@ -56,8 +58,18 @@ public class PgVectorConstants {
             .initializeSchema(connectionParameters.getRequiredBoolean(INITIALIZE_SCHEMA))
             .schemaName(connectionParameters.getRequiredString(SCHEMA_NAME))
             .vectorTableName(connectionParameters.getRequiredString(TABLE_NAME))
-            .maxDocumentBatchSize(connectionParameters.getRequiredInteger(MAX_DOCUMENT_BATCH_SIZE))
-            .build();
+            .maxDocumentBatchSize(connectionParameters.getRequiredInteger(MAX_DOCUMENT_BATCH_SIZE));
+
+        Map<String, Object> additionalColumns = JdbcVectorStore.getAdditionalColumns(inputParameters);
+
+        if (additionalColumns.isEmpty()) {
+            return builder.build();
+        }
+
+        return new AdditionalColumnsPgVectorStore(
+            builder, jdbcTemplate, connectionParameters.getRequiredString(SCHEMA_NAME),
+            connectionParameters.getRequiredString(TABLE_NAME),
+            connectionParameters.getRequiredInteger(MAX_DOCUMENT_BATCH_SIZE), additionalColumns);
     };
 
     private PgVectorConstants() {

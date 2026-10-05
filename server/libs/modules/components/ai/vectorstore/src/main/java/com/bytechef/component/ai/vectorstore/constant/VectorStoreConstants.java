@@ -34,11 +34,20 @@ import java.util.List;
  */
 public class VectorStoreConstants {
 
+    public static final String ADDITIONAL_COLUMNS = "additionalColumns";
     public static final String ADDITIONAL_METADATA = "additionalMetadata";
     public static final String METADATA_FILTER = "metadataFilter";
     public static final String QUERY = "query";
     public static final String SIMILARITY_THRESHOLD = "similarityThreshold";
     public static final String TOP_K = "topK";
+
+    public static final Property ADDITIONAL_COLUMNS_PROPERTY = object(ADDITIONAL_COLUMNS)
+        .label("Additional Columns")
+        .description(
+            "Column name/value pairs written to every inserted row, for extra columns in the vector table (e.g. " +
+                "required foreign keys).")
+        .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time())
+        .required(false);
 
     public static final Property ADDITIONAL_METADATA_PROPERTY = object(ADDITIONAL_METADATA)
         .label("Additional Metadata")
