@@ -1,8 +1,4 @@
 dependencies {
-    // opentelemetry.version is defined in the root gradle.properties; the platform lifts the Spring Boot BOM managed
-    // version on the compile classpath of this module and of the modules depending on it
-    implementation(platform("io.opentelemetry:opentelemetry-bom:${property("opentelemetry.version")}"))
-
     implementation("ch.qos.logback:logback-core")
     implementation("jakarta.servlet:jakarta.servlet-api")
     implementation("io.micrometer:micrometer-core")
