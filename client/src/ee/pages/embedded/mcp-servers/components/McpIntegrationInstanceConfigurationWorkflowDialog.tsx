@@ -14,6 +14,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import McpServerFormField from '@/shared/components/mcp-server/McpServerFormField';
 import {
     McpServer,
     useCreateMcpIntegrationInstanceConfigurationMutation,
@@ -215,27 +216,10 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
 
                                 {!isEditMode && (
                                     <>
-                                        <FormField
+                                        <McpServerFormField
                                             control={control}
+                                            mcpServer={mcpServer}
                                             name="mcpServerId"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>MCP Server</FormLabel>
-
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            disabled={!!mcpServer}
-                                                            placeholder={
-                                                                mcpServer ? mcpServer.name : 'Select MCP Server'
-                                                            }
-                                                            value={mcpServer ? mcpServer.name : field.value}
-                                                        />
-                                                    </FormControl>
-
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
                                         />
 
                                         <FormField
