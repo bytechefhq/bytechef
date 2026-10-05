@@ -11,6 +11,8 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.ee.embedded.ai.mcp.event.McpToolBeforeDeleteEventListener;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolServiceImpl;
+import com.bytechef.encryption.EncryptionImpl;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.mcp.service.McpToolServiceImpl;
@@ -20,6 +22,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
@@ -34,12 +37,18 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Import({
-    JacksonConfiguration.class, LiquibaseConfiguration.class, McpIntegrationInstanceToolServiceImpl.class,
-    McpToolBeforeDeleteEventListener.class, McpToolServiceImpl.class, PostgreSQLContainerConfiguration.class
+    EncryptionImpl.class, JacksonConfiguration.class, LiquibaseConfiguration.class,
+    McpIntegrationInstanceToolServiceImpl.class, McpToolBeforeDeleteEventListener.class, McpToolServiceImpl.class,
+    PostgreSQLContainerConfiguration.class
 })
 @EnableAutoConfiguration
 @Configuration
 public class EmbeddedMcpIntTestConfiguration {
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class EmbeddedMcpIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
