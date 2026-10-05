@@ -17,6 +17,10 @@
 package com.bytechef.component.ai.agent.chat.memory.jdbc.cluster;
 
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.CONVERSATION_ID;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.SCHEMA;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.TABLE;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.TABLE_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 
@@ -53,10 +57,13 @@ public class JdbcChatMemory {
             .title("JDBC Chat Memory")
             .description("Memory is retrieved from a JDBC database and added as prior messages in the conversation.")
             .properties(
+                SCHEMA_PROPERTY,
+                TABLE_PROPERTY,
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
                     .options(JdbcChatMemoryUtils.getClusterElementFirstMessages())
+                    .optionsLookupDependsOn(SCHEMA, TABLE)
                     .required(true))
             .type(CHAT_MEMORY)
             .object(() -> this::apply);
@@ -68,7 +75,7 @@ public class JdbcChatMemory {
 
         MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
             .chatMemoryRepository(
-                JdbcChatMemoryUtils.getChatMemoryRepository(extensions, componentConnections,
+                JdbcChatMemoryUtils.getChatMemoryRepository(inputParameters, extensions, componentConnections,
                     clusterElementDefinitionService))
             .build();
 

@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.agent.chat.memory.jdbc.action;
 
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.TABLE_PROPERTY;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils.getChatMemoryRepository;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -44,6 +46,7 @@ public class JdbcChatMemoryListConversationsAction {
         return action("listConversations")
             .title("List Conversations")
             .description("Lists all conversation IDs in the chat memory.")
+            .properties(SCHEMA_PROPERTY, TABLE_PROPERTY)
             .output(
                 outputSchema(
                     object()
@@ -66,7 +69,7 @@ public class JdbcChatMemoryListConversationsAction {
         Parameters extensions, ClusterElementDefinitionService clusterElementDefinitionService) throws Exception {
 
         ChatMemoryRepository repository = getChatMemoryRepository(
-            extensions, componentConnections, clusterElementDefinitionService);
+            inputParameters, extensions, componentConnections, clusterElementDefinitionService);
 
         List<String> conversationIds = repository.findConversationIds();
 
