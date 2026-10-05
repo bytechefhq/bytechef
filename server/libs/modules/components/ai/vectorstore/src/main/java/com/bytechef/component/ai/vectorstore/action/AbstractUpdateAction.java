@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.action;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_COLUMNS_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_METADATA_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -23,6 +24,7 @@ import static com.bytechef.platform.component.definition.VectorStoreComponentDef
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
+import com.bytechef.component.ai.vectorstore.JdbcVectorStore;
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.ai.vectorstore.util.VectorStoreUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -77,11 +79,17 @@ public abstract class AbstractUpdateAction {
                 "Updates documents in the vector store by deleting existing ones matching the metadata filter " +
                     "and loading new ones using LLM embeddings.")
             .properties(
-                Stream.of(properties.stream(), Stream.of(METADATA_FILTER_PROPERTY, ADDITIONAL_METADATA_PROPERTY))
+                Stream
+                    .of(properties.stream(), Stream.of(METADATA_FILTER_PROPERTY, ADDITIONAL_METADATA_PROPERTY),
+                        getJdbcProperties(vectorStore))
                     .flatMap(stream -> stream)
                     .toList())
             .help("", "https://docs.bytechef.io/reference/components/" + componentName + "_v1#update-documents")
             .perform((MultipleConnectionsPerformFunction) updateAction::perform);
+    }
+
+    private static Stream<Property> getJdbcProperties(VectorStore vectorStore) {
+        return vectorStore instanceof JdbcVectorStore ? Stream.of(ADDITIONAL_COLUMNS_PROPERTY) : Stream.empty();
     }
 
     protected Object perform(

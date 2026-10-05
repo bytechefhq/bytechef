@@ -19,8 +19,10 @@ package com.bytechef.component.ai.vectorstore.oracle.constant;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 
-import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.JdbcVectorStore;
+import com.bytechef.component.ai.vectorstore.oracle.util.AdditionalColumnsOracleVectorStore;
 import com.bytechef.component.definition.Parameters;
+import java.util.Map;
 import org.springframework.ai.vectorstore.oracle.OracleVectorStore;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -38,11 +40,13 @@ public class OracleConstants {
     public static final String TABLE_NAME = "tableName";
     public static final String URL = "url";
 
-    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
+    public static final JdbcVectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         JdbcTemplate jdbcTemplate = createJdbcTemplate(connectionParameters);
 
-        OracleVectorStore vectorStore = OracleVectorStore.builder(jdbcTemplate, embeddingModel)
-            .tableName(connectionParameters.getString(TABLE_NAME, OracleVectorStore.DEFAULT_TABLE_NAME))
+        String tableName = connectionParameters.getString(TABLE_NAME, OracleVectorStore.DEFAULT_TABLE_NAME);
+
+        OracleVectorStore.Builder builder = OracleVectorStore.builder(jdbcTemplate, embeddingModel)
+            .tableName(tableName)
             .indexType(
                 connectionParameters.get(INDEX_TYPE, OracleVectorStore.OracleVectorStoreIndexType.class,
                     OracleVectorStore.DEFAULT_INDEX_TYPE))
@@ -50,8 +54,13 @@ public class OracleConstants {
                 connectionParameters.get(DISTANCE_TYPE, OracleVectorStore.OracleVectorStoreDistanceType.class,
                     OracleVectorStore.DEFAULT_DISTANCE_TYPE))
             .dimensions(connectionParameters.getInteger(DIMENSIONS, OracleVectorStore.DEFAULT_DIMENSIONS))
-            .initializeSchema(connectionParameters.getBoolean(INITIALIZE_SCHEMA, false))
-            .build();
+            .initializeSchema(connectionParameters.getBoolean(INITIALIZE_SCHEMA, false));
+
+        Map<String, Object> additionalColumns = JdbcVectorStore.getAdditionalColumns(inputParameters);
+
+        OracleVectorStore vectorStore = additionalColumns.isEmpty()
+            ? builder.build()
+            : new AdditionalColumnsOracleVectorStore(builder, jdbcTemplate, tableName, additionalColumns);
 
         try {
             vectorStore.afterPropertiesSet();

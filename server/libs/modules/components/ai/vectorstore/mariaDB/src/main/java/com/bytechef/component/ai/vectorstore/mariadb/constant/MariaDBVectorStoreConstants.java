@@ -19,8 +19,10 @@ package com.bytechef.component.ai.vectorstore.mariadb.constant;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 
-import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.JdbcVectorStore;
+import com.bytechef.component.ai.vectorstore.mariadb.util.AdditionalColumnsMariaDBVectorStore;
 import com.bytechef.component.definition.Parameters;
+import java.util.Map;
 import org.springframework.ai.vectorstore.mariadb.MariaDBVectorStore;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -38,19 +40,26 @@ public class MariaDBVectorStoreConstants {
     public static final String TABLE_NAME = "tableName";
     public static final String URL = "url";
 
-    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
+    public static final JdbcVectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         JdbcTemplate jdbcTemplate = createJdbcTemplate(connectionParameters);
 
-        MariaDBVectorStore vectorStore = MariaDBVectorStore.builder(jdbcTemplate, embeddingModel)
-            .vectorTableName(
-                connectionParameters.getString(TABLE_NAME, MariaDBVectorStore.DEFAULT_TABLE_NAME))
-            .schemaName(connectionParameters.getString(SCHEMA_NAME, null))
+        String tableName = connectionParameters.getString(TABLE_NAME, MariaDBVectorStore.DEFAULT_TABLE_NAME);
+        String schemaName = connectionParameters.getString(SCHEMA_NAME, null);
+
+        MariaDBVectorStore.MariaDBBuilder builder = MariaDBVectorStore.builder(jdbcTemplate, embeddingModel)
+            .vectorTableName(tableName)
+            .schemaName(schemaName)
             .distanceType(
                 connectionParameters.get(DISTANCE_TYPE, MariaDBVectorStore.MariaDBDistanceType.class,
                     MariaDBVectorStore.MariaDBDistanceType.COSINE))
             .dimensions(connectionParameters.getInteger(DIMENSIONS, MariaDBVectorStore.INVALID_EMBEDDING_DIMENSION))
-            .initializeSchema(connectionParameters.getBoolean(INITIALIZE_SCHEMA, false))
-            .build();
+            .initializeSchema(connectionParameters.getBoolean(INITIALIZE_SCHEMA, false));
+
+        Map<String, Object> additionalColumns = JdbcVectorStore.getAdditionalColumns(inputParameters);
+
+        MariaDBVectorStore vectorStore = additionalColumns.isEmpty()
+            ? builder.build()
+            : new AdditionalColumnsMariaDBVectorStore(builder, jdbcTemplate, schemaName, tableName, additionalColumns);
 
         try {
             vectorStore.afterPropertiesSet();
