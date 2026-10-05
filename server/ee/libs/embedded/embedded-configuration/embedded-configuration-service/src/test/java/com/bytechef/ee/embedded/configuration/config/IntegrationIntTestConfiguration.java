@@ -47,7 +47,10 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
     },
     excludeFilters = @Filter(
         type = FilterType.REGEX,
-        pattern = "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.AutomationWorkflowProjectFacadeIntTestConfiguration"))
+        pattern = {
+            "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.AutomationWorkflowProjectFacadeIntTestConfiguration",
+            "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration"
+        }))
 @EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
