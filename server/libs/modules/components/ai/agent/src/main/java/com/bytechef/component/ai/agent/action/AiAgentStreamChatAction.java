@@ -108,7 +108,25 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
         TurnTextSeparator turnTextSeparator = new TurnTextSeparator();
 
-        ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
+        ToolExecutionListener toolExecutionListener = createToolExecutionListener(
+            emitterReference, bufferedEvents, turnTextSeparator, context);
+
+        ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
+            inputParameters, connectionParameters, extensions, toolExecutionListener, context);
+
+        Flux<Object> contentFlux = withEnvironmentContext(
+            chatClientRequestSpec.stream()
+                .chatResponse()
+                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
+
+        return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
+    }
+
+    static ToolExecutionListener createToolExecutionListener(
+        AtomicReference<@Nullable SseEmitter> emitterReference, Queue<Map<String, @Nullable Object>> bufferedEvents,
+        TurnTextSeparator turnTextSeparator, ActionContext context) {
+
+        return toolExecutionEvent -> {
             turnTextSeparator.markToolExecuted();
 
             Map<String, @Nullable Object> toolExecutionLogEntry = new LinkedHashMap<>();
@@ -142,16 +160,6 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                 }
             }
         };
-
-        ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
-            inputParameters, connectionParameters, extensions, toolExecutionListener, context);
-
-        Flux<Object> contentFlux = withEnvironmentContext(
-            chatClientRequestSpec.stream()
-                .chatResponse()
-                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
-
-        return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
     }
 
     static SseEmitterHandler createSseHandler(
@@ -227,7 +235,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             reactor.util.context.Context.of(EnvironmentContextThreadLocalAccessor.KEY, environment));
     }
 
-    private static List<Object> toSseEvents(
+    static List<Object> toSseEvents(
         ChatResponse chatResponse, TurnTextSeparator turnTextSeparator, ActionContext context) {
 
         List<Object> events = new ArrayList<>();
