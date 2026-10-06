@@ -623,7 +623,7 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
+export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null, mcpTools: Array<{ id: string } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
 export type AddDataTableColumnMutationVariables = Exact<{
   input: Types.AddColumnInput;
@@ -977,7 +977,7 @@ export type ConnectedUserMcpServersQueryVariables = Exact<{
 }>;
 
 
-export type ConnectedUserMcpServersQuery = { connectedUserMcpServers: Array<{ id: string, name: string, enabled: boolean, environmentId: string, lastModifiedDate: string | null, tools: Array<{ id: string, componentName: string, componentVersion: number, integrationInstanceId: string, name: string, enabled: boolean }> }> };
+export type ConnectedUserMcpServersQuery = { connectedUserMcpServers: Array<{ id: string, name: string, enabled: boolean, environmentId: string, lastModifiedDate: string | null, tools: Array<{ id: string, componentName: string, componentVersion: number, integrationInstanceId: string, name: string, enabled: boolean }>, workflows: Array<{ integrationInstanceId: string, componentName: string, integrationVersion: number, workflowId: string, name: string, description: string | null, enabled: boolean, lastExecutionDate: string | null }> }> };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: string | number | null | undefined;
@@ -4116,6 +4116,9 @@ export const WorkspaceMcpServersDocument = new TypedDocumentString(`
       componentName
       componentVersion
       title
+      mcpTools {
+        id
+      }
     }
     tags {
       id
@@ -5305,6 +5308,16 @@ export const ConnectedUserMcpServersDocument = new TypedDocumentString(`
       integrationInstanceId
       name
       enabled
+    }
+    workflows {
+      integrationInstanceId
+      componentName
+      integrationVersion
+      workflowId
+      name
+      description
+      enabled
+      lastExecutionDate
     }
   }
 }
