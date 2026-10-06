@@ -16,34 +16,45 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.agent.utils.test.util.AiAgentUtilsTestUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class AiAgentUtilsSkillsToolTest {
 
     @Mock
@@ -149,6 +160,48 @@ class AiAgentUtilsSkillsToolTest {
         assertNotNull(toolCallbackProvider);
         verify(aiSkillFacade).getAiSkillDownload(1L);
         verify(aiSkillFacade).getAiSkillDownload(2L);
+    }
+
+    @Test
+    void testApplyScriptToolDeclaresInputAndPassesItToScript() throws Exception {
+        String script = "function perform(input, context) {\n    return input.commits;\n}\n";
+
+        byte[] zipBytes = AiAgentUtilsTestUtils.createZipWithEntries(
+            Map.of(
+                "release-notes/SKILL.md",
+                AiAgentUtilsTestUtils.createSkillMd("release-notes", "Turns commits into release notes."),
+                "release-notes/scripts/group_commits.js", script));
+
+        when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(1L));
+        when(aiSkillFacade.getAiSkillDownload(1L)).thenReturn(zipBytes);
+        when(polyglotEngine.execute(eq("js"), any(Parameters.class), eq(Map.of()), eq(context)))
+            .thenReturn(Map.of());
+
+        ToolCallback scriptToolCallback = Arrays.stream(invokeApply().getToolCallbacks())
+            .filter(toolCallback -> "release_notes_group_commits".equals(toolCallback.getToolDefinition()
+                .name()))
+            .findFirst()
+            .orElseThrow();
+
+        ToolDefinition toolDefinition = scriptToolCallback.getToolDefinition();
+
+        Map<String, ?> inputSchema = JsonUtils.readMap(toolDefinition.inputSchema());
+
+        assertThat(inputSchema.get("required")).isEqualTo(List.of("input"));
+        assertThat(inputSchema).extractingByKey("properties", InstanceOfAssertFactories.MAP)
+            .containsKey("input");
+        assertThat(toolDefinition.description()).contains("scripts/group_commits.js", "release-notes");
+
+        scriptToolCallback.call("{\"input\": {\"commits\": [\"feat: add skills tool\"]}}");
+
+        ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+
+        verify(polyglotEngine).execute(eq("js"), parametersArgumentCaptor.capture(), eq(Map.of()), eq(context));
+
+        Parameters scriptParameters = parametersArgumentCaptor.getValue();
+
+        assertThat(scriptParameters.getRequiredString("script")).isEqualTo(script);
+        assertThat(scriptParameters.getMap("input")).isEqualTo(Map.of("commits", List.of("feat: add skills tool")));
     }
 
     @Test
