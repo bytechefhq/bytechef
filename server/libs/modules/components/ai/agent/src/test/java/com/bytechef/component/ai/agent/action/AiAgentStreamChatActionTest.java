@@ -178,4 +178,26 @@ class AiAgentStreamChatActionTest {
         verify(emitter).complete();
         verify(emitter, never()).error(any());
     }
+
+    @Test
+    void testTurnTextSeparatorSeparatesTextAcrossToolExecution() {
+        AiAgentStreamChatAction.TurnTextSeparator turnTextSeparator = new AiAgentStreamChatAction.TurnTextSeparator();
+
+        assertThat(turnTextSeparator.apply("I'll load the skill first.")).isEqualTo("I'll load the skill first.");
+
+        turnTextSeparator.markToolExecuted();
+
+        assertThat(turnTextSeparator.apply("**New**")).isEqualTo("\n\n**New**");
+        assertThat(turnTextSeparator.apply(" items")).isEqualTo(" items");
+    }
+
+    @Test
+    void testTurnTextSeparatorDoesNotPrefixFirstText() {
+        AiAgentStreamChatAction.TurnTextSeparator turnTextSeparator = new AiAgentStreamChatAction.TurnTextSeparator();
+
+        turnTextSeparator.markToolExecuted();
+
+        assertThat(turnTextSeparator.apply("**New**")).isEqualTo("**New**");
+        assertThat(turnTextSeparator.apply(" items")).isEqualTo(" items");
+    }
 }
