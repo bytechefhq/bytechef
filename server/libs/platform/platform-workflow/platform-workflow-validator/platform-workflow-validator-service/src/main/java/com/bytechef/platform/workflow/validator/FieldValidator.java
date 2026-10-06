@@ -47,6 +47,21 @@ class FieldValidator {
     }
 
     /**
+     * Validates that a field, when present, is a string. A missing field is valid.
+     */
+    public static void validateStringFieldType(JsonNode jsonNode, String fieldName, StringBuilder errors) {
+        if (!jsonNode.has(fieldName)) {
+            return;
+        }
+
+        JsonNode fieldJsonNode = jsonNode.get(fieldName);
+
+        if (!fieldJsonNode.isTextual()) {
+            StringUtils.appendWithNewline("Field '" + fieldName + "' must be a string", errors);
+        }
+    }
+
+    /**
      * Validates that a required string field exists and is of correct type.
      */
     public static void validateRequiredStringField(JsonNode jsonNode, String fieldName, StringBuilder errors) {

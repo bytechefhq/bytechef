@@ -68,7 +68,7 @@ class TaskValidator {
             int errorsStart = errors.length();
             int warningsStart = warnings.length();
 
-            validateTaskStructureFields(taskJsonNode, errors, warnings);
+            validateTaskStructureFields(taskJsonNode, errors);
 
             List<PropertyInfo> taskDefinition = validateTaskParameters(taskJsonNode, context);
 
@@ -290,9 +290,8 @@ class TaskValidator {
      *
      * @param taskJson the task JSON string to validate
      * @param errors   StringBuilder to collect validation errors
-     * @param warnings StringBuilder to collect validation warnings
      */
-    public static void validateTaskStructure(String taskJson, StringBuilder errors, StringBuilder warnings) {
+    public static void validateTaskStructure(String taskJson, StringBuilder errors) {
         JsonNode taskJsonNode = JsonNodeUtils.parseJsonWithErrorHandling(taskJson, errors);
 
         if (taskJsonNode == null) {
@@ -314,20 +313,16 @@ class TaskValidator {
         }
 
         int errorsStart = errors.length();
-        int warningsStart = warnings.length();
 
-        validateTaskStructureFields(taskJsonNode, errors, warnings);
+        validateTaskStructureFields(taskJsonNode, errors);
 
         if (!taskName.isEmpty()) {
             prefixTaskMessages(errors, errorsStart, taskName);
-            prefixTaskMessages(warnings, warningsStart, taskName);
         }
     }
 
-    private static void validateTaskStructureFields(
-        JsonNode taskJsonNode, StringBuilder errors, StringBuilder warnings) {
-
-        FieldValidator.validateOptionalStringField(taskJsonNode, "label", errors, warnings);
+    private static void validateTaskStructureFields(JsonNode taskJsonNode, StringBuilder errors) {
+        FieldValidator.validateStringFieldType(taskJsonNode, "label", errors);
         FieldValidator.validateRequiredStringField(taskJsonNode, "name", errors);
         appendErrorTaskTypeField(taskJsonNode, errors);
         appendErrorParametersField(taskJsonNode, errors);
@@ -336,8 +331,7 @@ class TaskValidator {
     /**
      * Validates an array containing TASK objects.
      */
-    public static void validateTaskArray(
-        JsonNode arrayValueJsonNode, String propertyPath, StringBuilder errors, StringBuilder warnings) {
+    public static void validateTaskArray(JsonNode arrayValueJsonNode, String propertyPath, StringBuilder errors) {
 
         for (int i = 0; i < arrayValueJsonNode.size(); i++) {
             JsonNode taskJsonNode = arrayValueJsonNode.get(i);
@@ -348,7 +342,7 @@ class TaskValidator {
 
                 StringUtils.appendWithNewline(ValidationErrorUtils.typeError(path, "object", actualType), errors);
             } else {
-                validateTaskStructureFields(taskJsonNode, errors, warnings);
+                validateTaskStructureFields(taskJsonNode, errors);
 
                 if (taskJsonNode.has("parameters") && taskJsonNode.has("type")) {
                     JsonNode parametersJsonNode = taskJsonNode.get("parameters");
@@ -611,7 +605,7 @@ class TaskValidator {
      * Validates the structure of a nested task.
      */
     private static void validateTaskStructure(JsonNode nestedTaskJsonNode, ValidationContext context) {
-        validateTaskStructureFields(nestedTaskJsonNode, context.getErrors(), context.getWarnings());
+        validateTaskStructureFields(nestedTaskJsonNode, context.getErrors());
     }
 
     /**
