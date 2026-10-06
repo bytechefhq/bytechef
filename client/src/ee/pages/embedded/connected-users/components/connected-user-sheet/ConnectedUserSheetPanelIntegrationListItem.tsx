@@ -1,12 +1,11 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import CredentialsStatus from '@/ee/pages/embedded/connected-users/components/CredentialsStatus';
+import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
+import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserSheetPanelIntegrationWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowList';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {
@@ -22,7 +21,6 @@ import {
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -104,13 +102,10 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
 
                             <div className="flex gap-4">
-                                <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-                                    <CredentialsStatus
-                                        enabled={connectedUserIntegrationInstance.credentialStatus === 'VALID'}
-                                    />
-
-                                    <span>{`Account ${connectedUserIntegrationInstance.credentialStatus === 'VALID' ? 'Connected' : 'Errors'}`}</span>
-                                </div>
+                                <ConnectedUserCredentialStatus
+                                    componentTitle={componentDefinition.title!}
+                                    credentialStatus={connectedUserIntegrationInstance.credentialStatus}
+                                />
 
                                 <div className="flex items-center space-x-1">
                                     {integrationInstance && (
@@ -175,24 +170,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
                         </div>
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    className="text-destructive"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                >
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
                     </div>
                 </div>
             )}

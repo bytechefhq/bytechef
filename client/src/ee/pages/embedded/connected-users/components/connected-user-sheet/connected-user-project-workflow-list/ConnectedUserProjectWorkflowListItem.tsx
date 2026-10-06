@@ -1,17 +1,15 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import {
     ConnectedUserProjectsQuery,
     useDeleteConnectedUserProjectWorkflowMutation,
     useEnableConnectedUserProjectWorkflowMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
 export type ConnectedUserProjectWorkflowType =
@@ -102,21 +100,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                         </div>
                     </div>
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                                size="icon"
-                                variant="ghost"
-                            />
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
                 </div>
             </li>
 
