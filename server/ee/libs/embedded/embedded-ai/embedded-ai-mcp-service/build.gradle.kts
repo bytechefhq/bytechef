@@ -2,6 +2,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
@@ -10,6 +11,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
