@@ -12,6 +12,9 @@ query workspaceMcpServers($workspaceId: ID!) {
             componentName
             componentVersion
             title
+            mcpTools {
+                id
+            }
         }
         tags {
             id
