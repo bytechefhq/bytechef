@@ -44,6 +44,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Flow;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
@@ -105,8 +106,11 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
         AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
         Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        TurnTextSeparator turnTextSeparator = new TurnTextSeparator();
 
         ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
+            turnTextSeparator.markToolExecuted();
+
             Map<String, @Nullable Object> toolExecutionLogEntry = new LinkedHashMap<>();
 
             toolExecutionLogEntry.put("confidence", toolExecutionEvent.confidence());
@@ -145,7 +149,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Flux<Object> contentFlux = withEnvironmentContext(
             chatClientRequestSpec.stream()
                 .chatResponse()
-                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, context))));
+                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
 
         return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
     }
@@ -223,7 +227,9 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             reactor.util.context.Context.of(EnvironmentContextThreadLocalAccessor.KEY, environment));
     }
 
-    private static List<Object> toSseEvents(ChatResponse chatResponse, ActionContext context) {
+    private static List<Object> toSseEvents(
+        ChatResponse chatResponse, TurnTextSeparator turnTextSeparator, ActionContext context) {
+
         List<Object> events = new ArrayList<>();
 
         Generation result = chatResponse.getResult();
@@ -235,7 +241,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                 String text = output.getText();
 
                 if (text != null && !text.isEmpty()) {
-                    events.add(text);
+                    events.add(turnTextSeparator.apply(text));
                 }
             }
         }
@@ -255,5 +261,29 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         }
 
         return events;
+    }
+
+    /**
+     * Separates the text of consecutive model turns. With internal tool execution the model's turns arrive as one
+     * stream, so the text written before a tool call and the text written after it would otherwise run together.
+     */
+    static final class TurnTextSeparator {
+
+        private static final String SEPARATOR = "\n\n";
+
+        private final AtomicBoolean textEmitted = new AtomicBoolean();
+        private final AtomicBoolean toolExecuted = new AtomicBoolean();
+
+        void markToolExecuted() {
+            toolExecuted.set(true);
+        }
+
+        String apply(String text) {
+            boolean separate = toolExecuted.getAndSet(false) && textEmitted.get();
+
+            textEmitted.set(true);
+
+            return separate ? SEPARATOR + text : text;
+        }
     }
 }
