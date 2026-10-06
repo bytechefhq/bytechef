@@ -23,8 +23,8 @@ comingSoon: true
 Each server in the list displays:
 
 - **Name** -- the server name.
-- **Component count** -- how many components the server exposes as MCP tools.
-- **Workflow count** -- how many workflows are associated with the server.
+- **Component tool count** -- how many component actions the server exposes as MCP tools, across all of its components.
+- **Workflow tool count** -- how many workflows the server exposes; each workflow becomes one tool.
 - **Tags** -- assigned tags shown as badges.
 - **Enabled/Disabled status** -- whether the server is currently active.
 - **Last modified date** -- when the server was last updated.
