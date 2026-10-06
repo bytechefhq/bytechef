@@ -82,6 +82,20 @@ public class AiAgentUtilsSkillsTool implements AiAgentUtilsClusterElementContrib
     private static final Pattern FRONTMATTER_DESCRIPTION_PATTERN = Pattern.compile(
         "^---\\s*\\n.*?^description:\\s*(.+?)\\s*$", Pattern.MULTILINE | Pattern.DOTALL);
     private static final String SKILLS = "skills";
+    private static final String SCRIPT_TOOL_INPUT = "input";
+    private static final String SCRIPT_TOOL_INPUT_SCHEMA = """
+        {
+          "type": "object",
+          "properties": {
+            "input": {
+              "type": "object",
+              "description": "The input object the script receives, shaped as the skill's instructions describe.",
+              "additionalProperties": true
+            }
+          },
+          "required": ["input"]
+        }
+        """;
     private static final String SKILL_ID = "skillId";
     private static final String SKILL_MD_FILENAME = "SKILL.md";
 
@@ -233,15 +247,21 @@ public class AiAgentUtilsSkillsTool implements AiAgentUtilsClusterElementContrib
         return FunctionToolCallback.builder(
             toolName,
             (Map<String, Object> toolInput) -> {
+                Object scriptInput = toolInput == null ? null : toolInput.get(SCRIPT_TOOL_INPUT);
+
                 Parameters scriptParams = ParametersFactory.create(
                     Map.of(
                         "script", scriptContent,
-                        ScriptConstants.INPUT, toolInput != null ? toolInput : Map.of()));
+                        ScriptConstants.INPUT, scriptInput != null ? scriptInput : Map.of()));
 
                 return polyglotEngine.execute(languageId, scriptParams, componentConnections, jobContextAware);
             })
             .inputType(Map.class)
-            .description(skillDescription)
+            .inputSchema(SCRIPT_TOOL_INPUT_SCHEMA)
+            .description(
+                ("Runs the scripts/%s script of the %s skill. Put the script's input object in the `%s` argument, " +
+                    "with the fields the skill's instructions give for this script. Skill: %s")
+                        .formatted(scriptEntry.fileName(), skillName, SCRIPT_TOOL_INPUT, skillDescription))
             .build();
     }
 
