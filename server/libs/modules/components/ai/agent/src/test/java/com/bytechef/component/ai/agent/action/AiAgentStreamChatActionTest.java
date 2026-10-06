@@ -25,9 +25,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
+import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -35,6 +38,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
@@ -199,5 +205,35 @@ class AiAgentStreamChatActionTest {
 
         assertThat(turnTextSeparator.apply("**New**")).isEqualTo("**New**");
         assertThat(turnTextSeparator.apply(" items")).isEqualTo(" items");
+    }
+
+    @Test
+    void testToolExecutionSeparatesStreamedTextOfNextTurn() {
+        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
+        ActionContext context = mock(ActionContext.class);
+        AiAgentStreamChatAction.TurnTextSeparator turnTextSeparator = new AiAgentStreamChatAction.TurnTextSeparator();
+
+        ToolExecutionListener toolExecutionListener = AiAgentStreamChatAction.createToolExecutionListener(
+            emitterReference, bufferedEvents, turnTextSeparator, context);
+
+        assertThat(
+            AiAgentStreamChatAction.toSseEvents(chatResponse("I'll load the skill first."), turnTextSeparator, context))
+                .containsExactly("I'll load the skill first.");
+
+        toolExecutionListener.onToolExecution(
+            new ToolExecutionEvent("release_notes", Map.of(), "skill instructions", null, null));
+
+        assertThat(AiAgentStreamChatAction.toSseEvents(chatResponse("**New**"), turnTextSeparator, context))
+            .containsExactly("\n\n**New**");
+        assertThat(AiAgentStreamChatAction.toSseEvents(chatResponse(" items"), turnTextSeparator, context))
+            .containsExactly(" items");
+        assertThat(bufferedEvents).hasSize(1);
+    }
+
+    private static ChatResponse chatResponse(String text) {
+        return ChatResponse.builder()
+            .generations(List.of(new Generation(new AssistantMessage(text))))
+            .build();
     }
 }
