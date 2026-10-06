@@ -138,7 +138,9 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                     </div>
                 </div>
 
-                {!isMcpWorkflow && (
+                {isMcpWorkflow ? (
+                    <div aria-hidden="true" className="size-9 shrink-0" />
+                ) : (
                     <IntegrationInstanceConfigurationWorkflowListItemDropDownMenu
                         onEditClick={() => setShowEditWorkflowDialog(true)}
                         workflow={workflow}

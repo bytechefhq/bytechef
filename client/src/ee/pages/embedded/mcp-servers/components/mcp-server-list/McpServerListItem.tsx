@@ -4,8 +4,9 @@ import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpServerDialog from '@/ee/pages/embedded/mcp-servers/components/McpServerDialog';
-import McpServerListItemDropdownMenu from '@/ee/pages/embedded/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
 import TagList from '@/shared/components/TagList';
+import McpServerListItemDropdownMenu from '@/shared/components/mcp-server/McpServerListItemDropdownMenu';
+import McpServerToolCounts from '@/shared/components/mcp-server/McpServerToolCounts';
 import {McpServer, Tag} from '@/shared/middleware/graphql';
 import {ChevronDown, ServerIcon} from 'lucide-react';
 
@@ -58,19 +59,10 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                                     className="group mr-4 flex text-xs font-semibold text-muted-foreground"
                                     ref={toolsCollapsibleTriggerRef}
                                 >
-                                    <span className="mr-1">
-                                        {mcpServer.mcpComponents?.length === 1
-                                            ? `1 component`
-                                            : `${mcpServer.mcpComponents?.length || 0} components`}
-                                    </span>
-
-                                    <span className="mx-1">-</span>
-
-                                    <span className="mr-1">
-                                        {mcpIntegrationInstanceConfigurationWorkflows?.length === 1
-                                            ? `1 workflow`
-                                            : `${mcpIntegrationInstanceConfigurationWorkflows?.length || 0} workflows`}
-                                    </span>
+                                    <McpServerToolCounts
+                                        mcpServer={mcpServer}
+                                        workflowToolCount={mcpIntegrationInstanceConfigurationWorkflows?.length || 0}
+                                    />
 
                                     <ChevronDown className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
