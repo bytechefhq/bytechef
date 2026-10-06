@@ -57,9 +57,9 @@ const McpServerTabs = ({
             <Tabs onValueChange={(value) => setActiveTab(value as McpServerToolsTabType | 'connect')} value={activeTab}>
                 <div className="flex items-center justify-between">
                     <TabsList>
-                        <TabsTrigger value="components">Components</TabsTrigger>
+                        <TabsTrigger value="components">Component Tools</TabsTrigger>
 
-                        <TabsTrigger value="workflows">Workflows</TabsTrigger>
+                        <TabsTrigger value="workflows">Workflow Tools</TabsTrigger>
 
                         <TabsTrigger value="connect">Connect</TabsTrigger>
                     </TabsList>
