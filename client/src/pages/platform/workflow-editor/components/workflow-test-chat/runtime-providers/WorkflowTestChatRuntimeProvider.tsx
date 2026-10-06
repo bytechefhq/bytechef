@@ -1,6 +1,7 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import getChatTriggerName from '@/pages/platform/workflow-editor/utils/getChatTriggerName';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
@@ -109,7 +110,7 @@ export function WorkflowTestChatRuntimeProvider({
                 id: workflow.id!,
                 testWorkflowRequest: {
                     inputs: {
-                        trigger_1: {
+                        [getChatTriggerName(workflow)]: {
                             attachments: message.attachments,
                             conversationId,
                             message: input,
