@@ -7,10 +7,13 @@
 
 package com.bytechef.ee.embedded.ai.mcp.config;
 
+import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.ee.embedded.ai.mcp.event.McpToolBeforeDeleteEventListener;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolServiceImpl;
+import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionImpl;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -53,17 +56,22 @@ public class EmbeddedMcpIntTestConfiguration {
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class EmbeddedMcpIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
+        private final Encryption encryption;
         private final ObjectMapper objectMapper;
 
         @SuppressFBWarnings("EI2")
-        public EmbeddedMcpIntTestJdbcConfiguration(ObjectMapper objectMapper) {
+        public EmbeddedMcpIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            this.encryption = encryption;
             this.objectMapper = objectMapper;
         }
 
         @Override
         protected List<?> userConverters() {
             return Arrays.asList(
-                new MapWrapperToStringConverter(objectMapper), new StringToMapWrapperConverter(objectMapper));
+                new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                new MapWrapperToStringConverter(objectMapper),
+                new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
+                new StringToMapWrapperConverter(objectMapper));
         }
     }
 }

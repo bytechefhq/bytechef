@@ -15,6 +15,7 @@ type ConnectedUserMcpServer {
     environmentId: ID!
     lastModifiedDate: String
     tools: [ConnectedUserMcpServerTool!]!
+    workflows: [ConnectedUserMcpServerWorkflow!]!
 }
 
 type ConnectedUserMcpServerTool {
@@ -24,4 +25,15 @@ type ConnectedUserMcpServerTool {
     integrationInstanceId: ID!
     name: String!
     enabled: Boolean!
+}
+
+type ConnectedUserMcpServerWorkflow {
+    integrationInstanceId: ID!
+    componentName: String!
+    integrationVersion: Int!
+    workflowId: String!
+    name: String!
+    description: String
+    enabled: Boolean!
+    lastExecutionDate: String
 }
