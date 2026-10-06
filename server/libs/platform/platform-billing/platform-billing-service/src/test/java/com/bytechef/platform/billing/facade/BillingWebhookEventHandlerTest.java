@@ -17,6 +17,7 @@
 package com.bytechef.platform.billing.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -61,6 +62,23 @@ class BillingWebhookEventHandlerTest {
     private static final String PRODUCT_USAGE_ID = "prod_usage_test";
     private static final String SUBSCRIPTION_ID = "sub_test123";
     private static final String CHECKOUT_SUBSCRIPTION_ID = "sub_checkout_test";
+    private static final String USAGE_ITEM_JSON = """
+        {
+          "id": "si_usage_item",
+          "object": "subscription_item",
+          "current_period_start": 1780272000,
+          "current_period_end": 1782864000,
+          "price": {
+            "id": "price_usage",
+            "object": "price",
+            "product": "prod_usage",
+            "recurring": {
+              "interval": "month",
+              "usage_type": "metered"
+            }
+          }
+        }
+        """;
 
     @Mock
     private BillingSubscriptionService billingSubscriptionService;
@@ -107,7 +125,7 @@ class BillingWebhookEventHandlerTest {
         when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
+        when(stripeClient.retrievePrice("price_usage")).thenReturn(priceWithProductUnitLimit(500L));
 
         handler.handle(buildEvent(subscriptionUpdatedPayloadWithPeriodRollover(
             SUBSCRIPTION_ID, 1780272000L, 1782864000L)));
@@ -115,6 +133,8 @@ class BillingWebhookEventHandlerTest {
         ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
 
         verify(billingSubscriptionService).save(captor.capture());
+        assertThat(captor.getValue()
+            .getProductUnitLimit()).isEqualTo(500);
         assertThat(captor.getValue()
             .getLastReportedAt()).isNull();
         assertThat(captor.getValue()
@@ -137,6 +157,21 @@ class BillingWebhookEventHandlerTest {
         verify(billingSubscriptionService).save(captor.capture());
         assertThat(captor.getValue()
             .getPlanName()).isEqualTo("Starter");
+    }
+
+    @Test
+    void testHandleSubscriptionUpdatedThrowsWhenMeteredItemMissing() {
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
+            .thenReturn(Optional.of(starterSubscription()));
+
+        assertThatThrownBy(
+            () -> handler.handle(buildEvent(subscriptionUpdatedPayloadWithoutUsageItem(SUBSCRIPTION_ID))))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Subscription missing usage product");
+
+        verify(billingSubscriptionService, never()).save(any());
+        verify(billingWebhookEventService, never()).save(any());
     }
 
     @Test
@@ -171,7 +206,7 @@ class BillingWebhookEventHandlerTest {
         when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
+        when(stripeClient.retrievePrice("price_usage")).thenReturn(priceWithProductUnitLimit(100L));
 
         handler.handle(buildEvent(subscriptionUpdatedPayloadWithProduct(SUBSCRIPTION_ID, PRODUCT_STARTER_ID)));
 
@@ -194,7 +229,7 @@ class BillingWebhookEventHandlerTest {
         when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(stripeClient.retrievePrice(any())).thenReturn(priceWithProductUnitLimit(100L));
+        when(stripeClient.retrievePrice("price_usage")).thenReturn(priceWithProductUnitLimit(100L));
 
         handler.handle(buildEvent(subscriptionUpdatedPayloadWithProduct(SUBSCRIPTION_ID, PRODUCT_GROWTH_ID)));
 
@@ -395,13 +430,14 @@ class BillingWebhookEventHandlerTest {
                             "usage_type": "licensed"
                           }
                         }
-                      }
+                      },
+                      %s
                     ]
                   }
                 }
               }
             }
-            """.formatted(subscriptionId, periodStartEpoch, periodEndEpoch);
+            """.formatted(subscriptionId, periodStartEpoch, periodEndEpoch, USAGE_ITEM_JSON);
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
@@ -418,11 +454,32 @@ class BillingWebhookEventHandlerTest {
                   "object": "subscription",
                   "status": "active",
                   "metadata": { "planName": "%s", "tenantId": "public" },
+                  "items": { "object": "list", "data": [%s], "has_more": false, "url": "/v1/subscription_items" }
+                }
+              }
+            }
+            """.formatted(subscriptionId, planName, USAGE_ITEM_JSON);
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private String subscriptionUpdatedPayloadWithoutUsageItem(String subscriptionId) {
+        return """
+            {
+              "id": "evt_sub_updated_without_usage",
+              "object": "event",
+              "api_version": "2026-04-22.dahlia",
+              "type": "customer.subscription.updated",
+              "data": {
+                "object": {
+                  "id": "%s",
+                  "object": "subscription",
+                  "status": "active",
+                  "metadata": { "tenantId": "public" },
                   "items": { "object": "list", "data": [], "has_more": false, "url": "/v1/subscription_items" }
                 }
               }
             }
-            """.formatted(subscriptionId, planName);
+            """.formatted(subscriptionId);
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
@@ -507,13 +564,14 @@ class BillingWebhookEventHandlerTest {
                             "usage_type": "licensed"
                           }
                         }
-                      }
+                      },
+                      %s
                     ]
                   }
                 }
               }
             }
-            """.formatted(subscriptionId, productId);
+            """.formatted(subscriptionId, productId, USAGE_ITEM_JSON);
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
@@ -533,14 +591,14 @@ class BillingWebhookEventHandlerTest {
                   "metadata": { "tenantId": "public" },
                   "items": {
                     "object": "list",
-                    "data": [],
+                    "data": [%s],
                     "has_more": false,
                     "url": "/v1/subscription_items"
                   }
                 }
               }
             }
-            """.formatted(subscriptionId);
+            """.formatted(subscriptionId, USAGE_ITEM_JSON);
     }
 
     private Event buildEvent(String payload) throws Exception {
