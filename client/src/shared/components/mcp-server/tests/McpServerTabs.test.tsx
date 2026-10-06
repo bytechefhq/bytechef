@@ -55,11 +55,11 @@ afterEach(() => {
 });
 
 describe('McpServerTabs', () => {
-    it('opens on the Components tab with an Add Component button', () => {
+    it('opens on the Component Tools tab with an Add Component button', () => {
         renderTabs();
 
         expect(screen.getByText('Showing components')).toBeInTheDocument();
-        expect(screen.getByRole('tab', {name: 'Components', selected: true})).toBeInTheDocument();
+        expect(screen.getByRole('tab', {name: 'Component Tools', selected: true})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Add Component'})).toBeInTheDocument();
     });
 
@@ -75,10 +75,10 @@ describe('McpServerTabs', () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    it('switches the button to Add Workflows on the Workflows tab', async () => {
+    it('switches the button to Add Workflows on the Workflow Tools tab', async () => {
         renderTabs();
 
-        await userEvent.click(screen.getByRole('tab', {name: 'Workflows'}));
+        await userEvent.click(screen.getByRole('tab', {name: 'Workflow Tools'}));
 
         expect(screen.getByText('Showing workflows')).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Add Component'})).not.toBeInTheDocument();
@@ -105,12 +105,12 @@ describe('McpServerTabs', () => {
         expect(screen.getByText('Workflow dialog for mcpserver1')).toBeInTheDocument();
     });
 
-    it('shows Components, Workflows and Connect as the server tabs', () => {
+    it('shows Component Tools, Workflow Tools and Connect as the server tabs', () => {
         renderTabs();
 
         expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
-            'Components',
-            'Workflows',
+            'Component Tools',
+            'Workflow Tools',
             'Connect',
         ]);
     });

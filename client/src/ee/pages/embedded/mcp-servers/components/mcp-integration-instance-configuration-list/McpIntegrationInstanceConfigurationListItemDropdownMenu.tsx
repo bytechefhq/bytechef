@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {
@@ -7,7 +8,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, RefreshCwIcon, Trash2Icon} from 'lucide-react';
 
 import {McpIntegrationInstanceConfigurationItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
 import useMcpIntegrationInstanceConfigurationListItemDropdownMenu from './hooks/useMcpIntegrationInstanceConfigurationListItemDropdownMenu';
@@ -34,16 +35,22 @@ const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={onEditWorkflowsClick}>Edit Workflows</DropdownMenuItem>
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onEditWorkflowsClick}>
+                        <EditIcon /> Edit Workflows
+                    </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={onUpdateIntegrationVersionClick}>
-                        Update Integration Version
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onUpdateIntegrationVersionClick}>
+                        <RefreshCwIcon /> Update Integration Version
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
-                        <span className="w-full">Delete</span>
+                    <DropdownMenuItem
+                        className="dropdown-menu-item-destructive"
+                        onClick={() => setShowDeleteDialog(true)}
+                        variant="destructive"
+                    >
+                        <Trash2Icon /> Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {
@@ -7,7 +8,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, RefreshCwIcon, Trash2Icon} from 'lucide-react';
 
 import {McpProjectItemType} from './hooks/useMcpProjectList';
 import useMcpProjectListItemDropdownMenu from './hooks/useMcpProjectListItemDropdownMenu';
@@ -34,18 +35,23 @@ const McpProjectListItemDropdownMenu = ({
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={onEditWorkflowsClick}>Edit Workflows</DropdownMenuItem>
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onEditWorkflowsClick}>
+                        <EditIcon /> Edit Workflows
+                    </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={onChangeProjectVersionClick}>Change Project Version</DropdownMenuItem>
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onChangeProjectVersionClick}>
+                        <RefreshCwIcon /> Change Project Version
+                    </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem
-                        className="text-destructive"
+                        className="dropdown-menu-item-destructive"
                         disabled={isDeletePending}
                         onClick={() => setShowDeleteDialog(true)}
+                        variant="destructive"
                     >
-                        <span className="w-full">Delete</span>
+                        <Trash2Icon /> Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

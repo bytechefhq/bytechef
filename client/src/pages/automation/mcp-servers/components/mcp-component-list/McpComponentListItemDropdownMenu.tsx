@@ -1,9 +1,16 @@
+import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {McpComponent, useDeleteMcpComponentMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 interface McpComponentListItemDropDownProps {
@@ -39,12 +46,18 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpCompon
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={onEditClick}>
-                        <span className="w-full">Edit</span>
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
+                        <EditIcon /> Edit
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
-                        <span className="w-full">Delete</span>
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                        className="dropdown-menu-item-destructive"
+                        onClick={() => setShowDeleteDialog(true)}
+                        variant="destructive"
+                    >
+                        <Trash2Icon /> Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
