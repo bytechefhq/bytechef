@@ -309,7 +309,9 @@ public class StripeClientImpl implements StripeClient {
                         .build())
                 .putMetadata("planName", planName)
                 .putMetadata("tenantId", tenantId)
+                .setAllowPromotionCodes(true)
                 .setClientReferenceId(tenantId)
+                .setPaymentMethodCollection(SessionCreateParams.PaymentMethodCollection.IF_REQUIRED)
                 .setSubscriptionData(
                     SessionCreateParams.SubscriptionData.builder()
                         .putMetadata("tenantId", tenantId)
