@@ -156,6 +156,7 @@ class WorkflowValidatorNestedTaskReferenceTest {
                                 "key": "BOT",
                                 "tasks": [
                                     {
+                                        "label": 42,
                                         "name": "task1",
                                         "type": "component/v1/action1",
                                         "parameters": {
@@ -176,8 +177,8 @@ class WorkflowValidatorNestedTaskReferenceTest {
 
         validate(tasksJson, errors, warnings);
 
-        assertEquals("", errors.toString());
-        assertEquals("[branch_1] Missing recommended field: label", warnings.toString());
+        assertEquals("[branch_1] Field 'label' must be a string", errors.toString());
+        assertEquals("", warnings.toString());
     }
 
     private static void assertNoErrors(String tasksJson) {

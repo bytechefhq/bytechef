@@ -132,7 +132,7 @@ class WorkflowValidatorOptionalParametersTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(task, errors, new StringBuilder());
+        TaskValidator.validateTaskStructure(task, errors);
 
         assertEquals("[testTask] Field 'parameters' must be an object", errors.toString());
     }
