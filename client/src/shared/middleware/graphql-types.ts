@@ -578,6 +578,7 @@ export type ConnectedUserMcpServer = {
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   tools: Array<ConnectedUserMcpServerTool>;
+  workflows: Array<ConnectedUserMcpServerWorkflow>;
 };
 
 export type ConnectedUserMcpServerTool = {
@@ -588,6 +589,18 @@ export type ConnectedUserMcpServerTool = {
   id: Scalars['ID']['output'];
   integrationInstanceId: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+};
+
+export type ConnectedUserMcpServerWorkflow = {
+  __typename?: 'ConnectedUserMcpServerWorkflow';
+  componentName: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  integrationInstanceId: Scalars['ID']['output'];
+  integrationVersion: Scalars['Int']['output'];
+  lastExecutionDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  workflowId: Scalars['String']['output'];
 };
 
 export type ConnectedUserPage = {
