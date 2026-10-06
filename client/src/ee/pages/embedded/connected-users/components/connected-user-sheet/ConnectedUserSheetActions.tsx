@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -11,7 +12,7 @@ import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {EllipsisVerticalIcon, PowerIcon, PowerOffIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 const ConnectedUserSheetActions = ({connectedUser}: {connectedUser: ConnectedUser}) => {
@@ -40,6 +41,7 @@ const ConnectedUserSheetActions = ({connectedUser}: {connectedUser: ConnectedUse
 
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem
+                        className="dropdown-menu-item"
                         onClick={() =>
                             enableConnectedUserMutation.mutate({
                                 enable: !connectedUser.enabled,
@@ -47,13 +49,25 @@ const ConnectedUserSheetActions = ({connectedUser}: {connectedUser: ConnectedUse
                             })
                         }
                     >
-                        {connectedUser.enabled ? 'Disable' : 'Enable'}
+                        {connectedUser.enabled ? (
+                            <>
+                                <PowerOffIcon /> Disable
+                            </>
+                        ) : (
+                            <>
+                                <PowerIcon /> Enable
+                            </>
+                        )}
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
-                        Delete
+                    <DropdownMenuItem
+                        className="dropdown-menu-item-destructive"
+                        onClick={() => setShowDeleteDialog(true)}
+                        variant="destructive"
+                    >
+                        <Trash2Icon /> Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

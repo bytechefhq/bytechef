@@ -1,36 +1,38 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
-import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserMcpServerTool, useEnableConnectedUserMcpToolMutation} from '@/shared/middleware/graphql';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import InlineSVG from 'react-inlinesvg';
 
 const ConnectedUserMcpServerListItemToolRow = ({tool}: {tool: ConnectedUserMcpServerTool}) => {
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true});
+    const {data: componentDefinition} = useGetComponentDefinitionQuery({
+        componentName: tool.componentName,
+        componentVersion: tool.componentVersion,
+    });
 
-    const componentDefinition = componentDefinitions?.find((definition) => definition.name === tool.componentName);
+    const toolDefinition = componentDefinition?.clusterElements?.find(
+        (clusterElement) => clusterElement.type === 'TOOLS' && clusterElement.name === tool.name
+    );
 
     const queryClient = useQueryClient();
 
     const enableConnectedUserMcpToolMutation = useEnableConnectedUserMcpToolMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['connectedUserMcpServers']});
+            void queryClient.invalidateQueries({queryKey: ['connectedUserMcpServers']});
         },
     });
 
     return (
-        <li className="flex items-center justify-between rounded-md p-2 py-1 hover:bg-gray-50">
-            <div className="flex items-center gap-x-2 text-sm font-semibold">
-                {componentDefinition?.icon && (
-                    <div className="flex items-center justify-center rounded-full border p-1">
-                        <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
-                    </div>
-                )}
+        <li className="flex items-center gap-2 py-0.5">
+            <div className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm font-medium">{toolDefinition?.title || tool.name}</span>
 
-                <span>{tool.name}</span>
+                {toolDefinition?.description && (
+                    <span className="truncate text-xs text-muted-foreground">{toolDefinition.description}</span>
+                )}
             </div>
 
-            <div className="relative mr-11 flex items-center">
+            <div className="relative mr-11 flex shrink-0 items-center">
                 {enableConnectedUserMcpToolMutation.isPending && (
                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                 )}

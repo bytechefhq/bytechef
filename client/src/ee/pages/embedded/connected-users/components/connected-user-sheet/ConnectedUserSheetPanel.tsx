@@ -8,7 +8,7 @@ import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 // Underline tab styling that matches the workflow node details panel — brand-colored active
 // bottom border + text, no pill background — so tabs read consistently across the app.
 const tabsTriggerClassName =
-    'grow rounded-none border-0 border-b border-border py-2.5 text-content-neutral-secondary shadow-none hover:border-stroke-brand-primary hover:text-content-brand-primary data-[state=active]:border-stroke-brand-primary data-[state=active]:bg-transparent data-[state=active]:text-content-brand-primary data-[state=active]:shadow-none';
+    'grow rounded-none border-0 border-b border-border py-2.5 text-content-neutral-secondary shadow-none hover:text-content-brand-primary group-data-[variant=default]/tabs-list:data-[state=active]:shadow-none data-[state=active]:border-stroke-brand-primary data-[state=active]:bg-transparent data-[state=active]:text-content-brand-primary data-[state=active]:shadow-none';
 
 interface ConnectedUserSheetPanelProps {
     connectedUser: ConnectedUser;
@@ -49,7 +49,10 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
 
                 <TabsContent value="mcp-servers">
                     {connectedUser.id != null && (
-                        <ConnectedUserSheetPanelMcpServerList connectedUserId={connectedUser.id} />
+                        <ConnectedUserSheetPanelMcpServerList
+                            connectedUserId={connectedUser.id}
+                            connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
+                        />
                     )}
                 </TabsContent>
 
