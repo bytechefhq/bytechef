@@ -29,7 +29,7 @@ const ProjectItemSelect = ({
             <TooltipTrigger asChild>
                 <DropdownMenuTrigger
                     aria-label="Project item select"
-                    className="flex max-w-64 items-center gap-1 rounded-md px-1.5 py-1 font-semibold text-content-neutral-primary outline-hidden hover:bg-surface-neutral-primary-hover data-[state=open]:bg-surface-neutral-primary-hover"
+                    className="flex max-w-64 items-center gap-1 rounded-md px-1.5 py-1 text-content-neutral-primary outline-hidden hover:bg-surface-neutral-primary-hover data-[state=open]:bg-surface-neutral-primary-hover"
                 >
                     {currentLabel ? (
                         <span className="truncate">{currentLabel}</span>
