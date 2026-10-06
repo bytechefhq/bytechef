@@ -263,10 +263,6 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         return events;
     }
 
-    /**
-     * Separates the text of consecutive model turns. With internal tool execution the model's turns arrive as one
-     * stream, so the text written before a tool call and the text written after it would otherwise run together.
-     */
     static final class TurnTextSeparator {
 
         private static final String SEPARATOR = "\n\n";
