@@ -1,26 +1,30 @@
 import AlertDialog from '@/components/AlertDialog';
-import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
+import ConnectedUserMcpServerComponentGroup from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerComponentGroup';
 import ConnectedUserMcpServerListItemToolRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemToolRow';
+import ConnectedUserMcpServerListItemWorkflowRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemWorkflowRow';
+import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
+import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {
     ConnectedUserMcpServer,
     useDeleteConnectedUserMcpServerMutation,
     useEnableConnectedUserMcpServerMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ConnectedUserMcpServerListItem = ({
     connectedUserId,
+    connectedUserIntegrationInstances,
     mcpServer,
 }: {
     connectedUserId: number;
+    connectedUserIntegrationInstances: ConnectedUserIntegrationInstance[];
     mcpServer: ConnectedUserMcpServer;
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -29,7 +33,7 @@ const ConnectedUserMcpServerListItem = ({
 
     const deleteConnectedUserMcpServerMutation = useDeleteConnectedUserMcpServerMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['connectedUserMcpServers']});
+            void queryClient.invalidateQueries({queryKey: ['connectedUserMcpServers']});
 
             setShowDeleteDialog(false);
         },
@@ -37,18 +41,35 @@ const ConnectedUserMcpServerListItem = ({
 
     const enableConnectedUserMcpServerMutation = useEnableConnectedUserMcpServerMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['connectedUserMcpServers']});
+            void queryClient.invalidateQueries({queryKey: ['connectedUserMcpServers']});
+            void queryClient.invalidateQueries({queryKey: ConnectedUserKeys.connectedUser(connectedUserId)});
         },
     });
 
     const toolCount = mcpServer.tools.length;
+    const workflowCount = mcpServer.workflows.length;
+
+    const toolsByComponentName = useMemo(
+        () => groupByComponent(mcpServer.tools, (tool) => tool.componentVersion),
+        [mcpServer.tools]
+    );
+
+    const workflowsByComponentName = useMemo(
+        () => groupByComponent(mcpServer.workflows, (workflow) => workflow.integrationVersion),
+        [mcpServer.workflows]
+    );
+
+    const getCredentialStatus = (integrationInstanceId: string) =>
+        connectedUserIntegrationInstances.find(
+            (integrationInstance) => String(integrationInstance.id) === integrationInstanceId
+        )?.credentialStatus;
 
     const lastModifiedDate = mcpServer.lastModifiedDate ? new Date(Date.parse(mcpServer.lastModifiedDate)) : undefined;
 
     return (
         <>
-            <Collapsible key={mcpServer.id}>
-                <div className="mb-2 flex items-center justify-between rounded border border-border/50 p-3">
+            <Collapsible className="mb-2 rounded border border-border/50" key={mcpServer.id}>
+                <div className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-destructive-foreground">
                     <CollapsibleTrigger className="flex-1 py-3">
                         <div className="flex flex-col items-start justify-center gap-y-2">
                             <div
@@ -60,8 +81,16 @@ const ConnectedUserMcpServerListItem = ({
                                 {mcpServer.name}
                             </div>
 
-                            <div className="text-xs font-semibold text-muted-foreground">
-                                {toolCount === 1 ? `${toolCount} tool` : `${toolCount} tools`}
+                            <div className="flex gap-4 text-xs font-semibold text-muted-foreground">
+                                {toolCount > 0 && (
+                                    <span>{toolCount === 1 ? '1 component tool' : `${toolCount} component tools`}</span>
+                                )}
+
+                                {workflowCount > 0 && (
+                                    <span>
+                                        {workflowCount === 1 ? '1 workflow tool' : `${workflowCount} workflow tools`}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </CollapsibleTrigger>
@@ -96,42 +125,69 @@ const ConnectedUserMcpServerListItem = ({
                             )}
                         </div>
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    className="text-destructive"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                >
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        {workflowCount > 0 ? (
+                            <div aria-hidden="true" className="size-9 shrink-0" />
+                        ) : (
+                            <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                        )}
                     </div>
                 </div>
 
                 <CollapsibleContent>
-                    {toolCount > 0 ? (
-                        <div className="flex w-full flex-col gap-y-3 p-3">
-                            <h3 className="flex justify-start px-2 text-sm font-semibold text-muted-foreground uppercase">
-                                Tools
+                    {toolCount > 0 && (
+                        <div className="flex w-full flex-col gap-y-2 py-3">
+                            <h3 className="flex justify-start px-3 text-sm font-semibold text-muted-foreground uppercase">
+                                Component Tools
                             </h3>
 
-                            <ul>
-                                {mcpServer.tools.map((tool) => (
-                                    <ConnectedUserMcpServerListItemToolRow key={tool.id} tool={tool} />
+                            <div className="flex flex-col gap-2 px-3">
+                                {toolsByComponentName.map((group) => (
+                                    <ConnectedUserMcpServerComponentGroup
+                                        componentName={group.componentName}
+                                        credentialStatus={getCredentialStatus(group.items[0].integrationInstanceId)}
+                                        key={`${group.componentName}_${group.version}`}
+                                        version={group.version}
+                                        versionKind="component"
+                                    >
+                                        {group.items.map((tool) => (
+                                            <ConnectedUserMcpServerListItemToolRow key={tool.id} tool={tool} />
+                                        ))}
+                                    </ConnectedUserMcpServerComponentGroup>
                                 ))}
-                            </ul>
+                            </div>
                         </div>
-                    ) : (
-                        <div className="px-4 py-3 text-sm text-muted-foreground">No tools enabled for this user.</div>
+                    )}
+
+                    {workflowCount > 0 && (
+                        <div className="flex w-full flex-col gap-y-2 py-3">
+                            <h3 className="flex justify-start px-3 text-sm font-semibold text-muted-foreground uppercase">
+                                Workflow Tools
+                            </h3>
+
+                            <div className="flex flex-col gap-2 px-3">
+                                {workflowsByComponentName.map((group) => (
+                                    <ConnectedUserMcpServerComponentGroup
+                                        componentName={group.componentName}
+                                        credentialStatus={getCredentialStatus(group.items[0].integrationInstanceId)}
+                                        key={`${group.componentName}_${group.version}`}
+                                        version={group.version}
+                                        versionKind="integration"
+                                    >
+                                        {group.items.map((workflow) => (
+                                            <ConnectedUserMcpServerListItemWorkflowRow
+                                                connectedUserId={connectedUserId}
+                                                key={`${workflow.integrationInstanceId}_${workflow.workflowId}`}
+                                                workflow={workflow}
+                                            />
+                                        ))}
+                                    </ConnectedUserMcpServerComponentGroup>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {toolCount === 0 && workflowCount === 0 && (
+                        <div className="px-3 py-3 text-sm text-muted-foreground">No tools enabled for this user.</div>
                     )}
                 </CollapsibleContent>
             </Collapsible>
@@ -150,5 +206,31 @@ const ConnectedUserMcpServerListItem = ({
         </>
     );
 };
+
+interface ComponentGroupI<T> {
+    componentName: string;
+    items: T[];
+    version: number;
+}
+
+function groupByComponent<T extends {componentName: string}>(
+    items: T[],
+    getVersion: (item: T) => number
+): ComponentGroupI<T>[] {
+    const groupsByKey = new Map<string, ComponentGroupI<T>>();
+
+    for (const item of items) {
+        const version = getVersion(item);
+        const key = `${item.componentName}_${version}`;
+
+        const group = groupsByKey.get(key) ?? {componentName: item.componentName, items: [], version};
+
+        group.items.push(item);
+
+        groupsByKey.set(key, group);
+    }
+
+    return [...groupsByKey.values()];
+}
 
 export default ConnectedUserMcpServerListItem;

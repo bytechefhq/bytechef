@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -16,7 +17,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {EllipsisVerticalIcon, EyeIcon, PowerIcon, PowerOffIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -129,25 +130,39 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem data-action="open-sheet" data-index={info.row.index.toString()}>
-                                Details
+                            <DropdownMenuItem
+                                className="dropdown-menu-item"
+                                data-action="open-sheet"
+                                data-index={info.row.index.toString()}
+                            >
+                                <EyeIcon /> Details
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
+                                className="dropdown-menu-item"
                                 data-action={connectedUsers[info.row.index].enabled ? 'disable' : 'enable'}
                                 data-index={info.row.index.toString()}
                             >
-                                {connectedUsers[info.row.index].enabled ? 'Disable' : 'Enable'}
+                                {connectedUsers[info.row.index].enabled ? (
+                                    <>
+                                        <PowerOffIcon /> Disable
+                                    </>
+                                ) : (
+                                    <>
+                                        <PowerIcon /> Enable
+                                    </>
+                                )}
                             </DropdownMenuItem>
 
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem
-                                className="text-destructive"
+                                className="dropdown-menu-item-destructive"
                                 data-action="delete"
                                 data-index={info.row.index.toString()}
+                                variant="destructive"
                             >
-                                Delete
+                                <Trash2Icon /> Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

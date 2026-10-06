@@ -1,7 +1,14 @@
 import ConnectedUserMcpServerListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItem';
+import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {useConnectedUserMcpServersQuery} from '@/shared/middleware/graphql';
 
-const ConnectedUserSheetPanelMcpServerList = ({connectedUserId}: {connectedUserId: number}) => {
+const ConnectedUserSheetPanelMcpServerList = ({
+    connectedUserId,
+    connectedUserIntegrationInstances,
+}: {
+    connectedUserId: number;
+    connectedUserIntegrationInstances: ConnectedUserIntegrationInstance[];
+}) => {
     const {data, isLoading} = useConnectedUserMcpServersQuery({
         connectedUserId: connectedUserId.toString(),
     });
@@ -13,10 +20,11 @@ const ConnectedUserSheetPanelMcpServerList = ({connectedUserId}: {connectedUserI
     const mcpServers = data?.connectedUserMcpServers ?? [];
 
     return mcpServers.length > 0 ? (
-        <div className="divide-y">
+        <div>
             {mcpServers.map((mcpServer) => (
                 <ConnectedUserMcpServerListItem
                     connectedUserId={connectedUserId}
+                    connectedUserIntegrationInstances={connectedUserIntegrationInstances}
                     key={mcpServer.id}
                     mcpServer={mcpServer}
                 />
