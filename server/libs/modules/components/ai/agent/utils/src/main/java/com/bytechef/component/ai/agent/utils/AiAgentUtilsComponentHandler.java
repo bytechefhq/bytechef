@@ -37,6 +37,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -50,8 +51,10 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
     private final ComponentDefinition componentDefinition;
 
     public AiAgentUtilsComponentHandler(
-        AiSkillFacade aiSkillFacade,
-        List<AiAgentUtilsClusterElementContributor> clusterElementContributors) {
+        AiSkillFacade aiSkillFacade, List<AiAgentUtilsClusterElementContributor> clusterElementContributors,
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        AiAgentUtilsTaskTool agentUtilsTaskTool = new AiAgentUtilsTaskTool(clusterElementDefinitionService);
 
         List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(
             AiAgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
@@ -61,7 +64,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             AiAgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
-            AiAgentUtilsTaskTool.CLUSTER_ELEMENT_DEFINITION,
+            agentUtilsTaskTool.clusterElementDefinition,
             tool(AiAgentUtilsAppendFilesToAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsCreateAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsDeleteAiSkillAction.of(aiSkillFacade)),
