@@ -114,6 +114,11 @@ class BillingWebhookEventHandler {
                 List<SubscriptionItem> items = stripeSubscription.getItems()
                     .getData();
 
+                SubscriptionItem usageItem = items.stream()
+                    .filter(this::isMeteredItem)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Subscription missing usage product"));
+
                 items.stream()
                     .filter(item -> !isMeteredItem(item))
                     .findFirst()
@@ -141,7 +146,7 @@ class BillingWebhookEventHandler {
                         Instant newPeriodStart = Instant.ofEpochSecond(flatItem.getCurrentPeriodStart());
 
                         if (!newPeriodStart.equals(subscription.getCurrentPeriodStart())) {
-                            subscription.setProductUnitLimit(getProductUnitLimit(flatItem));
+                            subscription.setProductUnitLimit(getProductUnitLimit(usageItem));
                             subscription.setCurrentPeriodStart(newPeriodStart);
                             subscription.setCurrentPeriodEnd(
                                 Instant.ofEpochSecond(flatItem.getCurrentPeriodEnd()));
@@ -149,10 +154,7 @@ class BillingWebhookEventHandler {
                         }
                     });
 
-                items.stream()
-                    .filter(this::isMeteredItem)
-                    .findFirst()
-                    .ifPresent(usageItem -> subscription.setUsageProductId(usageItem.getId()));
+                subscription.setUsageProductId(usageItem.getId());
 
                 return billingSubscriptionService.save(subscription);
             })
