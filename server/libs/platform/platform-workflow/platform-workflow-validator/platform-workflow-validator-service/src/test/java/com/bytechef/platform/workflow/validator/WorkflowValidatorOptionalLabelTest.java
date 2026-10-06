@@ -40,7 +40,7 @@ class WorkflowValidatorOptionalLabelTest {
             new PropertyInfo("name", "STRING", null, false, true, null, null)));
 
     @Test
-    void validateWorkflowTasksMissingTaskLabelAddsWarningNotError() {
+    void validateWorkflowTasksMissingTaskLabelAddsNoWarning() {
         String tasksJson = """
             [
                 {
@@ -59,7 +59,7 @@ class WorkflowValidatorOptionalLabelTest {
         validateTasks(tasksJson, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("[testTask] Missing recommended field: label", warnings.toString());
+        assertEquals("", warnings.toString());
     }
 
     @Test
@@ -133,7 +133,7 @@ class WorkflowValidatorOptionalLabelTest {
     }
 
     @Test
-    void validateWorkflowMissingTriggerLabelAddsWarningNotError() {
+    void validateWorkflowMissingTriggerLabelAddsNoWarning() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -156,7 +156,7 @@ class WorkflowValidatorOptionalLabelTest {
         validateWorkflow(workflow, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("[trigger_1] Missing recommended field: label", warnings.toString());
+        assertEquals("", warnings.toString());
     }
 
     private static void validateTasks(String tasksJson, StringBuilder errors, StringBuilder warnings) {

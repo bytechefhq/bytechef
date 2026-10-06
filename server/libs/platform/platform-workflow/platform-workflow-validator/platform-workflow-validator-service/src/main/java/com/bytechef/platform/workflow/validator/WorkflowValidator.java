@@ -216,7 +216,7 @@ public class WorkflowValidator {
         String task, TaskDefinitionProvider taskDefinitionProvider, StringBuilder errors, StringBuilder warnings) {
 
         try {
-            TaskValidator.validateTaskStructure(task, errors, warnings);
+            TaskValidator.validateTaskStructure(task, errors);
 
             JsonNode taskJsonNode = com.bytechef.commons.util.JsonUtils.readTree(task);
 
@@ -398,7 +398,7 @@ public class WorkflowValidator {
             taskOutputPropertyInfoMap.put(type, nestedTaskOutput);
         }
 
-        TaskValidator.validateTaskStructure(nestedTaskJsonNode.toString(), errors, warnings);
+        TaskValidator.validateTaskStructure(nestedTaskJsonNode.toString(), errors);
 
         return type;
     }
