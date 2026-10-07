@@ -41,7 +41,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(classes = ProjectIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
-public class ProjectWorkflowServiceIntTest {
+class ProjectWorkflowServiceIntTest {
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -58,19 +58,19 @@ public class ProjectWorkflowServiceIntTest {
     private Workspace workspace;
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         projectWorkflowRepository.deleteAll();
         projectRepository.deleteAll();
         workspaceRepository.deleteAll();
     }
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         workspace = workspaceRepository.save(new Workspace("test"));
     }
 
     @Test
-    public void testAddWorkflow() {
+    void testAddWorkflow() {
         Project project = projectRepository.save(getProject());
 
         projectWorkflowService.addWorkflow(
@@ -81,7 +81,7 @@ public class ProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testPublishWorkflow() {
+    void testPublishWorkflow() {
         Project project = projectRepository.save(getProject());
 
         long projectId = Validate.notNull(project.getId(), "id");
@@ -122,12 +122,35 @@ public class ProjectWorkflowServiceIntTest {
         assertThat(workflowsAfterPublish)
             .anyMatch(
                 workflow -> workflow.getProjectVersion() == initialVersion &&
-                    "workflow1".equals(workflow.getWorkflowId()));
-
-        assertThat(workflowsAfterPublish)
+                    "workflow1".equals(workflow.getWorkflowId()))
             .anyMatch(
                 workflow -> workflow.getProjectVersion() == newVersion &&
                     newWorkflowId.equals(workflow.getWorkflowId()));
+    }
+
+    @Test
+    void testPublishWorkflowKeepsThePermissionExpressionOnThePublishedVersion() {
+        Project project = projectRepository.save(getProject());
+
+        long projectId = Validate.notNull(project.getId(), "id");
+        int initialVersion = project.getLastProjectVersion();
+
+        ProjectWorkflow initialWorkflow = projectWorkflowService.addWorkflow(projectId, initialVersion, "workflow1");
+
+        projectWorkflowService.updatePermissionExpression(
+            Validate.notNull(initialWorkflow.getId(), "id"), "metadata['tier'] == 'pro'");
+
+        ProjectWorkflow workflowToPublish = projectWorkflowService.getProjectWorkflow(initialWorkflow.getId());
+
+        workflowToPublish.setProjectVersion(initialVersion + 1);
+        workflowToPublish.setWorkflowId("workflow1_v2");
+
+        projectWorkflowService.publishWorkflow(projectId, initialVersion, "workflow1", workflowToPublish);
+
+        assertThat(projectWorkflowService.getProjectWorkflows(projectId, initialWorkflow.getUuidAsString()))
+            .hasSize(2)
+            .extracting(ProjectWorkflow::getPermissionExpression)
+            .containsOnly("metadata['tier'] == 'pro'");
     }
 
     private Project getProject() {
