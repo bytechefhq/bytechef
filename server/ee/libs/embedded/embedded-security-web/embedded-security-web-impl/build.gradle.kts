@@ -19,6 +19,7 @@ dependencies {
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.mockito:mockito-core")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:core:commons:commons-util"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
 
