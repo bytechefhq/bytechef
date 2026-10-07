@@ -25,7 +25,6 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
-import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -152,8 +151,6 @@ class ConnectedUserProjectFacadeIntTest {
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
-    // Publishing would otherwise run the rollout from the after-commit listener and catch every reference up to the
-    // newly published version, which is exactly the pending update some tests here observe.
     @MockitoBean
     private AutomationWorkflowProjectPublishedEventListener automationWorkflowProjectPublishedEventListener;
 
@@ -224,7 +221,6 @@ class ConnectedUserProjectFacadeIntTest {
             any(), any(), any(), anyList(), any(), anyList(), anyBoolean(), anyInt()))
                 .thenReturn(Page.empty());
 
-        // Every automation workflow project is visible unless it carries the hidden expression.
         when(embeddedPermissionEvaluator.evaluate(any(), any()))
             .thenReturn(true);
         when(embeddedPermissionEvaluator.evaluate(eq(HIDDEN_PERMISSION_EXPRESSION), any()))
@@ -283,11 +279,6 @@ class ConnectedUserProjectFacadeIntTest {
         assertThat(projectDeploymentWorkflow.getInputs()).isEqualTo(Map.of("sheetName", "Leads"));
     }
 
-    /**
-     * The lookup runs against the connected user's OWN project, so another user's workflowUuid is simply absent from
-     * it. That surfaces as not-found rather than as a permission error, which is what stops a connected user probing
-     * uuids to learn which ones exist.
-     */
     @Test
     void testUpdateProjectWorkflowInputsRefusesAWorkflowOutsideTheConnectedUsersProject() {
         createPublishedCopy(externalUserId, COPY_WORKFLOW_WITH_SHEET_INPUT_DEFINITION);
@@ -309,16 +300,12 @@ class ConnectedUserProjectFacadeIntTest {
         assertThat(otherProjectDeploymentWorkflow.getInputs()).isEmpty();
     }
 
-    /**
-     * A workflowUuid that belongs to a reference row is written to the reference's own deployment on the automation workflow project
-     * project, never to the caller's copy-mode deployment -- the same reference-vs-copy branch
-     * {@code enableProjectWorkflow} makes.
-     */
     @Test
     void testUpdateProjectWorkflowInputsOnAReferenceWritesTheReferenceDeployment() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Reference Inputs");
 
-        String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String automationWorkflowUuid =
+            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
@@ -338,7 +325,8 @@ class ConnectedUserProjectFacadeIntTest {
     void testUpdateProjectWorkflowInputsOnADanglingReferenceIsRefused() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Dangling Inputs");
 
-        String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String automationWorkflowUuid =
+            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
@@ -464,7 +452,8 @@ class ConnectedUserProjectFacadeIntTest {
     void testGetConnectedUserProjectWorkflowsForwardsTheStoredInputsAndAttentionReason() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Attention");
 
-        String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String automationWorkflowUuid =
+            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
@@ -474,7 +463,6 @@ class ConnectedUserProjectFacadeIntTest {
         connectedUserProjectFacade.updateProjectWorkflowInputs(
             externalUserId, automationWorkflowUuid, Map.of("channel", "#alerts"), null);
 
-        // A newer automation workflow project version the reference has not caught up with yet.
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
         List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflowDTOs =
@@ -509,10 +497,6 @@ class ConnectedUserProjectFacadeIntTest {
         assertThat(getReference(reference.getId()).isEnabled()).isTrue();
     }
 
-    /**
-     * Regression pin: a copy-mode uuid (no matching reference row) keeps going through the connected user's own project
-     * deployment.
-     */
     @Test
     void testEnableProjectWorkflowOnACopyUuidTogglesTheConnectedUsersDeploymentWorkflow() {
         String workflowUuid = createPublishedCopy(externalUserId, COPY_WORKFLOW_WITH_SHEET_INPUT_DEFINITION);
@@ -570,9 +554,9 @@ class ConnectedUserProjectFacadeIntTest {
 
         String visibleWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        addHiddenAutomationWorkflow(automationWorkflowProjectId);
 
-        createPublishedHiddenAutomationWorkflowTemplate("Hidden Sibling");
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
         String copyWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
             externalUserId, visibleWorkflowUuid, Environment.PRODUCTION);
@@ -588,7 +572,13 @@ class ConnectedUserProjectFacadeIntTest {
 
     @Test
     void testCopyWorkflowTemplateRejectsATemplateHiddenByThePermissionExpression() {
-        String hiddenWorkflowUuid = createPublishedHiddenAutomationWorkflowTemplate("Hidden Template");
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Hidden Template");
+
+        addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        String hiddenWorkflowUuid = addHiddenAutomationWorkflow(automationWorkflowProjectId);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
         assertThatThrownBy(() -> connectedUserProjectFacade.copyWorkflowTemplate(
             externalUserId, hiddenWorkflowUuid, Environment.PRODUCTION))
@@ -598,14 +588,13 @@ class ConnectedUserProjectFacadeIntTest {
             .isEmpty();
     }
 
-    /**
-     * The point of the rejection: a caller must not be able to tell a template that exists but is hidden from them
-     * apart from a uuid that does not exist at all. Same exception type, and a message that differs only by the uuid
-     * the caller itself supplied.
-     */
     @Test
     void testHiddenTemplateRejectionIsIndistinguishableFromAnUnknownUuid() {
-        String hiddenWorkflowUuid = createPublishedHiddenAutomationWorkflowTemplate("Indistinguishable");
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Indistinguishable");
+
+        String hiddenWorkflowUuid = addHiddenAutomationWorkflow(automationWorkflowProjectId);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
         String unknownWorkflowUuid = UUID.randomUUID()
             .toString();
@@ -624,30 +613,23 @@ class ConnectedUserProjectFacadeIntTest {
     }
 
     private String addAutomationWorkflow(long automationWorkflowProjectId, String definition) {
-        String workflowId = automationWorkflowProjectFacade.createProjectWorkflow(automationWorkflowProjectId, definition, null);
+        return addAutomationWorkflow(automationWorkflowProjectId, definition, null);
+    }
 
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+    private String
+        addAutomationWorkflow(long automationWorkflowProjectId, String definition, String permissionExpression) {
+        return automationWorkflowProjectFacade.createProjectWorkflow(
+            automationWorkflowProjectId, definition, permissionExpression);
+    }
 
-        return projectWorkflow.getUuidAsString();
+    private String addHiddenAutomationWorkflow(long automationWorkflowProjectId) {
+        return addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION,
+            HIDDEN_PERMISSION_EXPRESSION);
     }
 
     private long createAutomationWorkflowProject(String name) {
-        return createAutomationWorkflowProject(name, null);
-    }
-
-    private long createAutomationWorkflowProject(String name, String permissionExpression) {
         return automationWorkflowProjectFacade.createProject(
-            name + " " + UUID.randomUUID(), "", null, List.of(), permissionExpression, null);
-    }
-
-    private String createPublishedHiddenAutomationWorkflowTemplate(String name) {
-        long automationWorkflowProjectId = createAutomationWorkflowProject(name, HIDDEN_PERMISSION_EXPRESSION);
-
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
-
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-
-        return workflowUuid;
+            name + " " + UUID.randomUUID(), "", null, List.of(), null, null);
     }
 
     private String createConnectedUser() {
