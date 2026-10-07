@@ -50,8 +50,8 @@ public interface ConnectedUserProjectWorkflowApi {
 
     String PATH_COPY_FRONTEND_WORKFLOW_TEMPLATE = "/automation/workflow-templates/{workflowUuid}/copy";
     /**
-     * POST /automation/workflow-templates/{workflowUuid}/copy : Copy a catalog workflow template into a new user workflow
-     * Copy a catalog workflow template into a new user workflow.
+     * POST /automation/workflow-templates/{workflowUuid}/copy : Copy an automation workflow template into a new user workflow
+     * Copy an automation workflow template into a new user workflow.
      *
      * @param workflowUuid The workflow template uuid. (required)
      * @param xEnvironment The environment. (optional)
@@ -59,8 +59,8 @@ public interface ConnectedUserProjectWorkflowApi {
      */
     @Operation(
         operationId = "copyFrontendWorkflowTemplate",
-        summary = "Copy a catalog workflow template into a new user workflow",
-        description = "Copy a catalog workflow template into a new user workflow.",
+        summary = "Copy an automation workflow template into a new user workflow",
+        description = "Copy an automation workflow template into a new user workflow.",
         tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {
@@ -87,8 +87,8 @@ public interface ConnectedUserProjectWorkflowApi {
 
     String PATH_COPY_WORKFLOW_TEMPLATE = "/{externalUserId}/automation/workflow-templates/{workflowUuid}/copy";
     /**
-     * POST /{externalUserId}/automation/workflow-templates/{workflowUuid}/copy : Copy a catalog workflow template into a new user workflow
-     * Copy a catalog workflow template into a new user workflow.
+     * POST /{externalUserId}/automation/workflow-templates/{workflowUuid}/copy : Copy an automation workflow template into a new user workflow
+     * Copy an automation workflow template into a new user workflow.
      *
      * @param externalUserId The external user id. (required)
      * @param workflowUuid The workflow template uuid. (required)
@@ -97,8 +97,8 @@ public interface ConnectedUserProjectWorkflowApi {
      */
     @Operation(
         operationId = "copyWorkflowTemplate",
-        summary = "Copy a catalog workflow template into a new user workflow",
-        description = "Copy a catalog workflow template into a new user workflow.",
+        summary = "Copy an automation workflow template into a new user workflow",
+        description = "Copy an automation workflow template into a new user workflow.",
         tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {

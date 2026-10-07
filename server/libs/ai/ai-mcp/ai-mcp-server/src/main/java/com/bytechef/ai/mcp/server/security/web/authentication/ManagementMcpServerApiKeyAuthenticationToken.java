@@ -42,7 +42,7 @@ public class ManagementMcpServerApiKeyAuthenticationToken extends AbstractApiKey
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerApiKeyAuthenticationToken(User user) {
-        super(user);
+        super(-1, user);
     }
 
     public String getAuthSecretKey() {
