@@ -40,6 +40,16 @@ public interface AuthorizeHttpRequestContributor {
     }
 
     /**
+     * Provides a list of page paths that should be set to permit-all and that pages served from other origins may embed
+     * in an iframe. These paths are served without the {@code X-Frame-Options} header, while every other path keeps it.
+     *
+     * @return a list of string representations of frameable paths to be granted access without authentication.
+     */
+    default List<String> getFrameablePermitAllRequestMatcherPaths() {
+        return List.of();
+    }
+
+    /**
      * Provides a list of paths that should be set to permit-all in the security configuration.
      *
      * @return a list of string representations of paths to be granted access without authentication.
