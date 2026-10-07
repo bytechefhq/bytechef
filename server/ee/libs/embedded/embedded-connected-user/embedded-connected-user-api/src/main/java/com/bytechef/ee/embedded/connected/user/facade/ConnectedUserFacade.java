@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.connected.user.facade;
 
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserDTO;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import java.time.LocalDate;
@@ -19,11 +20,19 @@ import org.springframework.data.domain.Page;
  */
 public interface ConnectedUserFacade {
 
+    void deleteConnectedUser(long id);
+
     void enableConnectedUser(long id, boolean enable);
 
-    ConnectedUserDTO getConnectedUser(long id);
+    ConnectedUser getConnectedUser(long id);
 
-    Page<ConnectedUserDTO> getConnectedUsers(
+    ConnectedUserDTO getConnectedUserDTO(long id);
+
+    Page<ConnectedUserDTO> getConnectedUserDTOs(
         Long environmentId, String search, CredentialStatus credentialStatus, LocalDate createDateFrom,
         LocalDate createDateTo, Long integrationId, int pageNumber);
+
+    Page<ConnectedUser> getConnectedUsers(
+        Long environmentId, String name, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
+        int pageNumber);
 }

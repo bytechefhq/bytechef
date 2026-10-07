@@ -11,7 +11,9 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
@@ -23,14 +25,18 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +50,11 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
-    private final ConnectionService connectionService;
+    private final ConnectedUserConnectionService connectedUserConnectionService;
+    private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConnectedUserService connectedUserService;
+    private final ConnectionFacade connectionFacade;
+    private final ConnectionService connectionService;
     private final EnvironmentService environmentService;
     private final IntegrationInstanceFacade integrationInstanceFacade;
     private final IntegrationInstanceService integrationInstanceService;
@@ -54,14 +63,19 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @SuppressFBWarnings("EI")
     public ConnectedUserFacadeImpl(
-        ConnectionService connectionService, ConnectedUserService connectedUserService,
-        EnvironmentService environmentService, IntegrationInstanceFacade integrationInstanceFacade,
+        ConnectedUserConnectionService connectedUserConnectionService,
+        ConnectedUserProjectFacade connectedUserProjectFacade, ConnectedUserService connectedUserService,
+        ConnectionFacade connectionFacade, ConnectionService connectionService, EnvironmentService environmentService,
+        IntegrationInstanceFacade integrationInstanceFacade,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService) {
 
-        this.connectionService = connectionService;
+        this.connectedUserConnectionService = connectedUserConnectionService;
+        this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.connectedUserService = connectedUserService;
+        this.connectionFacade = connectionFacade;
+        this.connectionService = connectionService;
         this.environmentService = environmentService;
         this.integrationInstanceFacade = integrationInstanceFacade;
         this.integrationInstanceService = integrationInstanceService;
@@ -70,6 +84,31 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
+    public void deleteConnectedUser(long id) {
+        Set<Long> connectionIds = new LinkedHashSet<>(connectedUserConnectionService.getConnectionIds(id));
+
+        for (IntegrationInstance integrationInstance : integrationInstanceService.getConnectedUserIntegrationInstances(
+            id)) {
+
+            connectionIds.add(integrationInstance.getConnectionId());
+
+            integrationInstanceFacade.deleteIntegrationInstance(integrationInstance.getId());
+        }
+
+        connectedUserProjectFacade.deleteConnectedUserProjects(id);
+
+        for (long connectionId : connectionIds) {
+            connectedUserConnectionService.deleteByConnectionId(connectionId);
+
+            connectionFacade.delete(connectionId);
+        }
+
+        connectedUserService.deleteConnectedUser(id);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableConnectedUser(long id, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(id);
@@ -86,7 +125,8 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public ConnectedUserDTO getConnectedUser(long id) {
+    @PreAuthorize("isTenantAdmin()")
+    public ConnectedUserDTO getConnectedUserDTO(long id) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(id);
 
         List<IntegrationInstance> integrationInstances = integrationInstanceService
@@ -103,10 +143,17 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
             connectedUser, integrationInstances, integrationInstanceConfigurations, integrations);
     }
 
-    // TODO Add paging and filtering
     @Override
     @Transactional(readOnly = true)
-    public Page<ConnectedUserDTO> getConnectedUsers(
+    @PreAuthorize("isTenantAdmin()")
+    public ConnectedUser getConnectedUser(long id) {
+        return connectedUserService.getConnectedUser(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public Page<ConnectedUserDTO> getConnectedUserDTOs(
         Long environmentId, String search, CredentialStatus credentialStatus, LocalDate createDateFrom,
         LocalDate createDateTo, Long integrationId, int pageNumber) {
 
@@ -134,6 +181,19 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
                 integrationInstance -> Objects.equals(
                     integrationInstance.getConnectedUserId(), connectedUser.getId())),
             integrationInstanceConfigurations, integrations));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public Page<ConnectedUser> getConnectedUsers(
+        Long environmentId, String name, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
+        int pageNumber) {
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
+        return connectedUserService.getConnectedUsers(
+            environment, name, createDateFrom, createDateTo, integrationId, pageNumber);
     }
 
     private ConnectedUserDTO createConnectedUserDTO(
