@@ -421,7 +421,7 @@ function getElkNodeSize(node: Node, direction: LayoutDirectionType): {height: nu
 
     let crossAxisSize = direction === 'TB' ? width : height;
 
-    if (node.type === 'placeholder') {
+    if (node.type === 'placeholder' || isReadOnlyPlaceholder(node)) {
         crossAxisSize = CASE_PLACEHOLDER_CROSS_FOOTPRINT;
     }
 
