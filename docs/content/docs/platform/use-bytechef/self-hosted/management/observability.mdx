@@ -24,12 +24,15 @@ out into parallel tasks appears as a single trace with the whole task tree; an e
 coordinator → broker → worker keeps one continuous trace across the services, because W3C trace
 context propagates on every hop.
 
-**Logs.** Under the `prod` profile ByteChef emits **Elastic Common Schema JSON** to the console
-(`logging.structured.format.console: ecs`); the `dev` profile uses a human-readable pattern instead.
-Either way every line carries the active `traceId` and `spanId` through Spring Boot's correlation
-pattern, and the current tenant id is published to the SLF4J MDC as `tenantId`, so you can filter by
-tenant and pivot from a log line to its containing trace. When log export is enabled, the same
-records are also shipped over OTLP.
+**Logs.** Under the `prod` profile the console keeps a human-readable pattern, so `docker logs` and a
+terminal stay readable, and the same records are written as **Elastic Common Schema JSON** to
+`/opt/bytechef/server/logs/bytechef.log` (`logging.file.name` with
+`logging.structured.format.file: ecs`) for a file-tailing agent to pick up; the `dev` profile logs to
+the console only. Either way every line carries the active `traceId` and `spanId` through Spring
+Boot's correlation pattern, and the current tenant id is published to the SLF4J MDC as `tenantId`, so
+you can filter by tenant and pivot from a log line to its containing trace. When log export is
+enabled, the same records are also shipped over OTLP - to a collector, or
+[straight to AWS CloudWatch](#aws-cloudwatch-direct-otlp).
 
 **Metrics.** Micrometer meters for HTTP requests, the JVM, Logback, the process, and the system.
 See [Metrics detail](#metrics-detail) below.
@@ -123,6 +126,11 @@ them correlated:
 - **The Logback OTLP appender.** `OpenTelemetryAppender.install(...)` runs at startup. This is what
   puts log records onto the OTLP pipeline - the appender is not wired by autoconfiguration, so log
   export depends on this bean existing.
+- **AWS SigV4 signing for log export.** When `bytechef.observability.logging.aws.enabled` is on, the
+  OTLP log exporter's HTTP sender is replaced with one that signs every request with AWS Signature
+  Version 4 and attaches the CloudWatch log group and log stream headers, so logs can go directly to
+  the CloudWatch OTLP endpoint without a collector in between. See
+  [AWS CloudWatch (direct OTLP)](#aws-cloudwatch-direct-otlp).
 - **OpenTelemetry semantic conventions for meters.** Micrometer's default naming is replaced with the
   OpenTelemetry conventions for HTTP server requests, CPU, memory, threads and class loading, so the
   meters arrive under the names an OTLP backend expects rather than Micrometer's own.
@@ -169,7 +177,7 @@ ByteChef doesn't care which backend you run - point the collector wherever you a
 | **Splunk** | OTLP to the Splunk OpenTelemetry Collector, or OTLP straight to Splunk Observability Cloud's ingest. |
 | **Grafana stack** | Traces → Tempo, logs → Loki, metrics → Mimir/Prometheus, dashboards in Grafana. |
 | **Honeycomb** | OTLP traces and metrics to Honeycomb; logs to your log backend with trace-ID correlation. |
-| **AWS** | OTLP via the ADOT collector to CloudWatch / X-Ray. |
+| **AWS** | OTLP via the ADOT collector to CloudWatch / X-Ray, or logs straight to the CloudWatch OTLP endpoint with SigV4-signed requests - see [AWS CloudWatch (direct OTLP)](#aws-cloudwatch-direct-otlp). |
 
 You don't have to commit to one - the collector fans out to multiple backends.
 
@@ -206,8 +214,61 @@ BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT=http://splunk-otel-collector:4318/v1/log
 ```
 
 <Callout type="info">
-  Running the vendor's collector/agent in front of ByteChef is the recommended shape: it owns the API-key/token and any batching or tail-sampling, keeping credentials out of ByteChef's config. ByteChef only ever speaks OTLP/HTTP to a local endpoint.
+  Running the vendor's collector/agent in front of ByteChef is the recommended shape: it owns the API-key/token and any batching or tail-sampling, keeping credentials out of ByteChef's config. ByteChef then only ever speaks OTLP/HTTP to a local endpoint. The one built-in exception is the direct CloudWatch log export below, where ByteChef signs the requests itself.
 </Callout>
+
+### AWS CloudWatch (direct OTLP)
+
+CloudWatch Logs accepts OTLP/HTTP directly at `https://logs.<region>.amazonaws.com/v1/logs`, but only
+when every request is signed with AWS Signature Version 4 and names the target log group and log
+stream in two request headers. ByteChef can do that signing itself, so logs reach CloudWatch without
+an ADOT collector in between. Traces and metrics have no such endpoint - keep routing those through
+a collector.
+
+Point log export at the regional endpoint, switch signing on, and name an **existing** log group and
+log stream:
+
+```yaml
+bytechef:
+  observability:
+    logging:
+      enabled: true
+      endpoint: https://logs.eu-central-1.amazonaws.com/v1/logs
+      aws:
+        enabled: true
+        log-group: bytechef
+        log-stream: server
+        # region: eu-central-1   - derived from the endpoint host when not set
+        # service: logs          - the signature scope service name
+```
+
+As environment variables:
+
+```bash
+BYTECHEF_OBSERVABILITY_LOGGING_ENABLED=true
+BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT=https://logs.eu-central-1.amazonaws.com/v1/logs
+BYTECHEF_OBSERVABILITY_LOGGING_AWS_ENABLED=true
+BYTECHEF_OBSERVABILITY_LOGGING_AWS_LOG_GROUP=bytechef
+BYTECHEF_OBSERVABILITY_LOGGING_AWS_LOG_STREAM=server
+```
+
+How the pieces resolve:
+
+- **Credentials** come from the AWS SDK default provider chain - the `AWS_ACCESS_KEY_ID` /
+  `AWS_SECRET_ACCESS_KEY` environment variables, a shared credentials file, or the instance or task
+  role on EC2, ECS and EKS. A session token is included in the signature when the chain yields
+  temporary credentials. Nothing AWS-specific is stored in ByteChef's own configuration. The
+  credentials need `logs:PutLogEvents` on the log group.
+- **Region** is read from the endpoint host when it has the `logs.<region>.amazonaws.com` shape.
+  For any other host - a VPC endpoint hostname or a proxy in front of CloudWatch - set
+  `bytechef.observability.logging.aws.region` explicitly, or startup fails.
+- **Log group and log stream** are sent as the `x-aws-log-group` and `x-aws-log-stream` headers.
+  They are **required when signing is enabled**; a missing value fails startup rather than letting
+  CloudWatch reject every batch at runtime. If you already pass them through
+  `management.opentelemetry.logging.export.otlp.headers.x-aws-log-group` / `...x-aws-log-stream`,
+  leave the ByteChef properties unset - setting both with different values is also a startup
+  failure. Both must exist in CloudWatch beforehand; the exporter does not create them.
+- **Transport** must be the default OTLP/HTTP; the signer does not apply to the gRPC transport.
 
 ## See also
 
