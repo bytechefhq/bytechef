@@ -1,4 +1,4 @@
-import {MutableRefObject, useCallback, useRef, useState} from 'react';
+import {MutableRefObject, useCallback, useEffect, useRef, useState} from 'react';
 
 import {OAUTH_BROADCAST_CHANNEL, OAUTH_RESPONSE, OAUTH_STATE_KEY, OAUTH_STORAGE_KEY} from './constants';
 import {objectToQuery} from './tools';
@@ -21,6 +21,9 @@ const POPUP_HEIGHT = 800;
 const POPUP_WIDTH = 600;
 
 const POPUP_CLOSED_GRACE_PERIOD_MS = 2_000;
+
+// Backstop for a popup that stays open but never answers, for example behind the app window.
+const AUTHORIZATION_TIMEOUT_MS = 5 * 60 * 1_000;
 
 // https://medium.com/@dazcyril/generating-cryptographic-random-state-in-javascript-in-the-browser-c538b3daae50
 const generateState = () => {
@@ -97,11 +100,14 @@ const cleanup = (
 
 type ResponseType = 'code' | 'token';
 
+export type OAuth2AbortReasonType = 'cancelled' | 'popup_closed' | 'timeout' | 'unmounted';
+
 export interface UseOAuth2Props {
     authorizationUrl: string;
     clientId: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extraQueryParameters?: Record<string, any>;
+    onAbort?: (reason: OAuth2AbortReasonType) => void;
     onCodeSuccess?: (payload: CodePayloadI) => void;
     onError?: (error: string) => void;
     onTokenSuccess?: (payload: TokenPayloadI) => void;
@@ -114,6 +120,7 @@ const useOAuth2 = ({
     authorizationUrl,
     clientId,
     extraQueryParameters,
+    onAbort,
     onCodeSuccess,
     onError,
     onTokenSuccess,
@@ -126,6 +133,7 @@ const useOAuth2 = ({
         error: string | null;
     }>({error: null, loading: false});
 
+    const abortRef = useRef<((reason: OAuth2AbortReasonType) => void) | undefined>(undefined);
     const extraQueryParametersRef = useRef(extraQueryParameters);
     const popupRef = useRef<Window | null>(null);
     const curStateRef = useRef(undefined);
@@ -270,9 +278,32 @@ const useOAuth2 = ({
         };
         window.addEventListener('storage', handleStorageListener);
 
+        const authorizationTimeout = setTimeout(() => {
+            setUI({
+                error: 'OAuth error: Authorization timed out.',
+                loading: false,
+            });
+
+            abort('timeout');
+        }, AUTHORIZATION_TIMEOUT_MS);
+
         function doCleanup() {
+            clearTimeout(authorizationTimeout);
+
+            abortRef.current = undefined;
+
             cleanup(intervalRef, popupRef, handleMessageListener, broadcastChannel, handleStorageListener);
         }
+
+        function abort(reason: OAuth2AbortReasonType) {
+            doCleanup();
+
+            if (onAbort) {
+                onAbort(reason);
+            }
+        }
+
+        abortRef.current = abort;
 
         let popupClosedAt: number | null = null;
 
@@ -312,7 +343,7 @@ const useOAuth2 = ({
 
                     console.warn('Warning: Popup was closed before completing authentication.');
 
-                    doCleanup();
+                    abort('popup_closed');
                 }
             } else {
                 popupClosedAt = null;
@@ -322,9 +353,31 @@ const useOAuth2 = ({
         return () => {
             doCleanup();
         };
-    }, [scopes, clientId, redirectUri, responseType, authorizationUrl, onError, onCodeSuccess, onTokenSuccess]);
+    }, [
+        scopes,
+        clientId,
+        redirectUri,
+        responseType,
+        authorizationUrl,
+        onAbort,
+        onError,
+        onCodeSuccess,
+        onTokenSuccess,
+    ]);
 
-    return {error, getAuth, loading};
+    const cancel = useCallback(() => {
+        setUI({
+            error: null,
+            loading: false,
+        });
+
+        abortRef.current?.('cancelled');
+    }, []);
+
+    // Without this, a popup left open after the button unmounts can still save a connection later.
+    useEffect(() => () => abortRef.current?.('unmounted'), []);
+
+    return {cancel, error, getAuth, loading};
 };
 
 export default useOAuth2;

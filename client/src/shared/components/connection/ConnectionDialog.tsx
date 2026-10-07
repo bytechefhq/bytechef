@@ -801,6 +801,7 @@ const ConnectionDialog = ({
                                                 <OAuth2Button
                                                     authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
                                                     clientId={oAuth2AuthorizationParameters.clientId}
+                                                    componentName={selectedComponentDefinition?.name}
                                                     extraQueryParameters={
                                                         oAuth2AuthorizationParameters?.extraQueryParameters
                                                     }
