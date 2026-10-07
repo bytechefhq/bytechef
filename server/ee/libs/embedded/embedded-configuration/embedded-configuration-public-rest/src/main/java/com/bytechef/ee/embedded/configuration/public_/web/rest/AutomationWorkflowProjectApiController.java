@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
@@ -15,6 +16,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Environment
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -53,7 +55,17 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
     @CrossOrigin
     @Override
     public ResponseEntity<List<AutomationWorkflowProjectModel>> getFrontendProjects(EnvironmentModel xEnvironment) {
-        return ResponseEntity.ok(toAutomationWorkflowProjectModels());
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<AutomationWorkflowProjectModel> models = automationWorkflowProjectFacade
+            .getPublishedProjects(externalUserId, getEnvironment(xEnvironment))
+            .stream()
+            .filter(AutomationWorkflowProjectDTO::automationHubVisible)
+            .map(project -> conversionService.convert(project, AutomationWorkflowProjectModel.class))
+            .toList();
+
+        return ResponseEntity.ok(models);
     }
 
     @Override
@@ -76,12 +88,5 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
 
     private Environment getEnvironment(EnvironmentModel xEnvironment) {
         return environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
-    }
-
-    private List<AutomationWorkflowProjectModel> toAutomationWorkflowProjectModels() {
-        return automationWorkflowProjectFacade.getPublishedProjects()
-            .stream()
-            .map(project -> conversionService.convert(project, AutomationWorkflowProjectModel.class))
-            .toList();
     }
 }

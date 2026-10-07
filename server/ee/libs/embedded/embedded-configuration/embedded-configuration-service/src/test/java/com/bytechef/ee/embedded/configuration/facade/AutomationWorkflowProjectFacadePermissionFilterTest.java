@@ -25,22 +25,17 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
- * Focused unit tests for permission-expression persistence and connected-user project/workflow filtering in
- * {@link AutomationWorkflowProjectFacadeImpl}. Uses a real {@link EmbeddedPermissionEvaluator} (real SpEL) and mocked
- * collaborators.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -50,7 +45,6 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
     private static final String MARKER = "__EMBEDDED_AUTOMATION__";
 
     private final CategoryService categoryService = mock(CategoryService.class);
-    private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
     private final ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator =
         new EmbeddedPermissionEvaluator(SpelEvaluator.create());
@@ -58,8 +52,7 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
     private final ProjectWorkflowFacade projectWorkflowFacade = mock(ProjectWorkflowFacade.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
     private final TagService tagService = mock(TagService.class);
-    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService =
-        mock(TaskDispatcherDefinitionService.class);
+    private final WorkflowComponentResolver workflowComponentResolver = mock(WorkflowComponentResolver.class);
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService =
         mock(WorkflowNodeTestOutputService.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
@@ -67,9 +60,11 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
         mock(WorkflowTestConfigurationService.class);
 
     private final AutomationWorkflowProjectFacadeImpl facade = new AutomationWorkflowProjectFacadeImpl(
-        categoryService, componentDefinitionService, connectedUserService, embeddedPermissionEvaluator,
-        projectService, projectWorkflowFacade, projectWorkflowService, tagService, taskDispatcherDefinitionService,
-        workflowNodeTestOutputService, workflowService, workflowTestConfigurationService);
+        mock(ApplicationEventPublisher.class), categoryService, mock(ConnectedUserReferenceRolloutManager.class),
+        connectedUserService, embeddedPermissionEvaluator,
+        projectService, projectWorkflowFacade, projectWorkflowService, tagService,
+        workflowComponentResolver, workflowNodeTestOutputService, workflowService, workflowTestConfigurationService,
+        List.of());
 
     @Test
     void testGetPublishedProjectsHidesProjectWhenExpressionIsFalse() {
@@ -93,7 +88,7 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
 
         when(projectService.getProject(7L)).thenReturn(project);
 
-        facade.updateProject(7L, "Pro", "desc", null, List.of(), null);
+        facade.updateProject(7L, "Pro", "desc", null, List.of(), null, null);
 
         ArgumentCaptor<Project> captor = ArgumentCaptor.forClass(Project.class);
 
@@ -109,7 +104,7 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
 
         when(projectService.getProject(7L)).thenReturn(project);
 
-        facade.updateProject(7L, "Pro", "desc", null, List.of(), "");
+        facade.updateProject(7L, "Pro", "desc", null, List.of(), "", null);
 
         // A blank argument normalizes to null and clears the stored value through the dedicated
         // updatePermissionExpression(...); the generic update(...) intentionally leaves the column untouched.
@@ -122,10 +117,11 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
 
         when(projectWorkflow.getId()).thenReturn(5L);
         when(projectWorkflow.getProjectId()).thenReturn(1L);
+        when(projectWorkflowService.getLastWorkflowId("wf-uuid-1")).thenReturn("wf-1");
         when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1")).thenReturn(projectWorkflow);
         when(projectService.getProject(1L)).thenReturn(markedPublishedProject(1L, "P", null));
 
-        facade.updateProjectWorkflowPermissionExpression("wf-1", "metadata['tier'] == 'gold'");
+        facade.updateProjectWorkflowPermissionExpression("wf-uuid-1", "metadata['tier'] == 'gold'");
 
         // The expression is persisted through the dedicated updatePermissionExpression(...) on the join entity.
         verify(projectWorkflowService).updatePermissionExpression(5L, "metadata['tier'] == 'gold'");
