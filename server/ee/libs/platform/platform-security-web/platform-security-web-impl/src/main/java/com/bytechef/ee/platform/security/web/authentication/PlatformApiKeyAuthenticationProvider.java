@@ -64,7 +64,7 @@ public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvi
                 "User with token " + platformApiKeyAuthenticationToken.getSecretKey()
                     + " was not found in the database"));
 
-        return new PlatformApiKeyAuthenticationToken(user);
+        return new PlatformApiKeyAuthenticationToken(platformApiKeyAuthenticationToken.getEnvironmentId(), user);
     }
 
     @Override

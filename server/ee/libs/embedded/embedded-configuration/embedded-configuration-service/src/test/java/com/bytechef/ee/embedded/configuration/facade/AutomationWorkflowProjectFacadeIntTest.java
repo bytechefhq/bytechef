@@ -273,13 +273,13 @@ public class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testPublishProject() {
         long publishedProjectId = automationWorkflowProjectFacade.createProject(
-            "PublishedCatalog", "", null, List.of(), null);
+            "PublishedAutomationWorkflow", "", null, List.of(), null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(publishedProjectId, null, null);
         automationWorkflowProjectFacade.publishProject(publishedProjectId);
 
         long unpublishedProjectId = automationWorkflowProjectFacade.createProject(
-            "UnpublishedCatalog", "", null, List.of(), null);
+            "UnpublishedAutomationWorkflow", "", null, List.of(), null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(unpublishedProjectId, null, null);
 
@@ -302,7 +302,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
     @Test
     void testPublishProjectDoesNotAccumulateWorkflowTemplatesInAdminList() {
-        long projectId = automationWorkflowProjectFacade.createProject("StableCatalog", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("StableAutomationWorkflow", "", null, List.of(), null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
@@ -341,7 +341,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
         when(componentDefinitionService.fetchComponentDefinition(anyString(), any()))
             .thenReturn(Optional.of(gmailDefinition));
 
-        long projectId = automationWorkflowProjectFacade.createProject("EmailCatalog", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("EmailAutomationWorkflow", "", null, List.of(), null);
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, workflowDefinitionWithTask, null);
 
         AutomationWorkflowProjectDTO project = automationWorkflowProjectFacade.getProject(projectId);
@@ -364,7 +364,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testWorkflowComponentsNonNullForEmptyWorkflow() {
         long projectId =
-            automationWorkflowProjectFacade.createProject("EmptyWorkflowCatalog", "", null, List.of(), null);
+            automationWorkflowProjectFacade.createProject("EmptyWorkflowAutomationWorkflow", "", null, List.of(), null);
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
         AutomationWorkflowProjectDTO project = automationWorkflowProjectFacade.getProject(projectId);
@@ -397,7 +397,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
             }
             """;
 
-        long projectId = automationWorkflowProjectFacade.createProject("BranchCatalog", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("BranchAutomationWorkflow", "", null, List.of(), null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, workflowDefinitionWithTaskDispatcher, null);
 
@@ -423,7 +423,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
             }
             """;
 
-        long projectId = automationWorkflowProjectFacade.createProject("ManualCatalog", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("ManualAutomationWorkflow", "", null, List.of(), null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, workflowDefinitionWithoutTrigger, null);
 
@@ -440,7 +440,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testCreateProjectCreatesNewCategoryAndTags() {
         long projectId = automationWorkflowProjectFacade.createProject(
-            "CatalogWithNewCategoryAndTags", "", "Automation", List.of("crm", "erp"), null);
+            "AutomationWorkflowWithNewCategoryAndTags", "", "Automation", List.of("crm", "erp"), null);
 
         AutomationWorkflowProjectDTO project = automationWorkflowProjectFacade.getProject(projectId);
 
@@ -459,9 +459,9 @@ public class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testCreateProjectReusesExistingCategoryByName() {
         long firstProjectId = automationWorkflowProjectFacade.createProject(
-            "FirstCatalogProject", "", "Reusable", List.of(), null);
+            "FirstAutomationWorkflowProject", "", "Reusable", List.of(), null);
         long secondProjectId = automationWorkflowProjectFacade.createProject(
-            "SecondCatalogProject", "", "Reusable", List.of(), null);
+            "SecondAutomationWorkflowProject", "", "Reusable", List.of(), null);
 
         AutomationWorkflowProjectDTO firstProject = automationWorkflowProjectFacade.getProject(firstProjectId);
         AutomationWorkflowProjectDTO secondProject = automationWorkflowProjectFacade.getProject(secondProjectId);

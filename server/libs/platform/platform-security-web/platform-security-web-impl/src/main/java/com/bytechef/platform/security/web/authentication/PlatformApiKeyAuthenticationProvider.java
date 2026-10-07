@@ -1,11 +1,20 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the ByteChef Enterprise license (the "Enterprise License");
- * you may not use this file except in compliance with the Enterprise License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.bytechef.ee.automation.security.web.authentication;
+package com.bytechef.platform.security.web.authentication;
 
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
@@ -25,18 +34,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
- * @version ee
- *
  * @author Ivica Cardic
  */
-public class AutomationApiKeyAuthenticationProvider implements AuthenticationProvider {
+public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvider {
 
     private final ApiKeyService apiKeyService;
     private final AuthorityService authorityService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public AutomationApiKeyAuthenticationProvider(
+    public PlatformApiKeyAuthenticationProvider(
         ApiKeyService apiKeyService, AuthorityService authorityService, UserService userService) {
 
         this.apiKeyService = apiKeyService;
@@ -46,31 +53,34 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        AutomationApiKeyAuthenticationToken automationApiKeyAuthenticationToken =
-            (AutomationApiKeyAuthenticationToken) authentication;
+        PlatformApiKeyAuthenticationToken platformApiKeyAuthenticationToken =
+            (PlatformApiKeyAuthenticationToken) authentication;
 
         ApiKey apiKey;
 
         try {
             apiKey = apiKeyService.getApiKey(
-                automationApiKeyAuthenticationToken.getSecretKey(),
-                automationApiKeyAuthenticationToken.getEnvironmentId());
+                platformApiKeyAuthenticationToken.getSecretKey(), platformApiKeyAuthenticationToken.getEnvironmentId());
         } catch (IllegalArgumentException e) {
             throw new BadCredentialsException("Unknown API secret key", e);
         }
 
-        org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())
-            .map(curUser -> createSpringSecurityUser(automationApiKeyAuthenticationToken.getSecretKey(), curUser))
-            .orElseThrow(() -> new UsernameNotFoundException(
-                "User with token " + automationApiKeyAuthenticationToken.getSecretKey()
-                    + " was not found in the database"));
+        if (apiKey.getType() != null) {
+            throw new BadCredentialsException("Admin API key required");
+        }
 
-        return new AutomationApiKeyAuthenticationToken(automationApiKeyAuthenticationToken.getEnvironmentId(), user);
+        org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())
+            .map(curUser -> createSpringSecurityUser(platformApiKeyAuthenticationToken.getSecretKey(), curUser))
+            .orElseThrow(() -> new UsernameNotFoundException(
+                "User with token " + platformApiKeyAuthenticationToken.getSecretKey() +
+                    " was not found in the database"));
+
+        return new PlatformApiKeyAuthenticationToken(platformApiKeyAuthenticationToken.getEnvironmentId(), user);
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(AutomationApiKeyAuthenticationToken.class);
+        return authentication.equals(PlatformApiKeyAuthenticationToken.class);
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String secretKey, User user) {
