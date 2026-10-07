@@ -12,7 +12,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCateg
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectAdminFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -31,10 +31,12 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnEEVersion
 public class AutomationWorkflowProjectGraphQlController {
 
-    private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private final AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade;
 
     @SuppressFBWarnings("EI")
-    public AutomationWorkflowProjectGraphQlController(AutomationWorkflowProjectFacade automationWorkflowProjectFacade) {
+    public AutomationWorkflowProjectGraphQlController(
+        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade) {
+
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
     }
 
@@ -56,20 +58,24 @@ public class AutomationWorkflowProjectGraphQlController {
     @MutationMapping
     public String createAutomationWorkflowProject(
         @Argument String name, @Argument String description, @Argument String category,
-        @Argument List<String> tags, @Argument String permissionExpression) {
+        @Argument List<String> tags, @Argument String permissionExpression,
+        @Argument Boolean automationHubVisible) {
 
         return String.valueOf(
             automationWorkflowProjectFacade.createProject(
-                name, description, category, tags == null ? List.of() : tags, permissionExpression));
+                name, description, category, tags == null ? List.of() : tags, permissionExpression,
+                automationHubVisible));
     }
 
     @MutationMapping
     public boolean updateAutomationWorkflowProject(
         @Argument String id, @Argument String name, @Argument String description, @Argument String category,
-        @Argument List<String> tags, @Argument String permissionExpression) {
+        @Argument List<String> tags, @Argument String permissionExpression,
+        @Argument Boolean automationHubVisible) {
 
         automationWorkflowProjectFacade.updateProject(
-            Long.parseLong(id), name, description, category, tags == null ? List.of() : tags, permissionExpression);
+            Long.parseLong(id), name, description, category, tags == null ? List.of() : tags, permissionExpression,
+            automationHubVisible);
 
         return true;
     }
