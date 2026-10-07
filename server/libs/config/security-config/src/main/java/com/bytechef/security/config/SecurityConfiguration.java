@@ -70,9 +70,14 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * @author Ivica Cardic
@@ -307,6 +312,25 @@ public class SecurityConfiguration {
         List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors,
         List<SpaWebFilterContributor> spaWebFilterContributors) throws Exception {
 
+        List<RequestMatcher> frameableRequestMatchers = new ArrayList<>();
+
+        for (AuthorizeHttpRequestContributor authorizeHttpRequestContributor : authorizeHttpRequestContributors) {
+            for (String path : authorizeHttpRequestContributor.getFrameablePermitAllRequestMatcherPaths()) {
+                frameableRequestMatchers.add(mvc.matcher(path));
+            }
+        }
+
+        if (!frameableRequestMatchers.isEmpty()) {
+            RequestMatcher nonFrameableRequestMatcher = new NegatedRequestMatcher(
+                new OrRequestMatcher(frameableRequestMatchers));
+
+            http.headers(headers -> headers
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                .addHeaderWriter(
+                    new DelegatingRequestMatcherHeaderWriter(
+                        nonFrameableRequestMatcher, new XFrameOptionsHeaderWriter(XFrameOptionsMode.DENY))));
+        }
+
         http
             .addFilterBefore(new CsrfCookieIssuingFilter(csrfTokenRepository), BasicAuthenticationFilter.class)
             .addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
@@ -319,6 +343,12 @@ public class SecurityConfiguration {
                             .requestMatchers(mvc.matcher(path))
                             .permitAll();
                     }
+                }
+
+                for (RequestMatcher frameableRequestMatcher : frameableRequestMatchers) {
+                    authz
+                        .requestMatchers(frameableRequestMatcher)
+                        .permitAll();
                 }
 
                 authz
