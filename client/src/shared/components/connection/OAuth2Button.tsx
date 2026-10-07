@@ -42,30 +42,24 @@ const OAuth2Button = ({
         onAbort: (reason: OAuth2AbortReasonType) => {
             captureOAuth2AuthorizationFailed(componentName, reason);
 
-            if (reason === 'timeout' && onError) {
-                onError('The authorization window did not respond in time. Click Connect to try again.');
+            if (reason === 'timeout') {
+                onError?.('The authorization window did not respond in time. Click Connect to try again.');
             }
         },
         onCodeSuccess: (payload: CodePayloadI) => {
             captureOAuth2AuthorizationSucceeded(componentName);
 
-            if (onCodeSuccess) {
-                onCodeSuccess(payload);
-            }
+            onCodeSuccess?.(payload);
         },
         onError: (error: string) => {
             captureOAuth2AuthorizationFailed(componentName, 'error');
 
-            if (onError) {
-                onError(error);
-            }
+            onError?.(error);
         },
         onTokenSuccess: (payload: TokenPayloadI) => {
             captureOAuth2AuthorizationSucceeded(componentName);
 
-            if (onTokenSuccess) {
-                onTokenSuccess(payload);
-            }
+            onTokenSuccess?.(payload);
         },
         redirectUri,
         responseType,

@@ -278,14 +278,7 @@ const useOAuth2 = ({
         };
         window.addEventListener('storage', handleStorageListener);
 
-        const authorizationTimeout = setTimeout(() => {
-            setUI({
-                error: 'OAuth error: Authorization timed out.',
-                loading: false,
-            });
-
-            abort('timeout');
-        }, AUTHORIZATION_TIMEOUT_MS);
+        const authorizationTimeout = setTimeout(() => abort('timeout'), AUTHORIZATION_TIMEOUT_MS);
 
         function doCleanup() {
             clearTimeout(authorizationTimeout);
@@ -296,11 +289,14 @@ const useOAuth2 = ({
         }
 
         function abort(reason: OAuth2AbortReasonType) {
+            setUI((currentUI) => ({
+                ...currentUI,
+                loading: false,
+            }));
+
             doCleanup();
 
-            if (onAbort) {
-                onAbort(reason);
-            }
+            onAbort?.(reason);
         }
 
         abortRef.current = abort;
@@ -336,11 +332,6 @@ const useOAuth2 = ({
                 }
 
                 if (Date.now() - popupClosedAt > POPUP_CLOSED_GRACE_PERIOD_MS) {
-                    setUI((currentUI) => ({
-                        ...currentUI,
-                        loading: false,
-                    }));
-
                     console.warn('Warning: Popup was closed before completing authentication.');
 
                     abort('popup_closed');
@@ -349,10 +340,6 @@ const useOAuth2 = ({
                 popupClosedAt = null;
             }
         }, 250);
-
-        return () => {
-            doCleanup();
-        };
     }, [
         scopes,
         clientId,
@@ -365,14 +352,7 @@ const useOAuth2 = ({
         onTokenSuccess,
     ]);
 
-    const cancel = useCallback(() => {
-        setUI({
-            error: null,
-            loading: false,
-        });
-
-        abortRef.current?.('cancelled');
-    }, []);
+    const cancel = useCallback(() => abortRef.current?.('cancelled'), []);
 
     // Without this, a popup left open after the button unmounts can still save a connection later.
     useEffect(() => () => abortRef.current?.('unmounted'), []);
