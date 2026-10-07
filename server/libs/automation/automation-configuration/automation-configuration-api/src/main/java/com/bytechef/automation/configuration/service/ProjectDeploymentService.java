@@ -25,12 +25,17 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public interface ProjectDeploymentService {
-
     ProjectDeployment create(ProjectDeployment projectDeployment);
 
     void delete(long id);
 
+    Optional<ProjectDeployment> fetchProjectDeployment(long id);
+
     Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment);
+
+    Optional<ProjectDeployment> fetchProjectDeploymentByName(long projectId, String name);
+
+    List<ProjectDeployment> getAllProjectDeployments(long projectId);
 
     ProjectDeployment getProjectDeployment(long id);
 
