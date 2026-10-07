@@ -63,12 +63,18 @@ const ELK_SIBLING_SPACING = 50;
 // The TRUE/FALSE case labels hang off a condition's icon, so the frame's entry
 // bar is pulled toward the dispatcher (node→bar gap becomes ELK_LAYER_SPACING +
 // slack − pull = 38px in both directions) to keep the labels reading attached
-// to the box. The child side of the bar keeps its 94px entry run regardless of
-// pull.
+// to the box.
 const BAR_LABEL_PULL = 28;
 
+// The pull lengthens only the entry run, so half of it is moved from the
+// entry side to the exit side up front: the interior reads 80/80 around a
+// chain instead of 94/66, and a lone task sits centered in its box, level
+// with an empty sibling's "+". TB branch frames keep the full entry run
+// for their case chip (see TB_BRANCH_ENTRY_INSET).
+const INTERIOR_PULL_REBALANCE = BAR_LABEL_PULL / 2;
+
 // TB branch entries stack [case chip][add-button] between the bar and the
-// column's first node; the standard 94px run makes the chip and the button
+// column's first node; the 94px run (no pull rebalance) makes the chip and the button
 // kiss on rows whose chain defines the frame height. The extra inset stretches
 // tight branch entries to 120: chip 16..52, button 63..87, node at 120.
 const TB_BRANCH_ENTRY_INSET = 26;
@@ -76,7 +82,8 @@ const TB_BRANCH_ENTRY_INSET = 26;
 // Extra footprint below a bottom bar (bar pinned to the footprint start), so
 // edges LEAVING a box read like node→node edges: bar→next node becomes
 // extension + ELK_LAYER_SPACING + slack = 80, and nested→enclosing bottom-bar
-// merge stubs become extension + ELK_LAYER_SPACING = 66 instead of a cramped 52.
+// merge stubs become extension + ELK_LAYER_SPACING + INTERIOR_PULL_REBALANCE
+// = 80 instead of a cramped 52.
 const BOTTOM_BAR_EXIT_EXTENSION = 14;
 
 // Size of a node's visual anchor: the 72px icon box whose edges carry the
@@ -1123,12 +1130,15 @@ export const getElkLayoutElements = async ({
                 placeNode(topGhostNode, frameTopFootprintStart);
 
                 const isBranchFrame = (frameDispatcherNode.data as NodeDataType).componentName === 'branch';
+                const hasTbBranchEntryInset = direction === 'TB' && isBranchFrame;
+                const pullRebalance = hasTbBranchEntryInset ? 0 : INTERIOR_PULL_REBALANCE;
 
                 const interiorStart =
                     frameTopFootprintStart +
                     footprintMainOf(topGhostNode) +
                     ELK_LAYER_SPACING +
-                    (direction === 'TB' && isBranchFrame ? TB_BRANCH_ENTRY_INSET : 0);
+                    (hasTbBranchEntryInset ? TB_BRANCH_ENTRY_INSET : 0) -
+                    pullRebalance;
 
                 let interiorEnd = interiorStart;
 
@@ -1150,7 +1160,7 @@ export const getElkLayoutElements = async ({
                     interiorEnd = Math.max(interiorEnd, placeChain(entryNode, bottomGhostId, interiorStart));
                 });
 
-                const bottomBarFootprintStart = interiorEnd + ELK_LAYER_SPACING;
+                const bottomBarFootprintStart = interiorEnd + ELK_LAYER_SPACING + pullRebalance;
 
                 placeNode(bottomGhostNode, bottomBarFootprintStart);
 
@@ -1367,8 +1377,8 @@ export const getElkLayoutElements = async ({
         // than its tallest sibling floats centered between the bars instead of
         // sitting wherever ELK's layer assignment quantized it (layer snapping
         // plus the top-bar pull leave short chains off-center). The frame's
-        // DEFINING (tallest) chain is never moved — it already sits at the
-        // designed asymmetric bar gaps, which the interior derives from.
+        // DEFINING (tallest) chain is never moved — it already sits centered
+        // at the symmetric bar gaps, which the interior derives from.
         // Shifts are rigid over each chain's whole subtree, so processing order
         // across nesting levels does not matter; chains carrying saved
         // positions still define the tallest extent but are never moved.
