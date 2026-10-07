@@ -33,5 +33,9 @@ public interface ProjectDeploymentRepository
 
     List<ProjectDeployment> findAllByIdIn(List<Long> ids);
 
+    List<ProjectDeployment> findAllByProjectId(long projectId);
+
     Optional<ProjectDeployment> findByProjectIdAndEnvironment(long projectId, int environment);
+
+    Optional<ProjectDeployment> findByProjectIdAndName(long projectId, String name);
 }

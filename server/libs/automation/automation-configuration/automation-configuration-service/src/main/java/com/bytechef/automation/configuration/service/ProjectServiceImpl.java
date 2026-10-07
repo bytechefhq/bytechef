@@ -74,6 +74,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Project> fetchProject(long id) {
+        return projectRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<Project> fetchProject(String name) {
         return projectRepository.findByNameIgnoreCase(name);
     }
@@ -180,6 +186,15 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = getProject(id);
 
         project.setTagIds(tagIds);
+
+        return projectRepository.save(project);
+    }
+
+    @Override
+    public Project updateAutomationHubVisible(long id, boolean automationHubVisible) {
+        Project project = getProject(id);
+
+        project.setAutomationHubVisible(automationHubVisible);
 
         return projectRepository.save(project);
     }

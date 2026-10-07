@@ -35,6 +35,8 @@ public interface ProjectService {
 
     void delete(long id);
 
+    Optional<Project> fetchProject(long id);
+
     Optional<Project> fetchProject(String name);
 
     Optional<Project> fetchProject(String name, long workspaceId);
@@ -66,4 +68,7 @@ public interface ProjectService {
     Project update(Project project);
 
     Project updatePermissionExpression(long id, @Nullable String permissionExpression);
+
+    Project updateAutomationHubVisible(long id, boolean automationHubVisible);
+
 }
