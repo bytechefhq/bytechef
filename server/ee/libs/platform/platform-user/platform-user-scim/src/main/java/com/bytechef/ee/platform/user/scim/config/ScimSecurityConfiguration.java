@@ -8,10 +8,10 @@
 package com.bytechef.ee.platform.user.scim.config;
 
 import com.bytechef.ee.platform.user.scim.web.filter.ScimBearerTokenAuthenticationFilter;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
-import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
