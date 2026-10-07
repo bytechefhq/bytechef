@@ -49,6 +49,9 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table
 public final class Project {
 
+    @Column("automation_hub_visible")
+    private boolean automationHubVisible = true;
+
     @Column("category_id")
     private AggregateReference<Category, Long> categoryId;
 
@@ -223,6 +226,10 @@ public final class Project {
         return workspaceId == null ? null : workspaceId.getId();
     }
 
+    public boolean isAutomationHubVisible() {
+        return automationHubVisible;
+    }
+
     public boolean isPublished() {
         return projectVersions.stream()
             .anyMatch(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED);
@@ -240,6 +247,10 @@ public final class Project {
         projectVersions.add(new ProjectVersion(newVersion));
 
         return newVersion;
+    }
+
+    public void setAutomationHubVisible(boolean automationHubVisible) {
+        this.automationHubVisible = automationHubVisible;
     }
 
     public void setCategory(Category category) {

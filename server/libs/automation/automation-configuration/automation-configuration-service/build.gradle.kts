@@ -1,4 +1,8 @@
 dependencies {
+    implementation("org.springframework.boot:spring-boot-actuator")
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    implementation("org.springframework:spring-web")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
