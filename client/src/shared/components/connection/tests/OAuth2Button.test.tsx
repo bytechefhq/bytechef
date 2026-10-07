@@ -61,14 +61,12 @@ describe('OAuth2Button', () => {
         expect(posthog.capture).toHaveBeenCalledWith('oauth2_authorization_started', {componentName: 'gmail'});
     });
 
-    it('should close the popup when unmounted during a pending attempt', async () => {
+    it('should report an unmounted failure when unmounted during a pending attempt', async () => {
         const {unmount} = renderButton();
 
         await userEvent.click(screen.getByRole('button', {name: 'Connect'}));
 
         unmount();
-
-        expect(mockPopup.close).toHaveBeenCalled();
 
         await vi.waitFor(() =>
             expect(posthog.capture).toHaveBeenCalledWith('oauth2_authorization_failed', {

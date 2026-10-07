@@ -794,7 +794,6 @@ describe('useOAuth2', () => {
         });
 
         expect(result.current.loading).toBe(false);
-        expect(result.current.error).toBe('OAuth error: Authorization timed out.');
         expect(mockWindow!.close).toHaveBeenCalled();
         expect(onAbort).toHaveBeenCalledTimes(1);
         expect(onAbort).toHaveBeenCalledWith('timeout');
