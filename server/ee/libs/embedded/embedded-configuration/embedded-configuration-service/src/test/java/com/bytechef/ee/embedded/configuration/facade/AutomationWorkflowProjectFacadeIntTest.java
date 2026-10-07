@@ -16,17 +16,21 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -71,6 +75,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +118,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     WorkflowTestConfigurationFacade.class, WorkflowTestConfigurationService.class,
     WorkspaceConnectionFacade.class, WorkspaceFacade.class
 })
-public class AutomationWorkflowProjectFacadeIntTest {
+class AutomationWorkflowProjectFacadeIntTest {
 
     private static final String TEST_EXTERNAL_USER_ID = "test-external-user-42";
 
@@ -127,10 +132,19 @@ public class AutomationWorkflowProjectFacadeIntTest {
     private ConnectedUserService connectedUserService;
 
     @Autowired
+    private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+
+    @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @Autowired
     private ConnectedUserProjectFacade connectedUserProjectFacade;
+
+    @Autowired
+    private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
+
+    @Autowired
+    private ProjectWorkflowService projectWorkflowService;
 
     @Autowired
     private TagService tagService;
@@ -142,11 +156,17 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
         when(connectedUserService.getConnectedUser(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(connectedUser);
+
+        // copyWorkflowTemplate validates against the permission-FILTERED automation workflows, which consults this
+        // (mocked)
+        // evaluator; the default mock answer of false would hide every template from every user.
+        when(embeddedPermissionEvaluator.evaluate(any(), any()))
+            .thenReturn(true);
     }
 
     @Test
     void testCopyWorkflowTemplate() {
-        long projectId = automationWorkflowProjectFacade.createProject("Onboarding", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("Onboarding", "", null, List.of(), null, null);
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
         automationWorkflowProjectFacade.publishProject(projectId);
 
@@ -167,6 +187,43 @@ public class AutomationWorkflowProjectFacadeIntTest {
     }
 
     @Test
+    void testCopyWorkflowTemplateRecordsCopiedFromWorkflowUuid() {
+        long projectId = automationWorkflowProjectFacade.createProject("Onboarding", "", null, List.of(), null, null);
+        automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        String publishedWorkflowUuid = automationWorkflowProjectFacade.getPublishedProjects()
+            .stream()
+            .filter(project -> project.id() == projectId)
+            .flatMap(project -> project.workflowTemplates()
+                .stream())
+            .findFirst()
+            .map(ConnectedUserWorkflowTemplateDTO::workflowUuid)
+            .orElseThrow();
+
+        String newWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
+            TEST_EXTERNAL_USER_ID, publishedWorkflowUuid, Environment.PRODUCTION);
+
+        // The sync invocation endpoint's dedup lookup (RequestTriggerApiController's automation-bridge branch)
+        // relies on this bookkeeping surviving a real round trip through Spring Data JDBC, not just an in-memory
+        // domain object.
+        ConnectedUserProjectWorkflow copy = connectedUserProjectWorkflowRepository.findAllByConnectedUserId(1L)
+            .stream()
+            .filter(row -> row.getAutomationWorkflowUuid() == null)
+            .filter(row -> {
+                ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
+                    row.getProjectWorkflowId());
+
+                return projectWorkflow.getUuidAsString()
+                    .equals(newWorkflowUuid);
+            })
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(copy.getCopiedFromWorkflowUuid()).isEqualTo(publishedWorkflowUuid);
+    }
+
+    @Test
     void testCopyWorkflowTemplateUnknownIdThrows() {
         assertThatThrownBy(() -> connectedUserProjectFacade
             .copyWorkflowTemplate(TEST_EXTERNAL_USER_ID, "nope", Environment.PRODUCTION))
@@ -175,7 +232,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
     @Test
     void testCopyWorkflowTemplateUnpublishedThrows() {
-        long projectId = automationWorkflowProjectFacade.createProject("Unpublished", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("Unpublished", "", null, List.of(), null, null);
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
         String draftWorkflowUuid = automationWorkflowProjectFacade.getProject(projectId)
@@ -192,7 +249,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testCreateAndGetProject() {
         long projectId = automationWorkflowProjectFacade.createProject(
-            "Onboarding", "Onboarding flows", null, List.of(), null);
+            "Onboarding", "Onboarding flows", null, List.of(), null, null);
 
         AutomationWorkflowProjectDTO project = automationWorkflowProjectFacade.getProject(projectId);
 
@@ -204,7 +261,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
     @Test
     void testCreateProjectWorkflow() {
-        long projectId = automationWorkflowProjectFacade.createProject("Onboarding", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("Onboarding", "", null, List.of(), null, null);
 
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
@@ -217,10 +274,10 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
     @Test
     void testUpdateProjectPersistsPermissionExpression() {
-        long projectId = automationWorkflowProjectFacade.createProject("Gated", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("Gated", "", null, List.of(), null, null);
 
         automationWorkflowProjectFacade.updateProject(
-            projectId, "Gated", "", null, List.of(), "metadata['tier'] == 'pro'");
+            projectId, "Gated", "", null, List.of(), "metadata['tier'] == 'pro'", null);
 
         assertThat(automationWorkflowProjectFacade.getProject(projectId)
             .permissionExpression()).isEqualTo("metadata['tier'] == 'pro'");
@@ -228,7 +285,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
     @Test
     void testCreateProjectWorkflowPersistsPermissionExpression() {
-        long projectId = automationWorkflowProjectFacade.createProject("Gated", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("Gated", "", null, List.of(), null, null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, "metadata['tier'] == 'pro'");
 
@@ -240,7 +297,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
     @Test
     void testUpdateProjectWorkflowPermissionExpressionPersistsAndClears() {
-        long projectId = automationWorkflowProjectFacade.createProject("Gated", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("Gated", "", null, List.of(), null, null);
 
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
@@ -262,7 +319,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
     @Test
     void testDeleteProject() {
-        long projectId = automationWorkflowProjectFacade.createProject("Temp", "", null, List.of(), null);
+        long projectId = automationWorkflowProjectFacade.createProject("Temp", "", null, List.of(), null, null);
 
         automationWorkflowProjectFacade.deleteProject(projectId);
 
@@ -273,13 +330,13 @@ public class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testPublishProject() {
         long publishedProjectId = automationWorkflowProjectFacade.createProject(
-            "PublishedAutomationWorkflow", "", null, List.of(), null);
+            "PublishedAutomationWorkflow", "", null, List.of(), null, null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(publishedProjectId, null, null);
         automationWorkflowProjectFacade.publishProject(publishedProjectId);
 
         long unpublishedProjectId = automationWorkflowProjectFacade.createProject(
-            "UnpublishedAutomationWorkflow", "", null, List.of(), null);
+            "UnpublishedAutomationWorkflow", "", null, List.of(), null, null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(unpublishedProjectId, null, null);
 
@@ -302,7 +359,8 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
     @Test
     void testPublishProjectDoesNotAccumulateWorkflowTemplatesInAdminList() {
-        long projectId = automationWorkflowProjectFacade.createProject("StableAutomationWorkflow", "", null, List.of(), null);
+        long projectId =
+            automationWorkflowProjectFacade.createProject("StableAutomationWorkflow", "", null, List.of(), null, null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
@@ -315,6 +373,72 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
         assertThat(automationWorkflowProjectFacade.getProject(projectId)
             .workflowTemplates()).hasSize(workflowTemplateCountBeforePublish);
+    }
+
+    /**
+     * The editor routes by the template's workflowUuid. Publishing moves the draft onto a duplicated workflow, so the
+     * uuid has to stay put while the draft's workflow id changes; the old workflow id now belongs to the published
+     * version.
+     */
+    @Test
+    void testPublishKeepsTheTemplateUuidAndMovesTheDraftToANewWorkflow() {
+        long projectId = automationWorkflowProjectFacade.createProject("StableUuid", "", null, List.of(), null, null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        ConnectedUserWorkflowTemplateDTO draftBeforePublish = getDraftTemplate(projectId);
+
+        assertThat(draftBeforePublish.workflowUuid()).isEqualTo(workflowUuid);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        ConnectedUserWorkflowTemplateDTO draftAfterPublish = getDraftTemplate(projectId);
+
+        assertThat(draftAfterPublish.workflowUuid()).isEqualTo(workflowUuid);
+        assertThat(draftAfterPublish.workflowId()).isNotEqualTo(draftBeforePublish.workflowId());
+        assertThat(getPublishedTemplate(projectId).workflowUuid()).isEqualTo(workflowUuid);
+    }
+
+    @Test
+    void testUpdateProjectWorkflowAfterPublishEditsTheDraftNotThePublishedVersion() {
+        long projectId = automationWorkflowProjectFacade.createProject("DraftEdit", "", null, List.of(), null, null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            projectId, "{\"label\":\"Original\",\"tasks\":[]}", null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        automationWorkflowProjectFacade.updateProjectWorkflow(workflowUuid, "Renamed", "");
+
+        assertThat(getDraftTemplate(projectId).label()).isEqualTo("Renamed");
+        assertThat(getPublishedTemplate(projectId).label()).isEqualTo("Original");
+    }
+
+    @Test
+    void testDeleteProjectWorkflowByTemplateUuid() {
+        long projectId = automationWorkflowProjectFacade.createProject("DeleteByUuid", "", null, List.of(), null, null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        automationWorkflowProjectFacade.deleteProjectWorkflow(workflowUuid);
+
+        assertThat(automationWorkflowProjectFacade.getProject(projectId)
+            .workflowTemplates()).isEmpty();
+    }
+
+    @Test
+    void testDuplicateProjectWorkflowReturnsTheCopysTemplateUuid() {
+        long projectId = automationWorkflowProjectFacade.createProject("Duplicate", "", null, List.of(), null, null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        String duplicateWorkflowUuid = automationWorkflowProjectFacade.duplicateProjectWorkflow(workflowUuid);
+
+        assertThat(automationWorkflowProjectFacade.getProject(projectId)
+            .workflowTemplates()).extracting(ConnectedUserWorkflowTemplateDTO::workflowUuid)
+                .containsExactlyInAnyOrder(workflowUuid, duplicateWorkflowUuid);
     }
 
     @Test
@@ -341,7 +465,8 @@ public class AutomationWorkflowProjectFacadeIntTest {
         when(componentDefinitionService.fetchComponentDefinition(anyString(), any()))
             .thenReturn(Optional.of(gmailDefinition));
 
-        long projectId = automationWorkflowProjectFacade.createProject("EmailAutomationWorkflow", "", null, List.of(), null);
+        long projectId =
+            automationWorkflowProjectFacade.createProject("EmailAutomationWorkflow", "", null, List.of(), null, null);
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, workflowDefinitionWithTask, null);
 
         AutomationWorkflowProjectDTO project = automationWorkflowProjectFacade.getProject(projectId);
@@ -364,7 +489,8 @@ public class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testWorkflowComponentsNonNullForEmptyWorkflow() {
         long projectId =
-            automationWorkflowProjectFacade.createProject("EmptyWorkflowAutomationWorkflow", "", null, List.of(), null);
+            automationWorkflowProjectFacade.createProject("EmptyWorkflowAutomationWorkflow", "", null, List.of(), null,
+                null);
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
         AutomationWorkflowProjectDTO project = automationWorkflowProjectFacade.getProject(projectId);
@@ -397,7 +523,8 @@ public class AutomationWorkflowProjectFacadeIntTest {
             }
             """;
 
-        long projectId = automationWorkflowProjectFacade.createProject("BranchAutomationWorkflow", "", null, List.of(), null);
+        long projectId =
+            automationWorkflowProjectFacade.createProject("BranchAutomationWorkflow", "", null, List.of(), null, null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, workflowDefinitionWithTaskDispatcher, null);
 
@@ -423,7 +550,8 @@ public class AutomationWorkflowProjectFacadeIntTest {
             }
             """;
 
-        long projectId = automationWorkflowProjectFacade.createProject("ManualAutomationWorkflow", "", null, List.of(), null);
+        long projectId =
+            automationWorkflowProjectFacade.createProject("ManualAutomationWorkflow", "", null, List.of(), null, null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, workflowDefinitionWithoutTrigger, null);
 
@@ -440,7 +568,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testCreateProjectCreatesNewCategoryAndTags() {
         long projectId = automationWorkflowProjectFacade.createProject(
-            "AutomationWorkflowWithNewCategoryAndTags", "", "Automation", List.of("crm", "erp"), null);
+            "AutomationWorkflowWithNewCategoryAndTags", "", "Automation", List.of("crm", "erp"), null, null);
 
         AutomationWorkflowProjectDTO project = automationWorkflowProjectFacade.getProject(projectId);
 
@@ -459,9 +587,9 @@ public class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testCreateProjectReusesExistingCategoryByName() {
         long firstProjectId = automationWorkflowProjectFacade.createProject(
-            "FirstAutomationWorkflowProject", "", "Reusable", List.of(), null);
+            "FirstAutomationWorkflowProject", "", "Reusable", List.of(), null, null);
         long secondProjectId = automationWorkflowProjectFacade.createProject(
-            "SecondAutomationWorkflowProject", "", "Reusable", List.of(), null);
+            "SecondAutomationWorkflowProject", "", "Reusable", List.of(), null, null);
 
         AutomationWorkflowProjectDTO firstProject = automationWorkflowProjectFacade.getProject(firstProjectId);
         AutomationWorkflowProjectDTO secondProject = automationWorkflowProjectFacade.getProject(secondProjectId);
@@ -476,5 +604,41 @@ public class AutomationWorkflowProjectFacadeIntTest {
             .count();
 
         assertThat(reusableCategoryCount).isEqualTo(1);
+    }
+
+    @Test
+    void testAutomationHubVisibleDefaultsToTrueAndRoundTrips() {
+        long projectId = automationWorkflowProjectFacade.createProject(
+            "Hub Visible " + UUID.randomUUID(), "", null, List.of(), null, null);
+
+        assertThat(automationWorkflowProjectFacade.getProject(projectId)
+            .automationHubVisible()).isTrue();
+
+        automationWorkflowProjectFacade.updateProject(
+            projectId, "Hub Visible", "", null, List.of(), null, false);
+
+        assertThat(automationWorkflowProjectFacade.getProject(projectId)
+            .automationHubVisible()).isFalse();
+
+        automationWorkflowProjectFacade.updateProject(projectId, "Hub Visible", "", null, List.of(), null, null);
+
+        assertThat(automationWorkflowProjectFacade.getProject(projectId)
+            .automationHubVisible()).isFalse();
+    }
+
+    private ConnectedUserWorkflowTemplateDTO getDraftTemplate(long projectId) {
+        return automationWorkflowProjectFacade.getProject(projectId)
+            .workflowTemplates()
+            .getFirst();
+    }
+
+    private ConnectedUserWorkflowTemplateDTO getPublishedTemplate(long projectId) {
+        return automationWorkflowProjectFacade.getPublishedProjects()
+            .stream()
+            .filter(project -> project.id() == projectId)
+            .flatMap(project -> project.workflowTemplates()
+                .stream())
+            .findFirst()
+            .orElseThrow();
     }
 }

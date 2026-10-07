@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDT
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -20,11 +21,11 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public interface AutomationWorkflowProjectFacade {
-
     long createProject(
-        String name, String description, String category, List<String> tags, String permissionExpression);
+        String name, String description, String category, List<String> tags, String permissionExpression,
+        @Nullable Boolean automationHubVisible);
 
-    String duplicateProjectWorkflow(String workflowId);
+    String duplicateProjectWorkflow(String workflowUuid);
 
     long duplicateProject(long projectId);
 
@@ -52,9 +53,9 @@ public interface AutomationWorkflowProjectFacade {
 
     void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
-        String permissionExpression);
+        String permissionExpression, @Nullable Boolean automationHubVisible);
 
-    void updateProjectWorkflow(String workflowId, String label, String description);
+    void updateProjectWorkflow(String workflowUuid, String label, String description);
 
-    void updateProjectWorkflowPermissionExpression(String workflowId, String permissionExpression);
+    void updateProjectWorkflowPermissionExpression(String workflowUuid, String permissionExpression);
 }

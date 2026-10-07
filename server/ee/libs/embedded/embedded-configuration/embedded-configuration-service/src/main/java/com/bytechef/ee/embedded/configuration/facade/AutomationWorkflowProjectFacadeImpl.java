@@ -8,11 +8,11 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
@@ -24,34 +24,29 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectPublishedEvent;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.Nullable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -66,8 +61,7 @@ import tools.jackson.core.type.TypeReference;
 @ConditionalOnEEVersion
 @SkipAutomationAuthorization
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
-
-    private static final String MARKER = "__EMBEDDED_AUTOMATION__";
+    private static final String MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -79,49 +73,52 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         }
         """;
 
-    private static final String MANUAL_COMPONENT_NAME = "manual";
-
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final CategoryService categoryService;
-    private final ComponentDefinitionService componentDefinitionService;
+    private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
     private final ConnectedUserService connectedUserService;
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
     private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
-    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+    private final WorkflowComponentResolver workflowComponentResolver;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectFacadeImpl(
-        CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
+        ApplicationEventPublisher applicationEventPublisher, CategoryService categoryService,
+        ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
-        ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
-        ProjectWorkflowService projectWorkflowService, TagService tagService,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        ProjectService projectService,
+        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
+        TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
-
+        WorkflowTestConfigurationService workflowTestConfigurationService,
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
+        this.applicationEventPublisher = applicationEventPublisher;
         this.categoryService = categoryService;
-        this.componentDefinitionService = componentDefinitionService;
+        this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
         this.connectedUserService = connectedUserService;
         this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
         this.projectService = projectService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
-        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
+        this.workflowComponentResolver = workflowComponentResolver;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
     public long createProject(
-        String name, String description, String category, List<String> tags, String permissionExpression) {
-
+        String name, String description, String category, List<String> tags, String permissionExpression,
+        @Nullable Boolean automationHubVisible) {
         if (name != null && name.startsWith("__EMBEDDED")) {
             throw new IllegalArgumentException("Project name must not start with '__EMBEDDED': " + name);
         }
@@ -136,6 +133,10 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         project.setPermissionExpression(normalizePermissionExpression(permissionExpression));
 
         project = projectService.create(project);
+
+        if (automationHubVisible != null && !automationHubVisible) {
+            projectService.updateAutomationHubVisible(project.getId(), false);
+        }
 
         return project.getId();
     }
@@ -153,14 +154,22 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             projectWorkflowService.updatePermissionExpression(projectWorkflow.getId(), normalized);
         }
 
-        return projectWorkflow.getWorkflowId();
+        return projectWorkflow.getUuidAsString();
     }
 
     @Override
     public void deleteProject(long projectId) {
         getMarkedProject(projectId);
 
+        connectedUserReferenceRolloutManager.deleteReferenceDeployments(projectId);
+
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(projectId);
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+                workflowPreDeleteListener.onWorkflowPreDelete(projectWorkflow.getWorkflowId());
+            }
+        }
 
         projectWorkflowService.delete(
             projectWorkflows.stream()
@@ -182,11 +191,21 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public void deleteProjectWorkflow(String workflowUuid) {
-        projectWorkflowFacade.deleteWorkflow(workflowUuid);
+        String lastWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
+        ProjectWorkflow lastProjectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(lastWorkflowId);
+
+        Project project = getMarkedProject(lastProjectWorkflow.getProjectId());
+
+        projectWorkflowService.fetchProjectWorkflow(project.getId(), project.getLastProjectVersion(), workflowUuid)
+            .ifPresent(draftProjectWorkflow -> projectWorkflowFacade.deleteWorkflow(
+                draftProjectWorkflow.getWorkflowId()));
     }
 
     @Override
-    public String duplicateProjectWorkflow(String workflowId) {
+    public String duplicateProjectWorkflow(String workflowUuid) {
+        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
         ProjectWorkflow sourceProjectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
         long projectId = sourceProjectWorkflow.getProjectId();
@@ -205,7 +224,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         ProjectWorkflow newProjectWorkflow = projectWorkflowFacade.addWorkflow(projectId, newDefinition);
 
-        return newProjectWorkflow.getWorkflowId();
+        return newProjectWorkflow.getUuidAsString();
     }
 
     @Override
@@ -261,7 +280,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .stream()
             .filter(project -> project.getName() != null && Strings.CS.startsWith(project.getName(), MARKER) &&
                 Objects.equals(project.getWorkspaceId(), Workspace.DEFAULT_WORKSPACE_ID))
-            .map(this::toDTO)
+            .map(project -> toDTO(project))
             .toList();
     }
 
@@ -271,7 +290,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .stream()
             .filter(project -> project.getName() != null && Strings.CS.startsWith(project.getName(), MARKER) &&
                 Objects.equals(project.getWorkspaceId(), Workspace.DEFAULT_WORKSPACE_ID))
-            .map(this::toPublishedDTO)
+            .map(project -> toPublishedDTO(project))
             .toList();
     }
 
@@ -310,13 +329,14 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
             workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
         }
+
+        applicationEventPublisher.publishEvent(new AutomationWorkflowProjectPublishedEvent(projectId));
     }
 
     @Override
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
-        String permissionExpression) {
-
+        String permissionExpression, @Nullable Boolean automationHubVisible) {
         Project project = getMarkedProject(projectId);
 
         project.setName(MARKER + name);
@@ -326,17 +346,19 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         projectService.update(project);
 
-        // The permission expression is persisted via the dedicated updatePermissionExpression(...); the generic
-        // update(...) above intentionally leaves the column untouched so model-derived updates from the main
-        // automation app don't wipe a stored expression. A null argument means "not supplied" (leave as-is); a
-        // blank argument normalizes to null and clears the stored value.
         if (permissionExpression != null) {
             projectService.updatePermissionExpression(projectId, normalizePermissionExpression(permissionExpression));
+        }
+
+        if (automationHubVisible != null) {
+            projectService.updateAutomationHubVisible(projectId, automationHubVisible);
         }
     }
 
     @Override
-    public void updateProjectWorkflow(String workflowId, String label, String description) {
+    public void updateProjectWorkflow(String workflowUuid, String label, String description) {
+        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
         getMarkedProject(projectWorkflow.getProjectId());
@@ -353,7 +375,9 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    public void updateProjectWorkflowPermissionExpression(String workflowId, String permissionExpression) {
+    public void updateProjectWorkflowPermissionExpression(String workflowUuid, String permissionExpression) {
+        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
         getMarkedProject(projectWorkflow.getProjectId());
@@ -394,7 +418,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     private AutomationWorkflowProjectDTO filterWorkflowTemplates(
         AutomationWorkflowProjectDTO project, ConnectedUser connectedUser) {
-
         List<ConnectedUserWorkflowTemplateDTO> visibleTemplates = project.workflowTemplates()
             .stream()
             .filter(template -> embeddedPermissionEvaluator.evaluate(
@@ -404,79 +427,20 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return new AutomationWorkflowProjectDTO(
             project.id(), project.name(), project.description(), project.categoryId(), project.tagIds(),
             project.published(), project.version(), project.lastPublishedVersion(), visibleTemplates,
-            project.permissionExpression());
+            project.permissionExpression(), project.automationHubVisible());
+    }
+
+    private static List<ConnectedUserWorkflowTemplateDTO.Input> toInputs(Workflow workflow) {
+        List<Workflow.Input> inputs = workflow.getInputs();
+
+        return inputs.stream()
+            .map(input -> new ConnectedUserWorkflowTemplateDTO.Input(
+                input.name(), input.label(), input.type(), input.required()))
+            .toList();
     }
 
     private static String normalizePermissionExpression(String permissionExpression) {
         return StringUtils.isBlank(permissionExpression) ? null : permissionExpression.trim();
-    }
-
-    private List<ConnectedUserWorkflowTemplateDTO.Component> getTaskComponents(Workflow workflow) {
-        Map<String, WorkflowNodeType> workflowNodeTypesByName = new LinkedHashMap<>();
-
-        for (WorkflowTask workflowTask : workflow.getTasks(true)) {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-            workflowNodeTypesByName.putIfAbsent(workflowNodeType.name(), workflowNodeType);
-        }
-
-        return resolveComponents(workflowNodeTypesByName);
-    }
-
-    private List<ConnectedUserWorkflowTemplateDTO.Component> getTriggerComponents(Workflow workflow) {
-        Map<String, WorkflowNodeType> workflowNodeTypesByName = new LinkedHashMap<>();
-
-        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-            workflowNodeTypesByName.putIfAbsent(workflowNodeType.name(), workflowNodeType);
-        }
-
-        if (workflowNodeTypesByName.isEmpty()) {
-            workflowNodeTypesByName.put(
-                MANUAL_COMPONENT_NAME, new WorkflowNodeType(MANUAL_COMPONENT_NAME, 1, MANUAL_COMPONENT_NAME));
-        }
-
-        return resolveComponents(workflowNodeTypesByName);
-    }
-
-    private List<ConnectedUserWorkflowTemplateDTO.Component> resolveComponents(
-        Map<String, WorkflowNodeType> workflowNodeTypesByName) {
-
-        List<ConnectedUserWorkflowTemplateDTO.Component> components = new ArrayList<>();
-
-        for (WorkflowNodeType workflowNodeType : workflowNodeTypesByName.values()) {
-            components.add(resolveComponent(workflowNodeType));
-        }
-
-        return components;
-    }
-
-    private ConnectedUserWorkflowTemplateDTO.Component resolveComponent(WorkflowNodeType workflowNodeType) {
-        Optional<ComponentDefinition> componentDefinitionOptional =
-            componentDefinitionService.fetchComponentDefinition(workflowNodeType.name(), workflowNodeType.version());
-
-        if (componentDefinitionOptional.isPresent()) {
-            ComponentDefinition componentDefinition = componentDefinitionOptional.get();
-
-            return new ConnectedUserWorkflowTemplateDTO.Component(
-                componentDefinition.getName(), componentDefinition.getTitle(), componentDefinition.getIcon());
-        }
-
-        Optional<TaskDispatcherDefinition> taskDispatcherDefinitionOptional =
-            taskDispatcherDefinitionService.fetchTaskDispatcherDefinition(
-                workflowNodeType.name(), workflowNodeType.version());
-
-        if (taskDispatcherDefinitionOptional.isPresent()) {
-            TaskDispatcherDefinition taskDispatcherDefinition = taskDispatcherDefinitionOptional.get();
-
-            return new ConnectedUserWorkflowTemplateDTO.Component(
-                taskDispatcherDefinition.getName(), taskDispatcherDefinition.getTitle(),
-                taskDispatcherDefinition.getIcon());
-        }
-
-        return new ConnectedUserWorkflowTemplateDTO.Component(
-            workflowNodeType.name(), workflowNodeType.name(), null);
     }
 
     private Project getMarkedProject(long projectId) {
@@ -524,9 +488,11 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
                 Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
                 return new ConnectedUserWorkflowTemplateDTO(
-                    projectWorkflow.getWorkflowId(), workflow.getLabel(), workflow.getDescription(),
-                    Objects.toString(workflow.getLastModifiedDate(), null), getTriggerComponents(workflow),
-                    getTaskComponents(workflow), projectWorkflow.getPermissionExpression());
+                    projectWorkflow.getUuidAsString(), workflow.getLabel(), workflow.getDescription(),
+                    Objects.toString(workflow.getLastModifiedDate(), null),
+                    workflowComponentResolver.getTriggerComponents(workflow),
+                    workflowComponentResolver.getTaskComponents(workflow), toInputs(workflow),
+                    projectWorkflow.getPermissionExpression(), projectWorkflow.getWorkflowId());
             })
             .filter(Objects::nonNull)
             .toList();
@@ -542,7 +508,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return new AutomationWorkflowProjectDTO(
             project.getId(), displayName, project.getDescription(), project.getCategoryId(),
             project.getTagIds(), published, project.getLastProjectVersion(), lastPublishedVersion, workflowTemplates,
-            project.getPermissionExpression());
+            project.getPermissionExpression(), project.isAutomationHubVisible());
     }
 
     private AutomationWorkflowProjectDTO toPublishedDTO(Project project) {
@@ -562,8 +528,10 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
                     return new ConnectedUserWorkflowTemplateDTO(
                         projectWorkflow.getUuidAsString(), workflow.getLabel(), workflow.getDescription(),
-                        Objects.toString(workflow.getLastModifiedDate(), null), getTriggerComponents(workflow),
-                        getTaskComponents(workflow), projectWorkflow.getPermissionExpression());
+                        Objects.toString(workflow.getLastModifiedDate(), null),
+                        workflowComponentResolver.getTriggerComponents(workflow),
+                        workflowComponentResolver.getTaskComponents(workflow), toInputs(workflow),
+                        projectWorkflow.getPermissionExpression());
                 })
                 .filter(Objects::nonNull)
                 .toList();
@@ -578,6 +546,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return new AutomationWorkflowProjectDTO(
             project.getId(), displayName, project.getDescription(), project.getCategoryId(),
             project.getTagIds(), published, project.getLastProjectVersion(), lastPublishedVersion, workflowTemplates,
-            project.getPermissionExpression());
+            project.getPermissionExpression(), project.isAutomationHubVisible());
     }
 }
