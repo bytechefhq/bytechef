@@ -232,6 +232,7 @@ function hasSideLabelForCollision(memberNode: Node): boolean {
     return (
         memberNode.type !== 'placeholder' &&
         memberNode.type !== 'triggerPlaceholder' &&
+        !isReadOnlyPlaceholder(memberNode) &&
         memberNode.type !== 'taskDispatcherTopGhostNode' &&
         memberNode.type !== 'taskDispatcherBottomGhostNode' &&
         memberNode.type !== 'taskDispatcherLeftGhostNode'

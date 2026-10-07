@@ -3042,6 +3042,64 @@ describe('no-crossing lanes', () => {
         expect(falseCenter - trueCenter).toBeLessThanOrEqual(leftColumnEnd + 50 + 45 + 1);
     });
 
+    it('extends the left column past the footprint when its label outgrows it', async () => {
+        const longNodeName = 'childTrueWithAVeryLongWorkflowNodeName';
+
+        const nodes: Node[] = [
+            conditionNode('condition_1'),
+            ...conditionGhostNodes('condition_1'),
+            taskNode(longNodeName, {conditionCase: 'caseTrue', conditionId: 'condition_1'}),
+            taskNode('childFalse1', {conditionCase: 'caseFalse', conditionId: 'condition_1'}),
+        ];
+
+        const edges: Edge[] = [
+            edge('condition_1', 'condition_1-condition-top-ghost'),
+            edge('condition_1-condition-top-ghost', longNodeName),
+            edge('condition_1-condition-top-ghost', 'childFalse1'),
+            edge(longNodeName, 'condition_1-condition-bottom-ghost'),
+            edge('childFalse1', 'condition_1-condition-bottom-ghost'),
+        ];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const trueCenter = positionOf(result.nodes, longNodeName).x + 36;
+        const falseCenter = positionOf(result.nodes, 'childFalse1').x + 36;
+
+        // The capped label estimate (36 + 200) ends past the footprint's 204,
+        // so the label binds: 236 + 50 + 45 = 331
+        expect(labelSideEdge(0, longNodeName)).toBeGreaterThan(-36 + 240);
+        expect(falseCenter - trueCenter).toBeGreaterThanOrEqual(labelSideEdge(0, longNodeName) + 50 + 45 - 1);
+        expect(falseCenter - trueCenter).toBeLessThanOrEqual(labelSideEdge(0, longNodeName) + 50 + 45 + 1);
+    });
+
+    it('keeps a read-only case placeholder box centered on its dot', async () => {
+        const nodes: Node[] = [
+            conditionNode('condition_1'),
+            ...conditionGhostNodes('condition_1'),
+            {...conditionPlaceholderNode('condition_1', 'left'), type: 'readonlyPlaceholder'},
+            taskNode('childFalse1', {conditionCase: 'caseFalse', conditionId: 'condition_1'}),
+        ];
+
+        const edges: Edge[] = [
+            edge('condition_1', 'condition_1-condition-top-ghost'),
+            edge('condition_1-condition-top-ghost', 'condition_1-condition-left-placeholder-0'),
+            edge('condition_1-condition-top-ghost', 'childFalse1'),
+            edge('condition_1-condition-left-placeholder-0', 'condition_1-condition-bottom-ghost'),
+            edge('childFalse1', 'condition_1-condition-bottom-ghost'),
+        ];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const dotCenter = positionOf(result.nodes, 'condition_1-condition-left-placeholder-0').x + 1;
+        const falseCenter = positionOf(result.nodes, 'childFalse1').x + 36;
+
+        // The 2px dot has no side label: its 240 footprint stays centered
+        // (120 each side) rather than starting at the dot and running 240
+        // right — 120 + 50 + the right column's 45px spine = 215
+        expect(falseCenter - dotCenter).toBeGreaterThanOrEqual(120 + 50 + 45 - 1);
+        expect(falseCenter - dotCenter).toBeLessThanOrEqual(120 + 50 + 45 + 1);
+    });
+
     it('keeps a short chain clear of a deep sibling subtree for the FULL frame height', async () => {
         // condition_1: TRUE = chain into a nested condition (wide, deep),
         // FALSE = one task. Band-blind tucking would slide the FALSE task in
