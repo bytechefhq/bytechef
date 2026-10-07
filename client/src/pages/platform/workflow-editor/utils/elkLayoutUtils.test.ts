@@ -12,15 +12,18 @@ import type {ElkNode} from 'elkjs/lib/elk-api';
 // pair, at every nesting depth, in both TB and LR — the engine's core invariant.
 const CHAIN_GAP = 80;
 
-// Box-adjacent edges (condition→frame bar, bar→next node): layer gap + one
-// 14px anchor slack.
-const BOX_GAP = 66;
-
 // The frame's entry bar is pulled toward the condition so the TRUE/FALSE labels
 // read as attached to the box: both directions pull 28 for a 38px corridor.
 // See BAR_LABEL_PULL in elkLayoutUtils.
 const TOP_BOX_GAP = 38;
-const BAR_TO_CHILD_GAP = 94;
+
+// Half the pull is rebalanced onto the exit side, so the interior reads the
+// same run on both sides of a chain (see INTERIOR_PULL_REBALANCE).
+const BAR_TO_CHILD_GAP = 80;
+const CHILD_TO_BAR_GAP = 80;
+
+// TB branch entries keep the full run plus the case-chip inset.
+const TB_BRANCH_BAR_TO_CHILD_GAP = 120;
 const CHAIN_STEP = 72 + CHAIN_GAP;
 
 const taskNode = (
@@ -518,9 +521,8 @@ describe('getElkLayoutElements', () => {
 
         const topGhostBarX = positionOf(result.nodes, 'condition_1-condition-top-ghost').x;
 
-        // LR can't pull the bar toward the dispatcher (the rotated TRUE/FALSE
-        // labels own that gap), so the interior inset supplies the same 94px
-        // entry run instead — room for the edge add-button before the node
+        // LR frames read the same entry run as TB — room for the edge
+        // add-button before the node
         expect(positionOf(result.nodes, 'childTrue1').x - (topGhostBarX + 2)).toBe(BAR_TO_CHILD_GAP);
         expect(positionOf(result.nodes, 'childFalse1').x - (topGhostBarX + 2)).toBe(BAR_TO_CHILD_GAP);
     });
@@ -827,13 +829,13 @@ describe('getElkLayoutElements', () => {
         const innerBottomBarY = positionOf(result.nodes, 'condition_2-condition-bottom-ghost').y;
         const outerBottomBarY = positionOf(result.nodes, 'condition_1-condition-bottom-ghost').y;
 
-        expect(outerBottomBarY - (innerBottomBarY + 2)).toBe(BOX_GAP);
+        expect(outerBottomBarY - (innerBottomBarY + 2)).toBe(CHILD_TO_BAR_GAP);
     });
 
     it('centers a short branch chain between the bars when its sibling is taller', async () => {
         // dagre parity (centerDispatcherChildrenOnMainAxis): the FALSE branch's
         // lone task floats centered in the frame interior instead of hugging the
-        // top bar; the tall TRUE chain keeps its designed 94/66 gaps
+        // top bar; the tall TRUE chain keeps its symmetric 80/80 gaps
         const nodes: Node[] = [
             conditionNode('condition_1'),
             ...conditionGhostNodes('condition_1'),
@@ -858,9 +860,9 @@ describe('getElkLayoutElements', () => {
         const topGhostBarY = positionOf(result.nodes, 'condition_1-condition-top-ghost').y;
         const bottomGhostBarY = positionOf(result.nodes, 'condition_1-condition-bottom-ghost').y;
 
-        // Tall TRUE chain keeps the designed asymmetric gaps
+        // Tall TRUE chain keeps the symmetric gaps
         expect(positionOf(result.nodes, 'childTrue1').y - (topGhostBarY + 2)).toBe(BAR_TO_CHILD_GAP);
-        expect(bottomGhostBarY - (positionOf(result.nodes, 'childTrue3').y + 72)).toBe(BOX_GAP);
+        expect(bottomGhostBarY - (positionOf(result.nodes, 'childTrue3').y + 72)).toBe(CHILD_TO_BAR_GAP);
 
         // Short FALSE chain floats centered in the interior
         const interiorCenter = (topGhostBarY + 2 + bottomGhostBarY) / 2;
@@ -941,7 +943,7 @@ describe('getElkLayoutElements', () => {
         expect(Math.abs((leftPlaceholderCenter + rightPlaceholderCenter) / 2 - conditionCenter)).toBeLessThanOrEqual(1);
 
         // The visible edge from the condition icon to the frame's top ghost bar is
-        // exactly BOX_GAP (layer gap + one anchor slack)
+        // exactly TOP_BOX_GAP
         const conditionBottom = positionOf(result.nodes, 'condition_1').y + 72;
         const topGhostBarY = positionOf(result.nodes, 'condition_1-condition-top-ghost').y;
 
@@ -973,7 +975,7 @@ describe('getElkLayoutElements', () => {
 
         expect(topGhostBarY - conditionBottom).toBe(TOP_BOX_GAP);
         expect(loggerTaskTop - (topGhostBarY + 2)).toBe(BAR_TO_CHILD_GAP);
-        expect(bottomGhostBarY - (loggerTaskTop + 72)).toBe(BOX_GAP);
+        expect(bottomGhostBarY - (loggerTaskTop + 72)).toBe(CHILD_TO_BAR_GAP);
 
         // Condition sits midway between the populated chain and the empty-branch placeholder
         const conditionCenter = positionOf(result.nodes, 'condition_1').x + 36;
@@ -981,6 +983,39 @@ describe('getElkLayoutElements', () => {
         const placeholderCenter = positionOf(result.nodes, 'condition_1-condition-right-placeholder-0').x + 36;
 
         expect(Math.abs((loggerCenter + placeholderCenter) / 2 - conditionCenter)).toBeLessThanOrEqual(1);
+    });
+
+    it('centers a lone LR branch task in its box, level with the empty sibling placeholder', async () => {
+        const nodes: Node[] = [
+            conditionNode('condition_1'),
+            ...conditionGhostNodes('condition_1'),
+            taskNode('loggerTask', {conditionCase: 'caseTrue', conditionId: 'condition_1'}),
+            conditionPlaceholderNode('condition_1', 'right'),
+        ];
+
+        const edges: Edge[] = [
+            edge('condition_1', 'condition_1-condition-top-ghost'),
+            edge('condition_1-condition-top-ghost', 'loggerTask'),
+            edge('loggerTask', 'condition_1-condition-bottom-ghost'),
+            edge('condition_1-condition-top-ghost', 'condition_1-condition-right-placeholder-0'),
+            edge('condition_1-condition-right-placeholder-0', 'condition_1-condition-bottom-ghost'),
+        ];
+
+        const result = await getElkLayoutElements({
+            canvasHeight: 800,
+            canvasWidth: 1200,
+            direction: 'LR',
+            edges,
+            nodes,
+        });
+
+        const topGhostBarX = positionOf(result.nodes, 'condition_1-condition-top-ghost').x;
+        const bottomGhostBarX = positionOf(result.nodes, 'condition_1-condition-bottom-ghost').x;
+        const loggerCenterX = positionOf(result.nodes, 'loggerTask').x + 36;
+        const placeholderCenterX = positionOf(result.nodes, 'condition_1-condition-right-placeholder-0').x + 36;
+
+        expect(Math.abs(loggerCenterX - (topGhostBarX + 2 + bottomGhostBarX) / 2)).toBeLessThanOrEqual(1);
+        expect(Math.abs(loggerCenterX - placeholderCenterX)).toBeLessThanOrEqual(1);
     });
 
     it('moves the whole frame with a dispatcher that has a saved position', async () => {
@@ -1014,7 +1049,7 @@ describe('getElkLayoutElements', () => {
 
         expect(topGhostBarY - (900 + 72)).toBe(TOP_BOX_GAP);
         expect(loggerTaskTop - (topGhostBarY + 2)).toBe(BAR_TO_CHILD_GAP);
-        expect(bottomGhostBarY - (loggerTaskTop + 72)).toBe(BOX_GAP);
+        expect(bottomGhostBarY - (loggerTaskTop + 72)).toBe(CHILD_TO_BAR_GAP);
 
         const topGhostCenter = positionOf(result.nodes, 'condition_1-condition-top-ghost').x + 36;
 
@@ -1230,7 +1265,7 @@ describe('getElkLayoutElements with loops', () => {
         expect(topGhostBarY - loopBottom).toBe(TOP_BOX_GAP);
         expect(firstChildTop - (topGhostBarY + 2)).toBe(BAR_TO_CHILD_GAP);
         expect(secondChildTop - firstChildTop).toBe(CHAIN_STEP);
-        expect(bottomGhostBarY - (secondChildTop + 72)).toBe(BOX_GAP);
+        expect(bottomGhostBarY - (secondChildTop + 72)).toBe(CHILD_TO_BAR_GAP);
     });
 
     it('centers an empty loop placeholder inside the frame', async () => {
@@ -1409,7 +1444,7 @@ describe('getElkLayoutElements with loops', () => {
         const innerBottomBarY = positionOf(result.nodes, 'loop_2-loop-bottom-ghost').y;
         const outerBottomBarY = positionOf(result.nodes, 'loop_1-loop-bottom-ghost').y;
 
-        expect(outerBottomBarY - (innerBottomBarY + 2)).toBe(BOX_GAP);
+        expect(outerBottomBarY - (innerBottomBarY + 2)).toBe(CHILD_TO_BAR_GAP);
 
         // Ring staircase: each loop's body column sits on its own ring's right
         // side, and each rail mirrors its own content offset — so the inner
@@ -1588,9 +1623,9 @@ describe('getElkLayoutElements with branches', () => {
         const topGhostBarY = positionOf(result.nodes, 'branch_1-branch-top-ghost').y;
 
         // Branch entries stack [case chip][add-button] before the node, so they
-        // get 26px on top of the standard 94px frame entry
-        expect(positionOf(result.nodes, 'child1').y - (topGhostBarY + 2)).toBe(BAR_TO_CHILD_GAP + 26);
-        expect(positionOf(result.nodes, 'child2').y - (topGhostBarY + 2)).toBe(BAR_TO_CHILD_GAP + 26);
+        // keep the full pre-rebalance entry run plus a 26px inset
+        expect(positionOf(result.nodes, 'child1').y - (topGhostBarY + 2)).toBe(TB_BRANCH_BAR_TO_CHILD_GAP);
+        expect(positionOf(result.nodes, 'child2').y - (topGhostBarY + 2)).toBe(TB_BRANCH_BAR_TO_CHILD_GAP);
     });
 
     // Mirrors the live "condition3" workflow: a wide TRUE branch subtree
@@ -1855,7 +1890,7 @@ describe('getElkLayoutElements with branches', () => {
         const accelo1Bottom = positionOf(result.nodes, 'accelo_1').y + 72;
         const loop1BottomBarY = positionOf(result.nodes, 'loop_1-loop-bottom-ghost').y;
 
-        expect(loop1BottomBarY - accelo1Bottom).toBe(BOX_GAP);
+        expect(loop1BottomBarY - accelo1Bottom).toBe(CHILD_TO_BAR_GAP);
     });
 
     it('orders branch case columns by the params-derived canonical order, not array order', async () => {
@@ -2526,7 +2561,7 @@ describe('getElkLayoutElements with each and map', () => {
         expect(topBarY - mapBottom).toBe(TOP_BOX_GAP);
         expect(positionOf(result.nodes, 'mapChild1').y - (topBarY + 2)).toBe(BAR_TO_CHILD_GAP);
         expect(positionOf(result.nodes, 'mapChild2').y - positionOf(result.nodes, 'mapChild1').y).toBe(CHAIN_STEP);
-        expect(bottomBarY - (positionOf(result.nodes, 'mapChild2').y + 72)).toBe(BOX_GAP);
+        expect(bottomBarY - (positionOf(result.nodes, 'mapChild2').y + 72)).toBe(CHILD_TO_BAR_GAP);
         expect(positionOf(result.nodes, 'task2').y - (bottomBarY + 2)).toBe(CHAIN_GAP);
     });
 
@@ -2666,7 +2701,7 @@ describe('getElkLayoutElements with each and map', () => {
         const forkJoinBottomY = positionOf(result.nodes, 'fork-join_1-forkJoin-bottom-ghost').y;
         const eachBottomY = positionOf(result.nodes, 'each_1-each-bottom-ghost').y;
 
-        expect(eachBottomY - (forkJoinBottomY + 2)).toBe(BOX_GAP);
+        expect(eachBottomY - (forkJoinBottomY + 2)).toBe(CHILD_TO_BAR_GAP);
 
         // The dangling edge is gone from the output
         expect(result.edges.some((resultEdge) => resultEdge.source === 'fork-join_1-fork-join-bottom-ghost')).toBe(
@@ -2770,7 +2805,7 @@ describe('getElkLayoutElements with on-error', () => {
 
         expect(topBarY - parentBottom).toBe(TOP_BOX_GAP);
         expect(positionOf(result.nodes, 'tryChild').y - (topBarY + 2)).toBe(BAR_TO_CHILD_GAP);
-        expect(bottomBarY - (positionOf(result.nodes, 'tryChild').y + 72)).toBe(BOX_GAP);
+        expect(bottomBarY - (positionOf(result.nodes, 'tryChild').y + 72)).toBe(CHILD_TO_BAR_GAP);
         expect(positionOf(result.nodes, 'task2').y - (bottomBarY + 2)).toBe(CHAIN_GAP);
     });
 
@@ -3269,7 +3304,7 @@ describe('LR ring content side', () => {
 describe('LR entry gap', () => {
     it('gives the LR condition the same node-to-bar corridor as TB', async () => {
         // LR pulls the bar by the same 28 as TB, so the condition->bar gap is 38
-        // in both directions and the child side still reads the 94px entry run.
+        // in both directions and the child side still reads the 80px entry run.
         const {edges, nodes} = singleConditionFixture();
 
         const result = await getElkLayoutElements({
