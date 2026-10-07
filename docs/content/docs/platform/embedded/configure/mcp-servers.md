@@ -55,6 +55,15 @@ For each exposed component action, you choose which parameters you fix yourself 
 
 <!-- TODO screenshot: Add Component dialog on the Select Tools step, showing the list of the component's actions with per-tool selection and the tool properties popover -->
 
+### Enabling and disabling individual tools
+
+Expand a server row, then expand one of its components to see the tools it exposes. Each tool has a switch, a **Configure** button that opens the tool's parameters, and a **Delete** button.
+
+- **Switch on** - the tool is offered to agents.
+- **Switch off** - the tool is not offered to any agent and cannot be called, whatever a connected user has enabled for themselves.
+
+The switch applies to the whole server, for every connected user. When you edit a component's tools, each tool keeps its switch state; newly added tools start switched on.
+
 ### Managing MCP Servers
 
 Each server row has an **Enabled** switch and an ellipsis (⋮) menu:
@@ -64,6 +73,8 @@ Each server row has an **Enabled** switch and an ellipsis (⋮) menu:
 - **Delete** -- remove the server (confirmed via an alert dialog).
 
 Tags are edited inline on the server row.
+
+Creating, editing and deleting MCP servers and the workflows they expose requires a tenant admin. Connected users can only switch tools and workflows on or off, and set workflow inputs, for their own integration instances (see [Which tools a user's agent sees](#which-tools-a-users-agent-sees)).
 
 ### Filtering MCP Servers
 
@@ -114,11 +125,25 @@ The message asks the agent to show the link to the user as a markdown link label
 
 ### Which tools a user's agent sees
 
-Before a user connects an integration, the server lists every tool it exposes for that integration, and each one returns `connection_required` when called.
+Tools you switched off on the server are never listed. A workflow tool is listed only while its workflow is enabled in the instance configuration.
+
+Before a user connects an integration, the server lists every remaining tool it exposes for that integration, and each one returns `connection_required` when called.
 
 Once the user has connected, the server lists only the tools that user has enabled. Tools start disabled. The user enables them on the **Tools** tab of the Connect dialog, which lists the server's component tools and workflow tools for that integration. The tab appears only when an MCP server exposes something for the integration.
 
 To switch a server's tools off for a single user, use the **MCP Servers** tab in [Connected Users](/platform/embedded/monitor/connected-users#user-details).
+
+### Workflow tool runs
+
+Calling a workflow tool starts a run of the workflow and waits up to 300 seconds for it to finish. If it does not finish in time, the tool call fails with an error saying the job did not finish within that time.
+
+When the run finishes, the tool returns the workflow's output. A failed run returns its error. A run that stops before it finishes returns its `jobId` and a `status`:
+
+| Status | Meaning |
+|---|---|
+| `approval_required` | The run is paused waiting for a human approval decision. |
+| `suspended` | The run is paused and resumes later on its own. |
+| `stopped` | The run was stopped before it finished. |
 
 ### Tenant scoping
 
