@@ -161,14 +161,14 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment) {
-        boolean isPublishedCatalogWorkflowTemplate = automationWorkflowProjectFacade.getPublishedProjects()
+        boolean isPublishedAutomationWorkflowTemplate = automationWorkflowProjectFacade.getPublishedProjects()
             .stream()
             .flatMap(project -> CollectionUtils.stream(project.workflowTemplates()))
             .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid));
 
-        if (!isPublishedCatalogWorkflowTemplate) {
+        if (!isPublishedAutomationWorkflowTemplate) {
             throw new IllegalArgumentException(
-                "Not a published catalog workflow template: " + workflowUuid);
+                "Not a published automation workflow template: " + workflowUuid);
         }
 
         String publishedWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);

@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.security.web.authentication;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.core.userdetails.User;
 
@@ -16,7 +17,8 @@ import org.springframework.security.core.userdetails.User;
  *
  * @author Ivica Cardic
  */
-public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken
+    implements ConnectedUserAuthentication {
 
     private String externalUserId;
     private String secretKey;
@@ -31,8 +33,8 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
     }
 
     @SuppressFBWarnings("EI")
-    public EmbeddedApiKeyAuthenticationToken(User user) {
-        super(user);
+    public EmbeddedApiKeyAuthenticationToken(long environmentId, User user) {
+        super(environmentId, user);
     }
 
     public String getExternalUserId() {

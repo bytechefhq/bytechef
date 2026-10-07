@@ -17,10 +17,10 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A component used in a catalog workflow.
+ * A component used in an automation workflow.
  */
 
-@Schema(name = "AutomationWorkflowProjectComponent", description = "A component used in a catalog workflow.")
+@Schema(name = "AutomationWorkflowProjectComponent", description = "A component used in an automation workflow.")
 @JsonTypeName("AutomationWorkflowProjectComponent")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class AutomationWorkflowProjectComponentModel {

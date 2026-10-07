@@ -27,8 +27,8 @@ public class ApiPlatformApiKeyAuthenticationToken extends AbstractApiKeyAuthenti
     }
 
     @SuppressFBWarnings("EI")
-    public ApiPlatformApiKeyAuthenticationToken(User user) {
-        super(user);
+    public ApiPlatformApiKeyAuthenticationToken(long environmentId, User user) {
+        super(environmentId, user);
     }
 
     public String getSecretKey() {
