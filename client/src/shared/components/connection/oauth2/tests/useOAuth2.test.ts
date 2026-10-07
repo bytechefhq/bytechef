@@ -701,4 +701,140 @@ describe('useOAuth2', () => {
         consoleWarnSpy.mockRestore();
         vi.useRealTimers();
     });
+
+    it('should close the popup and report unmounted when unmounted during a pending attempt', () => {
+        vi.useFakeTimers();
+
+        const onAbort = vi.fn();
+        const onCodeSuccess = vi.fn();
+        const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+        const {result, unmount} = renderHook(() => useOAuth2({...defaultProps, onAbort, onCodeSuccess}));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+
+        unmount();
+
+        expect(mockWindow!.close).toHaveBeenCalled();
+        expect(onAbort).toHaveBeenCalledWith('unmounted');
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('storage', expect.any(Function));
+        expect(MockBroadcastChannel.instances.length).toBe(0);
+
+        // A late response from the stale popup must not save a connection.
+        localStorage.setItem(
+            OAUTH_STORAGE_KEY,
+            JSON.stringify({payload: {code: 'late-code', state: savedState}, type: OAUTH_RESPONSE})
+        );
+
+        act(() => {
+            vi.advanceTimersByTime(1_000);
+        });
+
+        expect(onCodeSuccess).not.toHaveBeenCalled();
+
+        vi.useRealTimers();
+    });
+
+    it('should not report unmounted when unmounted without a pending attempt', () => {
+        const onAbort = vi.fn();
+
+        const {unmount} = renderHook(() => useOAuth2({...defaultProps, onAbort}));
+
+        unmount();
+
+        expect(onAbort).not.toHaveBeenCalled();
+    });
+
+    it('should reset loading and close the popup when cancelled', () => {
+        const onAbort = vi.fn();
+
+        const {result} = renderHook(() => useOAuth2({...defaultProps, onAbort}));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        act(() => {
+            result.current.cancel();
+        });
+
+        expect(result.current.loading).toBe(false);
+        expect(mockWindow!.close).toHaveBeenCalled();
+        expect(onAbort).toHaveBeenCalledWith('cancelled');
+        expect(sessionStorage.getItem(OAUTH_STATE_KEY)).toBeNull();
+    });
+
+    it('should reset loading after the timeout when the popup stays open without a response', () => {
+        vi.useFakeTimers();
+
+        const onAbort = vi.fn();
+
+        // The popup stays open behind the app, so this window can hold focus while nothing happens.
+        const hasFocusSpy = vi.spyOn(document, 'hasFocus').mockReturnValue(true);
+
+        const {result} = renderHook(() => useOAuth2({...defaultProps, onAbort}));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        act(() => {
+            vi.advanceTimersByTime(4 * 60 * 1_000);
+        });
+
+        expect(result.current.loading).toBe(true);
+
+        act(() => {
+            vi.advanceTimersByTime(60 * 1_000);
+        });
+
+        expect(result.current.loading).toBe(false);
+        expect(result.current.error).toBe('OAuth error: Authorization timed out.');
+        expect(mockWindow!.close).toHaveBeenCalled();
+        expect(onAbort).toHaveBeenCalledTimes(1);
+        expect(onAbort).toHaveBeenCalledWith('timeout');
+
+        hasFocusSpy.mockRestore();
+        vi.useRealTimers();
+    });
+
+    it('should report popup_closed when the popup is closed without a response', () => {
+        vi.useFakeTimers();
+
+        const onAbort = vi.fn();
+
+        vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        const hasFocusSpy = vi.spyOn(document, 'hasFocus').mockReturnValue(true);
+
+        const {result} = renderHook(() => useOAuth2({...defaultProps, onAbort}));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        (mockWindow as unknown as {closed: boolean}).closed = true;
+
+        act(() => {
+            vi.advanceTimersByTime(3_000);
+        });
+
+        expect(onAbort).toHaveBeenCalledTimes(1);
+        expect(onAbort).toHaveBeenCalledWith('popup_closed');
+
+        // The timeout is cleared with the rest of the attempt, so it does not report a second outcome.
+        act(() => {
+            vi.advanceTimersByTime(10 * 60 * 1_000);
+        });
+
+        expect(onAbort).toHaveBeenCalledTimes(1);
+
+        hasFocusSpy.mockRestore();
+        vi.useRealTimers();
+    });
 });

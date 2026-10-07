@@ -13,6 +13,9 @@ export interface AnalyticsI {
     captureIntegrationWorkflowCreated(): void;
     captureIntegrationWorkflowImported(): void;
     captureIntegrationWorkflowTested(): void;
+    captureOAuth2AuthorizationFailed(componentName: string | undefined, reason: string): void;
+    captureOAuth2AuthorizationStarted(componentName: string | undefined): void;
+    captureOAuth2AuthorizationSucceeded(componentName: string | undefined): void;
     captureProjectCreated(): void;
     captureProjectDeploymentCreated(): void;
     captureProjectDeploymentEnabled(): void;
@@ -80,6 +83,12 @@ export const useAnalytics = (): AnalyticsI => {
         captureIntegrationWorkflowCreated: () => captureEvent('integration_workflow_created'),
         captureIntegrationWorkflowImported: () => captureEvent('integration_workflow_created', {imported: true}),
         captureIntegrationWorkflowTested: () => captureEvent('integration_workflow_tested'),
+        captureOAuth2AuthorizationFailed: (componentName: string | undefined, reason: string) =>
+            captureEvent('oauth2_authorization_failed', {componentName, reason}),
+        captureOAuth2AuthorizationStarted: (componentName: string | undefined) =>
+            captureEvent('oauth2_authorization_started', {componentName}),
+        captureOAuth2AuthorizationSucceeded: (componentName: string | undefined) =>
+            captureEvent('oauth2_authorization_succeeded', {componentName}),
         captureProjectCreated: () => captureEvent('project_created'),
         captureProjectDeploymentCreated: () => captureEvent('project_deployment_created'),
         captureProjectDeploymentEnabled: () => captureEvent('project_deployment_enabled'),
