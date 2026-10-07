@@ -195,12 +195,14 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
 
         Assert.notNull(projectWorkflow, "'projectWorkflow' must not be null");
 
-        update(projectWorkflow);
+        ProjectWorkflow draftProjectWorkflow = update(projectWorkflow);
 
-        projectWorkflow = new ProjectWorkflow(
-            projectId, oldProjectVersion, oldWorkflowId, UUID.fromString(projectWorkflow.getUuidAsString()));
+        ProjectWorkflow publishedProjectWorkflow = new ProjectWorkflow(
+            projectId, oldProjectVersion, oldWorkflowId, UUID.fromString(draftProjectWorkflow.getUuidAsString()));
 
-        projectWorkflowRepository.save(projectWorkflow);
+        publishedProjectWorkflow.setPermissionExpression(draftProjectWorkflow.getPermissionExpression());
+
+        projectWorkflowRepository.save(publishedProjectWorkflow);
     }
 
     @Override
