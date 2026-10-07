@@ -97,6 +97,11 @@ if (!Element.prototype.scrollIntoView) {
     Element.prototype.scrollIntoView = vi.fn();
 }
 
+// Ensure scrollTo exists
+if (!Element.prototype.scrollTo) {
+    Element.prototype.scrollTo = vi.fn();
+}
+
 // ProseMirror/TipTap rely on DOM geometry APIs that jsdom does not fully implement.
 // Provide minimal, test-only polyfills to avoid runtime errors like
 // "TypeError: target.getClientRects is not a function" when computing selection coords.
