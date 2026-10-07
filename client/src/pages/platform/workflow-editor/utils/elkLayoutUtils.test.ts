@@ -3093,11 +3093,12 @@ describe('no-crossing lanes', () => {
         const dotCenter = positionOf(result.nodes, 'condition_1-condition-left-placeholder-0').x + 1;
         const falseCenter = positionOf(result.nodes, 'childFalse1').x + 36;
 
-        // The 2px dot has no side label: its 240 footprint stays centered
-        // (120 each side) rather than starting at the dot and running 240
-        // right — 120 + 50 + the right column's 45px spine = 215
-        expect(falseCenter - dotCenter).toBeGreaterThanOrEqual(120 + 50 + 45 - 1);
-        expect(falseCenter - dotCenter).toBeLessThanOrEqual(120 + 50 + 45 + 1);
+        // The 2px dot has no side label: it reserves the editable "+"
+        // placeholder's 160 case footprint, centered (80 each side) rather
+        // than starting at the dot — 80 + 50 + the right column's 45px
+        // spine = 175, the same pitch as an editable empty case
+        expect(falseCenter - dotCenter).toBeGreaterThanOrEqual(80 + 50 + 45 - 1);
+        expect(falseCenter - dotCenter).toBeLessThanOrEqual(80 + 50 + 45 + 1);
     });
 
     it('keeps a short chain clear of a deep sibling subtree for the FULL frame height', async () => {
