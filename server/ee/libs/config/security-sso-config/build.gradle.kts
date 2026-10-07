@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    implementation(project(":server:ee:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
 }

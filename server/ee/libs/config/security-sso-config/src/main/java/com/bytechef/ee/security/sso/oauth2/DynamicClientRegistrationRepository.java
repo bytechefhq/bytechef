@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.security.sso.oauth2;
 
+import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.user.domain.IdentityProvider;
-import com.bytechef.platform.user.service.IdentityProviderService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import org.springframework.beans.factory.ObjectProvider;

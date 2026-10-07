@@ -33,16 +33,16 @@ import org.springframework.stereotype.Component;
 public class SingleTenantOAuth2LoginCustomizer implements OAuth2LoginCustomizer {
 
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomOidcUserService customOidcUserService;
+    private final SocialOidcUserService socialOidcUserService;
     private final RememberMeServices rememberMeServices;
 
     @SuppressFBWarnings("EI")
     public SingleTenantOAuth2LoginCustomizer(
-        CustomOAuth2UserService customOAuth2UserService, CustomOidcUserService customOidcUserService,
+        CustomOAuth2UserService customOAuth2UserService, SocialOidcUserService socialOidcUserService,
         RememberMeServices rememberMeServices) {
 
         this.customOAuth2UserService = customOAuth2UserService;
-        this.customOidcUserService = customOidcUserService;
+        this.socialOidcUserService = socialOidcUserService;
         this.rememberMeServices = rememberMeServices;
     }
 
@@ -51,7 +51,7 @@ public class SingleTenantOAuth2LoginCustomizer implements OAuth2LoginCustomizer 
         http.oauth2Login(oauth2 -> oauth2
             .userInfoEndpoint(endpoint -> endpoint
                 .userService(customOAuth2UserService)
-                .oidcUserService(customOidcUserService))
+                .oidcUserService(socialOidcUserService))
             .successHandler(new OAuth2AuthenticationSuccessHandler(rememberMeServices))
             .failureHandler(new OAuth2AuthenticationFailureHandler()));
     }
