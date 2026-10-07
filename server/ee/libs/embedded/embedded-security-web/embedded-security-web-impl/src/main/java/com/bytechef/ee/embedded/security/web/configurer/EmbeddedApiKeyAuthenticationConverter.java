@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.security.web.configurer;
 
+import com.bytechef.ee.embedded.connected.user.constant.ConnectedUserConstants;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
@@ -22,11 +23,14 @@ import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Locator;
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.StringUtils;
 
 /**
  * Authentication converter for embedded API key authentication.
@@ -38,6 +42,7 @@ import org.springframework.security.core.Authentication;
 class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
 
     static final Pattern EXTERNAL_USER_ID_PATTERN = Pattern.compile(".*/v\\d+/([^/]+)/.*");
+    static final Pattern PUBLIC_API_EXTERNAL_USER_ID_PATTERN = Pattern.compile("^/api/embedded/v\\d+/([^/]+)(?:/.*)?$");
     static final Pattern JWT_TOKEN_PATTERN =
         Pattern.compile("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_.+/=]*$");
 
@@ -68,6 +73,12 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
 
             String externalUserId = payload.getSubject();
 
+            String pathExternalUserId = fetchPathExternalUserId(request);
+
+            if (pathExternalUserId != null && !pathExternalUserId.equals(externalUserId)) {
+                throw new BadCredentialsException("Token subject does not match the external user in the request path");
+            }
+
             JwsHeader header = jws.getHeader();
 
             TenantKey tenantKey = TenantKey.parse(header.getKeyId());
@@ -84,11 +95,39 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
                 throw new IllegalArgumentException("externalUserId parameter is required");
             }
 
+            if (ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(externalUserId)) {
+                throw new BadCredentialsException("Non-JWT tokens are not accepted on this endpoint");
+            }
+
             TenantKey tenantKey = TenantKey.parse(authToken);
 
             return new EmbeddedApiKeyAuthenticationToken(
                 environment.ordinal(), externalUserId, authToken, tenantKey.getTenantId());
         }
+    }
+
+    @Nullable
+    private static String fetchPathExternalUserId(HttpServletRequest request) {
+        String requestPath = request.getRequestURI();
+        String contextPath = request.getContextPath();
+
+        if (contextPath != null && requestPath.startsWith(contextPath)) {
+            requestPath = requestPath.substring(contextPath.length());
+        }
+
+        Matcher matcher = PUBLIC_API_EXTERNAL_USER_ID_PATTERN.matcher(requestPath);
+
+        if (!matcher.matches()) {
+            return null;
+        }
+
+        String pathExternalUserId = StringUtils.uriDecode(matcher.group(1), StandardCharsets.UTF_8);
+
+        if (ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(pathExternalUserId)) {
+            return null;
+        }
+
+        return pathExternalUserId;
     }
 
     private Jws<Claims> getJws(String secretKey, long environmentId) {
