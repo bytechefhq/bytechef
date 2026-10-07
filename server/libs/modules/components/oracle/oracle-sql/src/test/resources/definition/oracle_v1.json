@@ -1373,7 +1373,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": true,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": null,
