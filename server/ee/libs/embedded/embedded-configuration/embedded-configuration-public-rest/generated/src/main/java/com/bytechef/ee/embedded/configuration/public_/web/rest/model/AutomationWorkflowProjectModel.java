@@ -21,10 +21,10 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * An automation workflow catalog project.
+ * An automation workflow automation workflow project.
  */
 
-@Schema(name = "AutomationWorkflowProject", description = "An automation workflow catalog project.")
+@Schema(name = "AutomationWorkflowProject", description = "An automation workflow automation workflow project.")
 @JsonTypeName("AutomationWorkflowProject")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class AutomationWorkflowProjectModel {
@@ -115,11 +115,11 @@ public class AutomationWorkflowProjectModel {
   }
 
   /**
-   * The list of catalog workflow templates belonging to this project.
+   * The list of automation workflow templates belonging to this project.
    * @return workflowTemplates
    */
   @Valid 
-  @Schema(name = "workflowTemplates", description = "The list of catalog workflow templates belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "workflowTemplates", description = "The list of automation workflow templates belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTemplates")
   public List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> getWorkflowTemplates() {
     return workflowTemplates;

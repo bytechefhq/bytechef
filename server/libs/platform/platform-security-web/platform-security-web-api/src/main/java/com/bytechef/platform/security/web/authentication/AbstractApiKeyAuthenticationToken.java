@@ -42,9 +42,10 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
     }
 
     @SuppressFBWarnings("EI")
-    public AbstractApiKeyAuthenticationToken(User user) {
+    public AbstractApiKeyAuthenticationToken(long environmentId, User user) {
         super(user.getAuthorities());
 
+        this.environmentId = environmentId;
         this.user = user;
 
         setAuthenticated(true);

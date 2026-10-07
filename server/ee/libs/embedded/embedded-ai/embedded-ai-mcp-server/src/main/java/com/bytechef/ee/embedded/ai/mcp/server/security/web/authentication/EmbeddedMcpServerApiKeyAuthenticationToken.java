@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.core.userdetails.User;
 
@@ -16,7 +17,8 @@ import org.springframework.security.core.userdetails.User;
  *
  * @author Ivica Cardic
  */
-public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken
+    implements ConnectedUserAuthentication {
 
     private String externalUserId;
 
@@ -27,8 +29,8 @@ public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAu
     }
 
     @SuppressFBWarnings("EI")
-    public EmbeddedMcpServerApiKeyAuthenticationToken(User user) {
-        super(user);
+    public EmbeddedMcpServerApiKeyAuthenticationToken(long environmentId, User user) {
+        super(environmentId, user);
     }
 
     public String getExternalUserId() {

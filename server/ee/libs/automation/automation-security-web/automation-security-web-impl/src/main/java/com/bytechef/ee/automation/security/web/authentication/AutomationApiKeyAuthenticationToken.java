@@ -25,8 +25,8 @@ public class AutomationApiKeyAuthenticationToken extends AbstractApiKeyAuthentic
         this.secretKey = secretKey;
     }
 
-    public AutomationApiKeyAuthenticationToken(User user) {
-        super(user);
+    public AutomationApiKeyAuthenticationToken(long environmentId, User user) {
+        super(environmentId, user);
     }
 
     public String getSecretKey() {

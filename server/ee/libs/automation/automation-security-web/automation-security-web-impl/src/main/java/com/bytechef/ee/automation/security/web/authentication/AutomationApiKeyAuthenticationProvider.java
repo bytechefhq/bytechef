@@ -65,7 +65,7 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
                 "User with token " + automationApiKeyAuthenticationToken.getSecretKey()
                     + " was not found in the database"));
 
-        return new AutomationApiKeyAuthenticationToken(user);
+        return new AutomationApiKeyAuthenticationToken(automationApiKeyAuthenticationToken.getEnvironmentId(), user);
     }
 
     @Override

@@ -220,8 +220,8 @@ paths:
         - bearerAuth: [ ]
   /automation/workflow-templates/{workflowUuid}/copy:
     post:
-      description: "Copy a catalog workflow template into a new user workflow."
-      summary: "Copy a catalog workflow template into a new user workflow"
+      description: "Copy an automation workflow template into a new user workflow."
+      summary: "Copy an automation workflow template into a new user workflow"
       tags:
         - "connected-user-project-workflow"
       operationId: "copyFrontendWorkflowTemplate"
@@ -908,8 +908,8 @@ paths:
         - bearerAuth: [ ]
   /{externalUserId}/automation/workflow-templates/{workflowUuid}/copy:
     post:
-      description: "Copy a catalog workflow template into a new user workflow."
-      summary: "Copy a catalog workflow template into a new user workflow"
+      description: "Copy an automation workflow template into a new user workflow."
+      summary: "Copy an automation workflow template into a new user workflow"
       tags:
         - "connected-user-project-workflow"
       operationId: "copyWorkflowTemplate"
@@ -2030,7 +2030,7 @@ components:
           type: "string"
     AutomationWorkflowProject:
       type: "object"
-      description: "An automation workflow catalog project."
+      description: "An automation workflow automation workflow project."
       properties:
         id:
           description: "The id of the automation workflow project."
@@ -2043,13 +2043,13 @@ components:
           description: "The description of the automation workflow project."
           type: "string"
         workflowTemplates:
-          description: "The list of catalog workflow templates belonging to this project."
+          description: "The list of automation workflow templates belonging to this project."
           type: "array"
           items:
             $ref: "#/components/schemas/AutomationWorkflowProjectWorkflowTemplate"
     AutomationWorkflowProjectWorkflowTemplate:
       type: "object"
-      description: "A catalog workflow template within an automation workflow project."
+      description: "An automation workflow template within an automation workflow project."
       properties:
         id:
           description: "The workflow UUID."
@@ -2067,7 +2067,7 @@ components:
             $ref: "#/components/schemas/AutomationWorkflowProjectComponent"
     AutomationWorkflowProjectComponent:
       type: "object"
-      description: "A component used in a catalog workflow."
+      description: "A component used in an automation workflow."
       properties:
         name:
           description: "The name of the component."
