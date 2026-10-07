@@ -11,7 +11,6 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCateg
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
-import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -20,20 +19,10 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Ivica Cardic
  */
-public interface AutomationWorkflowProjectFacade {
+public interface AutomationWorkflowProjectAdminFacade {
     long createProject(
         String name, String description, String category, List<String> tags, String permissionExpression,
         @Nullable Boolean automationHubVisible);
-
-    String duplicateProjectWorkflow(String workflowUuid);
-
-    long duplicateProject(long projectId);
-
-    List<AutomationWorkflowProjectVersionDTO> getProjectVersions(long projectId);
-
-    List<AutomationWorkflowProjectCategoryDTO> getCategories();
-
-    List<AutomationWorkflowProjectTagDTO> getTags();
 
     String createProjectWorkflow(long projectId, String definition, String permissionExpression);
 
@@ -41,13 +30,17 @@ public interface AutomationWorkflowProjectFacade {
 
     void deleteProjectWorkflow(String workflowUuid);
 
-    AutomationWorkflowProjectDTO getProject(long projectId);
+    long duplicateProject(long projectId);
+
+    String duplicateProjectWorkflow(String workflowUuid);
+
+    List<AutomationWorkflowProjectCategoryDTO> getCategories();
+
+    List<AutomationWorkflowProjectVersionDTO> getProjectVersions(long projectId);
 
     List<AutomationWorkflowProjectDTO> getProjects();
 
-    List<AutomationWorkflowProjectDTO> getPublishedProjects();
-
-    List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment);
+    List<AutomationWorkflowProjectTagDTO> getTags();
 
     void publishProject(long projectId);
 

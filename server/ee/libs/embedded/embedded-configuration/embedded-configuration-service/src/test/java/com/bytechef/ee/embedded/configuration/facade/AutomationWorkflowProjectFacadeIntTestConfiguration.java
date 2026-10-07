@@ -42,6 +42,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
@@ -62,9 +63,12 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "com.bytechef.platform.connection",
         "com.bytechef.platform.tag"
     },
-    excludeFilters = @ComponentScan.Filter(
-        type = FilterType.REGEX,
-        pattern = "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration"))
+    excludeFilters = {
+        @Filter(
+            type = FilterType.REGEX,
+            pattern = "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration"),
+        @Filter(type = FilterType.REGEX, pattern = ".*IntTest\\$.*")
+    })
 @EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
