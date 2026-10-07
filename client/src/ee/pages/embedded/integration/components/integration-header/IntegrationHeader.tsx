@@ -76,11 +76,7 @@ const IntegrationHeader = ({
     });
 
     const loadingIndicator = (isSaving > 0 || !isOnline) && (
-        <LoadingIndicator
-            className="absolute -top-1 -right-1 size-5 rounded-full"
-            isFetching={isSaving}
-            isOnline={isOnline}
-        />
+        <LoadingIndicator className="size-6 rounded-full" isFetching={isSaving} isOnline={isOnline} />
     );
 
     if (!integration) {
@@ -111,6 +107,8 @@ const IntegrationHeader = ({
                         }
                     />
                 )}
+
+                {loadingIndicator}
             </div>
 
             <div className="flex items-center gap-1">
@@ -129,16 +127,12 @@ const IntegrationHeader = ({
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                <div className="relative">
-                    <SettingsMenu
-                        bottomResizablePanelRef={bottomResizablePanelRef}
-                        integration={integration}
-                        updateWorkflowMutation={updateWorkflowMutation}
-                        workflow={workflow as Workflow}
-                    />
-
-                    {loadingIndicator}
-                </div>
+                <SettingsMenu
+                    bottomResizablePanelRef={bottomResizablePanelRef}
+                    integration={integration}
+                    updateWorkflowMutation={updateWorkflowMutation}
+                    workflow={workflow as Workflow}
+                />
             </div>
         </header>
     );

@@ -81,11 +81,7 @@ const ProjectHeader = ({
     });
 
     const loadingIndicator = (isSaving > 0 || !isOnline) && (
-        <LoadingIndicator
-            className="absolute -top-1 -right-1 size-5 rounded-full"
-            isFetching={isSaving}
-            isOnline={isOnline}
-        />
+        <LoadingIndicator className="size-6 rounded-full" isFetching={isSaving} isOnline={isOnline} />
     );
 
     if (!project) {
@@ -116,6 +112,8 @@ const ProjectHeader = ({
                         project={project}
                     />
                 )}
+
+                {loadingIndicator}
             </div>
 
             <div className="flex items-center gap-1">
@@ -139,16 +137,12 @@ const ProjectHeader = ({
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                <div className="relative">
-                    <SettingsMenu
-                        bottomResizablePanelRef={bottomResizablePanelRef}
-                        project={project}
-                        updateWorkflowMutation={updateWorkflowMutation}
-                        workflow={workflow}
-                    />
-
-                    {loadingIndicator}
-                </div>
+                <SettingsMenu
+                    bottomResizablePanelRef={bottomResizablePanelRef}
+                    project={project}
+                    updateWorkflowMutation={updateWorkflowMutation}
+                    workflow={workflow}
+                />
             </div>
         </header>
     );
