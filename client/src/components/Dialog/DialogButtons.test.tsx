@@ -1,8 +1,7 @@
-import {DialogTitle as ShadcnDialogTitle} from '@/components/ui/dialog';
 import {act, render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it, vi} from 'vitest';
 
-import {Dialog, DialogContent} from './Dialog';
+import {Dialog, DialogContent, DialogTitle} from './Dialog';
 import {DialogCancelButton, DialogNextButton, DialogPreviousButton} from './DialogButtons';
 import {type DialogStepI, DialogStepsProvider, type DialogStepsProviderProps} from './DialogStepsProvider';
 import {useDialogSteps} from './hooks/useDialogSteps';
@@ -163,7 +162,7 @@ describe('DialogCancelButton', () => {
         return render(
             <Dialog onOpenChange={onOpenChange} open>
                 <DialogContent aria-describedby={undefined}>
-                    <ShadcnDialogTitle>Title</ShadcnDialogTitle>
+                    <DialogTitle>Title</DialogTitle>
 
                     <DialogCancelButton label={label} />
                 </DialogContent>

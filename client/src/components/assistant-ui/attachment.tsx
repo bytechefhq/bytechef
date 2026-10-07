@@ -17,10 +17,11 @@ import {
 } from "@/components/ui/tooltip";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogMain,
+  DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/Dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { cn } from "@/shared/util/cn-utils";
@@ -94,13 +95,19 @@ const AttachmentPreviewDialog: FC<PropsWithChildren> = ({ children }) => {
       >
         {children}
       </DialogTrigger>
-      <DialogContent className="aui-attachment-preview-dialog-content [&>button]:bg-foreground/60 [&_svg]:text-background [&>button]:hover:[&_svg]:text-destructive p-2 sm:max-w-3xl [&>button]:rounded-full [&>button]:p-1 [&>button]:opacity-100 [&>button]:ring-0!">
+      <DialogContent
+        aria-describedby={undefined}
+        className="aui-attachment-preview-dialog-content"
+        size="lg"
+      >
         <DialogTitle className="aui-sr-only sr-only">
           Image Attachment Preview
         </DialogTitle>
-        <div className="aui-attachment-preview bg-background relative mx-auto flex max-h-[80dvh] w-full items-center justify-center overflow-hidden">
-          <AttachmentPreview src={src} />
-        </div>
+        <DialogMain className="p-2">
+          <div className="aui-attachment-preview bg-background relative mx-auto flex max-h-[80dvh] w-full items-center justify-center overflow-hidden">
+            <AttachmentPreview src={src} />
+          </div>
+        </DialogMain>
       </DialogContent>
     </Dialog>
   );

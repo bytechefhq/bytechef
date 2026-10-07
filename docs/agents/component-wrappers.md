@@ -31,6 +31,8 @@ A wrapper sits in `client/src/components/<Name>/<Name>.tsx` and does three jobs:
 
 Layering: `radix / native element` → `components/ui/<name>` (stock shadcn) → `components/<Name>/<Name>` (this wrapper) → app.
 
+Exception: Dialog skips the middle layer and builds on the `radix-ui` `Dialog` primitive directly (see §11).
+
 ---
 
 ## 2. Canonical file structure
@@ -422,13 +424,21 @@ Description — `DialogHeader` takes them as `title` / `description` props so a 
 render two — and `DialogContent` sizes itself with a `size` union (`sm` 512 / `md` 640 / `lg`
 800 / `xl` 1000) rather than letting callers hand-roll widths.
 
+Dialog is also the one wrapper that doesn't wrap its `components/ui` base. The stock shadcn
+`DialogContent` painted a surface (`bg-background p-6 border grid gap-4`) that the family had to
+cancel class by class, so the family builds on the `radix-ui` `Dialog` primitive instead.
+`Dialog.tsx` is the only family file that imports it. `DialogContent` there owns the portal, the
+overlay, centring and the open/close animation, and paints nothing: `DialogMain` is the card.
+
 ### Migrating a dialog
 
-`@/components/ui/dialog` is restricted by ESLint. Existing importers are listed as a shrinking
-backlog in `eslint.config.mjs`; new code has to use the family. The old-part → new-part table,
-the `<form>` wrapper rule and the per-PR checklist live in
-[dialog-migration-plan.md](dialog-migration-plan.md) §4 and §7, and §6 gives the order the
-remaining files get migrated in.
+Every app dialog is on the family. `components/ui/dialog.tsx` stays only as the base of
+`CommandDialog` in `components/ui/command.tsx` (the cmdk palette behind global search). It is
+restricted in `eslint-restricted-imports.mjs`, so nothing outside `components/ui` should import
+it. A new dialog follows the target shape
+`DialogContent > DialogMain > DialogHeader + DialogBody + DialogFooter`, with the form wrapping
+header, body and footer when there is one. Full-bleed surfaces with their own toolbar skip
+`DialogHeader` and give Radix its title through `VisuallyHidden` + `DialogTitle`.
 
 ---
 
