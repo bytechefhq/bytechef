@@ -474,6 +474,11 @@ System administrator is used for accessing protected data reachable through /act
 |---|---|---|
 | `BYTECHEF_OBSERVABILITY_LOGGING_ENABLED` | Enable or disable OTel logging | `false` |
 | `BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT` | OTel logging endpoint URL | `http://localhost:4318/v1/logs` |
+| `BYTECHEF_OBSERVABILITY_LOGGING_AWS_ENABLED` | Sign OTel log export requests with AWS Signature Version 4 for the CloudWatch OTLP endpoint (`https://logs.<region>.amazonaws.com/v1/logs`). Credentials come from the AWS SDK default provider chain. See [Observability](/platform/use-bytechef/self-hosted/management/observability#aws-cloudwatch-direct-otlp). | `false` |
+| `BYTECHEF_OBSERVABILITY_LOGGING_AWS_LOG_GROUP` | Existing CloudWatch log group the logs are written to, sent as the `x-aws-log-group` header. Required when signing is enabled unless the header is set through `management.opentelemetry.logging.export.otlp.headers`. | - |
+| `BYTECHEF_OBSERVABILITY_LOGGING_AWS_LOG_STREAM` | Existing CloudWatch log stream the logs are written to, sent as the `x-aws-log-stream` header. Required when signing is enabled unless the header is set through `management.opentelemetry.logging.export.otlp.headers`. | - |
+| `BYTECHEF_OBSERVABILITY_LOGGING_AWS_REGION` | AWS region used in the signature scope. Derived from a `logs.<region>.amazonaws.com` endpoint host when unset; required for any other host. | - (derived) |
+| `BYTECHEF_OBSERVABILITY_LOGGING_AWS_SERVICE` | AWS service name used in the signature scope | `logs` |
 | `BYTECHEF_OBSERVABILITY_METRICS_ENABLED` | Enable or disable OTel metrics | `false` |
 | `BYTECHEF_OBSERVABILITY_METRICS_ENDPOINT` | OTel metrics endpoint URL | `http://localhost:4318/v1/metrics` |
 | `BYTECHEF_OBSERVABILITY_TRACING_ENABLED` | Enable or disable OTel tracing | `false` |
