@@ -1,14 +1,9 @@
 import Button from '@/components/Button/Button';
-import {
-    DialogClose as ShadcnDialogClose,
-    DialogDescription as ShadcnDialogDescription,
-    DialogTitle as ShadcnDialogTitle,
-} from '@/components/ui/dialog';
 import {XIcon} from 'lucide-react';
 import {type ComponentPropsWithRef, type ReactElement, type ReactNode, useEffect, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {useDialogLayout} from './Dialog';
+import {DialogClose, DialogDescription, DialogTitle, useDialogLayout} from './Dialog';
 import {useOptionalDialogSteps} from './hooks/useDialogSteps';
 
 type DialogMainPropsType = ComponentPropsWithRef<'div'>;
@@ -93,7 +88,7 @@ const DialogHeader = ({
                     )}
 
                     {(headingText || dialogTitle) && (
-                        <ShadcnDialogTitle className={headingStyles} ref={headingRef} tabIndex={-1}>
+                        <DialogTitle className={headingStyles} ref={headingRef} tabIndex={-1}>
                             {dialogTitle ? (
                                 <>
                                     <span className="sr-only">
@@ -107,12 +102,12 @@ const DialogHeader = ({
                             ) : (
                                 headingText
                             )}
-                        </ShadcnDialogTitle>
+                        </DialogTitle>
                     )}
                 </div>
 
                 {(description || dialogDescription) && (
-                    <ShadcnDialogDescription className={twMerge(descriptionStyles, !description && 'lg:sr-only')}>
+                    <DialogDescription className={twMerge(descriptionStyles, !description && 'lg:sr-only')}>
                         {dialogDescription && (
                             <span className={description ? 'lg:sr-only' : undefined}>
                                 {description ? `${dialogDescription} ` : dialogDescription}
@@ -120,7 +115,7 @@ const DialogHeader = ({
                         )}
 
                         {description}
-                    </ShadcnDialogDescription>
+                    </DialogDescription>
                 )}
 
                 {stepPositionLabel && (
@@ -134,9 +129,9 @@ const DialogHeader = ({
                 {endContent}
 
                 {showCloseButton && (
-                    <ShadcnDialogClose asChild>
+                    <DialogClose asChild>
                         <Button aria-label="Close" icon={<XIcon />} size="iconXs" variant="ghost" />
-                    </ShadcnDialogClose>
+                    </DialogClose>
                 )}
             </div>
         </div>

@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {DialogClose as ShadcnDialogClose} from '@/components/ui/dialog';
 
+import {DialogClose} from './Dialog';
 import {useDialogSteps} from './hooks/useDialogSteps';
 
 interface DialogNextButtonProps {
@@ -75,9 +75,9 @@ DialogPreviousButton.displayName = 'DialogPreviousButton';
 
 function DialogCancelButton({className, disabled, label = 'Cancel'}: DialogCancelButtonProps) {
     return (
-        <ShadcnDialogClose asChild>
+        <DialogClose asChild>
             <Button className={className} disabled={disabled} label={label} type="button" variant="outline" />
-        </ShadcnDialogClose>
+        </DialogClose>
     );
 }
 

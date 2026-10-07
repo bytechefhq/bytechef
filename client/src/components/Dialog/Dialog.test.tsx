@@ -1,9 +1,17 @@
-import {DialogTitle as ShadcnDialogTitle} from '@/components/ui/dialog';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {type ReactNode} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
-import {Dialog, DialogClose, DialogContent, type DialogContentSizeType, DialogTrigger, useDialogLayout} from './Dialog';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    type DialogContentSizeType,
+    DialogDescription,
+    DialogTitle,
+    DialogTrigger,
+    useDialogLayout,
+} from './Dialog';
 
 function LayoutProbe() {
     const {hasSidebar} = useDialogLayout();
@@ -15,7 +23,7 @@ function renderOpenDialog(content?: ReactNode, className?: string, hasSidebar?: 
     return render(
         <Dialog open>
             <DialogContent aria-describedby={undefined} className={className} hasSidebar={hasSidebar} size={size}>
-                <ShadcnDialogTitle>Title</ShadcnDialogTitle>
+                <DialogTitle>Title</DialogTitle>
 
                 {content}
             </DialogContent>
@@ -24,16 +32,37 @@ function renderOpenDialog(content?: ReactNode, className?: string, hasSidebar?: 
 }
 
 describe('DialogContent - Surface', () => {
-    it('should replace the shadcn surface with the ByteChef base classes', () => {
+    it('should render a bare ByteChef shell and leave the surface to DialogMain', () => {
         renderOpenDialog();
 
         const dialog = screen.getByRole('dialog');
 
         expect(dialog).toHaveAttribute('data-slot', 'dialog-content');
-        expect(dialog).toHaveClass('flex', 'rounded-lg', 'border-0', 'bg-transparent', 'p-0', 'shadow-xl');
+        expect(dialog).toHaveClass('flex', 'rounded-lg', 'shadow-xl');
         expect(dialog).not.toHaveClass('grid');
         expect(dialog).not.toHaveClass('p-6');
+        expect(dialog).not.toHaveClass('bg-background');
+        expect(dialog).not.toHaveClass('border');
         expect(dialog).not.toHaveClass('sm:max-w-lg');
+    });
+
+    it('should center itself in the viewport', () => {
+        renderOpenDialog();
+
+        expect(screen.getByRole('dialog')).toHaveClass(
+            'fixed',
+            'top-[50%]',
+            'left-[50%]',
+            'z-50',
+            'translate-x-[-50%]',
+            'translate-y-[-50%]'
+        );
+    });
+
+    it('should render a dimmed overlay behind the content', () => {
+        renderOpenDialog();
+
+        expect(document.querySelector('[data-slot="dialog-overlay"]')).toHaveClass('fixed', 'inset-0', 'bg-black/50');
     });
 
     it('should switch to the sidebar layout from lg up when hasSidebar is set', () => {
@@ -133,7 +162,7 @@ describe('Dialog - Open state', () => {
                 <DialogTrigger>Open dialog</DialogTrigger>
 
                 <DialogContent aria-describedby={undefined}>
-                    <ShadcnDialogTitle>Title</ShadcnDialogTitle>
+                    <DialogTitle>Title</DialogTitle>
                 </DialogContent>
             </Dialog>
         );
@@ -151,7 +180,7 @@ describe('Dialog - Open state', () => {
         render(
             <Dialog onOpenChange={handleOpenChange} open>
                 <DialogContent aria-describedby={undefined}>
-                    <ShadcnDialogTitle>Title</ShadcnDialogTitle>
+                    <DialogTitle>Title</DialogTitle>
 
                     <DialogClose>Close dialog</DialogClose>
                 </DialogContent>
@@ -161,5 +190,25 @@ describe('Dialog - Open state', () => {
         await userEvent.click(screen.getByText('Close dialog'));
 
         expect(handleOpenChange).toHaveBeenCalledWith(false);
+    });
+});
+
+describe('Dialog - Accessible name', () => {
+    it('should name and describe the dialog from DialogTitle and DialogDescription', () => {
+        render(
+            <Dialog open>
+                <DialogContent>
+                    <DialogTitle>Rename workflow</DialogTitle>
+
+                    <DialogDescription>Pick a new name.</DialogDescription>
+                </DialogContent>
+            </Dialog>
+        );
+
+        const dialog = screen.getByRole('dialog', {name: 'Rename workflow'});
+
+        expect(dialog).toHaveAccessibleDescription('Pick a new name.');
+        expect(screen.getByText('Rename workflow')).toHaveAttribute('data-slot', 'dialog-title');
+        expect(screen.getByText('Pick a new name.')).toHaveAttribute('data-slot', 'dialog-description');
     });
 });

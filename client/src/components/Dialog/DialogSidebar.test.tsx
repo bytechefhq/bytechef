@@ -1,17 +1,16 @@
-import {DialogTitle as ShadcnDialogTitle} from '@/components/ui/dialog';
 import {render, screen} from '@/shared/util/test-utils';
 import {RocketIcon} from 'lucide-react';
 import {type ReactNode} from 'react';
 import {describe, expect, it} from 'vitest';
 
-import {Dialog, DialogContent} from './Dialog';
+import {Dialog, DialogContent, DialogTitle} from './Dialog';
 import {DialogSidebar} from './DialogSidebar';
 
 function renderInDialog(content: ReactNode) {
     return render(
         <Dialog open>
             <DialogContent aria-describedby={undefined} hasSidebar>
-                <ShadcnDialogTitle>Deployment</ShadcnDialogTitle>
+                <DialogTitle>Deployment</DialogTitle>
 
                 {content}
             </DialogContent>
