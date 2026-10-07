@@ -31,6 +31,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +55,7 @@ import tools.jackson.core.type.TypeReference;
 @Transactional
 @ConditionalOnEEVersion
 @SkipAutomationAuthorization
-public class ConnectedUserProjectWorkflowManager {
-
+class ConnectedUserProjectWorkflowManager {
     private static final String DEFAULT_DEFINITION = """
         {
             "label": "New Workflow",
@@ -84,7 +84,6 @@ public class ConnectedUserProjectWorkflowManager {
         ConnectedUserService connectedUserService, ConnectionService connectionService, ProjectService projectService,
         ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
         WorkflowService workflowService, WorkflowTestConfigurationFacade workflowTestConfigurationFacade) {
-
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectedUserService = connectedUserService;
@@ -97,6 +96,11 @@ public class ConnectedUserProjectWorkflowManager {
     }
 
     public String createProjectWorkflow(String externalUserId, String definition, Environment environment) {
+        return createProjectWorkflow(externalUserId, definition, environment, null);
+    }
+
+    public String createProjectWorkflow(
+        String externalUserId, String definition, Environment environment, @Nullable String copiedFromWorkflowUuid) {
         ConnectedUserProject connectedUserProject = getOrCreateConnectedUserProject(externalUserId, environment);
 
         String effectiveDefinition = StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition;
@@ -108,6 +112,7 @@ public class ConnectedUserProjectWorkflowManager {
 
         connectedUserProjectWorkflow.setConnectedUserProjectId(connectedUserProject.getId());
         connectedUserProjectWorkflow.setProjectWorkflowId(projectWorkflow.getId());
+        connectedUserProjectWorkflow.setCopiedFromWorkflowUuid(copiedFromWorkflowUuid);
 
         connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
 
@@ -121,7 +126,6 @@ public class ConnectedUserProjectWorkflowManager {
 
     public void updateProjectWorkflow(
         String externalUserId, String workflowUuid, String definition, Environment environment) {
-
         ConnectedUserProject connectedUserProject = getOrCreateConnectedUserProject(externalUserId, environment);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
@@ -152,7 +156,6 @@ public class ConnectedUserProjectWorkflowManager {
     private void checkWorkflowNodeConnection(
         String map, List<Connection> connections, ProjectWorkflow projectWorkflow, String workflowNodeName,
         long environmentId) {
-
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(map);
 
         connections.stream()
@@ -165,7 +168,6 @@ public class ConnectedUserProjectWorkflowManager {
 
     private void checkWorkflowNodeConnections(
         Map<String, ?> workflowMap, List<Connection> connections, ProjectWorkflow projectWorkflow, long environmentId) {
-
         List<Map<String, ?>> triggers = MapUtils.getList(workflowMap, "triggers", new TypeReference<>() {}, List.of());
 
         for (Map<String, ?> triggerMap : triggers) {
