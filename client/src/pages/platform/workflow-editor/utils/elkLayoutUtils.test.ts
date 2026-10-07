@@ -3029,14 +3029,17 @@ describe('no-crossing lanes', () => {
         const trueCenter = positionOf(result.nodes, 'childTrue1').x + 36;
         const falseCenter = positionOf(result.nodes, 'childFalse1').x + 36;
 
-        // Binding pair: the left column's label edge (center + 36 + the
-        // per-node estimate, 106 for the 10-char 'childTrue1') against the
-        // right column's footprint edge (center − 120) at the exact 50px gap
-        // — 142 + 50 + 120 = 312. A centered-footprint model would pack these
-        // at 290 and let long labels collide; a flat worst-case reservation
-        // packed them at 406 and read too airy beside dagre.
-        expect(falseCenter - trueCenter).toBeGreaterThanOrEqual(labelSideEdge(0, 'childTrue1') + 50 + 120 - 1);
-        expect(falseCenter - trueCenter).toBeLessThanOrEqual(labelSideEdge(0, 'childTrue1') + 50 + 120 + 1);
+        // Binding pair: the left column's box starts at its icon's left edge
+        // and spans the larger of dagre's 240 footprint and the label extent
+        // (icon + 106 for the 10-char 'childTrue1') — here the footprint,
+        // ending 204 past the center — against the right column's 45px spine
+        // at the exact 50px gap: 204 + 50 + 45 = 299. Centering the footprint
+        // on the icon reserved 84px of empty space left of every column and
+        // packed frames ~110px wider than dagre.
+        const leftColumnEnd = Math.max(-36 + 240, labelSideEdge(0, 'childTrue1'));
+
+        expect(falseCenter - trueCenter).toBeGreaterThanOrEqual(leftColumnEnd + 50 + 45 - 1);
+        expect(falseCenter - trueCenter).toBeLessThanOrEqual(leftColumnEnd + 50 + 45 + 1);
     });
 
     it('keeps a short chain clear of a deep sibling subtree for the FULL frame height', async () => {
@@ -3205,12 +3208,14 @@ describe('ring corridor rhythm', () => {
         const leftGap = ringLine - siblingAxis;
         const rightGap = contentLine - ringLine;
 
-        // Content-bound hug: exactly 106 off the leftmost content center —
-        // the corridor-splitting distance (a ring-bound neighbour packs 96px
-        // off the ring line, a footprint-bound one 215px off the content axis,
-        // so 106 reads as the middle line in both rhythms)
+        // The ring line takes the farther of its bar-aligned mirror (100 off
+        // the loop center) and the content hug (105 off the leftmost content
+        // center), so it never sits closer than the corridor-splitting
+        // distance (a ring-bound neighbour packs 96px off the ring line)
+        const loopCenter = positionOf(result.nodes, 'loop_1').x + 36;
+
+        expect(ringLine).toBeCloseTo(Math.min(loopCenter - 100, contentLine - 105), 0);
         expect(rightGap).toBeGreaterThanOrEqual(104);
-        expect(rightGap).toBeLessThanOrEqual(107);
 
         // The sibling can never sit closer than the ring-bound minimum; in
         // this fixture its own entry-band label pitch governs (further out)
