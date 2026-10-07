@@ -55,6 +55,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
+    public Optional<Project> fetchProject(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<Project> fetchProject(String name) {
         throw new UnsupportedOperationException();
     }
@@ -149,6 +154,11 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public Project updatePermissionExpression(long id, String permissionExpression) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Project updateAutomationHubVisible(long id, boolean automationHubVisible) {
         throw new UnsupportedOperationException();
     }
 }
