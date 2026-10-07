@@ -181,10 +181,12 @@ function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDi
 }
 
 /**
- * Cross-axis bounds of a node for collision purposes: footprint half-width on
- * both sides (covers chips and general slack), extended on the label side in
- * TB where the rendered title block outgrows the footprint. Rails stay
- * hairline. LR labels extend along the MAIN axis, so no cross extension there.
+ * Cross-axis bounds of a node for collision purposes. Nodes with a side label
+ * in TB start at the icon's left edge and span the footprint rightwards (dagre's
+ * box: nothing renders left of the icon), extended where the rendered title
+ * block outgrows the footprint. Other nodes take the footprint half-width on
+ * both sides. Rails stay hairline. LR labels extend along the MAIN axis, so no
+ * cross extension there.
  */
 function getMemberCrossBounds(
     memberNode: Node,
@@ -202,15 +204,23 @@ function getMemberCrossBounds(
         return {crossEnd: memberCrossCenter + renderedCross / 2, crossStart: memberCrossCenter - renderedCross / 2};
     }
 
-    const memberHalfWidth = Math.max(renderedCross, footprintCross) / 2;
-
     const hasSideLabel = crossAxis === 'x' && hasSideLabelForCollision(memberNode);
 
-    const labelSideHalfWidth = hasSideLabel
-        ? Math.max(memberHalfWidth, renderedCross / 2 + getLabelCrossOverhang(memberNode))
-        : memberHalfWidth;
+    if (hasSideLabel) {
+        const iconCrossStart = memberCrossCenter - renderedCross / 2;
 
-    return {crossEnd: memberCrossCenter + labelSideHalfWidth, crossStart: memberCrossCenter - memberHalfWidth};
+        return {
+            crossEnd: Math.max(
+                iconCrossStart + footprintCross,
+                iconCrossStart + renderedCross + getLabelCrossOverhang(memberNode)
+            ),
+            crossStart: iconCrossStart,
+        };
+    }
+
+    const memberHalfWidth = Math.max(renderedCross, footprintCross) / 2;
+
+    return {crossEnd: memberCrossCenter + memberHalfWidth, crossStart: memberCrossCenter - memberHalfWidth};
 }
 
 /**
