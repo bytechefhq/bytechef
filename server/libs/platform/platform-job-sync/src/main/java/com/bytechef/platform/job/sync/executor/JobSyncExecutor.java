@@ -85,6 +85,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -965,7 +966,8 @@ public class JobSyncExecutor {
                 latch.await();
             } else {
                 if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
-                    throw new TimeoutException("Timeout waiting for job completion: " + jobId);
+                    throw new TimeoutException(
+                        "Job %d did not finish within %d milliseconds".formatted(jobId, timeoutMillis));
                 }
             }
         } catch (InterruptedException | TimeoutException exception) {
@@ -973,6 +975,11 @@ public class JobSyncExecutor {
                 log.trace(exception.getMessage());
             }
 
+            job.setError(
+                new ExecutionError(
+                    Objects.requireNonNullElse(
+                        exception.getMessage(), "Interrupted while waiting for job %d".formatted(jobId)),
+                    List.of()));
             job.setStatus(Job.Status.FAILED);
 
             jobService.update(job);

@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,7 +63,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import tools.jackson.databind.ObjectMapper;
@@ -77,8 +77,8 @@ class JobSyncExecutorTest {
 
     private MemoryMessageBroker memoryMessageBroker;
     private JobSyncExecutor jobSyncExecutor;
-    private final JobService jobService = Mockito.mock(JobService.class);
-    private final TaskExecutionService taskExecutionService = Mockito.mock(TaskExecutionService.class);
+    private final JobService jobService = mock(JobService.class);
+    private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
 
     @BeforeEach
     void beforeEach() {
@@ -93,11 +93,11 @@ class JobSyncExecutorTest {
 
         memoryMessageBroker = new SyncMessageBroker();
 
-        ContextService contextService = Mockito.mock(ContextService.class);
-        Evaluator evaluator = Mockito.mock(Evaluator.class);
-        TaskHandlerRegistry taskHandlerRegistry = Mockito.mock(TaskHandlerRegistry.class);
-        TaskFileStorage taskFileStorage = Mockito.mock(TaskFileStorage.class);
-        WorkflowService workflowService = Mockito.mock(WorkflowService.class);
+        ContextService contextService = mock(ContextService.class);
+        Evaluator evaluator = mock(Evaluator.class);
+        TaskHandlerRegistry taskHandlerRegistry = mock(TaskHandlerRegistry.class);
+        TaskFileStorage taskFileStorage = mock(TaskFileStorage.class);
+        WorkflowService workflowService = mock(WorkflowService.class);
 
         jobSyncExecutor = new JobSyncExecutor(
             contextService, evaluator, jobService, -1, memoryMessageBroker, List.of(), List.of(), List.of(),
@@ -363,6 +363,17 @@ class JobSyncExecutorTest {
         assertThat(sseStreamIndex).isNotNegative();
         assertThat(suspendIndex).isNotNegative();
         assertThat(sseStreamIndex).isLessThan(suspendIndex);
+    }
+
+    @Test
+    void testTimedOutJobFailsWithAnErrorThatNamesTheJob() {
+        long jobId = 707L;
+
+        stubStartedJob(jobId);
+
+        assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Job 707 did not finish within 2000 milliseconds");
     }
 
     private void stubStartedJob(long jobId) {
