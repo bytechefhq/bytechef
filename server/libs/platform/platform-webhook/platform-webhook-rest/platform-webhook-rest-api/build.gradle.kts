@@ -1,6 +1,7 @@
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 
 dependencies {
+    testImplementation(project(":server:libs:test:test-support"))
     annotationProcessor(libs.org.mapstruct.mapstruct.processor)
     annotationProcessor(libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions)
 
