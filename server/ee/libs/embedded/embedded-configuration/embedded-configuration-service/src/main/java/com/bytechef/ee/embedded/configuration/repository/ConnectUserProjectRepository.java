@@ -53,4 +53,7 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
     Optional<Long> findConnectedUserIdByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
 
     Optional<ConnectedUserProject> findByConnectedUserId(Long connectedUserid);
+
+    @Query("SELECT * FROM connected_user_project WHERE id = :id FOR UPDATE")
+    Optional<ConnectedUserProject> findByIdForUpdate(@Param("id") long id);
 }

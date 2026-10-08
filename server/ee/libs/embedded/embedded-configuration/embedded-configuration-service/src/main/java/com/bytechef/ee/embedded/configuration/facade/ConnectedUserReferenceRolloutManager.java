@@ -36,15 +36,6 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Brings every reference deployment of an automation workflow project to the project's last published version, each deployment in
- * its own transaction so one connected user's failure never blocks another's. Idempotent: a deployment already at the
- * target version is skipped. {@code @SkipAutomationAuthorization} lives here, not on the listener: its aspect applies
- * on the thread that calls this bean, and the publishing thread's bypass does not follow {@code @Async}.
- *
- * <p>
- * Depends on {@link ConnectedUserReferenceDeploymentManager} only, never on the reference facade, so the facade can
- * call {@link #rollOutDeploymentIfBehind} for its lazy catch-up without a constructor cycle.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -56,6 +47,7 @@ public class ConnectedUserReferenceRolloutManager {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserReferenceRolloutManager.class);
 
+    private static final String DELETED_DANGLING_REASON = "The automation workflow project was deleted";
     private static final String REMOVED_DANGLING_REASON = "Removed from the automation workflow project on publish";
 
     private final ConnectedUserProjectService connectedUserProjectService;
@@ -86,18 +78,33 @@ public class ConnectedUserReferenceRolloutManager {
         this.requiresNewTransactionTemplate = transactionTemplate;
     }
 
-    /**
-     * Rolls every reference deployment of the automation workflow project that is behind its last published version forward, each
-     * in its own transaction that also loads the deployment's references. A failure is logged and leaves that
-     * deployment on its old version; the rollout continues with the next one. A failure to list the deployments at all
-     * is logged and ends the rollout: the deployments converge on the next publish or on their users' next enable.
-     */
+    public void deleteReferenceDeployments(long automationWorkflowProjectId) {
+        for (ProjectDeployment projectDeployment : projectDeploymentService.getAllProjectDeployments(
+            automationWorkflowProjectId)) {
+
+            if (!ConnectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment)) {
+                continue;
+            }
+
+            List<ConnectedUserProjectWorkflow> references = getReferences(projectDeployment.getId());
+
+            for (ConnectedUserProjectWorkflow reference : references) {
+                markDangling(reference, DELETED_DANGLING_REASON);
+            }
+
+            connectedUserReferenceDeploymentManager.deleteDeployment(projectDeployment.getId());
+
+            connectedUserProjectWorkflowRepository.saveAll(references);
+        }
+    }
+
     public void rollOut(long automationWorkflowProjectId) {
         int lastPublishedVersion;
         List<ProjectDeployment> projectDeployments;
 
         try {
-            lastPublishedVersion = connectedUserReferenceDeploymentManager.getLastPublishedVersion(automationWorkflowProjectId);
+            lastPublishedVersion =
+                connectedUserReferenceDeploymentManager.getLastPublishedVersion(automationWorkflowProjectId);
             projectDeployments = projectDeploymentService.getAllProjectDeployments(automationWorkflowProjectId);
         } catch (RuntimeException exception) {
             log.error("Rolling out automation workflow project id={} failed", automationWorkflowProjectId, exception);
@@ -119,13 +126,6 @@ public class ConnectedUserReferenceRolloutManager {
         }
     }
 
-    /**
-     * Rolls one deployment forward when it is behind, inside the caller's transaction. A deployment none of whose
-     * references survives the new version -- or that has no reference left at all -- is deleted, so a caller that goes
-     * on to write into it must look it up again.
-     *
-     * @return whether the deployment was behind and rolled forward, i.e. whether its references may have changed
-     */
     public boolean rollOutDeploymentIfBehind(long projectDeploymentId) {
         ProjectDeployment projectDeployment = connectedUserReferenceDeploymentManager.getDeployment(
             projectDeploymentId);
@@ -142,10 +142,6 @@ public class ConnectedUserReferenceRolloutManager {
         return true;
     }
 
-    /**
-     * Dangling references are included on purpose: a deployment whose every reference dangles must still be emptied and
-     * deleted, or its old triggers keep running.
-     */
     private List<ConnectedUserProjectWorkflow> getReferences(long projectDeploymentId) {
         return connectedUserProjectWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId)
             .stream()
@@ -153,11 +149,17 @@ public class ConnectedUserReferenceRolloutManager {
             .toList();
     }
 
-    /**
-     * A concurrent write to the same deployment or reference (the user enabling it while the rollout runs) is expected
-     * and self-healing, so it is not reported as an error.
-     */
-    private static void logRolloutFailure(long automationWorkflowProjectId, long projectDeploymentId, RuntimeException exception) {
+    private static void markDangling(ConnectedUserProjectWorkflow reference, String danglingReason) {
+        if (!reference.isDangling()) {
+            reference.setDangling(true);
+            reference.setDanglingReason(danglingReason);
+        }
+
+        reference.setEnabled(false);
+    }
+
+    private static void
+        logRolloutFailure(long automationWorkflowProjectId, long projectDeploymentId, RuntimeException exception) {
         for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
             if (cause instanceof OptimisticLockingFailureException) {
                 log.warn(
@@ -171,15 +173,11 @@ public class ConnectedUserReferenceRolloutManager {
         }
 
         log.error(
-            "Rolling out automation workflow project id={} to deployment id={} failed", automationWorkflowProjectId, projectDeploymentId,
+            "Rolling out automation workflow project id={} to deployment id={} failed", automationWorkflowProjectId,
+            projectDeploymentId,
             exception);
     }
 
-    /**
-     * A reference deployment with no reference left still has to go: a reference deleted while its row was still
-     * running (a dangling one, whose rows a code-workflow redeploy leaves to this rollout) may have been the last one.
-     * Any other deployment of the automation workflow project is none of the rollout's business and is left alone.
-     */
     private void rollOutDeploymentWithReferences(ProjectDeployment projectDeployment, int lastPublishedVersion) {
         if (!ConnectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment)) {
             return;
@@ -196,14 +194,8 @@ public class ConnectedUserReferenceRolloutManager {
         rollOutDeployment(projectDeployment, lastPublishedVersion, references);
     }
 
-    /**
-     * Rows at the new version are written as one complete list, so the rows of removed templates are dropped (their
-     * triggers disabled first) and the carried rows keep their inputs; when nothing remains the deployment itself goes.
-     * A reference is never enabled here: its row stays enabled only if it was enabled and still resolves.
-     */
     private void rollOutDeployment(
         ProjectDeployment projectDeployment, int lastPublishedVersion, List<ConnectedUserProjectWorkflow> references) {
-
         long automationWorkflowProjectId = projectDeployment.getProjectId();
         long projectDeploymentId = projectDeployment.getId();
 
@@ -219,12 +211,7 @@ public class ConnectedUserReferenceRolloutManager {
             String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
 
             if (reference.isDangling() || !publishedAutomationWorkflowUuids.contains(automationWorkflowUuid)) {
-                if (!reference.isDangling()) {
-                    reference.setDangling(true);
-                    reference.setDanglingReason(REMOVED_DANGLING_REASON);
-                }
-
-                reference.setEnabled(false);
+                markDangling(reference, REMOVED_DANGLING_REASON);
 
                 continue;
             }
@@ -247,13 +234,9 @@ public class ConnectedUserReferenceRolloutManager {
         connectedUserProjectWorkflowRepository.saveAll(references);
     }
 
-    /**
-     * The spec carries no inputs: at a version change {@code putWorkflows} keeps each row's existing inputs.
-     */
     private RowSpec resolveRowSpec(
         ConnectedUserProjectWorkflow reference, long automationWorkflowProjectId, long projectDeploymentId,
         int lastPublishedVersion) {
-
         String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
 
         ConnectedUserProject connectedUserProject = connectedUserProjectService.getConnectedUserProject(

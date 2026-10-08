@@ -24,10 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * A reference's stored inputs and why it needs the connected user's attention, both read from one lookup of its
- * deployment row. The reason is derived on every read and never stored, so it can never disagree with what is actually
- * wired.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -43,15 +39,15 @@ class ConnectedUserReferenceAttentionResolver {
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserReferenceAttentionResolver.class);
 
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
-    private final WorkflowConnectionSlots workflowConnectionSlots;
+    private final WorkflowConnectionSlot workflowConnectionSlot;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserReferenceAttentionResolver(
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
-        WorkflowConnectionSlots workflowConnectionSlots) {
+        WorkflowConnectionSlot workflowConnectionSlot) {
 
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
-        this.workflowConnectionSlots = workflowConnectionSlots;
+        this.workflowConnectionSlot = workflowConnectionSlot;
     }
 
     public ReferenceState resolve(ConnectedUserProjectWorkflow reference) {
@@ -98,7 +94,6 @@ class ConnectedUserReferenceAttentionResolver {
     @Nullable
     private String resolveAttentionReason(
         ProjectDeployment projectDeployment, Optional<String> workflowId, Optional<ProjectDeploymentWorkflow> row) {
-
         int lastPublishedVersion = connectedUserReferenceDeploymentManager.getLastPublishedVersion(
             projectDeployment.getProjectId());
 
@@ -114,13 +109,14 @@ class ConnectedUserReferenceAttentionResolver {
 
         List<ProjectDeploymentWorkflowConnection> connections = projectDeploymentWorkflow.getConnections();
 
-        for (ComponentConnection slot : workflowConnectionSlots.getSlots(workflowId.get())) {
+        for (ComponentConnection componentConnection : workflowConnectionSlot.getSlots(workflowId.get())) {
             boolean wired = connections.stream()
-                .anyMatch(connection -> Objects.equals(connection.getWorkflowNodeName(), slot.workflowNodeName()) &&
-                    Objects.equals(connection.getWorkflowConnectionKey(), slot.key()));
+                .anyMatch(connection -> Objects.equals(
+                    connection.getWorkflowNodeName(), componentConnection.workflowNodeName()) &&
+                    Objects.equals(connection.getWorkflowConnectionKey(), componentConnection.key()));
 
-            if (slot.required() && !wired) {
-                return MISSING_CONNECTION_PREFIX + slot.componentName();
+            if (componentConnection.required() && !wired) {
+                return MISSING_CONNECTION_PREFIX + componentConnection.componentName();
             }
         }
 
