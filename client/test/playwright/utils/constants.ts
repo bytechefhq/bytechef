@@ -15,6 +15,8 @@ export const ROUTES = {
     projects: '/automation/projects',
 } as const;
 
+export const PROPERTY_MENTIONS_WORKFLOW_PATH = 'test/playwright/propertyMentionsWorkflow.json';
+
 export const SAMPLE_WORKFLOW_PATH = 'test/playwright/sampleWorkflow.json';
 
 export const SELECTABLE_INDEX_WORKFLOW_PATH = 'test/playwright/selectableIndexWorkflow.json';

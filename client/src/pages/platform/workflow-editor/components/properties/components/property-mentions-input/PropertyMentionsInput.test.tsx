@@ -455,7 +455,7 @@ describe('PropertyMentionsInput', () => {
         expect(strong).toHaveTextContent('foo');
     });
 
-    test('TEXT_AREA preserves angle-bracket content ', async () => {
+    test('TEXT and TEXT_AREA preserve angle-bracket content, also next to a data pill', async () => {
         useWorkflowDataStore.setState({
             workflow: {
                 id: 'wf-text-area-angle',
@@ -518,33 +518,42 @@ describe('PropertyMentionsInput', () => {
         const valuesToTest = [
             'Hey <!everyone>,\nlook at this <https://www.bytechef.io/|page>\n:smile:',
             'Hey <!everyone>, look at this <https://www.bytechef.io/|page> :smile:',
+            'Hey <!everyone>, look at this <https://www.bytechef.io/|page> ${trigger_1.name} :smile:',
         ];
 
-        for (const value of valuesToTest) {
-            const {unmount} = render(
-                <WorkflowEditorProvider value={providerValue}>
-                    <PropertyMentionsInput
-                        controlType="TEXT_AREA"
-                        label="TEXT_AREA Angle Label"
-                        leadingIcon="📄"
-                        path="parameters.body"
-                        placeholder=""
-                        type="STRING"
-                        value={value}
-                    />
-                </WorkflowEditorProvider>
-            );
+        for (const controlType of ['TEXT', 'TEXT_AREA'] as const) {
+            for (const value of valuesToTest) {
+                const {unmount} = render(
+                    <WorkflowEditorProvider value={providerValue}>
+                        <PropertyMentionsInput
+                            controlType={controlType}
+                            label={`${controlType} Angle Label`}
+                            leadingIcon="📄"
+                            path="parameters.body"
+                            placeholder=""
+                            type="STRING"
+                            value={value}
+                        />
+                    </WorkflowEditorProvider>
+                );
 
-            await microtaskTick(2);
+                await microtaskTick(2);
 
-            const textbox = screen.getByRole('textbox', {name: 'TEXT_AREA Angle Label'});
-            const textContent = textbox.textContent ?? '';
+                const textbox = screen.getByRole('textbox', {name: `${controlType} Angle Label`});
+                const textContent = textbox.textContent ?? '';
 
-            for (const segment of angleBracketSegments) {
-                expect(textContent).toContain(segment);
+                for (const segment of angleBracketSegments) {
+                    expect(textContent).toContain(segment);
+                }
+
+                const mentionIds = Array.from(textbox.querySelectorAll('.property-mention[data-id]')).map(
+                    (mentionElement) => mentionElement.getAttribute('data-id')
+                );
+
+                expect(mentionIds).toEqual(value.includes('${trigger_1.name}') ? ['trigger_1.name'] : []);
+
+                unmount();
             }
-
-            unmount();
         }
     });
 });
