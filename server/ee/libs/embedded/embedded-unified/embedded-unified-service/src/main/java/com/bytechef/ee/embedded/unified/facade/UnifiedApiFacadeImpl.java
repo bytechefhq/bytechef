@@ -45,14 +45,12 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Unified API facade implementation that provides CRUD operations for unified API models. Hash comparisons use
- * timing-safe comparison via {@link MessageDigest#isEqual} to prevent timing attacks.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -281,22 +279,26 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
     private ComponentConnection getComponentConnection(
         String externalUserId, UnifiedApiCategory category, Long integrationInstanceId, Environment environment) {
 
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
+
+        IntegrationInstance integrationInstance;
+
         if (integrationInstanceId == null) {
             List<String> componentNames = unifiedApiDefinitionService.getUnifiedApiComponentDefinitions(category)
                 .stream()
                 .map(ComponentDefinition::getName)
                 .toList();
 
-            ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
-
-            IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstance = integrationInstanceService.getIntegrationInstance(
                 connectedUser.getId(), componentNames, environment);
+        } else {
+            integrationInstance = integrationInstanceService.getIntegrationInstance(integrationInstanceId);
 
-            integrationInstanceId = integrationInstance.getId();
+            if (!Objects.equals(integrationInstance.getConnectedUserId(), connectedUser.getId())) {
+                throw new AccessDeniedException(
+                    "Integration instance " + integrationInstanceId + " is not owned by the connected user");
+            }
         }
-
-        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
-            integrationInstanceId);
 
         long connectionId = integrationInstance.getConnectionId();
 

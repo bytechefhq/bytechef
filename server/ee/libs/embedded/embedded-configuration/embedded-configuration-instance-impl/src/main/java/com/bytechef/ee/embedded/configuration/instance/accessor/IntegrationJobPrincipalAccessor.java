@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.instance.accessor;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
@@ -14,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -35,17 +37,21 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
+    private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
 
     @SuppressFBWarnings("EI")
     public IntegrationJobPrincipalAccessor(
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationInstanceService integrationInstanceService, IntegrationWorkflowService integrationWorkflowService) {
+        IntegrationInstanceService integrationInstanceService,
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
+        IntegrationWorkflowService integrationWorkflowService) {
 
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
+        this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
     }
 
@@ -86,15 +92,23 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, ?> getInputMap(long jobPrincipalId, String workflowUuid) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(jobPrincipalId);
 
+        String workflowId = getWorkflowId(jobPrincipalId, workflowUuid);
+
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                integrationInstance.getIntegrationInstanceConfigurationId(),
-                getWorkflowId(jobPrincipalId, workflowUuid));
+                integrationInstance.getIntegrationInstanceConfigurationId(), workflowId);
 
-        return integrationInstanceConfigurationWorkflow.getInputs();
+        Map<String, Object> connectedUserInputs = integrationInstanceWorkflowService
+            .fetchIntegrationInstanceWorkflow(jobPrincipalId, workflowId)
+            .map(integrationInstanceWorkflow -> (Map<String, Object>) integrationInstanceWorkflow.getInputs())
+            .orElse(Map.of());
+
+        return MapUtils.concat(
+            (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(), connectedUserInputs);
     }
 
     @Override

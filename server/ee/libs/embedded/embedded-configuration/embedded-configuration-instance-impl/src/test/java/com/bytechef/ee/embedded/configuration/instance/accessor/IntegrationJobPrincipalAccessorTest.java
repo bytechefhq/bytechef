@@ -16,11 +16,15 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +54,9 @@ public class IntegrationJobPrincipalAccessorTest {
     private IntegrationInstanceService integrationInstanceService;
 
     @Mock
+    private IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
+
+    @Mock
     private IntegrationWorkflowService integrationWorkflowService;
 
     @Mock
@@ -63,6 +70,7 @@ public class IntegrationJobPrincipalAccessorTest {
             integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService,
             integrationInstanceService,
+            integrationInstanceWorkflowService,
             integrationWorkflowService);
 
         when(integrationInstanceService.getIntegrationInstance(INSTANCE_ID)).thenReturn(integrationInstance);
@@ -112,6 +120,8 @@ public class IntegrationJobPrincipalAccessorTest {
         when(integrationInstanceConfigurationWorkflowService
             .getIntegrationInstanceConfigurationWorkflow(CONFIGURATION_ID, WORKFLOW_ID))
                 .thenReturn(configurationWorkflow);
+        when(integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(INSTANCE_ID, WORKFLOW_ID))
+            .thenReturn(Optional.empty());
 
         Map<String, ?> result = accessor.getInputMap(INSTANCE_ID, WORKFLOW_UUID);
 
@@ -122,5 +132,53 @@ public class IntegrationJobPrincipalAccessorTest {
 
         verify(integrationInstanceConfigurationWorkflowService, never())
             .getIntegrationInstanceConfigurationWorkflow(INSTANCE_ID, WORKFLOW_ID);
+    }
+
+    @Test
+    void testGetInputMapMergesConnectedUserInputsOverConfigurationInputs() {
+        when(integrationWorkflowService.getWorkflowId(INSTANCE_ID, WORKFLOW_UUID)).thenReturn(WORKFLOW_ID);
+
+        IntegrationInstanceConfigurationWorkflow configurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        configurationWorkflow.setInputs(Map.of("apiKey", "config-key", "region", "eu"));
+
+        when(integrationInstanceConfigurationWorkflowService
+            .getIntegrationInstanceConfigurationWorkflow(CONFIGURATION_ID, WORKFLOW_ID))
+                .thenReturn(configurationWorkflow);
+
+        IntegrationInstanceWorkflow instanceWorkflow = new IntegrationInstanceWorkflow();
+
+        instanceWorkflow.setInputs(
+            Map.of("apiKey", "user-key", "contactMapping", Map.of("objectType", "contacts", "mappings", List.of())));
+
+        when(integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(INSTANCE_ID, WORKFLOW_ID))
+            .thenReturn(Optional.of(instanceWorkflow));
+
+        Map<String, ?> result = accessor.getInputMap(INSTANCE_ID, WORKFLOW_UUID);
+
+        assertEquals("user-key", result.get("apiKey"));
+        assertEquals("eu", result.get("region"));
+        assertEquals(Map.of("objectType", "contacts", "mappings", List.of()), result.get("contactMapping"));
+    }
+
+    @Test
+    void testGetInputMapReturnsConfigurationInputsWhenConnectedUserHasNoRow() {
+        when(integrationWorkflowService.getWorkflowId(INSTANCE_ID, WORKFLOW_UUID)).thenReturn(WORKFLOW_ID);
+
+        IntegrationInstanceConfigurationWorkflow configurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        configurationWorkflow.setInputs(Map.of("apiKey", "config-key"));
+
+        when(integrationInstanceConfigurationWorkflowService
+            .getIntegrationInstanceConfigurationWorkflow(CONFIGURATION_ID, WORKFLOW_ID))
+                .thenReturn(configurationWorkflow);
+        when(integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(INSTANCE_ID, WORKFLOW_ID))
+            .thenReturn(Optional.empty());
+
+        Map<String, ?> result = accessor.getInputMap(INSTANCE_ID, WORKFLOW_UUID);
+
+        assertEquals(Map.of("apiKey", "config-key"), result);
     }
 }
