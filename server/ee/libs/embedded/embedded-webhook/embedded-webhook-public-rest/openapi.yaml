@@ -15,15 +15,64 @@ tags:
   - name: "request-trigger"
     description: "The Embedded Request Trigger Public API"
 paths:
-  /app-events:
+  /{externalUserId}/app-events:
     post:
-      description: "Fires an App Event for the connected user, starting every one of their enabled\
+      description: "Fires an App Event for the connected user identified by external user id, starting every one of their enabled\
         \ workflows that has an App Event trigger. Returns no body; inspect the runs through the\
-        \ workflow executions endpoints."
+        \ workflow executions endpoints. The request body is read once and delivered to every matching workflow.\
+        \ If one or more workflows could not be started, the others still run and the response is a 500 problem\
+        \ detail whose failedWorkflows property lists the uuids of the workflows that were not started."
       summary: "Trigger all subscribed workflows"
       tags:
         - "app-event-trigger"
       operationId: "executeWorkflows"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      responses:
+        "204":
+          description: "Successful operation."
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "499":
+          $ref: "#/components/responses/remoteProviderError"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+        "501":
+          $ref: "#/components/responses/notImplemented"
+      security:
+        - bearerAuth: [ ]
+  /app-events:
+    post:
+      description: "Fires an App Event for the connected user, starting every one of their enabled\
+        \ workflows that has an App Event trigger. Returns no body; inspect the runs through the\
+        \ workflow executions endpoints. The request body is read once and delivered to every matching workflow.\
+        \ If one or more workflows could not be started, the others still run and the response is a 500 problem\
+        \ detail whose failedWorkflows property lists the uuids of the workflows that were not started."
+      summary: "Trigger all subscribed workflows"
+      tags:
+        - "app-event-trigger"
+      operationId: "executeFrontendWorkflows"
       parameters:
         - name: "X-Environment"
           description: "The environment."
@@ -54,6 +103,60 @@ paths:
           $ref: "#/components/responses/notImplemented"
       security:
         - jwtBearerAuth: [ ]
+  /{externalUserId}/workflows/{workflowUuid}:
+    post:
+      description: "Executes a single workflow of the connected user identified by external user id through its Request trigger and returns the result\
+        \ the workflow produces."
+      summary: "Execute a workflow"
+      tags:
+        - "request-trigger"
+      operationId: "executeWorkflow"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowUuid"
+          description: "The workflow uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      responses:
+        "200":
+          description: "The result returned by the workflow's request trigger."
+          content:
+            application/json:
+              schema:
+                type: "object"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "499":
+          $ref: "#/components/responses/remoteProviderError"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+        "501":
+          $ref: "#/components/responses/notImplemented"
+      security:
+        - bearerAuth: [ ]
   /workflows/{workflowUuid}:
     post:
       description: "Executes a single workflow through its Request trigger and returns the result\
@@ -61,7 +164,7 @@ paths:
       summary: "Execute a workflow"
       tags:
         - "request-trigger"
-      operationId: "executeWorkflow"
+      operationId: "executeFrontendWorkflow"
       parameters:
         - name: "workflowUuid"
           description: "The workflow uuid."
@@ -104,6 +207,9 @@ paths:
         - jwtBearerAuth: [ ]
 components:
   securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
     jwtBearerAuth:
       type: http
       scheme: bearer
