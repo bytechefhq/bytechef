@@ -1,13 +1,14 @@
 ---
 title: A2A Servers
-description: Expose an agent-backed workflow as an A2A (Agent2Agent) server so external agents can discover and call it.
+description: Expose project workflows as the skills of an A2A (Agent2Agent) server so external agents can discover and call them.
 comingSoon: true
 ---
 
-An **A2A Server** exposes an agent-backed workflow over the [Agent2Agent (A2A) protocol](https://a2a-protocol.org)
-so that external A2A clients - another agent, Claude, Cursor, or your own code - can discover it through an **agent
-card** and send it tasks. Where an [MCP Server](/platform/automation/deploy/mcp-servers) publishes your tools *to* an assistant, an
-A2A Server publishes a whole **agent** that other agents can delegate work to.
+An **A2A Server** exposes workflows from your projects over the [Agent2Agent (A2A) protocol](https://a2a-protocol.org)
+so that external A2A clients - another agent or your own code - can discover them through an **agent card** and send
+them tasks. Where an [MCP Server](/platform/automation/deploy/mcp-servers) publishes your tools *to* an assistant, an
+A2A Server publishes an **agent** that other agents can delegate work to. Each exposed workflow becomes one **skill**
+of that agent.
 
 Each server gives you a secret-key URL. The agent card lives at:
 
@@ -15,70 +16,102 @@ Each server gives you a secret-key URL. The agent card lives at:
 GET  https://<your-host>/api/automation/a2a/<secretKey>/.well-known/agent-card.json
 ```
 
-and the JSON-RPC endpoint (where clients send `message/send` and `message/stream`) is:
+and the JSON-RPC endpoint is:
 
 ```
 POST https://<your-host>/api/automation/a2a/<secretKey>
 ```
 
+The endpoint supports the `message/send`, `message/stream`, `tasks/get` and `tasks/cancel` methods.
+
 ---
 
 ## Create an A2A server
 
-1. In the Automation workspace, open **A2A Servers** from the sidebar (under **Deploy**).
-2. Click **New A2A Server**.
+1. In the Automation workspace, open **A2A Servers** from the sidebar.
+2. Click **New A2A Server** (or **Create A2A Server** while the list is empty).
 3. Give it a **name** and a **description** - both appear on the agent card that external clients read.
-4. Choose whether to **require authentication** (see [Authentication](#authentication) below), and whether the server
-   is **enabled**.
+4. Choose whether to **Require authentication** (see [Authentication](#authentication) below). It is on by default.
 
-Each server belongs to a single environment (Development, Staging, or Production), selected with the environment
-switcher, so you can expose a different agent per environment. A server exposes nothing until you add workflows to it.
-Its agent-card URL is printed on the server's row in the list.
+A new server is enabled straight away; the **Enabled** checkbox is in the edit dialog. The server belongs to the
+environment selected in the application sidebar when you create it (Development, Staging, or Production), and keeps
+it - so you can expose a different agent per environment. The list shows the servers of the selected environment.
+
+Creating, editing and deleting servers, and changing their skills, requires the `ADMIN` role. The secret key - and so
+the agent-card URL shown on the server's row - is visible to tenant admins only.
+
+A server exposes nothing until you add a project to it.
 
 ---
 
 ## Expose workflows as skills
 
-Open a server's menu and choose **Manage Skills**.
+1. From the server's menu, choose **Add Project**.
+2. **Select a project** and a published **version**.
+3. **Select the workflows** to expose. Only workflows with a **New Workflow Call** trigger
+   (`workflow/v1/newWorkflowCall`) are listed - that trigger is what lets the workflow be invoked as a skill.
 
-1. **Select a project** and a published **version**.
-2. **Select the workflows** to expose. Only workflows with a **New Workflow Call** trigger
-   (`workflow/v1/newWorkflowCall`) are eligible - that trigger is what lets the workflow be invoked as an agent skill.
-3. Optionally give each one a **skill name** and **skill description**. Left blank, they fall back to the workflow's
-   own label and description.
+Adding a project does not touch your own deployments. The server deploys the selected workflows itself, in a deployment
+of its own in the server's environment that does not appear in the Deployments list. Each selected workflow becomes a
+skill on the agent card; the skill id is the workflow id.
 
-Each selected workflow becomes a **skill** on the agent card. When an external client sends a task with `message/send`,
-the server runs the **first** exposed workflow - the message text is passed to it as the `message` input - synchronously,
-and returns the workflow's output as the agent's response. Additional skills are advertised on the card but are not
-individually addressable through `message/send`, so put the workflow you want called first.
+A server can hold one version of a project: adding a project the server already has is rejected, whichever version
+you pick. To expose more of its workflows, edit the skills of the project already on the server; to switch to another
+version, remove the project from the server and add it again with that version.
+
+To change the selection or describe the skills, open the project's menu under the server and choose **Edit Skills**.
+Under **Skill details** you can give each workflow a **skill name** and a **skill description** and save each one
+with **Save skill**. Left blank, they fall back to the workflow's own label and description.
+
+### How a task runs
+
+When a client sends `message/send`:
+
+- The skill is picked from `metadata.skillId` on the request params, or on the message. A server with exactly one
+  skill uses it when no `skillId` is given; a server with several skills rejects a message without a `skillId`, and
+  an unknown `skillId`, with an invalid-params error listing the valid ids.
+- The text parts of the message are joined and passed to the workflow's trigger as its `message` input. A message
+  without text is rejected. Continuing an existing task with a new message is not supported.
+- ByteChef starts the workflow and waits up to 300 seconds for it to finish. A finished run returns its response
+  output, or the run's outputs, as a `completed` task; a failed run returns a `failed` task. A run that is still going
+  returns a `working` task to poll with `tasks/get`.
+- A run that pauses on an [approval](/platform/automation/build/workflows/human-in-the-loop) step returns an
+  `input-required` task, with the approval form link when ByteChef's public URL is configured. Once the decision is
+  made, poll `tasks/get` for the result.
+
+The task id identifies the workflow run, so `tasks/get` works for any task of the server, not only recent ones.
+`tasks/cancel` does not stop a run: it answers that the task cannot be canceled.
 
 <Callout type="info">
     A `message/stream` call is answered over Server-Sent Events with a `working` status event followed by a final
-    `TaskStatusUpdateEvent`. Streaming is event-level, not token-level: ByteChef runs the workflow to completion, so
-    the agent card advertises `streaming: false` while streaming clients still receive a valid SSE response.
-
-    Tasks are held in a bounded in-memory cache, not durable storage, so `tasks/get` and `tasks/cancel` reach a recent
-    task rather than an arbitrarily old one.
+    status event. Streaming is event-level, not token-level: ByteChef runs the workflow and sends its result as the
+    final event. The agent card advertises `streaming: true`.
 </Callout>
+
+### The agent card
+
+The card carries the server's name and description, protocol version `0.3.0`, the JSON-RPC transport, text input and
+output, and one entry per skill. Its `url` is built from ByteChef's public URL when one is configured, and from the
+request URL otherwise.
 
 ---
 
 ## Authentication
 
-The secret key in the URL is itself a capability - a client must know it to reach the server. On top of that:
+The secret key in the URL identifies the server and the tenant that owns it. On top of that:
 
-- **Require authentication on** (default): the client must also present a ByteChef **API key** as a `Bearer` token in
-  the `Authorization` header, along with an `X-ENVIRONMENT` header naming the environment (`PRODUCTION` when omitted).
-  Requests without a valid, environment-matching Automation API key are rejected.
-- **Require authentication off**: possession of the secret-key URL is sufficient; no API key is required. Use this only
-  for low-risk agents or short-lived testing.
+- **Require authentication on** (default): every request - the agent card included - must present a ByteChef
+  workspace **API key** as a `Bearer` token in the `Authorization` header. The key must be an Automation key whose
+  environment matches the server's environment, and its user must be active. Other requests are rejected with `401`.
+- **Require authentication off**: the secret-key URL is sufficient and no API key is needed; an API key that is sent
+  is ignored. Use this only for low-risk agents or short-lived testing.
 
-The secret key doubles as the tenant anchor, so a request is always scoped to the tenant that owns the server.
+A disabled server, or an unknown secret key, answers every request with `401`.
 
 ---
 
-## Call an A2A server from another ByteChef agent
+## Deleting
 
-An AI Agent can delegate a task to any A2A server (yours or a third party's) with the **Agent Client Tool**
-(`sendTaskToRemoteAgent`) from the AI Agent Utils component: point it at the remote agent's base URL, and it resolves
-the agent card, sends the task, and returns the response.
+- Deleting an A2A server removes its projects, their skills and the deployments the server created.
+- Deleting a project from a server removes its skills and that project's deployment.
+- Deleting a workflow removes the skill that exposed it.
