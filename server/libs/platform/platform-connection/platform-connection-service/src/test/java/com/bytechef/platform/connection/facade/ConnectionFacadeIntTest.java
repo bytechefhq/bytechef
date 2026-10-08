@@ -35,6 +35,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -54,6 +55,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * @author Ivica Cardic
@@ -63,9 +69,10 @@ import org.springframework.context.annotation.Import;
     properties = {
         "spring.application.name=server-app"
     })
+@WithMockUser(username = "admin@localhost.com", authorities = AuthorityConstants.ADMIN)
 @Import(PostgreSQLContainerConfiguration.class)
 @ConnectionIntTestConfigurationSharedMocks
-public class ConnectionFacadeIntTest {
+class ConnectionFacadeIntTest {
 
     @Autowired
     private ConnectionDefinitionService connectionDefinitionService;
@@ -80,19 +87,19 @@ public class ConnectionFacadeIntTest {
     private TagRepository tagRepository;
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         connectionRepository.deleteAll();
         tagRepository.deleteAll();
     }
 
     @BeforeEach
-    public void beforeEach() {
-        when(connectionDefinitionService.getConnectionConnectionDefinition(eq("componentName"), eq(1)))
+    void beforeEach() {
+        when(connectionDefinitionService.getConnectionConnectionDefinition("componentName", 1))
             .thenReturn(new ConnectionDefinition(new MockConnectionDefinition(), "componentName", null, null));
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
@@ -104,12 +111,13 @@ public class ConnectionFacadeIntTest {
 
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
-        Assertions.assertThat(connectionId)
-            .isEqualTo(1055L);
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getName())
+                .isEqualTo("name1"));
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         ConnectionDTO connectionDTO1 = ConnectionDTO.builder()
             .authorizationType(AuthorizationType.BASIC_AUTH)
             .componentName("componentName")
@@ -151,7 +159,7 @@ public class ConnectionFacadeIntTest {
     }
 
     @Test
-    public void testGetConnection() {
+    void testGetConnection() {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
@@ -176,7 +184,7 @@ public class ConnectionFacadeIntTest {
     }
 
     @Test
-    public void testGetConnectionWhenExecuteBaseUriThrowsException() {
+    void testGetConnectionWhenExecuteBaseUriThrowsException() {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
@@ -204,7 +212,7 @@ public class ConnectionFacadeIntTest {
     }
 
     @Test
-    public void testGetConnectionWhenExecuteBaseUriThrowsNullPointerException() {
+    void testGetConnectionWhenExecuteBaseUriThrowsNullPointerException() {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
@@ -229,7 +237,7 @@ public class ConnectionFacadeIntTest {
     }
 
     @Test
-    public void testGetConnections() {
+    void testGetConnections() {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
@@ -255,25 +263,52 @@ public class ConnectionFacadeIntTest {
             .isEqualTo(connectionDTO)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
 
-        when(connectionDefinitionService.getConnectionConnectionDefinition(eq("componentName2"), eq(1)))
+        when(connectionDefinitionService.getConnectionConnectionDefinition("componentName2", 1))
             .thenThrow(new IllegalArgumentException("componentName2 not found"));
 
         Connection connection2 = new Connection();
 
         connection2.setComponentName("componentName2");
         connection2.setName("name");
+        connection2.setShared(true);
         connection2.setType(PlatformType.AUTOMATION);
 
-        connectionRepository.save(connection2);
+        connection2 = connectionRepository.save(connection2);
 
         connectionDTOs = connectionFacade.getConnections(null, null, List.of(), null, null, PlatformType.AUTOMATION);
 
-        Assertions.assertThat(CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
-            .isEqualTo(List.of(connection));
+        // ConnectionFacadeImpl#getConnections now returns a degraded placeholder DTO for connections whose
+        // component definition cannot be resolved (see buildDegradedConnectionDTO). Previously these rows were
+        // filtered out via `filter(Objects::nonNull)`, which made failing rows invisible to admins — they
+        // could not tell a mapping failure from a missing connection. The second row therefore surfaces with
+        // active=false, componentName preserved, and a suffixed name like "[unavailable: IllegalArgumentException]".
+        Assertions.assertThat(connectionDTOs)
+            .hasSize(2);
+
+        ConnectionDTO healthyDTO = connectionDTOs.stream()
+            .filter(dto -> "componentName".equals(dto.componentName()))
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertThat(healthyDTO)
+            .hasFieldOrPropertyWithValue("componentName", "componentName")
+            .hasFieldOrPropertyWithValue("name", "name");
+
+        ConnectionDTO degradedDTO = connectionDTOs.stream()
+            .filter(dto -> "componentName2".equals(dto.componentName()))
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertThat(degradedDTO)
+            .hasFieldOrPropertyWithValue("active", false)
+            .hasFieldOrPropertyWithValue("componentName", "componentName2")
+            .hasFieldOrPropertyWithValue("id", connection2.getId())
+            .hasFieldOrPropertyWithValue("name", "name [unavailable: IllegalArgumentException]")
+            .hasFieldOrPropertyWithValue("shared", true);
     }
 
     @Test
-    public void testGetConnectionTags() {
+    void testGetConnectionTags() {
         Connection connection = new Connection();
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
@@ -320,7 +355,7 @@ public class ConnectionFacadeIntTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         Tag tag1 = new Tag("tag1");
 
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
@@ -343,6 +378,39 @@ public class ConnectionFacadeIntTest {
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(1);
+    }
+
+    @Test
+    void testUpdateAndDeleteByNonOwnerNonAdminAreDenied() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
+
+        ConnectionDTO createdConnectionDTO = connectionFacade.getConnection(connectionId);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("user@localhost.com", null, AuthorityConstants.USER));
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.update(connectionId, "renamed", List.of(), createdConnectionDTO.version()))
+            .isInstanceOf(AccessDeniedException.class);
+        Assertions.assertThatThrownBy(() -> connectionFacade.delete(connectionId))
+            .isInstanceOf(AccessDeniedException.class);
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value")))
+            .isInstanceOf(AccessDeniedException.class);
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getName())
+                .isEqualTo("name"));
     }
 
     @ComponentScan(basePackages = {

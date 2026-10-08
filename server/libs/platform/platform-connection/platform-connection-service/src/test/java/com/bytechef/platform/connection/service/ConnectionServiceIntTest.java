@@ -25,6 +25,7 @@ import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSha
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -36,14 +37,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * @author Ivica Cardic
  */
+@WithMockUser(username = "admin@localhost.com", authorities = AuthorityConstants.ADMIN)
 @SpringBootTest(classes = ConnectionIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @ConnectionIntTestConfigurationSharedMocks
-public class ConnectionServiceIntTest {
+class ConnectionServiceIntTest {
 
     @Autowired
     private ConnectionService connectionService;
@@ -55,13 +58,13 @@ public class ConnectionServiceIntTest {
     private TagRepository tagRepository;
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         connectionRepository.deleteAll();
         tagRepository.deleteAll();
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         Connection connection = getConnection();
 
         Tag tag = tagRepository.save(new Tag("tag1"));
@@ -76,7 +79,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
-    public void testCreateWithParameters() {
+    void testCreateWithParameters() {
         AuthorizationType authorizationType = AuthorizationType.BASIC_AUTH;
         String componentName = "componentName";
         int connectionVersion = 1;
@@ -99,7 +102,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
-    public void testCreateWithAuthorizationTypNone() {
+    void testCreateWithAuthorizationTypNone() {
         String componentName = "componentName";
         int connectionVersion = 1;
         Environment environment = Environment.PRODUCTION;
@@ -121,7 +124,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         Connection connection = connectionRepository.save(getConnection());
 
         connectionService.delete(Validate.notNull(connection.getId(), "id"));
@@ -130,7 +133,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
-    public void testGetConnection() {
+    void testGetConnection() {
         Connection connection = getConnection();
 
         Tag tag = new Tag("tag1");
@@ -146,7 +149,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
-    public void getGetConnections() {
+    void getGetConnections() {
         connectionRepository.save(getConnection());
 
         assertThat(connectionService.getConnections(null, null, null, null, PlatformType.AUTOMATION)).hasSize(1);

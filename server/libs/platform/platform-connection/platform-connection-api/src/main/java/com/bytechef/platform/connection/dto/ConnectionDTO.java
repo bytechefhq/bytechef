@@ -19,11 +19,13 @@ package com.bytechef.platform.connection.dto;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,18 +36,22 @@ public record ConnectionDTO(
     boolean active, @Nullable AuthorizationType authorizationType, Map<String, ?> authorizationParameters,
     String baseUri, String componentName, Map<String, ?> connectionParameters, int connectionVersion, String createdBy,
     Instant createdDate, CredentialStatus credentialStatus, int environmentId, Long id, String lastModifiedBy,
-    Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
+    Instant lastModifiedDate, String name, Map<String, ?> parameters, ConnectionStatus status, List<Tag> tags,
+    int version, boolean shared) {
+    public ConnectionDTO {
+        Objects.requireNonNull(status, "status");
+    }
 
     public ConnectionDTO(
         boolean active, Map<String, ?> authorizationParameters, String baseUri, Connection connection,
         Map<String, ?> connectionParameters, List<Tag> tags) {
-
         this(
             active, connection.getAuthorizationType(), authorizationParameters, baseUri, connection.getComponentName(),
             connectionParameters, connection.getConnectionVersion(), connection.getCreatedBy(),
             connection.getCreatedDate(), connection.getCredentialStatus(), connection.getEnvironmentId(),
-            connection.getId(), connection.getLastModifiedBy(), connection.getLastModifiedDate(), connection.getName(),
-            connection.getParameters(), tags, connection.getVersion());
+            connection.getId(), connection.getLastModifiedBy(),
+            connection.getLastModifiedDate(), connection.getName(), connection.getParameters(),
+            connection.getStatus(), tags, connection.getVersion(), connection.isShared());
     }
 
     public Connection toConnection() {
@@ -54,10 +60,13 @@ public record ConnectionDTO(
         connection.setAuthorizationType(authorizationType);
         connection.setComponentName(componentName);
         connection.setConnectionVersion(connectionVersion);
+
         connection.setEnvironmentId(environmentId);
         connection.setId(id);
         connection.setName(name);
         connection.setParameters(parameters);
+        connection.setShared(shared);
+        connection.setStatus(status);
         connection.setTags(tags);
         connection.setVersion(version);
 
@@ -68,11 +77,40 @@ public record ConnectionDTO(
         return new Builder();
     }
 
+    public static Builder builder(ConnectionDTO connectionDTO) {
+        Builder builder = new Builder();
+
+        builder.active = connectionDTO.active();
+        builder.authorizationParameters = connectionDTO.authorizationParameters();
+        builder.authorizationType = connectionDTO.authorizationType();
+        builder.baseUri = connectionDTO.baseUri();
+        builder.componentName = connectionDTO.componentName();
+        builder.connectionParameters = connectionDTO.connectionParameters();
+        builder.connectionVersion = connectionDTO.connectionVersion();
+        builder.createdBy = connectionDTO.createdBy();
+        builder.createdDate = connectionDTO.createdDate();
+        builder.credentialStatus = connectionDTO.credentialStatus();
+        builder.environmentId = connectionDTO.environmentId();
+        builder.id = connectionDTO.id();
+        builder.lastModifiedBy = connectionDTO.lastModifiedBy();
+        builder.lastModifiedDate = connectionDTO.lastModifiedDate();
+        builder.name = connectionDTO.name();
+        builder.parameters = connectionDTO.parameters();
+        builder.shared = connectionDTO.shared();
+        builder.status = connectionDTO.status();
+        builder.tags = connectionDTO.tags();
+        builder.version = connectionDTO.version();
+
+        return builder;
+    }
+
     public static final class Builder {
         private boolean active;
+        private Map<String, ?> authorizationParameters = Map.of();
         private AuthorizationType authorizationType;
         private String baseUri;
         private String componentName;
+        private Map<String, ?> connectionParameters = Map.of();
         private int connectionVersion;
         private String createdBy;
         private Instant createdDate;
@@ -82,7 +120,9 @@ public record ConnectionDTO(
         private String lastModifiedBy;
         private Instant lastModifiedDate;
         private String name;
-        private Map<String, Object> parameters;
+        private Map<String, ?> parameters;
+        private boolean shared;
+        private ConnectionStatus status = ConnectionStatus.ACTIVE;
         private List<Tag> tags;
         private int version;
 
@@ -91,6 +131,12 @@ public record ConnectionDTO(
 
         public Builder active(boolean active) {
             this.active = active;
+
+            return this;
+        }
+
+        public Builder authorizationParameters(Map<String, ?> authorizationParameters) {
+            this.authorizationParameters = authorizationParameters;
 
             return this;
         }
@@ -109,6 +155,12 @@ public record ConnectionDTO(
 
         public Builder componentName(String componentName) {
             this.componentName = componentName;
+
+            return this;
+        }
+
+        public Builder connectionParameters(Map<String, ?> connectionParameters) {
+            this.connectionParameters = connectionParameters;
 
             return this;
         }
@@ -167,8 +219,14 @@ public record ConnectionDTO(
             return this;
         }
 
-        public Builder parameters(Map<String, Object> parameters) {
+        public Builder parameters(Map<String, ?> parameters) {
             this.parameters = parameters;
+
+            return this;
+        }
+
+        public Builder shared(boolean shared) {
+            this.shared = shared;
 
             return this;
         }
@@ -179,16 +237,23 @@ public record ConnectionDTO(
             return this;
         }
 
+        public Builder status(ConnectionStatus status) {
+            this.status = status;
+
+            return this;
+        }
+
         public Builder version(int version) {
             this.version = version;
+
             return this;
         }
 
         public ConnectionDTO build() {
             return new ConnectionDTO(
-                active, authorizationType, Map.of(), baseUri, componentName, Map.of(), connectionVersion, createdBy,
-                createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters,
-                tags, version);
+                active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters,
+                connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy,
+                lastModifiedDate, name, parameters, status, tags, version, shared);
         }
     }
 }

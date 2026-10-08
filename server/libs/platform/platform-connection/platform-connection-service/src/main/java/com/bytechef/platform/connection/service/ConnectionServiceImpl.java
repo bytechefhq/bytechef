@@ -20,13 +20,18 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.FormatUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -42,7 +47,6 @@ import org.springframework.util.Assert;
 @Service("connectionService")
 @Transactional
 public class ConnectionServiceImpl implements ConnectionService {
-
     private static final Logger log = LoggerFactory.getLogger(ConnectionServiceImpl.class);
 
     private final ConnectionRepository connectionRepository;
@@ -65,10 +69,8 @@ public class ConnectionServiceImpl implements ConnectionService {
     public Connection create(
         @Nullable AuthorizationType authorizationType, String componentName, int connectionVersion,
         int environmentId, String name, Map<String, Object> parameters, PlatformType platformType) {
-
         Assert.hasText(componentName, "'componentName' must not be empty");
         Assert.hasText(name, "'name' must not be empty");
-        Assert.notNull(environmentId, "'environment' must not be null");
         Assert.notNull(parameters, "'parameters' must not be null");
         Assert.notNull(platformType, "'platformType' must not be null");
 
@@ -91,7 +93,10 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public void delete(long id) {
-        connectionRepository.deleteById(id);
+        Connection connection = connectionRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
+
+        connectionRepository.delete(connection);
     }
 
     @Override
@@ -102,9 +107,22 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Connection> fetchConnection(long id) {
+        return connectionRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Connection> getConnections(PlatformType type) {
         return CollectionUtils.filter(
             connectionRepository.findAll(Sort.by("name", "id")), connection -> connection.getType() == type);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Connection> getSharedConnections(int environmentId, PlatformType type) {
+        return connectionRepository.findAllBySharedIsTrueAndEnvironmentAndTypeOrderByName(
+            environmentId, type.ordinal());
     }
 
     @Override
@@ -118,7 +136,6 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Transactional(readOnly = true)
     public List<Connection> getConnections(
         String componentName, Integer connectionVersion, Long tagId, Long environmentId, PlatformType type) {
-
         List<Connection> connections;
 
         if (StringUtils.isBlank(componentName) && tagId == null) {
@@ -168,6 +185,16 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection update(long id, String name, List<Long> tagIds, int version) {
+        return updateNameTagsAndShared(id, name, tagIds, null, version);
+    }
+
+    @Override
+    public Connection update(long id, String name, List<Long> tagIds, boolean shared, int version) {
+        return updateNameTagsAndShared(id, name, tagIds, shared, version);
+    }
+
+    private Connection updateNameTagsAndShared(
+        long id, String name, List<Long> tagIds, @Nullable Boolean shared, int version) {
         Connection curConnection = getConnection(id);
 
         if (name != null) {
@@ -176,6 +203,10 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         if (tagIds != null) {
             curConnection.setTagIds(tagIds);
+        }
+
+        if (shared != null) {
+            curConnection.setShared(shared);
         }
 
         curConnection.setVersion(version);
@@ -196,6 +227,22 @@ public class ConnectionServiceImpl implements ConnectionService {
         updatedConnection.setCredentialsStatusUpdated();
 
         return updatedConnection;
+    }
+
+    @Override
+    public Connection updateConnectionStatus(long connectionId, ConnectionStatus status) {
+        Assert.notNull(status, "'status' must not be null");
+
+        Connection connection = connectionRepository.findById(connectionId)
+            .orElseThrow(() -> new NoSuchElementException("Connection not found: " + connectionId));
+
+        try {
+            connection.setStatus(status);
+        } catch (IllegalStateException exception) {
+            throw new ConfigurationException(exception.getMessage(), ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        return connectionRepository.save(connection);
     }
 
     @Override
@@ -225,4 +272,47 @@ public class ConnectionServiceImpl implements ConnectionService {
         return connectionRepository.save(connection);
     }
 
+    @Override
+    public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        Assert.notNull(parameters, "'parameters' must not be null");
+
+        Connection connection = getConnection(connectionId);
+
+        connection.setParameters(new HashMap<>(parameters));
+
+        return connectionRepository.save(connection);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Connection> getInactiveConnections(List<Long> connectionIds) {
+        if (connectionIds == null || connectionIds.isEmpty()) {
+            return List.of();
+        }
+
+        return connectionRepository.findAllByIdIn(connectionIds)
+            .stream()
+            .filter(connection -> connection.getStatus() != ConnectionStatus.ACTIVE)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateConnectionsActive(List<Long> connectionIds) {
+        List<Connection> inactive = getInactiveConnections(connectionIds);
+
+        if (inactive.isEmpty()) {
+            return;
+        }
+
+        String detail = inactive.stream()
+            .map(connection -> "id=%s status=%s".formatted(connection.getId(), connection.getStatus()))
+            .reduce((left, right) -> left + ", " + right)
+            .orElse("");
+
+        throw new ConfigurationException(
+            "Workflow execution blocked: %d non-ACTIVE connection(s): %s. Reassign or reactivate to resume."
+                .formatted(inactive.size(), detail),
+            ConnectionErrorType.CONNECTION_NOT_ACTIVE);
+    }
 }
