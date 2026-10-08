@@ -20,6 +20,8 @@ import org.springframework.security.core.userdetails.User;
 public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken
     implements ConnectedUserAuthentication {
 
+    private boolean apiKeyAuthenticated;
+    private long connectedUserId;
     private String externalUserId;
     private String secretKey;
 
@@ -33,8 +35,34 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
     }
 
     @SuppressFBWarnings("EI")
-    public EmbeddedApiKeyAuthenticationToken(long environmentId, User user) {
+    public EmbeddedApiKeyAuthenticationToken(
+        long environmentId, long connectedUserId, User user, boolean apiKeyAuthenticated) {
+
         super(environmentId, user);
+
+        this.apiKeyAuthenticated = apiKeyAuthenticated;
+        this.connectedUserId = connectedUserId;
+        this.externalUserId = user.getUsername();
+    }
+
+    @Override
+    public boolean apiKeyAuthenticated() {
+        return apiKeyAuthenticated;
+    }
+
+    @Override
+    public long connectedUserId() {
+        return connectedUserId;
+    }
+
+    @Override
+    public String externalUserId() {
+        return externalUserId;
+    }
+
+    @Override
+    public long environmentId() {
+        return getEnvironmentId();
     }
 
     public String getExternalUserId() {

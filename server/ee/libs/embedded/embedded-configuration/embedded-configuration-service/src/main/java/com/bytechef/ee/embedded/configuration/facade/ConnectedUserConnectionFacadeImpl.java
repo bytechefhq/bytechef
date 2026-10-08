@@ -16,7 +16,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -89,7 +89,11 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         Set<Long> entitledConnectionIds = connectedUserConnectionMembership.getConnectionIds(
             connectedUser.getId(), connectedUser.getEnvironment());
 
-        return connectionFacade.getConnections(new ArrayList<>(entitledConnectionIds), PlatformType.EMBEDDED)
+        List<Long> allowedConnectionIds = entitledConnectionIds.stream()
+            .filter(connectionId -> connectionIds.isEmpty() || connectionIds.contains(connectionId))
+            .toList();
+
+        return connectionFacade.getConnections(new ArrayList<>(allowedConnectionIds), PlatformType.EMBEDDED)
             .stream()
             .filter(connectionDTO -> componentName == null || componentName.equals(connectionDTO.componentName()))
             .toList();
@@ -113,7 +117,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     @Override
     @Transactional(readOnly = true)
     public void validateCurrentPrincipalConnectedUser(long connectedUserId) {
-        if (!ConnectedUserAuthentication.isCurrentPrincipalConnectedUser()) {
+        if (!ConnectedUserAuthentications.isConnectedUser()) {
             return;
         }
 

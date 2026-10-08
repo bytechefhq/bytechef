@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +31,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+/**
+ * @author Ivica Cardic
+ */
 class AutomationMethodSecurityExpressionRootTest {
 
     private PermissionService permissionService;
@@ -108,7 +111,7 @@ class AutomationMethodSecurityExpressionRootTest {
     @Test
     void testConnectedUserIsDeniedUnderSkipChecks() throws Throwable {
         SecurityContextHolder.getContext()
-            .setAuthentication(mock(ConnectedUserAuthentication.class));
+            .setAuthentication(TestConnectedUserAuthentication.of("external-user"));
 
         AutomationAuthorizationContext.callSkippingChecks(() -> {
             assertThat(root.isConnectedUser()).isTrue();
@@ -125,7 +128,7 @@ class AutomationMethodSecurityExpressionRootTest {
     @Test
     void testConnectedUserIsDeniedWithoutConsultingPermissionService() {
         SecurityContextHolder.getContext()
-            .setAuthentication(mock(ConnectedUserAuthentication.class));
+            .setAuthentication(TestConnectedUserAuthentication.of("external-user"));
 
         assertThat(root.isCurrentUser(7L)).isFalse();
         assertThat(root.isTenantAdmin()).isFalse();

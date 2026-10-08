@@ -55,7 +55,8 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
             .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environmentId));
 
         return new EmbeddedApiKeyAuthenticationToken(
-            environmentId, createSpringSecurityUser(externalUserId, connectedUser));
+            environmentId, connectedUser.getId(), createSpringSecurityUser(externalUserId, connectedUser),
+            embeddedApiKeyAuthenticationToken.getSecretKey() != null);
     }
 
     @Override
