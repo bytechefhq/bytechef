@@ -59,6 +59,17 @@ output schema and the workflow continues with the next task - `approved`
 > public URL is configured…"*. Set the public URL to something the approver
 > can actually reach (your domain, an ngrok tunnel for dev, etc.).
 
+> **Link signing.** Approval links and resume ids are signed with the secret
+> in `bytechef.approval.signed-token.secret`. When it is unset, the secret is
+> derived from the instance's encryption key. In an Enterprise Edition
+> distributed deployment, every app that issues or accepts these links
+> (worker, execution, webhook and runtime job apps) must resolve the same
+> secret, so set `bytechef.approval.signed-token.secret` to one value for all
+> of them: the worker, execution and webhook apps have no encryption key to
+> derive it from, and without the property they issue and accept unsigned
+> links. Setting `bytechef.approval.signed-token.required=true` rejects
+> unsigned links and makes an app without a secret fail at startup.
+
 ---
 
 ## Two interaction modes
