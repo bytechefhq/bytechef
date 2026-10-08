@@ -7,7 +7,9 @@
 
 package com.bytechef.embedded.workflow.coordinator.trigger.dispatcher;
 
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -33,17 +35,19 @@ import org.springframework.stereotype.Component;
 public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TriggerDispatcherPreSendProcessor {
 
+    private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
 
     @SuppressFBWarnings("EI")
     public IntegrationTriggerDispatcherPreSendProcessor(
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationWorkflowService integrationWorkflowService,
+        IntegrationInstanceService integrationInstanceService, IntegrationWorkflowService integrationWorkflowService,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
 
         super(integrationInstanceConfigurationWorkflowService);
 
+        this.integrationInstanceService = integrationInstanceService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
     }
@@ -52,11 +56,16 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
     public TriggerExecution process(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
+        long integrationInstanceId = workflowExecutionId.getJobPrincipalId();
+
         String workflowId = integrationWorkflowService.getWorkflowId(
-            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+            integrationInstanceId, workflowExecutionId.getWorkflowUuid());
+
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstanceId);
 
         Map<String, Long> connectionIdMap = getConnectionIdMap(
-            workflowExecutionId.getJobPrincipalId(), workflowId, triggerExecution.getName());
+            integrationInstance.getIntegrationInstanceConfigurationId(), workflowId, triggerExecution.getName());
 
         if (!connectionIdMap.isEmpty()) {
             triggerExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
