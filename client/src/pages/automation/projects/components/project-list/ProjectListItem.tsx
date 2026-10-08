@@ -1,16 +1,15 @@
-import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {ButtonGroup} from '@/components/ui/button-group';
-import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
+import {ButtonGroup} from '@/components/ui/button-group';
+import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import {
@@ -235,7 +234,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
             const interactiveSelectors = [
                 '[data-interactive]',
-                '.dropdown-menu-item',
+                '[role="menu"]',
                 '[data-radix-dropdown-menu-item]',
                 '[data-radix-dropdown-menu-trigger]',
                 '[data-radix-collapsible-trigger]',
@@ -344,22 +343,22 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             </Button>
                                         </DropdownMenuTrigger>
 
-                                        <DropdownMenuContent align="end" className="p-0">
+                                        <DropdownMenuContent align="end">
                                             <DropdownMenuItem
                                                 aria-label="Create Workflow from Template"
-                                                className="dropdown-menu-item"
+                                                icon={<LayoutTemplateIcon />}
+                                                label="From Template"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
 
                                                     navigate(`./${project.id}/templates`);
                                                 }}
-                                            >
-                                                <LayoutTemplateIcon /> From Template
-                                            </DropdownMenuItem>
+                                            />
 
                                             <DropdownMenuItem
                                                 aria-label="Import Workflow"
-                                                className="dropdown-menu-item"
+                                                icon={<UploadIcon />}
+                                                label="Import Workflow"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
 
@@ -367,25 +366,22 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                                         hiddenFileInputRef.current.click();
                                                     }
                                                 }}
-                                            >
-                                                <UploadIcon /> Import Workflow
-                                            </DropdownMenuItem>
+                                            />
 
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <span className="block">
                                                         <DropdownMenuItem
                                                             aria-label="Import n8n Workflow"
-                                                            className="dropdown-menu-item"
                                                             disabled={importN8nWorkflowDisabled}
+                                                            icon={<UploadIcon />}
+                                                            label="Import n8n Workflow"
                                                             onClick={() => {
                                                                 if (converterHiddenFileInputRef.current) {
                                                                     converterHiddenFileInputRef.current.click();
                                                                 }
                                                             }}
-                                                        >
-                                                            <UploadIcon /> Import n8n Workflow
-                                                        </DropdownMenuItem>
+                                                        />
                                                     </span>
                                                 </TooltipTrigger>
 
@@ -485,109 +481,100 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 />
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end" className="p-0">
+                            <DropdownMenuContent align="end">
                                 <ProjectListItemPublishMenuItem
                                     hasWorkflows={hasWorkflows}
                                     onClick={() => setShowPublishProjectDialog(true)}
                                 />
 
-                                <DropdownMenuSeparator className="m-0" />
+                                <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
                                     aria-label="Edit Project"
-                                    className="dropdown-menu-item"
+                                    icon={<EditIcon />}
+                                    label="Edit"
                                     onClick={() => setShowEditDialog(true)}
-                                >
-                                    <EditIcon /> Edit
-                                </DropdownMenuItem>
+                                />
 
                                 <DropdownMenuItem
                                     aria-label="Duplicate Project"
-                                    className="dropdown-menu-item"
+                                    icon={<CopyIcon />}
+                                    label="Duplicate"
                                     onClick={() => duplicateProjectMutation.mutate(project.id!)}
-                                >
-                                    <CopyIcon /> Duplicate
-                                </DropdownMenuItem>
+                                />
 
                                 {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
                                     <DropdownMenuItem
                                         aria-label="View Workflows"
-                                        className="dropdown-menu-item"
+                                        icon={<WorkflowIcon />}
+                                        label="View Workflows"
                                         onClick={() =>
                                             navigate(
                                                 `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
                                             )
                                         }
-                                    >
-                                        <WorkflowIcon /> View Workflows
-                                    </DropdownMenuItem>
+                                    />
                                 )}
 
                                 <DropdownMenuItem
                                     aria-label="Share Project"
-                                    className="dropdown-menu-item"
+                                    icon={<Share2Icon />}
+                                    label="Share"
                                     onClick={() => setShowProjectShareDialog(true)}
-                                >
-                                    <Share2Icon /> Share
-                                </DropdownMenuItem>
+                                />
 
                                 {templatesSubmissionForm && (
                                     <DropdownMenuItem
                                         aria-label="Share with Community"
-                                        className="dropdown-menu-item"
+                                        icon={<Share2Icon />}
+                                        label="Share with Community"
                                         onClick={() => window.open(templatesSubmissionForm, '_blank')}
-                                    >
-                                        <Share2Icon /> Share with Community
-                                    </DropdownMenuItem>
+                                    />
                                 )}
 
                                 <DropdownMenuItem
                                     aria-label="Export Project"
-                                    className="dropdown-menu-item"
+                                    icon={<DownloadIcon />}
+                                    label="Export"
                                     onClick={() =>
                                         (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
                                     }
-                                >
-                                    <DownloadIcon /> Export
-                                </DropdownMenuItem>
+                                />
 
-                                <DropdownMenuSeparator className="m-0" />
+                                <DropdownMenuSeparator />
 
                                 {ff_1039 && (
                                     <EEVersion hidden={true}>
                                         <DropdownMenuItem
                                             aria-label="Pull Project from Git"
-                                            className="dropdown-menu-item"
                                             disabled={!projectGitConfiguration?.enabled}
+                                            icon={<GitPullRequestArrowIcon />}
+                                            label="Pull Project from Git"
                                             onClick={handlePullProjectFromGitClick}
-                                        >
-                                            <GitPullRequestArrowIcon /> Pull Project from Git
-                                        </DropdownMenuItem>
+                                        />
 
                                         <DropdownMenuItem
                                             aria-label="Git Configuration"
-                                            className="dropdown-menu-item"
+                                            icon={<GitBranchIcon />}
+                                            label="Git Configuration"
                                             onClick={() => setShowProjectGitConfigurationDialog(true)}
-                                        >
-                                            <GitBranchIcon /> Git Configuration
-                                        </DropdownMenuItem>
+                                        />
 
-                                        <DropdownMenuSeparator className="m-0" />
+                                        <DropdownMenuSeparator />
                                     </EEVersion>
                                 )}
 
                                 <DropdownMenuItem
                                     aria-label="Delete Project"
-                                    className="dropdown-menu-item-destructive"
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
                                     onClick={(event: MouseEvent) => {
                                         setShowDeleteDialog(true);
 
                                         event.stopPropagation();
                                     }}
                                     variant="destructive"
-                                >
-                                    <Trash2Icon /> Delete
-                                </DropdownMenuItem>
+                                />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
