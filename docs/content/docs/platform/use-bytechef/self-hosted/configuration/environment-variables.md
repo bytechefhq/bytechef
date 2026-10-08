@@ -273,6 +273,12 @@ does not support.
 |---|---|---|
 | `BYTECHEF_EDITION` | ByteChef edition (CE, EE) | `EE` |
 
+## Embedded Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS` | Comma-separated origins (scheme, host and optional port, no path or wildcard, e.g. `https://app.example.com,https://admin.example.com`) of the applications allowed to embed the Automation Hub, Workflow Builder and Integration Marketplace pages. It is sent as `Content-Security-Policy: frame-ancestors` on those pages, and the pages accept their initialization message only from these origins. When empty, any origin can embed the pages and the pages log a warning in the browser console. EE only | - |
+
 ## Environment Configuration
 
 | Environment Variable | Description | Default Value |
@@ -497,7 +503,7 @@ System administrator is used for accessing protected data reachable through /act
 | `BYTECHEF_WORKER_ENABLED` | Enable or disable the worker | `true` |
 | `BYTECHEF_WORKER_TASK_DEFAULT_TIMEOUT` | Default timeout for task execution in milliseconds. Unset falls back to the built-in 24-hour ceiling; a task's own `timeout` parameter overrides both. | - (24 hours) |
 | `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` | Number of concurrent consumers for the `default` worker queue, and the cap on concurrent task execution process-wide. On a single-node deployment this is simply "max concurrent workflow tasks" | `10` |
-| `BYTECHEF_WORKER_TASK_SYNC_CONCURRENCY_LIMIT` | Concurrent executions allowed in the synchronous, interactive lane — the API Platform sync request path and the workflow editor's Test button. Kept separate from the queue above so a burst of scheduled runs cannot leave an interactive caller waiting | `5` |
+| `BYTECHEF_WORKER_TASK_SYNC_CONCURRENCY_LIMIT` | Concurrent executions allowed in the synchronous, interactive lane - the API Platform sync request path and the workflow editor's Test button. Kept separate from the queue above so a burst of scheduled runs cannot leave an interactive caller waiting | `5` |
 | `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_<QUEUE_NAME>` | Number of concurrent consumers for an additional worker queue (e.g., `captions` for tasks routed via `node: captions`). The queue must be created before tasks can be routed to it; ByteChef creates the queue automatically when the worker bootstraps if it doesn't already exist. | - |
 
 ## Workflow Configuration
