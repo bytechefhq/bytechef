@@ -67,8 +67,4 @@ public interface ProjectService {
 
     Project update(Project project);
 
-    Project updatePermissionExpression(long id, @Nullable String permissionExpression);
-
-    Project updateAutomationHubVisible(long id, boolean automationHubVisible);
-
 }

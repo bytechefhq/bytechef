@@ -49,9 +49,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table
 public final class Project {
 
-    @Column("automation_hub_visible")
-    private boolean automationHubVisible = true;
-
     @Column("category_id")
     private AggregateReference<Category, Long> categoryId;
 
@@ -65,9 +62,6 @@ public final class Project {
 
     @Column
     private String description;
-
-    @Column("permission_expression")
-    private String permissionExpression;
 
     @Id
     private Long id;
@@ -157,10 +151,6 @@ public final class Project {
         return description;
     }
 
-    public String getPermissionExpression() {
-        return permissionExpression;
-    }
-
     public Long getId() {
         return id;
     }
@@ -226,10 +216,6 @@ public final class Project {
         return workspaceId == null ? null : workspaceId.getId();
     }
 
-    public boolean isAutomationHubVisible() {
-        return automationHubVisible;
-    }
-
     public boolean isPublished() {
         return projectVersions.stream()
             .anyMatch(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED);
@@ -249,10 +235,6 @@ public final class Project {
         return newVersion;
     }
 
-    public void setAutomationHubVisible(boolean automationHubVisible) {
-        this.automationHubVisible = automationHubVisible;
-    }
-
     public void setCategory(Category category) {
         this.categoryId = category == null
             ? null
@@ -265,10 +247,6 @@ public final class Project {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void setPermissionExpression(String permissionExpression) {
-        this.permissionExpression = permissionExpression;
     }
 
     public void setId(Long id) {

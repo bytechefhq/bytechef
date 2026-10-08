@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -187,15 +186,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project updateAutomationHubVisible(long id, boolean automationHubVisible) {
-        Project project = getProject(id);
-
-        project.setAutomationHubVisible(automationHubVisible);
-
-        return projectRepository.save(project);
-    }
-
-    @Override
     public Project update(Project project) {
         Assert.notNull(project, "'project' must not be null");
         Assert.notNull(project.getId(), "id");
@@ -212,12 +202,4 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(curProject);
     }
 
-    @Override
-    public Project updatePermissionExpression(long id, @Nullable String permissionExpression) {
-        Project project = getProject(id);
-
-        project.setPermissionExpression(permissionExpression);
-
-        return projectRepository.save(project);
-    }
 }

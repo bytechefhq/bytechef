@@ -19,7 +19,6 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.util.List;
 import java.util.Optional;
-import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -76,5 +75,4 @@ public interface ProjectWorkflowService {
 
     ProjectWorkflow update(ProjectWorkflow projectWorkflow);
 
-    ProjectWorkflow updatePermissionExpression(long id, @Nullable String permissionExpression);
 }
