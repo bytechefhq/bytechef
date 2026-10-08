@@ -36,18 +36,18 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(classes = IntegrationIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks
-public class IntegrationRepositoryIntTest {
+class IntegrationRepositoryIntTest {
 
     @Autowired
     private IntegrationRepository integrationRepository;
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         integrationRepository.deleteAll();
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         Integration integration = integrationRepository.save(getIntegration());
 
         assertThat(integration).isEqualTo(
@@ -55,7 +55,7 @@ public class IntegrationRepositoryIntTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         Integration integration = integrationRepository.save(getIntegration());
 
         Integration resultIntegration = OptionalUtils.get(
@@ -70,7 +70,7 @@ public class IntegrationRepositoryIntTest {
     }
 
     @Test
-    public void testFindById() {
+    void testFindById() {
         Integration integration = integrationRepository.save(getIntegration());
 
         Integration resultIntegration = OptionalUtils.get(
@@ -80,7 +80,7 @@ public class IntegrationRepositoryIntTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         Integration integration = integrationRepository.save(getIntegration());
 
         integrationRepository.save(integration);
