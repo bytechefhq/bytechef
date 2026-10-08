@@ -58,6 +58,7 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
+import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
@@ -87,9 +88,11 @@ import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -100,6 +103,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -121,17 +126,10 @@ public class EmbeddedMcpServerConfiguration {
         return WebMvcStreamableServerTransportProvider.builder()
             .mcpEndpoint("/api/embedded/{secretKey}/mcp")
             .contextExtractor(serverRequest -> {
-                String externalUserId = SecurityUtils.getCurrentUserLogin();
-                String secretKey = serverRequest.pathVariable(SECRET_KEY);
                 HttpServletRequest httpServletRequest = serverRequest.servletRequest();
 
-                String environment = httpServletRequest.getHeader("X-Environment");
-
-                return McpTransportContext.create(
-                    Map.of(
-                        ENVIRONMENT, environment,
-                        EXTERNAL_USER_ID, externalUserId,
-                        SECRET_KEY, secretKey));
+                return createMcpTransportContext(
+                    serverRequest.pathVariable(SECRET_KEY), httpServletRequest.getHeader("X-Environment"));
             })
             .build();
     }
@@ -252,7 +250,8 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     SecurityConfigurerContributor embeddedMcpServerSecurityConfigurerContributor(
-        ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
+        ConnectedUserService connectedUserService, McpServerService mcpServerService,
+        SigningKeyService signingKeyService) {
 
         return new SecurityConfigurerContributor() {
 
@@ -261,9 +260,28 @@ public class EmbeddedMcpServerConfiguration {
             public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T
                 getSecurityConfigurerAdapter() {
 
-                return (T) new EmbeddedMcpServerSecurityConfigurer(connectedUserService, signingKeyService);
+                return (T) new EmbeddedMcpServerSecurityConfigurer(
+                    connectedUserService, mcpServerService, signingKeyService);
             }
         };
+    }
+
+    static McpTransportContext createMcpTransportContext(String secretKey, @Nullable String environment) {
+        Map<String, Object> context = new HashMap<>();
+
+        context.put(SECRET_KEY, secretKey);
+
+        if (environment != null) {
+            context.put(ENVIRONMENT, environment);
+        }
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        if (!(securityContext.getAuthentication() instanceof McpAnonymousAuthenticationToken)) {
+            context.put(EXTERNAL_USER_ID, SecurityUtils.getCurrentUserLogin());
+        }
+
+        return McpTransportContext.create(context);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {

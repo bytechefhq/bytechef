@@ -11,8 +11,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -26,6 +29,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.server.config.EmbeddedMcpServerIntTestConfiguration;
@@ -43,6 +47,8 @@ import com.bytechef.encryption.Encryption;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -69,6 +75,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -147,6 +154,9 @@ class EmbeddedMcpToolFacadeIntTest {
 
     @Autowired
     private McpServerRepository mcpServerRepository;
+
+    @MockitoSpyBean
+    private McpServerService mcpServerService;
 
     @Autowired
     private McpToolRepository mcpToolRepository;
@@ -227,6 +237,86 @@ class EmbeddedMcpToolFacadeIntTest {
                     .isNull();
 
         verifyNoInteractions(mcpComponentService, clusterElementDefinitionService, mcpIntegrationInstanceToolService);
+    }
+
+    @Test
+    void testClusterElementToolCallReadsMcpServerWithoutWorkspacePermissionChecks() {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+            Map.of(), UNCONNECTED_EXTERNAL_USER_ID);
+
+        boolean[] executedSkippingChecks = {
+            true
+        };
+
+        doAnswer(invocation -> {
+            if (!AutomationAuthorizationContext.isSkipChecks()) {
+                throw new IllegalStateException("Access Denied");
+            }
+
+            return invocation.callRealMethod();
+        }).when(mcpServerService)
+            .getMcpServer(anyLong());
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1))
+            .thenReturn(mock(ComponentDefinition.class));
+        when(clusterElementDefinitionFacade.executeTool(eq("httpClient"), eq(1), eq("post"), any(), isNull()))
+            .thenAnswer(invocation -> {
+                executedSkippingChecks[0] = AutomationAuthorizationContext.isSkipChecks();
+
+                return Map.of("ok", true);
+            });
+
+        functionToolCallback.call("{}");
+
+        verify(clusterElementDefinitionFacade).executeTool(eq("httpClient"), eq(1), eq("post"), any(), isNull());
+
+        assertThat(executedSkippingChecks[0]).isFalse();
+        assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
+    }
+
+    @Test
+    void testAnonymousCallOfConnectionRequiringClusterElementToolFailsWithClearError() {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+            Map.of(), null);
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinition.getConnection()).thenReturn(mock(ConnectionDefinition.class));
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1)).thenReturn(componentDefinition);
+
+        assertThatThrownBy(() -> functionToolCallback.call("{}"))
+            .hasStackTraceContaining("The httpClient tool requires a connected user");
+
+        verify(jwtTokenService, never()).generateJwtToken(any(), anyLong(), anyInt(), any());
+        verify(clusterElementDefinitionFacade, never()).executeTool(any(), anyInt(), any(), any(), any());
+    }
+
+    @Test
+    void testAnonymousCallOfConnectionlessClusterElementToolExecutes() {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+            Map.of(), null);
+
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1))
+            .thenReturn(mock(ComponentDefinition.class));
+        when(clusterElementDefinitionFacade.executeTool(eq("httpClient"), eq(1), eq("post"), any(), isNull()))
+            .thenReturn(Map.of("ok", true));
+
+        functionToolCallback.call("{}");
+
+        verify(clusterElementDefinitionFacade).executeTool(eq("httpClient"), eq(1), eq("post"), any(), isNull());
+    }
+
+    @Test
+    void testAnonymousWorkflowToolCallFailsWithClearErrorInsteadOfIssuingConnectLink() {
+        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(Map.of(), List.of(), null, false);
+
+        assertThat(toolCallbacks).hasSize(1);
+
+        ToolCallback toolCallback = toolCallbacks.getFirst();
+
+        assertThatThrownBy(() -> toolCallback.call("{}"))
+            .hasStackTraceContaining("The myComponent tool requires a connected user");
+
+        verify(jwtTokenService, never()).generateJwtToken(any(), anyLong(), anyInt(), any());
     }
 
     @Test
@@ -379,6 +469,15 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     private ToolDefinition getClusterElementToolDefinition(Map<String, Object> parameters) {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+            parameters, UNCONNECTED_EXTERNAL_USER_ID);
+
+        return functionToolCallback.getToolDefinition();
+    }
+
+    private FunctionToolCallback<Map<String, Object>, Object> getClusterElementToolCallback(
+        Map<String, Object> parameters, @Nullable String externalUserId) {
+
         McpTool mcpTool = saveMcpTool("post", parameters, true);
 
         ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
@@ -391,12 +490,11 @@ class EmbeddedMcpToolFacadeIntTest {
             .thenReturn(clusterElementDefinition);
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
-            embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, UNCONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+            embeddedMcpToolFacade.getFunctionToolCallback(mcpTool, externalUserId, Environment.PRODUCTION, "tenant");
 
         assertThat(functionToolCallback).isNotNull();
 
-        return functionToolCallback.getToolDefinition();
+        return functionToolCallback;
     }
 
     private ToolCallback getConnectedWorkflowToolCallback(List<Map<String, String>> tasks) {
@@ -421,7 +519,7 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     private List<ToolCallback> getWorkflowToolCallbacks(
-        Map<String, Object> toolParameters, List<Map<String, String>> tasks, String externalUserId,
+        Map<String, Object> toolParameters, List<Map<String, String>> tasks, @Nullable String externalUserId,
         boolean connected) {
 
         McpServer mcpServer = mcpServerRepository.save(

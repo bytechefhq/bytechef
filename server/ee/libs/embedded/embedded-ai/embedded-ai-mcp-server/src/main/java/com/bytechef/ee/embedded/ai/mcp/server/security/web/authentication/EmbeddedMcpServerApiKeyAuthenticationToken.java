@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.userdetails.User;
 
 /**
@@ -21,12 +22,16 @@ public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAu
     implements ConnectedUserAuthentication {
 
     private long connectedUserId;
-    private String externalUserId;
+    private @Nullable String externalUserId;
+    private @Nullable String mcpServerSecretKey;
 
-    public EmbeddedMcpServerApiKeyAuthenticationToken(long environmentId, String externalUserId, String tenantId) {
+    public EmbeddedMcpServerApiKeyAuthenticationToken(
+        long environmentId, @Nullable String externalUserId, String tenantId, String mcpServerSecretKey) {
+
         super(environmentId, tenantId);
 
         this.externalUserId = externalUserId;
+        this.mcpServerSecretKey = mcpServerSecretKey;
     }
 
     @SuppressFBWarnings("EI")
@@ -52,7 +57,11 @@ public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAu
         return getEnvironmentId();
     }
 
-    public String getExternalUserId() {
+    public @Nullable String getExternalUserId() {
         return externalUserId;
+    }
+
+    public @Nullable String getMcpServerSecretKey() {
+        return mcpServerSecretKey;
     }
 }
