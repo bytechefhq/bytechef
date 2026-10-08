@@ -15,7 +15,7 @@ comingSoon: true
 | Component filtering | Filter MCP servers by the components they expose using the left sidebar. |
 | Integration filtering | Filter by the integrations associated with the server. |
 | Tag filtering | Organize and filter servers by assigned tags. |
-| Environment selector | Choose the environment (e.g., Development) in the left sidebar header. |
+| Environment | The list shows the servers of the environment selected in the application sidebar. |
 | Enable/Disable toggle | Activate or deactivate an MCP server without removing it. |
 
 ### MCP Server Details
@@ -37,19 +37,18 @@ Each server in the list displays:
 
 1. Click the **New MCP Server** button in the top-right corner.
 2. Provide a **Name** for the server.
-3. Optionally toggle **Require authentication** (on by default for a new server) and **Enforce tool authorization**. The second depends on the first: turning **Require authentication** off disables **Enforce tool authorization** and clears it, because there is no caller identity to authorize against.
-4. Click **Save** to create the server.
+3. Click **Save** to create the server.
 
-The server is created empty - you add the components and workflows it exposes from the server row afterward (see below). Assign tags inline on the server row once it exists.
+The server is created empty and disabled - you add the components and workflows it exposes from the server row afterward (see below), then turn it on with its **Enabled** switch. Assign tags inline on the server row once it exists.
 
-<!-- TODO screenshot: New MCP Server dialog showing the Name field and the Require authentication / Enforce tool authorization toggles -->
+A new server requires authentication (see [Authentication](#authentication)); the dialog has no setting for it.
 
 ### Adding components and workflows to a server
 
-Open the server row's ellipsis (⋮) menu:
+Expand the server row. It has **Component Tools**, **Workflow Tools** and **Connect** tabs:
 
-- **Add Component** -- opens a two-step dialog: **Select Component** (pick the third-party component) then **Select Tools from &lt;component&gt;** (choose which of its actions are exposed as tools, and configure each tool's parameters).
-- **Add Workflows** -- pick an integration instance configuration, then the workflows within it to expose. Only workflows carrying a **New Workflow Call** trigger are eligible; a configuration with none shows "No tool-eligible workflows found".
+- **Add Component** (on the **Component Tools** tab) -- opens a two-step dialog: **Select Component** (pick the third-party component) then **Select Tools from &lt;component&gt;** (choose which of its actions are exposed as tools, and configure each tool's parameters).
+- **Add Workflows** (on the **Workflow Tools** tab) -- pick an integration instance configuration, then the workflows within it to expose. Only workflows carrying a **New Workflow Call** trigger are eligible; a configuration with none shows "No tool-eligible workflows found".
 
 For each exposed component action, you choose which parameters you fix yourself and which the connected agent fills at call time, using the `fromAi(...)` expression - the same mechanism as attaching tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
 
@@ -69,12 +68,12 @@ The switch applies to the whole server, for every connected user. When you edit 
 Each server row has an **Enabled** switch and an ellipsis (⋮) menu:
 
 - **Enable/Disable** -- flip the switch on the row to control availability.
-- **Edit** -- update the server name and authentication toggles.
+- **Edit** -- update the server name.
 - **Delete** -- remove the server (confirmed via an alert dialog).
 
 Tags are edited inline on the server row.
 
-Creating, editing and deleting MCP servers and the workflows they expose requires a tenant admin. Connected users can only switch tools and workflows on or off, and set workflow inputs, for their own integration instances (see [Which tools a user's agent sees](#which-tools-a-users-agent-sees)).
+Administering embedded MCP servers is tenant-admin only: creating, editing and deleting servers, their components, tools and the workflows they expose, and switching a server's tools on or off, all require a tenant admin; editing checks the `MCP_EDIT` permission, which only a tenant admin holds for embedded servers. Connected users can only switch tools and workflows on or off, and set workflow inputs, for their own integration instances (see [Which tools a user's agent sees](#which-tools-a-users-agent-sees)).
 
 ### Filtering MCP Servers
 
@@ -86,26 +85,22 @@ Use the left sidebar to filter the server list:
 
 ### Environment Selection
 
-Use the environment selector in the left sidebar header to switch between environments. MCP server configurations are scoped per environment.
+Use the environment selector in the application sidebar to switch between environments. MCP server configurations are scoped per environment.
 
 ---
 
 ## Connecting to a server
 
-Each server is reachable at `/api/embedded/{secretKey}/mcp`. A request selects the environment with the `X-Environment` header; the tools it sees are scoped to that environment.
+Each server is reachable at `/api/embedded/{secretKey}/mcp`. A request selects the environment with the `X-Environment` header (`PRODUCTION` when omitted); the tools it sees are scoped to that environment.
 
 ### Authentication
 
-The **Require authentication** toggle (set when creating or editing the server) controls what a request must present:
+Each server has a **Require authentication** setting, on for every newly created server:
 
-- **On** (the default for newly created servers) - the request's `Authorization` header must carry one of:
-  - A ByteChef-signed JWT minted with the tenant's signing key. The JWT's `kid` header identifies the tenant and its `sub` claim carries the external user id.
-  - A JWT issued by the tenant's configured external identity provider, via OAuth2 federation.
+- **On** - the request's `Authorization` header must carry a ByteChef-signed JWT minted with the tenant's signing key: its `kid` header identifies the signing key and its `sub` claim carries the external user id. The JWT resolves the caller to a ConnectedUser, created on first use; a disabled ConnectedUser is rejected. A request without a valid JWT is rejected with `401` - an API key is not accepted.
+- **Off** - the endpoint serves the request using the URL secret alone. No credential is required, any token sent is ignored, and no ConnectedUser is resolved. A component tool that needs a connection, and every workflow tool, then fails with an error saying the tool requires a connected user and that authentication must be enabled on the MCP server.
 
-  Either credential resolves the caller to a ConnectedUser.
-- **Off** - the endpoint serves the request using the URL secret alone. No credential is required and no ConnectedUser is resolved, so a tool that needs a connection returns a setup URL instead of executing.
-
-Servers created before this setting existed default to off, so they keep working unchanged.
+Servers created before this setting existed default to off, so they keep working unchanged - except servers that already had **Enforce tool authorization** on, which default to on. The server rejects **Enforce tool authorization** without **Require authentication**, since an anonymous caller has no identity to authorize.
 
 ### When a tool needs the user's account
 
@@ -127,15 +122,15 @@ The message asks the agent to show the link to the user as a markdown link label
 
 Tools you switched off on the server are never listed. A workflow tool is listed only while its workflow is enabled in the instance configuration.
 
-Before a user connects an integration, the server lists every remaining tool it exposes for that integration, and each one returns `connection_required` when called.
+Before a user connects an integration, the server lists every remaining tool it exposes for that integration. Workflow tools, and component tools whose component needs a connection, return `connection_required` when called; a component tool that needs no connection runs directly.
 
-Once the user has connected, the server lists only the tools that user has enabled. Tools start disabled. The user enables them on the **Tools** tab of the Connect dialog, which lists the server's component tools and workflow tools for that integration. The tab appears only when an MCP server exposes something for the integration.
+Once the user has connected, the server lists only the tools that user has enabled, and a workflow tool also needs the user's own instance workflow to be enabled. Tools start disabled. The user enables them on the **Tools** tab of the Connect dialog, which lists the server's component tools and workflow tools for that integration. The list appears only when an MCP server exposes something for the integration; it is shown as a tab when the integration also has regular workflows, and on its own otherwise.
 
 To switch a server's tools off for a single user, use the **MCP Servers** tab in [Connected Users](/platform/embedded/monitor/connected-users#user-details).
 
 ### Workflow tool runs
 
-Calling a workflow tool starts a run of the workflow and waits up to 300 seconds for it to finish. If it does not finish in time, the tool call fails with an error saying the job did not finish within that time.
+Calling a workflow tool starts a run of the workflow and waits up to 300 seconds for it to finish. If it does not finish in time, the tool call fails with an error saying the job did not finish within that time (the message gives the limit in seconds or in milliseconds, depending on the workflow).
 
 When the run finishes, the tool returns the workflow's output. A failed run returns its error. A run that stops before it finishes returns its `jobId` and a `status`:
 
