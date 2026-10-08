@@ -700,6 +700,7 @@ include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:plat
 include("server:ee:libs:modules:components:api-platform")
 include("server:ee:libs:modules:components:app-event")
 include("server:ee:libs:modules:components:code-workflow")
+include("server:ee:libs:modules:components:field-mapping")
 include("server:ee:libs:modules:components:request")
 
 include("spring-ai:spring-ai-model-chat-memory-repository-aws")
