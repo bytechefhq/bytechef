@@ -1,0 +1,6 @@
+spring:
+  liquibase:
+    contexts: configuration,connection,user
+
+bytechef:
+  edition: ee
