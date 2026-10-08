@@ -33,6 +33,7 @@ vi.mock('@/shared/stores/useAuthenticationStore', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    EditionType: {CE: 'CE', EE: 'EE'},
     useApplicationInfoStore: vi.fn(),
 }));
 
