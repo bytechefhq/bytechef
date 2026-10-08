@@ -1,0 +1,19 @@
+{
+  "label": "Sync contacts",
+  "inputs": [ {
+    "name": "contactMapping",
+    "label": "Contact Mapping",
+    "type": "field_mapping",
+    "objectName": "Contacts"
+  }, {
+    "name": "accountMapping",
+    "label": "Account Mapping",
+    "type": "field_mapping",
+    "objectName": "Accounts"
+  }, {
+    "name": "apiKey",
+    "label": "API Key",
+    "type": "string"
+  } ],
+  "tasks": [ ]
+}

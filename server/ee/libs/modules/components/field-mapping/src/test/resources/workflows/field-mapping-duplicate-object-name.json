@@ -1,0 +1,15 @@
+{
+  "label": "Sync contacts",
+  "inputs": [ {
+    "name": "contactMapping",
+    "label": "Contact Mapping",
+    "type": "field_mapping",
+    "objectName": "Contacts"
+  }, {
+    "name": "contactMapping2",
+    "label": "Contact Mapping 2",
+    "type": "field_mapping",
+    "objectName": "Contacts"
+  } ],
+  "tasks": [ ]
+}
