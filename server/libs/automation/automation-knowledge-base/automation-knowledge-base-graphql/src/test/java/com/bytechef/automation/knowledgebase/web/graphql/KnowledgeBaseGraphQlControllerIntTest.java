@@ -25,6 +25,7 @@ import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade
 import com.bytechef.automation.knowledgebase.web.graphql.config.AutomationKnowledgeBaseGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.knowledgebase.web.graphql.config.AutomationKnowledgeBaseGraphQlTestConfiguration;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
@@ -62,6 +63,9 @@ import org.springframework.test.context.ContextConfiguration;
     })
 @AutomationKnowledgeBaseGraphQlConfigurationSharedMocks
 class KnowledgeBaseGraphQlControllerIntTest {
+
+    @Autowired
+    private EmbeddingProviderStatusProvider embeddingProviderStatusProvider;
 
     @Autowired
     private GraphQlTester graphQlTester;
@@ -240,6 +244,38 @@ class KnowledgeBaseGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(workspaceKnowledgeBaseFacade).deleteWorkspaceKnowledgeBase(knowledgeBaseId);
+    }
+
+    @Test
+    void testKnowledgeBaseEmbeddingActiveReturnsTheProviderStatus() {
+        when(embeddingProviderStatusProvider.isEmbeddingActive(2)).thenReturn(true);
+
+        this.graphQlTester
+            .document("""
+                query {
+                    knowledgeBaseEmbeddingActive(environment: 2)
+                }
+                """)
+            .execute()
+            .path("knowledgeBaseEmbeddingActive")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+    }
+
+    @Test
+    void testKnowledgeBaseEmbeddingInactiveWithoutADefaultEmbeddingProvider() {
+        when(embeddingProviderStatusProvider.isEmbeddingActive(1)).thenReturn(false);
+
+        this.graphQlTester
+            .document("""
+                query {
+                    knowledgeBaseEmbeddingActive(environment: 1)
+                }
+                """)
+            .execute()
+            .path("knowledgeBaseEmbeddingActive")
+            .entity(Boolean.class)
+            .isEqualTo(false);
     }
 
     @Test

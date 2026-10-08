@@ -17,6 +17,7 @@
 package com.bytechef.automation.knowledgebase.web.graphql.config;
 
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
@@ -38,7 +39,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    EnvironmentService.class, KnowledgeBaseDocumentChunkFacade.class, KnowledgeBaseDocumentFacade.class,
+    EmbeddingProviderStatusProvider.class, EnvironmentService.class, KnowledgeBaseDocumentChunkFacade.class,
+    KnowledgeBaseDocumentFacade.class,
     KnowledgeBaseDocumentService.class, KnowledgeBaseFacade.class, KnowledgeBaseService.class,
     TagService.class, WorkspaceKnowledgeBaseFacade.class
 })
