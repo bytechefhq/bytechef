@@ -270,18 +270,12 @@ class ConnectionFacadeIntTest {
 
         connection2.setComponentName("componentName2");
         connection2.setName("name");
-        connection2.setShared(true);
         connection2.setType(PlatformType.AUTOMATION);
 
         connection2 = connectionRepository.save(connection2);
 
         connectionDTOs = connectionFacade.getConnections(null, null, List.of(), null, null, PlatformType.AUTOMATION);
 
-        // ConnectionFacadeImpl#getConnections now returns a degraded placeholder DTO for connections whose
-        // component definition cannot be resolved (see buildDegradedConnectionDTO). Previously these rows were
-        // filtered out via `filter(Objects::nonNull)`, which made failing rows invisible to admins — they
-        // could not tell a mapping failure from a missing connection. The second row therefore surfaces with
-        // active=false, componentName preserved, and a suffixed name like "[unavailable: IllegalArgumentException]".
         Assertions.assertThat(connectionDTOs)
             .hasSize(2);
 
@@ -303,8 +297,7 @@ class ConnectionFacadeIntTest {
             .hasFieldOrPropertyWithValue("active", false)
             .hasFieldOrPropertyWithValue("componentName", "componentName2")
             .hasFieldOrPropertyWithValue("id", connection2.getId())
-            .hasFieldOrPropertyWithValue("name", "name [unavailable: IllegalArgumentException]")
-            .hasFieldOrPropertyWithValue("shared", true);
+            .hasFieldOrPropertyWithValue("name", "name [unavailable: IllegalArgumentException]");
     }
 
     @Test

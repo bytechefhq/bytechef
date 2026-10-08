@@ -18,20 +18,28 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationCategoryFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CategoryModel;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -45,11 +53,40 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@Disabled
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
 @WebMvcTest(value = IntegrationApiController.class)
 @EmbeddedConfigurationRestConfigurationSharedMocks
-public class CategoryApiControllerIntTest {
+class CategoryApiControllerIntTest {
+
+    @MockitoBean
+    private AppEventFacade appEventFacade;
+
+    @MockitoBean
+    private AppEventService appEventService;
+
+    @MockitoBean
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @MockitoBean
+    private ConnectedUserProjectFacade connectedUserProjectFacade;
+
+    @MockitoBean
+    private EnvironmentService environmentService;
+
+    @MockitoBean
+    private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
+
+    @MockitoBean
+    private IntegrationService integrationService;
+
+    @MockitoBean
+    private IntegrationWorkflowFacade integrationWorkflowFacade;
+
+    @MockitoBean
+    private WorkflowFacade workflowFacade;
+
+    @MockitoBean
+    private WorkflowService workflowService;
 
     @MockitoBean
     private CategoryService categoryService;
@@ -57,7 +94,7 @@ public class CategoryApiControllerIntTest {
     @MockitoBean
     private IntegrationFacade integrationFacade;
 
-    @MockitoBean
+    @Autowired
     private IntegrationCategoryFacade integrationCategoryFacade;
 
     @MockitoBean
@@ -82,21 +119,17 @@ public class CategoryApiControllerIntTest {
     }
 
     @Test
-    public void testGetIntegrationCategories() {
-        try {
-            when(integrationCategoryFacade.getIntegrationCategories()).thenReturn(List.of(new Category(1, "name")));
+    void testGetIntegrationCategories() {
+        when(integrationCategoryFacade.getIntegrationCategories()).thenReturn(List.of(new Category(1, "name")));
 
-            this.webTestClient
-                .get()
-                .uri("/internal/integrations/categories")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(CategoryModel.class)
-                .hasSize(1);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .get()
+            .uri("/internal/integrations/categories")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(CategoryModel.class)
+            .hasSize(1);
     }
 }

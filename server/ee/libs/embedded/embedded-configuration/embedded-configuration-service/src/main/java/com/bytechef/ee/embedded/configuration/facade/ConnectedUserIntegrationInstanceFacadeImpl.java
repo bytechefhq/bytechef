@@ -19,8 +19,8 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
-import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +28,9 @@ import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,7 +121,7 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
             .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
 
         Optional<String> externalUserId = SecurityUtils.fetchCurrentUserLogin();
-        Optional<Long> principalEnvironmentId = PrincipalEnvironment.fetchCurrentPrincipalEnvironmentId();
+        Optional<Long> principalEnvironmentId = fetchCurrentPrincipalEnvironmentId();
 
         if (externalUserId.isEmpty() || principalEnvironmentId.isEmpty() ||
             principalEnvironmentId.get() != integrationInstanceConfiguration.getEnvironmentId() ||
@@ -150,6 +153,19 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
 
         integrationInstanceFacade.enableIntegrationInstanceWorkflow(
             id, integrationWorkflowService.getWorkflowId(id, workflowUuid), enable);
+    }
+
+    public static Optional<Long> fetchCurrentPrincipalEnvironmentId() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        Authentication authentication = securityContext.getAuthentication();
+
+        if (!(authentication instanceof AbstractApiKeyAuthenticationToken apiKeyAuthenticationToken)) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(
+            apiKeyAuthenticationToken.getEnvironmentId() == -1 ? null : apiKeyAuthenticationToken.getEnvironmentId());
     }
 
     private boolean isOwnedByConnectedUser(String externalUserId, long id, IntegrationInstance integrationInstance) {

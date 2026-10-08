@@ -20,22 +20,31 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationTagFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.Iterator;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +59,40 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@Disabled
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
 @WebMvcTest(value = IntegrationApiController.class)
 @EmbeddedConfigurationRestConfigurationSharedMocks
-public class IntegrationTagApiControllerIntTest {
+class IntegrationTagApiControllerIntTest {
+
+    @MockitoBean
+    private AppEventFacade appEventFacade;
+
+    @MockitoBean
+    private AppEventService appEventService;
+
+    @MockitoBean
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @MockitoBean
+    private ConnectedUserProjectFacade connectedUserProjectFacade;
+
+    @MockitoBean
+    private EnvironmentService environmentService;
+
+    @MockitoBean
+    private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
+
+    @MockitoBean
+    private IntegrationService integrationService;
+
+    @MockitoBean
+    private IntegrationWorkflowFacade integrationWorkflowFacade;
+
+    @MockitoBean
+    private WorkflowFacade workflowFacade;
+
+    @MockitoBean
+    private WorkflowService workflowService;
 
     @MockitoBean
     private CategoryService categoryService;
@@ -68,7 +106,7 @@ public class IntegrationTagApiControllerIntTest {
     @MockitoBean
     private IntegrationInstanceService integrationInstanceService;
 
-    @MockitoBean
+    @Autowired
     private IntegrationTagFacade integrationTagFacade;
 
     @Autowired
@@ -87,46 +125,38 @@ public class IntegrationTagApiControllerIntTest {
     }
 
     @Test
-    public void testGetIntegrationTags() {
+    void testGetIntegrationTags() {
         when(integrationTagFacade.getIntegrationTags()).thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
-        try {
-            this.webTestClient
-                .get()
-                .uri("/internal/integrations/tags")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.[0].id")
-                .isEqualTo(1)
-                .jsonPath("$.[1].id")
-                .isEqualTo(2)
-                .jsonPath("$.[0].name")
-                .isEqualTo("tag1")
-                .jsonPath("$.[1].name")
-                .isEqualTo("tag2");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .get()
+            .uri("/internal/integrations/tags")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.[0].id")
+            .isEqualTo(1)
+            .jsonPath("$.[1].id")
+            .isEqualTo(2)
+            .jsonPath("$.[0].name")
+            .isEqualTo("tag1")
+            .jsonPath("$.[1].name")
+            .isEqualTo("tag2");
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testPutIntegrationTags() {
-        try {
-            this.webTestClient
-                .put()
-                .uri("/internal/integrations/1/tags")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+    void testPutIntegrationTags() {
+        this.webTestClient
+            .put()
+            .uri("/internal/integrations/1/tags")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful();
 
         ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 

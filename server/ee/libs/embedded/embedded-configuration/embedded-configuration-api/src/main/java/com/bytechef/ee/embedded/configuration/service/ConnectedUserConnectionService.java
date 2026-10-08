@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.service;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @version ee
@@ -21,4 +22,8 @@ public interface ConnectedUserConnectionService {
     void deleteByConnectionId(long connectionId);
 
     List<Long> getConnectionIds(long connectedUserId);
+
+    Set<Long> getSharedConnectionIds();
+
+    void updateShared(long connectionId, boolean shared);
 }

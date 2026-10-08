@@ -8,13 +8,13 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceAdminFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,13 +30,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class IntegrationInstanceApiController implements IntegrationInstanceApi {
 
     private final ConversionService conversionService;
+    private final IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
     private final IntegrationInstanceFacade integrationInstanceFacade;
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceApiController(
-        ConversionService conversionService, IntegrationInstanceFacade integrationInstanceFacade) {
+        ConversionService conversionService, IntegrationInstanceAdminFacade integrationInstanceAdminFacade,
+        IntegrationInstanceFacade integrationInstanceFacade) {
 
         this.conversionService = conversionService;
+        this.integrationInstanceAdminFacade = integrationInstanceAdminFacade;
         this.integrationInstanceFacade = integrationInstanceFacade;
     }
 
@@ -57,9 +60,8 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> enableIntegrationInstanceWorkflow(Long id, String workflowId, Boolean enable) {
-        integrationInstanceFacade.enableIntegrationInstanceWorkflow(id, workflowId, enable);
+        integrationInstanceAdminFacade.enableIntegrationInstanceWorkflow(id, workflowId, enable);
 
         return ResponseEntity.ok()
             .build();

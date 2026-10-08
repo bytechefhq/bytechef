@@ -16,10 +16,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublisher;
-import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
-import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,9 +54,6 @@ class PreAuthorizeProxyEnforcementIntTest {
 
     @Autowired
     private GuardedResourceOwnerReads guardedResourceOwnerReads;
-
-    @Autowired
-    private WorkspaceUserService workspaceUserService;
 
     @BeforeEach
     void authenticateAsNonAdmin() {
@@ -119,42 +114,15 @@ class PreAuthorizeProxyEnforcementIntTest {
         guardedProjectMutations.getProject(1L);
     }
 
-    @Test
-    void testRealWorkspaceUserServiceImplEnforcesAddWorkspaceUser() {
-        assertThatThrownBy(() -> workspaceUserService.addWorkspaceUser(2L, 1L, WorkspaceRole.VIEWER))
-            .isInstanceOf(AccessDeniedException.class);
-    }
-
-    @Test
-    void testRealWorkspaceUserServiceImplEnforcesRemoveWorkspaceUser() {
-        assertThatThrownBy(() -> workspaceUserService.removeWorkspaceUser(2L, 1L))
-            .isInstanceOf(AccessDeniedException.class);
-    }
-
-    @Test
-    void testRealWorkspaceUserServiceImplEnforcesUpdateWorkspaceUserRole() {
-        assertThatThrownBy(
-            () -> workspaceUserService.updateWorkspaceUserRole(2L, 1L, WorkspaceRole.VIEWER))
-                .isInstanceOf(AccessDeniedException.class);
-    }
-
-    @Test
-    void testRealWorkspaceUserServiceImplEnforcesGetWorkspaceWorkspaceUsers() {
-        assertThatThrownBy(() -> workspaceUserService.getWorkspaceWorkspaceUsers(1L))
-            .isInstanceOf(AccessDeniedException.class);
-    }
-
     // @SpringBootConfiguration (not @TestConfiguration) because @SpringBootTest(classes = Config.class) requires a
     // primary Spring Boot configuration class; @TestConfiguration is a supplemental config and Spring Boot explicitly
     // rejects it as the primary ("Classes annotated with @TestConfiguration are not considered"). The synthetic
-    // Guarded* stand-ins and the real WorkspaceUserServiceImpl share one context; the mocked PermissionService backs
-    // both.
+    // Guarded* stand-ins share one context backed by the mocked PermissionService.
     @SpringBootConfiguration
     @EnableMethodSecurity
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        GuardedProjectMutations.class, GuardedProjectFacadeReads.class, GuardedResourceOwnerReads.class,
-        WorkspaceUserServiceImpl.class
+        GuardedProjectMutations.class, GuardedProjectFacadeReads.class, GuardedResourceOwnerReads.class
     })
     static class Config {
 
@@ -162,52 +130,51 @@ class PreAuthorizeProxyEnforcementIntTest {
         PermissionService permissionService() {
             return mock(PermissionService.class);
         }
-
-        @Bean
-        WorkspaceUserRepository workspaceUserRepository() {
-            return mock(WorkspaceUserRepository.class);
-        }
-
-        @Bean
-        WorkspaceUserAuditPublisher workspaceUserAuditPublisher() {
-            return mock(WorkspaceUserAuditPublisher.class);
-        }
     }
 
     /**
      * Mirrors the {@code 'Project'} {@code @PreAuthorize} expressions on the project facade/service impls. The
      * evaluator routes the {@code 'Project'} targetType to
      * {@code permissionService.hasWorkspaceScopeForProject(projectId, scope)}, which the mocked
-     * {@link PermissionService} stubs. Kept in sync by {@link PreAuthorizeAnnotationTest}, which pins the expressions
-     * on the production impls. If the production annotation changes without updating this stand-in, the test still
-     * fires the proxy — it just exercises the old expression, so the reflection test in
-     * {@code PreAuthorizeAnnotationTest} is the source of truth for drift.
+     * {@link PermissionService} stubs. The expressions on the production impls are enforced against the real facades by
+     * {@code FacadePreAuthorizeEnforcementIntTest}, which is the source of truth for drift; this stand-in only
+     * exercises the proxy chain.
      */
     @Service
     static class GuardedProjectMutations {
 
+        private final AtomicInteger invocations = new AtomicInteger();
+
         @PreAuthorize("hasPermission(#projectId, 'Project', 'PROJECT_DELETE')")
         public void deleteProject(long projectId) {
+            invocations.incrementAndGet();
         }
 
         @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
         public void getProject(long projectId) {
+            invocations.incrementAndGet();
         }
     }
 
     @Service
     static class GuardedProjectFacadeReads {
 
+        private final AtomicInteger invocations = new AtomicInteger();
+
         @PreAuthorize("isTenantAdmin() or isCurrentUser(#id)")
         public void getUserWorkspaces(long id) {
+            invocations.incrementAndGet();
         }
     }
 
     @Service
     static class GuardedResourceOwnerReads {
 
+        private final AtomicInteger invocations = new AtomicInteger();
+
         @PreAuthorize("isResourceOwner(#id, 'ApiKey')")
         public void getApiKey(long id) {
+            invocations.incrementAndGet();
         }
     }
 }

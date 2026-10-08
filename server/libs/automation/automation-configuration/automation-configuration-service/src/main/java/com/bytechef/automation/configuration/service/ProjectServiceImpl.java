@@ -31,7 +31,6 @@ import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -67,7 +66,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_DELETE')")
     public void delete(long id) {
         projectRepository.deleteById(id);
     }
@@ -155,7 +153,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Project', 'DEPLOYMENT_PUSH')")
     public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = getProject(id);
 
@@ -181,7 +178,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT')")
     public Project update(long id, List<Long> tagIds) {
         Project project = getProject(id);
 
@@ -200,7 +196,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#project.id, 'Project', 'WORKFLOW_EDIT')")
     public Project update(Project project) {
         Assert.notNull(project, "'project' must not be null");
         Assert.notNull(project.getId(), "id");

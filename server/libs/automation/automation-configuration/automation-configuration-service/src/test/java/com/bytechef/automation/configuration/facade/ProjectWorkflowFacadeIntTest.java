@@ -17,8 +17,11 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +39,8 @@ import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.repository.CategoryRepository;
@@ -44,22 +49,32 @@ import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateSummary;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
@@ -101,7 +116,7 @@ public class ProjectWorkflowFacadeIntTest {
     private SharedTemplateService sharedTemplateService;
 
     @MockitoBean
-    private com.bytechef.automation.configuration.service.PreBuiltTemplateService preBuiltTemplateService;
+    private PreBuiltTemplateService preBuiltTemplateService;
 
     private Workspace workspace;
 
@@ -518,5 +533,135 @@ public class ProjectWorkflowFacadeIntTest {
         assertThat(workflow.getTasks())
             .extracting(WorkflowTaskDTO::getName)
             .containsExactlyInAnyOrder("branch_1", "slack_1", "googleMail_1");
+    }
+
+    @Nested
+    @ContextConfiguration(classes = Authorization.MethodSecurityConfiguration.class)
+    class Authorization {
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testDeleteWorkflowIsDeniedWithoutWorkflowScope() {
+            String workflowId = addWorkflow("Delete Denied Project");
+
+            authenticate("user", AuthorityConstants.USER);
+
+            assertThatThrownBy(() -> projectWorkflowFacade.deleteWorkflow(workflowId))
+                .isInstanceOf(AccessDeniedException.class);
+
+            assertThat(workflowRepository.findById(workflowId)).isPresent();
+        }
+
+        @Test
+        void testDeleteWorkflowAllowsTenantAdmin() {
+            String workflowId = addWorkflow("Delete Allowed Project");
+
+            projectWorkflowFacade.deleteWorkflow(workflowId);
+
+            assertThat(workflowRepository.findById(workflowId)).isEmpty();
+        }
+
+        private String addWorkflow(String projectName) {
+            authenticate("admin", AuthorityConstants.ADMIN);
+
+            Project project = new Project();
+
+            project.setName(projectName);
+            project.setWorkspaceId(workspace.getId());
+
+            project = projectRepository.save(project);
+
+            ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
+                project.getId(), "{\"label\":\"" + projectName + " Workflow\",\"tasks\":[]}");
+
+            return projectWorkflow.getWorkflowId();
+        }
+
+        private static void authenticate(String login, String authority) {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(login, "n/a",
+                        List.of(new SimpleGrantedAuthority(authority))));
+        }
+
+        @EnableMethodSecurity
+        static class MethodSecurityConfiguration {
+        }
+    }
+
+    @Nested
+    @ContextConfiguration(classes = PreAuthorizeEnforcement.MethodSecurityConfiguration.class)
+    class PreAuthorizeEnforcement {
+
+        private static final long PROJECT_ID = 11L;
+        private static final String WORKFLOW_ID = "workflow-41";
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            reset(permissionService);
+
+            authenticate(AuthorityConstants.USER);
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testWorkflowWriteMethodsAreProtected() {
+            assertRequiresScope(
+                PROJECT_ID, "Project", "WORKFLOW_CREATE", () -> projectWorkflowFacade.addWorkflow(PROJECT_ID, "{}"));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "WORKFLOW_CREATE",
+                () -> projectWorkflowFacade.duplicateWorkflow(PROJECT_ID, WORKFLOW_ID));
+            assertRequiresScope(
+                WORKFLOW_ID, "Workflow", "WORKFLOW_DELETE", () -> projectWorkflowFacade.deleteWorkflow(WORKFLOW_ID));
+        }
+
+        private void
+            assertRequiresScope(Serializable targetId, String targetType, String scope, ThrowingCallable call) {
+            reset(permissionService);
+
+            assertDenied(call);
+
+            when(permissionService.hasResourceScope(targetId, targetType, scope)).thenReturn(true);
+
+            assertNotDenied(call);
+
+            reset(permissionService);
+        }
+
+        private static void assertDenied(ThrowingCallable call) {
+            assertThatThrownBy(call).isInstanceOf(AccessDeniedException.class);
+        }
+
+        private static void assertNotDenied(ThrowingCallable call) {
+            Throwable throwable = catchThrowable(call);
+
+            assertThat(throwable)
+                .as("Expected the gate to let the call through, but it was denied: %s", throwable)
+                .satisfiesAnyOf(
+                    actual -> assertThat(actual).isNull(),
+                    actual -> assertThat(actual).isNotInstanceOf(AccessDeniedException.class));
+        }
+
+        private static void authenticate(String authority) {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "user", "n/a", List.of(new SimpleGrantedAuthority(authority))));
+        }
+
+        @EnableMethodSecurity
+        static class MethodSecurityConfiguration {
+        }
     }
 }

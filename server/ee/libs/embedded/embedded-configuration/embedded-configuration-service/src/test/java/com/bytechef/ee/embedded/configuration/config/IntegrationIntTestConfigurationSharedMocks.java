@@ -41,6 +41,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
+import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
@@ -86,7 +87,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ProjectDeploymentFacade.class, ProjectDeploymentService.class,
     ProjectDeploymentWorkflowService.class,
     ProjectFacade.class, ProjectService.class, ProjectWorkflowFacade.class, ProjectWorkflowService.class,
-    WorkflowCacheManager.class, WorkflowService.class, WorkflowTestConfigurationFacade.class
+    WebhookTriggerTestFacade.class, WorkflowCacheManager.class, WorkflowService.class,
+    WorkflowTestConfigurationFacade.class
 })
 public @interface IntegrationIntTestConfigurationSharedMocks {
 }
