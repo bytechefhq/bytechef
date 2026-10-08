@@ -152,13 +152,4 @@ public class RemoteProjectServiceClient implements ProjectService {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public Project updatePermissionExpression(long id, String permissionExpression) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Project updateAutomationHubVisible(long id, boolean automationHubVisible) {
-        throw new UnsupportedOperationException();
-    }
 }

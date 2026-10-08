@@ -152,8 +152,4 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public ProjectWorkflow updatePermissionExpression(long id, String permissionExpression) {
-        throw new UnsupportedOperationException();
-    }
 }

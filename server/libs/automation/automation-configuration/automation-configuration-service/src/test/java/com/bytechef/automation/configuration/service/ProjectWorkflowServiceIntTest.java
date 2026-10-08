@@ -128,31 +128,6 @@ class ProjectWorkflowServiceIntTest {
                     newWorkflowId.equals(workflow.getWorkflowId()));
     }
 
-    @Test
-    void testPublishWorkflowKeepsThePermissionExpressionOnThePublishedVersion() {
-        Project project = projectRepository.save(getProject());
-
-        long projectId = Validate.notNull(project.getId(), "id");
-        int initialVersion = project.getLastProjectVersion();
-
-        ProjectWorkflow initialWorkflow = projectWorkflowService.addWorkflow(projectId, initialVersion, "workflow1");
-
-        projectWorkflowService.updatePermissionExpression(
-            Validate.notNull(initialWorkflow.getId(), "id"), "metadata['tier'] == 'pro'");
-
-        ProjectWorkflow workflowToPublish = projectWorkflowService.getProjectWorkflow(initialWorkflow.getId());
-
-        workflowToPublish.setProjectVersion(initialVersion + 1);
-        workflowToPublish.setWorkflowId("workflow1_v2");
-
-        projectWorkflowService.publishWorkflow(projectId, initialVersion, "workflow1", workflowToPublish);
-
-        assertThat(projectWorkflowService.getProjectWorkflows(projectId, initialWorkflow.getUuidAsString()))
-            .hasSize(2)
-            .extracting(ProjectWorkflow::getPermissionExpression)
-            .containsOnly("metadata['tier'] == 'pro'");
-    }
-
     private Project getProject() {
         return Project.builder()
             .description("description")
