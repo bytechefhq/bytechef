@@ -1,0 +1,10 @@
+{
+  "label": "Sync contacts",
+  "inputs": [ {
+    "name": "apiKey",
+    "label": "API Key",
+    "type": "string",
+    "objectName": "Contacts"
+  } ],
+  "tasks": [ ]
+}
