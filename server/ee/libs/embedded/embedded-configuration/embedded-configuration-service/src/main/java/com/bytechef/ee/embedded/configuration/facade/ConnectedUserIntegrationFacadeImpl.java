@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
@@ -68,6 +69,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,6 +81,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
+@SkipAutomationAuthorization
 public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrationFacade {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -90,6 +93,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
+    private final IntegrationInstanceFacade integrationInstanceFacade;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final McpComponentService mcpComponentService;
@@ -113,8 +117,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        McpComponentService mcpComponentService,
+        IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
+        IntegrationService integrationService, McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
@@ -131,6 +135,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
+        this.integrationInstanceFacade = integrationInstanceFacade;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.mcpComponentService = mcpComponentService;
@@ -185,20 +190,27 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     @Override
     public void deleteIntegrationInstance(String externalUserId, long integrationInstanceId) {
-        integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
-
-        IntegrationInstance integrationInstance =
-            integrationInstanceService.getIntegrationInstance(integrationInstanceId);
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstanceId);
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
 
-        connectedUserService.fetchConnectedUser(externalUserId, integrationInstanceConfiguration.getEnvironment())
-            .ifPresent(connectedUser -> {
-                if (Objects.equals(connectedUser.getExternalId(), externalUserId)) {
-                    integrationInstanceService.delete(integrationInstanceId);
-                }
-            });
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+            externalUserId, integrationInstanceConfiguration.getEnvironment());
+
+        if (!Objects.equals(integrationInstance.getConnectedUserId(), connectedUser.getId())) {
+            throw new AccessDeniedException(
+                "Integration instance " + integrationInstanceId + " is not owned by the connected user");
+        }
+
+        if (integrationInstance.isEnabled()) {
+            disableIntegrationInstanceWorkflows(integrationInstanceId);
+        }
+
+        integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
+
+        integrationInstanceService.delete(integrationInstanceId);
     }
 
     @Override
@@ -288,11 +300,11 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .toList();
     }
 
-    boolean isIntegrationVisible(IntegrationDTO integrationDTO, ConnectedUser connectedUser) {
+    private boolean isIntegrationVisible(IntegrationDTO integrationDTO, ConnectedUser connectedUser) {
         return embeddedPermissionEvaluator.evaluate(integrationDTO.permissionExpression(), connectedUser);
     }
 
-    IntegrationInstanceConfigurationDTO filterWorkflows(
+    private IntegrationInstanceConfigurationDTO filterWorkflows(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO, ConnectedUser connectedUser,
         List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows) {
 
@@ -330,6 +342,22 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         return integrationInstanceConfigurationDTO.toBuilder()
             .integrationInstanceConfigurationWorkflows(visibleWorkflows)
             .build();
+    }
+
+    private void disableIntegrationInstanceWorkflows(long integrationInstanceId) {
+        List<IntegrationInstanceWorkflow> integrationInstanceWorkflows = integrationInstanceWorkflowService
+            .getIntegrationInstanceWorkflows(integrationInstanceId);
+
+        for (IntegrationInstanceWorkflow integrationInstanceWorkflow : integrationInstanceWorkflows) {
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                    integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+            if (integrationInstanceConfigurationWorkflow.isEnabled() && integrationInstanceWorkflow.isEnabled()) {
+                integrationInstanceFacade.enableIntegrationInstanceWorkflow(
+                    integrationInstanceId, integrationInstanceConfigurationWorkflow.getWorkflowId(), false);
+            }
+        }
     }
 
     private IntegrationInstanceConfigurationWorkflowDTO resolveComponentInputGroups(

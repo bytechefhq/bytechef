@@ -9,12 +9,17 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,12 +38,15 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 class McpIntegrationInstanceWorkflowApiController {
 
+    private final ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade;
     private final McpIntegrationInstanceWorkflowFacade mcpIntegrationInstanceWorkflowFacade;
 
     @SuppressFBWarnings("EI")
     McpIntegrationInstanceWorkflowApiController(
+        ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade,
         McpIntegrationInstanceWorkflowFacade mcpIntegrationInstanceWorkflowFacade) {
 
+        this.connectedUserIntegrationInstanceFacade = connectedUserIntegrationInstanceFacade;
         this.mcpIntegrationInstanceWorkflowFacade = mcpIntegrationInstanceWorkflowFacade;
     }
 
@@ -47,6 +55,8 @@ class McpIntegrationInstanceWorkflowApiController {
     public ResponseEntity<Void> updateFrontendMcpIntegrationInstanceWorkflow(
         @PathVariable Long id, @PathVariable String workflowUuid,
         @RequestBody UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
+
+        connectedUserIntegrationInstanceFacade.validateIntegrationInstanceOwnership(getCurrentExternalUserId(), id);
 
         mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
             id, workflowUuid, updateFrontendIntegrationInstanceWorkflowRequestModel.getInputs());
@@ -60,7 +70,7 @@ class McpIntegrationInstanceWorkflowApiController {
     public ResponseEntity<Void> enableFrontendMcpIntegrationInstanceWorkflow(
         @PathVariable Long id, @PathVariable String workflowUuid) {
 
-        mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(id, workflowUuid, true);
+        updateMcpIntegrationInstanceWorkflowEnabled(getCurrentExternalUserId(), id, workflowUuid, true);
 
         return ResponseEntity.noContent()
             .build();
@@ -71,31 +81,48 @@ class McpIntegrationInstanceWorkflowApiController {
     public ResponseEntity<Void> disableFrontendMcpIntegrationInstanceWorkflow(
         @PathVariable Long id, @PathVariable String workflowUuid) {
 
-        mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(id, workflowUuid, false);
+        updateMcpIntegrationInstanceWorkflowEnabled(getCurrentExternalUserId(), id, workflowUuid, false);
 
         return ResponseEntity.noContent()
             .build();
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    @PostMapping("/external/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
+    @PostMapping("/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
     public ResponseEntity<Void> enableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
 
-        mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(id, workflowUuid, true);
+        updateMcpIntegrationInstanceWorkflowEnabled(externalUserId, id, workflowUuid, true);
 
         return ResponseEntity.noContent()
             .build();
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    @DeleteMapping("/external/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
+    @DeleteMapping("/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
     public ResponseEntity<Void> disableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
 
-        mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(id, workflowUuid, false);
+        updateMcpIntegrationInstanceWorkflowEnabled(externalUserId, id, workflowUuid, false);
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @ExceptionHandler(EmbeddedIntegrationNotVisibleException.class)
+    public ResponseEntity<Void> handleEmbeddedIntegrationNotVisibleException() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .build();
+    }
+
+    private void updateMcpIntegrationInstanceWorkflowEnabled(
+        String externalUserId, long id, String workflowUuid, boolean enable) {
+
+        connectedUserIntegrationInstanceFacade.validateIntegrationInstanceOwnership(externalUserId, id);
+
+        mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(id, workflowUuid, enable);
+    }
+
+    private static String getCurrentExternalUserId() {
+        return SecurityUtils.fetchCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
     }
 }

@@ -18,10 +18,14 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
+import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -101,6 +105,40 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
             id, integrationWorkflowService.getWorkflowId(id, workflowUuid), inputs);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public void validateCurrentPrincipalIntegrationInstanceOwnership(long id) {
+        if (!ConnectedUserAuthentication.isCurrentPrincipalConnectedUser()) {
+            return;
+        }
+
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(id);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
+
+        Optional<String> externalUserId = SecurityUtils.fetchCurrentUserLogin();
+        Optional<Long> principalEnvironmentId = PrincipalEnvironment.fetchCurrentPrincipalEnvironmentId();
+
+        if (externalUserId.isEmpty() || principalEnvironmentId.isEmpty() ||
+            principalEnvironmentId.get() != integrationInstanceConfiguration.getEnvironmentId() ||
+            !isOwnedByConnectedUser(
+                externalUserId.get(), id, integrationInstance, integrationInstanceConfiguration)) {
+
+            throw new EmbeddedIntegrationNotVisibleException(id);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateIntegrationInstanceOwnership(String externalUserId, long id) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(id);
+
+        if (!isOwnedByConnectedUser(externalUserId, id, integrationInstance)) {
+            throw new EmbeddedIntegrationNotVisibleException(id);
+        }
+    }
+
     private void enableIntegrationInstanceWorkflow(
         String externalUserId, long id, String workflowUuid, boolean enable) {
 
@@ -114,14 +152,16 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
             id, integrationWorkflowService.getWorkflowId(id, workflowUuid), enable);
     }
 
-    /**
-     * Resolves the connected user for the request and verifies it owns the given integration instance. Fails closed: an
-     * absent connected user (no row for the instance's environment) is treated as not-owned, and the null/null id case
-     * never grants access. Denials are logged with the instance id plus owning and resolved connected-user ids.
-     */
     private boolean isOwnedByConnectedUser(String externalUserId, long id, IntegrationInstance integrationInstance) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
+
+        return isOwnedByConnectedUser(externalUserId, id, integrationInstance, integrationInstanceConfiguration);
+    }
+
+    private boolean isOwnedByConnectedUser(
+        String externalUserId, long id, IntegrationInstance integrationInstance,
+        IntegrationInstanceConfiguration integrationInstanceConfiguration) {
 
         Long owningConnectedUserId = integrationInstance.getConnectedUserId();
 
