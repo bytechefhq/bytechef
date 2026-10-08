@@ -22,6 +22,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Locator;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -30,6 +33,8 @@ import org.springframework.security.core.Authentication;
  * @author Ivica Cardic
  */
 class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
+
+    private static final Pattern SECRET_KEY_PATH_PATTERN = Pattern.compile("^/api/embedded/(.+)/mcp");
 
     private final SigningKeyService signingKeyService;
 
@@ -40,11 +45,15 @@ class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthe
     @Override
     @Nullable
     public Authentication convert(HttpServletRequest request) {
-        String authToken = getAuthToken(request);
-
+        String mcpServerSecretKey = getMcpServerSecretKey(request);
         Environment environment = getEnvironment(request);
 
-        Jws<Claims> jws = getJws(authToken, environment.ordinal());
+        Jws<Claims> jws = fetchJws(fetchAuthToken(request), environment.ordinal());
+
+        if (jws == null) {
+            return new EmbeddedMcpServerApiKeyAuthenticationToken(
+                environment.ordinal(), null, getTenantId(mcpServerSecretKey), mcpServerSecretKey);
+        }
 
         Claims payload = jws.getPayload();
 
@@ -55,7 +64,40 @@ class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthe
         TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
         return new EmbeddedMcpServerApiKeyAuthenticationToken(
-            environment.ordinal(), externalUserId, tenantKey.getTenantId());
+            environment.ordinal(), externalUserId, tenantKey.getTenantId(), mcpServerSecretKey);
+    }
+
+    @Nullable
+    private Jws<Claims> fetchJws(@Nullable String authToken, long environmentId) {
+        if (authToken == null) {
+            return null;
+        }
+
+        try {
+            return getJws(authToken, environmentId);
+        } catch (RuntimeException runtimeException) {
+            return null;
+        }
+    }
+
+    private static String getMcpServerSecretKey(HttpServletRequest request) {
+        Matcher matcher = SECRET_KEY_PATH_PATTERN.matcher(request.getServletPath());
+
+        if (!matcher.matches()) {
+            throw new BadCredentialsException("Invalid MCP server secret key");
+        }
+
+        return matcher.group(1);
+    }
+
+    private static String getTenantId(String mcpServerSecretKey) {
+        try {
+            TenantKey tenantKey = TenantKey.parse(mcpServerSecretKey);
+
+            return tenantKey.getTenantId();
+        } catch (RuntimeException runtimeException) {
+            throw new BadCredentialsException("Invalid MCP server secret key", runtimeException);
+        }
     }
 
     private Jws<Claims> getJws(String secretKey, long environmentId) {

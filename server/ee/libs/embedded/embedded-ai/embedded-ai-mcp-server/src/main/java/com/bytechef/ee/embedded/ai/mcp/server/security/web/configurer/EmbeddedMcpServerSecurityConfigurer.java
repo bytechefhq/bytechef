@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer;
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerApiKeyAuthenticationProvider;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
+import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
@@ -24,12 +25,13 @@ public class EmbeddedMcpServerSecurityConfigurer extends AbstractApiKeyHttpConfi
     private static final String PATH_PATTERN = "^/api/embedded/.+/mcp";
 
     public EmbeddedMcpServerSecurityConfigurer(
-        ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
+        ConnectedUserService connectedUserService, McpServerService mcpServerService,
+        SigningKeyService signingKeyService) {
 
         super(
             PATH_PATTERN,
             new EmbeddedMcpServerApiKeyAuthenticationConverter(signingKeyService),
-            new EmbeddedMcpServerApiKeyAuthenticationProvider(connectedUserService));
+            new EmbeddedMcpServerApiKeyAuthenticationProvider(connectedUserService, mcpServerService));
     }
 
     @Override
