@@ -4,4 +4,6 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
 
     implementation(project(":server:ee:libs:core:remote:remote-client"))
+
+    testImplementation(project(":server:libs:core:tenant:tenant-api"))
 }
