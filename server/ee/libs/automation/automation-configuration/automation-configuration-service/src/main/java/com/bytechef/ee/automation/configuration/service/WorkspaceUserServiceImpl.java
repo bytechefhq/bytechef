@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +53,6 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')")
     public WorkspaceUser addWorkspaceUser(long userId, long workspaceId, WorkspaceRole workspaceRole) {
         Optional<WorkspaceUser> existing = workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId);
 
@@ -102,14 +100,12 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_VIEW')")
     @Transactional(readOnly = true)
     public List<WorkspaceUser> getWorkspaceWorkspaceUsers(long workspaceId) {
         return workspaceUserRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')")
     public boolean removeWorkspaceUser(long userId, long workspaceId) {
         WorkspaceUser workspaceUser = workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
             .orElseThrow(() -> new ConfigurationException(
@@ -135,7 +131,6 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')")
     public WorkspaceUser updateWorkspaceUserRole(long userId, long workspaceId, WorkspaceRole workspaceRole) {
         WorkspaceUser workspaceUser = workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
             .orElseThrow(() -> new ConfigurationException(

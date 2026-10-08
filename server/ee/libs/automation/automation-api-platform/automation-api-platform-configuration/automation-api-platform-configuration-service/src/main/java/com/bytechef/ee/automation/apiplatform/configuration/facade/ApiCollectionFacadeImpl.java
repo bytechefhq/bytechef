@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -101,6 +102,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#apiCollectionDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
     public ApiCollectionDTO createApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
 

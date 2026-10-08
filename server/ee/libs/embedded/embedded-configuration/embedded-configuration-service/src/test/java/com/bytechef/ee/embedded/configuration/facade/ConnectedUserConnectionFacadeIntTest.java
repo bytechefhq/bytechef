@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -25,11 +26,14 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.repository.ConnectedUserSharedConnectionRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -37,6 +41,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -74,18 +79,35 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @version ee
@@ -129,6 +151,9 @@ class ConnectedUserConnectionFacadeIntTest {
     private ConnectedUserConnectionService connectedUserConnectionService;
 
     @Autowired
+    private ConnectedUserSharedConnectionRepository connectedUserSharedConnectionRepository;
+
+    @Autowired
     private ConnectedUserService connectedUserService;
 
     @Autowired
@@ -146,11 +171,13 @@ class ConnectedUserConnectionFacadeIntTest {
     @Autowired
     private IntegrationService integrationService;
 
-    /**
-     * {@code connectionIds} is a caller assertion the server cannot verify, so it may only narrow the connected user's
-     * entitled set (own connections plus shared ones in their environment), never widen it. The entitled set is
-     * resolved by the real {@code ConnectedUserConnectionMembership} over persisted connected_user_connection rows.
-     */
+    private final Map<Long, Connection> sharedConnections = new HashMap<>();
+
+    @AfterEach
+    void afterEach() {
+        connectedUserSharedConnectionRepository.deleteAll();
+    }
+
     @Test
     void testGetConnectionsNarrowsToTheRequestedEntitledConnectionIds() {
         ConnectedUser connectedUser = connectedUserService.createConnectedUser(
@@ -165,12 +192,7 @@ class ConnectedUserConnectionFacadeIntTest {
         connectedUserConnectionService.create(connectedUserId, ownedConnectionAId);
         connectedUserConnectionService.create(connectedUserId, ownedConnectionBId);
 
-        Connection sharedConnection = new Connection();
-
-        sharedConnection.setId(sharedConnectionId);
-
-        when(connectionService.getSharedConnections(Environment.PRODUCTION.ordinal(), PlatformType.EMBEDDED))
-            .thenReturn(List.of(sharedConnection));
+        stubSharedConnections(Environment.PRODUCTION, sharedConnectionId);
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED)))
             .thenAnswer(invocation -> {
                 List<Long> requestedConnectionIds = invocation.getArgument(0);
@@ -197,13 +219,6 @@ class ConnectedUserConnectionFacadeIntTest {
             .isEmpty();
     }
 
-    /**
-     * The connection-enumeration hole this facade used to have. {@code connectionIds} carries the host's
-     * {@code sharedConnectionIds} by way of the browser, so it is a caller assertion the server cannot verify; it was
-     * added to the lookup unconditionally, which let a connected user read any embedded connection in the tenant by
-     * guessing its id. {@code connectionIds} may now only narrow the entitled set, so ids the user does not own select
-     * nothing.
-     */
     @Test
     void testGetConnectionsNeverAddsRequestedConnectionIdsTheUserDoesNotOwn() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
@@ -223,10 +238,6 @@ class ConnectedUserConnectionFacadeIntTest {
         assertThat(captor.getValue()).isEmpty();
     }
 
-    /**
-     * The dedup must not change what the caller receives. Whether or not this connected user has already been warned
-     * about, every request still drops the ids they do not own -- the log is a migration signal, never the mechanism.
-     */
     @Test
     void testGetConnectionsIgnoresUnownedIdsOnEveryCallNotJustTheFirst() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
@@ -267,11 +278,6 @@ class ConnectedUserConnectionFacadeIntTest {
         assertThat(captor.getValue()).containsExactlyInAnyOrder(82210L, 82211L);
     }
 
-    /**
-     * The case this ticket restores. A connection a tenant admin marked {@code shared} is entitled to every connected
-     * user in the environment -- that is what a shared connection is now -- so the picker must list it even though it
-     * is on neither the user's own instance nor their own connections.
-     */
     @Test
     void testGetConnectionsIncludesConnectionsMarkedShared() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
@@ -280,8 +286,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
         connectedUserConnectionService.create(connectedUserId, 82311L);
 
-        when(connectionService.getSharedConnections(Environment.PRODUCTION.ordinal(), PlatformType.EMBEDDED))
-            .thenReturn(List.of(connection(82312L)));
+        stubSharedConnections(Environment.PRODUCTION, 82312L);
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED))).thenReturn(List.of());
 
         connectedUserConnectionFacade.getConnections(connectedUserId, null, List.of());
@@ -293,11 +298,6 @@ class ConnectedUserConnectionFacadeIntTest {
         assertThat(captor.getValue()).containsExactlyInAnyOrder(82310L, 82311L, 82312L);
     }
 
-    /**
-     * The environment axis. Source 3 applies {@code environment.ordinal()} in its own query, so a shared connection
-     * from another environment is never included -- the door this ticket must not reopen. The connected user also has
-     * an instance under a PRODUCTION configuration, which the DEVELOPMENT-scoped instance lookup must leave out.
-     */
     @Test
     void testGetConnectionsNeverIncludesASharedConnectionFromAnotherEnvironment() {
         long connectedUserId = createConnectedUser(Environment.DEVELOPMENT);
@@ -305,10 +305,8 @@ class ConnectedUserConnectionFacadeIntTest {
         createIntegrationInstance(connectedUserId, 82410L, Environment.DEVELOPMENT);
         createIntegrationInstance(connectedUserId, 82414L, Environment.PRODUCTION);
 
-        when(connectionService.getSharedConnections(Environment.DEVELOPMENT.ordinal(), PlatformType.EMBEDDED))
-            .thenReturn(List.of(connection(82412L)));
-        when(connectionService.getSharedConnections(Environment.PRODUCTION.ordinal(), PlatformType.EMBEDDED))
-            .thenReturn(List.of(connection(82413L)));
+        stubSharedConnections(Environment.DEVELOPMENT, 82412L);
+        stubSharedConnections(Environment.PRODUCTION, 82413L);
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED))).thenReturn(List.of());
 
         connectedUserConnectionFacade.getConnections(connectedUserId, null, List.of());
@@ -318,27 +316,16 @@ class ConnectedUserConnectionFacadeIntTest {
         verify(connectionFacade).getConnections(captor.capture(), eq(PlatformType.EMBEDDED));
 
         assertThat(captor.getValue()).containsExactlyInAnyOrder(82410L, 82412L);
-
-        verify(connectionService, never())
-            .getSharedConnections(Environment.PRODUCTION.ordinal(), PlatformType.EMBEDDED);
     }
 
-    /**
-     * Entitlement is not ownership. A shared connection is listed, but it belongs to the tenant admin who marked it
-     * shared and is entitled to every connected user in the environment, so an end user must not be able to delete or
-     * reauthorize it out from under the others.
-     */
     @Test
     void testSharedConnectionIsListedButNotMutable() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
 
         createIntegrationInstance(connectedUserId, 82510L, Environment.PRODUCTION);
 
-        when(connectionService.getSharedConnections(Environment.PRODUCTION.ordinal(), PlatformType.EMBEDDED))
-            .thenReturn(List.of(connection(82512L)));
+        stubSharedConnections(Environment.PRODUCTION, 82512L);
 
-        // Echoes back only the ids it is asked for: requireOwned narrows the lookup to the OWNED subset, and a stub
-        // that answered the same list regardless would hide exactly the narrowing this test is about.
         stubEchoingConnectionFacade();
 
         assertThat(connectedUserConnectionFacade.getConnections(connectedUserId, null, List.of()))
@@ -352,14 +339,6 @@ class ConnectedUserConnectionFacadeIntTest {
         verify(connectionFacade, never()).delete(any());
     }
 
-    /**
-     * getConnections no longer narrows the INSTANCE query by component name -- it queries the caller's instances for
-     * the environment and lets the surviving exact-match filter on {@code connectionDTO.componentName()} do the work.
-     * The two filters are on different columns ({@code integration.component_name} vs the connection's own component),
-     * and the argument that the change is output-preserving rests on the removed one being strictly looser, so this
-     * exercises the case that would expose it: a second instance belonging to a DIFFERENT integration, whose connection
-     * must not appear in a component-scoped listing even though a shared connection is present too.
-     */
     @Test
     void testGetConnectionsFiltersOutAnotherIntegrationsConnectionByComponentName() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
@@ -367,8 +346,7 @@ class ConnectedUserConnectionFacadeIntTest {
         createIntegrationInstance(connectedUserId, 82610L, Environment.PRODUCTION);
         createIntegrationInstance(connectedUserId, 82620L, Environment.PRODUCTION);
 
-        when(connectionService.getSharedConnections(Environment.PRODUCTION.ordinal(), PlatformType.EMBEDDED))
-            .thenReturn(List.of(connection(82630L)));
+        stubSharedConnections(Environment.PRODUCTION, 82630L);
 
         ConnectionDTO slackConnectionDTO = ConnectionDTO.builder()
             .id(82610L)
@@ -411,32 +389,20 @@ class ConnectedUserConnectionFacadeIntTest {
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).containsExactly(82705L);
     }
 
-    /**
-     * The security boundary this facade owns. A connected user who could mark their own connection shared would hand
-     * their credentials to every other connected user in the environment, so {@code shared} is forced off regardless of
-     * what the request body carries.
-     */
     @Test
-    void testCreateConnectedUserConnectionForcesSharedFalse() {
+    void testCreateConnectedUserConnectionIsNeverShared() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
 
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("slack")
             .name("My Slack")
-            .shared(true)
             .build();
 
         when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED))).thenReturn(82842L);
 
         connectedUserConnectionFacade.createConnectedUserConnection(connectedUserId, connectionDTO);
 
-        ArgumentCaptor<ConnectionDTO> connectionDTOArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
-
-        verify(connectionFacade).create(connectionDTOArgumentCaptor.capture(), eq(PlatformType.EMBEDDED));
-
-        ConnectionDTO capturedConnectionDTO = connectionDTOArgumentCaptor.getValue();
-
-        assertThat(capturedConnectionDTO.shared()).isFalse();
+        assertThat(connectedUserConnectionService.getSharedConnectionIds()).doesNotContain(82842L);
     }
 
     @Test
@@ -507,10 +473,6 @@ class ConnectedUserConnectionFacadeIntTest {
         verify(connectionFacade, never()).delete(any());
     }
 
-    /**
-     * The connected-user link must be gone by the time the platform connection is deleted, so the stubbed
-     * {@code ConnectionFacade#delete} reads the persisted rows at the moment it is called.
-     */
     @Test
     void testDeleteConnectedUserConnectionDelegates() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
@@ -568,12 +530,6 @@ class ConnectedUserConnectionFacadeIntTest {
         verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
     }
 
-    /**
-     * A shared connection is entitled -- {@code getConnections} must list it -- but never owned, since
-     * {@code ConnectedUserConnectionMembership#getOwnedConnectionIds} structurally excludes source 3. The listing
-     * assertion lives in this same test deliberately: it proves id 83550 genuinely went through source 3 rather than
-     * merely resembling the pre-existing foreign-id case.
-     */
     @Test
     void testDeleteConnectedUserConnectionRefusesSharedConnection() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
@@ -591,10 +547,6 @@ class ConnectedUserConnectionFacadeIntTest {
         verify(connectionFacade, never()).delete(any());
     }
 
-    /**
-     * The reauthorize counterpart of {@link #testDeleteConnectedUserConnectionRefusesSharedConnection}: the same
-     * shared, entitled-but-unowned connection must be refused here too.
-     */
     @Test
     void testReauthorizeConnectedUserConnectionRefusesSharedConnection() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
@@ -627,10 +579,6 @@ class ConnectedUserConnectionFacadeIntTest {
         return connectedUser.getId();
     }
 
-    /**
-     * Persists an integration instance for {@code connectedUserId} under its own integration and integration instance
-     * configuration in {@code environment}, so each instance belongs to a different integration.
-     */
     private void createIntegrationInstance(long connectedUserId, long connectionId, Environment environment) {
         String componentName = "integration-" + UUID.randomUUID();
 
@@ -655,11 +603,6 @@ class ConnectedUserConnectionFacadeIntTest {
         integrationInstanceService.create(connectedUserId, connectionId, integrationInstanceConfiguration.getId());
     }
 
-    /**
-     * Persists the connection-id sources that {@code requireOwned} walks for {@code connectedUserId}:
-     * {@code connectedUserConnectionIds} as connected-user-linked connections and
-     * {@code integrationInstanceConnectionIds} as the connections of PRODUCTION integration instances.
-     */
     private void createOwnership(
         long connectedUserId, List<Long> connectedUserConnectionIds, List<Long> integrationInstanceConnectionIds) {
 
@@ -672,11 +615,6 @@ class ConnectedUserConnectionFacadeIntTest {
         }
     }
 
-    /**
-     * Makes {@code connectionFacade.getConnections} echo back one {@link ConnectionDTO} per requested id, so both the
-     * entitled-ids lookup in {@code getConnections} and the owned-ids lookup in {@code requireOwned} resolve against
-     * the ids they were actually called with, rather than a fixed canned list.
-     */
     private void stubEchoingConnectionFacade() {
         when(connectionFacade.getConnections(any(), eq(PlatformType.EMBEDDED)))
             .thenAnswer(invocation -> {
@@ -690,10 +628,6 @@ class ConnectedUserConnectionFacadeIntTest {
             });
     }
 
-    /**
-     * Stubs {@code connectionFacade.getConnections} with one {@link ConnectionDTO} per owned id, so
-     * {@code requireOwned}'s membership check resolves.
-     */
     private void stubOwnedConnectionDTOs(List<Long> ownedConnectionIds) {
         List<ConnectionDTO> ownedConnectionDTOs = ownedConnectionIds.stream()
             .map(connectionId -> ConnectionDTO.builder()
@@ -704,20 +638,292 @@ class ConnectedUserConnectionFacadeIntTest {
         when(connectionFacade.getConnections(any(), eq(PlatformType.EMBEDDED))).thenReturn(ownedConnectionDTOs);
     }
 
-    /**
-     * Marks connection {@code connectionId} shared for the PRODUCTION environment (source 3 of
-     * {@code ConnectedUserConnectionMembership}) and makes {@code connectionFacade.getConnections} echo back the ids it
-     * is asked for.
-     */
     private void stubSharedConnection(long connectionId) {
-        when(connectionService.getSharedConnections(Environment.PRODUCTION.ordinal(), PlatformType.EMBEDDED))
-            .thenReturn(List.of(connection(connectionId)));
+        stubSharedConnections(Environment.PRODUCTION, connectionId);
 
         stubEchoingConnectionFacade();
+    }
+
+    private void stubSharedConnections(Environment environment, long... connectionIds) {
+        for (long connectionId : connectionIds) {
+            Connection connection = connection(connectionId);
+
+            connection.setEnvironmentId(environment.ordinal());
+            connection.setType(PlatformType.EMBEDDED);
+
+            sharedConnections.put(connectionId, connection);
+
+            connectedUserConnectionService.updateShared(connectionId, true);
+        }
+
+        when(connectionService.getConnections(anyList())).thenAnswer(invocation -> {
+            List<Long> requestedConnectionIds = invocation.getArgument(0);
+
+            return requestedConnectionIds.stream()
+                .map(sharedConnections::get)
+                .filter(Objects::nonNull)
+                .toList();
+        });
     }
 
     @Configuration
     @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
     static class ConnectedUserServiceConfiguration {
+    }
+
+    @Nested
+    @ContextConfiguration(classes = Authorization.MethodSecurityConfiguration.class)
+    @MockitoBean(types = PermissionService.class)
+    @MockitoSpyBean(types = ConnectedUserService.class)
+    class Authorization {
+
+        private static final long CONNECTED_USER_A_CONNECTION_ID = 91001L;
+        private static final long CONNECTED_USER_B_CONNECTION_ID = 91002L;
+        private static final long CONNECTION_ID = 91042L;
+        private static final long UNKNOWN_CONNECTED_USER_ID = Long.MAX_VALUE;
+
+        @Autowired
+        private PermissionService permissionService;
+
+        private long connectedUserADevelopmentId;
+        private long connectedUserAId;
+        private long connectedUserBId;
+        private String externalUserAId;
+        private String externalUserBId;
+
+        @BeforeEach
+        void beforeEach() {
+            externalUserAId = "external-user-a-" + UUID.randomUUID();
+            externalUserBId = "external-user-b-" + UUID.randomUUID();
+
+            connectedUserAId = createConnectedUser(externalUserAId, Environment.PRODUCTION);
+            connectedUserADevelopmentId = createConnectedUser(externalUserAId, Environment.DEVELOPMENT);
+            connectedUserBId = createConnectedUser(externalUserBId, Environment.PRODUCTION);
+
+            connectedUserConnectionService.create(connectedUserAId, CONNECTED_USER_A_CONNECTION_ID);
+            connectedUserConnectionService.create(connectedUserBId, CONNECTED_USER_B_CONNECTION_ID);
+
+            when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED)))
+                .thenReturn(CONNECTION_ID);
+            when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED)))
+                .thenAnswer(invocation -> {
+                    List<Long> requestedConnectionIds = invocation.getArgument(0);
+
+                    return requestedConnectionIds.stream()
+                        .map(connectionId -> ConnectionDTO.builder()
+                            .componentName("slack")
+                            .id(connectionId)
+                            .build())
+                        .toList();
+                });
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testGetConnectedUserConnectionsDeniesConnectedUserOnAnotherConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.getConnectedUserConnections(connectedUserBId, null, List.of()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).getConnections(anyList(), any());
+        }
+
+        @Test
+        void testGetConnectedUserConnectionsDeniesConnectedUserOnUnknownConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.getConnectedUserConnections(UNKNOWN_CONNECTED_USER_ID, null,
+                    List.of()))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).getConnections(anyList(), any());
+        }
+
+        @Test
+        void testGetConnectedUserConnectionsDeniesConnectedUserFromAnotherEnvironment() {
+            authenticate(createConnectedUserAuthentication(Environment.DEVELOPMENT));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.getConnectedUserConnections(connectedUserAId, null, List.of()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).getConnections(anyList(), any());
+        }
+
+        @Test
+        void testGetConnectedUserConnectionsAllowsConnectedUserOnOwnConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThat(connectedUserConnectionFacade.getConnectedUserConnections(connectedUserAId, null, List.of()))
+                .hasSize(1);
+
+            verify(connectionFacade).getConnections(List.of(CONNECTED_USER_A_CONNECTION_ID), PlatformType.EMBEDDED);
+        }
+
+        @Test
+        void testGetConnectedUserConnectionsAllowsTenantAdminOnAnyConnectedUser() {
+            authenticate(createTenantAdminAuthentication());
+
+            assertThat(connectedUserConnectionFacade.getConnectedUserConnections(connectedUserBId, null, List.of()))
+                .hasSize(1);
+
+            verify(connectionFacade).getConnections(List.of(CONNECTED_USER_B_CONNECTION_ID), PlatformType.EMBEDDED);
+        }
+
+        @Test
+        void testGetConnectedUserConnectionsDeniesCallerWhoIsNeitherTenantAdminNorConnectedUser() {
+            authenticate(createRegularUserAuthentication());
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.getConnectedUserConnections(connectedUserAId, null, List.of()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).getConnections(anyList(), any());
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionDeniesConnectedUserOnAnotherConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.createConnectedUserConnection(connectedUserBId, connectionDTO()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).create(any(), any());
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserBId))
+                .containsExactly(CONNECTED_USER_B_CONNECTION_ID);
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionDeniesConnectedUserFromAnotherEnvironment() {
+            authenticate(createConnectedUserAuthentication(Environment.DEVELOPMENT));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.createConnectedUserConnection(connectedUserAId, connectionDTO()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).create(any(), any());
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
+                .containsExactly(CONNECTED_USER_A_CONNECTION_ID);
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionAllowsConnectedUserOnOwnConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThat(connectedUserConnectionFacade.createConnectedUserConnection(connectedUserAId, connectionDTO()))
+                .isEqualTo(CONNECTION_ID);
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
+                .containsExactlyInAnyOrder(CONNECTED_USER_A_CONNECTION_ID, CONNECTION_ID);
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionAllowsTenantAdminOnAnyConnectedUser() {
+            authenticate(createTenantAdminAuthentication());
+
+            assertThat(connectedUserConnectionFacade.createConnectedUserConnection(connectedUserBId, connectionDTO()))
+                .isEqualTo(CONNECTION_ID);
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserBId))
+                .containsExactlyInAnyOrder(CONNECTED_USER_B_CONNECTION_ID, CONNECTION_ID);
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionDeniesCallerWhoIsNeitherTenantAdminNorConnectedUser() {
+            authenticate(createRegularUserAuthentication());
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.createConnectedUserConnection(connectedUserAId, connectionDTO()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).create(any(), any());
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
+                .containsExactly(CONNECTED_USER_A_CONNECTION_ID);
+        }
+
+        @Test
+        void testGetConnectedUserConnectionsByExternalUserIdAllowsTheMatchingPrincipal() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThat(
+                connectedUserConnectionFacade.getConnectedUserConnections(
+                    externalUserAId, Environment.PRODUCTION, null, List.of()))
+                        .hasSize(1);
+        }
+
+        @Test
+        void testGetConnectedUserConnectionsByExternalUserIdDeniesAnotherExternalUserId() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.getConnectedUserConnections(
+                    externalUserBId, Environment.PRODUCTION, null, List.of()))
+                        .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.getOwnedConnectionIds(externalUserBId, Environment.PRODUCTION))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectedUserService, never()).getConnectedUser(externalUserBId, Environment.PRODUCTION);
+        }
+
+        private static ConnectionDTO connectionDTO() {
+            return ConnectionDTO.builder()
+                .componentName("slack")
+                .build();
+        }
+
+        private static void authenticate(Authentication authentication) {
+            SecurityContextHolder.getContext()
+                .setAuthentication(authentication);
+        }
+
+        private EmbeddedApiKeyAuthenticationToken createConnectedUserAuthentication(Environment environment) {
+            long connectedUserId =
+                environment == Environment.PRODUCTION ? connectedUserAId : connectedUserADevelopmentId;
+
+            return new EmbeddedApiKeyAuthenticationToken(
+                environment.ordinal(), connectedUserId, new User(externalUserAId, "", List.of()), false);
+        }
+
+        private long createConnectedUser(String externalUserId, Environment environment) {
+            ConnectedUser connectedUser = connectedUserService.createConnectedUser(externalUserId, environment);
+
+            return connectedUser.getId();
+        }
+
+        private static Authentication createRegularUserAuthentication() {
+            return new UsernamePasswordAuthenticationToken(
+                "user@localhost.com", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        }
+
+        private Authentication createTenantAdminAuthentication() {
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+
+            return new UsernamePasswordAuthenticationToken(
+                "admin@localhost.com", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        }
+
+        @Configuration
+        @EnableMethodSecurity
+        static class MethodSecurityConfiguration {
+
+            @Bean
+            static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+                @Lazy PermissionService permissionService) {
+
+                return new AutomationMethodSecurityExpressionHandler(permissionService);
+            }
+        }
     }
 }

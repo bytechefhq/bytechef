@@ -12,22 +12,19 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionSer
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
-import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,12 +56,9 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
     public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
-        ConnectionDTO unsharedConnectionDTO = ConnectionDTO.builder(connectionDTO)
-            .shared(false)
-            .build();
-
-        long connectionId = connectionFacade.create(unsharedConnectionDTO, PlatformType.EMBEDDED);
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
         connectedUserConnectionService.create(connectedUserId, connectionId);
 
@@ -78,6 +72,24 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         connectedUserConnectionService.deleteByConnectionId(connectionId);
 
         connectionFacade.delete(connectionId);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    public List<ConnectionDTO> getConnectedUserConnections(
+        long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
+
+        return getConnections(connectedUserId, componentName, connectionIds);
+    }
+
+    @Override
+    @PreAuthorize("#externalUserId == authentication.name")
+    public List<ConnectionDTO> getConnectedUserConnections(
+        String externalUserId, Environment environment, @Nullable String componentName, List<Long> connectionIds) {
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
+
+        return getConnections(connectedUser.getId(), componentName, connectionIds);
     }
 
     @Override
@@ -115,28 +127,16 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public void validateCurrentPrincipalConnectedUser(long connectedUserId) {
-        if (!ConnectedUserAuthentications.isConnectedUser()) {
-            return;
-        }
+    @PreAuthorize("#externalUserId == authentication.name")
+    public Set<Long> getOwnedConnectionIds(String externalUserId, Environment environment) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
-        Optional<String> externalUserId = SecurityUtils.fetchCurrentUserLogin();
-        Optional<Long> principalEnvironmentId = PrincipalEnvironment.fetchCurrentPrincipalEnvironmentId();
-        Optional<ConnectedUser> connectedUser = connectedUserService.fetchConnectedUser(connectedUserId);
-
-        if (externalUserId.isEmpty() || principalEnvironmentId.isEmpty() || connectedUser.isEmpty() ||
-            !isSameConnectedUser(connectedUser.get(), externalUserId.get(), principalEnvironmentId.get())) {
-
-            throw new AccessDeniedException("Connected user id=%s is not accessible".formatted(connectedUserId));
-        }
+        return getOwnedConnectionIds(connectedUser.getId());
     }
 
-    private static boolean isSameConnectedUser(
-        ConnectedUser connectedUser, String externalUserId, long principalEnvironmentId) {
-
-        return Objects.equals(connectedUser.getExternalId(), externalUserId) &&
-            connectedUser.getEnvironmentId() == principalEnvironmentId;
+    @Override
+    public Set<Long> getSharedConnectionIds() {
+        return connectedUserConnectionService.getSharedConnectionIds();
     }
 
     private void requireOwned(long connectedUserId, long connectionId) {

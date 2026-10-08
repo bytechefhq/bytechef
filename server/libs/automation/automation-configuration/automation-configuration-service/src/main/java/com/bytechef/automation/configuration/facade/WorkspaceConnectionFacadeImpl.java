@@ -24,9 +24,11 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +76,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void disconnectConnection(long connectionId) {
         projectDeploymentWorkflowService.deleteProjectDeploymentWorkflowConnection(connectionId);
         workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(connectionId);

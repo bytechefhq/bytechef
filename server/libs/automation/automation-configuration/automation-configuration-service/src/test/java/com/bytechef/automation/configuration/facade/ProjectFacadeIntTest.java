@@ -20,7 +20,10 @@ import static com.bytechef.automation.configuration.util.ProjectDeploymentFacade
 import static com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_DESCRIPTION;
 import static com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -37,6 +40,8 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
@@ -45,11 +50,13 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.FileItem;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -62,13 +69,21 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.Validate;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -115,7 +130,7 @@ public class ProjectFacadeIntTest {
     private SharedTemplateService sharedTemplateService;
 
     @MockitoBean
-    private com.bytechef.automation.configuration.service.PreBuiltTemplateService preBuiltTemplateService;
+    private PreBuiltTemplateService preBuiltTemplateService;
 
     private Workspace workspace;
 
@@ -974,5 +989,154 @@ public class ProjectFacadeIntTest {
 
         assertThat(projectDTO.tags()).hasSize(1);
         assertThat(projectDTO.name()).isEqualTo("Updated Name");
+    }
+
+    @Nested
+    @ContextConfiguration(classes = PreAuthorizeEnforcement.MethodSecurityConfiguration.class)
+    class PreAuthorizeEnforcement {
+
+        private static final long PROJECT_ID = 11L;
+        private static final long WORKSPACE_ID = 21L;
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            reset(permissionService);
+
+            authenticate(AuthorityConstants.USER);
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testCreateMutationsAreProtected() {
+            ProjectDTO projectDTO = ProjectDTO.builder()
+                .name("project")
+                .workspaceId(WORKSPACE_ID)
+                .build();
+
+            assertRequiresScope(WORKSPACE_ID, "Workspace", "PROJECT_CREATE",
+                () -> projectFacade.createProject(projectDTO));
+            assertRequiresScope(
+                WORKSPACE_ID, "Workspace", "PROJECT_CREATE",
+                () -> projectFacade.importProject(new byte[0], WORKSPACE_ID));
+            assertRequiresScope(
+                WORKSPACE_ID, "Workspace", "PROJECT_CREATE",
+                () -> projectFacade.importProjectTemplate("template", WORKSPACE_ID, false));
+        }
+
+        @Test
+        void testMutatingMethodsAreProtected() {
+            ProjectDTO projectDTO = ProjectDTO.builder()
+                .id(PROJECT_ID)
+                .name("project")
+                .workspaceId(WORKSPACE_ID)
+                .build();
+
+            assertRequiresScope(PROJECT_ID, "Project", "PROJECT_DELETE", () -> projectFacade.deleteProject(PROJECT_ID));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "PROJECT_SETTINGS", () -> projectFacade.deleteSharedProject(PROJECT_ID));
+            assertRequiresBothScopes(
+                PROJECT_ID, "Project", "WORKFLOW_VIEW", "WORKFLOW_CREATE",
+                () -> projectFacade.duplicateProject(PROJECT_ID));
+            assertRequiresScope(PROJECT_ID, "Project", "WORKFLOW_VIEW", () -> projectFacade.exportProject(PROJECT_ID));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "PROJECT_SETTINGS",
+                () -> projectFacade.exportSharedProject(PROJECT_ID, "description"));
+            assertRequiresBothScopes(
+                PROJECT_ID, "Project", "WORKFLOW_EDIT", "DEPLOYMENT_PUSH",
+                () -> projectFacade.publishProject(PROJECT_ID, "description", false));
+            assertRequiresScope(PROJECT_ID, "Project", "WORKFLOW_EDIT", () -> projectFacade.updateProject(projectDTO));
+        }
+
+        @Test
+        void testReadMethodsAreProtected() {
+            assertRequiresScope(PROJECT_ID, "Project", "WORKFLOW_VIEW", () -> projectFacade.getProject(PROJECT_ID));
+            assertRequiresScope(
+                WORKSPACE_ID, "Workspace", "WORKFLOW_VIEW",
+                () -> projectFacade.getWorkspaceProjects(null, null, false, null, null, null, WORKSPACE_ID));
+            assertRequiresScope(
+                WORKSPACE_ID, "Workspace", "WORKFLOW_VIEW",
+                () -> projectFacade.getWorkspaceProjectWorkflows(WORKSPACE_ID));
+
+            assertRequiresTenantAdmin(() -> projectFacade.getProjects(null, null, null, null));
+        }
+
+        private void assertRequiresBothScopes(
+            Serializable targetId, String targetType, String firstScope, String secondScope, ThrowingCallable call) {
+
+            reset(permissionService);
+
+            when(permissionService.hasResourceScope(targetId, targetType, firstScope)).thenReturn(true);
+
+            assertDenied(call);
+
+            reset(permissionService);
+
+            when(permissionService.hasResourceScope(targetId, targetType, secondScope)).thenReturn(true);
+
+            assertDenied(call);
+
+            when(permissionService.hasResourceScope(targetId, targetType, firstScope)).thenReturn(true);
+
+            assertNotDenied(call);
+
+            reset(permissionService);
+        }
+
+        private void
+            assertRequiresScope(Serializable targetId, String targetType, String scope, ThrowingCallable call) {
+            reset(permissionService);
+
+            assertDenied(call);
+
+            when(permissionService.hasResourceScope(targetId, targetType, scope)).thenReturn(true);
+
+            assertNotDenied(call);
+
+            reset(permissionService);
+        }
+
+        private void assertRequiresTenantAdmin(ThrowingCallable call) {
+            reset(permissionService);
+
+            assertDenied(call);
+
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+
+            assertNotDenied(call);
+
+            reset(permissionService);
+        }
+
+        private static void assertDenied(ThrowingCallable call) {
+            assertThatThrownBy(call).isInstanceOf(AccessDeniedException.class);
+        }
+
+        private static void assertNotDenied(ThrowingCallable call) {
+            Throwable throwable = catchThrowable(call);
+
+            assertThat(throwable)
+                .as("Expected the gate to let the call through, but it was denied: %s", throwable)
+                .satisfiesAnyOf(
+                    actual -> assertThat(actual).isNull(),
+                    actual -> assertThat(actual).isNotInstanceOf(AccessDeniedException.class));
+        }
+
+        private static void authenticate(String authority) {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "user", "n/a", List.of(new SimpleGrantedAuthority(authority))));
+        }
+
+        @EnableMethodSecurity
+        static class MethodSecurityConfiguration {
+        }
     }
 }

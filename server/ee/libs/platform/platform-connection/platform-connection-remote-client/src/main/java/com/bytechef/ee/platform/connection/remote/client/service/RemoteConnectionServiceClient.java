@@ -77,11 +77,6 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getSharedConnections(int environmentId, PlatformType type) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<Connection> getConnections(String componentName, int version, PlatformType type) {
         throw new UnsupportedOperationException();
     }
@@ -104,11 +99,6 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public Connection update(long id, String name, List<Long> tagIds, int version) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Connection update(long id, String name, List<Long> tagIds, boolean shared, int version) {
         throw new UnsupportedOperationException();
     }
 

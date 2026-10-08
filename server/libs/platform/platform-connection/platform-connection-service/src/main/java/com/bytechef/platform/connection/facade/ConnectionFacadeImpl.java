@@ -51,7 +51,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -295,21 +294,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         connectionService.update(id, name, CollectionUtils.map(tags, Tag::getId), version);
     }
 
-    @Override
-    public void update(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version) {
-        validateOwnerOrAdmin(connectionService.getConnection(id));
-
-        tags = checkTags(tags);
-
-        List<Long> tagIds = CollectionUtils.map(tags, Tag::getId);
-
-        if (shared == null) {
-            connectionService.update(id, name, tagIds, version);
-        } else {
-            connectionService.update(id, name, tagIds, shared, version);
-        }
-    }
-
     private static void validateOwnerOrAdmin(Connection connection) {
         if (!SecurityUtils.isAuthenticated()) {
             throw new AccessDeniedException("Authentication required to modify connection " + connection.getId());
@@ -421,7 +405,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .lastModifiedBy(connection.getLastModifiedBy())
             .lastModifiedDate(connection.getLastModifiedDate())
             .name(degradedName(connection, cause))
-            .shared(connection.isShared())
             .status(connection.getStatus())
             .tags(tags)
             .version(connection.getVersion())

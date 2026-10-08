@@ -71,7 +71,5 @@ public interface ConnectionRepository
         """)
     List<Connection> findAllByTagIdAndTypeOrderByName(@Param("tagId") long tagId, @Param("type") int type);
 
-    List<Connection> findAllBySharedIsTrueAndEnvironmentAndTypeOrderByName(int environment, int type);
-
     List<Connection> findAllByTypeOrderByName(int type);
 }

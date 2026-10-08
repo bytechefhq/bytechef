@@ -16,21 +16,35 @@
 
 package com.bytechef.ee.embedded.configuration.web.rest;
 
+import static org.mockito.Mockito.when;
+
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.service.AppEventService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
@@ -38,11 +52,49 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@Disabled
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
 @WebMvcTest(ComponentDefinitionApiController.class)
 @EmbeddedConfigurationRestConfigurationSharedMocks
-public class ComponentDefinitionApiControllerIntTest {
+class ComponentDefinitionApiControllerIntTest {
+
+    @MockitoBean
+    private AppEventFacade appEventFacade;
+
+    @MockitoBean
+    private AppEventService appEventService;
+
+    @MockitoBean
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @MockitoBean
+    private ConnectedUserProjectFacade connectedUserProjectFacade;
+
+    @MockitoBean
+    private EnvironmentService environmentService;
+
+    @MockitoBean
+    private IntegrationFacade integrationFacade;
+
+    @MockitoBean
+    private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
+
+    @MockitoBean
+    private IntegrationInstanceFacade integrationInstanceFacade;
+
+    @MockitoBean
+    private IntegrationInstanceService integrationInstanceService;
+
+    @MockitoBean
+    private IntegrationService integrationService;
+
+    @MockitoBean
+    private IntegrationWorkflowFacade integrationWorkflowFacade;
+
+    @MockitoBean
+    private WorkflowFacade workflowFacade;
+
+    @MockitoBean
+    private WorkflowService workflowService;
 
     @Autowired
     private ComponentDefinitionService componentDefinitionService;
@@ -59,34 +111,31 @@ public class ComponentDefinitionApiControllerIntTest {
     }
 
     @Test
-    public void testGetComponentDefinitions() {
-        Mockito
-            .when(
-                componentDefinitionService.getComponentDefinitions(null, null, null, null, null, PlatformType.EMBEDDED))
-            .thenReturn(List.of(new ComponentDefinition("component1"), new ComponentDefinition("component2")));
+    void testGetComponentDefinitions() {
+        when(componentDefinitionService.getComponentDefinitions(null, null, null, null, null, PlatformType.EMBEDDED))
+            .thenReturn(
+                List.of(
+                    new ComponentDefinition(ComponentDsl.component("component1")),
+                    new ComponentDefinition(ComponentDsl.component("component2"))));
 
-        try {
-            webTestClient
-                .get()
-                .uri("/internal/core/component-definitions")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .json(
-                    """
-                        [
-                            {
-                                "name":"component1"
-                            },
-                            {
-                                "name":"component2"
-                            }
-                        ]
-                        """);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .get()
+            .uri("/internal/component-definitions")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .json(
+                """
+                    [
+                        {
+                            "name":"component1"
+                        },
+                        {
+                            "name":"component2"
+                        }
+                    ]
+                    """);
     }
 }

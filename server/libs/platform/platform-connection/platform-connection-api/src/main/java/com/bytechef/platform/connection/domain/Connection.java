@@ -99,9 +99,6 @@ public final class Connection {
     private EncryptedMapWrapper parameters;
 
     @Column
-    private boolean shared;
-
-    @Column
     private int status;
 
     @Column
@@ -302,14 +299,6 @@ public final class Connection {
         return credentialStatusUpdated;
     }
 
-    public boolean isShared() {
-        return shared;
-    }
-
-    public void setShared(boolean shared) {
-        this.shared = shared;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -382,7 +371,6 @@ public final class Connection {
         private Long id;
         private String name;
         private Map<String, Object> parameters;
-        private boolean shared;
         private ConnectionStatus status;
         private List<Long> tagIds;
         private PlatformType type;
@@ -427,12 +415,6 @@ public final class Connection {
             return this;
         }
 
-        public Builder shared(boolean shared) {
-            this.shared = shared;
-
-            return this;
-        }
-
         public Builder status(ConnectionStatus status) {
             this.status = status;
 
@@ -466,7 +448,6 @@ public final class Connection {
             connection.setId(id);
             connection.setName(name);
             connection.setParameters(parameters);
-            connection.setShared(shared);
             connection.setTagIds(tagIds);
             connection.setType(type);
             connection.setVersion(version);
