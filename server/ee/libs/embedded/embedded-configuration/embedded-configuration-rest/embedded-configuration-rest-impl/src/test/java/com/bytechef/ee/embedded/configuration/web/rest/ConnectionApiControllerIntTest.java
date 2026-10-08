@@ -306,9 +306,9 @@ public class ConnectionApiControllerIntTest {
     /**
      * Spring hands this nested class to the enclosing test directly, as its detected default configuration class, so
      * the exclude filter does not affect that. It keeps the classes nested inside a sibling test -- notably
-     * {@code WebhookTriggerTestApiControllerAuthorizationTest.Config}, whose own
-     * {@code WebhookTriggerTestApiController} bean would leave the request mapping ambiguous -- from being scanned into
-     * this context, the same way {@code EmbeddedConfigurationRestTestConfiguration} keeps them out of its own.
+     * {@code WebhookTriggerTestApiControllerTest.Config}, whose own {@code WebhookTriggerTestApiController} bean would
+     * leave the request mapping ambiguous -- from being scanned into this context, the same way
+     * {@code EmbeddedConfigurationRestTestConfiguration} keeps them out of its own.
      */
     @ComponentScan(
         basePackages = "com.bytechef.ee.embedded.configuration.web.rest",
