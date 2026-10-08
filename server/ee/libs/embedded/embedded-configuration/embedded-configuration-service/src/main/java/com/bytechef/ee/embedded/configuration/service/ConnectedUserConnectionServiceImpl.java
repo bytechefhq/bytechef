@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserConnection;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class ConnectedUserConnectionServiceImpl implements ConnectedUserConnecti
 
     private final ConnectedUserConnectionRepository connectedUserConnectionRepository;
 
+    @SuppressFBWarnings("EI")
     public ConnectedUserConnectionServiceImpl(ConnectedUserConnectionRepository connectedUserConnectionRepository) {
         this.connectedUserConnectionRepository = connectedUserConnectionRepository;
     }
@@ -38,6 +40,11 @@ public class ConnectedUserConnectionServiceImpl implements ConnectedUserConnecti
         connectedUserConnection.setConnectionId(connectionId);
 
         connectedUserConnectionRepository.save(connectedUserConnection);
+    }
+
+    @Override
+    public void deleteByConnectionId(long connectionId) {
+        connectedUserConnectionRepository.deleteByConnectionId(connectionId);
     }
 
     @Override
