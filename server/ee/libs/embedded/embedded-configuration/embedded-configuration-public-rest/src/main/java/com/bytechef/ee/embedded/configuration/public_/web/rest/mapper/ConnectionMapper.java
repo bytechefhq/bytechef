@@ -24,6 +24,8 @@ import org.springframework.core.convert.converter.Converter;
 public interface ConnectionMapper extends Converter<ConnectionDTO, ConnectionModel> {
 
     @Override
+    @Mapping(target = "editable", ignore = true)
     @Mapping(target = "environment", source = "environmentId")
+    @Mapping(target = "shared", ignore = true)
     ConnectionModel convert(ConnectionDTO source);
 }

@@ -19,6 +19,19 @@ dependencies {
 
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:core:evaluator:evaluator-api"))
+    testImplementation(project(":server:libs:platform:platform-category:platform-category-api"))
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    testImplementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
+    testImplementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
+
+    testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
 }

@@ -8,13 +8,10 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,20 +26,18 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
-    private final WebhookTriggerTestFacade webhookTriggerTestFacade;
+    private final WebhookTriggerTestAdminFacade webhookTriggerTestAdminFacade;
 
-    public WebhookTriggerTestApiController(WebhookTriggerTestFacade webhookTriggerTestFacade) {
-        this.webhookTriggerTestFacade = webhookTriggerTestFacade;
+    public WebhookTriggerTestApiController(WebhookTriggerTestAdminFacade webhookTriggerTestAdminFacade) {
+        this.webhookTriggerTestAdminFacade = webhookTriggerTestAdminFacade;
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
         String workflowId, Long environmentId, String triggerName) {
 
-        String webhookUrl = webhookTriggerTestFacade.enableTrigger(
-            workflowId, triggerName, PrincipalEnvironment.resolveEffectiveEnvironmentId((long) environmentId),
-            PlatformType.EMBEDDED);
+        String webhookUrl = webhookTriggerTestAdminFacade.startWebhookTriggerTest(
+            workflowId, triggerName, environmentId);
 
         return ResponseEntity.ok(
             new StartWebhookTriggerTest200ResponseModel()
@@ -50,11 +45,9 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> stopWebhookTriggerTest(String workflowId, Long environmentId, String triggerName) {
-        webhookTriggerTestFacade.disableTrigger(
-            workflowId, triggerName, PrincipalEnvironment.resolveEffectiveEnvironmentId((long) environmentId),
-            PlatformType.EMBEDDED);
+        webhookTriggerTestAdminFacade.stopWebhookTriggerTest(
+            workflowId, triggerName, environmentId);
 
         return ResponseEntity.noContent()
             .build();

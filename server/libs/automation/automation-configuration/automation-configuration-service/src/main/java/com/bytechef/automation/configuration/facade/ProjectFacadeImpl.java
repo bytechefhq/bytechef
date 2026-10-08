@@ -196,7 +196,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW') and hasPermission(#id, 'Project', 'WORKFLOW_CREATE')")
     public ProjectDTO duplicateProject(long id) {
         Project project = projectService.getProject(id);
 
@@ -422,7 +422,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT')")
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT') and hasPermission(#id, 'Project', 'DEPLOYMENT_PUSH')")
     public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = projectService.getProject(id);
 

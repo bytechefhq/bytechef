@@ -43,8 +43,6 @@ public interface ConnectionService {
 
     List<Connection> getConnections(PlatformType type);
 
-    List<Connection> getSharedConnections(int environmentId, PlatformType type);
-
     List<Connection> getConnections(String componentName, int version, PlatformType type);
 
     List<Connection> getConnections(
@@ -55,8 +53,6 @@ public interface ConnectionService {
     Connection update(long id, List<Long> tagIds);
 
     Connection update(long id, String name, List<Long> tagIds, int version);
-
-    Connection update(long id, String name, List<Long> tagIds, boolean shared, int version);
 
     Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status);
 

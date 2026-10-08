@@ -25,6 +25,7 @@ import org.springframework.core.convert.converter.Converter;
 public interface ConnectionMapper extends Converter<ConnectionDTO, ConnectionModel> {
 
     @Override
+    @Mapping(target = "shared", ignore = true)
     ConnectionModel convert(ConnectionDTO connectionDTO);
 
     @InheritInverseConfiguration

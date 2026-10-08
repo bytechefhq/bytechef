@@ -33,7 +33,6 @@ import java.util.Set;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -68,22 +67,21 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    @PreAuthorize("#externalUserId == authentication.name")
     public ResponseEntity<List<ConnectionModel>> getConnections(
         String externalUserId, String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
         Environment environment = getEnvironment(xEnvironment);
 
-        // TODO Move to facade
+        Set<Long> ownedConnectionIds = connectedUserConnectionFacade.getOwnedConnectionIds(
+            externalUserId, environment);
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
-
-        Set<Long> ownedConnectionIds = connectedUserConnectionFacade.getOwnedConnectionIds(connectedUser.getId());
+        Set<Long> sharedConnectionIds = connectedUserConnectionFacade.getSharedConnectionIds();
 
         return ResponseEntity.ok(
             connectedUserConnectionFacade
-                .getConnections(connectedUser.getId(), componentName, connectionIds == null ? List.of() : connectionIds)
+                .getConnectedUserConnections(
+                    externalUserId, environment, componentName, connectionIds == null ? List.of() : connectionIds)
                 .stream()
-                .map(connectionDTO -> toConnectionModel(connectionDTO, ownedConnectionIds))
+                .map(connectionDTO -> toConnectionModel(connectionDTO, ownedConnectionIds, sharedConnectionIds))
                 .toList());
     }
 
@@ -94,11 +92,13 @@ public class ConnectionApiController implements ConnectionApi {
 
         Set<Long> ownedConnectionIds = connectedUserConnectionFacade.getOwnedConnectionIds(connectedUser.getId());
 
+        Set<Long> sharedConnectionIds = connectedUserConnectionFacade.getSharedConnectionIds();
+
         return ResponseEntity.ok(
             connectedUserConnectionFacade
                 .getConnections(connectedUser.getId(), componentName, connectionIds == null ? List.of() : connectionIds)
                 .stream()
-                .map(connectionDTO -> toConnectionModel(connectionDTO, ownedConnectionIds))
+                .map(connectionDTO -> toConnectionModel(connectionDTO, ownedConnectionIds, sharedConnectionIds))
                 .toList());
     }
 
@@ -108,19 +108,22 @@ public class ConnectionApiController implements ConnectionApi {
 
         Set<Long> ownedConnectionIds = connectedUserConnectionFacade.getOwnedConnectionIds(connectedUser.getId());
 
+        Set<Long> sharedConnectionIds = connectedUserConnectionFacade.getSharedConnectionIds();
+
         return ResponseEntity.ok(
             connectedUserConnectionFacade.getConnections(connectedUser.getId(), null, List.of())
                 .stream()
-                .map(connectionDTO -> toConnectionModel(connectionDTO, ownedConnectionIds))
+                .map(connectionDTO -> toConnectionModel(connectionDTO, ownedConnectionIds, sharedConnectionIds))
                 .toList());
     }
 
-    private ConnectionModel toConnectionModel(ConnectionDTO connectionDTO, Set<Long> ownedConnectionIds) {
+    private ConnectionModel toConnectionModel(
+        ConnectionDTO connectionDTO, Set<Long> ownedConnectionIds, Set<Long> sharedConnectionIds) {
         ConnectionModel connectionModel = conversionService.convert(connectionDTO, ConnectionModel.class);
 
         if (connectionModel != null) {
-            connectionModel.setShared(connectionDTO.shared());
             connectionModel.setEditable(ownedConnectionIds.contains(connectionDTO.id()));
+            connectionModel.setShared(sharedConnectionIds.contains(connectionDTO.id()));
         }
 
         return connectionModel;

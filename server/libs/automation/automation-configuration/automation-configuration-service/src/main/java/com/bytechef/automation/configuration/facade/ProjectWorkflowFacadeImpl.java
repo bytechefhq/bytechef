@@ -78,6 +78,7 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -139,6 +140,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
 
@@ -163,6 +165,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_DELETE')")
     public void deleteWorkflow(String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
@@ -201,6 +204,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public String duplicateWorkflow(long projectId, String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 

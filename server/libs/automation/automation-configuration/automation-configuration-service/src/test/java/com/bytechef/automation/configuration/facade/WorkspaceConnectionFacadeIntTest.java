@@ -17,6 +17,9 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.Mockito.reset;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
@@ -30,20 +33,31 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflo
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -259,5 +273,67 @@ public class WorkspaceConnectionFacadeIntTest {
         workspaceConnectionFacade.disconnectConnection(nonExistentConnectionId);
 
         // Then - No exception should be thrown (method completes successfully)
+    }
+
+    @Nested
+    @ContextConfiguration(classes = PreAuthorizeEnforcement.MethodSecurityConfiguration.class)
+    class PreAuthorizeEnforcement {
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            reset(permissionService);
+
+            authenticate(AuthorityConstants.USER);
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testDisconnectIsAdminOnly() {
+            assertRequiresAdminAuthority(() -> workspaceConnectionFacade.disconnectConnection(1L));
+        }
+
+        private void assertRequiresAdminAuthority(ThrowingCallable call) {
+            authenticate(AuthorityConstants.USER);
+
+            assertDenied(call);
+
+            authenticate(AuthorityConstants.ADMIN);
+
+            assertNotDenied(call);
+
+            authenticate(AuthorityConstants.USER);
+        }
+
+        private static void assertDenied(ThrowingCallable call) {
+            assertThatThrownBy(call).isInstanceOf(AccessDeniedException.class);
+        }
+
+        private static void assertNotDenied(ThrowingCallable call) {
+            Throwable throwable = catchThrowable(call);
+
+            assertThat(throwable)
+                .as("Expected the gate to let the call through, but it was denied: %s", throwable)
+                .satisfiesAnyOf(
+                    actual -> assertThat(actual).isNull(),
+                    actual -> assertThat(actual).isNotInstanceOf(AccessDeniedException.class));
+        }
+
+        private static void authenticate(String authority) {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "user", "n/a", List.of(new SimpleGrantedAuthority(authority))));
+        }
+
+        @EnableMethodSecurity
+        static class MethodSecurityConfiguration {
+        }
     }
 }

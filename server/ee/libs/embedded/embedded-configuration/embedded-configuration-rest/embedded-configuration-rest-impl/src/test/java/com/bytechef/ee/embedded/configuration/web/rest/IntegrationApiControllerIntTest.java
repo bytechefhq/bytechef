@@ -20,22 +20,31 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
+import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +59,40 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@Disabled
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
 @WebMvcTest(value = IntegrationApiController.class)
 @EmbeddedConfigurationRestConfigurationSharedMocks
-public class IntegrationApiControllerIntTest {
+class IntegrationApiControllerIntTest {
+
+    @MockitoBean
+    private AppEventFacade appEventFacade;
+
+    @MockitoBean
+    private AppEventService appEventService;
+
+    @MockitoBean
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @MockitoBean
+    private ConnectedUserProjectFacade connectedUserProjectFacade;
+
+    @MockitoBean
+    private EnvironmentService environmentService;
+
+    @MockitoBean
+    private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
+
+    @MockitoBean
+    private IntegrationService integrationService;
+
+    @MockitoBean
+    private IntegrationWorkflowFacade integrationWorkflowFacade;
+
+    @MockitoBean
+    private WorkflowFacade workflowFacade;
+
+    @MockitoBean
+    private WorkflowService workflowService;
 
     @MockitoBean
     private CategoryService categoryService;
@@ -84,17 +122,13 @@ public class IntegrationApiControllerIntTest {
     }
 
     @Test
-    public void testDeleteIntegration() {
-        try {
-            this.webTestClient
-                .delete()
-                .uri("/internal/integrations/1")
-                .exchange()
-                .expectStatus()
-                .isOk();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+    void testDeleteIntegration() {
+        this.webTestClient
+            .delete()
+            .uri("/internal/integrations/1")
+            .exchange()
+            .expectStatus()
+            .isOk();
 
         ArgumentCaptor<Long> argument = ArgumentCaptor.forClass(Long.class);
 
@@ -104,28 +138,24 @@ public class IntegrationApiControllerIntTest {
     }
 
     @Test
-    public void testGetIntegration() {
-        try {
-            IntegrationDTO integrationDTO = getIntegrationDTO();
+    void testGetIntegration() {
+        IntegrationDTO integrationDTO = getIntegrationDTO();
 
-            when(integrationFacade.getIntegration(1L)).thenReturn(integrationDTO);
+        when(integrationFacade.getIntegration(1L)).thenReturn(integrationDTO);
 
-            this.webTestClient
-                .get()
-                .uri("/internal/integrations/1")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(IntegrationModel.class)
-                .isEqualTo(Validate.notNull(integrationMapper.convert(integrationDTO), "integrationModel"));
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .get()
+            .uri("/internal/integrations/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(IntegrationModel.class)
+            .isEqualTo(Validate.notNull(integrationMapper.convert(integrationDTO), "integrationModel"));
     }
 
     @Test
-    public void testGetIntegrations() {
+    void testGetIntegrations() {
         IntegrationDTO integrationDTO = getIntegrationDTO();
 
         when(integrationFacade.getIntegrations(null, false, null, null, true)).thenReturn(List.of(integrationDTO));
@@ -177,32 +207,27 @@ public class IntegrationApiControllerIntTest {
     }
 
     @Test
-    public void testPostIntegration() {
+    void testPostIntegration() {
         IntegrationDTO integrationDTO = getIntegrationDTO();
-        IntegrationModel integrationModel = new IntegrationModel();
+        IntegrationModel integrationModel = new IntegrationModel()
+            .componentName("componentName")
+            .name("Name");
 
         when(integrationFacade.createIntegration(any())).thenReturn(integrationDTO.id());
 
-        try {
-            assert integrationDTO.id() != null;
+        assert integrationDTO.id() != null;
 
-            this.webTestClient
-                .post()
-                .uri("/internal/integrations")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(integrationModel)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.id")
-                .isEqualTo(integrationDTO.id())
-                .jsonPath("$.workflowIds[0]")
-                .isEqualTo("workflow1");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .post()
+            .uri("/internal/integrations")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(integrationModel)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(Long.class)
+            .isEqualTo(integrationDTO.id());
 
         ArgumentCaptor<IntegrationDTO> integrationDTOArgumentCaptor = ArgumentCaptor.forClass(IntegrationDTO.class);
 
@@ -214,23 +239,19 @@ public class IntegrationApiControllerIntTest {
     }
 
     @Test
-    public void testPutIntegration() {
+    void testPutIntegration() {
         IntegrationModel integrationModel = new IntegrationModel()
             .id(1L);
 
-        try {
-            this.webTestClient
-                .put()
-                .uri("/internal/integrations/1")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(integrationModel)
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .put()
+            .uri("/internal/integrations/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(integrationModel)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
     }
 
     private static IntegrationDTO getIntegrationDTO() {
