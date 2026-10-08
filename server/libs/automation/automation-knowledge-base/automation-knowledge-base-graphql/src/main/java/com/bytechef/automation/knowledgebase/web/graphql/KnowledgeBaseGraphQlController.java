@@ -27,7 +27,6 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -40,7 +39,7 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 class KnowledgeBaseGraphQlController {
 
-    private final ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProvider;
+    private final EmbeddingProviderStatusProvider embeddingProviderStatusProvider;
     private final EnvironmentService environmentService;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseFacade knowledgeBaseFacade;
@@ -49,7 +48,7 @@ class KnowledgeBaseGraphQlController {
 
     @SuppressFBWarnings("EI")
     KnowledgeBaseGraphQlController(
-        ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProvider,
+        EmbeddingProviderStatusProvider embeddingProviderStatusProvider,
         EnvironmentService environmentService, KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseFacade knowledgeBaseFacade, KnowledgeBaseService knowledgeBaseService,
         WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
@@ -109,18 +108,6 @@ class KnowledgeBaseGraphQlController {
 
     @QueryMapping
     public boolean knowledgeBaseEmbeddingActive(@Argument Integer environment) {
-        return resolveEmbeddingActive(embeddingProviderStatusProvider, environment);
-    }
-
-    static boolean resolveEmbeddingActive(
-        ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProvider, int environment) {
-
-        EmbeddingProviderStatusProvider statusProvider = embeddingProviderStatusProvider.getIfAvailable();
-
-        if (statusProvider == null) {
-            return true;
-        }
-
-        return statusProvider.isEmbeddingActive(environment);
+        return embeddingProviderStatusProvider.isEmbeddingActive(environment);
     }
 }
