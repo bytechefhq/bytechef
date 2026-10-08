@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.webhook.rest.validator;
+package com.bytechef.platform.webhook.rest.util;
 
+import com.bytechef.commons.util.UrlValidatorUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
@@ -35,9 +36,9 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Ivica Cardic
  */
-public final class RedirectValidator {
+public final class RedirectValidatorUtils {
 
-    private RedirectValidator() {
+    private RedirectValidatorUtils() {
     }
 
     /**
@@ -61,7 +62,6 @@ public final class RedirectValidator {
      */
     public static boolean isValidRedirect(
         String redirectUrl, @Nullable String serverHost, @Nullable Set<String> allowedDomains) {
-
         if (redirectUrl == null || redirectUrl.isBlank()) {
             return false;
         }
@@ -104,7 +104,7 @@ public final class RedirectValidator {
             if (allowedDomains != null && !allowedDomains.isEmpty()) {
                 for (String allowedDomain : allowedDomains) {
                     if (hostMatchesDomain(host, allowedDomain)) {
-                        return true;
+                        return !UrlValidatorUtils.resolvesToPrivateAddress(host);
                     }
                 }
             }
@@ -128,7 +128,6 @@ public final class RedirectValidator {
     @Nullable
     public static String sanitizeRedirectUrl(
         String redirectUrl, @Nullable String serverHost, @Nullable Set<String> allowedDomains) {
-
         if (isValidRedirect(redirectUrl, serverHost, allowedDomains)) {
             return redirectUrl;
         }
