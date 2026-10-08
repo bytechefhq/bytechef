@@ -19,7 +19,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -108,7 +108,7 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
     @Override
     @Transactional(readOnly = true)
     public void validateCurrentPrincipalIntegrationInstanceOwnership(long id) {
-        if (!ConnectedUserAuthentication.isCurrentPrincipalConnectedUser()) {
+        if (!ConnectedUserAuthentications.isConnectedUser()) {
             return;
         }
 

@@ -17,7 +17,7 @@
 package com.bytechef.automation.configuration.security;
 
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
@@ -63,7 +63,7 @@ public final class AutomationMethodSecurityExpressionRoot
      * Returns {@code true} if the current principal is an embedded connected user.
      */
     public boolean isConnectedUser() {
-        return ConnectedUserAuthentication.isCurrentPrincipalConnectedUser();
+        return ConnectedUserAuthentications.isConnectedUser();
     }
 
     /**
