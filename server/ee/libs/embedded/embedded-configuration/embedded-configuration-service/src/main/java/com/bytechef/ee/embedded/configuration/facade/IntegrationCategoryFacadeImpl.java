@@ -15,6 +15,7 @@ import com.bytechef.platform.category.service.CategoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ public class IntegrationCategoryFacadeImpl implements IntegrationCategoryFacade 
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<Category> getIntegrationCategories() {
         List<Integration> integrations = integrationService.getIntegrations();
 

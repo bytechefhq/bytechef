@@ -59,6 +59,11 @@ public class RemoteIntegrationWorkflowFacadeClient implements IntegrationWorkflo
     }
 
     @Override
+    public void updatePermissionExpression(long integrationWorkflowId, String permissionExpression) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         throw new UnsupportedOperationException();
     }

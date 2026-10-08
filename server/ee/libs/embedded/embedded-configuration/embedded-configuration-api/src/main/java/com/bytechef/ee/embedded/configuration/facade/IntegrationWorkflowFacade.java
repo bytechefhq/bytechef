@@ -39,5 +39,7 @@ public interface IntegrationWorkflowFacade {
 
     List<IntegrationWorkflowDTO> getIntegrationWorkflows(long integrationId);
 
+    void updatePermissionExpression(long integrationWorkflowId, String permissionExpression);
+
     IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
 }

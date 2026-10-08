@@ -68,6 +68,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -145,6 +146,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public long createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
@@ -211,6 +213,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(propagation = Propagation.NEVER)
+    @PreAuthorize("isTenantAdmin()")
     public long createIntegrationInstanceConfigurationWorkflowJob(Long id, String workflowId) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(id, workflowId);
@@ -221,6 +224,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void deleteIntegrationInstanceConfiguration(long id) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);
@@ -268,6 +272,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstanceConfiguration(long integrationInstanceConfigurationId, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
             integrationInstanceConfigurationId);
@@ -290,6 +295,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId, boolean enable) {
 
@@ -320,6 +326,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurationIntegrations(
         boolean enabled, Environment environment) {
 
@@ -358,6 +365,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfiguration(long id) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);
@@ -379,6 +387,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<Tag> getIntegrationInstanceConfigurationTags() {
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations();
@@ -393,6 +402,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
         Long environmentId, Long integrationId, Long tagId, boolean includeAllFields) {
 
@@ -457,6 +467,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
@@ -484,11 +495,13 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceConfigurationTags(long id, List<Tag> tags) {
         integrationInstanceConfigurationService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceConfigurationWorkflow(
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
 

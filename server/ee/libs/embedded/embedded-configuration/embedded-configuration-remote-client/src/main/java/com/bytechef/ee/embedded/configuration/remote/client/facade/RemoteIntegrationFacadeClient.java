@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
@@ -35,6 +36,11 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
 
     @Override
     public IntegrationDTO getIntegration(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<IntegrationVersion> getIntegrationVersions(long id) {
         throw new UnsupportedOperationException();
     }
 
