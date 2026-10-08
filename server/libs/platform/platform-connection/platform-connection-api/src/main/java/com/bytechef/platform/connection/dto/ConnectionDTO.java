@@ -37,7 +37,7 @@ public record ConnectionDTO(
     String baseUri, String componentName, Map<String, ?> connectionParameters, int connectionVersion, String createdBy,
     Instant createdDate, CredentialStatus credentialStatus, int environmentId, Long id, String lastModifiedBy,
     Instant lastModifiedDate, String name, Map<String, ?> parameters, ConnectionStatus status, List<Tag> tags,
-    int version, boolean shared) {
+    int version) {
     public ConnectionDTO {
         Objects.requireNonNull(status, "status");
     }
@@ -51,7 +51,7 @@ public record ConnectionDTO(
             connection.getCreatedDate(), connection.getCredentialStatus(), connection.getEnvironmentId(),
             connection.getId(), connection.getLastModifiedBy(),
             connection.getLastModifiedDate(), connection.getName(), connection.getParameters(),
-            connection.getStatus(), tags, connection.getVersion(), connection.isShared());
+            connection.getStatus(), tags, connection.getVersion());
     }
 
     public Connection toConnection() {
@@ -65,7 +65,6 @@ public record ConnectionDTO(
         connection.setId(id);
         connection.setName(name);
         connection.setParameters(parameters);
-        connection.setShared(shared);
         connection.setStatus(status);
         connection.setTags(tags);
         connection.setVersion(version);
@@ -96,7 +95,6 @@ public record ConnectionDTO(
         builder.lastModifiedDate = connectionDTO.lastModifiedDate();
         builder.name = connectionDTO.name();
         builder.parameters = connectionDTO.parameters();
-        builder.shared = connectionDTO.shared();
         builder.status = connectionDTO.status();
         builder.tags = connectionDTO.tags();
         builder.version = connectionDTO.version();
@@ -121,7 +119,6 @@ public record ConnectionDTO(
         private Instant lastModifiedDate;
         private String name;
         private Map<String, ?> parameters;
-        private boolean shared;
         private ConnectionStatus status = ConnectionStatus.ACTIVE;
         private List<Tag> tags;
         private int version;
@@ -225,12 +222,6 @@ public record ConnectionDTO(
             return this;
         }
 
-        public Builder shared(boolean shared) {
-            this.shared = shared;
-
-            return this;
-        }
-
         public Builder tags(List<Tag> tags) {
             this.tags = tags;
 
@@ -253,7 +244,7 @@ public record ConnectionDTO(
             return new ConnectionDTO(
                 active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters,
                 connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy,
-                lastModifiedDate, name, parameters, status, tags, version, shared);
+                lastModifiedDate, name, parameters, status, tags, version);
         }
     }
 }

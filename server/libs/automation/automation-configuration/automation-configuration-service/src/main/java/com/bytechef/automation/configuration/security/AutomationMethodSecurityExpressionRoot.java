@@ -33,6 +33,8 @@ import org.springframework.security.core.Authentication;
  * <li>{@code isTenantAdmin()} — grants when the current user is a global tenant administrator.</li>
  * <li>{@code isResourceOwner(#id, 'Type')} — grants when the current user owns the identified resource.</li>
  * <li>{@code isConnectedUser()} — grants when the current principal is an embedded connected user.</li>
+ * <li>{@code isCurrentConnectedUser(#id)} — grants when the current principal is the embedded connected user with the
+ * supplied id.</li>
  * </ul>
  *
  * <p>
@@ -59,11 +61,14 @@ public final class AutomationMethodSecurityExpressionRoot
         this.target = methodInvocation.getThis();
     }
 
-    /**
-     * Returns {@code true} if the current principal is an embedded connected user.
-     */
     public boolean isConnectedUser() {
         return ConnectedUserAuthentications.isConnectedUser();
+    }
+
+    public boolean isCurrentConnectedUser(long connectedUserId) {
+        return ConnectedUserAuthentications.fetchCurrent()
+            .map(connectedUserAuthentication -> connectedUserAuthentication.connectedUserId() == connectedUserId)
+            .orElse(false);
     }
 
     /**

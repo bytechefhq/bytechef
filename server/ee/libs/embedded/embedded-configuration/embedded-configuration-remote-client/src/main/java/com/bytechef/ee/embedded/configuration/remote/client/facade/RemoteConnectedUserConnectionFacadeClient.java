@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,20 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
     }
 
     @Override
+    public List<ConnectionDTO> getConnectedUserConnections(
+        long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ConnectionDTO> getConnectedUserConnections(
+        String externalUserId, Environment environment, @Nullable String componentName, List<Long> connectionIds) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ConnectionDTO> getConnections(
         Long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
@@ -48,12 +63,18 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
     }
 
     @Override
-    public void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters) {
+    public Set<Long> getOwnedConnectionIds(String externalUserId, Environment environment) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void validateCurrentPrincipalConnectedUser(long connectedUserId) {
+    public Set<Long> getSharedConnectionIds() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters) {
+        throw new UnsupportedOperationException();
+    }
+
 }

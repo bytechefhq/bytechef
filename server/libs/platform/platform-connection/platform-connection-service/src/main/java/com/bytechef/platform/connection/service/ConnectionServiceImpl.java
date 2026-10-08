@@ -120,13 +120,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getSharedConnections(int environmentId, PlatformType type) {
-        return connectionRepository.findAllBySharedIsTrueAndEnvironmentAndTypeOrderByName(
-            environmentId, type.ordinal());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<Connection> getConnections(String componentName, int version, PlatformType type) {
         return connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
             componentName, version, type.ordinal());
@@ -185,16 +178,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection update(long id, String name, List<Long> tagIds, int version) {
-        return updateNameTagsAndShared(id, name, tagIds, null, version);
-    }
-
-    @Override
-    public Connection update(long id, String name, List<Long> tagIds, boolean shared, int version) {
-        return updateNameTagsAndShared(id, name, tagIds, shared, version);
-    }
-
-    private Connection updateNameTagsAndShared(
-        long id, String name, List<Long> tagIds, @Nullable Boolean shared, int version) {
         Connection curConnection = getConnection(id);
 
         if (name != null) {
@@ -203,10 +186,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         if (tagIds != null) {
             curConnection.setTagIds(tagIds);
-        }
-
-        if (shared != null) {
-            curConnection.setShared(shared);
         }
 
         curConnection.setVersion(version);

@@ -22,7 +22,6 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
-import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -49,8 +48,6 @@ public interface ConnectionFacade {
     void update(long id, List<Tag> tags);
 
     void update(long id, String name, List<Tag> tags, int version);
-
-    void update(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version);
 
     void replaceAuthorizationParameters(long id, Map<String, ?> parameters);
 

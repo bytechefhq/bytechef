@@ -8,11 +8,15 @@
 package com.bytechef.ee.embedded.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserConnection;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserSharedConnection;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
+import com.bytechef.ee.embedded.configuration.repository.ConnectedUserSharedConnectionRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,10 +33,14 @@ class ConnectedUserConnectionServiceTest {
     @Mock
     private ConnectedUserConnectionRepository connectedUserConnectionRepository;
 
+    @Mock
+    private ConnectedUserSharedConnectionRepository connectedUserSharedConnectionRepository;
+
     @Test
     void testCreate() {
         ConnectedUserConnectionService service =
-            new ConnectedUserConnectionServiceImpl(connectedUserConnectionRepository);
+            new ConnectedUserConnectionServiceImpl(
+                connectedUserConnectionRepository, connectedUserSharedConnectionRepository);
 
         service.create(1L, 5L);
 
@@ -49,7 +57,8 @@ class ConnectedUserConnectionServiceTest {
     @Test
     void testGetConnectionIds() {
         ConnectedUserConnectionService service =
-            new ConnectedUserConnectionServiceImpl(connectedUserConnectionRepository);
+            new ConnectedUserConnectionServiceImpl(
+                connectedUserConnectionRepository, connectedUserSharedConnectionRepository);
 
         ConnectedUserConnection connection = new ConnectedUserConnection();
 
@@ -59,5 +68,76 @@ class ConnectedUserConnectionServiceTest {
         when(connectedUserConnectionRepository.findAllByConnectedUserId(1L)).thenReturn(List.of(connection));
 
         assertThat(service.getConnectionIds(1L)).containsExactly(5L);
+    }
+
+    @Test
+    void testDeleteByConnectionIdAlsoRemovesTheSharedFlag() {
+        ConnectedUserConnectionService service =
+            new ConnectedUserConnectionServiceImpl(
+                connectedUserConnectionRepository, connectedUserSharedConnectionRepository);
+
+        service.deleteByConnectionId(5L);
+
+        verify(connectedUserConnectionRepository).deleteByConnectionId(5L);
+        verify(connectedUserSharedConnectionRepository).deleteByConnectionId(5L);
+    }
+
+    @Test
+    void testGetSharedConnectionIds() {
+        ConnectedUserConnectionService service =
+            new ConnectedUserConnectionServiceImpl(
+                connectedUserConnectionRepository, connectedUserSharedConnectionRepository);
+
+        when(connectedUserSharedConnectionRepository.findAll())
+            .thenReturn(List.of(new ConnectedUserSharedConnection(7L), new ConnectedUserSharedConnection(9L)));
+
+        assertThat(service.getSharedConnectionIds()).containsExactly(7L, 9L);
+    }
+
+    @Test
+    void testUpdateSharedMarksAnUnsharedConnectionShared() {
+        ConnectedUserConnectionService service =
+            new ConnectedUserConnectionServiceImpl(
+                connectedUserConnectionRepository, connectedUserSharedConnectionRepository);
+
+        when(connectedUserSharedConnectionRepository.existsByConnectionId(5L)).thenReturn(false);
+
+        service.updateShared(5L, true);
+
+        ArgumentCaptor<ConnectedUserSharedConnection> captor =
+            ArgumentCaptor.forClass(ConnectedUserSharedConnection.class);
+
+        verify(connectedUserSharedConnectionRepository).save(captor.capture());
+
+        assertThat(captor.getValue()
+            .getConnectionId()).isEqualTo(5L);
+    }
+
+    @Test
+    void testUpdateSharedLeavesAnAlreadySharedConnectionAlone() {
+        ConnectedUserConnectionService service =
+            new ConnectedUserConnectionServiceImpl(
+                connectedUserConnectionRepository, connectedUserSharedConnectionRepository);
+
+        when(connectedUserSharedConnectionRepository.existsByConnectionId(5L)).thenReturn(true);
+
+        service.updateShared(5L, true);
+
+        verify(connectedUserSharedConnectionRepository, never()).save(any());
+        verify(connectedUserSharedConnectionRepository, never()).deleteByConnectionId(5L);
+    }
+
+    @Test
+    void testUpdateSharedUnsharesASharedConnection() {
+        ConnectedUserConnectionService service =
+            new ConnectedUserConnectionServiceImpl(
+                connectedUserConnectionRepository, connectedUserSharedConnectionRepository);
+
+        when(connectedUserSharedConnectionRepository.existsByConnectionId(5L)).thenReturn(true);
+
+        service.updateShared(5L, false);
+
+        verify(connectedUserSharedConnectionRepository).deleteByConnectionId(5L);
+        verify(connectedUserSharedConnectionRepository, never()).save(any());
     }
 }

@@ -5,21 +5,14 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.web.rest;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+package com.bytechef.ee.embedded.configuration.facade;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-public class ConnectionTagApiControllerTest {
+public interface IntegrationInstanceAdminFacade {
 
-    @Disabled
-    @Test
-    public void test() {
-        // TODO
-    }
+    void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable);
 }

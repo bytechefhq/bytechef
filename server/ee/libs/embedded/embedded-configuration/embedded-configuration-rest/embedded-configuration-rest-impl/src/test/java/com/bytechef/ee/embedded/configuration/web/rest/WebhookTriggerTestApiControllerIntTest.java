@@ -1,0 +1,195 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.configuration.web.rest;
+
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestAdminFacade;
+import com.bytechef.ee.embedded.configuration.service.AppEventService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestConfigurationSharedMocks;
+import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
+import java.util.List;
+import java.util.Objects;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.reactive.server.WebTestClientConfigurer;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.client.MockMvcHttpConnector;
+import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
+@Import(WebhookTriggerTestApiControllerIntTest.SecurityTestConfiguration.class)
+@WebMvcTest(WebhookTriggerTestApiController.class)
+@EmbeddedConfigurationRestConfigurationSharedMocks
+class WebhookTriggerTestApiControllerIntTest {
+
+    private static final long DEVELOPMENT_ORDINAL = 0L;
+    private static final String TRIGGER_NAME = "trigger_1";
+    private static final String WEBHOOK_URL = "https://example.org/webhook";
+    private static final String WORKFLOW_ID = "workflow-1";
+
+    @MockitoBean
+    private AppEventFacade appEventFacade;
+
+    @MockitoBean
+    private AppEventService appEventService;
+
+    @MockitoBean
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @MockitoBean
+    private ConnectedUserProjectFacade connectedUserProjectFacade;
+
+    @MockitoBean
+    private EnvironmentService environmentService;
+
+    @MockitoBean
+    private IntegrationFacade integrationFacade;
+
+    @MockitoBean
+    private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
+
+    @MockitoBean
+    private IntegrationInstanceFacade integrationInstanceFacade;
+
+    @MockitoBean
+    private IntegrationInstanceService integrationInstanceService;
+
+    @MockitoBean
+    private IntegrationService integrationService;
+
+    @MockitoBean
+    private IntegrationWorkflowFacade integrationWorkflowFacade;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private WebhookTriggerTestAdminFacade webhookTriggerTestAdminFacade;
+
+    private WebTestClient webTestClient;
+
+    @MockitoBean
+    private WorkflowFacade workflowFacade;
+
+    @MockitoBean
+    private WorkflowService workflowService;
+
+    @BeforeEach
+    void beforeEach() {
+        webTestClient = MockMvcWebTestClient.bindTo(mockMvc)
+            .build();
+    }
+
+    @Test
+    void testStartWebhookTriggerTestHonoursSessionPrincipalRequestedEnvironment() {
+        when(webhookTriggerTestAdminFacade.startWebhookTriggerTest(eq(WORKFLOW_ID), eq(TRIGGER_NAME), anyLong()))
+            .thenReturn(WEBHOOK_URL);
+
+        startWebhookTriggerTest(sessionAuthentication());
+
+        verify(webhookTriggerTestAdminFacade).startWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, DEVELOPMENT_ORDINAL);
+    }
+
+    @Test
+    void testStopWebhookTriggerTestHonoursSessionPrincipalRequestedEnvironment() {
+        stopWebhookTriggerTest(sessionAuthentication());
+
+        verify(webhookTriggerTestAdminFacade).stopWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, DEVELOPMENT_ORDINAL);
+    }
+
+    private void startWebhookTriggerTest(Authentication principalAuthentication) {
+        webTestClient
+            .mutateWith(authenticatedAs(principalAuthentication))
+            .post()
+            .uri(
+                "/internal/webhooks/{workflowId}/test/start?environmentId={environmentId}&triggerName={triggerName}",
+                WORKFLOW_ID, DEVELOPMENT_ORDINAL, TRIGGER_NAME)
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.webhookUrl")
+            .isEqualTo(WEBHOOK_URL);
+    }
+
+    private void stopWebhookTriggerTest(Authentication principalAuthentication) {
+        webTestClient
+            .mutateWith(authenticatedAs(principalAuthentication))
+            .post()
+            .uri(
+                "/internal/webhooks/{workflowId}/test/stop?environmentId={environmentId}&triggerName={triggerName}",
+                WORKFLOW_ID, DEVELOPMENT_ORDINAL, TRIGGER_NAME)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+    }
+
+    private static WebTestClientConfigurer authenticatedAs(Authentication principalAuthentication) {
+        return (builder, httpHandlerBuilder, connector) -> {
+            MockMvcHttpConnector mockMvcHttpConnector = (MockMvcHttpConnector) Objects.requireNonNull(connector);
+
+            builder.clientConnector(
+                mockMvcHttpConnector.with(List.of(authentication(principalAuthentication), csrf())));
+        };
+    }
+
+    private static Authentication sessionAuthentication() {
+        return new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of());
+    }
+
+    @EnableWebSecurity
+    static class SecurityTestConfiguration {
+
+        @Bean
+        SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+            httpSecurity.authorizeHttpRequests(authorize -> authorize
+                .anyRequest()
+                .authenticated());
+
+            return httpSecurity.build();
+        }
+    }
+
+}

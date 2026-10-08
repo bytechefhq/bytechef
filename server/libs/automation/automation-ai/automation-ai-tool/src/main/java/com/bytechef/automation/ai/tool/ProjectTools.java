@@ -28,10 +28,14 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.dto.ProjectDTO;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -55,13 +59,22 @@ public class ProjectTools {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectTools.class);
 
-    private final ProjectService projectService;
+    private final CategoryService categoryService;
     private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectFacade projectFacade;
+    private final ProjectService projectService;
+    private final TagService tagService;
 
     @SuppressFBWarnings("EI")
-    public ProjectTools(ProjectService projectService, ProjectDeploymentService projectDeploymentService) {
-        this.projectService = projectService;
+    public ProjectTools(
+        CategoryService categoryService, ProjectDeploymentService projectDeploymentService, ProjectFacade projectFacade,
+        ProjectService projectService, TagService tagService) {
+
+        this.categoryService = categoryService;
         this.projectDeploymentService = projectDeploymentService;
+        this.projectFacade = projectFacade;
+        this.projectService = projectService;
+        this.tagService = tagService;
     }
 
     @Tool(
@@ -288,7 +301,14 @@ public class ProjectTools {
                 existingProject.setTagIds(tagIds);
             }
 
-            Project updatedProject = projectService.update(existingProject);
+            Long existingCategoryId = existingProject.getCategoryId();
+
+            projectFacade.updateProject(
+                new ProjectDTO(
+                    existingCategoryId == null ? null : categoryService.getCategory(existingCategoryId),
+                    existingProject, List.of(), tagService.getTags(existingProject.getTagIds())));
+
+            Project updatedProject = projectService.getProject(projectId);
 
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -320,7 +340,7 @@ public class ProjectTools {
             Project project = projectService.getProject(projectId);
             String projectName = project.getName();
 
-            projectService.delete(projectId);
+            projectFacade.deleteProject(projectId);
 
             if (log.isDebugEnabled()) {
                 log.debug("deleteProject({}): Deleted project {} with name '{}'", projectId, projectId, projectName);
@@ -343,7 +363,7 @@ public class ProjectTools {
         @ToolParam(required = false, description = "The description for this published version") String description) {
 
         try {
-            int publishedVersion = projectService.publishProject(projectId, description, false);
+            int publishedVersion = projectFacade.publishProject(projectId, description, false);
 
             Project updatedProject = projectService.getProject(projectId);
 

@@ -17,6 +17,8 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -36,6 +38,7 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -46,22 +49,29 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflo
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +80,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -727,5 +744,109 @@ public class ProjectDeploymentFacadeIntTest {
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerDisable(any(), any(), any(), any(), any());
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerEnable(
             any(), any(), any(), any(), any(), any(), anyLong());
+    }
+
+    @Nested
+    @ContextConfiguration(classes = PreAuthorizeEnforcement.MethodSecurityConfiguration.class)
+    class PreAuthorizeEnforcement {
+
+        private static final long PROJECT_ID = 11L;
+        private static final String WORKFLOW_ID = "workflow-41";
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            reset(permissionService);
+
+            authenticate(AuthorityConstants.USER);
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testEveryOverloadChecksDeploymentPush() {
+            ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+                .projectId(PROJECT_ID)
+                .projectVersion(1)
+                .build();
+
+            ProjectDeployment projectDeployment = new ProjectDeployment();
+
+            projectDeployment.setProjectId(PROJECT_ID);
+
+            assertRequiresScope(
+                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
+                () -> projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
+                () -> projectDeploymentFacade.createProjectDeployment(projectDeployment, WORKFLOW_ID, List.of()));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
+                () -> projectDeploymentFacade.createProjectDeployment(projectDeployment, List.of(), List.of()));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
+                () -> projectDeploymentFacade.updateProjectDeployment(projectDeploymentDTO));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
+                () -> projectDeploymentFacade.updateProjectDeployment(PROJECT_ID, 1, "uuid", List.of(), null));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
+                () -> projectDeploymentFacade.updateProjectDeployment(projectDeployment, List.of(), List.of()));
+
+            assertThat(countOverloads(ProjectDeploymentFacadeImpl.class, "createProjectDeployment")).isEqualTo(3);
+            assertThat(countOverloads(ProjectDeploymentFacadeImpl.class, "updateProjectDeployment")).isEqualTo(3);
+        }
+
+        private void
+            assertRequiresScope(Serializable targetId, String targetType, String scope, ThrowingCallable call) {
+            reset(permissionService);
+
+            assertDenied(call);
+
+            when(permissionService.hasResourceScope(targetId, targetType, scope)).thenReturn(true);
+
+            assertNotDenied(call);
+
+            reset(permissionService);
+        }
+
+        private static void assertDenied(ThrowingCallable call) {
+            assertThatThrownBy(call).isInstanceOf(AccessDeniedException.class);
+        }
+
+        private static void assertNotDenied(ThrowingCallable call) {
+            Throwable throwable = catchThrowable(call);
+
+            assertThat(throwable)
+                .as("Expected the gate to let the call through, but it was denied: %s", throwable)
+                .satisfiesAnyOf(
+                    actual -> assertThat(actual).isNull(),
+                    actual -> assertThat(actual).isNotInstanceOf(AccessDeniedException.class));
+        }
+
+        private static void authenticate(String authority) {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "user", "n/a", List.of(new SimpleGrantedAuthority(authority))));
+        }
+
+        private static long countOverloads(Class<?> clazz, String methodName) {
+            Method[] methods = clazz.getDeclaredMethods();
+
+            return Arrays.stream(methods)
+                .filter(method -> !method.isSynthetic())
+                .filter(method -> methodName.equals(method.getName()))
+                .count();
+        }
+
+        @EnableMethodSecurity
+        static class MethodSecurityConfiguration {
+        }
     }
 }

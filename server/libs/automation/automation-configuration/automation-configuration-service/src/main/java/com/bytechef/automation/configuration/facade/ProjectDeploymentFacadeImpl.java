@@ -71,6 +71,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,6 +137,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         return createProjectDeployment(
             projectDeploymentDTO.toProjectDeployment(), CollectionUtils.map(
@@ -145,6 +147,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public long createProjectDeployment(
         ProjectDeployment projectDeployment, String workflowId, List<ProjectDeploymentWorkflowConnection> connections) {
 
@@ -159,6 +162,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public long createProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
         List<Tag> tags) {
@@ -377,6 +381,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
     public void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         updateProjectDeployment(
             projectDeploymentDTO.toProjectDeployment(),
@@ -387,6 +392,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public void updateProjectDeployment(
         long projectId, int projectVersion, String workflowUuid,
         List<ProjectDeploymentWorkflowConnection> connections, Long environmentId) {
@@ -437,6 +443,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public void updateProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
         List<Tag> tags) {

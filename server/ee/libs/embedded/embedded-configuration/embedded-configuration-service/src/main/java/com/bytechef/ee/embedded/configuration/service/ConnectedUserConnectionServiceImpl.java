@@ -8,10 +8,15 @@
 package com.bytechef.ee.embedded.configuration.service;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserConnection;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserSharedConnection;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
+import com.bytechef.ee.embedded.configuration.repository.ConnectedUserSharedConnectionRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +31,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ConnectedUserConnectionServiceImpl implements ConnectedUserConnectionService {
 
     private final ConnectedUserConnectionRepository connectedUserConnectionRepository;
+    private final ConnectedUserSharedConnectionRepository connectedUserSharedConnectionRepository;
 
     @SuppressFBWarnings("EI")
-    public ConnectedUserConnectionServiceImpl(ConnectedUserConnectionRepository connectedUserConnectionRepository) {
+    public ConnectedUserConnectionServiceImpl(
+        ConnectedUserConnectionRepository connectedUserConnectionRepository,
+        ConnectedUserSharedConnectionRepository connectedUserSharedConnectionRepository) {
+
         this.connectedUserConnectionRepository = connectedUserConnectionRepository;
+        this.connectedUserSharedConnectionRepository = connectedUserSharedConnectionRepository;
     }
 
     @Override
@@ -45,6 +55,7 @@ public class ConnectedUserConnectionServiceImpl implements ConnectedUserConnecti
     @Override
     public void deleteByConnectionId(long connectionId) {
         connectedUserConnectionRepository.deleteByConnectionId(connectionId);
+        connectedUserSharedConnectionRepository.deleteByConnectionId(connectionId);
     }
 
     @Override
@@ -54,5 +65,25 @@ public class ConnectedUserConnectionServiceImpl implements ConnectedUserConnecti
             .stream()
             .map(ConnectedUserConnection::getConnectionId)
             .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Long> getSharedConnectionIds() {
+        return connectedUserSharedConnectionRepository.findAll()
+            .stream()
+            .map(ConnectedUserSharedConnection::getConnectionId)
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    @Override
+    public void updateShared(long connectionId, boolean shared) {
+        boolean currentlyShared = connectedUserSharedConnectionRepository.existsByConnectionId(connectionId);
+
+        if (shared && !currentlyShared) {
+            connectedUserSharedConnectionRepository.save(new ConnectedUserSharedConnection(connectionId));
+        } else if (!shared && currentlyShared) {
+            connectedUserSharedConnectionRepository.deleteByConnectionId(connectionId);
+        }
     }
 }

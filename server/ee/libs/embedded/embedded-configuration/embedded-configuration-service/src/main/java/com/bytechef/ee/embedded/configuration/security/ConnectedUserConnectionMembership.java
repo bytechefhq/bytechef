@@ -16,6 +16,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,9 +53,16 @@ public class ConnectedUserConnectionMembership {
 
         Set<Long> connectionIds = getOwnedConnectionIds(connectedUserId, integrationInstances);
 
-        for (Connection connection : connectionService.getSharedConnections(
-            environment.ordinal(), PlatformType.EMBEDDED)) {
-            connectionIds.add(connection.getId());
+        Set<Long> sharedConnectionIds = connectedUserConnectionService.getSharedConnectionIds();
+
+        if (!sharedConnectionIds.isEmpty()) {
+            for (Connection connection : connectionService.getConnections(new ArrayList<>(sharedConnectionIds))) {
+                if (connection.getType() == PlatformType.EMBEDDED &&
+                    connection.getEnvironmentId() == environment.ordinal()) {
+
+                    connectionIds.add(connection.getId());
+                }
+            }
         }
 
         return connectionIds;
