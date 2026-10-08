@@ -59,13 +59,16 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  * @author Igor Beslic
+ * @author Marko Kriskovic
  */
 public class HttpClientActionUtils {
 
@@ -186,31 +189,26 @@ public class HttpClientActionUtils {
         "rawtypes", "unchecked"
     })
     public static Object execute(Parameters inputParameters, RequestMethod requestMethod, Context context) {
-        Http.Response response =
-            context
-                .http(http -> http.exchange(inputParameters.getRequiredString(URI), requestMethod))
-                .configuration(
-                    Http.allowUnauthorizedCerts(inputParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
-                        .filename(inputParameters.getString(RESPONSE_FILENAME))
-                        .followAllRedirects(inputParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
-                        .followRedirect(inputParameters.getBoolean(FOLLOW_REDIRECT, false))
-                        .proxy(inputParameters.getString(PROXY))
-                        .responseType(getResponseType(inputParameters))
-                        .connectTimeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
-                .headers((Map) inputParameters.getMap(HEADERS, List.class, Collections.emptyMap()))
-                .queryParameters((Map) inputParameters.getMap(QUERY_PARAMETERS, List.class, Collections.emptyMap()))
-                .body(getBody(inputParameters, getBodyContentType(inputParameters)))
-                .execute();
+        return execute(
+            inputParameters, requestMethod, context,
+            (Map) inputParameters.getMap(HEADERS, List.class, Collections.emptyMap()),
+            (Map) inputParameters.getMap(QUERY_PARAMETERS, List.class, Collections.emptyMap()));
+    }
 
-        if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
-            return response;
-        } else {
-            return response.getBody();
-        }
+    public static Object executeV2(Parameters inputParameters, RequestMethod requestMethod, Context context) {
+        return execute(
+            inputParameters, requestMethod, context,
+            toMultiValueMap(inputParameters.getMap(HEADERS, Object.class, Collections.emptyMap()), context),
+            toMultiValueMap(inputParameters.getMap(QUERY_PARAMETERS, Object.class, Collections.emptyMap()), context));
     }
 
     public static ActionDefinition.PerformFunction getPerform(RequestMethod requestMethod) {
         return (inputParameters, connectionParameters, context) -> execute(
+            inputParameters, requestMethod, context);
+    }
+
+    public static ActionDefinition.PerformFunction getPerformV2(RequestMethod requestMethod) {
+        return (inputParameters, connectionParameters, context) -> executeV2(
             inputParameters, requestMethod, context);
     }
 
@@ -223,6 +221,69 @@ public class HttpClientActionUtils {
         }
 
         return allProperties.toArray(Property[]::new);
+    }
+
+    private static Object execute(
+        Parameters inputParameters, RequestMethod requestMethod, Context context, Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters) {
+
+        Http.Response response =
+            context
+                .http(http -> http.exchange(inputParameters.getRequiredString(URI), requestMethod))
+                .configuration(
+                    Http.allowUnauthorizedCerts(inputParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
+                        .filename(inputParameters.getString(RESPONSE_FILENAME))
+                        .followAllRedirects(inputParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
+                        .followRedirect(inputParameters.getBoolean(FOLLOW_REDIRECT, false))
+                        .proxy(inputParameters.getString(PROXY))
+                        .responseType(getResponseType(inputParameters))
+                        .connectTimeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
+                .headers(headers)
+                .queryParameters(queryParameters)
+                .body(getBody(inputParameters, getBodyContentType(inputParameters)))
+                .execute();
+
+        if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
+            return response;
+        } else {
+            return response.getBody();
+        }
+    }
+
+    private static Map<String, List<String>> toMultiValueMap(Map<String, Object> map, Context context) {
+        Map<String, List<String>> multiValueMap = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+
+            if (value == null) {
+                continue;
+            }
+
+            List<String> values = new ArrayList<>();
+
+            if (value instanceof Collection<?> collection) {
+                for (Object item : collection) {
+                    if (item != null) {
+                        values.add(toStringValue(item, context));
+                    }
+                }
+            } else {
+                values.add(toStringValue(value, context));
+            }
+
+            multiValueMap.put(entry.getKey(), values);
+        }
+
+        return multiValueMap;
+    }
+
+    private static String toStringValue(Object value, Context context) {
+        if (value instanceof Map<?, ?> || value instanceof Collection<?>) {
+            return context.json(json -> json.write(value));
+        }
+
+        return String.valueOf(value);
     }
 
     private static BodyContentType getBodyContentType(Parameters inputParameters) {
