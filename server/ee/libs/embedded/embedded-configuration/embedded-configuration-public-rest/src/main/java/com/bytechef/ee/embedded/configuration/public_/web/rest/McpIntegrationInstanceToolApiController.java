@@ -9,11 +9,16 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
+import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,12 +35,15 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 class McpIntegrationInstanceToolApiController {
 
+    private final ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade;
     private final McpIntegrationInstanceToolFacade mcpIntegrationInstanceToolFacade;
 
     @SuppressFBWarnings("EI")
     McpIntegrationInstanceToolApiController(
+        ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade,
         McpIntegrationInstanceToolFacade mcpIntegrationInstanceToolFacade) {
 
+        this.connectedUserIntegrationInstanceFacade = connectedUserIntegrationInstanceFacade;
         this.mcpIntegrationInstanceToolFacade = mcpIntegrationInstanceToolFacade;
     }
 
@@ -44,7 +52,7 @@ class McpIntegrationInstanceToolApiController {
     public ResponseEntity<Void> enableFrontendMcpIntegrationInstanceTool(
         @PathVariable Long id, @PathVariable Long mcpToolId) {
 
-        mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(id, mcpToolId, true);
+        updateMcpIntegrationInstanceToolEnabled(getCurrentExternalUserId(), id, mcpToolId, true);
 
         return ResponseEntity.noContent()
             .build();
@@ -55,31 +63,48 @@ class McpIntegrationInstanceToolApiController {
     public ResponseEntity<Void> disableFrontendMcpIntegrationInstanceTool(
         @PathVariable Long id, @PathVariable Long mcpToolId) {
 
-        mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(id, mcpToolId, false);
+        updateMcpIntegrationInstanceToolEnabled(getCurrentExternalUserId(), id, mcpToolId, false);
 
         return ResponseEntity.noContent()
             .build();
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    @PostMapping("/external/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
+    @PostMapping("/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
     public ResponseEntity<Void> enableMcpIntegrationInstanceTool(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable Long mcpToolId) {
 
-        mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(id, mcpToolId, true);
+        updateMcpIntegrationInstanceToolEnabled(externalUserId, id, mcpToolId, true);
 
         return ResponseEntity.noContent()
             .build();
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    @DeleteMapping("/external/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
+    @DeleteMapping("/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
     public ResponseEntity<Void> disableMcpIntegrationInstanceTool(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable Long mcpToolId) {
 
-        mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(id, mcpToolId, false);
+        updateMcpIntegrationInstanceToolEnabled(externalUserId, id, mcpToolId, false);
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @ExceptionHandler(EmbeddedIntegrationNotVisibleException.class)
+    public ResponseEntity<Void> handleEmbeddedIntegrationNotVisibleException() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .build();
+    }
+
+    private void updateMcpIntegrationInstanceToolEnabled(
+        String externalUserId, long id, long mcpToolId, boolean enable) {
+
+        connectedUserIntegrationInstanceFacade.validateIntegrationInstanceOwnership(externalUserId, id);
+
+        mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(id, mcpToolId, enable);
+    }
+
+    private static String getCurrentExternalUserId() {
+        return SecurityUtils.fetchCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
     }
 }
