@@ -39,6 +39,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -58,6 +59,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @author Ivica Cardic
@@ -68,9 +70,12 @@ public class ProjectWorkflowExecutionFacadeTest {
     private Evaluator evaluator;
     private ProjectWorkflowExecutionFacadeImpl facade;
     private JobService jobService;
+    private PermissionService permissionService;
+    private ProjectWorkflowService projectWorkflowService;
     private TaskExecution taskExecution;
     private TaskExecutionService taskExecutionService;
     private TaskFileStorage taskFileStorage;
+    private WorkflowExecutionRowService workflowExecutionRowService;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
@@ -80,14 +85,25 @@ public class ProjectWorkflowExecutionFacadeTest {
         contextService = mock(ContextService.class);
         evaluator = mock(Evaluator.class);
         jobService = mock(JobService.class);
+        permissionService = mock(PermissionService.class);
+        projectWorkflowService = mock(ProjectWorkflowService.class);
         taskExecutionService = mock(TaskExecutionService.class);
         taskFileStorage = mock(TaskFileStorage.class);
+        workflowExecutionRowService = mock(WorkflowExecutionRowService.class);
+
+        // Permissive on purpose: these tests cover DTO assembly, not authorization. The facade's in-body narrowing
+        // checks run here even without a proxy -- only the @PreAuthorize annotations need one -- so a default mock
+        // returning false would fail every listing that names a project, deployment or workflow.
+        lenient().when(permissionService.hasResourceScope(any(), anyString(), anyString()))
+            .thenReturn(true);
+        lenient().when(permissionService.hasWorkflowScope(anyString(), anyString()))
+            .thenReturn(true);
 
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService, contextService, evaluator, mock(EnvironmentService.class),
-            mock(WorkflowExecutionRowService.class), jobService, mock(PrincipalJobService.class),
+            workflowExecutionRowService, jobService, permissionService, mock(PrincipalJobService.class),
             mock(ProjectFacade.class),
-            mock(ProjectDeploymentService.class), mock(ProjectService.class), mock(ProjectWorkflowService.class),
+            mock(ProjectDeploymentService.class), mock(ProjectService.class), projectWorkflowService,
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
             mock(TriggerExecutionService.class), mock(TriggerFileStorage.class), mock(WorkflowService.class));
 
@@ -228,5 +244,44 @@ public class ProjectWorkflowExecutionFacadeTest {
             .isEmpty();
 
         verify(taskExecutionService, never()).getJobTaskExecutions(anyLong());
+    }
+
+    @Test
+    public void testGetWorkflowExecutionsDeniesWorkflowTheCallerCannotView() {
+        when(permissionService.hasWorkflowScope("workflow-1", "EXECUTION_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(
+            () -> facade.getWorkflowExecutions(false, 1L, null, null, null, null, null, "workflow-1", null, 3L, 0))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(workflowExecutionRowService);
+    }
+
+    @Test
+    public void testGetWorkflowExecutionsDeniesProjectTheCallerCannotView() {
+        when(permissionService.hasResourceScope(7L, "Project", "EXECUTION_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(
+            () -> facade.getWorkflowExecutions(false, 1L, null, null, null, 7L, null, null, null, 3L, 0))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verify(projectWorkflowService, never()).getProjectWorkflowIds(anyLong());
+        verifyNoInteractions(workflowExecutionRowService);
+    }
+
+    @Test
+    public void testGetWorkflowExecutionsDeniesProjectDeploymentTheCallerCannotView() {
+        when(projectWorkflowService.getProjectWorkflowIds(7L))
+            .thenReturn(List.of("workflow-1"));
+        when(permissionService.hasResourceScope(11L, "ProjectDeployment", "EXECUTION_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(
+            () -> facade.getWorkflowExecutions(false, 1L, null, null, null, 7L, 11L, null, null, 3L, 0))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(workflowExecutionRowService);
     }
 }

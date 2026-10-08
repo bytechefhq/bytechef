@@ -39,6 +39,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -76,18 +77,21 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @QueryMapping
-    McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow(@Argument long id) {
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow(@Argument long id) {
         return mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(id)
             .orElse(null);
     }
 
     @QueryMapping
-    List<McpIntegrationInstanceConfigurationWorkflow> mcpIntegrationInstanceConfigurationWorkflows() {
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfigurationWorkflow> mcpIntegrationInstanceConfigurationWorkflows() {
         return mcpIntegrationInstanceConfigurationWorkflowService.getMcpIntegrationInstanceConfigurationWorkflows();
     }
 
     @QueryMapping
-    List<McpIntegrationInstanceConfigurationWorkflow>
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfigurationWorkflow>
         mcpIntegrationInstanceConfigurationWorkflowsByMcpIntegrationInstanceConfigurationId(
             @Argument long mcpIntegrationInstanceConfigurationId) {
         return mcpIntegrationInstanceConfigurationWorkflowService
@@ -96,7 +100,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @QueryMapping
-    List<IntegrationWorkflowDTO> toolEligibleIntegrationVersionWorkflows(
+    @PreAuthorize("isTenantAdmin()")
+    public List<IntegrationWorkflowDTO> toolEligibleIntegrationVersionWorkflows(
         @Argument long integrationId, @Argument int integrationVersion) {
 
         return integrationWorkflowService.getIntegrationWorkflows(integrationId, integrationVersion)
@@ -111,7 +116,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @QueryMapping
-    List<IntegrationWorkflowDTO> toolEligibleIntegrationInstanceConfigurationWorkflows(
+    @PreAuthorize("isTenantAdmin()")
+    public List<IntegrationWorkflowDTO> toolEligibleIntegrationInstanceConfigurationWorkflows(
         @Argument long integrationInstanceConfigurationId) {
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration =
@@ -133,7 +139,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
 
     @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
     @QueryMapping
-    List<Property> mcpIntegrationInstanceConfigurationWorkflowProperties(
+    @PreAuthorize("isTenantAdmin()")
+    public List<Property> mcpIntegrationInstanceConfigurationWorkflowProperties(
         @Argument long mcpIntegrationInstanceConfigurationWorkflowId) {
         McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
             mcpIntegrationInstanceConfigurationWorkflowService
@@ -191,7 +198,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @MutationMapping
-    McpIntegrationInstanceConfigurationWorkflow
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfigurationWorkflow
         createMcpIntegrationInstanceConfigurationWorkflow(@Argument("input") Map<String, Object> input) {
         Long mcpIntegrationInstanceConfigurationId =
             Long.valueOf(String.valueOf(input.get("mcpIntegrationInstanceConfigurationId")));
@@ -204,7 +212,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
 
     @SuppressWarnings("unchecked")
     @MutationMapping
-    McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflow(
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflow(
         @Argument("id") long id, @Argument("input") Map<String, Object> input) {
 
         Long mcpIntegrationInstanceConfigurationId = null;
@@ -244,7 +253,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteMcpIntegrationInstanceConfigurationWorkflow(@Argument("id") long id) {
+    @PreAuthorize("isTenantAdmin()")
+    public boolean deleteMcpIntegrationInstanceConfigurationWorkflow(@Argument("id") long id) {
         mcpIntegrationInstanceConfigurationWorkflowFacade.deleteMcpIntegrationInstanceConfigurationWorkflow(id);
 
         return true;

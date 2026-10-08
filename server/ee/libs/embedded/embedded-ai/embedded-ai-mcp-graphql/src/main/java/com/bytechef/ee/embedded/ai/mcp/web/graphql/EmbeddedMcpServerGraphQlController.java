@@ -26,6 +26,7 @@ import java.util.Set;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -59,12 +60,14 @@ class EmbeddedMcpServerGraphQlController {
     }
 
     @QueryMapping
-    List<McpServer> embeddedMcpServers() {
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpServer> embeddedMcpServers() {
         return mcpServerService.getMcpServers(PlatformType.EMBEDDED);
     }
 
     @QueryMapping
-    List<ComponentDefinition> mcpComponentDefinitions() {
+    @PreAuthorize("isTenantAdmin()")
+    public List<ComponentDefinition> mcpComponentDefinitions() {
         Set<Long> configuredIntegrationIds =
             Set.copyOf(integrationInstanceConfigurationService.getIntegrationIds());
 
@@ -85,7 +88,8 @@ class EmbeddedMcpServerGraphQlController {
     }
 
     @MutationMapping
-    McpServer createEmbeddedMcpServer(@Argument CreateEmbeddedMcpServerInput input) {
+    @PreAuthorize("isTenantAdmin()")
+    public McpServer createEmbeddedMcpServer(@Argument CreateEmbeddedMcpServerInput input) {
         Environment[] environments = Environment.values();
 
         int environmentIndex = (int) input.environmentId();
@@ -99,7 +103,8 @@ class EmbeddedMcpServerGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteEmbeddedMcpServer(@Argument Long mcpServerId) {
+    @PreAuthorize("isTenantAdmin()")
+    public boolean deleteEmbeddedMcpServer(@Argument Long mcpServerId) {
         embeddedMcpServerFacade.deleteEmbeddedMcpServer(mcpServerId);
 
         return true;

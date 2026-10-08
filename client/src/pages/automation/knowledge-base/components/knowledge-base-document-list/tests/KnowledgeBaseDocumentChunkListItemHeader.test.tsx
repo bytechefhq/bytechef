@@ -3,6 +3,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBaseDocumentChunkListItemHeader from '../KnowledgeBaseDocumentChunkListItemHeader';
 
+const hoistedScope = vi.hoisted(() => ({canEditKnowledgeBase: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoistedScope.canEditKnowledgeBase,
+}));
+
 const hoisted = vi.hoisted(() => {
     return {
         handleSelectionChange: vi.fn(),
@@ -20,6 +26,8 @@ const defaultMockReturn = {
 };
 
 beforeEach(() => {
+    hoistedScope.canEditKnowledgeBase = true;
+
     windowResizeObserver();
     hoisted.mockUseKnowledgeBaseDocumentChunkListItemHeader.mockReturnValue({...defaultMockReturn});
 });
@@ -38,6 +46,20 @@ describe('KnowledgeBaseDocumentChunkListItemHeader', () => {
         renderComponent();
 
         expect(screen.getByRole('checkbox')).toBeInTheDocument();
+    });
+
+    it('enables the checkbox with KNOWLEDGE_BASE_EDIT', () => {
+        renderComponent();
+
+        expect(screen.getByRole('checkbox', {name: 'Select chunk 1'})).toBeEnabled();
+    });
+
+    it('disables the checkbox without KNOWLEDGE_BASE_EDIT', () => {
+        hoistedScope.canEditKnowledgeBase = false;
+
+        renderComponent();
+
+        expect(screen.getByRole('checkbox', {name: 'Select chunk 1'})).toBeDisabled();
     });
 
     it('renders the document name', () => {

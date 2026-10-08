@@ -16,8 +16,9 @@ import java.util.Map;
  */
 public interface McpIntegrationInstanceWorkflowFacade {
 
-    void enableMcpIntegrationInstanceWorkflow(long integrationInstanceId, String workflowUuid, boolean enable);
+    void enableMcpIntegrationInstanceWorkflow(
+        String externalUserId, long integrationInstanceId, String workflowUuid, boolean enable);
 
     void updateMcpIntegrationInstanceWorkflow(
-        long integrationInstanceId, String workflowUuid, Map<String, Object> inputs);
+        String externalUserId, long integrationInstanceId, String workflowUuid, Map<String, Object> inputs);
 }

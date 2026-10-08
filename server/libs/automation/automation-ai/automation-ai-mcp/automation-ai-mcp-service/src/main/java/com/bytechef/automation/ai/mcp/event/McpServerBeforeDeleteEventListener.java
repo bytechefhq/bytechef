@@ -20,8 +20,10 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -33,8 +35,8 @@ import org.springframework.data.relational.core.mapping.event.Identifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Event listener that handles after-save events for {@link McpServer} entities. This listener is responsible for
- * cleaning up related MCP project data.
+ * Event listener that handles before-delete events for {@link McpServer} entities. This listener is responsible for
+ * cleaning up related MCP project data and the server's workspace assignment.
  *
  * @author Ivica Cardic
  */
@@ -46,25 +48,32 @@ public class McpServerBeforeDeleteEventListener extends AbstractRelationalEventL
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
+    private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public McpServerBeforeDeleteEventListener(
         McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        ProjectDeploymentService projectDeploymentService, ProjectDeploymentFacade projectDeploymentFacade) {
+        ProjectDeploymentService projectDeploymentService, ProjectDeploymentFacade projectDeploymentFacade,
+        WorkspaceMcpServerService workspaceMcpServerService) {
 
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentFacade = projectDeploymentFacade;
+        this.workspaceMcpServerService = workspaceMcpServerService;
     }
 
     @Override
     protected void onBeforeDelete(BeforeDeleteEvent<McpServer> beforeDeleteEvent) {
         Identifier identifier = beforeDeleteEvent.getId();
 
-        deleteMcpProjects((Long) identifier.getValue());
+        long mcpServerId = (Long) identifier.getValue();
+
+        runSkippingChecks(() -> deleteMcpProjects(mcpServerId));
+
+        workspaceMcpServerService.removeMcpServerFromWorkspace(mcpServerId);
     }
 
     private void deleteMcpProjects(long mcpServerId) {
@@ -86,6 +95,20 @@ public class McpServerBeforeDeleteEventListener extends AbstractRelationalEventL
 
             mcpProjectService.delete(mcpProject.getId());
             projectDeploymentService.delete(mcpProject.getProjectDeploymentId());
+        }
+    }
+
+    private static void runSkippingChecks(Runnable runnable) {
+        try {
+            AutomationAuthorizationContext.callSkippingChecks(() -> {
+                runnable.run();
+
+                return null;
+            });
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
         }
     }
 }

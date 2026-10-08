@@ -13,6 +13,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.constant.PlatformType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,6 +35,7 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
         String workflowId, Long environmentId, String triggerName) {
 
@@ -46,6 +48,7 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> stopWebhookTriggerTest(String workflowId, Long environmentId, String triggerName) {
         webhookTriggerTestFacade.disableTrigger(workflowId, triggerName, environmentId, PlatformType.EMBEDDED);
 

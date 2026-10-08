@@ -20,6 +20,7 @@ import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -38,6 +39,7 @@ import com.bytechef.automation.ai.mcp.server.spi.McpServerWorkspaceToolCallbackC
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
@@ -85,6 +87,7 @@ import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.beans.factory.ObjectProvider;
@@ -133,6 +136,7 @@ public class AutomationMcpServerConfiguration {
         Evaluator evaluator, JobService jobService, McpComponentService mcpComponentService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         SubflowResolver subflowResolver, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, @Qualifier("syncWorkerExecutor") TaskExecutor taskExecutor,
         TaskHandlerRegistry taskHandlerRegistry,
@@ -147,7 +151,8 @@ public class AutomationMcpServerConfiguration {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, evaluator, jobService, -1, asyncMessageBroker,
             getAdditionalApplicationEventListeners(
-                evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
+                evaluator, coordinatorEventPublisher, jobService, sharedApplicationEventListenerProvider,
+                taskExecutionService, taskFileStorage),
             getTaskCompletionHandlerFactories(
                 contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
             getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
@@ -200,6 +205,18 @@ public class AutomationMcpServerConfiguration {
         ObjectProvider<McpServerWorkspaceToolCallbackContributor> workspaceToolProviders,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
+        return callSkippingChecks(
+            () -> collectToolSpecifications(
+                secretKey, mcpComponentService, mcpProjectService, mcpServerService, mcpToolService, mcpToolFacade,
+                workspaceToolProviders, workspaceMcpServerService));
+    }
+
+    private static List<McpServerFeatures.AsyncToolSpecification> collectToolSpecifications(
+        String secretKey, McpComponentService mcpComponentService, McpProjectService mcpProjectService,
+        McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade,
+        ObjectProvider<McpServerWorkspaceToolCallbackContributor> workspaceToolProviders,
+        WorkspaceMcpServerService workspaceMcpServerService) {
+
         McpServer mcpServer = mcpServerService.getMcpServer(secretKey);
 
         List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
@@ -241,6 +258,16 @@ public class AutomationMcpServerConfiguration {
         };
     }
 
+    private static <T> T callSkippingChecks(Supplier<T> supplier) {
+        try {
+            return AutomationAuthorizationContext.callSkippingChecks(supplier::get);
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
+        }
+    }
+
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {
         return event -> {
             MessageEvent<?> messageEvent = (MessageEvent<?>) event;
@@ -253,11 +280,19 @@ public class AutomationMcpServerConfiguration {
 
     private static List<ApplicationEventListener> getAdditionalApplicationEventListeners(
         Evaluator evaluator, ApplicationEventPublisher coordinatorEventPublisher, JobService jobService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
-        return List.of(
+        List<ApplicationEventListener> applicationEventListeners = new ArrayList<>();
+
+        applicationEventListeners.add(
             new SubflowJobStatusEventListener(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+
+        sharedApplicationEventListenerProvider.orderedStream()
+            .forEach(applicationEventListeners::add);
+
+        return applicationEventListeners;
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(

@@ -10,6 +10,7 @@ import {useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCol
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
@@ -32,6 +33,8 @@ const ApiCollections = () => {
 
     const location = useLocation();
     const [searchParams] = useSearchParams();
+
+    const canCreateApiCollection = useHasWorkspaceScope(currentWorkspaceId, 'API_PLATFORM_CREATE');
 
     const filterData = location.pathname.includes('api-keys')
         ? {
@@ -70,7 +73,7 @@ const ApiCollections = () => {
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery(currentWorkspaceId!);
 
     return (
         <LayoutContainer
@@ -79,6 +82,7 @@ const ApiCollections = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateApiCollection &&
                         apiCollections &&
                         apiCollections.length > 0 && (
                             <ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />
@@ -126,7 +130,11 @@ const ApiCollections = () => {
                     <EmptyFilterResult entityName="API collections" entityTitle="API Collections" />
                 ) : (
                     <EmptyList
-                        button={<ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />}
+                        button={
+                            canCreateApiCollection ? (
+                                <ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />
+                            ) : undefined
+                        }
                         icon={<Link2Icon className="size-12 text-gray-400" />}
                         message="You do not have any API Collections created yet."
                         title="No API Collections"

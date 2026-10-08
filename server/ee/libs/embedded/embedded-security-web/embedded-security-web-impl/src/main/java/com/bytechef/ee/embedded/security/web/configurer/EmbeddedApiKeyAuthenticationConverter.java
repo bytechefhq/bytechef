@@ -22,11 +22,15 @@ import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Locator;
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.util.UriUtils;
 
 /**
  * Authentication converter for embedded API key authentication.
@@ -37,7 +41,10 @@ import org.springframework.security.core.Authentication;
  */
 class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
 
-    static final Pattern EXTERNAL_USER_ID_PATTERN = Pattern.compile(".*/v\\d+/([^/]+)/.*");
+    static final Pattern API_KEY_PATH_PATTERN = Pattern.compile(
+        "^/api/embedded/v\\d+/(?:external/([^/]+)/integration-instances(?:/.*)?|([^/]+)(?:/.*)?)$");
+    static final Pattern CONNECTED_USER_ONLY_PATH_PATTERN =
+        Pattern.compile("^/api/embedded/v\\d+/(?:app-events|workflows/[^/]+)/?$");
     static final Pattern JWT_TOKEN_PATTERN =
         Pattern.compile("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_.+/=]*$");
 
@@ -72,16 +79,53 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
 
             TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
-            return new EmbeddedApiKeyAuthenticationToken(
-                environment.ordinal(), externalUserId, null, tenantKey.getTenantId());
-        } else {
-            String externalUserId;
-            Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
+            Integer claimedEnvironmentId = payload.get("environmentId", Integer.class);
+            long environmentId = environment.ordinal();
 
-            if (matcher.matches()) {
-                externalUserId = matcher.group(1);
-            } else {
-                throw new IllegalArgumentException("externalUserId parameter is required");
+            if (claimedEnvironmentId != null) {
+                boolean builderToken = jwtTokenService.getPublicKey(header.getKeyId()) != null;
+                String environmentHeader = request.getHeader("X-ENVIRONMENT");
+
+                if ((!builderToken || StringUtils.isNotBlank(environmentHeader)) &&
+                    environment.ordinal() != claimedEnvironmentId) {
+
+                    throw new BadCredentialsException("X-ENVIRONMENT does not match the token's environment");
+                }
+
+                environmentId = claimedEnvironmentId;
+            }
+
+            return new EmbeddedApiKeyAuthenticationToken(
+                environmentId, externalUserId, null, tenantKey.getTenantId());
+        } else {
+            String contextPath = StringUtils.defaultString(request.getContextPath());
+            String requestURI = request.getRequestURI();
+
+            String path = requestURI.substring(contextPath.length());
+
+            Matcher connectedUserOnlyPathMatcher = CONNECTED_USER_ONLY_PATH_PATTERN.matcher(path);
+
+            if (connectedUserOnlyPathMatcher.matches()) {
+                throw new BadCredentialsException("This endpoint requires a connected-user token");
+            }
+
+            Matcher matcher = API_KEY_PATH_PATTERN.matcher(path);
+
+            if (!matcher.matches()) {
+                throw new BadCredentialsException("An API key requires the external user id as the first path segment");
+            }
+
+            String externalMcpInstanceUserId = matcher.group(1);
+
+            String externalUserId;
+
+            try {
+                externalUserId = UriUtils.decode(
+                    externalMcpInstanceUserId == null ? matcher.group(2) : externalMcpInstanceUserId,
+                    StandardCharsets.UTF_8);
+            } catch (IllegalArgumentException illegalArgumentException) {
+                throw new BadCredentialsException("The external user id is not validly encoded",
+                    illegalArgumentException);
             }
 
             TenantKey tenantKey = TenantKey.parse(authToken);

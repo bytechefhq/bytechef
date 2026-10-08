@@ -28,6 +28,14 @@ import java.util.Optional;
 public interface KnowledgeBaseDocumentChunkService {
 
     /**
+     * Retrieves a specific KnowledgeBaseDocumentChunk by its unique identifier, if it exists.
+     *
+     * @param id the unique identifier of the KnowledgeBaseDocumentChunk to retrieve
+     * @return the KnowledgeBaseDocumentChunk associated with the given identifier, or an empty {@code Optional}
+     */
+    Optional<KnowledgeBaseDocumentChunk> fetchKnowledgeBaseDocumentChunk(long id);
+
+    /**
      * Retrieves a specific KnowledgeBaseDocumentChunk by its unique identifier.
      *
      * @param id the unique identifier of the KnowledgeBaseDocumentChunk to retrieve

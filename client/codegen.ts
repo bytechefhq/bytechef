@@ -71,6 +71,7 @@ const config: CodegenConfig = {
         '../server/libs/platform/platform-mcp/platform-mcp-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-ai/automation-ai-mcp/automation-ai-mcp-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-configuration/automation-configuration-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/ee/libs/automation/automation-configuration/automation-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-search/automation-search-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-task/automation-task-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/automation/automation-ai/automation-ai-gateway/automation-ai-gateway-graphql/src/main/resources/graphql/*.graphqls',
@@ -86,6 +87,7 @@ const config: CodegenConfig = {
         '../server/ee/libs/embedded/embedded-ai/embedded-ai-mcp-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/platform/platform-ai/platform-ai-agent/platform-ai-agent-eval/platform-ai-agent-eval-graphql/src/main/resources/graphql/**/*.graphqls',
         '../server/libs/platform/platform-ai/platform-ai-skill/platform-ai-skill-graphql/src/main/resources/graphql/**/*.graphqls',
+        '../server/ee/libs/platform/platform-audit/platform-audit-graphql/src/main/resources/graphql/*.graphqls',
     ],
 };
 

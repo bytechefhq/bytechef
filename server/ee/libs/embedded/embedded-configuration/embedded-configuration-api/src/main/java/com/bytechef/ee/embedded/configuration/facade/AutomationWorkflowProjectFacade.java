@@ -44,8 +44,6 @@ public interface AutomationWorkflowProjectFacade {
 
     List<AutomationWorkflowProjectDTO> getProjects();
 
-    List<AutomationWorkflowProjectDTO> getPublishedProjects();
-
     List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment);
 
     void publishProject(long projectId);

@@ -16,6 +16,7 @@ import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -37,19 +38,22 @@ class ConnectedUserMcpServerGraphQlController {
     }
 
     @QueryMapping
-    List<ConnectedUserMcpServerDTO> connectedUserMcpServers(@Argument long connectedUserId) {
+    @PreAuthorize("isTenantAdmin()")
+    public List<ConnectedUserMcpServerDTO> connectedUserMcpServers(@Argument long connectedUserId) {
         return connectedUserMcpServerFacade.getConnectedUserMcpServers(connectedUserId);
     }
 
     @MutationMapping
-    boolean deleteConnectedUserMcpServer(@Argument long connectedUserId, @Argument long mcpServerId) {
+    @PreAuthorize("isTenantAdmin()")
+    public boolean deleteConnectedUserMcpServer(@Argument long connectedUserId, @Argument long mcpServerId) {
         connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, mcpServerId);
 
         return true;
     }
 
     @MutationMapping
-    boolean enableConnectedUserMcpServer(
+    @PreAuthorize("isTenantAdmin()")
+    public boolean enableConnectedUserMcpServer(
         @Argument long connectedUserId, @Argument long mcpServerId, @Argument boolean enable) {
 
         connectedUserMcpServerFacade.enableConnectedUserMcpServer(connectedUserId, mcpServerId, enable);
@@ -58,7 +62,8 @@ class ConnectedUserMcpServerGraphQlController {
     }
 
     @MutationMapping
-    boolean enableConnectedUserMcpTool(@Argument long id, @Argument boolean enable) {
+    @PreAuthorize("isTenantAdmin()")
+    public boolean enableConnectedUserMcpTool(@Argument long id, @Argument boolean enable) {
         connectedUserMcpServerFacade.enableMcpTool(id, enable);
 
         return true;

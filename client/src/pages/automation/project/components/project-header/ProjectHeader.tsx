@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import {ButtonGroup} from '@/components/ui/button-group';
 import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
@@ -9,13 +10,16 @@ import PublishPopover from '@/pages/automation/project/components/project-header
 import WorkflowActionsButton from '@/pages/automation/project/components/project-header/components/WorkflowActionsButton';
 import SettingsMenu from '@/pages/automation/project/components/project-header/components/settings-menu/SettingsMenu';
 import {useProjectHeader} from '@/pages/automation/project/components/project-header/hooks/useProjectHeader';
+import {useProjectWorkflowViewOnlyNotice} from '@/pages/automation/project/hooks/useProjectWorkflowViewOnlyNotice';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
+import {EyeIcon} from 'lucide-react';
 import {RefObject, useSyncExternalStore} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {twMerge} from 'tailwind-merge';
@@ -64,6 +68,8 @@ const ProjectHeader = ({
 
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
+    const readOnly = useWorkflowEditorReadOnly();
+    const viewOnlyNoticeVisible = useProjectWorkflowViewOnlyNotice();
     const {
         handleProjectWorkflowValueChange,
         handlePublishProjectSubmit,
@@ -114,6 +120,19 @@ const ProjectHeader = ({
                 )}
 
                 {loadingIndicator}
+
+                {readOnly && viewOnlyNoticeVisible && (
+                    <Badge
+                        aria-label="View only"
+                        className="ml-3"
+                        icon={<EyeIcon />}
+                        role="status"
+                        styleType="secondary-outline"
+                        title="You can view this workflow but not change or run it"
+                    >
+                        View only
+                    </Badge>
+                )}
             </div>
 
             <div className="flex items-center gap-1">
@@ -121,6 +140,7 @@ const ProjectHeader = ({
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
+                    readOnly={readOnly}
                     runDisabled={runDisabled}
                     workflowIsRunning={workflowIsRunning}
                 />

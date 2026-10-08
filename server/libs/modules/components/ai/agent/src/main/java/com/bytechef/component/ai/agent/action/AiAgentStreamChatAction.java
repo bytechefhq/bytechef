@@ -37,6 +37,7 @@ import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.context.EnvironmentContextThreadLocalAccessor;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,8 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import reactor.core.publisher.Flux;
 
 /**
@@ -114,7 +117,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context);
 
-        Flux<Object> contentFlux = withEnvironmentContext(
+        Flux<Object> contentFlux = withCallerContext(
             chatClientRequestSpec.stream()
                 .chatResponse()
                 .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
@@ -224,15 +227,26 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         };
     }
 
-    private static Flux<Object> withEnvironmentContext(Flux<Object> flux) {
+    static Flux<Object> withCallerContext(Flux<Object> flux) {
+        Map<Object, Object> contextEntries = new HashMap<>();
+
         Environment environment = EnvironmentContext.fetchCurrentEnvironment();
 
-        if (environment == null) {
+        if (environment != null) {
+            contextEntries.put(EnvironmentContextThreadLocalAccessor.KEY, environment);
+        }
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        if (securityContext.getAuthentication() != null) {
+            contextEntries.put(SecurityContext.class.getName(), securityContext);
+        }
+
+        if (contextEntries.isEmpty()) {
             return flux;
         }
 
-        return flux.contextWrite(
-            reactor.util.context.Context.of(EnvironmentContextThreadLocalAccessor.KEY, environment));
+        return flux.contextWrite(reactor.util.context.Context.of(contextEntries));
     }
 
     static List<Object> toSseEvents(

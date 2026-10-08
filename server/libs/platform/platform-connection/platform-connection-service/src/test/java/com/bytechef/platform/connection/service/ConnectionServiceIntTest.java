@@ -152,6 +152,14 @@ public class ConnectionServiceIntTest {
         assertThat(connectionService.getConnections(null, null, null, null, PlatformType.AUTOMATION)).hasSize(1);
     }
 
+    @Test
+    public void testFetchConnection() {
+        Connection connection = connectionRepository.save(getConnection());
+
+        assertThat(connectionService.fetchConnection(Validate.notNull(connection.getId(), "id"))).contains(connection);
+        assertThat(connectionService.fetchConnection(Long.MAX_VALUE)).isEmpty();
+    }
+
     private static Connection getConnection() {
         return Connection.builder()
             .authorizationType(AuthorizationType.BASIC_AUTH)

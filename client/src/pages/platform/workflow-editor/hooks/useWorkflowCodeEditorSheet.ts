@@ -1,3 +1,4 @@
+import {useWorkflowEditorCopilotAllowed} from '@/pages/platform/workflow-editor/providers/workflowEditorCopilotContext';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
@@ -91,7 +92,9 @@ const useWorkflowCodeEditorSheet = ({
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
-    const copilotEnabled = ai.copilot.enabled && ff_1570;
+    const copilotAllowed = useWorkflowEditorCopilotAllowed();
+
+    const copilotEnabled = ai.copilot.enabled && ff_1570 && copilotAllowed;
 
     const {getPersistedJobId, persistJobId} = usePersistJobId(workflow.id, currentEnvironmentId);
     const {close: closeWorkflowTestStream, setStreamRequest} = useWorkflowTestStream({

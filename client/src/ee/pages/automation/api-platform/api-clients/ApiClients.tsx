@@ -27,7 +27,7 @@ const ApiClients = () => {
         projectDeployments: true,
     });
 
-    const {data: tags, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery();
+    const {data: tags, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery(currentWorkspaceId!);
 
     return (
         <PageLoader errors={[apiKeysError]} loading={apiKeysLoading}>

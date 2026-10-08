@@ -1,4 +1,5 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import invalidateWorkflowValidation from '@/pages/platform/workflow-editor/utils/invalidateWorkflowValidation';
@@ -42,6 +43,7 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
         useGetConnectionTagsQuery,
         useGetConnectionsQuery,
     } = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     let connectionId: number | undefined;
 
@@ -73,6 +75,10 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
     const saveWorkflowNodeConnectionMutation = useSaveWorkflowTestConfigurationConnectionMutation();
 
     const handleValueChange = (connectionId: number, workflowConnectionKey: string) => {
+        if (readOnly) {
+            return;
+        }
+
         if (isClusterElement) {
             saveClusterElementConnectionMutation.mutate(
                 {

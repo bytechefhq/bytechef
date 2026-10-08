@@ -26,6 +26,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -51,13 +52,14 @@ public class McpServerBeforeDeleteEventListenerTest {
         ProjectDeploymentWorkflowService.class);
     private final ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
     private final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
+    private final WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
 
     @Test
     public void testOnBeforeDeleteServerWithProjectsDeletesAllRelatedData() {
         // Given
         McpServerBeforeDeleteEventListener listener = new McpServerBeforeDeleteEventListener(
             mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService,
-            projectDeploymentService, projectDeploymentFacade);
+            projectDeploymentService, projectDeploymentFacade, workspaceMcpServerService);
 
         Long mcpServerId = 1L;
 
@@ -136,7 +138,7 @@ public class McpServerBeforeDeleteEventListenerTest {
         // Given
         McpServerBeforeDeleteEventListener listener = new McpServerBeforeDeleteEventListener(
             mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService,
-            projectDeploymentService, projectDeploymentFacade);
+            projectDeploymentService, projectDeploymentFacade, workspaceMcpServerService);
 
         long mcpServerId = 1L;
 
@@ -168,7 +170,7 @@ public class McpServerBeforeDeleteEventListenerTest {
         // Given
         McpServerBeforeDeleteEventListener listener = new McpServerBeforeDeleteEventListener(
             mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService,
-            projectDeploymentService, projectDeploymentFacade);
+            projectDeploymentService, projectDeploymentFacade, workspaceMcpServerService);
 
         Long mcpServerId = 1L;
 
@@ -208,7 +210,7 @@ public class McpServerBeforeDeleteEventListenerTest {
         // Given
         McpServerBeforeDeleteEventListener listener = new McpServerBeforeDeleteEventListener(
             mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService,
-            projectDeploymentService, projectDeploymentFacade);
+            projectDeploymentService, projectDeploymentFacade, workspaceMcpServerService);
 
         Long mcpServerId = 2L;
 

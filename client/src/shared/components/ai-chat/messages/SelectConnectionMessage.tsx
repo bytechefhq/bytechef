@@ -3,6 +3,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {DataMessagePartProps, useThreadRuntime} from '@assistant-ui/react';
 import {CheckIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
@@ -23,6 +24,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
     const [pickedConnection, setPickedConnection] = useState<{id: number; name: string} | undefined>();
     const [supersededByLaterMessage, setSupersededByLaterMessage] = useState(false);
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const threadRuntime = useThreadRuntime();
@@ -36,6 +38,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
         {
             componentName: data.componentName,
             connectionVersion: connectionDefinition?.version,
+            environmentId: currentEnvironmentId,
             id: currentWorkspaceId!,
         },
         Boolean(connectionDefinition?.version) && currentWorkspaceId != null

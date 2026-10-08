@@ -1,0 +1,8 @@
+mutation AssignWorkspaceUserCustomRole($workspaceId: ID!, $userId: ID!, $customRoleId: ID!) {
+    assignWorkspaceUserCustomRole(workspaceId: $workspaceId, userId: $userId, customRoleId: $customRoleId) {
+        id
+        userId
+        workspaceRole
+        customRoleId
+    }
+}

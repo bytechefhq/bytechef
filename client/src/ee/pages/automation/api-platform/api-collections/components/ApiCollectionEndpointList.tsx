@@ -2,6 +2,8 @@ import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowIcon} from 'lucide-react';
@@ -25,6 +27,10 @@ const ApiCollectionEndpointList = ({
     projectDeploymentId: number;
     projectVersion: number;
 }) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditApiCollection = useHasWorkspaceScope(currentWorkspaceId, 'API_PLATFORM_EDIT');
+
     const {data: workflows} = useGetProjectVersionWorkflowsQuery(projectId, projectVersion);
 
     const {data: projectDeployment} = useGetProjectDeploymentQuery(projectDeploymentId);
@@ -74,14 +80,16 @@ const ApiCollectionEndpointList = ({
                 <div className="flex justify-center py-8">
                     <EmptyList
                         button={
-                            <ApiCollectionEndpointDialog
-                                apiCollectionId={apiCollectionId}
-                                collectionVersion={collectionVersion}
-                                contextPath={contextPath}
-                                projectId={projectId}
-                                projectVersion={projectVersion}
-                                triggerNode={<Button label="Create API Endpoint" />}
-                            />
+                            canEditApiCollection ? (
+                                <ApiCollectionEndpointDialog
+                                    apiCollectionId={apiCollectionId}
+                                    collectionVersion={collectionVersion}
+                                    contextPath={contextPath}
+                                    projectId={projectId}
+                                    projectVersion={projectVersion}
+                                    triggerNode={<Button label="Create API Endpoint" />}
+                                />
+                            ) : undefined
                         }
                         icon={<WorkflowIcon className="size-24 text-gray-300" />}
                         message="Get started by creating an API endpoint."

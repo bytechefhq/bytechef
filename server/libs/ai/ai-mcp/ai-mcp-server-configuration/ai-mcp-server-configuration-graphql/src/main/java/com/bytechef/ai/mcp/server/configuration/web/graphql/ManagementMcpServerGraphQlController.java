@@ -19,12 +19,14 @@ package com.bytechef.ai.mcp.server.configuration.web.graphql;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -48,7 +50,8 @@ class ManagementMcpServerGraphQlController {
     }
 
     @QueryMapping
-    String managementMcpServerUrl() {
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public String managementMcpServerUrl() {
         Optional<Property> propertyOptional = propertyService.fetchProperty(
             MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null);
         String secretKey;
@@ -68,7 +71,8 @@ class ManagementMcpServerGraphQlController {
     }
 
     @MutationMapping
-    String updateManagementMcpServerUrl() {
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public String updateManagementMcpServerUrl() {
         String secretKey = String.valueOf(TenantKey.of());
 
         propertyService.save(MCP_SERVER_PROPERTY_KEY, Map.of("secretKey", secretKey), Property.Scope.PLATFORM, null);

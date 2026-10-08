@@ -18,6 +18,7 @@ import resolveOperationNameForVersion from './resolveOperationNameForVersion';
 import saveClusterElementFieldChange from './saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from './saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 
 type OperationDefinitionType = ActionDefinition | ClusterElementDefinition | TriggerDefinition;
 
@@ -65,6 +66,10 @@ export default async function changeComponentVersion({
     updateWorkflowMutation,
     workflowId,
 }: ChangeComponentVersionProps): Promise<void> {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const {currentNode, setCurrentNode, setOperationChangeInProgress} = useWorkflowNodeDetailsPanelStore.getState();
 
     if (!currentNode || !Number.isInteger(newComponentVersion)) {

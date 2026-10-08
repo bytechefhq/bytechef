@@ -24,6 +24,10 @@ import {
     UpdateTagsRequestToJSON,
 } from '../models/UpdateTagsRequest';
 
+export interface GetApiCollectionTagsRequest {
+    id: number;
+}
+
 export interface UpdateApiCollectionTagsRequest {
     id: number;
     updateTagsRequest: UpdateTagsRequest;
@@ -37,13 +41,21 @@ export class ApiCollectionTagApi extends runtime.BaseAPI {
     /**
      * Creates request options for getApiCollectionTags without sending the request
      */
-    async getApiCollectionTagsRequestOpts(): Promise<runtime.RequestOpts> {
+    async getApiCollectionTagsRequestOpts(requestParameters: GetApiCollectionTagsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getApiCollectionTags().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/api-collections/tags`;
+        let urlPath = `/workspaces/{id}/api-collection-tags`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -54,22 +66,22 @@ export class ApiCollectionTagApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get API collection tags.
+     * Get API collection tags for a workspace.
      * Get API collection tags
      */
-    async getApiCollectionTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
-        const requestOptions = await this.getApiCollectionTagsRequestOpts();
+    async getApiCollectionTagsRaw(requestParameters: GetApiCollectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+        const requestOptions = await this.getApiCollectionTagsRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagFromJSON));
     }
 
     /**
-     * Get API collection tags.
+     * Get API collection tags for a workspace.
      * Get API collection tags
      */
-    async getApiCollectionTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Tag>> {
-        const response = await this.getApiCollectionTagsRaw(initOverrides);
+    async getApiCollectionTags(requestParameters: GetApiCollectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Tag>> {
+        const response = await this.getApiCollectionTagsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

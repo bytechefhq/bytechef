@@ -25,12 +25,14 @@ import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorS
 import com.bytechef.ee.platform.apiconnector.configuration.service.OpenApiSpecificationGenerator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -65,16 +67,19 @@ public class ApiConnectorGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector apiConnector(@Argument long id) {
         return apiConnectorService.getApiConnector(id);
     }
 
     @QueryMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public List<ApiConnectorDTO> apiConnectors() {
         return apiConnectorFacade.getApiConnectors();
     }
 
     @QueryMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public GenerationJobStatusRecord generationJobStatus(@Argument String jobId) {
         return apiConnectorGenerationJobService.get(jobId)
             .map(this::toGenerationJobStatusRecord)
@@ -82,6 +87,7 @@ public class ApiConnectorGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector createApiConnector(@Argument CreateApiConnectorInput input) {
         ApiConnector apiConnector = new ApiConnector();
 
@@ -95,6 +101,7 @@ public class ApiConnectorGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public boolean deleteApiConnector(@Argument long id) {
         apiConnectorService.delete(id);
 
@@ -102,6 +109,7 @@ public class ApiConnectorGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public boolean enableApiConnector(@Argument long id, @Argument boolean enable) {
         apiConnectorService.enableApiConnector(id, enable);
 
@@ -109,6 +117,7 @@ public class ApiConnectorGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector updateApiConnector(@Argument long id, @Argument UpdateApiConnectorInput input) {
         ApiConnector apiConnector = apiConnectorService.getApiConnector(id);
 
@@ -137,11 +146,13 @@ public class ApiConnectorGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector importOpenApiSpecification(@Argument ImportOpenApiSpecificationInput input) {
         return apiConnectorFacade.importOpenApiSpecification(input.name(), input.specification());
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public GenerateSpecificationResponseRecord generateSpecification(@Argument GenerateSpecificationInput input) {
         GenerateSpecificationRequestDTO requestDTO = toDTO(input);
 
@@ -151,11 +162,13 @@ public class ApiConnectorGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector generateFromDocumentation(@Argument GenerateFromDocumentationInput input) {
         return apiConnectorFacade.generateFromDocumentation(input.name(), input.documentationUrl());
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public GenerationJobStatusRecord startGenerateFromDocumentationPreview(
         @Argument GenerateFromDocumentationInput input) {
 
@@ -174,6 +187,7 @@ public class ApiConnectorGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public boolean cancelGenerationJob(@Argument String jobId) {
         return apiConnectorGenerationJobService.requestCancellation(jobId);
     }

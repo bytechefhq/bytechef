@@ -24,6 +24,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -59,28 +60,32 @@ class McpIntegrationInstanceConfigurationGraphQlController {
     }
 
     @MutationMapping
-    McpIntegrationInstanceConfiguration
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfiguration
         createMcpIntegrationInstanceConfiguration(@Argument CreateMcpIntegrationInstanceConfigurationInput input) {
         return mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
             input.mcpServerId(), input.integrationInstanceConfigurationId(), input.selectedWorkflowIds());
     }
 
     @MutationMapping
-    boolean deleteMcpIntegrationInstanceConfiguration(@Argument long id) {
+    @PreAuthorize("isTenantAdmin()")
+    public boolean deleteMcpIntegrationInstanceConfiguration(@Argument long id) {
         mcpIntegrationInstanceConfigurationFacade.deleteMcpIntegrationInstanceConfiguration(id);
 
         return true;
     }
 
     @MutationMapping
-    McpIntegrationInstanceConfiguration updateMcpIntegrationInstanceConfiguration(
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfiguration updateMcpIntegrationInstanceConfiguration(
         @Argument long id, @Argument UpdateMcpIntegrationInstanceConfigurationInput input) {
         return mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(id,
             input.selectedWorkflowIds());
     }
 
     @MutationMapping
-    boolean updateMcpIntegrationInstanceConfigurationVersion(
+    @PreAuthorize("isTenantAdmin()")
+    public boolean updateMcpIntegrationInstanceConfigurationVersion(
         @Argument long id, @Argument UpdateMcpIntegrationInstanceConfigurationVersionInput input) {
         mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfigurationVersion(id,
             input.integrationVersion(), input.workflowUuids());
@@ -89,18 +94,21 @@ class McpIntegrationInstanceConfigurationGraphQlController {
     }
 
     @QueryMapping
-    McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration(@Argument long id) {
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration(@Argument long id) {
         return mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(id)
             .orElse(null);
     }
 
     @QueryMapping
-    List<McpIntegrationInstanceConfiguration> mcpIntegrationInstanceConfigurations() {
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfiguration> mcpIntegrationInstanceConfigurations() {
         return mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations();
     }
 
     @QueryMapping
-    List<McpIntegrationInstanceConfiguration>
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfiguration>
         mcpIntegrationInstanceConfigurationsByServerId(@Argument long mcpServerId) {
         return mcpIntegrationInstanceConfigurationService.getMcpServerMcpIntegrationInstanceConfigurations(mcpServerId);
     }

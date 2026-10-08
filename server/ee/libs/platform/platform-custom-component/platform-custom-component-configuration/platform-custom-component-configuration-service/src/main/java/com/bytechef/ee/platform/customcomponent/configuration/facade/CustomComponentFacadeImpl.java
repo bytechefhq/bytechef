@@ -59,6 +59,7 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void delete(Long id) {
         CustomComponent customComponent = customComponentService.getCustomComponent(id);
 

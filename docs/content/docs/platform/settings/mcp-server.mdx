@@ -60,7 +60,7 @@ Authorization: Bearer <your-api-key>
 
 It must be an **Admin** API key. A workspace API key - the kind under **Settings** → **API Keys**, for the automation public API - is rejected here with `401`, because it is bound to a workspace while this server administers the whole account.
 
-The connection snippets below include this header. The API key is bound to an environment; requests target the environment given in the `X-ENVIRONMENT` header (`PRODUCTION` when omitted), and the key's environment must match. Because the key is bound to your user account, the AI assistant acts with your permissions - and you can revoke a single client by deleting its key without touching the server URL or other clients.
+The connection snippets below include this header. The key is not tied to an environment: tools that work in one take it as an argument. Because the key is bound to your user account, the AI assistant acts with your permissions - and you can revoke a single client by deleting its key without touching the server URL or other clients.
 
 ### OAuth2 (optional)
 

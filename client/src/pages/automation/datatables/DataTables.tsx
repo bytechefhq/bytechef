@@ -6,12 +6,17 @@ import DataTableList from '@/pages/automation/datatables/components/DataTableLis
 import DataTablesFilterTitle from '@/pages/automation/datatables/components/DataTablesFilterTitle';
 import DataTablesLeftSidebarNav from '@/pages/automation/datatables/components/DataTablesLeftSidebarNav';
 import useDataTables from '@/pages/automation/datatables/components/hooks/useDataTables';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Table2Icon} from 'lucide-react';
 
 const DataTables = () => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {allTags, error, filteredTables, isLoading, tables, tagId, tagsByTableData} = useDataTables();
+    const canCreateDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_CREATE');
 
     return (
         <LayoutContainer
@@ -19,7 +24,10 @@ const DataTables = () => {
                 <Header
                     centerTitle={true}
                     position="main"
-                    right={tables.length > 0 && <CreateDataTableDialog trigger={<Button>New Table</Button>} />}
+                    right={
+                        tables.length > 0 &&
+                        canCreateDataTable && <CreateDataTableDialog trigger={<Button>New Table</Button>} />
+                    }
                     title={
                         tables.length > 0 ? (
                             <DataTablesFilterTitle allTags={allTags} tagsByTableData={tagsByTableData} />
@@ -38,7 +46,11 @@ const DataTables = () => {
                     <DataTableList allTags={allTags} dataTables={filteredTables} tagsByTableData={tagsByTableData} />
                 ) : (
                     <EmptyList
-                        button={<CreateDataTableDialog trigger={<Button>Create Table</Button>} />}
+                        button={
+                            canCreateDataTable ? (
+                                <CreateDataTableDialog trigger={<Button>Create Table</Button>} />
+                            ) : undefined
+                        }
                         icon={<Table2Icon className="size-24 text-gray-300" />}
                         message={
                             tagId

@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,6 +78,8 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', "
+        + "#workflowTestConfigurationModel?.environmentId)")
     public ResponseEntity<WorkflowTestConfigurationModel> saveWorkflowTestConfiguration(
         String workflowId, WorkflowTestConfigurationModel workflowTestConfigurationModel) {
 
@@ -89,6 +92,7 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public ResponseEntity<Void> deleteWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey, Long environmentId,
         DeleteWorkflowTestConfigurationConnectionRequestModel deleteWorkflowTestConfigurationConnectionRequestModel) {
@@ -102,6 +106,7 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public ResponseEntity<Void> saveWorkflowTestConfigurationInputs(
         String workflowId, Long environmentId,
         SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequestModel) {

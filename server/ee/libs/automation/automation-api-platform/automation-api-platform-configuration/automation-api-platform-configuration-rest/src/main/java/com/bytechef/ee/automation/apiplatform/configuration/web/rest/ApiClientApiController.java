@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,6 +54,7 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<CreateApiClient200ResponseModel> createApiClient(ApiClientModel apiClientModel) {
         return ResponseEntity.ok(
             new CreateApiClient200ResponseModel().secretKey(
@@ -60,6 +62,7 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> deleteApiClient(Long id) {
         apiClientService.delete(id);
 
@@ -68,6 +71,7 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<ApiClientModel> getApiClient(Long id) {
         ApiClientModel apiClientModel = Objects.requireNonNull(
             conversionService.convert(apiClientService.getApiClient(id), ApiClientModel.class), "apiClientModel");
@@ -76,6 +80,7 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<ApiClientModel>> getApiClients() {
         return ResponseEntity.ok(
             CollectionUtils.map(
@@ -89,6 +94,7 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> updateApiClient(Long id, ApiClientModel apiClientModel) {
         apiClientService.update(conversionService.convert(apiClientModel.id(id), ApiClient.class));
 

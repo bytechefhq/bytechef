@@ -29,6 +29,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -58,7 +59,8 @@ class KnowledgeBaseDocumentGraphQlController {
     }
 
     @QueryMapping
-    List<KnowledgeBaseDocumentChunk> knowledgeBaseDocumentChunks(@Argument Long id) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_VIEW')")
+    public List<KnowledgeBaseDocumentChunk> knowledgeBaseDocumentChunks(@Argument Long id) {
         return knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentId(id);
     }
 
@@ -74,17 +76,20 @@ class KnowledgeBaseDocumentGraphQlController {
     }
 
     @QueryMapping
-    KnowledgeBaseDocument knowledgeBaseDocument(@Argument Long id) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_VIEW')")
+    public KnowledgeBaseDocument knowledgeBaseDocument(@Argument Long id) {
         return knowledgeBaseDocumentService.getKnowledgeBaseDocument(id);
     }
 
     @QueryMapping
-    DocumentStatusUpdate knowledgeBaseDocumentStatus(@Argument Long id) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_VIEW')")
+    public DocumentStatusUpdate knowledgeBaseDocumentStatus(@Argument Long id) {
         return knowledgeBaseDocumentService.getKnowledgeBaseDocumentStatus(id);
     }
 
     @MutationMapping
-    boolean deleteKnowledgeBaseDocument(@Argument Long id) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_EDIT')")
+    public boolean deleteKnowledgeBaseDocument(@Argument Long id) {
         knowledgeBaseDocumentFacade.deleteKnowledgeBaseDocument(id);
 
         return true;

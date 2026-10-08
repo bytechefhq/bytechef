@@ -82,7 +82,17 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
                 throw new BadCredentialsException("Invalid API secret key", e);
             }
 
-            org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())
+            if (apiKey.getType() != null) {
+                throw new BadCredentialsException("Invalid API secret key");
+            }
+
+            Long userId = apiKey.getUserId();
+
+            if (userId == null) {
+                throw new BadCredentialsException("Invalid API secret key");
+            }
+
+            org.springframework.security.core.userdetails.User user = userService.fetchUser(userId)
                 .map(curUser -> createSpringSecurityUser(
                     managementMcpServerApiKeyAuthenticationToken.getAuthSecretKey(), curUser))
                 .orElseThrow(() -> new UsernameNotFoundException(

@@ -21,6 +21,7 @@ import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
 import com.bytechef.platform.knowledgebase.exception.KnowledgeBaseDocumentNotFoundException;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentRepository;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,12 @@ class KnowledgeBaseDocumentServiceImpl implements KnowledgeBaseDocumentService {
     @Override
     public void delete(long id) {
         knowledgeBaseDocumentRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<KnowledgeBaseDocument> fetchKnowledgeBaseDocument(long id) {
+        return knowledgeBaseDocumentRepository.findById(id);
     }
 
     @Override

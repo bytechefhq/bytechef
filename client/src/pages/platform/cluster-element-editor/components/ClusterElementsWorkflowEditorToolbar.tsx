@@ -10,9 +10,13 @@ import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
 interface ClusterElementsWorkflowEditorToolbarPropsI {
     onResetLayout: () => void;
+    readOnly?: boolean;
 }
 
-const ClusterElementsWorkflowEditorToolbar = ({onResetLayout}: ClusterElementsWorkflowEditorToolbarPropsI) => {
+const ClusterElementsWorkflowEditorToolbar = ({
+    onResetLayout,
+    readOnly = false,
+}: ClusterElementsWorkflowEditorToolbarPropsI) => {
     const {nodesLocked, setNodesLocked} = useClusterElementsDataStore(
         useShallow((state) => ({
             nodesLocked: state.nodesLocked,
@@ -85,37 +89,47 @@ const ClusterElementsWorkflowEditorToolbar = ({onResetLayout}: ClusterElementsWo
                     </TooltipContent>
                 </Tooltip>
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            aria-label="Reset layout"
-                            icon={<BrushCleaningIcon />}
-                            onClick={onResetLayout}
-                            size="icon"
-                            variant="outline"
-                        />
-                    </TooltipTrigger>
+                {!readOnly && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                aria-label="Reset layout"
+                                icon={<BrushCleaningIcon />}
+                                onClick={onResetLayout}
+                                size="icon"
+                                variant="outline"
+                            />
+                        </TooltipTrigger>
 
-                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
-                        Reset layout
-                    </TooltipContent>
-                </Tooltip>
+                        <TooltipContent
+                            className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                            side="top"
+                        >
+                            Reset layout
+                        </TooltipContent>
+                    </Tooltip>
+                )}
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            aria-label={nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
-                            icon={nodesLocked ? <LockIcon /> : <LockOpenIcon />}
-                            onClick={handleToggleLock}
-                            size="icon"
-                            variant="outline"
-                        />
-                    </TooltipTrigger>
+                {!readOnly && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                aria-label={nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
+                                icon={nodesLocked ? <LockIcon /> : <LockOpenIcon />}
+                                onClick={handleToggleLock}
+                                size="icon"
+                                variant="outline"
+                            />
+                        </TooltipTrigger>
 
-                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
-                        {nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
-                    </TooltipContent>
-                </Tooltip>
+                        <TooltipContent
+                            className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                            side="top"
+                        >
+                            {nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
+                        </TooltipContent>
+                    </Tooltip>
+                )}
             </ButtonGroup>
         </Panel>
     );

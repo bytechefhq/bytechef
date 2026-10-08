@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -130,6 +131,9 @@ public class AutomationWorkflowProjectFacadeIntTest {
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @Autowired
+    private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+
+    @Autowired
     private ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @Autowired
@@ -142,6 +146,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
         when(connectedUserService.getConnectedUser(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(connectedUser);
+        when(embeddedPermissionEvaluator.evaluate(isNull(), any())).thenReturn(true);
     }
 
     @Test
@@ -150,7 +155,8 @@ public class AutomationWorkflowProjectFacadeIntTest {
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
         automationWorkflowProjectFacade.publishProject(projectId);
 
-        String publishedWorkflowUuid = automationWorkflowProjectFacade.getPublishedProjects()
+        String publishedWorkflowUuid = automationWorkflowProjectFacade.getPublishedProjects(
+            TEST_EXTERNAL_USER_ID, Environment.PRODUCTION)
             .stream()
             .filter(project -> project.id() == projectId)
             .flatMap(project -> project.workflowTemplates()
@@ -283,7 +289,8 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
         automationWorkflowProjectFacade.createProjectWorkflow(unpublishedProjectId, null, null);
 
-        List<AutomationWorkflowProjectDTO> publishedProjects = automationWorkflowProjectFacade.getPublishedProjects();
+        List<AutomationWorkflowProjectDTO> publishedProjects = automationWorkflowProjectFacade.getPublishedProjects(
+            TEST_EXTERNAL_USER_ID, Environment.PRODUCTION);
 
         AutomationWorkflowProjectDTO publishedProject = publishedProjects.stream()
             .filter(project -> project.id() == publishedProjectId)

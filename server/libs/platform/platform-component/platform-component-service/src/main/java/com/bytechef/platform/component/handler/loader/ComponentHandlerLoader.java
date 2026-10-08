@@ -19,6 +19,7 @@ package com.bytechef.platform.component.handler.loader;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import java.util.List;
 
 /**
@@ -35,6 +36,8 @@ public interface ComponentHandlerLoader {
     @FunctionalInterface
     interface ComponentTaskHandlerFunction {
 
-        ComponentTaskHandler apply(String actionName, ActionDefinitionFacade actionDefinitionFacade);
+        ComponentTaskHandler apply(
+            String actionName, ActionDefinitionFacade actionDefinitionFacade,
+            JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner);
     }
 }

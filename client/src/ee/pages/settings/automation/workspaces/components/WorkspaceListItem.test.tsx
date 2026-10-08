@@ -77,7 +77,7 @@ describe('WorkspaceListItem', () => {
 
         renderWorkspaceListItem();
 
-        await user.click(screen.getByRole('button', {name: 'Workspace actions'}));
+        await user.click(screen.getByRole('button', {name: 'Workspace actions for Workspace2'}));
         await user.click(screen.getByRole('menuitem', {name: 'Edit'}));
 
         expect(screen.getByText('Edit Workspace')).toBeInTheDocument();

@@ -6,6 +6,10 @@ import {describe, expect, it, vi} from 'vitest';
 
 import McpComponentToolListItem from './McpComponentToolListItem';
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('./hooks/useMcpProjectComponentToolDropdownMenu', () => ({
     default: () => ({
         handleConfirmDelete: vi.fn(),

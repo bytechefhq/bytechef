@@ -137,4 +137,7 @@ dependencies {
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
 
     implementation(project(":server:libs:core:tenant:tenant-api"))
+
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

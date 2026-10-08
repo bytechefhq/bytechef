@@ -14,6 +14,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,6 +41,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> deleteIntegrationInstance(Long id) {
         integrationInstanceFacade.deleteIntegrationInstance(id);
 
@@ -48,6 +50,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> enableIntegrationInstance(Long id, Boolean enable) {
         integrationInstanceFacade.enableIntegrationInstance(id, enable);
 
@@ -56,6 +59,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> enableIntegrationInstanceWorkflow(Long id, String workflowId, Boolean enable) {
         integrationInstanceFacade.enableIntegrationInstanceWorkflow(id, workflowId, enable);
 
@@ -64,6 +68,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<IntegrationInstanceModel> getIntegrationInstance(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(integrationInstanceFacade.getIntegrationInstance(id),

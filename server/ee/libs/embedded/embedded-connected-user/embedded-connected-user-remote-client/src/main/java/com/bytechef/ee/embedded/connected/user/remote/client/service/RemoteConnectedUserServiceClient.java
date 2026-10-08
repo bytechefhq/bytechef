@@ -47,6 +47,11 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
     }
 
     @Override
+    public Optional<ConnectedUser> fetchConnectedUser(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<ConnectedUser> fetchConnectedUser(String externalId, long environmentId) {
         throw new UnsupportedOperationException();
     }

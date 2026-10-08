@@ -16,14 +16,15 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 
 /**
- * Spring Data JPA repository for the PersistentAuditEvent entity.
+ * Spring Data JDBC repository for the PersistentAuditEvent entity.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
 public interface PersistenceAuditEventRepository
-    extends ListCrudRepository<PersistentAuditEvent, Long>, ListPagingAndSortingRepository<PersistentAuditEvent, Long> {
+    extends ListCrudRepository<PersistentAuditEvent, Long>, ListPagingAndSortingRepository<PersistentAuditEvent, Long>,
+    CustomPersistenceAuditEventRepository {
 
     List<PersistentAuditEvent> findByPrincipal(String principal);
 

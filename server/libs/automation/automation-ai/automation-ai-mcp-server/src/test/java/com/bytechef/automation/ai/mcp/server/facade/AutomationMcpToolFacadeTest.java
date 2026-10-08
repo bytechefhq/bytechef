@@ -17,13 +17,19 @@
 package com.bytechef.automation.ai.mcp.server.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpServerApiKeyAuthenticationToken;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
@@ -31,16 +37,21 @@ import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.mcp.domain.McpComponent;
+import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
@@ -48,15 +59,51 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 @ExtendWith(ObjectMapperSetupExtension.class)
 class AutomationMcpToolFacadeTest {
 
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade =
+        mock(ClusterElementDefinitionFacade.class);
     private final ClusterElementDefinitionService clusterElementDefinitionService =
         mock(ClusterElementDefinitionService.class);
     private final McpComponentService mcpComponentService = mock(McpComponentService.class);
+    private final McpServerService mcpServerService = mock(McpServerService.class);
 
     private final AutomationMcpToolFacade automationMcpToolFacade = new AutomationMcpToolFacade(
-        mock(ClusterElementDefinitionFacade.class), clusterElementDefinitionService, mock(Evaluator.class),
-        mock(JobSyncExecutor.class), mcpComponentService, mock(McpProjectWorkflowService.class),
-        mock(McpServerService.class), mock(PrincipalJobFacade.class), mock(ProjectDeploymentWorkflowService.class),
-        mock(TaskExecutionService.class), mock(TaskFileStorage.class), mock(WorkflowService.class));
+        clusterElementDefinitionFacade, clusterElementDefinitionService, mock(Evaluator.class),
+        mock(JobSyncExecutor.class), mcpComponentService, mock(McpProjectWorkflowService.class), mcpServerService,
+        mock(PrincipalJobFacade.class), mock(ProjectDeploymentWorkflowService.class), mock(TaskExecutionService.class),
+        mock(TaskFileStorage.class), mock(WorkflowService.class));
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testToolCallReadsTheGatedServerUnderTheServerSecretKeyPrincipal() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(new AutomationMcpServerApiKeyAuthenticationToken("api-key"));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        McpServer mcpServer = new McpServer();
+
+        mcpServer.setEnabled(true);
+
+        when(mcpServerService.getMcpServer(1L)).thenAnswer(invocation -> {
+            if (!AutomationAuthorizationContext.isSkipChecks()) {
+                throw new AccessDeniedException("Access Denied");
+            }
+
+            return mcpServer;
+        });
+        when(clusterElementDefinitionFacade.executeTool(eq("httpClient"), eq(1), eq("post"), anyMap(), isNull()))
+            .thenReturn("posted");
+
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getFunctionToolCallback(Map.of());
+
+        assertEquals("\"posted\"", functionToolCallback.call("{}"));
+        assertFalse(AutomationAuthorizationContext.isSkipChecks());
+    }
 
     // The tool name is optional, so a tool configured without one still has to reach the model under a callable
     // name derived from the component and the cluster element.
@@ -99,6 +146,12 @@ class AutomationMcpToolFacadeTest {
     }
 
     private ToolDefinition getToolDefinition(Map<String, Object> parameters) {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getFunctionToolCallback(parameters);
+
+        return functionToolCallback.getToolDefinition();
+    }
+
+    private FunctionToolCallback<Map<String, Object>, Object> getFunctionToolCallback(Map<String, Object> parameters) {
         McpTool mcpTool = new McpTool();
 
         mcpTool.setMcpComponentId(1L);
@@ -123,9 +176,6 @@ class AutomationMcpToolFacadeTest {
         when(clusterElementDefinitionService.getClusterElementDefinition("httpClient", 1, "post"))
             .thenReturn(clusterElementDefinition);
 
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
-            automationMcpToolFacade.getFunctionToolCallback(mcpTool);
-
-        return functionToolCallback.getToolDefinition();
+        return automationMcpToolFacade.getFunctionToolCallback(mcpTool);
     }
 }

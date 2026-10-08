@@ -9,19 +9,41 @@ const mockOnRunClick = vi.fn();
 
 const mockOnStopClick = vi.fn();
 
-const renderWorkflowActionsButton = (chatTrigger: boolean, workflowIsRunning?: boolean, runDisabled?: boolean) => {
+const renderWorkflowActionsButton = (
+    chatTrigger: boolean,
+    workflowIsRunning?: boolean,
+    runDisabled?: boolean,
+    readOnly?: boolean
+) => {
     render(
         <TooltipProvider>
             <WorkflowActionsButton
                 chatTrigger={chatTrigger}
                 onRunClick={mockOnRunClick}
                 onStopClick={mockOnStopClick}
+                readOnly={readOnly}
                 runDisabled={runDisabled ?? false}
                 workflowIsRunning={workflowIsRunning ?? false}
             />
         </TooltipProvider>
     );
 };
+
+it('should not offer Test or Chat in read-only mode', () => {
+    renderWorkflowActionsButton(false, false, false, true);
+
+    expect(screen.queryByRole('button', {name: 'Test'})).not.toBeInTheDocument();
+
+    renderWorkflowActionsButton(true, false, false, true);
+
+    expect(screen.queryByRole('button', {name: 'Chat'})).not.toBeInTheDocument();
+});
+
+it('should still offer Stop for a running workflow in read-only mode', () => {
+    renderWorkflowActionsButton(false, true, false, true);
+
+    expect(screen.getByRole('button', {name: 'Stop'})).toBeInTheDocument();
+});
 
 it('should show the workflow RUN button when chat trigger is false', () => {
     renderWorkflowActionsButton(false);

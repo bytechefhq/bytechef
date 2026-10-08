@@ -1,10 +1,15 @@
 import WorkflowsListItemDropdownMenu from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItemDropdownMenu';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+const ALL_WORKFLOW_SCOPES = ['WORKFLOW_CREATE', 'WORKFLOW_DELETE', 'WORKFLOW_EDIT', 'WORKFLOW_VIEW'];
 
 const hoisted = vi.hoisted(() => ({
     deleteMutate: vi.fn(),
     duplicateMutate: vi.fn(),
+    grantedEnvironmentId: 0 as number | undefined,
+    grantedScopes: [] as string[],
     navigate: vi.fn(),
     templatesSubmissionForm: 'https://templates.example.com' as string | undefined,
     toast: vi.fn(),
@@ -18,6 +23,11 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('sonner', () => ({
     toast: hoisted.toast,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string, environmentId?: number) =>
+        environmentId === hoisted.grantedEnvironmentId && hoisted.grantedScopes.includes(scope),
 }));
 
 vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({
@@ -125,6 +135,8 @@ const deleteWorkflow = async () => {
 
 beforeEach(() => {
     windowResizeObserver();
+    hoisted.grantedEnvironmentId = DEVELOPMENT_ENVIRONMENT;
+    hoisted.grantedScopes = [...ALL_WORKFLOW_SCOPES];
     hoisted.templatesSubmissionForm = 'https://templates.example.com';
 });
 
@@ -146,6 +158,75 @@ describe('WorkflowsListItemDropdownMenu', () => {
             'Share with Community',
             'Export',
             'Delete',
+        ]);
+    });
+
+    it('offers only Share with Community and Export to a member without workflow scopes', async () => {
+        hoisted.grantedScopes = [];
+
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'Share with Community',
+            'Export',
+        ]);
+    });
+
+    it('offers Edit and Share only with WORKFLOW_EDIT', async () => {
+        hoisted.grantedScopes = ['WORKFLOW_EDIT'];
+
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'Edit',
+            'Share',
+            'Share with Community',
+            'Export',
+        ]);
+    });
+
+    it('offers Duplicate only with WORKFLOW_CREATE and WORKFLOW_VIEW and Delete only with WORKFLOW_DELETE', async () => {
+        hoisted.grantedScopes = ['WORKFLOW_CREATE', 'WORKFLOW_DELETE', 'WORKFLOW_VIEW'];
+
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'Duplicate',
+            'Share with Community',
+            'Export',
+            'Delete',
+        ]);
+    });
+
+    it('withholds Duplicate from a member holding WORKFLOW_CREATE without WORKFLOW_VIEW', async () => {
+        hoisted.grantedScopes = ['WORKFLOW_CREATE'];
+
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'Share with Community',
+            'Export',
+        ]);
+    });
+
+    it('withholds workflow actions granted only in the selected non-Development environment', async () => {
+        hoisted.grantedEnvironmentId = undefined;
+
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'Share with Community',
+            'Export',
         ]);
     });
 

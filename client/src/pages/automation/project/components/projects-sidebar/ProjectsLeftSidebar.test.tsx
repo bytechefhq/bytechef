@@ -51,12 +51,12 @@ vi.mock('@/pages/automation/project/components/projects-sidebar/components/Workf
 
 // Hooks and stores
 const mockGetProjectWorkflowsQuery = vi.fn();
-const mockGetWorkflowsQuery = vi.fn();
+const mockGetWorkspaceWorkflowsQuery = vi.fn();
 vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useGetProjectWorkflowsQuery: (...args: any[]) => mockGetProjectWorkflowsQuery(...args),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    useGetWorkflowsQuery: (...args: any[]) => mockGetWorkflowsQuery(...args),
+    useGetWorkspaceWorkflowsQuery: (...args: any[]) => mockGetWorkspaceWorkflowsQuery(...args),
 }));
 
 const mockGetWorkspaceProjectsQuery = vi.fn();
@@ -105,10 +105,10 @@ const setupQueries = ({
 
     if (selectedProjectId !== 0) {
         mockGetProjectWorkflowsQuery.mockReturnValue({data: workflows, isLoading: loading});
-        mockGetWorkflowsQuery.mockReturnValue({data: undefined, isLoading: false});
+        mockGetWorkspaceWorkflowsQuery.mockReturnValue({data: undefined, isLoading: false});
     } else {
         mockGetProjectWorkflowsQuery.mockReturnValue({data: undefined, isLoading: false});
-        mockGetWorkflowsQuery.mockReturnValue({data: workflows, isLoading: loading});
+        mockGetWorkspaceWorkflowsQuery.mockReturnValue({data: workflows, isLoading: loading});
     }
 };
 
@@ -239,7 +239,7 @@ describe('ProjectsLeftSidebar', () => {
         expect(items).toHaveLength(projects.length);
 
         // Verify the "all workflows" query was called with enabled=true
-        expect(mockGetWorkflowsQuery).toHaveBeenCalledWith(true);
+        expect(mockGetWorkspaceWorkflowsQuery).toHaveBeenCalledWith(10, true);
         // And the project-specific query was disabled (NaN is converted to 0)
         expect(mockGetProjectWorkflowsQuery).toHaveBeenCalledWith(0, false);
     });

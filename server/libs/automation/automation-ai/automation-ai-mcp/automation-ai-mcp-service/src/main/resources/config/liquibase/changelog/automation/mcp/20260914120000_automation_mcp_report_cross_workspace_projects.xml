@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+      Report, once, any MCP project linking an MCP server in one workspace to a project in another.
+
+      createMcpProject never checked that the project belonged to the server's workspace, so such links could be
+      created. Every MCP ownership resolver answers through the server, so for these rows MCP_VIEW in the server's
+      workspace exposes the project's workflows to members with no access to the project's own workspace. New links
+      are now refused where they are written.
+
+      Existing rows are reported rather than changed. Which side is wrong - the server or the project - is a decision
+      only an operator can make, and deleting the link would silently remove tools a running MCP client depends on.
+      The precondition fails with WARN when any such row exists, which writes the warning to the startup log and lets
+      the upgrade continue. The changeset itself changes nothing.
+
+      To list the rows:
+
+        SELECT mcp_project.id, workspace_mcp_server.workspace_id AS server_workspace_id,
+               project.workspace_id AS project_workspace_id
+        FROM mcp_project
+                 JOIN workspace_mcp_server ON workspace_mcp_server.mcp_server_id = mcp_project.mcp_server_id
+                 JOIN project_deployment ON project_deployment.id = mcp_project.project_deployment_id
+                 JOIN project ON project.id = project_deployment.project_id
+        WHERE workspace_mcp_server.workspace_id <> project.workspace_id;
+    -->
+
+    <changeSet id="20260914120000" author="Ivica Cardic">
+        <preConditions onFail="WARN"
+                       onFailMessage="Found MCP projects whose MCP server and project are in different workspaces. MCP_VIEW in the server's workspace exposes those projects' workflows. The query to list them is in 20260914120000_automation_mcp_report_cross_workspace_projects.xml.">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM mcp_project
+                         JOIN workspace_mcp_server ON workspace_mcp_server.mcp_server_id = mcp_project.mcp_server_id
+                         JOIN project_deployment ON project_deployment.id = mcp_project.project_deployment_id
+                         JOIN project ON project.id = project_deployment.project_id
+                WHERE workspace_mcp_server.workspace_id &lt;&gt; project.workspace_id
+            </sqlCheck>
+        </preConditions>
+
+        <comment>Report-only check for cross-workspace MCP projects. Changes nothing.</comment>
+
+        <empty/>
+    </changeSet>
+</databaseChangeLog>

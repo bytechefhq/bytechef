@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -137,6 +138,25 @@ class ManagementMcpServerApiKeyAuthenticationProviderTest {
 
         assertThatThrownBy(() -> provider.authenticate(token(MCP_SERVER_SECRET_KEY, AUTH_SECRET_KEY)))
             .isInstanceOf(BadCredentialsException.class);
+
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    void testAuthenticateRejectsAWorkspaceOrEmbeddedApiKey() {
+        stubMcpServerProperty(MCP_SERVER_SECRET_KEY);
+
+        for (PlatformType type : PlatformType.values()) {
+            ApiKey apiKey = new ApiKey();
+
+            apiKey.setType(type);
+            apiKey.setUserId(USER_ID);
+
+            when(apiKeyService.getApiKey(AUTH_SECRET_KEY)).thenReturn(apiKey);
+
+            assertThatThrownBy(() -> provider.authenticate(token(MCP_SERVER_SECRET_KEY, AUTH_SECRET_KEY)))
+                .isInstanceOf(BadCredentialsException.class);
+        }
 
         verifyNoInteractions(userService);
     }

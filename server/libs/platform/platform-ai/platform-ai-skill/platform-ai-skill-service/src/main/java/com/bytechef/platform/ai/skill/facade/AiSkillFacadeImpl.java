@@ -23,6 +23,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.file.storage.AiSkillFileStorage;
 import com.bytechef.platform.ai.skill.service.AiSkillService;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -45,7 +46,11 @@ import java.util.zip.ZipOutputStream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +68,12 @@ import org.springframework.util.Assert;
     justification = "SKILL_NAME_PATTERN uses fixed separators between character classes — runs in linear time")
 class AiSkillFacadeImpl implements AiSkillFacade {
 
+    private static void checkNotConnectedUser() {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            throw new AccessDeniedException("A connected user has no AI skills");
+        }
+    }
+
     private static final int MAX_SKILL_FILE_SIZE = 10 * 1024 * 1024;
     private static final int MAX_SKILL_NAME_LENGTH = 64;
     private static final int MAX_SKILL_DESCRIPTION_LENGTH = 1024;
@@ -72,20 +83,26 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
     private static final Logger log = LoggerFactory.getLogger(AiSkillFacadeImpl.class);
 
+    private final AiSkillFacade aiSkillFacade;
     private final AiSkillFileStorage aiSkillFileStorage;
     private final AiSkillService aiSkillService;
     private final TagService tagService;
 
     AiSkillFacadeImpl(
-        AiSkillFileStorage aiSkillFileStorage, AiSkillService aiSkillService, TagService tagService) {
+        @Lazy AiSkillFacade aiSkillFacade, AiSkillFileStorage aiSkillFileStorage, AiSkillService aiSkillService,
+        TagService tagService) {
 
+        this.aiSkillFacade = aiSkillFacade;
         this.aiSkillFileStorage = aiSkillFileStorage;
         this.aiSkillService = aiSkillService;
         this.tagService = tagService;
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public AiSkill createAiSkill(String name, @Nullable String description, String filename, byte[] bytes) {
+        checkNotConnectedUser();
+
         Assert.hasText(name, "Skill name must not be blank");
         Assert.hasText(filename, "Filename must not be blank");
 
@@ -163,9 +180,12 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public AiSkill createAiSkillFromInstructions(
         String name, @Nullable String description, String instructions,
         @Nullable Map<String, String> additionalFiles) {
+
+        checkNotConnectedUser();
 
         Assert.hasText(name, "Skill name must not be blank");
         Assert.hasText(instructions, "Instructions must not be blank");
@@ -202,12 +222,18 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public AiSkill createAiSkillFromInstructions(String name, @Nullable String description, String instructions) {
+        checkNotConnectedUser();
+
         return createAiSkillFromInstructions(name, description, instructions, null);
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public void deleteAiSkill(long id) {
+        checkNotConnectedUser();
+
         AiSkill aiSkill = aiSkillService.getAiSkill(id);
 
         FileEntry fileEntry = aiSkill.getSkillFile();
@@ -230,20 +256,29 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public byte[] getAiSkillDownload(long id) {
+        checkNotConnectedUser();
+
         return getSkillZipBytes(id);
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     @Transactional(readOnly = true)
     public AiSkill getAiSkill(long id) {
+        checkNotConnectedUser();
+
         return aiSkillService.getAiSkill(id);
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     @Transactional(readOnly = true)
     public AiSkillDownload getAiSkillWithDownload(long id) {
+        checkNotConnectedUser();
+
         AiSkill aiSkill = aiSkillService.getAiSkill(id);
 
         byte[] bytes = aiSkillFileStorage.readAiSkillFileBytes(aiSkill.getSkillFile());
@@ -252,8 +287,11 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     @Transactional(readOnly = true)
     public String getAiSkillFileContent(long id, String path) {
+        checkNotConnectedUser();
+
         Assert.hasText(path, "File path must not be blank");
 
         if (path.contains("..") || path.startsWith("/")) {
@@ -293,8 +331,11 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     @Transactional(readOnly = true)
     public List<String> getAiSkillFilePaths(long id) {
+        checkNotConnectedUser();
+
         byte[] zipBytes = getSkillZipBytes(id);
 
         List<String> paths = new ArrayList<>();
@@ -323,14 +364,35 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PostFilter("isTenantAdmin() or isResourceOwner(filterObject.id, 'AiSkill')")
     @Transactional(readOnly = true)
     public List<AiSkill> getAiSkills() {
-        return aiSkillService.getAiSkills();
+        checkNotConnectedUser();
+
+        return new ArrayList<>(aiSkillService.getAiSkills());
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public List<Tag> getAiSkillTags() {
+        checkNotConnectedUser();
+
+        return getTags(
+            aiSkillFacade.getAiSkills()
+                .stream()
+                .flatMap(aiSkill -> aiSkill.getTagIds()
+                    .stream())
+                .distinct()
+                .toList());
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public List<Tag> getTags(List<Long> tagIds) {
+        checkNotConnectedUser();
+
         if (tagIds.isEmpty()) {
             return List.of();
         }
@@ -339,7 +401,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public AiSkill updateAiSkillTags(long id, List<Tag> tags) {
+        checkNotConnectedUser();
+
         List<Tag> tagsToCreate = tags.stream()
             .filter(tag -> tag.getId() == null)
             .toList();
@@ -369,7 +434,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public AiSkill updateAiSkillContent(long id, @Nullable String path, String content) {
+        checkNotConnectedUser();
+
         Assert.hasText(content, "Content must not be blank");
 
         byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
@@ -435,7 +503,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public AiSkill createAdditionalFilesInSkill(long id, Map<String, String> additionalFiles) {
+        checkNotConnectedUser();
+
         Assert.notEmpty(additionalFiles, "additionalFiles must not be null or empty");
 
         validateAdditionalFilePaths(additionalFiles);
@@ -496,7 +567,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public AiSkill removeFileInSkill(long id, String path) {
+        checkNotConnectedUser();
+
         Assert.hasText(path, "File path must not be blank");
 
         if (path.contains("..") || path.startsWith("/")) {
@@ -549,7 +623,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public AiSkill updateAiSkill(long id, String name, @Nullable String description) {
+        checkNotConnectedUser();
+
         Assert.hasText(name, "Skill name must not be blank");
 
         validateSkillName(name);

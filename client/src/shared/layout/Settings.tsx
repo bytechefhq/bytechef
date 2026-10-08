@@ -1,4 +1,5 @@
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -18,15 +19,45 @@ interface SettingsProps {
     title?: string;
 }
 
-const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
+// Matched on whole path segments rather than a bare substring: `users` is a substring of
+// `workspace-users`, so on the workspace page both the workspace and the organization entry lit up
+// at once. A nested route still counts as inside its nav item, which is what the substring match
+// was giving us by accident.
+export const isNavItemCurrent = (pathname: string, href: string): boolean => {
+    const segmentPath = href.startsWith('/') ? href : `/${href}`;
+
+    return pathname === segmentPath || pathname.endsWith(segmentPath) || pathname.includes(`${segmentPath}/`);
+};
+
+const TENANT_ADMIN_NAV_ITEM_HREFS = [
+    '/automation/settings/workspaces',
+    '/embedded/settings/api-keys',
+    '/embedded/settings/signing-keys',
+    'ai-providers',
+    'api-connectors',
+    'audit-events',
+    'billing',
+    'git-configuration',
+    'global-custom-roles',
+    'identity-providers',
+    'mcp-server',
+    'notifications',
+    'users',
+    'workspace-api-keys',
+];
+
+export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]): SettingsNavItemI[] => {
     const currentType = usePlatformTypeStore((state) => state.currentType);
 
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
-
-    const location = useLocation();
+    const isTenantAdmin = useIsTenantAdmin();
 
     const isNavItemVisible = (navItem: SettingsNavItemI) => {
+        if (!isTenantAdmin && navItem.href !== undefined && TENANT_ADMIN_NAV_ITEM_HREFS.includes(navItem.href)) {
+            return false;
+        }
+
         if (navItem.href === 'api-connectors') {
             return isFeatureFlagEnabled('ff-207');
         }
@@ -72,27 +103,33 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         return true;
     };
 
-    sidebarNavItems = sidebarNavItems
-        .filter(isNavItemVisible)
-        .map((navItem) => (navItem.items ? {...navItem, items: navItem.items.filter(isNavItemVisible)} : navItem))
-        .filter((navItem) => !navItem.items || navItem.items.length > 0);
-
     const isHeading = (navItem: SettingsNavItemI) => navItem.href === undefined && navItem.items === undefined;
 
-    sidebarNavItems = sidebarNavItems.filter(
-        (navItem, index, visibleNavItems) =>
-            !isHeading(navItem) || (visibleNavItems[index + 1] !== undefined && !isHeading(visibleNavItems[index + 1]))
-    );
+    return sidebarNavItems
+        .filter(isNavItemVisible)
+        .map((navItem) => (navItem.items ? {...navItem, items: navItem.items.filter(isNavItemVisible)} : navItem))
+        .filter((navItem) => !navItem.items || navItem.items.length > 0)
+        .filter(
+            (navItem, index, visibleNavItems) =>
+                !isHeading(navItem) ||
+                (visibleNavItems[index + 1] !== undefined && !isHeading(visibleNavItems[index + 1]))
+        );
+};
+
+const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
+    const location = useLocation();
+
+    const visibleNavItems = useVisibleSettingsNavItems(sidebarNavItems);
 
     return (
         <LayoutContainer
             leftSidebarBody={
                 <LeftSidebarNav
-                    body={sidebarNavItems.map((navItem) => {
+                    body={visibleNavItems.map((navItem) => {
                         if (navItem.items) {
                             return (
                                 <SettingsNavGroup
-                                    isCurrent={(href) => location.pathname.includes(href)}
+                                    isCurrent={(href) => isNavItemCurrent(location.pathname, href)}
                                     items={navItem.items as SettingsNavGroupItemI[]}
                                     key={navItem.title}
                                     title={navItem.title}
@@ -104,7 +141,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                             return (
                                 <LeftSidebarNavItem
                                     item={{
-                                        current: location.pathname.includes(navItem.href),
+                                        current: isNavItemCurrent(location.pathname, navItem.href),
                                         name: navItem.title,
                                     }}
                                     key={navItem.href}

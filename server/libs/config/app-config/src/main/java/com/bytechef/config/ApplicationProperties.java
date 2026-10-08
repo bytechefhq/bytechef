@@ -63,6 +63,11 @@ public class ApplicationProperties {
     private Async async = new Async();
 
     /**
+     * Audit events configuration
+     */
+    private Audit audit = new Audit();
+
+    /**
      * Cache provider configuration
      */
     private Cache cache = new Cache();
@@ -225,6 +230,10 @@ public class ApplicationProperties {
         return async;
     }
 
+    public Audit getAudit() {
+        return audit;
+    }
+
     public Cache getCache() {
         return cache;
     }
@@ -359,6 +368,10 @@ public class ApplicationProperties {
 
     public void setAsync(Async async) {
         this.async = async;
+    }
+
+    public void setAudit(Audit audit) {
+        this.audit = audit;
     }
 
     public void setCache(Cache cache) {
@@ -2718,6 +2731,52 @@ public class ApplicationProperties {
 
         public void setConcurrencyLimit(int concurrencyLimit) {
             this.concurrencyLimit = concurrencyLimit;
+        }
+    }
+
+    /**
+     * Audit events configuration (EE). Registered here because the {@code bytechef} prefix is bound strictly: a
+     * {@code bytechef.audit.*} key set in a property source without a matching field fails application startup.
+     */
+    public static class Audit {
+
+        /**
+         * Whether principals are masked (e.g. {@code a***@example.com}) when audit events are read through the API
+         */
+        private boolean maskPrincipals;
+
+        /**
+         * Cron expression of the audit retention job, evaluated in the JVM default time zone
+         */
+        private String retentionCron = "0 0 2 * * *";
+
+        /**
+         * Number of days audit events are kept. Zero or a negative value disables the purge
+         */
+        private long retentionDays = 365;
+
+        public boolean isMaskPrincipals() {
+            return maskPrincipals;
+        }
+
+        public String getRetentionCron() {
+            return retentionCron;
+        }
+
+        public long getRetentionDays() {
+            return retentionDays;
+        }
+
+        public void setMaskPrincipals(boolean maskPrincipals) {
+            this.maskPrincipals = maskPrincipals;
+        }
+
+        public void setRetentionCron(String retentionCron) {
+            this.retentionCron = retentionCron;
+        }
+
+        public void setRetentionDays(long retentionDays) {
+            this.retentionDays = retentionDays;
         }
     }
 

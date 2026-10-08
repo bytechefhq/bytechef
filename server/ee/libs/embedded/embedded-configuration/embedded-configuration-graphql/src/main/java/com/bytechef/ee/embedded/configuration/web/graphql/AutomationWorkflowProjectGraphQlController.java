@@ -19,6 +19,7 @@ import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -39,21 +40,25 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public List<AutomationWorkflowProjectDTO> automationWorkflowProjects() {
         return automationWorkflowProjectFacade.getProjects();
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public List<AutomationWorkflowProjectCategoryDTO> automationWorkflowProjectCategories() {
         return automationWorkflowProjectFacade.getCategories();
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public List<AutomationWorkflowProjectTagDTO> automationWorkflowProjectTags() {
         return automationWorkflowProjectFacade.getTags();
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public String createAutomationWorkflowProject(
         @Argument String name, @Argument String description, @Argument String category,
         @Argument List<String> tags, @Argument String permissionExpression) {
@@ -64,6 +69,7 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public boolean updateAutomationWorkflowProject(
         @Argument String id, @Argument String name, @Argument String description, @Argument String category,
         @Argument List<String> tags, @Argument String permissionExpression) {
@@ -75,6 +81,7 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public boolean deleteAutomationWorkflowProject(@Argument String id) {
         automationWorkflowProjectFacade.deleteProject(Long.parseLong(id));
 
@@ -82,6 +89,7 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public boolean publishAutomationWorkflowProject(@Argument String id) {
         automationWorkflowProjectFacade.publishProject(Long.parseLong(id));
 
@@ -89,6 +97,7 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public String createAutomationWorkflowProjectWorkflow(
         @Argument String projectId, @Argument String definition, @Argument String permissionExpression) {
 
@@ -97,6 +106,7 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public boolean updateAutomationWorkflowProjectWorkflow(
         @Argument String workflowUuid, @Argument String label, @Argument String description) {
 
@@ -106,6 +116,7 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public boolean updateAutomationWorkflowProjectWorkflowPermissionExpression(
         @Argument String workflowUuid, @Argument String permissionExpression) {
 
@@ -115,6 +126,7 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public boolean deleteAutomationWorkflowProjectWorkflow(@Argument String workflowUuid) {
         automationWorkflowProjectFacade.deleteProjectWorkflow(workflowUuid);
 
@@ -122,16 +134,19 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public List<AutomationWorkflowProjectVersionDTO> automationWorkflowProjectVersions(@Argument String id) {
         return automationWorkflowProjectFacade.getProjectVersions(Long.parseLong(id));
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public String duplicateAutomationWorkflowProjectWorkflow(@Argument String workflowUuid) {
         return automationWorkflowProjectFacade.duplicateProjectWorkflow(workflowUuid);
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public String duplicateAutomationWorkflowProject(@Argument String id) {
         return String.valueOf(automationWorkflowProjectFacade.duplicateProject(Long.parseLong(id)));
     }

@@ -28,6 +28,11 @@ public interface ApiKeyFacade {
 
     ApiKey create(ApiKey apiKey, @Nullable PlatformType type);
 
+    /**
+     * Creates an {@link PlatformType#AUTOMATION} key owned by the current user, without the tenant-admin check.
+     */
+    ApiKey createAutomationApiKey(ApiKey apiKey);
+
     void delete(long id);
 
     List<ApiKey> getAdminApiKeys(long environmentId);

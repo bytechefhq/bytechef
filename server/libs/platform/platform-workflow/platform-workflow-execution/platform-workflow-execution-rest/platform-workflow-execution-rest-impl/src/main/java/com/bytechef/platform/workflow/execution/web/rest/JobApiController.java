@@ -28,6 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,11 +53,13 @@ public class JobApiController implements JobApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
     public ResponseEntity<JobModel> getJob(Long id) {
         return ResponseEntity.ok(conversionService.convert(jobService.getJob(id), JobModel.class));
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     @SuppressWarnings("rawtypes")
     public ResponseEntity<Page> getJobsPage(Integer pageNumber) {
         return ResponseEntity.ok(
@@ -65,12 +68,14 @@ public class JobApiController implements JobApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<JobModel> getLatestJob() {
         return ResponseEntity.ok(
             conversionService.convert(OptionalUtils.orElse(jobService.fetchLastJob(), null), JobModel.class));
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Job', 'DEPLOYMENT_EDIT')")
     public ResponseEntity<Void> restartJob(Long id) {
         jobFacade.resumeJob(id);
 
@@ -79,6 +84,7 @@ public class JobApiController implements JobApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Job', 'DEPLOYMENT_EDIT')")
     public ResponseEntity<Void> stopJob(Long id) {
         jobFacade.stopJob(id);
 

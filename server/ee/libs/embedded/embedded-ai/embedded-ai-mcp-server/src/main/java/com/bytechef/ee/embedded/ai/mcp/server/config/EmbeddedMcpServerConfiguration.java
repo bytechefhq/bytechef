@@ -11,6 +11,7 @@ import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -56,7 +57,7 @@ import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
@@ -86,11 +87,13 @@ import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -99,7 +102,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
 
 /**
@@ -111,6 +118,7 @@ import org.springframework.web.servlet.function.ServerResponse;
 @ConditionalOnEEVersion
 public class EmbeddedMcpServerConfiguration {
 
+    private static final String AUTHENTICATION = "authentication";
     private static final String ENVIRONMENT = "environment";
     private static final String EXTERNAL_USER_ID = "externalUserId";
     private static final String SECRET_KEY = "secretKey";
@@ -120,19 +128,7 @@ public class EmbeddedMcpServerConfiguration {
     WebMvcStreamableServerTransportProvider embeddedWebMvcStreamableHttpServerTransportProvider() {
         return WebMvcStreamableServerTransportProvider.builder()
             .mcpEndpoint("/api/embedded/{secretKey}/mcp")
-            .contextExtractor(serverRequest -> {
-                String externalUserId = SecurityUtils.getCurrentUserLogin();
-                String secretKey = serverRequest.pathVariable(SECRET_KEY);
-                HttpServletRequest httpServletRequest = serverRequest.servletRequest();
-
-                String environment = httpServletRequest.getHeader("X-Environment");
-
-                return McpTransportContext.create(
-                    Map.of(
-                        ENVIRONMENT, environment,
-                        EXTERNAL_USER_ID, externalUserId,
-                        SECRET_KEY, secretKey));
-            })
+            .contextExtractor(EmbeddedMcpServerConfiguration::createTransportContext)
             .build();
     }
 
@@ -157,7 +153,9 @@ public class EmbeddedMcpServerConfiguration {
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpServerService mcpServerService,
-        PrincipalJobFacade principalJobFacade, SubflowResolver subflowResolver,
+        PrincipalJobFacade principalJobFacade,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
+        SubflowResolver subflowResolver,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, @Qualifier("syncWorkerExecutor") TaskExecutor taskExecutor,
         TaskHandlerRegistry taskHandlerRegistry,
@@ -172,7 +170,8 @@ public class EmbeddedMcpServerConfiguration {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, evaluator, jobService, -1, asyncMessageBroker,
             getAdditionalApplicationEventListeners(
-                evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
+                evaluator, coordinatorEventPublisher, jobService, sharedApplicationEventListenerProvider,
+                taskExecutionService, taskFileStorage),
             getTaskCompletionHandlerFactories(
                 contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
             getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
@@ -221,6 +220,8 @@ public class EmbeddedMcpServerConfiguration {
 
                 String tenantId = tenantKey.getTenantId();
 
+                Authentication authentication = (Authentication) mcpTransportContext.get(AUTHENTICATION);
+
                 mcpComponentService.getMcpServerMcpComponents(mcpServer.getId())
                     .stream()
                     .flatMap(
@@ -228,7 +229,7 @@ public class EmbeddedMcpServerConfiguration {
                             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
                     .forEach(mcpTool -> {
                         var callback = embeddedMcpToolFacade.getFunctionToolCallback(
-                            mcpTool, externalUserId, environment, tenantId);
+                            mcpTool, externalUserId, environment, tenantId, authentication);
 
                         if (callback != null) {
                             toolSpecifications.add(McpToolUtils.toAsyncToolSpecification(callback));
@@ -240,7 +241,8 @@ public class EmbeddedMcpServerConfiguration {
                     .stream()
                     .flatMap(mcpIntegrationInstanceConfiguration -> CollectionUtils.stream(
                         embeddedMcpToolFacade.getFunctionToolCallbacks(
-                            mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId)))
+                            mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId,
+                            authentication)))
                     .map(McpToolUtils::toAsyncToolSpecification)
                     .forEach(toolSpecifications::add);
 
@@ -265,6 +267,30 @@ public class EmbeddedMcpServerConfiguration {
         };
     }
 
+    static McpTransportContext createTransportContext(ServerRequest serverRequest) {
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
+        String secretKey = serverRequest.pathVariable(SECRET_KEY);
+        HttpServletRequest httpServletRequest = serverRequest.servletRequest();
+
+        String environment = httpServletRequest.getHeader("X-Environment");
+
+        Map<String, Object> transportContext = new HashMap<>();
+
+        transportContext.put(ENVIRONMENT, environment);
+        transportContext.put(EXTERNAL_USER_ID, externalUserId);
+        transportContext.put(SECRET_KEY, secretKey);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        Authentication authentication = securityContext.getAuthentication();
+
+        if (authentication != null) {
+            transportContext.put(AUTHENTICATION, authentication);
+        }
+
+        return McpTransportContext.create(transportContext);
+    }
+
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {
         return event -> {
             MessageEvent<?> messageEvent = (MessageEvent<?>) event;
@@ -277,11 +303,19 @@ public class EmbeddedMcpServerConfiguration {
 
     private static List<ApplicationEventListener> getAdditionalApplicationEventListeners(
         Evaluator evaluator, ApplicationEventPublisher coordinatorEventPublisher, JobService jobService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
-        return List.of(
+        List<ApplicationEventListener> applicationEventListeners = new ArrayList<>();
+
+        applicationEventListeners.add(
             new SubflowJobStatusEventListener(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+
+        sharedApplicationEventListenerProvider.orderedStream()
+            .forEach(applicationEventListeners::add);
+
+        return applicationEventListeners;
     }
 
     private com.bytechef.platform.configuration.domain.Environment getEnvironment(String environment) {

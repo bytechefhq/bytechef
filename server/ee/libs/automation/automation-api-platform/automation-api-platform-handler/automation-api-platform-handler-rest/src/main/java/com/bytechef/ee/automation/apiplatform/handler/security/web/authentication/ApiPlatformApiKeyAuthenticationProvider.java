@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.apiplatform.handler.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,6 +44,10 @@ public class ApiPlatformApiKeyAuthenticationProvider implements AuthenticationPr
                 apiPlatformApiKeyAuthenticationToken.getEnvironmentId());
         } catch (IllegalArgumentException e) {
             throw new BadCredentialsException("Unknown API secret key", e);
+        }
+
+        if (apiKey.getType() != PlatformType.AUTOMATION) {
+            throw new BadCredentialsException("Unknown API secret key");
         }
 
         return new ApiPlatformApiKeyAuthenticationToken(createSpringSecurityUser(apiKey.getName()));

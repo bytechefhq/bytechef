@@ -18,7 +18,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Integration
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -57,8 +57,7 @@ public class IntegrationApiController implements IntegrationApi {
     @CrossOrigin
     @Override
     public ResponseEntity<IntegrationModel> getFrontendIntegration(Long id, EnvironmentModel xEnvironment) {
-        String externalId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        String externalId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         return getIntegration(externalId, id, xEnvironment);
     }
@@ -66,8 +65,7 @@ public class IntegrationApiController implements IntegrationApi {
     @CrossOrigin
     @Override
     public ResponseEntity<List<IntegrationBasicModel>> getFrontendIntegrations(EnvironmentModel xEnvironment) {
-        String externalId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        String externalId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         return getIntegrations(externalId, xEnvironment);
     }
@@ -75,6 +73,8 @@ public class IntegrationApiController implements IntegrationApi {
     @Override
     public ResponseEntity<IntegrationModel> getIntegration(
         String externalUserId, Long id, EnvironmentModel xEnvironment) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         ConnectedUserIntegrationDTO connectedUserIntegrationDTO;
 
@@ -92,6 +92,8 @@ public class IntegrationApiController implements IntegrationApi {
     @Override
     public ResponseEntity<List<IntegrationBasicModel>> getIntegrations(
         String externalUserId, EnvironmentModel xEnvironment) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         return ResponseEntity.ok(
             connectedUserIntegrationFacade

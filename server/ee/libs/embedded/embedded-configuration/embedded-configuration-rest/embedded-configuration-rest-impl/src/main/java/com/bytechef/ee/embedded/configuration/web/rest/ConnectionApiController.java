@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
@@ -25,6 +24,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,6 +54,7 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Long> createConnection(ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             connectionFacade.create(
@@ -64,10 +65,12 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<Long> createConnectedUserConnection(Long connectedUserId, ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             connectedUserConnectionFacade.createConnectedUserConnection(
-                connectedUserId, conversionService.convert(connectionModel, ConnectionDTO.class)));
+                connectedUserId, connectionModel.getEnvironmentId(),
+                conversionService.convert(connectionModel, ConnectionDTO.class)));
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> deleteConnection(Long id) {
         connectionFacade.delete(id);
 
@@ -81,18 +84,20 @@ public class ConnectionApiController implements ConnectionApi {
 
         return ResponseEntity.ok(
             connectedUserConnectionFacade
-                .getConnections(connectedUserId, componentName, connectionIds == null ? List.of() : connectionIds)
+                .getConnectedUserConnections(connectedUserId, componentName)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
         return ResponseEntity.ok(toConnectionModel(connectionFacade.getConnection(Validate.notNull(id, "id"))));
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<ConnectionModel>> getConnections(
         String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
@@ -106,6 +111,7 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> updateConnection(Long id, UpdateConnectionRequestModel updateConnectionRequestModel) {
         List<Tag> list = updateConnectionRequestModel.getTags()
             .stream()
@@ -123,12 +129,13 @@ public class ConnectionApiController implements ConnectionApi {
     private ConnectionModel toConnectionModel(ConnectionDTO connection) {
         ConnectionModel connectionModel = conversionService.convert(connection, ConnectionModel.class);
 
-        Objects.requireNonNull(connectionModel)
-            .authorizationParameters(
-                MapUtils.toMap(
-                    connectionModel.getAuthorizationParameters(),
-                    Map.Entry::getKey,
-                    entry -> ObfuscateUtils.obfuscate(String.valueOf(entry.getValue()), 28, 8)));
+        Map<String, Object> authorizationParameters = Objects.requireNonNull(connectionModel)
+            .getAuthorizationParameters();
+
+        if (authorizationParameters != null) {
+            connectionModel.authorizationParameters(
+                ObfuscateUtils.toObfuscatedMap(authorizationParameters, 28, 8));
+        }
 
         return Validate.notNull(connectionModel, "connectionModel")
             .parameters(null);

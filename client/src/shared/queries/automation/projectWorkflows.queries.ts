@@ -19,6 +19,7 @@ export const ProjectWorkflowKeys = {
     ],
     projectWorkflows: (projectId: number) => [...ProjectKeys.projects, projectId, 'projectWorkflows'],
     workflows: [...ProjectKeys.projects, 'workflows'],
+    workspaceWorkflows: (workspaceId: number) => [...ProjectWorkflowKeys.workflows, workspaceId],
 };
 
 export const useGetProjectWorkflowQuery = (
@@ -55,9 +56,9 @@ export const useGetProjectVersionWorkflowsQuery = (
         refetchOnWindowFocus,
     });
 
-export const useGetWorkflowsQuery = (enabled?: boolean) =>
+export const useGetWorkspaceWorkflowsQuery = (workspaceId: number, enabled?: boolean) =>
     useQuery<Workflow[], Error>({
-        queryKey: ProjectWorkflowKeys.workflows,
-        queryFn: () => new WorkflowApi().getWorkflows(),
+        queryKey: ProjectWorkflowKeys.workspaceWorkflows(workspaceId),
+        queryFn: () => new WorkflowApi().getWorkspaceWorkflows({id: workspaceId}),
         enabled: enabled === undefined ? true : enabled,
     });

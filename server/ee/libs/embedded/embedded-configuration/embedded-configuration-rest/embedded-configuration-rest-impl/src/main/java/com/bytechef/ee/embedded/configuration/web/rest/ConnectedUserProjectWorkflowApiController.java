@@ -15,7 +15,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.PublishConnectedUse
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +52,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         String workflowUuid, Boolean enable, EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.enableProjectWorkflow(
-            SecurityUtils.getCurrentUserLogin(), workflowUuid, enable,
+            ConnectedUserAuthentications.getCurrentExternalUserId(), workflowUuid, enable,
             (long) getEnvironment(xEnvironment).ordinal());
 
         return ResponseEntity.noContent()
@@ -66,7 +66,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         return ResponseEntity.ok(
             conversionService.convert(
                 connectedUserProjectFacade.getConnectedUserProjectWorkflow(
-                    SecurityUtils.getCurrentUserLogin(), workflowUuid,
+                    ConnectedUserAuthentications.getCurrentExternalUserId(), workflowUuid,
                     (long) getEnvironment(xEnvironment).ordinal()),
                 ConnectedUserProjectWorkflowModel.class));
     }
@@ -78,7 +78,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.publishProjectWorkflow(
-            SecurityUtils.getCurrentUserLogin(), workflowUuid,
+            ConnectedUserAuthentications.getCurrentExternalUserId(), workflowUuid,
             publishConnectedUserProjectWorkflowRequestModel.getDescription(),
             (long) getEnvironment(xEnvironment).ordinal());
 

@@ -17,8 +17,9 @@
 package com.bytechef.automation.ai.mcp.event;
 
 import com.bytechef.automation.ai.mcp.domain.McpProject;
-import com.bytechef.automation.ai.mcp.service.McpProjectService;
+import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -41,14 +42,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class McpServerAfterSaveEventListener extends AbstractRelationalEventListener<McpServer> {
 
-    private final McpProjectService mcpProjectService;
+    private final McpProjectRepository mcpProjectRepository;
     private final ProjectDeploymentFacade projectDeploymentFacade;
 
     @SuppressFBWarnings("EI")
     public McpServerAfterSaveEventListener(
-        McpProjectService mcpProjectService, ProjectDeploymentFacade projectDeploymentFacade) {
+        McpProjectRepository mcpProjectRepository, ProjectDeploymentFacade projectDeploymentFacade) {
 
-        this.mcpProjectService = mcpProjectService;
+        this.mcpProjectRepository = mcpProjectRepository;
         this.projectDeploymentFacade = projectDeploymentFacade;
     }
 
@@ -56,14 +57,28 @@ public class McpServerAfterSaveEventListener extends AbstractRelationalEventList
     protected void onAfterSave(AfterSaveEvent<McpServer> event) {
         McpServer mcpServer = event.getEntity();
 
-        checkProjectDeploymentTriggers(mcpServer.getId(), mcpServer.isEnabled());
+        runSkippingChecks(() -> checkProjectDeploymentTriggers(mcpServer.getId(), mcpServer.isEnabled()));
     }
 
     private void checkProjectDeploymentTriggers(long mcpServerId, boolean enabled) {
-        List<McpProject> mcpProjects = mcpProjectService.getMcpServerMcpProjects(mcpServerId);
+        List<McpProject> mcpProjects = mcpProjectRepository.findAllByMcpServerId(mcpServerId);
 
         for (McpProject mcpProject : mcpProjects) {
             projectDeploymentFacade.enableProjectDeployment(mcpProject.getProjectDeploymentId(), enabled);
+        }
+    }
+
+    private static void runSkippingChecks(Runnable runnable) {
+        try {
+            AutomationAuthorizationContext.callSkippingChecks(() -> {
+                runnable.run();
+
+                return null;
+            });
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
         }
     }
 }

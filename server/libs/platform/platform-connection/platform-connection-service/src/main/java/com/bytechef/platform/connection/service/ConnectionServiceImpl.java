@@ -27,6 +27,7 @@ import com.bytechef.platform.constant.PlatformType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -98,6 +99,12 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Transactional(readOnly = true)
     public Connection getConnection(long id) {
         return OptionalUtils.get(connectionRepository.findById(id), "Connection does not exist for id=" + id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Connection> fetchConnection(long id) {
+        return connectionRepository.findById(id);
     }
 
     @Override

@@ -13,13 +13,13 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -29,9 +29,10 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -53,7 +54,6 @@ import tools.jackson.core.type.TypeReference;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
 public class ConnectedUserProjectWorkflowManager {
 
     private static final String DEFAULT_DEFINITION = """
@@ -67,6 +67,7 @@ public class ConnectedUserProjectWorkflowManager {
         """;
     private static final String MARKER = "__EMBEDDED__";
 
+    private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserProjectService connectUserProjectService;
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectedUserService connectedUserService;
@@ -79,12 +80,14 @@ public class ConnectedUserProjectWorkflowManager {
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowManager(
+        ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectedUserService connectedUserService, ConnectionService connectionService, ProjectService projectService,
         ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
         WorkflowService workflowService, WorkflowTestConfigurationFacade workflowTestConfigurationFacade) {
 
+        this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectedUserService = connectedUserService;
@@ -111,7 +114,7 @@ public class ConnectedUserProjectWorkflowManager {
 
         connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
 
-        List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
+        List<Connection> connections = getOwnedConnections(connectedUserProject.getConnectedUserId(), environment);
         Map<String, ?> workflowMap = JsonUtils.readMap(effectiveDefinition);
 
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
@@ -147,6 +150,20 @@ public class ConnectedUserProjectWorkflowManager {
 
                 return connectUserProjectService.create(connectedUser.getId(), project.getId());
             });
+    }
+
+    private List<Connection> getOwnedConnections(long connectedUserId, Environment environment) {
+        List<Long> ownedConnectionIds = new ArrayList<>(
+            connectedUserConnectionMembership.getOwnedConnectionIds(connectedUserId, environment));
+
+        if (ownedConnectionIds.isEmpty()) {
+            return List.of();
+        }
+
+        return connectionService.getConnections(ownedConnectionIds)
+            .stream()
+            .sorted(Comparator.comparingInt(connection -> ownedConnectionIds.indexOf(connection.getId())))
+            .toList();
     }
 
     private void checkWorkflowNodeConnection(

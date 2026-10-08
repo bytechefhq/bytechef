@@ -20,6 +20,7 @@ import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,6 +53,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> deleteWorkflow(String workflowId) {
         integrationWorkflowFacade.deleteWorkflow(workflowId);
 
@@ -59,6 +61,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
             .build();
     }
 
+    @PreAuthorize("isTenantAdmin()")
     @GetMapping("/workflows/{id}/export")
     @ResponseBody
     public ResponseEntity<Resource> exportWorkflow(@PathVariable("id") String id) {
@@ -66,6 +69,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<WorkflowModel> getIntegrationWorkflow(Long integrationWorkflowId) {
         return ResponseEntity.ok(
             conversionService.convert(
@@ -73,6 +77,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(Long id) {
         return ResponseEntity.ok(
             CollectionUtils.map(
@@ -81,6 +86,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<WorkflowModel>> getIntegrationVersionWorkflows(
         Long id, Integer integrationVersion, Boolean includeAllFields) {
 
@@ -91,6 +97,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
         // TODO Add check regarding platform type
 
@@ -99,6 +106,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
         // TODO Add check regarding platform type
 

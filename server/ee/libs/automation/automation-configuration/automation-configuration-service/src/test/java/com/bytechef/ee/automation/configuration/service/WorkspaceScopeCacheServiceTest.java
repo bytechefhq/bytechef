@@ -20,7 +20,9 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
@@ -82,7 +84,7 @@ class WorkspaceScopeCacheServiceTest {
     void testGetWorkspaceScopesResolvesBuiltInRole() {
         WorkspaceUser workspaceUser = WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
 
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(workspaceUser));
         when(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR))
             .thenReturn(Set.of("WORKFLOW_VIEW", "WORKFLOW_EDIT"));
@@ -96,7 +98,7 @@ class WorkspaceScopeCacheServiceTest {
     void testGetWorkspaceScopesResolvesCustomRole() {
         WorkspaceUser workspaceUser = WorkspaceUser.forCustomRole(USER_ID, WORKSPACE_ID, 900L);
 
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(workspaceUser));
         when(customRoleScopeResolver.resolveScopes(900L))
             .thenReturn(Optional.of(Set.of("PROJECT_SETTINGS")));
@@ -107,8 +109,86 @@ class WorkspaceScopeCacheServiceTest {
     }
 
     @Test
+    void testGetWorkspaceScopesForAnEnvironmentIsEmptyWhereTheMemberHoldsNoRole() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT.ordinal()))
+                .thenReturn(
+                    Optional.of(
+                        WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT)));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal()))
+                .thenReturn(Optional.empty());
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.empty());
+        when(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR))
+            .thenReturn(Set.of("DEPLOYMENT_CREATE", "WORKFLOW_EDIT"));
+
+        assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+            .containsExactlyInAnyOrder("DEPLOYMENT_CREATE", "WORKFLOW_EDIT");
+        assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION)).isEmpty();
+    }
+
+    @Test
+    void testGetWorkspaceScopesForAnEnvironmentResolvesThatEnvironmentsRole() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT.ordinal()))
+                .thenReturn(
+                    Optional.of(
+                        WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, Environment.DEVELOPMENT)));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal()))
+                .thenReturn(
+                    Optional.of(
+                        WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.PRODUCTION)));
+        when(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER))
+            .thenReturn(Set.of("WORKFLOW_VIEW"));
+        when(permissionScopeRegistry.getScopeNames(WorkspaceRole.ADMIN))
+            .thenReturn(Set.of("WORKFLOW_VIEW", "WORKSPACE_MEMBER_MANAGE"));
+
+        assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+            .containsExactly("WORKFLOW_VIEW");
+        assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+            .containsExactlyInAnyOrder("WORKFLOW_VIEW", "WORKSPACE_MEMBER_MANAGE");
+    }
+
+    @Test
+    void testGetWorkspaceScopesForAnEnvironmentIgnoresAnImplicitRowBesideEnvironmentRows() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal()))
+                .thenReturn(Optional.empty());
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceIdAndEnvironmentIsNotNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(true);
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN)));
+        when(permissionScopeRegistry.getScopeNames(WorkspaceRole.ADMIN))
+            .thenReturn(Set.of("WORKFLOW_VIEW", "WORKSPACE_MEMBER_MANAGE"));
+
+        assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION)).isEmpty();
+    }
+
+    @Test
+    void testGetWorkspaceScopesIgnoresAnImplicitRowBesideEnvironmentRows() {
+        WorkspaceUser implicitWorkspaceUser = WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN);
+        WorkspaceUser developmentWorkspaceUser =
+            WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, Environment.DEVELOPMENT);
+
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(implicitWorkspaceUser));
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceIdAndEnvironmentIsNotNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(true);
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(List.of(implicitWorkspaceUser, developmentWorkspaceUser));
+        when(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER))
+            .thenReturn(Set.of("WORKFLOW_VIEW"));
+        when(permissionScopeRegistry.getScopeNames(WorkspaceRole.ADMIN))
+            .thenReturn(Set.of("WORKFLOW_VIEW", "WORKSPACE_MEMBER_MANAGE"));
+
+        assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID)).containsExactly("WORKFLOW_VIEW");
+    }
+
+    @Test
     void testGetWorkspaceScopesReturnsEmptyForUnknownMembership() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.empty());
 
         assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID)).isEmpty();
@@ -122,7 +202,7 @@ class WorkspaceScopeCacheServiceTest {
         WorkspaceUser corrupted = mock(WorkspaceUser.class);
 
         when(corrupted.getWorkspaceRole()).thenReturn(999);
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(corrupted));
 
         assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID)).isEmpty();
@@ -139,7 +219,7 @@ class WorkspaceScopeCacheServiceTest {
 
         when(corrupted.getWorkspaceRole()).thenReturn(null);
         when(corrupted.getCustomRoleId()).thenReturn(null);
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(corrupted));
 
         assertThatThrownBy(() -> service.getWorkspaceScopes(USER_ID, WORKSPACE_ID))

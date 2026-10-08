@@ -48,6 +48,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -89,8 +90,13 @@ public class McpProjectWorkflowGraphQlController {
         return mcpProjectWorkflowService.getMcpProjectWorkflows();
     }
 
+    /**
+     * Deliberately {@code public}: proxy-based method security is only guaranteed to intercept public methods, so a
+     * package-private guard here could silently never run.
+     */
     @QueryMapping
-    List<McpProjectWorkflow> mcpProjectWorkflowsByMcpProjectId(@Argument long mcpProjectId) {
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_VIEW')")
+    public List<McpProjectWorkflow> mcpProjectWorkflowsByMcpProjectId(@Argument long mcpProjectId) {
         return mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId);
     }
 

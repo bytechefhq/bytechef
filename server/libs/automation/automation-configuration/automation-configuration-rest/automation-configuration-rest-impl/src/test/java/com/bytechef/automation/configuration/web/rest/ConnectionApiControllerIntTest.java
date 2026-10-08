@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.rest.mapper.WorkspaceConnectionMapper;
 import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
@@ -61,6 +62,9 @@ public class ConnectionApiControllerIntTest {
 
     @MockitoBean
     private ConnectionFacade connectionFacade;
+
+    @Autowired
+    private WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @MockitoBean
     private ConnectionService connectionService;
@@ -125,13 +129,13 @@ public class ConnectionApiControllerIntTest {
 
     @Test
     public void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(PlatformType.AUTOMATION))
+        when(workspaceConnectionFacade.getConnectionTags(1L, null))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         try {
             this.webTestClient
                 .get()
-                .uri("/internal/connections/tags")
+                .uri("/internal/workspaces/1/connection-tags")
                 .exchange()
                 .expectStatus()
                 .isOk()

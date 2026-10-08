@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.ai.skill.web.rest;
 
-import com.bytechef.platform.ai.skill.facade.AiSkillApiFacade;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade.AiSkillDownload;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -36,15 +36,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/ai/agent-skills")
 class AiSkillDownloadController {
 
-    private final AiSkillApiFacade aiSkillApiFacade;
+    private final AiSkillFacade aiSkillFacade;
 
-    AiSkillDownloadController(AiSkillApiFacade aiSkillApiFacade) {
-        this.aiSkillApiFacade = aiSkillApiFacade;
+    AiSkillDownloadController(AiSkillFacade aiSkillFacade) {
+        this.aiSkillFacade = aiSkillFacade;
     }
 
     @GetMapping("/{id}/download")
     ResponseEntity<Resource> downloadAiSkill(@PathVariable long id) {
-        AiSkillDownload download = aiSkillApiFacade.getAiSkillWithDownload(id);
+        AiSkillDownload download = aiSkillFacade.getAiSkillWithDownload(id);
 
         String safeName = download.aiSkill()
             .getName()

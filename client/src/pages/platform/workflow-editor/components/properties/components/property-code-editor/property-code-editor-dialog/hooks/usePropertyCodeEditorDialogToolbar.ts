@@ -1,4 +1,6 @@
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
+import {useWorkflowEditorCopilotAllowed} from '@/pages/platform/workflow-editor/providers/workflowEditorCopilotContext';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -54,7 +56,11 @@ export const usePropertyCodeEditorDialogToolbar = ({
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
-    const copilotEnabled = ai.copilot.enabled && ff_1570;
+    const readOnly = useWorkflowEditorReadOnly();
+
+    const copilotAllowed = useWorkflowEditorCopilotAllowed();
+
+    const copilotEnabled = ai.copilot.enabled && ff_1570 && copilotAllowed;
 
     const testClusterElementScriptMutation = useTestClusterElementScriptMutation();
     const testWorkflowNodeScriptMutation = useTestWorkflowNodeScriptMutation();
@@ -82,6 +88,10 @@ export const usePropertyCodeEditorDialogToolbar = ({
     }, [language, setContext, setCopilotPanelOpen]);
 
     const handleRunClick = useCallback(() => {
+        if (readOnly) {
+            return;
+        }
+
         setScriptIsRunning(true);
 
         const isClusterElement = currentNode?.clusterElementType && rootClusterElementNodeData?.workflowNodeName;
@@ -145,6 +155,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
         currentEnvironmentId,
         currentNode,
         inputParameters,
+        readOnly,
         rootClusterElementNodeData,
         setScriptIsRunning,
         setScriptTestExecution,
@@ -155,10 +166,14 @@ export const usePropertyCodeEditorDialogToolbar = ({
     ]);
 
     const handleSaveClick = useCallback(() => {
+        if (readOnly) {
+            return;
+        }
+
         setSaving(true);
 
         onChange(editorValue);
-    }, [editorValue, onChange, setSaving]);
+    }, [editorValue, onChange, readOnly, setSaving]);
 
     const handleStopClick = useCallback(() => {
         console.warn('Stop functionality not yet implemented');

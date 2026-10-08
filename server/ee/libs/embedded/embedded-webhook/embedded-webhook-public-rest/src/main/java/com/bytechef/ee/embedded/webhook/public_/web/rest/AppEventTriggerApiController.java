@@ -13,7 +13,6 @@ import static com.bytechef.platform.component.definition.AppEventComponentDefini
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
@@ -34,7 +33,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -100,7 +99,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), environment);
+            ConnectedUserAuthentications.getCurrentExternalUserId(), environment);
 
         List<IntegrationInstance> integrationInstances =
             integrationInstanceService.getConnectedUserIntegrationInstances(connectedUser.getId(), true);

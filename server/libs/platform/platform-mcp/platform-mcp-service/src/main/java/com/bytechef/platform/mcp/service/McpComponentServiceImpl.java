@@ -19,7 +19,12 @@ package com.bytechef.platform.mcp.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,19 +38,30 @@ import org.springframework.transaction.annotation.Transactional;
 public class McpComponentServiceImpl implements McpComponentService {
 
     private final McpComponentRepository mcpComponentRepository;
+    private final List<McpComponentConnectionUsageChecker> mcpComponentConnectionUsageCheckers;
 
-    public McpComponentServiceImpl(McpComponentRepository mcpComponentRepository) {
+    @SuppressFBWarnings("EI")
+    public McpComponentServiceImpl(
+        McpComponentRepository mcpComponentRepository,
+        List<McpComponentConnectionUsageChecker> mcpComponentConnectionUsageCheckers) {
+
         this.mcpComponentRepository = mcpComponentRepository;
+        this.mcpComponentConnectionUsageCheckers = mcpComponentConnectionUsageCheckers;
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent) {
+        checkConnectionUsage(mcpComponent.getMcpServerId(), mcpComponent.getConnectionId());
+
         return mcpComponentRepository.save(mcpComponent);
     }
 
     @Override
     public McpComponent update(McpComponent mcpComponent) {
         McpComponent currentMcpComponent = OptionalUtils.get(mcpComponentRepository.findById(mcpComponent.getId()));
+
+        checkConnectionUsage(currentMcpComponent.getMcpServerId(), mcpComponent.getConnectionId());
 
         currentMcpComponent.setConnectionId(mcpComponent.getConnectionId());
         currentMcpComponent.setVersion(mcpComponent.getVersion());
@@ -71,11 +87,27 @@ public class McpComponentServiceImpl implements McpComponentService {
 
     @Override
     public List<McpComponent> getMcpComponents() {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            throw new AccessDeniedException("A connected user may not list every MCP component");
+        }
+
         return mcpComponentRepository.findAll();
     }
 
     @Override
     public List<McpComponent> getMcpServerMcpComponents(long mcpServerId) {
         return mcpComponentRepository.findAllByMcpServerId(mcpServerId);
+    }
+
+    private void checkConnectionUsage(Long mcpServerId, Long connectionId) {
+        if (connectionId == null) {
+            return;
+        }
+
+        for (McpComponentConnectionUsageChecker mcpComponentConnectionUsageChecker : mcpComponentConnectionUsageCheckers) {
+
+            mcpComponentConnectionUsageChecker.checkConnectionUsage(
+                Objects.requireNonNull(mcpServerId, "mcpServerId"), connectionId);
+        }
     }
 }

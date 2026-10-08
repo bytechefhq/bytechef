@@ -11,6 +11,7 @@ import {useShallow} from 'zustand/react/shallow';
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 import useCanvasDropzone from '../hooks/useCanvasDropzone';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -40,6 +41,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
 
     const {updateWorkflowMutation} = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     const {dropzoneHandlers, isDropzoneActive} = useCanvasDropzone('task');
 
@@ -86,6 +88,27 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
             setMenuReady(false);
         }
     };
+
+    if (readOnly) {
+        return (
+            <div
+                className={twMerge('nodrag invisible relative mx-[22px] size-7', isClusterElement && 'mx-0 size-6')}
+                data-nodetype="readonlyPlaceholderNode"
+            >
+                <Handle
+                    className={styles.handle}
+                    position={mapHandlePosition(Position.Top, effectiveDirection)}
+                    type="target"
+                />
+
+                <Handle
+                    className={styles.handle}
+                    position={mapHandlePosition(Position.Bottom, effectiveDirection)}
+                    type="source"
+                />
+            </div>
+        );
+    }
 
     return (
         <ContextMenu onOpenChange={handleOpenChange}>

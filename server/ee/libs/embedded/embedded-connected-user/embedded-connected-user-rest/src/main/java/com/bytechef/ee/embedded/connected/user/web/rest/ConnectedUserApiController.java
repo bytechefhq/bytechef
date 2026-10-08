@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,6 +49,7 @@ public class ConnectedUserApiController implements ConnectedUserApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> deleteConnectedUser(Long id) {
         connectedUserService.deleteConnectedUser(id);
 
@@ -56,12 +58,14 @@ public class ConnectedUserApiController implements ConnectedUserApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<ConnectedUserModel> getConnectedUser(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(connectedUserFacade.getConnectedUser(id), ConnectedUserModel.class));
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> enableConnectedUser(Long id, Boolean enable) {
         connectedUserFacade.enableConnectedUser(id, enable);
 
@@ -70,6 +74,7 @@ public class ConnectedUserApiController implements ConnectedUserApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Page> getConnectedUsers(
         Long environmentId, CredentialStatusModel credentialStatus, LocalDate createDateFrom,
         LocalDate createDateTo, Long integrationId, Integer pageNumber, String search) {

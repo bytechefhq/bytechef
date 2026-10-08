@@ -18,6 +18,7 @@ package com.bytechef.web.rest.error;
 
 import com.bytechef.exception.AbstractException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.security.Principal;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -65,6 +67,25 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
                 createProblemDetail(
                     exception, HttpStatus.BAD_REQUEST, Map.of("inputParameters", exception.getInputParameters()),
                     request))
+            .build();
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    @SuppressFBWarnings(
+        value = "CRLF_INJECTION_LOGS",
+        justification = "The request description is the servlet request URI, which cannot carry raw CR or LF")
+    public ResponseEntity<ProblemDetail> handleAccessDeniedException(
+        final AccessDeniedException exception, final WebRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+
+        log.warn(
+            "Access denied to {} for {}: {}", request.getDescription(false),
+            principal == null ? "anonymous" : principal.getName(), exception.getMessage());
+
+        return ResponseEntity
+            .of(createProblemDetail(exception, HttpStatus.FORBIDDEN, "Access denied", null, null, request))
             .build();
     }
 
@@ -118,6 +139,10 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
         markErrorHandled(request);
 
         Exception exception = getCauseException((Exception) throwable);
+
+        if (exception instanceof AccessDeniedException accessDeniedException) {
+            return handleAccessDeniedException(accessDeniedException, request);
+        }
 
         if (exception instanceof IllegalArgumentException) {
             return handleIllegalArgumentExceptionException((IllegalArgumentException) exception, request);

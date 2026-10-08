@@ -57,13 +57,6 @@ public final class CopilotToolContextUtils {
         Authentication authentication = state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication value
             ? value : null;
 
-        // An embedded run carries a connected-user Authentication (no backing platform user) and is authorized by the
-        // embedded request layer, so its @PreAuthorize-gated tools must skip the platform automation RBAC check. This
-        // mirrors WorkflowEditorSpringAIAgent, which bypasses the workflow-scope gate on the same STATE_AUTHENTICATION
-        // signal — but the request thread's skip-checks ThreadLocal does not reach the tool-execution worker threads,
-        // so the flag is carried through the tool context and re-armed by RehydrateContextToolCallback.
-        boolean skipAutomationAuthorization = authentication != null;
-
         toolContext.putAll(
             AgentToolInvocationContext.builder()
                 .workspaceId(workspaceId)
@@ -71,7 +64,6 @@ public final class CopilotToolContextUtils {
                 .environmentId(environmentId)
                 .tenantId(tenantId)
                 .authentication(authentication)
-                .skipAutomationAuthorization(skipAutomationAuthorization)
                 .build()
                 .toToolContext());
 

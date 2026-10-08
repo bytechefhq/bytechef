@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,6 +63,7 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public ResponseEntity<Void> deleteWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Long environmentId) {
 
@@ -73,6 +75,7 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public ResponseEntity<WorkflowNodeTestOutputModel> saveWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Long environmentId) {
 
@@ -89,6 +92,7 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleOutput(
         String workflowId, String workflowNodeName, Long environmentId, Object body) {
 
