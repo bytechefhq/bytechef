@@ -21,7 +21,6 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -195,14 +194,12 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
 
         Assert.notNull(projectWorkflow, "'projectWorkflow' must not be null");
 
-        ProjectWorkflow draftProjectWorkflow = update(projectWorkflow);
+        update(projectWorkflow);
 
-        ProjectWorkflow publishedProjectWorkflow = new ProjectWorkflow(
-            projectId, oldProjectVersion, oldWorkflowId, UUID.fromString(draftProjectWorkflow.getUuidAsString()));
+        projectWorkflow = new ProjectWorkflow(
+            projectId, oldProjectVersion, oldWorkflowId, UUID.fromString(projectWorkflow.getUuidAsString()));
 
-        publishedProjectWorkflow.setPermissionExpression(draftProjectWorkflow.getPermissionExpression());
-
-        projectWorkflowRepository.save(publishedProjectWorkflow);
+        projectWorkflowRepository.save(projectWorkflow);
     }
 
     @Override
@@ -220,13 +217,4 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         return projectWorkflowRepository.save(curProjectWorkflow);
     }
 
-    @Override
-    public ProjectWorkflow updatePermissionExpression(long id, @Nullable String permissionExpression) {
-        ProjectWorkflow projectWorkflow = projectWorkflowRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("ProjectWorkflow not found"));
-
-        projectWorkflow.setPermissionExpression(permissionExpression);
-
-        return projectWorkflowRepository.save(projectWorkflow);
-    }
 }
