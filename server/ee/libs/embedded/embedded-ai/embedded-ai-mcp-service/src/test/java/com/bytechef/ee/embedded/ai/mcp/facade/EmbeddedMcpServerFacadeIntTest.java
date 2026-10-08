@@ -39,6 +39,9 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -134,6 +137,24 @@ class EmbeddedMcpServerFacadeIntTest {
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testEveryMethodRequiresTenantAdmin() {
+        authenticate(nonAdmin());
+
+        List<Method> methods = Arrays.stream(EmbeddedMcpServerFacade.class.getDeclaredMethods())
+            .filter(method -> !method.isSynthetic())
+            .filter(method -> !method.isDefault())
+            .toList();
+
+        assertThat(methods).isNotEmpty();
+
+        for (Method method : methods) {
+            assertThatThrownBy(() -> invoke(method))
+                .as("%s.%s", EmbeddedMcpServerFacade.class.getSimpleName(), method.getName())
+                .isInstanceOf(AccessDeniedException.class);
+        }
     }
 
     @Nested
@@ -510,6 +531,22 @@ class EmbeddedMcpServerFacadeIntTest {
             Environment.DEVELOPMENT.ordinal(), 1L, new User("external-user-1", "", List.of()), apiKeyAuthenticated);
     }
 
+    private static Object defaultValue(Class<?> type) {
+        if (type == boolean.class) {
+            return false;
+        }
+
+        if (type == int.class) {
+            return 0;
+        }
+
+        if (type == long.class) {
+            return 0L;
+        }
+
+        return null;
+    }
+
     private static McpComponent createMcpComponent(Long id, long mcpServerId) {
         McpComponent mcpComponent = new McpComponent("component", 1, mcpServerId, null);
 
@@ -532,6 +569,18 @@ class EmbeddedMcpServerFacadeIntTest {
         mcpTool.setId(id);
 
         return mcpTool;
+    }
+
+    private void invoke(Method method) throws Throwable {
+        Object[] arguments = Arrays.stream(method.getParameterTypes())
+            .map(EmbeddedMcpServerFacadeIntTest::defaultValue)
+            .toArray();
+
+        try {
+            method.invoke(embeddedMcpServerFacade, arguments);
+        } catch (InvocationTargetException invocationTargetException) {
+            throw invocationTargetException.getCause();
+        }
     }
 
     private static Authentication nonAdmin() {
