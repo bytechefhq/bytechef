@@ -446,6 +446,7 @@ class AiAgentChatActionResumeTest {
 
         assertThat(performResult).isNull();
         assertThat(suspendReference.get()).isNotNull();
+        assertThat(prompts).hasSize(1);
     }
 
     @Test
