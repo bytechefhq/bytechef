@@ -37,8 +37,6 @@ import java.util.Map;
  */
 public interface AiAgentComponentDefinition extends ClusterRootComponentDefinition {
 
-    String TASK_TOOL = "taskTool";
-
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
         return List.of(MODEL, CHAT_MEMORY, RAG, GUARDRAILS, TOOLS);
@@ -52,7 +50,6 @@ public interface AiAgentComponentDefinition extends ClusterRootComponentDefiniti
             JAILBREAK, List.of(MODEL.key()),
             NSFW, List.of(MODEL.key()),
             TOPICAL_ALIGNMENT, List.of(MODEL.key()),
-            CUSTOM, List.of(MODEL.key()),
-            TASK_TOOL, List.of(MODEL.key()));
+            CUSTOM, List.of(MODEL.key()));
     }
 }

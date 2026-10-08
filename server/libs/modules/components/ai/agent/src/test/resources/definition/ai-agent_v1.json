@@ -1038,13 +1038,12 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "checkForViolations": [ "checkForViolations" ],
-    "custom": [ "model" ],
+    "jailbreak": [ "model" ],
     "sanitizeText": [ "sanitizeText" ],
+    "checkForViolations": [ "checkForViolations" ],
     "topicalAlignment": [ "model" ],
-    "taskTool": [ "model" ],
-    "nsfw": [ "model" ],
-    "jailbreak": [ "model" ]
+    "custom": [ "model" ],
+    "nsfw": [ "model" ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",

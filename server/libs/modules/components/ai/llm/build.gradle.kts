@@ -7,8 +7,13 @@ dependencies {
 
     implementation("org.springframework.ai:spring-ai-retry")
     implementation("org.springframework.boot:spring-boot-http-client")
+    implementation("org.springframework:spring-context")
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:evaluator:evaluator-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
+    testImplementation("org.mockito:mockito-core")
     testImplementation(project(":server:libs:test:test-support"))
 }
 
