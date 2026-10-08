@@ -35,6 +35,8 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -45,11 +47,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,6 +92,82 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public long create(ConnectionDTO connectionDTO, PlatformType type) {
         Connection connection = connectionDTO.toConnection();
 
+        resolveOAuth2AuthorizationCode(connection);
+
+        Map<String, ?> parameters = new HashMap<>(connection.getParameters());
+
+        parameters.remove("state");
+
+        connection.setParameters(parameters);
+
+        List<Tag> tags = checkTags(connectionDTO.tags());
+
+        if (!tags.isEmpty()) {
+            connection.setTags(tags);
+        }
+
+        connection.setType(type);
+
+        connection = connectionService.create(connection);
+
+        return connection.getId();
+    }
+
+    @Override
+    public void delete(Long id) {
+        Connection connection = connectionService.getConnection(id);
+
+        validateOwnerOrAdmin(connection);
+
+        if (isConnectionUsed(id, connection.getType())) {
+            throw new ConfigurationException(
+                "Connection id=%s is used".formatted(id), ConnectionErrorType.CONNECTION_IS_USED);
+        }
+
+        connectionService.delete(id);
+    }
+
+    @Override
+    public void replaceAuthorizationParameters(long id, Map<String, ?> parameters) {
+        validateOwnerOrAdmin(connectionService.getConnection(id));
+
+        Connection connection = getConnectionWithReplacedAuthorizationParameters(id, parameters);
+
+        resolveOAuth2AuthorizationCode(connection);
+
+        Map<String, ?> updatedParameters = new HashMap<>(connection.getParameters());
+
+        updatedParameters.remove("state");
+
+        connectionService.replaceConnectionParameters(id, updatedParameters);
+
+        connectionService.updateConnectionCredentialStatus(id, Connection.CredentialStatus.VALID);
+    }
+
+    private Connection getConnectionWithReplacedAuthorizationParameters(long id, Map<String, ?> parameters) {
+        Connection connection = connectionService.getConnection(id);
+
+        ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
+            connection.getComponentName(), connection.getConnectionVersion());
+
+        List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
+            .stream()
+            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
+            .map(BaseProperty::getName)
+            .toList();
+
+        Map<String, Object> replacedParameters = new HashMap<>(connection.getParameters());
+
+        authorizationPropertyNames.forEach(replacedParameters::remove);
+
+        replacedParameters.putAll(parameters);
+
+        connection.setParameters(replacedParameters);
+
+        return connection;
+    }
+
+    private void resolveOAuth2AuthorizationCode(Connection connection) {
         if (connection.getAuthorizationType() != null && connection.containsParameter(Authorization.CODE)) {
 
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
@@ -128,40 +209,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 }
             }
         }
-
-        Map<String, ?> parameters = new HashMap<>(connection.getParameters());
-
-        parameters.remove("state");
-
-        connection.setParameters(parameters);
-
-        List<Tag> tags = checkTags(connectionDTO.tags());
-
-        if (!tags.isEmpty()) {
-            connection.setTags(tags);
-        }
-
-        connection.setType(type);
-
-        connection = connectionService.create(connection);
-
-        return connection.getId();
-    }
-
-    @Override
-    public void delete(Long id) {
-        Connection connection = connectionService.getConnection(id);
-
-        if (isConnectionUsed(id, connection.getType())) {
-            throw new ConfigurationException(
-                "Connection id=%s is used".formatted(id), ConnectionErrorType.CONNECTION_IS_USED);
-        }
-
-        connectionService.delete(id);
-
-// TODO find a way to delete ll tags not referenced anymore
-//        connection.getTagIds()
-//            .forEach(tagService::delete);
     }
 
     @Override
@@ -232,6 +279,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     public void update(long id, List<Tag> tags) {
+        validateOwnerOrAdmin(connectionService.getConnection(id));
+
         tags = checkTags(tags);
 
         connectionService.update(id, CollectionUtils.map(tags, Tag::getId));
@@ -239,9 +288,41 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     public void update(long id, String name, List<Tag> tags, int version) {
+        validateOwnerOrAdmin(connectionService.getConnection(id));
+
         tags = checkTags(tags);
 
         connectionService.update(id, name, CollectionUtils.map(tags, Tag::getId), version);
+    }
+
+    @Override
+    public void update(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version) {
+        validateOwnerOrAdmin(connectionService.getConnection(id));
+
+        tags = checkTags(tags);
+
+        List<Long> tagIds = CollectionUtils.map(tags, Tag::getId);
+
+        if (shared == null) {
+            connectionService.update(id, name, tagIds, version);
+        } else {
+            connectionService.update(id, name, tagIds, shared, version);
+        }
+    }
+
+    private static void validateOwnerOrAdmin(Connection connection) {
+        if (!SecurityUtils.isAuthenticated()) {
+            throw new AccessDeniedException("Authentication required to modify connection " + connection.getId());
+        }
+
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin();
+
+        if (!currentUserLogin.equals(connection.getCreatedBy()) &&
+            !SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)) {
+
+            throw new AccessDeniedException(
+                "Only the connection creator or an admin can modify connection " + connection.getId());
+        }
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
@@ -284,6 +365,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConnectionDTO> toConnectionDTOs(List<Connection> connections) {
+        return getConnections(connections);
+    }
+
     private List<ConnectionDTO> getConnections(List<Connection> connections) {
         List<Tag> tags = tagService.getTags(
             connections
@@ -294,18 +381,60 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         return connections.stream()
             .map(connection -> {
+                Long connectionId = connection.getId();
+
                 try {
                     return toConnectionDTO(
-                        isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection,
+                        isConnectionUsed(Validate.notNull(connectionId, "id"), connection.getType()), connection,
                         filterTags(tags, connection));
-                } catch (Exception e) {
-                    log.error(e.getMessage());
+                } catch (IllegalStateException | IllegalArgumentException | NoSuchElementException exception) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(
+                            "Failed to build ConnectionDTO for connection id={} componentName={}; "
+                                + "returning a degraded placeholder so admins can see the row exists",
+                            connectionId, connection.getComponentName(), exception);
+                    } else {
+                        log.warn(
+                            "Failed to build ConnectionDTO for connection id={} componentName={}; "
+                                + "returning a degraded placeholder so admins can see the row exists",
+                            connectionId, connection.getComponentName());
+                    }
 
-                    return null;
+                    return buildDegradedConnectionDTO(connection, filterTags(tags, connection), exception);
                 }
             })
-            .filter(Objects::nonNull)
             .toList();
+    }
+
+    private static ConnectionDTO buildDegradedConnectionDTO(Connection connection, List<Tag> tags, Throwable cause) {
+        return ConnectionDTO.builder()
+            .active(false)
+            .authorizationType(null)
+            .baseUri(null)
+            .componentName(connection.getComponentName())
+            .connectionVersion(connection.getConnectionVersion())
+            .createdBy(connection.getCreatedBy())
+            .createdDate(connection.getCreatedDate())
+            .credentialStatus(connection.getCredentialStatus())
+            .environmentId(connection.getEnvironmentId())
+            .id(connection.getId())
+            .lastModifiedBy(connection.getLastModifiedBy())
+            .lastModifiedDate(connection.getLastModifiedDate())
+            .name(degradedName(connection, cause))
+            .shared(connection.isShared())
+            .status(connection.getStatus())
+            .tags(tags)
+            .version(connection.getVersion())
+            .build();
+    }
+
+    private static String degradedName(Connection connection, Throwable cause) {
+        Class<? extends Throwable> causeClass = cause.getClass();
+
+        String suffix = " [unavailable: " + causeClass.getSimpleName() + "]";
+        String name = connection.getName();
+
+        return name == null ? suffix.trim() : name + suffix;
     }
 
     private static Map<String, ?> getConnectionParameters(

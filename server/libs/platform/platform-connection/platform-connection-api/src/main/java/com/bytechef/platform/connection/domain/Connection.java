@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
@@ -98,6 +99,12 @@ public final class Connection {
     private EncryptedMapWrapper parameters;
 
     @Column
+    private boolean shared;
+
+    @Column
+    private int status;
+
+    @Column
     private int type;
 
     @Version
@@ -105,6 +112,7 @@ public final class Connection {
 
     public Connection() {
         this.parameters = new EncryptedMapWrapper(Collections.emptyMap());
+        this.status = ConnectionStatus.ACTIVE.ordinal();
     }
 
     public static Builder builder() {
@@ -217,6 +225,18 @@ public final class Connection {
         return Collections.unmodifiableMap(parameters == null ? Map.of() : parameters.getMap());
     }
 
+    public ConnectionStatus getStatus() {
+        ConnectionStatus[] values = ConnectionStatus.values();
+
+        if (status < 0 || status >= values.length) {
+            throw new IllegalStateException(
+                "Connection id=%s has invalid status ordinal %d (valid range: 0-%d)".formatted(
+                    id, status, values.length - 1));
+        }
+
+        return values[status];
+    }
+
     public List<Long> getTagIds() {
         return connectionTags.stream()
             .map(ConnectionTag::getTagId)
@@ -243,12 +263,31 @@ public final class Connection {
         this.componentName = componentName;
     }
 
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public void setConnectionVersion(int connectionVersion) {
         this.connectionVersion = connectionVersion;
     }
 
     public void setCredentialStatus(CredentialStatus credentialStatus) {
+        Objects.requireNonNull(credentialStatus, "credentialStatus");
+
         this.credentialStatus = credentialStatus.ordinal();
+    }
+
+    public void setStatus(ConnectionStatus status) {
+        Objects.requireNonNull(status, "status");
+
+        ConnectionStatus currentStatus = getStatus();
+
+        if (currentStatus != status && !currentStatus.canTransitionTo(status)) {
+            throw new IllegalStateException(
+                "Cannot transition connection status from %s to %s".formatted(currentStatus, status));
+        }
+
+        this.status = status.ordinal();
     }
 
     public void setEnvironmentId(int environmentId) {
@@ -263,6 +302,14 @@ public final class Connection {
         return credentialStatusUpdated;
     }
 
+    public boolean isShared() {
+        return shared;
+    }
+
+    public void setShared(boolean shared) {
+        this.shared = shared;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -272,9 +319,11 @@ public final class Connection {
     }
 
     public void setParameters(Map<String, ?> parameters) {
-        if (!MapUtils.isEmpty(parameters)) {
-            this.parameters = new EncryptedMapWrapper(parameters);
+        if (parameters == null) {
+            return;
         }
+
+        this.parameters = new EncryptedMapWrapper(parameters);
     }
 
     public void setType(PlatformType type) {
@@ -314,6 +363,7 @@ public final class Connection {
             ", environment=" + environment +
             ", credentialStatus=" + credentialStatus +
             ", connectionTags=" + connectionTags +
+            ", status=" + status +
             ", type=" + type +
             ", parameters=" + parameters +
             ", createdBy='" + createdBy + '\'' +
@@ -332,6 +382,8 @@ public final class Connection {
         private Long id;
         private String name;
         private Map<String, Object> parameters;
+        private boolean shared;
+        private ConnectionStatus status;
         private List<Long> tagIds;
         private PlatformType type;
         private int version;
@@ -375,6 +427,18 @@ public final class Connection {
             return this;
         }
 
+        public Builder shared(boolean shared) {
+            this.shared = shared;
+
+            return this;
+        }
+
+        public Builder status(ConnectionStatus status) {
+            this.status = status;
+
+            return this;
+        }
+
         public Builder tagIds(List<Long> tagIds) {
             this.tagIds = tagIds;
 
@@ -402,9 +466,14 @@ public final class Connection {
             connection.setId(id);
             connection.setName(name);
             connection.setParameters(parameters);
+            connection.setShared(shared);
             connection.setTagIds(tagIds);
             connection.setType(type);
             connection.setVersion(version);
+
+            if (status != null) {
+                connection.setStatus(status);
+            }
 
             return connection;
         }
