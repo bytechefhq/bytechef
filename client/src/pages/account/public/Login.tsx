@@ -5,6 +5,7 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {getLoginRedirect, rememberLoginRedirect} from '@/shared/auth/login-redirect-utils';
+import useCeEdition from '@/shared/edition/useCeEdition';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -51,6 +52,8 @@ const Login = () => {
 
     const ff_1874 = useFeatureFlagsStore()('ff-1874');
 
+    const ceEdition = useCeEdition();
+
     const analytics = useAnalytics();
 
     const pageLocation = useLocation();
@@ -94,6 +97,10 @@ const Login = () => {
     };
 
     const handleEmailBlur = useCallback(async () => {
+        if (ceEdition) {
+            return;
+        }
+
         const email = form.getValues('email');
         const atIndex = email?.indexOf('@') ?? -1;
 
@@ -137,7 +144,7 @@ const Login = () => {
         } catch {
             setSsoRedirect(null);
         }
-    }, [form]);
+    }, [ceEdition, form]);
 
     const {from} = pageLocation.state || {
         from: getLoginRedirect(pageLocation.search) ?? {pathname: '/', search: pageLocation.search},
@@ -146,7 +153,7 @@ const Login = () => {
     useEffect(() => {
         const company = searchParams.get('company');
 
-        if (company) {
+        if (!ceEdition && company) {
             fetch(`/api/sso/discover-by-name?company=${encodeURIComponent(company)}`)
                 .then((response) => {
                     if (response.ok) {
@@ -164,7 +171,7 @@ const Login = () => {
                     // fall back to normal login
                 });
         }
-    }, [pageLocation.search, searchParams]);
+    }, [ceEdition, pageLocation.search, searchParams]);
 
     useEffect(() => {
         if (searchParams.get('error') === 'oauth2') {
