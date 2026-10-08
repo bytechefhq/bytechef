@@ -16,6 +16,8 @@
 
 package com.bytechef.test.config.graphql;
 
+import graphql.GraphQLContext;
+import graphql.execution.CoercedVariables;
 import graphql.language.ArrayValue;
 import graphql.language.BooleanValue;
 import graphql.language.FloatValue;
@@ -33,9 +35,11 @@ import graphql.schema.GraphQLScalarType;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Utility class providing shared GraphQL scalar type definitions for test configurations.
@@ -54,17 +58,24 @@ public final class GraphQLScalarTypes {
             .coercing(new Coercing<Object, Object>() {
 
                 @Override
-                public Object serialize(Object dataFetcherResult) throws CoercingSerializeException {
+                public Object serialize(
+                    @NonNull Object dataFetcherResult, @NonNull GraphQLContext graphQLContext, @NonNull Locale locale)
+                    throws CoercingSerializeException {
                     return dataFetcherResult;
                 }
 
                 @Override
-                public Object parseValue(Object input) throws CoercingParseValueException {
+                public Object
+                    parseValue(@NonNull Object input, @NonNull GraphQLContext graphQLContext, @NonNull Locale locale)
+                        throws CoercingParseValueException {
                     return input;
                 }
 
                 @Override
-                public Object parseLiteral(Object input) throws CoercingParseLiteralException {
+                public Object parseLiteral(
+                    @NonNull Value<?> input, @NonNull CoercedVariables variables,
+                    @NonNull GraphQLContext graphQLContext, @NonNull Locale locale)
+                    throws CoercingParseLiteralException {
                     return parseLiteralValue((Value<?>) input);
                 }
 
@@ -121,25 +132,28 @@ public final class GraphQLScalarTypes {
             .coercing(new Coercing<Long, Long>() {
 
                 @Override
-                public Long serialize(Object dataFetcherResult) throws CoercingSerializeException {
-                    if (dataFetcherResult instanceof Long) {
-                        return (Long) dataFetcherResult;
-                    }
-
-                    if (dataFetcherResult instanceof Number) {
-                        return ((Number) dataFetcherResult).longValue();
-                    }
-
-                    if (dataFetcherResult instanceof Instant) {
-                        return ((Instant) dataFetcherResult).toEpochMilli();
-                    }
-
-                    if (dataFetcherResult instanceof String) {
-                        try {
-                            return Long.parseLong((String) dataFetcherResult);
-                        } catch (NumberFormatException exception) {
-                            throw new CoercingSerializeException(
-                                "Expected a Long value but was: " + dataFetcherResult, exception);
+                public Long serialize(
+                    @NonNull Object dataFetcherResult, @NonNull GraphQLContext graphQLContext, @NonNull Locale locale)
+                    throws CoercingSerializeException {
+                    switch (dataFetcherResult) {
+                        case Long l -> {
+                            return l;
+                        }
+                        case Number number -> {
+                            return number.longValue();
+                        }
+                        case Instant instant -> {
+                            return instant.toEpochMilli();
+                        }
+                        case String s -> {
+                            try {
+                                return Long.parseLong(s);
+                            } catch (NumberFormatException exception) {
+                                throw new CoercingSerializeException(
+                                    "Expected a Long value but was: " + dataFetcherResult, exception);
+                            }
+                        }
+                        default -> {
                         }
                     }
 
@@ -147,21 +161,25 @@ public final class GraphQLScalarTypes {
                 }
 
                 @Override
-                public Long parseValue(Object input) throws CoercingParseValueException {
-                    if (input instanceof Long) {
-                        return (Long) input;
-                    }
-
-                    if (input instanceof Number) {
-                        return ((Number) input).longValue();
-                    }
-
-                    if (input instanceof String) {
-                        try {
-                            return Long.parseLong((String) input);
-                        } catch (NumberFormatException exception) {
-                            throw new CoercingParseValueException(
-                                "Expected a Long value but was: " + input, exception);
+                public Long
+                    parseValue(@NonNull Object input, @NonNull GraphQLContext graphQLContext, @NonNull Locale locale)
+                        throws CoercingParseValueException {
+                    switch (input) {
+                        case Long l -> {
+                            return l;
+                        }
+                        case Number number -> {
+                            return number.longValue();
+                        }
+                        case String s -> {
+                            try {
+                                return Long.parseLong(s);
+                            } catch (NumberFormatException exception) {
+                                throw new CoercingParseValueException(
+                                    "Expected a Long value but was: " + input, exception);
+                            }
+                        }
+                        default -> {
                         }
                     }
 
@@ -169,16 +187,21 @@ public final class GraphQLScalarTypes {
                 }
 
                 @Override
-                public Long parseLiteral(Object input) throws CoercingParseLiteralException {
+                public Long parseLiteral(
+                    @NonNull Value<?> input, @NonNull CoercedVariables variables,
+                    @NonNull GraphQLContext graphQLContext, @NonNull Locale locale)
+                    throws CoercingParseLiteralException {
                     if (input instanceof IntValue) {
                         BigInteger bigInteger = ((IntValue) input).getValue();
 
                         return bigInteger.longValue();
                     }
 
-                    if (input instanceof StringValue) {
+                    if (input instanceof StringValue stringValue) {
                         try {
-                            return Long.parseLong(((StringValue) input).getValue());
+                            if (stringValue.getValue() != null) {
+                                return Long.parseLong(stringValue.getValue());
+                            }
                         } catch (NumberFormatException exception) {
                             throw new CoercingParseLiteralException(
                                 "Expected a Long value but was: " + input, exception);
@@ -199,7 +222,9 @@ public final class GraphQLScalarTypes {
 
                 @Override
                 @SuppressWarnings("unchecked")
-                public Map<String, Object> serialize(Object dataFetcherResult) throws CoercingSerializeException {
+                public Map<String, Object> serialize(
+                    @NonNull Object dataFetcherResult, @NonNull GraphQLContext graphQLContext, @NonNull Locale locale)
+                    throws CoercingSerializeException {
                     if (dataFetcherResult instanceof Map) {
                         return (Map<String, Object>) dataFetcherResult;
                     }
@@ -209,7 +234,9 @@ public final class GraphQLScalarTypes {
 
                 @Override
                 @SuppressWarnings("unchecked")
-                public Map<String, Object> parseValue(Object input) throws CoercingParseValueException {
+                public Map<String, Object>
+                    parseValue(@NonNull Object input, @NonNull GraphQLContext graphQLContext, @NonNull Locale locale)
+                        throws CoercingParseValueException {
                     if (input instanceof Map) {
                         return (Map<String, Object>) input;
                     }
@@ -218,7 +245,10 @@ public final class GraphQLScalarTypes {
                 }
 
                 @Override
-                public Map<String, Object> parseLiteral(Object input) throws CoercingParseLiteralException {
+                public Map<String, Object> parseLiteral(
+                    @NonNull Value<?> input, @NonNull CoercedVariables variables,
+                    @NonNull GraphQLContext graphQLContext, @NonNull Locale locale)
+                    throws CoercingParseLiteralException {
                     if (input instanceof ObjectValue objectValue) {
                         return parseObjectValue(objectValue);
                     }
@@ -227,7 +257,7 @@ public final class GraphQLScalarTypes {
                         String value = Objects.requireNonNull(stringValue.getValue(), "string literal value");
 
                         return Objects.requireNonNull(
-                            parseValue(value), "parseValue returned null for a string literal");
+                            parseValue(value, graphQLContext, locale), "parseValue returned null for a string literal");
                     }
 
                     throw new CoercingParseLiteralException("Expected an ObjectValue or StringValue");
