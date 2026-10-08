@@ -38,14 +38,14 @@ class ConnectedUserReferenceAttentionResolverTest {
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
 
     @Mock
-    private WorkflowConnectionSlots workflowConnectionSlots;
+    private WorkflowConnectionSlot workflowConnectionSlot;
 
     private ConnectedUserReferenceAttentionResolver resolver;
 
     @BeforeEach
     void setUp() {
         resolver = new ConnectedUserReferenceAttentionResolver(
-            connectedUserReferenceDeploymentManager, workflowConnectionSlots);
+            connectedUserReferenceDeploymentManager, workflowConnectionSlot);
     }
 
     @Test
@@ -76,7 +76,7 @@ class ConnectedUserReferenceAttentionResolverTest {
     @Test
     void testRequiredSlotWithoutConnectionIsMissingConnection() {
         stubCurrentDeploymentWithRow(List.of(), Map.of());
-        when(workflowConnectionSlots.getSlots("automation-workflow-1"))
+        when(workflowConnectionSlot.getSlots("automation-workflow-1"))
             .thenReturn(List.of(new ComponentConnection("slack", 1, "postMessage1", "slack", true)));
 
         assertThat(resolver.resolve(reference())
@@ -87,7 +87,7 @@ class ConnectedUserReferenceAttentionResolverTest {
     void testMissingRequiredInputIsInputRequired() {
         stubCurrentDeploymentWithRow(
             List.of(new ProjectDeploymentWorkflowConnection(11L, "slack", "postMessage1")), Map.of());
-        when(workflowConnectionSlots.getSlots("automation-workflow-1"))
+        when(workflowConnectionSlot.getSlots("automation-workflow-1"))
             .thenReturn(List.of(new ComponentConnection("slack", 1, "postMessage1", "slack", true)));
         when(connectedUserReferenceDeploymentManager.findMissingRequiredInput("automation-workflow-1", Map.of()))
             .thenReturn("channel");
@@ -122,7 +122,7 @@ class ConnectedUserReferenceAttentionResolverTest {
     void testCompleteReferenceHasNoAttentionReason() {
         stubCurrentDeploymentWithRow(
             List.of(new ProjectDeploymentWorkflowConnection(11L, "slack", "postMessage1")), Map.of("channel", "#a"));
-        when(workflowConnectionSlots.getSlots("automation-workflow-1"))
+        when(workflowConnectionSlot.getSlots("automation-workflow-1"))
             .thenReturn(List.of(new ComponentConnection("slack", 1, "postMessage1", "slack", true)));
 
         ReferenceState referenceState = resolver.resolve(reference());

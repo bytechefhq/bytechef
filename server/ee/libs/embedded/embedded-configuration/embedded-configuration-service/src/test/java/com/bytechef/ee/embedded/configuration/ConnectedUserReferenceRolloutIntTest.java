@@ -49,11 +49,11 @@ import com.bytechef.ee.embedded.configuration.exception.MissingConnectionExcepti
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacadeIntTestConfiguration;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserCodeWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceRolloutManager;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -186,7 +186,7 @@ class ConnectedUserReferenceRolloutIntTest {
     private ComponentDefinitionService componentDefinitionService;
 
     @Autowired
-    private ConnectedUserCodeWorkflowReferenceFacade connectedUserCodeWorkflowReferenceFacade;
+    private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
     @MockitoBean
     private ConnectedUserConnectionFacade connectedUserConnectionFacade;
@@ -273,9 +273,9 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow first = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow first = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, firstUuid, Environment.PRODUCTION);
-        ConnectedUserProjectWorkflow second = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow second = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, secondUuid, Environment.PRODUCTION);
 
         assertThat(second.getProjectDeploymentId()).isEqualTo(first.getProjectDeploymentId());
@@ -300,10 +300,10 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow reference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        connectedUserCodeWorkflowReferenceFacade.enableReference(
+        connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, false, Environment.PRODUCTION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
@@ -311,7 +311,7 @@ class ConnectedUserReferenceRolloutIntTest {
         // Enabling catches the deployment up to the last published version first, so the row ends on that version.
         String versionTwoWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);
 
-        assertThatCode(() -> connectedUserCodeWorkflowReferenceFacade.enableReference(
+        assertThatCode(() -> connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION))
                 .doesNotThrowAnyException();
 
@@ -338,10 +338,10 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow reference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        connectedUserCodeWorkflowReferenceFacade.deleteReference(EXTERNAL_USER_ID, workflowUuid,
+        connectedUserWorkflowReferenceFacade.deleteReference(EXTERNAL_USER_ID, workflowUuid,
             Environment.PRODUCTION);
 
         assertThat(projectDeploymentService.fetchProjectDeploymentByName(
@@ -364,7 +364,7 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow first = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow first = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, firstUuid, Environment.PRODUCTION);
 
         assertThat(first.isEnabled()).isTrue();
@@ -376,12 +376,12 @@ class ConnectedUserReferenceRolloutIntTest {
             anyBoolean(), anyInt()))
                 .thenReturn(new PageImpl<>(List.of(RUNNING_FIRST_TEMPLATE_JOB_ID)));
 
-        ConnectedUserProjectWorkflow second = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow second = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, secondUuid, Environment.PRODUCTION);
 
-        connectedUserCodeWorkflowReferenceFacade.enableReference(
+        connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, secondUuid, false, Environment.PRODUCTION);
-        connectedUserCodeWorkflowReferenceFacade.enableReference(
+        connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, secondUuid, true, Environment.PRODUCTION);
 
         assertThat(second.getProjectDeploymentId()).isEqualTo(first.getProjectDeploymentId());
@@ -411,7 +411,7 @@ class ConnectedUserReferenceRolloutIntTest {
         when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
-        assertThatThrownBy(() -> connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION))
                 .isInstanceOf(IllegalStateException.class);
 
@@ -435,7 +435,7 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow reference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
         assertThat(reference.isEnabled()).isTrue();
@@ -443,7 +443,7 @@ class ConnectedUserReferenceRolloutIntTest {
         when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
-        assertThatThrownBy(() -> connectedUserCodeWorkflowReferenceFacade.enableReference(
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION))
                 .isInstanceOf(MissingConnectionException.class);
 
@@ -469,7 +469,7 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
         long environmentId = Environment.PRODUCTION.ordinal();
@@ -503,12 +503,12 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow reference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
         assertThat(reference.isEnabled()).isFalse();
 
-        assertThatThrownBy(() -> connectedUserCodeWorkflowReferenceFacade.enableReference(
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION))
                 .isInstanceOf(MissingInputException.class)
                 .extracting("inputName")
@@ -517,7 +517,7 @@ class ConnectedUserReferenceRolloutIntTest {
         connectedUserReferenceDeploymentManager.updateInputs(
             reference.getProjectDeploymentId(), workflowUuid, Map.of("channel", "#alerts"));
 
-        connectedUserCodeWorkflowReferenceFacade.enableReference(
+        connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION);
 
         assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId()))
@@ -542,13 +542,13 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow reference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
         connectedUserReferenceDeploymentManager.updateInputs(
             reference.getProjectDeploymentId(), workflowUuid, Map.of("channel", "#alerts"));
 
-        connectedUserCodeWorkflowReferenceFacade.enableReference(
+        connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION);
 
         long environmentId = Environment.PRODUCTION.ordinal();
@@ -583,10 +583,10 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow first = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow first = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, firstUuid, Environment.PRODUCTION);
 
-        connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, secondUuid, Environment.PRODUCTION);
 
         connectedUserReferenceDeploymentManager.updateInputs(
@@ -594,7 +594,7 @@ class ConnectedUserReferenceRolloutIntTest {
 
         // The required input was missing at provisioning, which left the reference disabled; rollout never enables a
         // disabled reference, so it is enabled here now that the input is set.
-        connectedUserCodeWorkflowReferenceFacade.enableReference(
+        connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, firstUuid, true, Environment.PRODUCTION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
@@ -625,9 +625,9 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow slackReference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow slackReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, slackUuid, Environment.PRODUCTION);
-        ConnectedUserProjectWorkflow otherReference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow otherReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, otherUuid, Environment.PRODUCTION);
 
         String draftWorkflowId = projectWorkflowService.getLastWorkflowId(slackUuid);
@@ -669,9 +669,9 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow keptReference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow keptReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, keptUuid, Environment.PRODUCTION);
-        ConnectedUserProjectWorkflow removedReference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow removedReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, removedUuid, Environment.PRODUCTION);
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(removedUuid);
@@ -702,7 +702,7 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow reference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, onlyReferencedUuid, Environment.PRODUCTION);
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(onlyReferencedUuid);
@@ -728,12 +728,12 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow reference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
-        connectedUserCodeWorkflowReferenceFacade.enableReference(
+        connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION);
 
         assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
@@ -776,7 +776,7 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow reference = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
         String publishedWorkflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
@@ -806,14 +806,14 @@ class ConnectedUserReferenceRolloutIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        ConnectedUserProjectWorkflow first = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow first = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, firstUuid, Environment.PRODUCTION);
 
         String secondUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
-        ConnectedUserProjectWorkflow second = connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
+        ConnectedUserProjectWorkflow second = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, secondUuid, Environment.PRODUCTION);
 
         long projectDeploymentId = first.getProjectDeploymentId();
