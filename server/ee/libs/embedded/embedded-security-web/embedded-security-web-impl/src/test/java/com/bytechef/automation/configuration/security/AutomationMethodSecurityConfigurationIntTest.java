@@ -5,27 +5,28 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.security.web.filter;
+package com.bytechef.automation.configuration.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
-import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
-import org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,25 +37,11 @@ import org.springframework.security.core.userdetails.User;
  *
  * @author Ivica Cardic
  */
-class EmbeddedConnectedUserMethodSecurityTest {
+@SpringBootTest(classes = AutomationMethodSecurityConfigurationIntTest.Config.class)
+class AutomationMethodSecurityConfigurationIntTest {
 
+    @Autowired
     private GatedOperations gatedOperations;
-
-    @BeforeEach
-    void setUp() {
-        PreAuthorizeAuthorizationManager preAuthorizeAuthorizationManager = new PreAuthorizeAuthorizationManager();
-
-        preAuthorizeAuthorizationManager.setExpressionHandler(
-            new AutomationMethodSecurityExpressionHandler(mock(PermissionService.class)));
-
-        ProxyFactory proxyFactory = new ProxyFactory(new GatedOperations());
-
-        proxyFactory.setProxyTargetClass(true);
-        proxyFactory.addAdvisor(AuthorizationManagerBeforeMethodInterceptor.preAuthorize(
-            preAuthorizeAuthorizationManager));
-
-        gatedOperations = (GatedOperations) proxyFactory.getProxy();
-    }
 
     @AfterEach
     void tearDown() {
@@ -119,7 +106,19 @@ class EmbeddedConnectedUserMethodSecurityTest {
     }
 
     private static EmbeddedApiKeyAuthenticationToken createConnectedUserAuthentication() {
-        return new EmbeddedApiKeyAuthenticationToken(1L, new User("external-user", "", List.of()));
+        return new EmbeddedApiKeyAuthenticationToken(1L, 1L, new User("external-user", "", List.of()), false);
+    }
+
+    @SpringBootConfiguration
+    @EnableMethodSecurity
+    @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
+    @Import(GatedOperations.class)
+    static class Config {
+
+        @Bean("permissionService")
+        PermissionService permissionService() {
+            return mock(PermissionService.class);
+        }
     }
 
     static class GatedOperations {

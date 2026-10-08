@@ -16,20 +16,18 @@
 
 package com.bytechef.platform.security.web.authentication;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 /**
- * Marks an {@link Authentication} whose principal is an embedded connected user rather than a platform user.
- *
  * @author Ivica Cardic
  */
-public interface ConnectedUserAuthentication extends Authentication {
+public interface ConnectedUserAuthentication {
 
-    static boolean isCurrentPrincipalConnectedUser() {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
+    long connectedUserId();
 
-        return securityContext.getAuthentication() instanceof ConnectedUserAuthentication;
+    String externalUserId();
+
+    long environmentId();
+
+    default boolean apiKeyAuthenticated() {
+        return false;
     }
 }
