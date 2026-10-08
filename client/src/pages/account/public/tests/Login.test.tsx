@@ -2,7 +2,7 @@ import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
-import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
+import {Mock, afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AccountErrorPage from '../AccountErrorPage';
 import Login from '../Login';
@@ -28,6 +28,7 @@ vi.mock('@/shared/stores/useAuthenticationStore', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    EditionType: {CE: 'CE', EE: 'EE'},
     useApplicationInfoStore: vi.fn(),
 }));
 
@@ -287,4 +288,67 @@ it('should ignore an off-site location recorded in the query string', () => {
     renderAuthenticatedLoginPage(`/login?redirect=${encodeURIComponent('https://evil.example')}`);
 
     expect(screen.getByText('Landing page')).toBeInTheDocument();
+});
+
+describe('SSO discovery', () => {
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+    const renderLoginPageAt = (initialEntry: string) => {
+        render(
+            <MemoryRouter initialEntries={[initialEntry]}>
+                <Routes>
+                    <Route element={<Login />} path="/login" />
+                </Routes>
+            </MemoryRouter>
+        );
+    };
+
+    const ssoDiscoveryCalls = () =>
+        fetchSpy.mock.calls.filter(([input]: [RequestInfo | URL]) => String(input).startsWith('/api/sso/discover'));
+
+    beforeEach(() => {
+        fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('{}', {status: 200}));
+    });
+
+    afterEach(() => {
+        fetchSpy.mockRestore();
+    });
+
+    it('should look up an SSO provider when the email field loses focus in the Enterprise edition', async () => {
+        mockApplicationInfoStore({edition: 'EE'});
+
+        renderLoginPageAt('/login');
+
+        await userEvent.type(screen.getByLabelText('Email'), 'user@example.com');
+        await userEvent.tab();
+
+        await waitFor(() => expect(ssoDiscoveryCalls()).toHaveLength(1));
+    });
+
+    it('should not look up an SSO provider when the email field loses focus in the Community edition', async () => {
+        mockApplicationInfoStore({edition: 'CE'});
+
+        renderLoginPageAt('/login');
+
+        await userEvent.type(screen.getByLabelText('Email'), 'user@example.com');
+        await userEvent.tab();
+
+        expect(ssoDiscoveryCalls()).toHaveLength(0);
+    });
+
+    it('should look up an SSO provider by company name in the Enterprise edition', async () => {
+        mockApplicationInfoStore({edition: 'EE'});
+
+        renderLoginPageAt('/login?company=acme');
+
+        await waitFor(() => expect(ssoDiscoveryCalls()).toHaveLength(1));
+    });
+
+    it('should not look up an SSO provider by company name in the Community edition', () => {
+        mockApplicationInfoStore({edition: 'CE'});
+
+        renderLoginPageAt('/login?company=acme');
+
+        expect(ssoDiscoveryCalls()).toHaveLength(0);
+    });
 });
