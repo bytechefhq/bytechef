@@ -1,4 +1,4 @@
-import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/DropdownMenu/DropdownMenu';
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it, vi} from 'vitest';

@@ -1,4 +1,4 @@
-import {DropdownMenuItem} from '@/components/ui/dropdown-menu';
+import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SendIcon} from 'lucide-react';
 
@@ -13,12 +13,11 @@ const ProjectListItemPublishMenuItem = ({hasWorkflows, onClick}: ProjectListItem
             <span className="block">
                 <DropdownMenuItem
                     aria-label="Publish Project"
-                    className="dropdown-menu-item"
                     disabled={!hasWorkflows}
+                    icon={<SendIcon />}
+                    label="Publish"
                     onSelect={onClick}
-                >
-                    <SendIcon /> Publish
-                </DropdownMenuItem>
+                />
             </span>
         </TooltipTrigger>
 
