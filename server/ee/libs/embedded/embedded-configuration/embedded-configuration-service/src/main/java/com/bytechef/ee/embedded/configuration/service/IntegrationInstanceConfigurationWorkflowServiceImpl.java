@@ -88,7 +88,7 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
 
         return OptionalUtils.get(
             integrationInstanceConfigurationWorkflowConnectionRepository
-                .findByIntegrationInstanceIdAndWorkflowIdAndOperationNameAndKey(
+                .findByIntegrationInstanceConfigurationIdAndWorkflowIdAndWorkflowNodeNameAndKey(
                     integrationInstanceConfigurationId, workflowId, operationName, key));
     }
 
@@ -99,7 +99,7 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
             Long integrationInstanceConfigurationId, String workflowId, String operationName) {
 
         return integrationInstanceConfigurationWorkflowConnectionRepository
-            .findAllByIntegrationInstanceIdAndWorkflowIdAndOperationName(
+            .findAllByIntegrationInstanceConfigurationIdAndWorkflowIdAndWorkflowNodeName(
                 integrationInstanceConfigurationId, workflowId, operationName);
     }
 

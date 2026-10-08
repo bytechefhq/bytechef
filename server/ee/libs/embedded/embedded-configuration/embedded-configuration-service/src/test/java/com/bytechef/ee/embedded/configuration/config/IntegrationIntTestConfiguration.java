@@ -18,7 +18,14 @@ package com.bytechef.ee.embedded.configuration.config;
 
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
+import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
@@ -26,6 +33,9 @@ import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -36,6 +46,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -49,7 +60,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
         type = FilterType.REGEX,
         pattern = {
             "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.AutomationWorkflowProjectFacadeIntTestConfiguration",
-            "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration"
+            "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration",
+            ".*IntTest\\$.*"
         }))
 @EnableAutoConfiguration
 @EnableCaching
@@ -77,5 +89,25 @@ public class IntegrationIntTestConfiguration {
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class IntegrationIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+
+        private final Encryption encryption;
+        private final ObjectMapper objectMapper;
+
+        @SuppressFBWarnings("EI2")
+        public IntegrationIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            this.encryption = encryption;
+            this.objectMapper = objectMapper;
+        }
+
+        @Override
+        protected List<?> userConverters() {
+            return Arrays.asList(
+                new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
+                new FileEntryToStringConverter(objectMapper),
+                new MapWrapperToStringConverter(objectMapper),
+                new StringToFileEntryConverter(objectMapper),
+                new StringToMapWrapperConverter(objectMapper));
+        }
     }
 }
