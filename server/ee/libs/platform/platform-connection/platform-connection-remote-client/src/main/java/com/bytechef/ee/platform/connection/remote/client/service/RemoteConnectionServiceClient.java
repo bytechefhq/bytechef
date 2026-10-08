@@ -10,11 +10,13 @@ package com.bytechef.ee.platform.connection.remote.client.service;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +27,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RemoteConnectionServiceClient implements ConnectionService {
-
     private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
@@ -42,7 +43,6 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     public Connection create(
         AuthorizationType authorizationType, String componentName, int connectionVersion, int environmentId,
         String name, Map<String, Object> parameters, PlatformType type) {
-
         throw new UnsupportedOperationException();
     }
 
@@ -62,6 +62,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public Optional<Connection> fetchConnection(long id) {
+        return Optional.ofNullable(getConnection(id));
+    }
+
+    @Override
     public List<Connection> getConnections(PlatformType type) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
@@ -72,6 +77,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public List<Connection> getSharedConnections(int environmentId, PlatformType type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Connection> getConnections(String componentName, int version, PlatformType type) {
         throw new UnsupportedOperationException();
     }
@@ -79,7 +89,6 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     @Override
     public List<Connection> getConnections(
         String componentName, Integer connectionVersion, Long typeId, Long environmentId, PlatformType type) {
-
         throw new UnsupportedOperationException();
     }
 
@@ -99,12 +108,37 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public Connection update(long id, String name, List<Long> tagIds, boolean shared, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status) {
         throw new UnsupportedOperationException();
     }
 
     @Override
+    public Connection updateConnectionStatus(long connectionId, ConnectionStatus status) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Connection> getInactiveConnections(List<Long> connectionIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void validateConnectionsActive(List<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }
 }

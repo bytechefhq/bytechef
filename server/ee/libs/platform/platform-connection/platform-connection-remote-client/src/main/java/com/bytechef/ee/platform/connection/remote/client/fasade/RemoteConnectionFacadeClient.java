@@ -7,11 +7,14 @@
 
 package com.bytechef.ee.platform.connection.remote.client.fasade;
 
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -56,6 +59,11 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
     }
 
     @Override
+    public List<ConnectionDTO> toConnectionDTOs(List<Connection> connections) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Tag> getConnectionTags(PlatformType type) {
         throw new UnsupportedOperationException();
     }
@@ -67,6 +75,16 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
 
     @Override
     public void update(long id, String name, List<Tag> tags, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void update(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void replaceAuthorizationParameters(long id, Map<String, ?> parameters) {
         throw new UnsupportedOperationException();
     }
 }
