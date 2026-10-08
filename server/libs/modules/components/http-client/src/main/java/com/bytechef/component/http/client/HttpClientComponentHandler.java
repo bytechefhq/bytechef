@@ -33,6 +33,7 @@ import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
 @AutoService(ComponentHandler.class)
 public class HttpClientComponentHandler implements ComponentHandler {
@@ -56,7 +57,8 @@ public class HttpClientComponentHandler implements ComponentHandler {
             tool(HttpClientHeadAction.ACTION_DEFINITION),
             tool(HttpClientPatchAction.ACTION_DEFINITION),
             tool(HttpClientPostAction.ACTION_DEFINITION),
-            tool(HttpClientPutAction.ACTION_DEFINITION));
+            tool(HttpClientPutAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

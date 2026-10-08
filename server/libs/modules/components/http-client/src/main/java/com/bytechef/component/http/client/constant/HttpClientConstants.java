@@ -30,6 +30,7 @@ import java.util.List;
 
 /**
  * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
 public class HttpClientConstants {
 
@@ -101,4 +102,53 @@ public class HttpClientConstants {
                 .description("Query parameters to send.")
                 .placeholder("Add parameter")
                 .additionalProperties(array().items(string()))));
+
+    public static final List<? extends Property> COMMON_PROPERTIESV2 = Collections.unmodifiableList(
+        Arrays.asList(
+            string(URI)
+                .label("URI")
+                .description(
+                    "The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.")
+                .exampleValue("/")
+                .placeholder("https://example.com/index.html")
+                .required(true),
+            bool(ALLOW_UNAUTHORIZED_CERTS)
+                .label("Allow Unauthorized Certs")
+                .description("Download the response even if SSL certificate validation is not possible.")
+                .defaultValue(false)
+                .advancedOption(true),
+            string(RESPONSE_FORMAT)
+                .label("Response Format")
+                .description("The format in which the data gets returned from the URL.")
+                .options(
+                    option(
+                        "JSON",
+                        String.valueOf(ResponseType.JSON.getType()),
+                        "The response is automatically converted to object/array."),
+                    option(
+                        "XML",
+                        String.valueOf(ResponseType.XML.getType()),
+                        "The response is automatically converted to object/array."),
+                    option("Text", String.valueOf(ResponseType.TEXT.getType()), "The response is returned as a text."),
+                    option(
+                        "File", String.valueOf(ResponseType.BINARY.getType()),
+                        "The response is returned as a file object."))
+                .defaultValue(String.valueOf(ResponseType.JSON.getType())),
+            string(RESPONSE_CONTENT_TYPE)
+                .label("Content Type")
+                .defaultValue("application/octet-stream")
+                .displayCondition("%s == '%s'".formatted(RESPONSE_FORMAT, ResponseType.BINARY.getType()))
+                .required(true),
+            string(RESPONSE_FILENAME)
+                .label("Response Filename")
+                .description("The name of the file if the response is returned as a file object.")
+                .displayCondition("%s == '%s'".formatted(RESPONSE_FORMAT, ResponseType.BINARY.getType())),
+            object(HEADERS)
+                .label("Headers")
+                .description("Headers to send.")
+                .placeholder("Add header"),
+            object(QUERY_PARAMETERS)
+                .label("Query Parameters")
+                .description("Query parameters to send.")
+                .placeholder("Add parameter")));
 }
