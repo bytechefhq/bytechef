@@ -29,11 +29,11 @@ public abstract class AbstractDispatcherPreSendProcessor {
     }
 
     protected Map<String, Long> getConnectionIdMap(
-        Long integrationInstanceId, String workflowId, String workflowNodeName) {
+        long integrationInstanceConfigurationId, String workflowId, String workflowNodeName) {
 
         List<IntegrationInstanceConfigurationWorkflowConnection> integrationInstanceConfigurationWorkflowConnections =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflowConnections(
-                integrationInstanceId, workflowId, workflowNodeName);
+                integrationInstanceConfigurationId, workflowId, workflowNodeName);
 
         return MapUtils.toMap(
             integrationInstanceConfigurationWorkflowConnections,

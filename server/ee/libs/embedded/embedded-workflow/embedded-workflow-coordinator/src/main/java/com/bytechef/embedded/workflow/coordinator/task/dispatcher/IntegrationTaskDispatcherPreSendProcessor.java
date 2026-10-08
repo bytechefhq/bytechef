@@ -82,15 +82,16 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, integrationInstanceId);
 
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstanceId);
+
         Map<String, Long> connectionIdMap = getConnectionIdMap(
-            integrationInstanceId, job.getWorkflowId(), taskExecution.getName());
+            integrationInstance.getIntegrationInstanceConfigurationId(), job.getWorkflowId(),
+            taskExecution.getName());
 
         WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
-            integrationInstanceId);
 
         Integration integration = integrationService.getIntegrationInstanceIntegration(integrationInstanceId);
 
