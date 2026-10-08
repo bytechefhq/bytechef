@@ -12,7 +12,6 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
-import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationStatusModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationVersionModel;
@@ -39,17 +38,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class IntegrationApiController implements IntegrationApi {
 
     private final ConversionService conversionService;
-    private final IntegrationService integrationService;
     private final IntegrationFacade integrationFacade;
     private final IntegrationWorkflowFacade integrationWorkflowFacade;
 
     @SuppressFBWarnings("EI2")
     public IntegrationApiController(
-        ConversionService conversionService, IntegrationService integrationService,
-        IntegrationFacade integrationFacade, IntegrationWorkflowFacade integrationWorkflowFacade) {
+        ConversionService conversionService, IntegrationFacade integrationFacade,
+        IntegrationWorkflowFacade integrationWorkflowFacade) {
 
         this.conversionService = conversionService;
-        this.integrationService = integrationService;
         this.integrationFacade = integrationFacade;
         this.integrationWorkflowFacade = integrationWorkflowFacade;
     }
@@ -84,7 +81,7 @@ public class IntegrationApiController implements IntegrationApi {
     @Override
     public ResponseEntity<List<IntegrationVersionModel>> getIntegrationVersions(Long id) {
         return ResponseEntity.ok(
-            integrationService.getIntegrationVersions(id)
+            integrationFacade.getIntegrationVersions(id)
                 .stream()
                 .map(projectVersion -> conversionService.convert(projectVersion, IntegrationVersionModel.class))
                 .toList());

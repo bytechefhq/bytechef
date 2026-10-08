@@ -12,6 +12,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
@@ -25,15 +26,16 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,19 +56,23 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final TagService tagService;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
 
     @SuppressFBWarnings("EI2")
     public IntegrationFacadeImpl(
-        CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
-        IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
+        CategoryService categoryService,
+        ComponentDefinitionService componentDefinitionService,
+        IntegrationService integrationService,
+        IntegrationWorkflowService integrationWorkflowService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         TagService tagService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
+        WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
         this.categoryService = categoryService;
         this.componentDefinitionService = componentDefinitionService;
@@ -76,11 +82,13 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.tagService = tagService;
         this.workflowService = workflowService;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public long createIntegration(IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
         Category category = integrationDTO.category();
@@ -103,6 +111,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void deleteIntegration(long id) {
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(id);
@@ -113,6 +122,12 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         }
 
         List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(id);
+
+        for (IntegrationWorkflow integrationWorkflow : integrationWorkflows) {
+            for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+                workflowPreDeleteListener.onWorkflowPreDelete(integrationWorkflow.getWorkflowId());
+            }
+        }
 
         workflowService.delete(
             integrationWorkflows.stream()
@@ -138,6 +153,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationDTO getIntegration(long id) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -146,6 +162,14 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public List<IntegrationVersion> getIntegrationVersions(long id) {
+        return integrationService.getIntegrationVersions(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<IntegrationDTO> getIntegrations(
         Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status,
         boolean includeAllFields) {
@@ -174,13 +198,16 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                     .filter(Objects::nonNull)
                     .toList());
 
-            Map<String, ComponentDefinition> componentDefinitionMap = integrations.stream()
+            Map<String, ComponentDefinition> componentDefinitionMap = new HashMap<>();
+
+            for (String componentName : integrations.stream()
                 .map(Integration::getComponentName)
                 .distinct()
-                .collect(
-                    Collectors.toMap(
-                        Function.identity(),
-                        componentName -> componentDefinitionService.getComponentDefinition(componentName, null)));
+                .toList()) {
+
+                componentDefinitionService.fetchComponentDefinition(componentName, null)
+                    .ifPresent(componentDefinition -> componentDefinitionMap.put(componentName, componentDefinition));
+            }
 
             return CollectionUtils.map(
                 integrations,
@@ -198,6 +225,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void publishIntegration(long id, String description) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -225,6 +253,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegration(IntegrationDTO integrationDTO) {
         List<Tag> tags = CollectionUtils.isEmpty(integrationDTO.tags())
             ? Collections.emptyList()
@@ -256,7 +285,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     private IntegrationDTO toIntegrationDTO(Integration integration) {
         return new IntegrationDTO(
             getCategory(integration),
-            componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
+            componentDefinitionService.fetchComponentDefinition(integration.getComponentName(), null)
+                .orElse(null),
             integration, getIntegrationWorkflowIds(integration),
             tagService.getTags(integration.getTagIds()));
     }

@@ -17,6 +17,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -26,10 +27,10 @@ import org.apache.commons.lang3.StringUtils;
 @SuppressFBWarnings("EI")
 public record IntegrationDTO(
     Category category, String componentName, int componentVersion, String createdBy, Instant createdDate,
-    String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
-    List<Long> integrationWorkflowIds, String lastModifiedBy, Instant lastModifiedDate, Instant lastPublishedDate,
-    Status lastStatus, Integer lastIntegrationVersion, boolean multipleInstances, String name,
-    String permissionExpression, List<Tag> tags, String title, int version) {
+    String description, String icon, Long id,
+    List<IntegrationVersion> integrationVersions, List<Long> integrationWorkflowIds, String lastModifiedBy,
+    Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion,
+    boolean multipleInstances, String name, String permissionExpression, List<Tag> tags, String title, int version) {
 
     public IntegrationDTO(Integration integration) {
         this(
@@ -44,17 +45,19 @@ public record IntegrationDTO(
     }
 
     public IntegrationDTO(
-        Category category, ComponentDefinition componentDefinition, Integration integration,
+        Category category, @Nullable ComponentDefinition componentDefinition, Integration integration,
         List<Long> integrationWorkflowIds, List<Tag> tags) {
-
         this(
-            category, integration.getComponentName(), integration.getComponentVersion(), integration.getCreatedBy(),
-            integration.getCreatedDate(), getDescription(componentDefinition, integration),
-            componentDefinition.getIcon(), integration.getId(), integration.getIntegrationVersions(),
-            integrationWorkflowIds, integration.getLastModifiedBy(), integration.getLastModifiedDate(),
-            integration.getLastPublishedDate(), integration.getLastStatus(), integration.getLastIntegrationVersion(),
-            integration.isMultipleInstances(), integration.getName(), integration.getPermissionExpression(), tags,
-            componentDefinition.getTitle(), integration.getVersion());
+            category, integration.getComponentName(),
+            integration.getComponentVersion(), integration.getCreatedBy(), integration.getCreatedDate(),
+            getDescription(componentDefinition, integration),
+            componentDefinition == null ? null : componentDefinition.getIcon(), integration.getId(),
+            integration.getIntegrationVersions(), integrationWorkflowIds, integration.getLastModifiedBy(),
+            integration.getLastModifiedDate(), integration.getLastPublishedDate(), integration.getLastStatus(),
+            integration.getLastIntegrationVersion(), integration.isMultipleInstances(), integration.getName(),
+            integration.getPermissionExpression(), tags,
+            componentDefinition == null ? integration.getComponentName() : componentDefinition.getTitle(),
+            integration.getVersion());
     }
 
     public static Builder builder() {
@@ -81,7 +84,6 @@ public record IntegrationDTO(
 
     @SuppressFBWarnings("EI")
     public static final class Builder {
-
         private boolean multipleInstances;
         private Category category;
         private String componentName;
@@ -221,15 +223,19 @@ public record IntegrationDTO(
 
         public IntegrationDTO build() {
             return new IntegrationDTO(
-                category, componentName, componentVersion, createdBy, createdDate, description, null, id,
-                integrationVersions, integrationWorkflowIds, lastModifiedBy, lastModifiedDate, lastPublishedDate,
-                lastStatus, lastIntegrationVersion, multipleInstances, name, permissionExpression, tags, null, version);
+                category, componentName, componentVersion, createdBy,
+                createdDate, description, null, id, integrationVersions, integrationWorkflowIds, lastModifiedBy,
+                lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name,
+                permissionExpression, tags, null, version);
         }
     }
 
     private static String getDescription(
-        ComponentDefinition componentDefinition, Integration integration) {
-        return StringUtils.isEmpty(integration.getDescription())
-            ? componentDefinition.getDescription() : integration.getDescription();
+        @Nullable ComponentDefinition componentDefinition, Integration integration) {
+        if (!StringUtils.isEmpty(integration.getDescription())) {
+            return integration.getDescription();
+        }
+
+        return componentDefinition == null ? null : componentDefinition.getDescription();
     }
 }
