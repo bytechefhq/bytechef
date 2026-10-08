@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -23,6 +24,8 @@ public interface IntegrationWorkflowService {
     void delete(List<Long> ids);
 
     void delete(long integrationId, int integrationVersion, String workflowId);
+
+    Optional<String> fetchLastWorkflowId(String workflowUuid, Environment environment);
 
     IntegrationWorkflow getIntegrationWorkflow(long id);
 

@@ -42,7 +42,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(classes = IntegrationIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks
-public class IntegrationServiceIntTest {
+class IntegrationServiceIntTest {
 
     private Category category;
 
@@ -59,20 +59,20 @@ public class IntegrationServiceIntTest {
     private TagRepository tagRepository;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         categoryRepository.deleteAll();
 
         category = categoryRepository.save(new Category("name"));
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         integrationRepository.deleteAll();
         tagRepository.deleteAll();
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         Integration integration = getIntegration();
 
         Tag tag = tagRepository.save(new Tag("tag1"));
@@ -87,7 +87,7 @@ public class IntegrationServiceIntTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         Integration integration = integrationRepository.save(getIntegration());
 
         integrationService.delete(Validate.notNull(integration.getId(), "id"));
@@ -96,7 +96,7 @@ public class IntegrationServiceIntTest {
     }
 
     @Test
-    public void testGetIntegration() {
+    void testGetIntegration() {
         Integration integration = integrationRepository.save(getIntegration());
 
         assertThat(integration).isEqualTo(
@@ -104,7 +104,7 @@ public class IntegrationServiceIntTest {
     }
 
     @Test
-    public void testGetIntegrations() {
+    void testGetIntegrations() {
         Integration integration = integrationRepository.save(getIntegration());
 
         assertThat(integrationService.getIntegrations(null, List.of(), null, null)).hasSize(1);
@@ -136,7 +136,7 @@ public class IntegrationServiceIntTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         Integration integration = integrationRepository.save(getIntegration());
 
         Tag tag = tagRepository.save(new Tag("tag2"));

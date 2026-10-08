@@ -83,7 +83,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     TriggerLifecycleFacade.class,
     ComponentConnectionFacade.class, WorkflowFacade.class, WorkflowNodeParameterFacade.class,
     WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class, OAuth2ParametersFacade.class,
-    ProjectDeploymentFacade.class, ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class,
+    ProjectDeploymentFacade.class, ProjectDeploymentService.class,
+    ProjectDeploymentWorkflowService.class,
     ProjectFacade.class, ProjectService.class, ProjectWorkflowFacade.class, ProjectWorkflowService.class,
     WorkflowCacheManager.class, WorkflowService.class, WorkflowTestConfigurationFacade.class
 })

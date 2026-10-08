@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepo
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,16 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     @Override
     public void delete(List<Long> ids) {
         integrationWorkflowRepository.deleteAllById(ids);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> fetchLastWorkflowId(String workflowUuid, Environment environment) {
+        try {
+            return Optional.of(getLastWorkflowId(workflowUuid, environment));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return Optional.empty();
+        }
     }
 
     @Override
