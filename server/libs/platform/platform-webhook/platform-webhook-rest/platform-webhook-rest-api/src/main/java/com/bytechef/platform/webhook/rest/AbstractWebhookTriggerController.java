@@ -25,8 +25,8 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
+import com.bytechef.platform.webhook.rest.util.RedirectValidatorUtils;
 import com.bytechef.platform.webhook.rest.util.WebhookRequestUtils;
-import com.bytechef.platform.webhook.rest.validator.RedirectValidator;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;
@@ -198,7 +198,7 @@ public abstract class AbstractWebhookTriggerController {
                 String redirectUrl = String.valueOf(webhookResponse.getBody());
                 String serverHost = httpServletRequest.getServerName();
 
-                if (RedirectValidator.isValidRedirect(redirectUrl, serverHost)) {
+                if (RedirectValidatorUtils.isValidRedirect(redirectUrl, serverHost)) {
                     responseEntity = ResponseEntity.noContent()
                         .build();
 
