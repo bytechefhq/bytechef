@@ -16,6 +16,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +54,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         connectedUserProjectFacade.enableProjectWorkflow(
             SecurityUtils.getCurrentUserLogin(), workflowUuid, enable,
-            (long) getEnvironment(xEnvironment).ordinal());
+            getEnvironmentId(xEnvironment));
 
         return ResponseEntity.noContent()
             .build();
@@ -67,7 +68,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
             conversionService.convert(
                 connectedUserProjectFacade.getConnectedUserProjectWorkflow(
                     SecurityUtils.getCurrentUserLogin(), workflowUuid,
-                    (long) getEnvironment(xEnvironment).ordinal()),
+                    getEnvironmentId(xEnvironment)),
                 ConnectedUserProjectWorkflowModel.class));
     }
 
@@ -80,13 +81,15 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         connectedUserProjectFacade.publishProjectWorkflow(
             SecurityUtils.getCurrentUserLogin(), workflowUuid,
             publishConnectedUserProjectWorkflowRequestModel.getDescription(),
-            (long) getEnvironment(xEnvironment).ordinal());
+            getEnvironmentId(xEnvironment));
 
         return ResponseEntity.noContent()
             .build();
     }
 
-    private Environment getEnvironment(EnvironmentModel xEnvironment) {
-        return environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
+    private long getEnvironmentId(EnvironmentModel xEnvironment) {
+        Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
+
+        return PrincipalEnvironment.resolveEffectiveEnvironmentId((long) environment.ordinal());
     }
 }
