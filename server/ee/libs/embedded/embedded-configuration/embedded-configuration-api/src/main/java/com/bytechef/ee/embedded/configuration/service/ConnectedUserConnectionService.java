@@ -18,5 +18,7 @@ public interface ConnectedUserConnectionService {
 
     void create(long connectedUserId, long connectionId);
 
+    void deleteByConnectionId(long connectionId);
+
     List<Long> getConnectionIds(long connectedUserId);
 }
