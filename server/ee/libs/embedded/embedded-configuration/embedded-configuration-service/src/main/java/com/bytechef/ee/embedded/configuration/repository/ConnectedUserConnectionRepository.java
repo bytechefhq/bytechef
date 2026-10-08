@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserConnection;
 import java.util.List;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -21,6 +22,13 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ConnectedUserConnectionRepository extends ListCrudRepository<ConnectedUserConnection, Long> {
+
+    @Modifying
+    @Query("""
+        DELETE FROM connected_user_connection
+        WHERE connection_id = :connectionId
+        """)
+    void deleteByConnectionId(@Param("connectionId") long connectionId);
 
     @Query("""
         SELECT connected_user_connection.*

@@ -9,6 +9,9 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -19,5 +22,14 @@ public interface ConnectedUserConnectionFacade {
 
     long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO);
 
-    List<ConnectionDTO> getConnections(Long connectedUserId, String componentName, List<Long> connectionIds);
+    void deleteConnectedUserConnection(long connectedUserId, long connectionId);
+
+    List<ConnectionDTO> getConnections(
+        Long connectedUserId, @Nullable String componentName, List<Long> connectionIds);
+
+    Set<Long> getOwnedConnectionIds(long connectedUserId);
+
+    void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters);
+
+    void validateCurrentPrincipalConnectedUser(long connectedUserId);
 }
