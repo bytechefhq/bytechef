@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.User;
 public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken
     implements ConnectedUserAuthentication {
 
+    private long connectedUserId;
     private String externalUserId;
 
     public EmbeddedMcpServerApiKeyAuthenticationToken(long environmentId, String externalUserId, String tenantId) {
@@ -29,8 +30,26 @@ public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAu
     }
 
     @SuppressFBWarnings("EI")
-    public EmbeddedMcpServerApiKeyAuthenticationToken(long environmentId, User user) {
+    public EmbeddedMcpServerApiKeyAuthenticationToken(long environmentId, long connectedUserId, User user) {
         super(environmentId, user);
+
+        this.connectedUserId = connectedUserId;
+        this.externalUserId = user.getUsername();
+    }
+
+    @Override
+    public long connectedUserId() {
+        return connectedUserId;
+    }
+
+    @Override
+    public String externalUserId() {
+        return externalUserId;
+    }
+
+    @Override
+    public long environmentId() {
+        return getEnvironmentId();
     }
 
     public String getExternalUserId() {

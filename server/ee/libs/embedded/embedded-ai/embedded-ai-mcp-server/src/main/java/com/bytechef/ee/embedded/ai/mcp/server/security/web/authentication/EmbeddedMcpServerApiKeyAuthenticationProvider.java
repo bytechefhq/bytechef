@@ -42,7 +42,7 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
             .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environmentId));
 
         return new EmbeddedMcpServerApiKeyAuthenticationToken(
-            environmentId, createSpringSecurityUser(externalUserId, connectedUser));
+            environmentId, connectedUser.getId(), createSpringSecurityUser(externalUserId, connectedUser));
     }
 
     @Override

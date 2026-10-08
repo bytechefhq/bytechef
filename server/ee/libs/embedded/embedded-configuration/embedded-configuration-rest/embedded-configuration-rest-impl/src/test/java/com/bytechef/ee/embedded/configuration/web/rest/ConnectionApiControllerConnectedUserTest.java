@@ -258,7 +258,7 @@ class ConnectionApiControllerConnectedUserTest {
 
     private static EmbeddedApiKeyAuthenticationToken createConnectedUserAuthentication(Environment environment) {
         return new EmbeddedApiKeyAuthenticationToken(
-            environment.ordinal(), new User(EXTERNAL_USER_A_ID, "", List.of()));
+            environment.ordinal(), 1L, new User(EXTERNAL_USER_A_ID, "", List.of()), false);
     }
 
     private static Authentication createRegularUserAuthentication() {
