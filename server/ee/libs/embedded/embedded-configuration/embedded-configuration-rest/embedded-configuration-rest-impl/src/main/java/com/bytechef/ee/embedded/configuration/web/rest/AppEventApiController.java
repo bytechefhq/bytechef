@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
-import com.bytechef.ee.embedded.configuration.service.AppEventService;
+import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.AppEventModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -31,25 +31,25 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 public class AppEventApiController implements AppEventApi {
 
-    private final AppEventService appEventService;
+    private final AppEventFacade appEventFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public AppEventApiController(AppEventService appEventService, ConversionService conversionService) {
-        this.appEventService = appEventService;
+    public AppEventApiController(AppEventFacade appEventFacade, ConversionService conversionService) {
+        this.appEventFacade = appEventFacade;
         this.conversionService = conversionService;
     }
 
     @Override
     public ResponseEntity<Long> createAppEvent(AppEventModel appEventModel) {
-        AppEvent appEvent = appEventService.create(conversionService.convert(appEventModel, AppEvent.class));
+        AppEvent appEvent = appEventFacade.create(conversionService.convert(appEventModel, AppEvent.class));
 
         return ResponseEntity.ok(appEvent.getId());
     }
 
     @Override
     public ResponseEntity<Void> deleteAppEvent(Long id) {
-        appEventService.delete(id);
+        appEventFacade.delete(id);
 
         return ResponseEntity.ok()
             .build();
@@ -57,19 +57,19 @@ public class AppEventApiController implements AppEventApi {
 
     @Override
     public ResponseEntity<AppEventModel> getAppEvent(Long id) {
-        return ResponseEntity.ok(conversionService.convert(appEventService.getAppEvent(id), AppEventModel.class));
+        return ResponseEntity.ok(conversionService.convert(appEventFacade.getAppEvent(id), AppEventModel.class));
     }
 
     @Override
     public ResponseEntity<List<AppEventModel>> getAppEvents() {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                appEventService.getAppEvents(), appEvent -> conversionService.convert(appEvent, AppEventModel.class)));
+                appEventFacade.getAppEvents(), appEvent -> conversionService.convert(appEvent, AppEventModel.class)));
     }
 
     @Override
     public ResponseEntity<Void> updateAppEvent(Long id, AppEventModel appEventModel) {
-        appEventService.update(conversionService.convert(appEventModel, AppEvent.class));
+        appEventFacade.update(conversionService.convert(appEventModel, AppEvent.class));
 
         return ResponseEntity.noContent()
             .build();
