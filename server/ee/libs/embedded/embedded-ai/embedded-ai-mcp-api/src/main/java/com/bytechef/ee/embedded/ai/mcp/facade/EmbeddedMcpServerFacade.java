@@ -7,6 +7,12 @@
 
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.tag.domain.Tag;
+import java.util.List;
+
 /**
  * @version ee
  *
@@ -14,5 +20,13 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
  */
 public interface EmbeddedMcpServerFacade {
 
+    McpServer createEmbeddedMcpServer(String name, Environment environment, boolean enabled);
+
     void deleteEmbeddedMcpServer(long mcpServerId);
+
+    List<McpServer> getEmbeddedMcpServers();
+
+    List<Tag> getEmbeddedMcpServerTags();
+
+    List<ComponentDefinition> getMcpComponentDefinitions();
 }
