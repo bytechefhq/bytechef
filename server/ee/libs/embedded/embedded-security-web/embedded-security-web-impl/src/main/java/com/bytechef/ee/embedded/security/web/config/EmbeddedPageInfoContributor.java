@@ -9,8 +9,10 @@ package com.bytechef.ee.embedded.security.web.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import java.util.List;
+import java.util.Map;
+import org.springframework.boot.actuate.info.Info;
+import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,24 +22,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-class EmbeddedPageAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
-
-    private static final List<String> EMBEDDED_PAGE_PATHS = List.of(
-        "/automation-hub.html", "/integration-marketplace.html", "/workflow-builder.html");
+class EmbeddedPageInfoContributor implements InfoContributor {
 
     private final List<String> allowedParentOrigins;
 
-    EmbeddedPageAuthorizeHttpRequestContributor(ApplicationProperties applicationProperties) {
+    EmbeddedPageInfoContributor(ApplicationProperties applicationProperties) {
         this.allowedParentOrigins = EmbeddedAllowedParentOrigins.of(applicationProperties);
     }
 
     @Override
-    public List<String> getFrameAncestors() {
-        return List.copyOf(allowedParentOrigins);
-    }
-
-    @Override
-    public List<String> getFrameablePermitAllRequestMatcherPaths() {
-        return EMBEDDED_PAGE_PATHS;
+    public void contribute(Info.Builder builder) {
+        builder.withDetail("embedded", Map.of("allowedParentOrigins", allowedParentOrigins));
     }
 }
