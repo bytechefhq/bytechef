@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261008120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="automation_workflow_project"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="automation_workflow_project">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="project_id" type="bigint">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_automation_workflow_project_project_id"/>
+            </column>
+            <column name="automation_hub_visible" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission_expression" type="text"/>
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="version" type="integer" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="automation_workflow_project" baseColumnNames="project_id"
+                                 constraintName="fk_automation_workflow_project_project"
+                                 referencedTableName="project" referencedColumnNames="id" onDelete="CASCADE"/>
+
+        <createTable tableName="automation_workflow_project_workflow">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="project_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_uuid" type="${uuid_type}">
+                <constraints nullable="false" unique="true"
+                             uniqueConstraintName="uk_automation_workflow_project_workflow_workflow_uuid"/>
+            </column>
+            <column name="permission_expression" type="text"/>
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="version" type="integer" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="automation_workflow_project_workflow" baseColumnNames="project_id"
+                                 constraintName="fk_automation_workflow_project_workflow_project"
+                                 referencedTableName="project" referencedColumnNames="id" onDelete="CASCADE"/>
+
+        <rollback>
+            <dropTable tableName="automation_workflow_project_workflow"/>
+            <dropTable tableName="automation_workflow_project"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261008120000-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="project" columnName="permission_expression"/>
+        </preConditions>
+
+        <sql>
+            INSERT INTO automation_workflow_project
+                (project_id, automation_hub_visible, permission_expression, created_date, last_modified_date, version)
+            SELECT id, TRUE, permission_expression, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0
+            FROM project
+            WHERE name LIKE '!_!_EMBEDDED!_AUTOMATION!_!_%' ESCAPE '!'
+        </sql>
+
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="20261008120000-3" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="project_workflow" columnName="permission_expression"/>
+        </preConditions>
+
+        <sql>
+            INSERT INTO automation_workflow_project_workflow
+                (project_id, workflow_uuid, permission_expression, created_date, last_modified_date, version)
+            SELECT project_workflow.project_id, project_workflow.uuid, project_workflow.permission_expression,
+                CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0
+            FROM project_workflow
+            WHERE project_workflow.permission_expression IS NOT NULL
+                AND project_workflow.uuid IS NOT NULL
+                AND project_workflow.project_version = (
+                    SELECT MAX(latest_project_workflow.project_version)
+                    FROM project_workflow latest_project_workflow
+                    WHERE latest_project_workflow.uuid = project_workflow.uuid)
+        </sql>
+
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="20261008120000-4" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="project" columnName="permission_expression"/>
+        </preConditions>
+
+        <dropColumn tableName="project" columnName="permission_expression"/>
+
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="20261008120000-5" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="project_workflow" columnName="permission_expression"/>
+        </preConditions>
+
+        <dropColumn tableName="project_workflow" columnName="permission_expression"/>
+
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
