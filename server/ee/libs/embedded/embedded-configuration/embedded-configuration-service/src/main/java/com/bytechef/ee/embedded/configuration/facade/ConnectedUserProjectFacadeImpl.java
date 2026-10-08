@@ -34,11 +34,10 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
-import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
@@ -98,7 +97,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserProjectService connectUserProjectService;
-    private final ConnectedUserCodeWorkflowReferenceFacade connectedUserCodeWorkflowReferenceFacade;
+    private final ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
     private final ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager;
     private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
@@ -129,7 +128,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         ComponentDefinitionService componentDefinitionService,
         ConnectedUserProjectService connectUserProjectService,
-        ConnectedUserCodeWorkflowReferenceFacade connectedUserCodeWorkflowReferenceFacade,
+        ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade,
         ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager,
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
@@ -145,11 +144,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         WorkflowFacade workflowFacade, WorkflowService workflowService,
         WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
-
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
         this.componentDefinitionService = componentDefinitionService;
         this.connectUserProjectService = connectUserProjectService;
-        this.connectedUserCodeWorkflowReferenceFacade = connectedUserCodeWorkflowReferenceFacade;
+        this.connectedUserWorkflowReferenceFacade = connectedUserWorkflowReferenceFacade;
         this.connectedUserProjectWorkflowManager = connectedUserProjectWorkflowManager;
         this.connectedUserProjectWorkflowRepository = connectedUserProjectWorkflowRepository;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
@@ -183,14 +181,15 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment) {
-        AutomationWorkflowProjectDTO automationWorkflowProject = automationWorkflowProjectFacade
+        boolean automationWorkflowTemplate = automationWorkflowProjectFacade
             .getPublishedProjects(externalUserId, environment)
             .stream()
-            .filter(project -> CollectionUtils.stream(project.workflowTemplates())
-                .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid)))
-            .findFirst()
-            .orElseThrow(
-                () -> new IllegalArgumentException("Not a published automation workflow template: " + workflowUuid));
+            .anyMatch(project -> CollectionUtils.stream(project.workflowTemplates())
+                .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid)));
+
+        if (!automationWorkflowTemplate) {
+            throw new IllegalArgumentException("Not a published automation workflow template: " + workflowUuid);
+        }
 
         String publishedWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);
 
@@ -205,7 +204,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public String createProjectWorkflow(
         String externalUserId, String prompt, @Nullable String systemPrompt, Environment environment,
         boolean generate) {
-
         if (!generate) {
             return connectedUserProjectWorkflowManager.createProjectWorkflow(externalUserId, prompt, environment);
         }
@@ -234,9 +232,39 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
+    public void deleteConnectedUserProjects(long connectedUserId) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        Optional<ConnectedUserProject> fetchedConnectedUserProject = connectUserProjectService
+            .fetchConnectUserProject(connectedUser.getExternalId(), connectedUser.getEnvironment());
+
+        if (fetchedConnectedUserProject.isEmpty()) {
+            return;
+        }
+
+        ConnectedUserProject connectedUserProject = fetchedConnectedUserProject.get();
+
+        List<ConnectedUserProjectWorkflow> connectedUserProjectWorkflows = connectedUserProjectWorkflowService
+            .getConnectedUserProjectWorkflows(connectedUserProject.getId());
+
+        for (ConnectedUserProjectWorkflow connectedUserProjectWorkflow : connectedUserProjectWorkflows) {
+            if (connectedUserProjectWorkflowRepository.existsById(connectedUserProjectWorkflow.getId())) {
+                deleteProjectWorkflow(connectedUserProjectWorkflow.getId());
+            }
+        }
+
+        connectUserProjectService.delete(connectedUserProject.getId());
+
+        projectFacade.deleteProject(connectedUserProject.getProjectId());
+    }
+
+    @Override
     public void deleteProjectWorkflow(String externalUserId, String workflowUuid, Environment environment) {
         ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
+
+        projectDeploymentService.fetchProjectDeployment(connectedUserProject.getProjectId(), environment)
+            .ifPresent(projectDeployment -> disableProjectDeploymentWorkflow(projectDeployment.getId(), workflowUuid));
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             connectedUserProject.getProjectId(), workflowUuid);
@@ -264,7 +292,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         String automationWorkflowUuid = connectedUserProjectWorkflow.getAutomationWorkflowUuid();
 
         if (automationWorkflowUuid != null) {
-            connectedUserCodeWorkflowReferenceFacade.deleteReference(
+            connectedUserWorkflowReferenceFacade.deleteReference(
                 connectedUser.getExternalId(), automationWorkflowUuid, connectedUser.getEnvironment());
 
             return;
@@ -280,7 +308,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Override
     public void enableProjectWorkflow(
         String externalUserId, String workflowUuid, boolean enable, Long environmentId) {
-
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
@@ -292,7 +319,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .isPresent();
 
         if (isReference) {
-            connectedUserCodeWorkflowReferenceFacade.enableReference(externalUserId, workflowUuid, enable, environment);
+            connectedUserWorkflowReferenceFacade.enableReference(externalUserId, workflowUuid, enable, environment);
 
             return;
         }
@@ -336,7 +363,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         String automationWorkflowUuid = connectedUserProjectWorkflow.getAutomationWorkflowUuid();
 
         if (automationWorkflowUuid != null) {
-            connectedUserCodeWorkflowReferenceFacade.enableReference(
+            connectedUserWorkflowReferenceFacade.enableReference(
                 connectedUser.getExternalId(), automationWorkflowUuid, enable, connectedUser.getEnvironment());
 
             return;
@@ -353,7 +380,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Override
     public ConnectedUserProjectWorkflowDTO getConnectedUserProjectWorkflow(
         String externalUserId, String workflowUuid, Long environmentId) {
-
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
@@ -378,7 +404,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Override
     public List<ConnectedUserProjectWorkflowDTO> getConnectedUserProjectWorkflows(
         String externalUserId, Environment environment) {
-
         ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
@@ -433,7 +458,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Override
     public CopilotChatContextDTO prepareCopilotChat(
         String externalUserId, String workflowUuid, Environment environment) {
-
         getConnectedUserProjectWorkflow(externalUserId, workflowUuid, (long) environment.ordinal());
 
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
@@ -446,7 +470,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Override
     public void publishProjectWorkflow(
         String externalUserId, String workflowUuid, String description, Long environmentId) {
-
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
@@ -508,7 +531,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Override
     public void updateProjectWorkflowInputs(
         String externalUserId, String workflowUuid, Map<String, ?> inputs, Long environmentId) {
-
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
@@ -519,20 +541,20 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .findByConnectedUserProjectIdAndAutomationWorkflowUuid(connectedUserProject.getId(), workflowUuid);
 
         if (reference.isPresent()) {
-            connectedUserCodeWorkflowReferenceFacade.updateReferenceInputs(
+            connectedUserWorkflowReferenceFacade.updateReferenceInputs(
                 externalUserId, workflowUuid, inputs, environment);
 
             return;
         }
 
+        long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
+            connectedUserProject.getProjectId(), environment);
+
         String workflowId = projectWorkflowService
-            .fetchLastProjectWorkflowId(connectedUserProject.getProjectId(), workflowUuid)
+            .fetchProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid)
             .orElseThrow(() -> new ConfigurationException(
                 "Workflow with workflowUuid: %s not exist".formatted(workflowUuid),
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
-
-        long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
-            connectedUserProject.getProjectId(), environment);
 
         ProjectDeploymentWorkflow projectDeploymentWorkflow =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(projectDeploymentId, workflowId);
@@ -545,7 +567,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Override
     public void updateProjectWorkflow(
         String externalUserId, String workflowUuid, String definition, Environment environment) {
-
         connectedUserProjectWorkflowManager.updateProjectWorkflow(externalUserId, workflowUuid, definition,
             environment);
     }
@@ -554,7 +575,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String updateProjectWorkflow(
         String externalUserId, String workflowUuid, String prompt, Environment environment, boolean generate) {
-
         if (!generate) {
             connectedUserProjectWorkflowManager.updateProjectWorkflow(externalUserId, workflowUuid, prompt,
                 environment);
@@ -589,7 +609,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public void updateWorkflowConfigurationConnection(
         String externalUserId, String workflowUuid, String workflowNodeName, String workflowConnectionKey,
         long connectionId, Environment environment) {
-
         ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
@@ -605,7 +624,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     private List<ConnectedUserProjectWorkflowDTO> getConnectedUserProjectWorkflows(
         ConnectedUserProject connectedUserProject, Environment environment) {
-
         Project project = projectService.getProject(connectedUserProject.getProjectId());
 
         List<ProjectWorkflow> latestProjectWorkflows = projectWorkflowService.getProjectWorkflows(
@@ -677,7 +695,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     private List<ConnectedUserProjectWorkflowDTO> getReferenceRows(
         ConnectedUserProject connectedUserProject, Environment environment) {
-
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserProject.getConnectedUserId());
 
         Map<String, ConnectedUserWorkflowTemplateDTO> templatesByUuid = automationWorkflowProjectFacade
@@ -688,7 +705,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .collect(Collectors.toMap(
                 ConnectedUserWorkflowTemplateDTO::workflowUuid, Function.identity(), (first, second) -> first));
 
-        return connectedUserCodeWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())
+        return connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())
             .stream()
             .filter(connectedUserProjectWorkflow -> connectedUserProjectWorkflow.getAutomationWorkflowUuid() != null)
             .map(reference -> {
@@ -712,10 +729,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .toList();
     }
 
-    /**
-     * The inputs this workflow declares, so a card can offer to change their values after activation rather than only
-     * during the wizard. {@code Workflow.Input#extensions} is authoring metadata for the builder and stays behind.
-     */
     private static List<ConnectedUserWorkflowTemplateDTO.Input> toInputs(Workflow workflow) {
         List<Workflow.Input> inputs = workflow.getInputs();
 
@@ -725,14 +738,26 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .toList();
     }
 
-    /**
-     * The values already stored for this workflow. Empty until the automation has been published -- the values live on
-     * the project deployment publishing creates, so an unpublished draft simply has nowhere to have kept them.
-     */
+    private void disableProjectDeploymentWorkflow(long projectDeploymentId, String workflowUuid) {
+        projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid)
+            .filter(workflowId -> projectDeploymentWorkflowService.isProjectDeploymentWorkflowEnabled(
+                projectDeploymentId, workflowId))
+            .ifPresent(workflowId -> projectDeploymentFacade.enableProjectDeploymentWorkflow(
+                projectDeploymentId, workflowId, false));
+    }
+
     private Map<String, ?> fetchInputValues(long projectId, ProjectWorkflow projectWorkflow, Environment environment) {
+        String workflowUuid = projectWorkflow.getUuidAsString();
+
+        if (workflowUuid == null) {
+            return Map.of();
+        }
+
         return projectDeploymentService.fetchProjectDeployment(projectId, environment)
-            .flatMap(projectDeployment -> projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(
-                projectDeployment.getId(), projectWorkflow.getWorkflowId()))
+            .flatMap(projectDeployment -> projectWorkflowService
+                .fetchProjectWorkflowWorkflowId(projectDeployment.getId(), workflowUuid)
+                .flatMap(workflowId -> projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(
+                    projectDeployment.getId(), workflowId)))
             .map(ProjectDeploymentWorkflow::getInputs)
             .orElseGet(Map::of);
     }
