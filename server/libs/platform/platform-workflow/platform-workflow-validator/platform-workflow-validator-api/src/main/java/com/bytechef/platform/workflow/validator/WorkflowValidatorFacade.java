@@ -17,10 +17,14 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.workflow.validator.exception.WorkflowValidatorErrorType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Facade for workflow validation operations.
@@ -28,7 +32,6 @@ import org.jspecify.annotations.Nullable;
  * @author Marko Kriskovic
  */
 public interface WorkflowValidatorFacade {
-
     /**
      * Validates a complete workflow JSON string.
      *
@@ -58,7 +61,6 @@ public interface WorkflowValidatorFacade {
      */
     default WorkflowValidationResult validateWorkflow(
         String workflow, @Nullable String workflowId, long environmentId) {
-
         return validateWorkflow(workflow, environmentId);
     }
 
@@ -148,6 +150,101 @@ public interface WorkflowValidatorFacade {
         String message) {
     }
 
+    default void validateNoReservedInputNames(String workflow) {
+        List<String> reservedInputNames = getReservedInputNames(workflow);
+
+        if (!reservedInputNames.isEmpty()) {
+            throw new ConfigurationException(
+                "Workflow input names must not start with the reserved '__' prefix or equal the reserved name '" +
+                    JobInputConstants.VARIABLES_INPUT + "'. Reserved input names: " +
+                    String.join(", ", reservedInputNames),
+                WorkflowValidatorErrorType.RESERVED_INPUT_NAME);
+        }
+    }
+
+    default void validateNoReservedNodeNames(String workflow) {
+        List<String> reservedNodeNames = getReservedNodeNames(workflow);
+
+        if (!reservedNodeNames.isEmpty()) {
+            throw new ConfigurationException(
+                "Workflow node names must not start with the reserved '__' prefix or equal the reserved name '" +
+                    JobInputConstants.VARIABLES_INPUT + "'. Reserved node names: " +
+                    String.join(", ", reservedNodeNames),
+                WorkflowValidatorErrorType.RESERVED_NODE_NAME);
+        }
+    }
+
+    private List<String> getReservedInputNames(String workflow) {
+        List<String> reservedInputNames = new ArrayList<>();
+
+        try {
+            JsonNode workflowJsonNode = readWorkflowTree(workflow);
+            JsonNode inputsJsonNode = workflowJsonNode.get("inputs");
+
+            if (inputsJsonNode != null && inputsJsonNode.isArray()) {
+                for (JsonNode inputJsonNode : inputsJsonNode) {
+                    if (!inputJsonNode.isObject()) {
+                        continue;
+                    }
+
+                    JsonNode nameJsonNode = inputJsonNode.get("name");
+
+                    if (nameJsonNode != null && nameJsonNode.isString() && isReservedName(nameJsonNode.asString())) {
+                        reservedInputNames.add(nameJsonNode.asString());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return List.of();
+        }
+
+        return reservedInputNames;
+    }
+
+    private List<String> getReservedNodeNames(String workflow) {
+        List<String> reservedNodeNames = new ArrayList<>();
+
+        try {
+            JsonNode workflowJsonNode = readWorkflowTree(workflow);
+
+            collectReservedNodeNames(workflowJsonNode.get("triggers"), reservedNodeNames);
+            collectReservedNodeNames(workflowJsonNode.get("tasks"), reservedNodeNames);
+        } catch (Exception e) {
+            return List.of();
+        }
+
+        return reservedNodeNames;
+    }
+
+    private static void collectReservedNodeNames(JsonNode nodesJsonNode, List<String> reservedNodeNames) {
+        if (nodesJsonNode == null || !nodesJsonNode.isArray()) {
+            return;
+        }
+
+        for (JsonNode nodeJsonNode : nodesJsonNode) {
+            if (!nodeJsonNode.isObject()) {
+                continue;
+            }
+
+            JsonNode nameJsonNode = nodeJsonNode.get("name");
+
+            if (nameJsonNode != null && nameJsonNode.isString() && isReservedName(nameJsonNode.asString())) {
+                reservedNodeNames.add(nameJsonNode.asString());
+            }
+        }
+    }
+
+    private static boolean isReservedName(String name) {
+        return name.startsWith("__") || name.equals(JobInputConstants.VARIABLES_INPUT);
+    }
+
+    private static JsonNode readWorkflowTree(String workflow) {
+        JsonMapper jsonMapper = JsonMapper.builder()
+            .build();
+
+        return jsonMapper.readTree(workflow);
+    }
+
     @SuppressFBWarnings("EI")
     record WorkflowValidationResult(
         List<String> errors, List<String> warnings, List<NodeValidationIssue> nodeIssues) {
@@ -158,7 +255,6 @@ public interface WorkflowValidatorFacade {
 
         public WorkflowValidationResult(
             List<String> errors, List<String> warnings, List<NodeValidationIssue> nodeIssues) {
-
             this.errors = List.copyOf(errors);
             this.warnings = List.copyOf(warnings);
             this.nodeIssues = List.copyOf(nodeIssues);
