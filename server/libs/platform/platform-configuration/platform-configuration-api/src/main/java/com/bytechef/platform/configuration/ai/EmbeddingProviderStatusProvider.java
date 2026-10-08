@@ -17,9 +17,8 @@
 package com.bytechef.platform.configuration.ai;
 
 /**
- * Reports whether an embedding-capable AI provider is currently usable for an environment. Implemented in EE (where the
- * embedding API key is resolved at runtime from the activated provider); absent in CE, where callers treat embeddings
- * as always active because the server cannot boot with the Knowledge Base enabled and no embedding key configured.
+ * Reports whether an embedding-capable AI provider is currently usable for an environment: a default embedding provider
+ * is activated and its API key resolves.
  *
  * @author Ivica Cardic
  */
