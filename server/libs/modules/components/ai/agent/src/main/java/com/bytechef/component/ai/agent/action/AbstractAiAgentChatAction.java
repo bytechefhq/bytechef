@@ -32,13 +32,14 @@ import static com.bytechef.platform.component.definition.ai.agent.guardrails.Gua
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
-import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
 import com.bytechef.component.ai.llm.advisor.JsonSchemaValidationAdvisor;
 import com.bytechef.component.ai.llm.advisor.TextGenerationFirstAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
+import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -48,10 +49,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
-import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
-import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
-import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
@@ -96,15 +94,16 @@ public abstract class AbstractAiAgentChatAction {
     private static final String TOOL_SIMULATION_UNAVAILABLE = "[tool simulation unavailable]";
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
-    private final AiAgentToolFacade aiAgentToolFacade;
+    private final ClusterElementToolCallbacks clusterElementToolCallbacks;
     private final ToolCallingManager toolCallingManager;
 
     protected AbstractAiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager) {
 
-        this.aiAgentToolFacade = aiAgentToolFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.clusterElementToolCallbacks =
+            new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService);
         this.toolCallingManager = toolCallingManager;
     }
 
@@ -487,49 +486,7 @@ public abstract class AbstractAiAgentChatAction {
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         for (ClusterElement clusterElement : toolClusterElements) {
-            Object clusterElementFunction = clusterElementDefinitionService.getClusterElement(
-                clusterElement.getComponentName(), clusterElement.getComponentVersion(),
-                clusterElement.getClusterElementName());
-
-            if (clusterElementFunction instanceof MultipleConnectionsToolCallbackProviderFunction multipleConnectionsToolCallbackProviderFunction) {
-                try {
-                    ToolCallback[] providerCallbacks = multipleConnectionsToolCallbackProviderFunction
-                        .apply(
-                            ParametersFactory.create(clusterElement.getParameters()),
-                            getConnectionParameters(connectionParameters, clusterElement),
-                            ParametersFactory.create(clusterElement.getExtensions()),
-                            connectionParameters, context)
-                        .getToolCallbacks();
-
-                    toolCallbacks.addAll(Arrays.asList(providerCallbacks));
-                } catch (Exception exception) {
-                    throw clusterElementInitializationException(clusterElement, "tool callback", exception, context);
-                }
-            } else if (clusterElementFunction instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
-                try {
-                    ComponentConnection componentConnection = connectionParameters.get(
-                        clusterElement.getWorkflowNodeName());
-
-                    ToolCallback[] providerCallbacks = toolCallbackProviderFunction
-                        .apply(
-                            ParametersFactory.create(clusterElement.getParameters()),
-                            ParametersFactory.create(componentConnection), context)
-                        .getToolCallbacks();
-
-                    toolCallbacks.addAll(Arrays.asList(providerCallbacks));
-                } catch (Exception exception) {
-                    throw clusterElementInitializationException(clusterElement, "tool callback", exception, context);
-                }
-            } else if (clusterElementFunction instanceof MultipleConnectionsToolFunction) {
-                toolCallbacks.add(
-                    aiAgentToolFacade.getFunctionToolCallback(clusterElement, connectionParameters, context));
-            } else {
-                ComponentConnection componentConnection = connectionParameters.get(
-                    clusterElement.getWorkflowNodeName());
-
-                toolCallbacks.add(
-                    aiAgentToolFacade.getFunctionToolCallback(clusterElement, componentConnection, context));
-            }
+            toolCallbacks.addAll(clusterElementToolCallbacks.build(clusterElement, connectionParameters, context));
         }
 
         if (toolSimulations != null && !toolSimulations.isEmpty()) {

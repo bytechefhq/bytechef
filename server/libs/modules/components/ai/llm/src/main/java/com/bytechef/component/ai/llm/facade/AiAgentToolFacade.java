@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.facade;
+package com.bytechef.component.ai.llm.facade;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;

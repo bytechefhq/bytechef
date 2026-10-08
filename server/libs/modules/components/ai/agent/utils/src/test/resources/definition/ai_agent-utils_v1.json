@@ -1,4 +1,11 @@
 {
+  "actionClusterElementTypes": {
+    "updateAiSkill": [ ],
+    "deleteAiSkill": [ ],
+    "createAiSkill": [ ],
+    "appendFilesToAiSkill": [ ],
+    "removeFileFromAiSkill": [ ]
+  },
   "actions": [ {
     "batch": null,
     "beforeResume": null,
@@ -1278,6 +1285,41 @@
     "title": "Update AI Skill",
     "workflowNodeDescription": null
   } ],
+  "clusterElementClusterElementTypes": {
+    "updateAiSkill": [ ],
+    "grepTool": [ ],
+    "deleteAiSkill": [ ],
+    "removeFileFromAiSkill": [ ],
+    "globTool": [ ],
+    "braveWebSearchTool": [ ],
+    "smartWebFetchTool": [ "MODEL" ],
+    "taskTool": [ "MODEL", "SUBAGENT" ],
+    "appendFilesToAiSkill": [ ],
+    "createAiSkill": [ ],
+    "fileSystemTools": [ ],
+    "todoWriteTool": [ ],
+    "subagentTool": [ "MODEL", "TOOLS" ],
+    "shellTools": [ ]
+  },
+  "clusterElementTypes": [ {
+    "name": "MODEL",
+    "key": "model",
+    "label": "Model",
+    "multipleElements": false,
+    "required": true
+  }, {
+    "name": "SUBAGENT",
+    "key": "subagent",
+    "label": "Subagent",
+    "multipleElements": true,
+    "required": false
+  }, {
+    "name": "TOOLS",
+    "key": "tools",
+    "label": "Tools",
+    "multipleElements": true,
+    "required": false
+  } ],
   "clusterElements": [ {
     "name": "fileSystemTools",
     "description": "Read, write, and edit files with precise control.",
@@ -1399,7 +1441,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "taskTool",
-    "description": "Delegate complex tasks to specialized sub-agents for parallel execution.",
+    "description": "Delegate tasks to subagents you define, each limited to the tools you attach to it.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -1410,6 +1452,89 @@
       "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "subagentTool",
+    "description": "A specialized agent the Task Tool can delegate to.",
+    "element": null,
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Identifier the parent agent uses when delegating to this subagent.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": false,
+      "hidden": null,
+      "label": "Name",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "subagentName",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT_AREA",
+      "defaultValue": null,
+      "description": "When the parent agent should delegate to this subagent.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": false,
+      "hidden": null,
+      "label": "Description",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "description",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT_AREA",
+      "defaultValue": null,
+      "description": "System prompt that tells this subagent how to do its work.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": false,
+      "hidden": null,
+      "label": "Instructions",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "instructions",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Subagent",
+    "type": {
+      "name": "SUBAGENT",
+      "key": "subagent",
+      "label": "Subagent",
       "multipleElements": true,
       "required": false
     },

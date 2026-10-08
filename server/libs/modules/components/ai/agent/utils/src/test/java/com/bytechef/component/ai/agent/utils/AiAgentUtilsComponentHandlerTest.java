@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.utils;
 
+import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.List;
@@ -31,6 +32,8 @@ public class AiAgentUtilsComponentHandlerTest {
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/ai_agent-utils_v1.json",
-            new AiAgentUtilsComponentHandler(Mockito.mock(AiSkillFacade.class), List.of(), null).getDefinition());
+            new AiAgentUtilsComponentHandler(
+                Mockito.mock(AiAgentToolFacade.class), Mockito.mock(AiSkillFacade.class), List.of(), null)
+                    .getDefinition());
     }
 }

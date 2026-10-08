@@ -26,10 +26,10 @@ import com.bytechef.component.definition.Property;
 /**
  * @author Ivica Cardic
  */
-public class AiAgentUtilsSubagent {
+public class AiAgentUtilsSubagentTool {
 
     public static final ClusterElementDefinition<?> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.clusterElement("subagent")
+        ComponentDsl.clusterElement("subagentTool")
             .title("Subagent")
             .description("A specialized agent the Task Tool can delegate to.")
             .type(SUBAGENT)
@@ -52,6 +52,6 @@ public class AiAgentUtilsSubagent {
                     .expressionEnabled(false)
                     .required(true));
 
-    private AiAgentUtilsSubagent() {
+    private AiAgentUtilsSubagentTool() {
     }
 }
