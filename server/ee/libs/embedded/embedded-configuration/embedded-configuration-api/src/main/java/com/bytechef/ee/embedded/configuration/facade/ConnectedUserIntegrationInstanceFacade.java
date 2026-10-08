@@ -28,4 +28,8 @@ public interface ConnectedUserIntegrationInstanceFacade {
 
     void updateIntegrationInstanceWorkflow(
         String externalUserId, long id, String workflowUuid, Map<String, Object> inputs);
+
+    void validateCurrentPrincipalIntegrationInstanceOwnership(long id);
+
+    void validateIntegrationInstanceOwnership(String externalUserId, long id);
 }
