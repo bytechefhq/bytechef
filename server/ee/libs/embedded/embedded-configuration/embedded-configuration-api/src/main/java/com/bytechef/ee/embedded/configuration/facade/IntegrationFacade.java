@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import java.util.List;
@@ -18,12 +19,13 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public interface IntegrationFacade {
-
     long createIntegration(IntegrationDTO integrationDTO);
 
     void deleteIntegration(long id);
 
     IntegrationDTO getIntegration(long id);
+
+    List<IntegrationVersion> getIntegrationVersions(long id);
 
     List<IntegrationDTO> getIntegrations(
         @Nullable Long categoryId, boolean integrationInstanceConfigurations, @Nullable Long tagId,
