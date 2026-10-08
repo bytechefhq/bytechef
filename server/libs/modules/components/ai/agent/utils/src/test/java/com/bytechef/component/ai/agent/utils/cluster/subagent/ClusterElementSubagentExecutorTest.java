@@ -126,7 +126,7 @@ class ClusterElementSubagentExecutorTest {
 
     private static ClusterElement clusterElement() {
         return new ClusterElement(
-            null, null, Map.of(), null, "aiAgentUtils/v1/subagent",
+            null, null, Map.of(), null, "aiAgentUtils/v1/subagentTool",
             Map.of("subagentName", "Analyst", "description", "Reads", "instructions", "Answer."), "subagent_1");
     }
 

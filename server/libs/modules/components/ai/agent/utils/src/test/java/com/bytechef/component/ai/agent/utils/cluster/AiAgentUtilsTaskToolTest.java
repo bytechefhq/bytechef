@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils;
+package com.bytechef.component.ai.agent.utils.cluster;
 
-import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
-import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic
  */
-public class AiAgentUtilsComponentHandlerTest {
+class AiAgentUtilsTaskToolTest {
 
     @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/ai_agent-utils_v1.json",
-            new AiAgentUtilsComponentHandler(
-                Mockito.mock(AiAgentToolFacade.class), Mockito.mock(AiSkillFacade.class), List.of(), null)
-                    .getDefinition());
+    void testTaskToolNeverConstructsLibraryDefinedSubagents() throws IOException {
+        String source = Files.readString(
+            Path.of("src/main/java/com/bytechef/component/ai/agent/utils/cluster/AiAgentUtilsTaskTool.java"));
+
+        assertThat(source).doesNotContain("ClaudeSubagentType");
+        assertThat(source).doesNotContain("ShellTools");
+        assertThat(source).doesNotContain("FileSystemTools");
     }
 }
