@@ -1,0 +1,44 @@
+{
+    "label": "Playwright Property Mentions Workflow",
+    "description": "",
+    "inputs": [],
+    "triggers": [
+        {
+            "description": "",
+            "label": "Manual",
+            "name": "trigger_1",
+            "type": "manual/v1/manual"
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Var",
+            "name": "var_1",
+            "parameters": {
+                "type": "OBJECT",
+                "value": {
+                    "Q&A": "answer",
+                    "String": "foo"
+                }
+            },
+            "type": "var/v1/set",
+            "metadata": {
+                "ui": {
+                    "dynamicPropertyTypes": {
+                        "value.Q&A": "STRING",
+                        "value.String": "STRING"
+                    }
+                }
+            }
+        },
+        {
+            "label": "Property Testing",
+            "name": "propertyTesting_1",
+            "parameters": {
+                "stringMinLength": "Hey <!everyone>, look at <https://www.bytechef.io/|page> ${var_1.String} :smile:",
+                "stringRegEx": "${var_1['Q&A']} & more"
+            },
+            "type": "propertyTesting/v1/testingAction"
+        }
+    ]
+}

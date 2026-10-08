@@ -19,6 +19,7 @@ All live in `client/test/playwright/tests/properties/` (116 tests total).
 | `propertyDynamicProperties.spec.ts` | `propertyTesting_1`    | 9     | #4152                |
 | `propertyOptions.spec.ts`           | `propertyTesting_1`    | 22    | untracked            |
 | `dataPillArrayIndex.spec.ts`        | `propertyTesting_1`    | 10    | #1629                |
+| `propertyMentions.spec.ts`          | `propertyTesting_1`    | 4     | untracked            |
 
 Open sub-issues:
 

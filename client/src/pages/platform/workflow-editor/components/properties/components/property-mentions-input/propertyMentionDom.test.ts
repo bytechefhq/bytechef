@@ -7,19 +7,43 @@ import {describe, expect, it} from 'vitest';
 describe('buildPropertyMentionsContent', () => {
     it('converts each ${id} pill into a mention span', () => {
         expect(buildPropertyMentionsContent('Hi ${trigger_1.firstName}', 'TEXT')).toBe(
-            'Hi <span data-type="mention" class="property-mention" data-id="trigger_1.firstName"></span>'
+            '<p>Hi <span data-type="mention" class="property-mention" data-id="trigger_1.firstName"></span></p>'
         );
     });
 
     it('converts multiple occurrences of the same pill', () => {
         expect(buildPropertyMentionsContent('${a.b} and ${a.b}', 'TEXT')).toBe(
-            '<span data-type="mention" class="property-mention" data-id="a.b"></span> and ' +
-                '<span data-type="mention" class="property-mention" data-id="a.b"></span>'
+            '<p><span data-type="mention" class="property-mention" data-id="a.b"></span> and ' +
+                '<span data-type="mention" class="property-mention" data-id="a.b"></span></p>'
         );
     });
 
-    it('returns plain constant text unchanged', () => {
-        expect(buildPropertyMentionsContent('a constant value', 'TEXT')).toBe('a constant value');
+    it('wraps plain constant text in a paragraph', () => {
+        expect(buildPropertyMentionsContent('a constant value', 'TEXT')).toBe('<p>a constant value</p>');
+    });
+
+    it('escapes markup around a pill on a single line', () => {
+        expect(buildPropertyMentionsContent('<Paragraph>${anthropic_1.body} </Paragraph>', 'TEXT')).toBe(
+            '<p>&lt;Paragraph&gt;<span data-type="mention" class="property-mention" data-id="anthropic_1.body"></span> &lt;/Paragraph&gt;</p>'
+        );
+    });
+
+    it('keeps a pill whose bracketed path contains markup characters', () => {
+        expect(buildPropertyMentionsContent("${trigger_1['Q&A']} & more", 'TEXT')).toBe(
+            '<p><span data-type="mention" class="property-mention" data-id="trigger_1[\'Q&A\']"></span> &amp; more</p>'
+        );
+    });
+
+    it('splits multi-line plain text into escaped paragraphs', () => {
+        expect(buildPropertyMentionsContent('a<b\n${x.y}', 'TEXT_AREA')).toBe(
+            '<p>a&lt;b</p><p><span data-type="mention" class="property-mention" data-id="x.y"></span></p>'
+        );
+    });
+
+    it('decodes and sanitizes encoded RICH_TEXT html instead of escaping it', () => {
+        expect(buildPropertyMentionsContent('&lt;p&gt;Hi ${a.b}&lt;/p&gt;', 'RICH_TEXT')).toBe(
+            '<p>Hi <span data-type="mention" class="property-mention" data-id="a.b"></span></p>'
+        );
     });
 
     it('returns empty string for empty input and undefined for non-string input', () => {

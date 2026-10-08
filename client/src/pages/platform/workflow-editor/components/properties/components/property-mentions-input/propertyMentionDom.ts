@@ -20,11 +20,10 @@ export const PROPERTY_MENTION_LABEL_CLASS = 'property-mention-label';
 export const PROPERTY_MENTION_ROOT_CLASS = 'property-mention';
 
 /**
- * Converts a stored property value into editor HTML: newlines become paragraphs (RICH_TEXT html is decoded
- * and sanitized instead) and each ${nodeName.path} data pill becomes a span[data-type="mention"][data-id] so
- * TipTap's Mention extension renders it as a visual chip. This is the forward direction of
- * replaceMentionNodesInHtmlWithVariables and is shared by the editor's content sync and the copilot apply path
- * so applied pills render immediately instead of only after a refresh.
+ * Converts a stored property value into editor HTML: lines become paragraphs, escaped for the plain-text control
+ * types (RICH_TEXT html is decoded and sanitized instead), and each ${nodeName.path} data pill becomes a
+ * span[data-type="mention"][data-id] so TipTap's Mention extension renders it as a visual chip. This is the forward
+ * direction of replaceMentionNodesInHtmlWithVariables.
  */
 export function buildPropertyMentionsContent(value?: string, controlType?: string): string | undefined {
     if (typeof value !== 'string') {
@@ -49,13 +48,14 @@ export function buildPropertyMentionsContent(value?: string, controlType?: strin
         contentIsDecodedHtml = true;
     }
 
-    if (!contentIsDecodedHtml && content.includes('\n')) {
+    const isPlainText = controlType === 'TEXT_AREA' || controlType === 'TEXT' || controlType === 'FORMULA_MODE';
+
+    if (!contentIsDecodedHtml && (content.includes('\n') || isPlainText)) {
         const valueLines = content.split('\n');
 
-        const paragraphedLines =
-            controlType === 'TEXT_AREA' || controlType === 'TEXT' || controlType === 'FORMULA_MODE'
-                ? valueLines.map((valueLine) => `<p>${escapeHtmlForParagraph(valueLine)}</p>`)
-                : valueLines.map((valueLine) => `<p>${valueLine}</p>`);
+        const paragraphedLines = isPlainText
+            ? valueLines.map((valueLine) => `<p>${escapeHtmlForParagraph(valueLine)}</p>`)
+            : valueLines.map((valueLine) => `<p>${valueLine}</p>`);
 
         content = paragraphedLines.join('');
     }
@@ -64,8 +64,12 @@ export function buildPropertyMentionsContent(value?: string, controlType?: strin
 
     if (matches) {
         for (const match of matches) {
+            const dataPill = `\${${match}}`;
+
+            // Plain text was escaped above, so a pill whose path holds &, < or > (a bracketed key such as
+            // ${trigger_1['Q&A']}) is only found in its escaped form.
             content = content.replace(
-                `\${${match}}`,
+                isPlainText ? escapeHtmlForParagraph(dataPill) : dataPill,
                 `<span data-type="mention" class="${PROPERTY_MENTION_ROOT_CLASS}" data-id="${match}"></span>`
             );
         }
