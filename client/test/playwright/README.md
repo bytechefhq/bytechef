@@ -68,6 +68,19 @@ import {importSelectableIndexWorkflowTest} from '../fixtures';
 // Requires: page and project (use with loginTest() and projectTest via mergeTests)
 ```
 
+### Property Mentions Workflow Fixture
+
+Imports `propertyMentionsWorkflow.json`. Its `propertyTesting_1` node stores text values that mix markup with
+data pills: angle brackets around a `${var_1.String}` pill, and a bracketed pill path holding an ampersand
+(`${var_1['Q&A']}`):
+
+```typescript
+import {importPropertyMentionsWorkflowTest} from '../fixtures';
+
+// importPropertyMentionsWorkflowTest provides: workflow fixture
+// Requires: page and project (use with loginTest() and projectTest via mergeTests)
+```
+
 ## Usage Pattern
 
 The key pattern is to use `mergeTests` at the top of your test file to combine independent fixtures:
