@@ -11,4 +11,5 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
+    implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
 }
