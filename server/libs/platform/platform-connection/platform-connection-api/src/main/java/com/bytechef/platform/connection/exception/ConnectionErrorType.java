@@ -25,6 +25,7 @@ import com.bytechef.platform.connection.domain.Connection;
 public class ConnectionErrorType extends AbstractErrorType {
 
     public static final ConnectionErrorType CONNECTION_IS_USED = new ConnectionErrorType(100);
+    public static final ConnectionErrorType CONNECTION_NOT_ACTIVE = new ConnectionErrorType(103);
     public static final ConnectionErrorType INVALID_CONNECTION = new ConnectionErrorType(101);
     public static final ConnectionErrorType INVALID_CONNECTION_COMPONENT_NAME = new ConnectionErrorType(102);
 

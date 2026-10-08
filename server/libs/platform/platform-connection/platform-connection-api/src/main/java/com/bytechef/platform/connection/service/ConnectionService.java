@@ -18,16 +18,17 @@ package com.bytechef.platform.connection.service;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface ConnectionService {
-
     Connection create(Connection connection);
 
     Connection create(
@@ -38,7 +39,11 @@ public interface ConnectionService {
 
     Connection getConnection(long id);
 
+    Optional<Connection> fetchConnection(long id);
+
     List<Connection> getConnections(PlatformType type);
+
+    List<Connection> getSharedConnections(int environmentId, PlatformType type);
 
     List<Connection> getConnections(String componentName, int version, PlatformType type);
 
@@ -51,7 +56,17 @@ public interface ConnectionService {
 
     Connection update(long id, String name, List<Long> tagIds, int version);
 
+    Connection update(long id, String name, List<Long> tagIds, boolean shared, int version);
+
     Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status);
 
+    Connection updateConnectionStatus(long connectionId, ConnectionStatus status);
+
     Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters);
+
+    Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters);
+
+    List<Connection> getInactiveConnections(List<Long> connectionIds);
+
+    void validateConnectionsActive(List<Long> connectionIds);
 }

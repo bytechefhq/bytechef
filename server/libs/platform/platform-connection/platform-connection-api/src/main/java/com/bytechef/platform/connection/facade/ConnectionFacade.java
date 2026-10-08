@@ -16,16 +16,18 @@
 
 package com.bytechef.platform.connection.facade;
 
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface ConnectionFacade {
-
     long create(ConnectionDTO connectionDTO, PlatformType type);
 
     void delete(Long id);
@@ -40,10 +42,16 @@ public interface ConnectionFacade {
         String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Long environmentId,
         PlatformType type);
 
+    List<ConnectionDTO> toConnectionDTOs(List<Connection> connections);
+
     List<Tag> getConnectionTags(PlatformType type);
 
     void update(long id, List<Tag> tags);
 
     void update(long id, String name, List<Tag> tags, int version);
+
+    void update(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version);
+
+    void replaceAuthorizationParameters(long id, Map<String, ?> parameters);
 
 }
