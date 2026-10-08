@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for managing MCP Integration operations that involve multiple services.
@@ -18,7 +19,6 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public interface McpIntegrationInstanceConfigurationFacade {
-
     /**
      * Creates a new MCP integration instance configuration linked to an existing IntegrationInstanceConfiguration. For
      * each selected workflow, reuses an existing IntegrationInstanceConfigurationWorkflow if one already exists
@@ -63,4 +63,11 @@ public interface McpIntegrationInstanceConfigurationFacade {
      */
     void updateMcpIntegrationInstanceConfigurationVersion(
         long mcpIntegrationInstanceConfigurationId, int integrationVersion, List<String> workflowUuids);
+
+    @Nullable
+    McpIntegrationInstanceConfiguration getMcpIntegrationInstanceConfiguration(long id);
+
+    List<McpIntegrationInstanceConfiguration> getMcpIntegrationInstanceConfigurations();
+
+    List<McpIntegrationInstanceConfiguration> getMcpServerMcpIntegrationInstanceConfigurations(long mcpServerId);
 }

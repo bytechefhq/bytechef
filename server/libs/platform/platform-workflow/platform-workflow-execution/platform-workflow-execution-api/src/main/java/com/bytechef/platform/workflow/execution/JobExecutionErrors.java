@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
  * @author Ivica Cardic
  */
 public final class JobExecutionErrors {
+
     private static final Logger log = LoggerFactory.getLogger(JobExecutionErrors.class);
 
     private JobExecutionErrors() {

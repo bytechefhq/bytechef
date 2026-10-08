@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
  * @author Ivica Cardic
  */
 public interface JobCompletionAwaiter {
+
     Duration DEFAULT_SYNC_TIMEOUT = Duration.ofSeconds(300);
 
     CompletableFuture<Job> await(long jobId, Duration timeout);

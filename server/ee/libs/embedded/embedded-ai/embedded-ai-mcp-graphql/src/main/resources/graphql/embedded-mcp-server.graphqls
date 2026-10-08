@@ -1,5 +1,6 @@
 extend type Query {
     embeddedMcpServers: [McpServer]
+    embeddedMcpServerTags: [Tag]
     mcpComponentDefinitions: [ComponentDefinition!]!
 }
 

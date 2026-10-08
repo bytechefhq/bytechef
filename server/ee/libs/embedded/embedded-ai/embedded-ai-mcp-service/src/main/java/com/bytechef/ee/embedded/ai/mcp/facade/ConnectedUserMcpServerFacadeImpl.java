@@ -52,6 +52,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,6 +115,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId) {
         // Remove every per-user tool row whose underlying McpComponent points at the given server.
         // Since the read query rebuilds the (server -> tools) shape from these rows, removing them
@@ -149,10 +151,8 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableConnectedUserMcpServer(long connectedUserId, long mcpServerId, boolean enable) {
-        // Bulk-flip every per-user tool whose underlying McpComponent points at the given server.
-        // Computed "server enabled for user" = any tool enabled; toggling the card thus disables or
-        // re-enables the whole group rather than introducing a separate per-(user, server) state row.
         Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
 
         List<IntegrationInstance> integrationInstances = integrationInstanceService
@@ -196,18 +196,18 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void enableMcpTool(long mcpIntegrationInstanceToolId, boolean enable) {
         mcpIntegrationInstanceToolService.updateEnabled(mcpIntegrationInstanceToolId, enable);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
     public List<ConnectedUserMcpServerDTO> getConnectedUserMcpServers(long connectedUserId) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(connectedUserId);
 
-        // Group per-tool rows by the MCP server they ultimately belong to so the UI can render one
-        // collapsible card per server with the user's enabled-tool list inside.
         Map<Long, List<ConnectedUserMcpServerToolDTO>> toolsByServerId = new HashMap<>();
         Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
 
