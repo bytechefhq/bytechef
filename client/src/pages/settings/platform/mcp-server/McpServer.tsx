@@ -28,7 +28,7 @@ const McpServer = () => {
     const updateManagementMcpServerAuthenticationRequiredMutation =
         useUpdateManagementMcpServerAuthenticationRequiredMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries({queryKey: ['managementMcpServerAuthenticationRequired']});
+                void queryClient.invalidateQueries({queryKey: ['managementMcpServerAuthenticationRequired']});
             },
         });
 

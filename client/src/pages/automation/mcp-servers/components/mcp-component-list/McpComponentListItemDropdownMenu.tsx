@@ -29,12 +29,12 @@ const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}:
     const queryClient = useQueryClient();
 
     const handleDeleteSuccess = () => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: [embedded ? 'embeddedMcpComponentsByServerId' : 'mcpComponentsByServerId'],
         });
 
         if (!embedded) {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['workspaceMcpServers'],
             });
         }
