@@ -92,6 +92,12 @@ describe('McpComponentDialog', () => {
             expect(screen.getByTestId('tool-selection-step')).toBeInTheDocument();
         });
 
+        it('should label the required authorities field', () => {
+            render(<McpComponentDialog mcpServerId="1" open />);
+
+            expect(screen.getByLabelText('Required Authorities')).toHaveTextContent('Select authorities');
+        });
+
         it('should offer Back when adding a new component', () => {
             render(<McpComponentDialog mcpServerId="1" open />);
 
