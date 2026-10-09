@@ -16,16 +16,26 @@
 
 package com.bytechef.platform.mcp.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
+import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
+import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationSharedMocks;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -56,6 +66,15 @@ public class McpComponentGraphQlControllerIntTest {
 
     @Autowired
     private McpServerFacade mcpServerFacade;
+
+    @Autowired
+    private McpServerService mcpServerService;
+
+    @BeforeEach
+    void beforeEach() {
+        when(mcpComponentService.getMcpComponent(anyLong())).thenReturn(createMockMcpComponent(1L, "component", 1));
+        when(mcpServerService.getMcpServer(anyLong())).thenReturn(createMcpServer(PlatformType.AUTOMATION));
+    }
 
     @Test
     void testGetMcpComponentById() {
@@ -188,6 +207,127 @@ public class McpComponentGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(mcpServerFacade).deleteMcpComponent(1L);
+    }
+
+    @Test
+    void testUpdateMcpComponentWithTools() {
+        McpComponent mcpComponent = createMockMcpComponent(1L, "component", 1);
+
+        when(mcpServerFacade.update(any(McpComponent.class), any())).thenReturn(mcpComponent);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpComponentWithTools(id: "1", input: {
+                        componentName: "component", componentVersion: 1, mcpServerId: "1", tools: [], version: 1
+                    }) {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpComponentWithTools.id")
+            .entity(String.class)
+            .isEqualTo("1");
+
+        verify(mcpServerFacade).update(any(McpComponent.class), any());
+    }
+
+    @Nested
+    class EmbeddedMcpServerTest {
+
+        private static final long EMBEDDED_MCP_SERVER_ID = 2L;
+
+        @BeforeEach
+        void beforeEach() {
+            McpComponent embeddedMcpComponent = new McpComponent("component", 1, EMBEDDED_MCP_SERVER_ID, null);
+
+            embeddedMcpComponent.setId(2L);
+
+            when(mcpComponentService.getMcpComponent(2L)).thenReturn(embeddedMcpComponent);
+            when(mcpServerService.getMcpServer(EMBEDDED_MCP_SERVER_ID)).thenReturn(
+                createMcpServer(PlatformType.EMBEDDED));
+        }
+
+        @Test
+        void testCreateMcpComponentRejectsEmbeddedMcpServer() {
+            assertRejected("""
+                mutation {
+                    createMcpComponent(input: {componentName: "component", componentVersion: 1, mcpServerId: "2"}) {
+                        id
+                    }
+                }
+                """);
+
+            verify(mcpComponentService, never()).create(any(McpComponent.class));
+        }
+
+        @Test
+        void testCreateMcpComponentWithToolsRejectsEmbeddedMcpServer() {
+            assertRejected("""
+                mutation {
+                    createMcpComponentWithTools(input: {
+                        componentName: "component", componentVersion: 1, mcpServerId: "2", tools: []
+                    }) {
+                        id
+                    }
+                }
+                """);
+
+            verifyNoInteractions(mcpServerFacade);
+        }
+
+        @Test
+        void testUpdateMcpComponentWithToolsRejectsEmbeddedMcpComponent() {
+            assertRejected("""
+                mutation {
+                    updateMcpComponentWithTools(id: "2", input: {
+                        componentName: "component", componentVersion: 1, mcpServerId: "2", tools: [], version: 1
+                    }) {
+                        id
+                    }
+                }
+                """);
+
+            verifyNoInteractions(mcpServerFacade);
+        }
+
+        @Test
+        void testUpdateMcpComponentWithToolsRejectsMoveIntoEmbeddedMcpServer() {
+            assertRejected("""
+                mutation {
+                    updateMcpComponentWithTools(id: "1", input: {
+                        componentName: "component", componentVersion: 1, mcpServerId: "2", tools: [], version: 1
+                    }) {
+                        id
+                    }
+                }
+                """);
+
+            verifyNoInteractions(mcpServerFacade);
+        }
+
+        @Test
+        void testDeleteMcpComponentRejectsEmbeddedMcpComponent() {
+            assertRejected("""
+                mutation {
+                    deleteMcpComponent(id: "2")
+                }
+                """);
+
+            verifyNoInteractions(mcpServerFacade);
+        }
+
+        private void assertRejected(String document) {
+            graphQlTester.document(document)
+                .execute()
+                .errors()
+                .satisfy(errors -> assertThat(errors).hasSize(1));
+        }
+    }
+
+    private static McpServer createMcpServer(PlatformType type) {
+        return new McpServer("Server", type, Environment.DEVELOPMENT, true);
     }
 
     private McpComponent createMockMcpComponent(Long id, String componentName, int componentVersion) {

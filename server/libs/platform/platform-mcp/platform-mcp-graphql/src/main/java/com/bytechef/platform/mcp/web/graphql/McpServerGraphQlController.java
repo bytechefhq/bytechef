@@ -61,28 +61,36 @@ public class McpServerGraphQlController {
 
     @QueryMapping
     public McpServer mcpServer(@Argument long id) {
-        return mcpServerService.getMcpServer(id);
+        return getNonEmbeddedMcpServer(id);
     }
 
     @QueryMapping
     public List<McpServer>
         mcpServers(@Argument PlatformType type, @Argument McpServerService.McpServerOrderBy orderBy) {
+        McpServerTypeUtils.checkNotEmbedded(type);
+
         return mcpServerService.getMcpServers(type, orderBy);
     }
 
     @MutationMapping
     public McpServer createMcpServer(@Argument McpServerInput input) {
+        McpServerTypeUtils.checkNotEmbedded(input.type());
+
         return mcpServerService.create(
             input.name(), input.type(), Environment.values()[(int) input.environmentId], input.enabled());
     }
 
     @MutationMapping
     public McpServer updateMcpServer(@Argument long id, @Argument McpServerUpdateInput input) {
+        getNonEmbeddedMcpServer(id);
+
         return mcpServerService.update(id, input.name(), input.enabled());
     }
 
     @MutationMapping
     public List<Tag> updateMcpServerTags(@Argument long id, @Argument List<TagInput> tags) {
+        getNonEmbeddedMcpServer(id);
+
         List<Tag> tagList = tags.stream()
             .map(tagInput -> {
                 Tag tag = new Tag();
@@ -99,6 +107,8 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public boolean deleteMcpServer(@Argument long id) {
+        getNonEmbeddedMcpServer(id);
+
         mcpServerFacade.deleteMcpServer(id);
 
         return true;
@@ -122,13 +132,21 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public String updateMcpServerUrl(@Argument long id) {
-        McpServer mcpServer = mcpServerService.getMcpServer(id);
+        McpServer mcpServer = getNonEmbeddedMcpServer(id);
 
         mcpServer.setSecretKey(String.valueOf(TenantKey.of()));
 
         mcpServer = mcpServerService.update(mcpServer);
 
         return getMcpServerUrl(mcpServer);
+    }
+
+    private McpServer getNonEmbeddedMcpServer(long id) {
+        McpServer mcpServer = mcpServerService.getMcpServer(id);
+
+        McpServerTypeUtils.checkNotEmbedded(mcpServer.getType());
+
+        return mcpServer;
     }
 
     private String getMcpServerUrl(McpServer mcpServer) {
