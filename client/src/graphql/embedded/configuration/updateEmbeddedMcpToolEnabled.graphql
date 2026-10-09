@@ -1,0 +1,6 @@
+mutation updateEmbeddedMcpToolEnabled($id: ID!, $enabled: Boolean!) {
+    updateEmbeddedMcpToolEnabled(id: $id, enabled: $enabled) {
+        id
+        enabled
+    }
+}

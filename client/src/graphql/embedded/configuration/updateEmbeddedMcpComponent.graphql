@@ -1,0 +1,15 @@
+mutation updateEmbeddedMcpComponent($id: ID!, $input: McpComponentWithToolsInput!) {
+    updateEmbeddedMcpComponent(id: $id, input: $input) {
+        id
+        componentName
+        componentVersion
+        title
+        mcpServerId
+        connectionId
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+        version
+    }
+}

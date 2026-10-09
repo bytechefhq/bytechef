@@ -1,0 +1,5 @@
+mutation updateEmbeddedMcpServerTags($id: ID!, $tags: [TagInput!]!) {
+    updateEmbeddedMcpServerTags(id: $id, tags: $tags) {
+        id
+    }
+}

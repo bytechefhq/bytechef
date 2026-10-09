@@ -1,0 +1,6 @@
+mutation updateEmbeddedMcpServerUrl($id: ID!) {
+    updateEmbeddedMcpServerUrl(id: $id) {
+        id
+        url
+    }
+}

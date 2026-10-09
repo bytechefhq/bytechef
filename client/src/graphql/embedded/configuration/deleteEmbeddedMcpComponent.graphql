@@ -1,0 +1,3 @@
+mutation deleteEmbeddedMcpComponent($id: ID!) {
+    deleteEmbeddedMcpComponent(id: $id)
+}
