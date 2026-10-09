@@ -50,6 +50,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
@@ -116,14 +118,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             inputParameters, connectionParameters, extensions, continueParameters, data,
             createToolExecutionListener(sseTransport, turnTextSeparator, context), context);
 
-        chatClientRequestSpec.toolContext(new AiAgentToolContext(context, sseTransport).toMap());
-
-        Flux<Object> contentFlux = withExecutionContext(
-            chatClientRequestSpec.stream()
-                .chatResponse()
-                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
-
-        return createSseHandler(contentFlux, sseTransport, context);
+        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, context);
     }
 
     protected SseEmitterHandler perform(
@@ -137,14 +132,48 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             inputParameters, connectionParameters, extensions,
             createToolExecutionListener(sseTransport, turnTextSeparator, context), context);
 
+        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, context);
+    }
+
+    private static SseEmitterHandler stream(
+        ChatClientRequestSpec chatClientRequestSpec, SseTransport sseTransport, TurnTextSeparator turnTextSeparator,
+        Parameters inputParameters, ActionContext context) {
+
         chatClientRequestSpec.toolContext(new AiAgentToolContext(context, sseTransport).toMap());
+
+        AtomicReference<Map<String, Object>> guardrailMetadataReference = new AtomicReference<>(Map.of());
 
         Flux<Object> contentFlux = withExecutionContext(
             chatClientRequestSpec.stream()
                 .chatResponse()
+                .doOnNext(chatResponse -> {
+                    Map<String, Object> guardrailMetadata = ModelUtils.extractGuardrailMetadata(chatResponse);
+
+                    if (!guardrailMetadata.isEmpty()) {
+                        guardrailMetadataReference.set(guardrailMetadata);
+                    }
+                })
                 .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
 
-        return createSseHandler(contentFlux, sseTransport, context);
+        return createSseHandler(
+            contentFlux, sseTransport,
+            () -> toOutput(
+                ModelUtils.toChatResponse(turnTextSeparator.getTurnText(), inputParameters, true, context),
+                guardrailMetadataReference.get()),
+            context);
+    }
+
+    static @Nullable Object toOutput(@Nullable Object response, Map<String, Object> guardrailMetadata) {
+        if (guardrailMetadata.isEmpty()) {
+            return response;
+        }
+
+        Map<String, @Nullable Object> output = new LinkedHashMap<>();
+
+        output.put("response", response);
+        output.put("guardrail", guardrailMetadata);
+
+        return output;
     }
 
     static ToolExecutionListener createToolExecutionListener(
@@ -184,6 +213,13 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
     static SseEmitterHandler createSseHandler(
         Flux<Object> contentFlux, SseTransport sseTransport, ActionContext context) {
 
+        return createSseHandler(contentFlux, sseTransport, () -> null, context);
+    }
+
+    static SseEmitterHandler createSseHandler(
+        Flux<Object> contentFlux, SseTransport sseTransport, Supplier<@Nullable Object> outputSupplier,
+        ActionContext context) {
+
         Flow.Publisher<?> effectivePublisher = FlowAdapters.toFlowPublisher(contentFlux);
 
         SseEmitterHandler sseEmitterHandler = emitter -> {
@@ -195,6 +231,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             effectivePublisher.subscribe(
                 new Flow.Subscriber<Object>() {
 
+                    private final AtomicBoolean failed = new AtomicBoolean();
                     private final StringBuilder responseTextBuilder = new StringBuilder();
                     private Flow.@Nullable Subscription subscription;
 
@@ -224,12 +261,18 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                                 subscription.cancel();
                             }
 
-                            emitter.error(exception);
+                            if (failed.compareAndSet(false, true)) {
+                                emitter.error(exception);
+                            }
                         }
                     }
 
                     @Override
                     public void onError(Throwable throwable) {
+                        if (!failed.compareAndSet(false, true)) {
+                            return;
+                        }
+
                         context.log(log -> log.error("AI agent stream failed", throwable));
 
                         emitter.error(throwable);
@@ -237,10 +280,26 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
                     @Override
                     public void onComplete() {
+                        if (failed.get()) {
+                            return;
+                        }
+
                         if (!responseTextBuilder.isEmpty()) {
                             String responseText = responseTextBuilder.toString();
 
                             context.log(log -> log.info("AI agent response: {}", responseText));
+                        }
+
+                        try {
+                            Object output = outputSupplier.get();
+
+                            if (output != null) {
+                                emitter.setOutput(output);
+                            }
+                        } catch (RuntimeException exception) {
+                            context.log(log -> log.warn(
+                                "Unable to convert the streamed agent response into the task output: {}",
+                                exception.getMessage(), exception));
                         }
 
                         emitter.complete();
@@ -310,9 +369,14 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
         private final AtomicBoolean textEmitted = new AtomicBoolean();
         private final AtomicBoolean toolExecuted = new AtomicBoolean();
+        private final StringBuilder turnTextBuilder = new StringBuilder();
 
         void markToolExecuted() {
             toolExecuted.set(true);
+
+            synchronized (turnTextBuilder) {
+                turnTextBuilder.setLength(0);
+            }
         }
 
         String apply(String text) {
@@ -320,7 +384,17 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
             textEmitted.set(true);
 
+            synchronized (turnTextBuilder) {
+                turnTextBuilder.append(text);
+            }
+
             return separate ? SEPARATOR + text : text;
+        }
+
+        String getTurnText() {
+            synchronized (turnTextBuilder) {
+                return turnTextBuilder.toString();
+            }
         }
     }
 }
