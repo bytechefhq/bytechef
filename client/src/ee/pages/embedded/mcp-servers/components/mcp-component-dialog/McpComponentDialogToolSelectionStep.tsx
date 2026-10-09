@@ -1,11 +1,11 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Checkbox} from '@/components/ui/checkbox';
-import {ComponentDefinition, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
+import {ComponentDefinition, EmbeddedMcpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
 
 import useMcpComponentDialogToolSelectionStep, {SelectedToolI} from './hooks/useMcpComponentDialogToolSelectionStep';
 
 interface ToolSelectionStepProps {
-    existingTools?: McpToolsByComponentIdQuery;
+    existingTools?: EmbeddedMcpToolsByComponentIdQuery;
     onToolsChange: (tools: SelectedToolI[]) => void;
     selectedComponent: ComponentDefinition | null;
     selectedTools: SelectedToolI[];

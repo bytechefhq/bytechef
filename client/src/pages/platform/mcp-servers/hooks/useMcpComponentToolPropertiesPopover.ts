@@ -56,7 +56,7 @@ export default function useMcpComponentToolPropertiesPopover(
 
     const handleUpdateSuccess = () => {
         queryClient.invalidateQueries({
-            queryKey: ['mcpComponentsByServerId'],
+            queryKey: [embedded ? 'embeddedMcpComponentsByServerId' : 'mcpComponentsByServerId'],
         });
 
         onClose();

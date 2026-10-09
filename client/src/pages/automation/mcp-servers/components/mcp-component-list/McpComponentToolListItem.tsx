@@ -59,7 +59,7 @@ const McpComponentToolListItem = ({
                     setIsEnablePending(false);
                 },
                 onSuccess: () => {
-                    void queryClient.invalidateQueries({queryKey: ['mcpComponentsByServerId']});
+                    void queryClient.invalidateQueries({queryKey: ['embeddedMcpComponentsByServerId']});
                 },
             }
         );

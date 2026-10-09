@@ -17,7 +17,9 @@ const McpServerToolsContent = ({mcpServer, ...toolsContentProps}: McpServerTools
             <McpServerToolsPanel
                 {...toolsContentProps}
                 componentList={<McpComponentList mcpServer={mcpServer} />}
-                isComponentListEmpty={!isMcpComponentsLoading && !componentData?.mcpComponentsByServerId?.length}
+                isComponentListEmpty={
+                    !isMcpComponentsLoading && !componentData?.embeddedMcpComponentsByServerId?.length
+                }
                 isWorkflowListEmpty={!isIntegrationsLoading && !mcpIntegrationInstanceConfigurations?.length}
                 workflowList={<McpIntegrationInstanceConfigurationList mcpServer={mcpServer} />}
             />

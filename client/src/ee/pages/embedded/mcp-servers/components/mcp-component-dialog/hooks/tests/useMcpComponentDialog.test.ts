@@ -11,7 +11,7 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useCreateEmbeddedMcpComponentMutation: () => ({mutate: hoisted.createMutate}),
-    useMcpToolsByComponentIdQuery: () => ({data: undefined}),
+    useEmbeddedMcpToolsByComponentIdQuery: () => ({data: undefined}),
     useUpdateEmbeddedMcpComponentMutation: () => ({mutate: hoisted.updateMutate}),
 }));
 
