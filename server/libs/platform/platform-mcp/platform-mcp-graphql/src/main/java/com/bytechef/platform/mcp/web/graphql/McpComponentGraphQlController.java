@@ -30,6 +30,7 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
@@ -70,16 +71,27 @@ public class McpComponentGraphQlController {
 
     @QueryMapping
     public McpComponent mcpComponent(@Argument long id) {
-        return mcpComponentService.getMcpComponent(id);
+        McpComponent mcpComponent = mcpComponentService.getMcpComponent(id);
+
+        checkMcpServerNotEmbedded(mcpComponent.getMcpServerId());
+
+        return mcpComponent;
     }
 
     @QueryMapping
     public List<McpComponent> mcpComponents() {
-        return mcpComponentService.getMcpComponents();
+        Set<Long> embeddedMcpServerIds = McpServerTypeUtils.getEmbeddedMcpServerIds(mcpServerService);
+
+        return mcpComponentService.getMcpComponents()
+            .stream()
+            .filter(mcpComponent -> !embeddedMcpServerIds.contains(mcpComponent.getMcpServerId()))
+            .toList();
     }
 
     @QueryMapping
     public List<McpComponent> mcpComponentsByServerId(@Argument long mcpServerId) {
+        checkMcpServerNotEmbedded(mcpServerId);
+
         return mcpComponentService.getMcpServerMcpComponents(mcpServerId);
     }
 

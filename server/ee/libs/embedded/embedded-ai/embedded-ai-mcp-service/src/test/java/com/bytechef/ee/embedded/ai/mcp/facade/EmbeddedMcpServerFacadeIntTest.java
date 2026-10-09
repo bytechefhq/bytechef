@@ -241,6 +241,27 @@ class EmbeddedMcpServerFacadeIntTest {
         }
 
         @Test
+        void testGetEmbeddedMcpComponentMcpTools() {
+            List<McpTool> mcpTools = List.of(createMcpTool(EMBEDDED_MCP_TOOL_ID, EMBEDDED_MCP_COMPONENT_ID));
+
+            when(mcpToolService.getMcpComponentMcpTools(EMBEDDED_MCP_COMPONENT_ID)).thenReturn(mcpTools);
+
+            assertThat(embeddedMcpServerFacade.getEmbeddedMcpComponentMcpTools(EMBEDDED_MCP_COMPONENT_ID))
+                .isSameAs(mcpTools);
+        }
+
+        @Test
+        void testGetEmbeddedMcpServerMcpComponents() {
+            List<McpComponent> mcpComponents = List.of(
+                createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID));
+
+            when(mcpComponentService.getMcpServerMcpComponents(EMBEDDED_MCP_SERVER_ID)).thenReturn(mcpComponents);
+
+            assertThat(embeddedMcpServerFacade.getEmbeddedMcpServerMcpComponents(EMBEDDED_MCP_SERVER_ID))
+                .isSameAs(mcpComponents);
+        }
+
+        @Test
         void testUpdateEmbeddedMcpComponent() {
             McpComponent mcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID);
             List<McpTool> mcpTools = List.of(new McpTool("tool", Map.of()));
@@ -348,6 +369,24 @@ class EmbeddedMcpServerFacadeIntTest {
         }
 
         @Test
+        void testGetEmbeddedMcpComponentMcpToolsRejectsAutomationMcpComponent() {
+            assertThatThrownBy(
+                () -> embeddedMcpServerFacade.getEmbeddedMcpComponentMcpTools(AUTOMATION_MCP_COMPONENT_ID))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            verify(mcpToolService, never()).getMcpComponentMcpTools(anyLong());
+        }
+
+        @Test
+        void testGetEmbeddedMcpServerMcpComponentsRejectsAutomationMcpServer() {
+            assertThatThrownBy(
+                () -> embeddedMcpServerFacade.getEmbeddedMcpServerMcpComponents(AUTOMATION_MCP_SERVER_ID))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            verify(mcpComponentService, never()).getMcpServerMcpComponents(anyLong());
+        }
+
+        @Test
         void testUpdateEmbeddedMcpComponentRejectsMoveToAutomationMcpServer() {
             McpComponent mcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, AUTOMATION_MCP_SERVER_ID);
 
@@ -417,6 +456,12 @@ class EmbeddedMcpServerFacadeIntTest {
                 "deleteEmbeddedMcpComponent", facade -> facade.deleteEmbeddedMcpComponent(EMBEDDED_MCP_COMPONENT_ID)),
             operation("deleteEmbeddedMcpServer", facade -> facade.deleteEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID)),
             operation("deleteEmbeddedMcpTool", facade -> facade.deleteEmbeddedMcpTool(EMBEDDED_MCP_TOOL_ID)),
+            operation(
+                "getEmbeddedMcpComponentMcpTools",
+                facade -> facade.getEmbeddedMcpComponentMcpTools(EMBEDDED_MCP_COMPONENT_ID)),
+            operation(
+                "getEmbeddedMcpServerMcpComponents",
+                facade -> facade.getEmbeddedMcpServerMcpComponents(EMBEDDED_MCP_SERVER_ID)),
             operation("getEmbeddedMcpServers", EmbeddedMcpServerFacade::getEmbeddedMcpServers),
             operation("getEmbeddedMcpServerTags", EmbeddedMcpServerFacade::getEmbeddedMcpServerTags),
             operation("getMcpComponentDefinitions", EmbeddedMcpServerFacade::getMcpComponentDefinitions),

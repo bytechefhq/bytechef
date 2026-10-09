@@ -120,6 +120,22 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    public List<McpTool> getEmbeddedMcpComponentMcpTools(long mcpComponentId) {
+        checkEmbeddedMcpComponent(mcpComponentId);
+
+        return mcpToolService.getMcpComponentMcpTools(mcpComponentId);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpComponent> getEmbeddedMcpServerMcpComponents(long mcpServerId) {
+        getEmbeddedMcpServer(mcpServerId);
+
+        return mcpComponentService.getMcpServerMcpComponents(mcpServerId);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public List<McpServer> getEmbeddedMcpServers() {
         return mcpServerService.getMcpServers(PlatformType.EMBEDDED);
     }

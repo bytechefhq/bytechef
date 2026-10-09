@@ -32,6 +32,10 @@ public interface EmbeddedMcpServerFacade {
 
     void deleteEmbeddedMcpTool(long mcpToolId);
 
+    List<McpTool> getEmbeddedMcpComponentMcpTools(long mcpComponentId);
+
+    List<McpComponent> getEmbeddedMcpServerMcpComponents(long mcpServerId);
+
     List<McpServer> getEmbeddedMcpServers();
 
     List<Tag> getEmbeddedMcpServerTags();

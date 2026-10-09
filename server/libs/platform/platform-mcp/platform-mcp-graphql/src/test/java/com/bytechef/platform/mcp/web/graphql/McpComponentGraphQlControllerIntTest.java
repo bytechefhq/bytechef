@@ -31,6 +31,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationSharedMocks;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
 import java.util.List;
@@ -69,6 +70,9 @@ public class McpComponentGraphQlControllerIntTest {
 
     @Autowired
     private McpServerService mcpServerService;
+
+    @Autowired
+    private McpToolService mcpToolService;
 
     @BeforeEach
     void beforeEach() {
@@ -247,6 +251,62 @@ public class McpComponentGraphQlControllerIntTest {
             when(mcpComponentService.getMcpComponent(2L)).thenReturn(embeddedMcpComponent);
             when(mcpServerService.getMcpServer(EMBEDDED_MCP_SERVER_ID)).thenReturn(
                 createMcpServer(PlatformType.EMBEDDED));
+        }
+
+        @Test
+        void testMcpComponentRejectsEmbeddedMcpComponent() {
+            assertRejected("""
+                query {
+                    mcpComponent(id: "2") {
+                        id
+                    }
+                }
+                """);
+        }
+
+        @Test
+        void testMcpComponentsByServerIdRejectsEmbeddedMcpServer() {
+            assertRejected("""
+                query {
+                    mcpComponentsByServerId(mcpServerId: "2") {
+                        id
+                    }
+                }
+                """);
+
+            verify(mcpComponentService, never()).getMcpServerMcpComponents(anyLong());
+        }
+
+        @Test
+        void testMcpComponentsOmitsEmbeddedMcpComponentsAndTheirTools() {
+            McpServer embeddedMcpServer = createMcpServer(PlatformType.EMBEDDED);
+
+            embeddedMcpServer.setId(EMBEDDED_MCP_SERVER_ID);
+
+            McpComponent embeddedMcpComponent = new McpComponent("component", 1, EMBEDDED_MCP_SERVER_ID, null);
+
+            embeddedMcpComponent.setId(2L);
+
+            when(mcpServerService.getMcpServers(PlatformType.EMBEDDED)).thenReturn(List.of(embeddedMcpServer));
+            when(mcpComponentService.getMcpComponents()).thenReturn(
+                List.of(createMockMcpComponent(1L, "automation-component", 1), embeddedMcpComponent));
+
+            graphQlTester.document("""
+                query {
+                    mcpComponents {
+                        id
+                        mcpTools {
+                            id
+                        }
+                    }
+                }
+                """)
+                .execute()
+                .path("mcpComponents[*].id")
+                .entityList(String.class)
+                .containsExactly("1");
+
+            verify(mcpToolService, never()).getMcpComponentMcpTools(2L);
         }
 
         @Test

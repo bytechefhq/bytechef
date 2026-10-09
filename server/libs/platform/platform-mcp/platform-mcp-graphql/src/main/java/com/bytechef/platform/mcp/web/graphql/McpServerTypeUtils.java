@@ -17,6 +17,10 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.service.McpServerService;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -32,5 +36,12 @@ final class McpServerTypeUtils {
             throw new AccessDeniedException(
                 "Embedded MCP servers can only be administered through the embedded MCP server operations");
         }
+    }
+
+    static Set<Long> getEmbeddedMcpServerIds(McpServerService mcpServerService) {
+        return mcpServerService.getMcpServers(PlatformType.EMBEDDED)
+            .stream()
+            .map(McpServer::getId)
+            .collect(Collectors.toSet());
     }
 }
