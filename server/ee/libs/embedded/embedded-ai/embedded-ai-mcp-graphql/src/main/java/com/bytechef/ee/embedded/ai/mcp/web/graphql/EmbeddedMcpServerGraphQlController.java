@@ -174,7 +174,8 @@ class EmbeddedMcpServerGraphQlController {
 
     private static List<McpTool> toMcpTools(List<McpToolInputForComponent> toolInputs) {
         return toolInputs.stream()
-            .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters()))
+            .map(toolInput -> new McpTool(
+                toolInput.name(), toolInput.parameters() == null ? Map.of() : toolInput.parameters()))
             .toList();
     }
 
