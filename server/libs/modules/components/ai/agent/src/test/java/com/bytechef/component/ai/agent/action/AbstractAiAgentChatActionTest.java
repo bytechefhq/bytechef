@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -41,6 +42,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
@@ -50,6 +52,7 @@ import com.bytechef.platform.component.definition.ai.agent.SessionConversationHi
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +61,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -83,11 +88,14 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.session.CreateSessionRequest;
 import org.springframework.ai.session.DefaultSessionService;
 import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
@@ -690,6 +698,104 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Test
+    void testResumedTurnWithSupportingChatMemoryKeepsTheToolTranscriptComplete() throws Exception {
+        SessionService sessionService = DefaultSessionService.builder()
+            .sessionRepository(InMemorySessionRepository.builder()
+                .build())
+            .build();
+
+        UserMessage userMessage = new UserMessage("ask me");
+        AssistantMessage questionToolCallMessage = AssistantMessage.builder()
+            .content("")
+            .toolCalls(List.of(new AssistantMessage.ToolCall("call-1", "function", "askUserQuestion", "{}")))
+            .build();
+
+        sessionService.create(CreateSessionRequest.builder()
+            .id(TOOL_LOOP_CONVERSATION_ID)
+            .userId("user-1")
+            .build());
+        sessionService.appendEvent(SessionEvent.builder()
+            .sessionId(TOOL_LOOP_CONVERSATION_ID)
+            .message(userMessage)
+            .build());
+        sessionService.appendEvent(SessionEvent.builder()
+            .sessionId(TOOL_LOOP_CONVERSATION_ID)
+            .message(questionToolCallMessage)
+            .build());
+
+        SessionMemoryAdvisor sessionMemoryAdvisor = SessionMemoryAdvisor.builder(sessionService)
+            .defaultUserId("user-1")
+            .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
+            .build();
+
+        ResumedToolLoopChatModel resumedToolLoopChatModel = new ResumedToolLoopChatModel();
+
+        List<Message> resumedConversation = List.of(
+            userMessage, questionToolCallMessage,
+            ToolResponseMessage.builder()
+                .responses(
+                    List.of(
+                        new ToolResponseMessage.ToolResponse("call-1", "askUserQuestion", "{\"answer\":\"blue\"}")))
+                .build());
+
+        ChatResponse chatResponse = runToolLoop(
+            resumedToolLoopChatModel,
+            ChatMemoryFunction.Result.persistingToolMessages(
+                sessionMemoryAdvisor, new SessionConversationHistoryReader(sessionService),
+                List.of(echoToolCallback())),
+            resumedConversation, true);
+
+        assertThat(Objects.requireNonNull(chatResponse.getResult())
+            .getOutput()
+            .getText()).isEqualTo("done");
+
+        List<Prompt> prompts = resumedToolLoopChatModel.getPrompts();
+
+        assertThat(prompts)
+            .as("the resumed turn calls one more tool, then answers")
+            .hasSize(2);
+
+        for (Prompt prompt : prompts) {
+            List<Message> instructions = prompt.getInstructions();
+
+            assertThat(instructions)
+                .as("every model call of the resumed turn carries the user turn exactly once")
+                .filteredOn(UserMessage.class::isInstance)
+                .hasSize(1);
+            assertThat(instructions)
+                .as("every tool call sent to the model has its tool response")
+                .filteredOn(AbstractAiAgentChatActionTest::isToolCallMessage)
+                .hasSameSizeAs(
+                    instructions.stream()
+                        .filter(ToolResponseMessage.class::isInstance)
+                        .toList());
+        }
+
+        assertThat(prompts.get(1)
+            .getInstructions())
+                .as("the second model call carries both tool exchanges")
+                .filteredOn(ToolResponseMessage.class::isInstance)
+                .hasSize(2);
+
+        List<Message> persistedMessages = sessionService.getMessages(TOOL_LOOP_CONVERSATION_ID);
+
+        assertThat(persistedMessages)
+            .as("the session keeps the user turn once")
+            .filteredOn(UserMessage.class::isInstance)
+            .hasSize(1);
+        assertThat(persistedMessages)
+            .as("the session keeps both tool calls once")
+            .filteredOn(AbstractAiAgentChatActionTest::isToolCallMessage)
+            .hasSize(2);
+        assertThat(persistedMessages)
+            .as("the session keeps the answer to the question and the second tool response")
+            .filteredOn(ToolResponseMessage.class::isInstance)
+            .hasSize(2);
+        assertThat(persistedMessages.getLast()
+            .getText()).isEqualTo("done");
+    }
+
+    @Test
     void testNonSupportingChatMemoryKeepsTheToolTranscriptOutsideMemory() throws Exception {
         ChatMemory chatMemory = MessageWindowChatMemory.builder()
             .build();
@@ -1130,6 +1236,13 @@ class AbstractAiAgentChatActionTest {
     private ChatResponse runToolLoop(ChatModel chatModel, ChatMemoryFunction.Result chatMemoryResult)
         throws Exception {
 
+        return runToolLoop(chatModel, chatMemoryResult, List.of(new UserMessage("run the tool")), false);
+    }
+
+    private ChatResponse runToolLoop(
+        ChatModel chatModel, ChatMemoryFunction.Result chatMemoryResult, List<Message> messages,
+        boolean resumedTurn) throws Exception {
+
         ModelFunction modelFunction = mock(ModelFunction.class);
         ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
 
@@ -1160,12 +1273,12 @@ class AbstractAiAgentChatActionTest {
 
         try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
             modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
-                .thenReturn(List.of(new UserMessage("run the tool")));
+                .thenReturn(messages);
 
             ChatClient.ChatClientRequestSpec chatClientRequestSpec = action.getChatClientRequestSpec(
                 MockParametersFactory.create(Map.of()),
                 Map.of("model_1", componentConnection, "chatMemory_1", componentConnection), extensions, null,
-                mock(ActionContextAware.class));
+                mock(ActionContextAware.class), messages, resumedTurn);
 
             return chatClientRequestSpec.call()
                 .chatResponse();
@@ -1241,6 +1354,43 @@ class AbstractAiAgentChatActionTest {
         }
     }
 
+    private static final class ResumedToolLoopChatModel implements ChatModel {
+
+        private final List<Prompt> prompts = new ArrayList<>();
+
+        @Override
+        public ChatResponse call(Prompt prompt) {
+            prompts.add(prompt);
+
+            boolean secondToolAnswered = prompt.getInstructions()
+                .stream()
+                .filter(ToolResponseMessage.class::isInstance)
+                .map(ToolResponseMessage.class::cast)
+                .flatMap(toolResponseMessage -> toolResponseMessage.getResponses()
+                    .stream())
+                .anyMatch(toolResponse -> Objects.equals(toolResponse.id(), "call-2"));
+
+            AssistantMessage assistantMessage = secondToolAnswered || prompts.size() >= 3
+                ? new AssistantMessage("done")
+                : AssistantMessage.builder()
+                    .content("")
+                    .toolCalls(List.of(new AssistantMessage.ToolCall("call-2", "function", "echo", "{}")))
+                    .build();
+
+            return new ChatResponse(List.of(new Generation(assistantMessage)));
+        }
+
+        @Override
+        public ChatOptions getOptions() {
+            return ToolCallingChatOptions.builder()
+                .build();
+        }
+
+        List<Prompt> getPrompts() {
+            return prompts;
+        }
+    }
+
     private static final class ToolLoopChatModel implements ChatModel {
 
         private static final int MAX_MODEL_CALLS = 5;
@@ -1273,6 +1423,87 @@ class AbstractAiAgentChatActionTest {
 
         List<Prompt> getPrompts() {
             return prompts;
+        }
+    }
+
+    @Nested
+    @ExtendWith(ObjectMapperSetupExtension.class)
+    class ObservableToolCallbackTests {
+
+        @Test
+        void testAFailedToolCallIsLoggedAndRethrown() {
+            IllegalStateException toolFailure = new IllegalStateException("lookup service unavailable");
+            ActionContext context = mock(ActionContext.class);
+            Context.Log log = mockLog(context);
+
+            ToolCallback observableToolCallback = AbstractAiAgentChatAction.createObservableToolCallback(
+                createFailingToolCallback(toolFailure), new AtomicReference<>(),
+                toolExecutionEvent -> {
+                    throw new AssertionError("A failed tool call must not be reported as executed");
+                },
+                context);
+
+            assertThatThrownBy(() -> observableToolCallback.call("{\"customerId\":\"42\"}"))
+                .isSameAs(toolFailure);
+
+            ArgumentCaptor<String> messageArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
+            verify(log).error(messageArgumentCaptor.capture(), eq(toolFailure));
+
+            assertThat(messageArgumentCaptor.getValue()).contains(
+                "\"error\":\"lookup service unavailable\"", "\"inputs\":{\"customerId\":\"42\"}",
+                "\"toolName\":\"lookUp\"");
+        }
+
+        @Test
+        void testASuspendingToolCallIsNotLoggedAsAFailure() {
+            ToolSuspensionException toolSuspensionException = new ToolSuspensionException(
+                "The approval request could not be sent", new IllegalStateException("mail server down"));
+            ActionContext context = mock(ActionContext.class);
+
+            ToolCallback observableToolCallback = AbstractAiAgentChatAction.createObservableToolCallback(
+                createFailingToolCallback(new RuntimeException("wrapped", toolSuspensionException)),
+                new AtomicReference<>(), toolExecutionEvent -> {}, context);
+
+            assertThatThrownBy(() -> observableToolCallback.call("{}")).hasCause(toolSuspensionException);
+
+            verify(context, never()).log(any());
+        }
+
+        private static ToolCallback createFailingToolCallback(RuntimeException toolFailure) {
+            ToolDefinition toolDefinition = DefaultToolDefinition.builder()
+                .name("lookUp")
+                .description("Looks up a customer")
+                .inputSchema("{}")
+                .build();
+
+            return new ToolCallback() {
+
+                @Override
+                public ToolDefinition getToolDefinition() {
+                    return toolDefinition;
+                }
+
+                @Override
+                public String call(String toolInput) {
+                    throw toolFailure;
+                }
+            };
+        }
+
+        private static Context.Log mockLog(ActionContext context) {
+            Context.Log log = mock(Context.Log.class);
+
+            doAnswer(invocation -> {
+                Context.ContextConsumer<Context.Log> logConsumer = invocation.getArgument(0);
+
+                logConsumer.accept(log);
+
+                return null;
+            }).when(context)
+                .log(any());
+
+            return log;
         }
     }
 

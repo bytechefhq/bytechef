@@ -20,7 +20,6 @@ dependencies {
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
-    testImplementation(project(":server:libs:core:tenant:tenant-api"))
     testImplementation(project(":server:libs:modules:components:approval"))
     testImplementation(project(":server:libs:modules:task-dispatchers:suspend"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-test-int-support"))
