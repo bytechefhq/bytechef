@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
@@ -64,7 +64,7 @@ const AutomationWorkflowEditorSettingsMenu = ({
                 <TooltipContent>Project and workflow settings</TooltipContent>
             </Tooltip>
 
-            <DropdownMenuContent align="end" className="p-0">
+            <DropdownMenuContent align="end">
                 <Tabs aria-label="Settings menu" defaultValue="workflow">
                     <TabsList className="rounded-none">
                         <TabsTrigger
@@ -86,137 +86,115 @@ const AutomationWorkflowEditorSettingsMenu = ({
 
                     <TabsContent className="mt-0" value="workflow">
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<EditIcon />}
+                            label="Edit"
                             onClick={() => {
                                 setOpen(false);
                                 onEditWorkflowClick();
                             }}
-                        >
-                            <EditIcon className="mr-2 size-4" />
-                            Edit
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<CopyIcon />}
+                            label="Duplicate"
                             onClick={() => {
                                 setOpen(false);
                                 onDuplicateWorkflowClick();
                             }}
-                        >
-                            <CopyIcon className="mr-2 size-4" />
-                            Duplicate
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<DownloadIcon />}
+                            label="Export"
                             onClick={() => {
                                 setOpen(false);
                                 onExportWorkflowClick();
                             }}
-                        >
-                            <DownloadIcon className="mr-2 size-4" />
-                            Export
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item-destructive"
+                            icon={<Trash2Icon />}
+                            label="Delete"
                             onClick={() => {
                                 setOpen(false);
                                 onDeleteWorkflowClick();
                             }}
                             variant="destructive"
-                        >
-                            <Trash2Icon className="mr-2 size-4" />
-                            Delete
-                        </DropdownMenuItem>
+                        />
                     </TabsContent>
 
                     <TabsContent className="mt-0" value="project">
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<EditIcon />}
+                            label="Edit"
                             onClick={() => {
                                 setOpen(false);
                                 onEditProjectClick();
                             }}
-                        >
-                            <EditIcon className="mr-2 size-4" />
-                            Edit
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<CopyIcon />}
+                            label="Duplicate"
                             onClick={() => {
                                 setOpen(false);
                                 onDuplicateProjectClick();
                             }}
-                        >
-                            <CopyIcon className="mr-2 size-4" />
-                            Duplicate
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<DownloadIcon />}
+                            label="Export"
                             onClick={() => {
                                 setOpen(false);
                                 onExportProjectClick();
                             }}
-                        >
-                            <DownloadIcon className="mr-2 size-4" />
-                            Export
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<PlusIcon />}
+                            label="New Workflow"
                             onClick={() => {
                                 setOpen(false);
                                 onNewWorkflowClick();
                             }}
-                        >
-                            <PlusIcon className="mr-2 size-4" />
-                            New Workflow
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<UploadIcon />}
+                            label="Import Workflow"
                             onClick={() => {
                                 setOpen(false);
                                 onImportWorkflowClick();
                             }}
-                        >
-                            <UploadIcon className="mr-2 size-4" />
-                            Import Workflow
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<HistoryIcon />}
+                            label="Project History"
                             onClick={() => {
                                 setOpen(false);
                                 onProjectHistoryClick();
                             }}
-                        >
-                            <HistoryIcon className="mr-2 size-4" />
-                            Project History
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item-destructive"
+                            icon={<Trash2Icon />}
+                            label="Delete"
                             onClick={() => {
                                 setOpen(false);
                                 onDeleteProjectClick();
                             }}
                             variant="destructive"
-                        >
-                            <Trash2Icon className="mr-2 size-4" />
-                            Delete
-                        </DropdownMenuItem>
+                        />
                     </TabsContent>
                 </Tabs>
             </DropdownMenuContent>

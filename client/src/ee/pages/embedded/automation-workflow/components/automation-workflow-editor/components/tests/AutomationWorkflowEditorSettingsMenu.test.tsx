@@ -45,6 +45,16 @@ it('opens the settings menu with the Workflow and Project tabs', async () => {
     expect(screen.getByLabelText('Project tab')).toBeInTheDocument();
 });
 
+it('renders with the design-system DropdownMenu', async () => {
+    renderSettingsMenu();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+    expect(screen.getByRole('menuitem', {name: 'Edit'})).toHaveClass('text-content-neutral-primary');
+    expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+});
+
 it('lists the workflow actions on the Workflow tab', async () => {
     renderSettingsMenu();
 
@@ -55,6 +65,21 @@ it('lists the workflow actions on the Workflow tab', async () => {
     expect(screen.getByRole('menuitem', {name: 'Export'})).toBeInTheDocument();
     expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', {name: 'New Workflow'})).not.toBeInTheDocument();
+});
+
+it.each([
+    ['Edit', 'onEditWorkflowClick'],
+    ['Duplicate', 'onDuplicateWorkflowClick'],
+    ['Export', 'onExportWorkflowClick'],
+    ['Delete', 'onDeleteWorkflowClick'],
+] as const)('calls the %s handler from the Workflow tab', async (name, handlerName) => {
+    renderSettingsMenu();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    await userEvent.click(screen.getByRole('menuitem', {name}));
+
+    expect(mockHandlers[handlerName]).toHaveBeenCalledTimes(1);
 });
 
 it('lists the workflow creation entries on the Project tab between Export and Project History', async () => {
@@ -95,6 +120,20 @@ it('starts a workflow import from the Project tab and closes the menu', async ()
 
     expect(mockHandlers.onImportWorkflowClick).toHaveBeenCalledTimes(1);
     expect(screen.queryByLabelText('Project tab')).not.toBeInTheDocument();
+});
+
+it.each([
+    ['Edit', 'onEditProjectClick'],
+    ['Duplicate', 'onDuplicateProjectClick'],
+    ['Export', 'onExportProjectClick'],
+] as const)('calls the %s handler from the Project tab', async (name, handlerName) => {
+    renderSettingsMenu();
+
+    await openProjectTab();
+
+    await userEvent.click(screen.getByRole('menuitem', {name}));
+
+    expect(mockHandlers[handlerName]).toHaveBeenCalledTimes(1);
 });
 
 it('calls the project handlers from the Project tab', async () => {

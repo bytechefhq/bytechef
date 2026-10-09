@@ -5,7 +5,7 @@ import {
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Workflow} from '@/shared/middleware/automation/configuration';
@@ -55,7 +55,7 @@ const ProjectItemSelect = ({
 
                         {projectWorkflows.map((workflow) => (
                             <DropdownMenuRadioItem
-                                className="cursor-pointer pl-2 data-[state=checked]:bg-surface-brand-secondary data-[state=checked]:text-content-brand-primary [&>span:first-child]:hidden"
+                                className="pl-2 data-[state=checked]:bg-surface-brand-secondary data-[state=checked]:text-content-brand-primary [&>span:first-child]:hidden"
                                 key={workflow.projectWorkflowId!}
                                 title={workflow.label!.length > 55 ? workflow.label! : undefined}
                                 value={workflow.projectWorkflowId!.toString()}
