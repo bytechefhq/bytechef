@@ -1094,6 +1094,13 @@ export type DuplicateAutomationWorkflowProjectWorkflowMutationVariables = Exact<
 
 export type DuplicateAutomationWorkflowProjectWorkflowMutation = { duplicateAutomationWorkflowProjectWorkflow: string };
 
+export type EmbeddedMcpComponentsByServerIdQueryVariables = Exact<{
+  mcpServerId: string | number;
+}>;
+
+
+export type EmbeddedMcpComponentsByServerIdQuery = { embeddedMcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, version: number | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
+
 export type EmbeddedMcpServerTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1103,6 +1110,13 @@ export type EmbeddedMcpServersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type EmbeddedMcpServersQuery = { embeddedMcpServers: Array<{ id: string, enabled: boolean, environmentId: string, lastModifiedDate: any, name: string, type: Types.PlatformType, url: string, mcpComponents: Array<{ componentName: string, componentVersion: number, connectionId: string | null, id: string, lastModifiedDate: any, mcpServerId: string, title: string | null, mcpTools: Array<{ id: string, mcpComponentId: string, name: string, title: string | null, parameters: any } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
+
+export type EmbeddedMcpToolsByComponentIdQueryVariables = Exact<{
+  mcpComponentId: string | number;
+}>;
+
+
+export type EmbeddedMcpToolsByComponentIdQuery = { embeddedMcpToolsByComponentId: Array<{ id: string, enabled: boolean, name: string, title: string | null, mcpComponentId: string, parameters: any, version: number | null } | null> | null };
 
 export type EnableConnectedUserMcpServerMutationVariables = Exact<{
   connectedUserId: string | number;
@@ -5794,6 +5808,46 @@ export const useDuplicateAutomationWorkflowProjectWorkflowMutation = <
   }
     )};
 
+export const EmbeddedMcpComponentsByServerIdDocument = new TypedDocumentString(`
+    query embeddedMcpComponentsByServerId($mcpServerId: ID!) {
+  embeddedMcpComponentsByServerId(mcpServerId: $mcpServerId) {
+    id
+    componentName
+    componentVersion
+    title
+    connectionId
+    lastModifiedDate
+    mcpServerId
+    mcpTools {
+      id
+      enabled
+      mcpComponentId
+      name
+      parameters
+      title
+      version
+    }
+    version
+  }
+}
+    `);
+
+export const useEmbeddedMcpComponentsByServerIdQuery = <
+      TData = EmbeddedMcpComponentsByServerIdQuery,
+      TError = unknown
+    >(
+      variables: EmbeddedMcpComponentsByServerIdQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedMcpComponentsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedMcpComponentsByServerIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedMcpComponentsByServerIdQuery, TError, TData>(
+      {
+    queryKey: ['embeddedMcpComponentsByServerId', variables],
+    queryFn: fetcher<EmbeddedMcpComponentsByServerIdQuery, EmbeddedMcpComponentsByServerIdQueryVariables>(EmbeddedMcpComponentsByServerIdDocument, variables),
+    ...options
+  }
+    )};
+
 export const EmbeddedMcpServerTagsDocument = new TypedDocumentString(`
     query embeddedMcpServerTags {
   embeddedMcpServerTags {
@@ -5865,6 +5919,36 @@ export const useEmbeddedMcpServersQuery = <
       {
     queryKey: variables === undefined ? ['embeddedMcpServers'] : ['embeddedMcpServers', variables],
     queryFn: fetcher<EmbeddedMcpServersQuery, EmbeddedMcpServersQueryVariables>(EmbeddedMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const EmbeddedMcpToolsByComponentIdDocument = new TypedDocumentString(`
+    query embeddedMcpToolsByComponentId($mcpComponentId: ID!) {
+  embeddedMcpToolsByComponentId(mcpComponentId: $mcpComponentId) {
+    id
+    enabled
+    name
+    title
+    mcpComponentId
+    parameters
+    version
+  }
+}
+    `);
+
+export const useEmbeddedMcpToolsByComponentIdQuery = <
+      TData = EmbeddedMcpToolsByComponentIdQuery,
+      TError = unknown
+    >(
+      variables: EmbeddedMcpToolsByComponentIdQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedMcpToolsByComponentIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedMcpToolsByComponentIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedMcpToolsByComponentIdQuery, TError, TData>(
+      {
+    queryKey: ['embeddedMcpToolsByComponentId', variables],
+    queryFn: fetcher<EmbeddedMcpToolsByComponentIdQuery, EmbeddedMcpToolsByComponentIdQueryVariables>(EmbeddedMcpToolsByComponentIdDocument, variables),
     ...options
   }
     )};
