@@ -853,6 +853,135 @@ class ConnectedUserConnectionFacadeIntTest {
         }
 
         @Test
+        void testDeleteConnectedUserConnectionDeniesConnectedUserOnAnotherConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.deleteConnectedUserConnection(
+                    connectedUserBId, CONNECTED_USER_B_CONNECTION_ID))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).delete(any());
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserBId))
+                .containsExactly(CONNECTED_USER_B_CONNECTION_ID);
+        }
+
+        @Test
+        void testDeleteConnectedUserConnectionDeniesConnectedUserFromAnotherEnvironment() {
+            authenticate(createConnectedUserAuthentication(Environment.DEVELOPMENT));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.deleteConnectedUserConnection(
+                    connectedUserAId, CONNECTED_USER_A_CONNECTION_ID))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).delete(any());
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
+                .containsExactly(CONNECTED_USER_A_CONNECTION_ID);
+        }
+
+        @Test
+        void testDeleteConnectedUserConnectionDeniesCallerWhoIsNeitherTenantAdminNorConnectedUser() {
+            authenticate(createRegularUserAuthentication());
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.deleteConnectedUserConnection(
+                    connectedUserAId, CONNECTED_USER_A_CONNECTION_ID))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).delete(any());
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
+                .containsExactly(CONNECTED_USER_A_CONNECTION_ID);
+        }
+
+        @Test
+        void testDeleteConnectedUserConnectionAllowsConnectedUserOnOwnConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            connectedUserConnectionFacade.deleteConnectedUserConnection(
+                connectedUserAId, CONNECTED_USER_A_CONNECTION_ID);
+
+            verify(connectionFacade).delete(CONNECTED_USER_A_CONNECTION_ID);
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId)).isEmpty();
+        }
+
+        @Test
+        void testDeleteConnectedUserConnectionAllowsTenantAdminOnAnyConnectedUser() {
+            authenticate(createTenantAdminAuthentication());
+
+            connectedUserConnectionFacade.deleteConnectedUserConnection(
+                connectedUserBId, CONNECTED_USER_B_CONNECTION_ID);
+
+            verify(connectionFacade).delete(CONNECTED_USER_B_CONNECTION_ID);
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserBId)).isEmpty();
+        }
+
+        @Test
+        void testReauthorizeConnectedUserConnectionDeniesConnectedUserOnAnotherConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+                    connectedUserBId, CONNECTED_USER_B_CONNECTION_ID, Map.of("apiKey", "new")))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
+        }
+
+        @Test
+        void testReauthorizeConnectedUserConnectionDeniesConnectedUserFromAnotherEnvironment() {
+            authenticate(createConnectedUserAuthentication(Environment.DEVELOPMENT));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+                    connectedUserAId, CONNECTED_USER_A_CONNECTION_ID, Map.of("apiKey", "new")))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
+        }
+
+        @Test
+        void testReauthorizeConnectedUserConnectionDeniesCallerWhoIsNeitherTenantAdminNorConnectedUser() {
+            authenticate(createRegularUserAuthentication());
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+                    connectedUserAId, CONNECTED_USER_A_CONNECTION_ID, Map.of("apiKey", "new")))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
+        }
+
+        @Test
+        void testReauthorizeConnectedUserConnectionAllowsConnectedUserOnOwnConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            Map<String, Object> parameters = Map.of("apiKey", "new");
+
+            connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+                connectedUserAId, CONNECTED_USER_A_CONNECTION_ID, parameters);
+
+            verify(connectionFacade).replaceAuthorizationParameters(CONNECTED_USER_A_CONNECTION_ID, parameters);
+        }
+
+        @Test
+        void testReauthorizeConnectedUserConnectionAllowsTenantAdminOnAnyConnectedUser() {
+            authenticate(createTenantAdminAuthentication());
+
+            Map<String, Object> parameters = Map.of("apiKey", "new");
+
+            connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+                connectedUserBId, CONNECTED_USER_B_CONNECTION_ID, parameters);
+
+            verify(connectionFacade).replaceAuthorizationParameters(CONNECTED_USER_B_CONNECTION_ID, parameters);
+        }
+
+        @Test
         void testGetConnectedUserConnectionsByExternalUserIdAllowsTheMatchingPrincipal() {
             authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
 
