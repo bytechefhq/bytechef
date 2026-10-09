@@ -43,7 +43,7 @@ public class WorkflowTask implements Task, Serializable {
     private String description;
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
-    private final Map<String, Object> extensions = new HashMap<>();
+    private Map<String, Object> extensions = new HashMap<>();
     private int maxRetries;
     private Map<String, ?> metadata = new HashMap<>();
     private String name;
