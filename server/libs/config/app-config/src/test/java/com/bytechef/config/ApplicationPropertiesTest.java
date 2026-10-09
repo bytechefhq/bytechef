@@ -19,8 +19,8 @@ package com.bytechef.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.config.ApplicationProperties.Ai.Memory.Redis;
-import com.bytechef.config.ApplicationProperties.Oauth2.ResourceServer;
 import com.bytechef.config.ApplicationProperties.Oauth2;
+import com.bytechef.config.ApplicationProperties.Oauth2.ResourceServer;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
