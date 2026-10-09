@@ -51,7 +51,7 @@ class ManagementMcpServerServiceTest {
     }
 
     @Test
-    void testIsAuthenticationRequiredReturnsFalseWhenKeyMissing() {
+    void testIsAuthenticationRequiredReturnsTrueWhenKeyMissing() {
         Property property = mock(Property.class);
 
         when(property.get("secretKey")).thenReturn("abc");
@@ -59,7 +59,7 @@ class ManagementMcpServerServiceTest {
         when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
             .thenReturn(Optional.of(property));
 
-        assertThat(managementMcpServerService.isAuthenticationRequired()).isFalse();
+        assertThat(managementMcpServerService.isAuthenticationRequired()).isTrue();
     }
 
     @Test
@@ -147,7 +147,7 @@ class ManagementMcpServerServiceTest {
     }
 
     @Test
-    void testUpdateManagementMcpServerUrlKeepsLegacyPropertyWithoutAuthenticationRequiredOpen() {
+    void testUpdateManagementMcpServerUrlRequiresAuthenticationForLegacyProperty() {
         Property property = mock(Property.class);
 
         when(property.get("secretKey")).thenReturn("abc");
@@ -160,7 +160,7 @@ class ManagementMcpServerServiceTest {
         verify(propertyService)
             .save(
                 eq(MCP_SERVER_PROPERTY_KEY),
-                argThat(map -> Boolean.FALSE.equals(map.get("authenticationRequired"))),
+                argThat(map -> Boolean.TRUE.equals(map.get("authenticationRequired"))),
                 eq(Property.Scope.PLATFORM), isNull());
     }
 }
