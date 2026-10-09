@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.definition;
 
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
-import static com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction.SESSION_REPOSITORY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
@@ -32,15 +31,13 @@ import org.junit.jupiter.api.Test;
 class SessionChatMemoryComponentDefinitionTest {
 
     @Test
-    void testOnlyTheSessionRepositoryIsRequired() {
+    void testTheOnlyChildIsAnOptionalSummarizerModel() {
         SessionChatMemoryComponentDefinition sessionChatMemoryComponentDefinition =
             mock(SessionChatMemoryComponentDefinition.class, CALLS_REAL_METHODS);
 
         List<ClusterElementType> clusterElementTypes = sessionChatMemoryComponentDefinition.getClusterElementTypes();
 
-        assertThat(clusterElementTypes).containsExactly(
-            SESSION_REPOSITORY, SessionChatMemoryComponentDefinition.SUMMARIZER_MODEL);
-        assertThat(SESSION_REPOSITORY.required()).isTrue();
+        assertThat(clusterElementTypes).containsExactly(SessionChatMemoryComponentDefinition.SUMMARIZER_MODEL);
         assertThat(SessionChatMemoryComponentDefinition.SUMMARIZER_MODEL.required()).isFalse();
     }
 

@@ -42,7 +42,6 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ConversationHistoryReader;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
-import com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -97,32 +96,17 @@ class SessionChatMemoryTest {
 
         seedConversation(sessionRepository);
 
-        SessionRepositoryFunction sessionRepositoryFunction =
-            (inputParameters, connectionParameters, extensions, componentConnections) -> sessionRepository;
-
-        when(clusterElementDefinitionService.<SessionRepositoryFunction>getClusterElement(
-            eq("builtInSessionChatMemory"), eq(1), eq("sessionRepository"))).thenReturn(sessionRepositoryFunction);
-
         Parameters inputParameters = MockParametersFactory.create(Map.of("conversationId", CONVERSATION_ID));
-        Parameters extensions = MockParametersFactory.create(
-            Map.of(
-                "clusterElements",
-                Map.of(
-                    "sessionRepository",
-                    Map.of(
-                        "name", "sessionRepository_1",
-                        "type", "builtInSessionChatMemory/v1/sessionRepository",
-                        "parameters", Map.of()))));
-
-        ComponentConnection componentConnection = new ComponentConnection(
-            "builtInSessionChatMemory", 1, 1L, Map.of(), null);
-
-        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(clusterElementDefinitionService)
+        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(
+            "Test Chat Memory", (
+                resolverInputParameters, connectionParameters, extensions,
+                componentConnections) -> sessionRepository,
+            clusterElementDefinitionService)
             .getElement();
 
         ChatMemoryFunction.Result result = chatMemoryFunction.apply(
-            inputParameters, MockParametersFactory.create(Map.of()), extensions,
-            Map.of("sessionRepository_1", componentConnection));
+            inputParameters, MockParametersFactory.create(Map.of()), MockParametersFactory.create(Map.of()),
+            Map.of());
 
         SessionMemoryAdvisor sessionMemoryAdvisor = assertInstanceOf(SessionMemoryAdvisor.class, result.advisor());
 
@@ -196,17 +180,78 @@ class SessionChatMemoryTest {
     }
 
     @Test
+    void testRecursiveSummarizationWithoutModelNamesTheComponent() {
+        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(
+            "JDBC Chat Memory",
+            (inputParameters, connectionParameters, extensions, componentConnections) -> InMemorySessionRepository
+                .builder()
+                .build(),
+            mock(ClusterElementDefinitionService.class))
+            .getElement();
+
+        Parameters inputParameters = MockParametersFactory.create(
+            Map.of(
+                "conversationId", CONVERSATION_ID, "compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents", 20,
+                "maxEventsToKeep", 10));
+        Parameters emptyParameters = MockParametersFactory.create(Map.of());
+
+        assertThatThrownBy(
+            () -> chatMemoryFunction.apply(inputParameters, emptyParameters, emptyParameters, Map.of()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Recursive summarization requires a Model child to be configured on JDBC Chat Memory.");
+    }
+
+    @Test
+    void testRecursiveSummarizationWithoutClusterElementDefinitionServiceNamesTheComponent() {
+        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(
+            "Redis Chat Memory",
+            (inputParameters, connectionParameters, extensions, componentConnections) -> InMemorySessionRepository
+                .builder()
+                .build(),
+            null)
+            .getElement();
+
+        Parameters inputParameters = MockParametersFactory.create(
+            Map.of(
+                "conversationId", CONVERSATION_ID, "compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEvents", 20,
+                "maxEventsToKeep", 10));
+        Parameters emptyParameters = MockParametersFactory.create(Map.of());
+
+        assertThatThrownBy(
+            () -> chatMemoryFunction.apply(inputParameters, emptyParameters, emptyParameters, Map.of()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Recursive summarization requires a Model child to be configured on Redis Chat Memory.");
+    }
+
+    @Test
+    void testResolverReceivesTheConnectionParameters() throws Exception {
+        List<Parameters> receivedConnectionParameters = new ArrayList<>();
+
+        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(
+            "Test Chat Memory", (inputParameters, connectionParameters, extensions, componentConnections) -> {
+                receivedConnectionParameters.add(connectionParameters);
+
+                return InMemorySessionRepository.builder()
+                    .build();
+            },
+            mock(ClusterElementDefinitionService.class))
+            .getElement();
+
+        chatMemoryFunction.apply(
+            MockParametersFactory.create(Map.of("conversationId", CONVERSATION_ID)),
+            MockParametersFactory.create(Map.of("host", "redis.internal")), MockParametersFactory.create(Map.of()),
+            Map.of());
+
+        assertThat(receivedConnectionParameters).singleElement()
+            .satisfies(connectionParameters -> assertEquals("redis.internal", connectionParameters.getString("host")));
+    }
+
+    @Test
     void testRecursiveSummarizationBuildsTheSummarizerFromTheModelChild() throws Exception {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
         SessionRepository sessionRepository = InMemorySessionRepository.builder()
             .build();
-
-        SessionRepositoryFunction sessionRepositoryFunction =
-            (inputParameters, connectionParameters, extensions, componentConnections) -> sessionRepository;
-
-        when(clusterElementDefinitionService.<SessionRepositoryFunction>getClusterElement(
-            eq("builtInSessionChatMemory"), eq(1), eq("sessionRepository"))).thenReturn(sessionRepositoryFunction);
 
         ModelFunction modelFunction = mock(ModelFunction.class);
 
@@ -220,11 +265,6 @@ class SessionChatMemoryTest {
             Map.of(
                 "clusterElements",
                 Map.of(
-                    "sessionRepository",
-                    Map.of(
-                        "name", "sessionRepository_1",
-                        "type", "builtInSessionChatMemory/v1/sessionRepository",
-                        "parameters", Map.of()),
                     "model",
                     Map.of(
                         "name", "model_1",
@@ -232,10 +272,13 @@ class SessionChatMemoryTest {
                         "parameters", Map.of("model", "gpt-4o-mini")))));
 
         Map<String, ComponentConnection> componentConnections = Map.of(
-            "sessionRepository_1", new ComponentConnection("builtInSessionChatMemory", 1, 1L, Map.of(), null),
             "model_1", new ComponentConnection("openAi", 1, 2L, Map.of("token", "test-token"), null));
 
-        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(clusterElementDefinitionService)
+        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(
+            "Test Chat Memory", (
+                resolverInputParameters, connectionParameters, resolverExtensions,
+                resolverComponentConnections) -> sessionRepository,
+            clusterElementDefinitionService)
             .getElement();
 
         ChatMemoryFunction.Result result = chatMemoryFunction.apply(
@@ -543,31 +586,18 @@ class SessionChatMemoryTest {
 
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
-        SessionRepositoryFunction sessionRepositoryFunction =
-            (inputParameters, connectionParameters, extensions, componentConnections) -> sessionRepository;
+        Parameters extensions = MockParametersFactory.create(Map.of());
 
-        when(clusterElementDefinitionService.<SessionRepositoryFunction>getClusterElement(
-            eq("builtInSessionChatMemory"), eq(1), eq("sessionRepository"))).thenReturn(sessionRepositoryFunction);
-
-        Parameters extensions = MockParametersFactory.create(
-            Map.of(
-                "clusterElements",
-                Map.of(
-                    "sessionRepository",
-                    Map.of(
-                        "name", "sessionRepository_1",
-                        "type", "builtInSessionChatMemory/v1/sessionRepository",
-                        "parameters", Map.of()))));
-
-        ComponentConnection componentConnection = new ComponentConnection(
-            "builtInSessionChatMemory", 1, 1L, Map.of(), null);
-
-        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(clusterElementDefinitionService)
+        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(
+            "Test Chat Memory", (
+                resolverInputParameters, resolverConnectionParameters, resolverExtensions,
+                resolverComponentConnections) -> sessionRepository,
+            clusterElementDefinitionService)
             .getElement();
 
         Parameters inputParameters = MockParametersFactory.create(inputParameterValues);
         Parameters connectionParameters = MockParametersFactory.create(Map.of());
-        Map<String, ComponentConnection> componentConnections = Map.of("sessionRepository_1", componentConnection);
+        Map<String, ComponentConnection> componentConnections = Map.of();
 
         if (context == null) {
             return chatMemoryFunction.apply(inputParameters, connectionParameters, extensions, componentConnections);

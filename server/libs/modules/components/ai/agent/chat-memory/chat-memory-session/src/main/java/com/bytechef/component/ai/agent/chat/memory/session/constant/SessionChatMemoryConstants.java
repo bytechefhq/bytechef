@@ -21,8 +21,6 @@ package com.bytechef.component.ai.agent.chat.memory.session.constant;
  */
 public class SessionChatMemoryConstants {
 
-    public static final String SESSION_CHAT_MEMORY = "sessionChatMemory";
-
     public static final String CONVERSATION_ID = "conversationId";
     public static final String DEFAULT_USER_ID = "defaultUserId";
     public static final String COMPACTION_STRATEGY = "compactionStrategy";
@@ -41,6 +39,11 @@ public class SessionChatMemoryConstants {
     public static final String RECURSIVE_SUMMARIZATION = "RECURSIVE_SUMMARIZATION";
 
     public static final String DEFAULT_USER_ID_VALUE = "bytechef";
+    public static final String INCLUDE_COMPACTED_HISTORY = "includeCompactedHistory";
+    public static final String MESSAGE_CONTENT = "content";
+    public static final String MESSAGE_ROLE = "role";
+    public static final String MESSAGES = "messages";
+    public static final String USER_ID = "userId";
 
     private SessionChatMemoryConstants() {
     }

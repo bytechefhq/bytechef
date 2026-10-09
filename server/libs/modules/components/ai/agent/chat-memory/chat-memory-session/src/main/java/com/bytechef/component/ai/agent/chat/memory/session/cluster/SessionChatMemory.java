@@ -38,8 +38,8 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
-import static com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction.SESSION_REPOSITORY;
 
+import com.bytechef.component.ai.agent.chat.memory.session.SessionRepositoryResolver;
 import com.bytechef.component.ai.agent.chat.memory.session.compaction.ContextLoggingSessionService;
 import com.bytechef.component.ai.agent.chat.memory.session.compaction.EventCountTrigger;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -51,7 +51,6 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.SessionConversationHistoryReader;
-import com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
@@ -63,7 +62,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.session.DefaultSessionService;
-import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.ai.session.compaction.CompactionStrategy;
@@ -90,21 +88,30 @@ public final class SessionChatMemory {
     private static final int DEFAULT_OVERLAP_SIZE = 2;
     private static final int DEFAULT_SEARCH_PAGE_SIZE = 10;
 
-    private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final @Nullable ClusterElementDefinitionService clusterElementDefinitionService;
+    private final String componentTitle;
+    private final SessionRepositoryResolver sessionRepositoryResolver;
 
     public static ClusterElementDefinition<ChatMemoryFunction> of(
-        ClusterElementDefinitionService clusterElementDefinitionService) {
+        String componentTitle, SessionRepositoryResolver sessionRepositoryResolver,
+        @Nullable ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return new SessionChatMemory(clusterElementDefinitionService).build();
+        return new SessionChatMemory(componentTitle, sessionRepositoryResolver, clusterElementDefinitionService)
+            .build();
     }
 
-    private SessionChatMemory(ClusterElementDefinitionService clusterElementDefinitionService) {
+    private SessionChatMemory(
+        String componentTitle, SessionRepositoryResolver sessionRepositoryResolver,
+        @Nullable ClusterElementDefinitionService clusterElementDefinitionService) {
+
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.componentTitle = componentTitle;
+        this.sessionRepositoryResolver = sessionRepositoryResolver;
     }
 
     private ClusterElementDefinition<ChatMemoryFunction> build() {
         return ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
-            .title("Session Chat Memory")
+            .title(componentTitle)
             .description("Event-sourced session memory; prior messages are recalled per conversation session.")
             .properties(
                 string(CONVERSATION_ID)
@@ -120,7 +127,7 @@ public final class SessionChatMemory {
                     .label("Compaction Strategy")
                     .description(
                         "How to shrink history when it grows. Older events are archived; Redis and S3 storage keep " +
-                            "only the 1000 most recent archived events, or, for the Built-in Session Repository, the " +
+                            "only the 1000 most recent archived events, or, for the built-in Chat Memory, the " +
                             "number set by bytechef.ai.memory.session-max-archived-events.")
                     .options(
                         option("None", NONE),
@@ -189,7 +196,9 @@ public final class SessionChatMemory {
         Map<String, ComponentConnection> componentConnections, @Nullable Context context) throws Exception {
 
         SessionService sessionService = DefaultSessionService.builder()
-            .sessionRepository(resolveSessionRepository(extensions, componentConnections))
+            .sessionRepository(
+                sessionRepositoryResolver.resolve(
+                    inputParameters, connectionParameters, extensions, componentConnections))
             .build();
 
         SessionMemoryAdvisor.Builder builder = SessionMemoryAdvisor
@@ -219,24 +228,6 @@ public final class SessionChatMemory {
         }
 
         return new ContextLoggingSessionService(sessionService, context);
-    }
-
-    private SessionRepository resolveSessionRepository(
-        Parameters extensions, Map<String, ComponentConnection> componentConnections) throws Exception {
-
-        ClusterElement clusterElement = ClusterElementMap.of(extensions)
-            .getClusterElement(SESSION_REPOSITORY);
-
-        SessionRepositoryFunction sessionRepositoryFunction = clusterElementDefinitionService.getClusterElement(
-            clusterElement.getComponentName(), clusterElement.getComponentVersion(),
-            clusterElement.getClusterElementName());
-
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
-
-        return sessionRepositoryFunction.apply(
-            ParametersFactory.create(clusterElement.getParameters()),
-            ParametersFactory.create(componentConnection),
-            ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
     }
 
     static @Nullable Compaction resolveCompaction(
@@ -317,10 +308,16 @@ public final class SessionChatMemory {
     private ChatClient resolveSummarizerChatClient(
         Parameters extensions, Map<String, ComponentConnection> componentConnections) throws Exception {
 
+        IllegalStateException missingModelException = new IllegalStateException(
+            "Recursive summarization requires a Model child to be configured on " + componentTitle + ".");
+
+        if (clusterElementDefinitionService == null) {
+            throw missingModelException;
+        }
+
         ClusterElement clusterElement = ClusterElementMap.of(extensions)
             .fetchClusterElement(MODEL)
-            .orElseThrow(() -> new IllegalStateException(
-                "Recursive summarization requires a Model child to be configured on Session Chat Memory."));
+            .orElseThrow(() -> missingModelException);
 
         ModelFunction modelFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
