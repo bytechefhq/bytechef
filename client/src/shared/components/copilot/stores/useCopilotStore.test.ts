@@ -1,10 +1,11 @@
 import {ThreadMessageLike} from '@assistant-ui/react';
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import {useCopilotStore} from './useCopilotStore';
+import {MODE, Source, useCopilotStore} from './useCopilotStore';
 
 function resetStore() {
     useCopilotStore.getState().resetMessages();
+    useCopilotStore.setState({conversationStack: [], globalPanelConversationToken: null});
 }
 
 function contentOf(message: ThreadMessageLike | undefined): string {
@@ -86,6 +87,122 @@ describe('useCopilotStore', () => {
             expect(messages).toHaveLength(4);
             expect(messages.map((message) => message.role)).toEqual(['user', 'assistant', 'user', 'assistant']);
             expect(contentOf(messages[3])).toBe('a2');
+        });
+    });
+
+    describe('saveConversationState and restoreConversationState', () => {
+        it('should restore the saved conversation when the matching token is passed', () => {
+            const store = useCopilotStore.getState();
+
+            store.setContext({mode: MODE.BUILD, parameters: {workflowId: 'w1'}, source: Source.WORKFLOW_EDITOR});
+            store.setSelectedLlm('openai', 'gpt-4o');
+            store.addMessage({content: 'original', role: 'user'});
+
+            const originalConversationId = useCopilotStore.getState().conversationId;
+
+            const token = store.saveConversationState();
+
+            store.resetMessages();
+            store.generateConversationId();
+            store.setContext({mode: MODE.ASK, parameters: {}, source: Source.MCP_SERVER});
+            store.addMessage({content: 'nested', role: 'user'});
+
+            useCopilotStore.getState().restoreConversationState(token);
+
+            const state = useCopilotStore.getState();
+
+            expect(state.conversationStack).toHaveLength(0);
+            expect(state.conversationId).toBe(originalConversationId);
+            expect(state.context).toEqual({
+                mode: MODE.BUILD,
+                parameters: {workflowId: 'w1'},
+                source: Source.WORKFLOW_EDITOR,
+            });
+            expect(state.messages.map(contentOf)).toEqual(['original']);
+            expect(state.selectedLlmProvider).toBe('openai');
+            expect(state.selectedLlmModel).toBe('gpt-4o');
+        });
+
+        it('should return a distinct token for every save', () => {
+            const store = useCopilotStore.getState();
+
+            const firstToken = store.saveConversationState();
+            const secondToken = store.saveConversationState();
+
+            expect(firstToken).not.toBe(secondToken);
+            expect(useCopilotStore.getState().conversationStack.map((snapshot) => snapshot.token)).toEqual([
+                firstToken,
+                secondToken,
+            ]);
+        });
+
+        it('should ignore a restore whose token is not on top of the stack', () => {
+            const store = useCopilotStore.getState();
+
+            const outerToken = store.saveConversationState();
+
+            store.saveConversationState();
+            store.addMessage({content: 'inner', role: 'user'});
+
+            useCopilotStore.getState().restoreConversationState(outerToken);
+
+            const state = useCopilotStore.getState();
+
+            expect(state.conversationStack).toHaveLength(2);
+            expect(state.messages.map(contentOf)).toEqual(['inner']);
+        });
+
+        it('should ignore a restore with a null token', () => {
+            const store = useCopilotStore.getState();
+
+            store.saveConversationState();
+            store.addMessage({content: 'current', role: 'user'});
+
+            useCopilotStore.getState().restoreConversationState(null);
+
+            const state = useCopilotStore.getState();
+
+            expect(state.conversationStack).toHaveLength(1);
+            expect(state.messages.map(contentOf)).toEqual(['current']);
+        });
+
+        it('should ignore a restore when nothing was saved', () => {
+            const store = useCopilotStore.getState();
+
+            store.addMessage({content: 'current', role: 'user'});
+
+            useCopilotStore.getState().restoreConversationState('missing');
+
+            expect(useCopilotStore.getState().messages.map(contentOf)).toEqual(['current']);
+        });
+
+        it('should drop the oldest snapshot and warn once the stack exceeds its depth', () => {
+            const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            const store = useCopilotStore.getState();
+
+            const tokens = Array.from({length: 11}, () => store.saveConversationState());
+
+            const {conversationStack} = useCopilotStore.getState();
+
+            expect(conversationStack).toHaveLength(10);
+            expect(conversationStack[0]?.token).toBe(tokens[1]);
+            expect(conversationStack[9]?.token).toBe(tokens[10]);
+            expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+
+            consoleWarnSpy.mockRestore();
+        });
+    });
+
+    describe('setGlobalPanelConversationToken', () => {
+        it('should store and clear the global panel conversation token', () => {
+            useCopilotStore.getState().setGlobalPanelConversationToken('token-1');
+
+            expect(useCopilotStore.getState().globalPanelConversationToken).toBe('token-1');
+
+            useCopilotStore.getState().setGlobalPanelConversationToken(null);
+
+            expect(useCopilotStore.getState().globalPanelConversationToken).toBeNull();
         });
     });
 });
