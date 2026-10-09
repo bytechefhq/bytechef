@@ -47,7 +47,7 @@ class ManagementMcpServerToolCallbackProviderTest {
         "listProjects", "getProject", "searchProjects", "getProjectStatus", "createProject", "updateProject",
         "deleteProject", "publishProject", "getWorkflow", "listWorkflows", "searchWorkflows",
         "createProjectWorkflow", "deleteWorkflow", "updateWorkflow", "saveWorkflowTestConnection",
-        "updateScriptComponentCode");
+        "updateScriptComponentCode", "updateWorkflowRootProperties", "updateClusterElementTask");
 
     @Test
     void includesContributedCallbacksAlongsideDirectTools() {
