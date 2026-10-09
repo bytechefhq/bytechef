@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
 
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
