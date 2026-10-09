@@ -691,13 +691,11 @@ const ConnectionDialog = ({
 
                                         <AlertTitle>Heads up!</AlertTitle>
 
-                                        <AlertDescription>
+                                        <AlertDescription className="flex">
                                             Excellent! You can connect and create the
-                                            <span className="mx-0.5 font-semibold">
-                                                {selectedComponentDefinition?.title}
-                                            </span>
+                                            <span className="font-semibold">{selectedComponentDefinition?.title}</span>
                                             connection under name
-                                            <span className="mx-0.5 font-semibold">{`'${getValues()?.name}'`}</span>.
+                                            <span className="font-semibold">{`'${getValues()?.name}'`}</span>.
                                         </AlertDescription>
                                     </Alert>
 
