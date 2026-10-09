@@ -13,6 +13,8 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,25 +39,28 @@ public class RemoteTriggerLifecycleFacadeController {
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/execute-trigger-disable")
-    public void executeTriggerDisable(TriggerRequest triggerRequest) {
+    public void executeTriggerDisable(@RequestBody TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerDisable(
-            triggerRequest.workflowId, triggerRequest.workflowExecutionId, triggerRequest.triggerWorkflowNodeType,
+            triggerRequest.workflowId, WorkflowExecutionId.parse(triggerRequest.workflowExecutionId),
+            triggerRequest.triggerWorkflowNodeType,
             triggerRequest.triggerParameters, triggerRequest.connectionId);
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/execute-trigger-enable")
-    public void executeTriggerEnable(TriggerRequest triggerRequest) {
+    public void executeTriggerEnable(@RequestBody TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerEnable(
-            triggerRequest.workflowId, triggerRequest.workflowExecutionId, triggerRequest.triggerWorkflowNodeType,
+            triggerRequest.workflowId, WorkflowExecutionId.parse(triggerRequest.workflowExecutionId),
+            triggerRequest.triggerWorkflowNodeType,
             triggerRequest.triggerParameters, triggerRequest.connectionId, triggerRequest.webhookUrl,
             triggerRequest.environmentId);
     }
 
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
-        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
-        Map<String, ?> triggerParameters, long connectionId, String webhookUrl, long environmentId) {
+        String workflowId, String workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
+        Map<String, ?> triggerParameters, @Nullable Long connectionId, @Nullable String webhookUrl,
+        long environmentId) {
     }
 }

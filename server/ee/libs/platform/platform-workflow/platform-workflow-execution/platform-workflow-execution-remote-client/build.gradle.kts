@@ -3,4 +3,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     implementation(project(":server:ee:libs:core:remote:remote-client"))
+
+    testImplementation(project(":server:libs:core:tenant:tenant-api"))
 }
