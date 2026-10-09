@@ -14,12 +14,53 @@ describe('usePropertyCodeEditorDialogStore', () => {
         it('has correct default values', () => {
             const {result} = renderHook(() => usePropertyCodeEditorDialogStore());
 
+            expect(result.current.conversationToken).toBeNull();
             expect(result.current.copilotPanelOpen).toBe(false);
             expect(result.current.dirty).toBe(false);
             expect(result.current.editorValue).toBeUndefined();
             expect(result.current.saving).toBe(false);
             expect(result.current.scriptIsRunning).toBe(false);
             expect(result.current.scriptTestExecution).toBeUndefined();
+        });
+    });
+
+    describe('setConversationToken', () => {
+        it('stores the saved copilot conversation token', () => {
+            const {result} = renderHook(() => usePropertyCodeEditorDialogStore());
+
+            act(() => {
+                result.current.setConversationToken('token-1');
+            });
+
+            expect(result.current.conversationToken).toBe('token-1');
+        });
+
+        it('clears the conversation token', () => {
+            const {result} = renderHook(() => usePropertyCodeEditorDialogStore());
+
+            act(() => {
+                result.current.setConversationToken('token-1');
+            });
+
+            act(() => {
+                result.current.setConversationToken(null);
+            });
+
+            expect(result.current.conversationToken).toBeNull();
+        });
+
+        it('clears the conversation token on reset', () => {
+            const {result} = renderHook(() => usePropertyCodeEditorDialogStore());
+
+            act(() => {
+                result.current.setConversationToken('token-1');
+            });
+
+            act(() => {
+                result.current.reset();
+            });
+
+            expect(result.current.conversationToken).toBeNull();
         });
     });
 
