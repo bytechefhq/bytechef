@@ -255,6 +255,33 @@ describe('McpComponentToolListItem', () => {
         expect(screen.getByRole('switch')).toBeEnabled();
     });
 
+    it('names each enabled switch after its tool', () => {
+        render(
+            <QueryClientProvider client={new QueryClient()}>
+                <McpActivePopoverProvider>
+                    <McpComponentToolListItem
+                        componentName="affinity"
+                        componentVersion={1}
+                        connectionId={null}
+                        embedded
+                        mcpTool={mcpTool}
+                    />
+
+                    <McpComponentToolListItem
+                        componentName="affinity"
+                        componentVersion={1}
+                        connectionId={null}
+                        embedded
+                        mcpTool={{...mcpTool, id: '43', name: 'deleteOpportunity', title: 'Delete Opportunity'}}
+                    />
+                </McpActivePopoverProvider>
+            </QueryClientProvider>
+        );
+
+        expect(screen.getByRole('switch', {name: 'Enable Create Opportunity'})).toBeInTheDocument();
+        expect(screen.getByRole('switch', {name: 'Enable Delete Opportunity'})).toBeInTheDocument();
+    });
+
     it('opens the delete confirmation from the delete button', () => {
         renderEmbeddedToolListItem();
 
