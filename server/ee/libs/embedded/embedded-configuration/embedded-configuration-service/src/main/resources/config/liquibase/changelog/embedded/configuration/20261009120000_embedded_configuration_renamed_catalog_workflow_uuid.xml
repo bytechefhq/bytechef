@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261009120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="connected_user_project_workflow" columnName="catalog_workflow_uuid"/>
+        </preConditions>
+
+        <renameColumn tableName="connected_user_project_workflow" oldColumnName="catalog_workflow_uuid"
+                      newColumnName="automation_workflow_uuid" columnDataType="VARCHAR(36)"/>
+    </changeSet>
+
+    <changeSet id="20261009120000-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'ck_cupw_project_or_catalog_not_both'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE connected_user_project_workflow
+            RENAME CONSTRAINT ck_cupw_project_or_catalog_not_both TO ck_cupw_project_or_automation_workflow_not_both
+        </sql>
+
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="20261009120000-3" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <indexExists tableName="connected_user_project_workflow"
+                         indexName="uk_cupw_connected_user_project_id_catalog_workflow_uuid"/>
+        </preConditions>
+
+        <sql>
+            ALTER INDEX uk_cupw_connected_user_project_id_catalog_workflow_uuid
+            RENAME TO uk_cupw_connected_user_project_id_automation_workflow_uuid
+        </sql>
+
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
