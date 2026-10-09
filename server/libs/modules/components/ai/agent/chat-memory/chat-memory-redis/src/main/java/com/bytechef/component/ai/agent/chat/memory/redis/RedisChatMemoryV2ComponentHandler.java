@@ -28,20 +28,23 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.SessionChatMemoryComponentDefinition;
-import com.google.auto.service.AutoService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@AutoService(ComponentHandler.class)
+@Component("redisChatMemory_v2_ComponentHandler")
 public class RedisChatMemoryV2ComponentHandler implements ComponentHandler {
 
-    private static final SessionRepositoryResolver SESSION_REPOSITORY_RESOLVER =
-        (inputParameters, connectionParameters, extensions, componentConnections) -> RedisSessionChatMemoryUtils
-            .getSessionRepository(connectionParameters);
+    private final SessionChatMemoryComponentDefinition componentDefinition;
 
-    private static final SessionChatMemoryComponentDefinition COMPONENT_DEFINITION =
-        new RedisChatMemoryV2ComponentDefinition(
+    public RedisChatMemoryV2ComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
+        SessionRepositoryResolver sessionRepositoryResolver =
+            (inputParameters, connectionParameters, extensions, componentConnections) -> RedisSessionChatMemoryUtils
+                .getSessionRepository(connectionParameters);
+
+        this.componentDefinition = new RedisChatMemoryV2ComponentDefinition(
             component("redisChatMemory")
                 .title("Redis Chat Memory")
                 .description("Redis Chat Memory stores session-based conversation history in Redis.")
@@ -49,12 +52,15 @@ public class RedisChatMemoryV2ComponentHandler implements ComponentHandler {
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .version(2)
                 .connection(RedisChatMemoryConnection.CONNECTION_DEFINITION)
-                .actions(SessionChatMemoryActions.of("redis-chat-memory", SESSION_REPOSITORY_RESOLVER, false))
-                .clusterElements(SessionChatMemory.of("Redis Chat Memory", SESSION_REPOSITORY_RESOLVER, null)));
+                .actions(SessionChatMemoryActions.of("redis-chat-memory", sessionRepositoryResolver, false))
+                .clusterElements(
+                    SessionChatMemory.of(
+                        "Redis Chat Memory", sessionRepositoryResolver, clusterElementDefinitionService)));
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
     }
 
     private static class RedisChatMemoryV2ComponentDefinition extends AbstractComponentDefinitionWrapper

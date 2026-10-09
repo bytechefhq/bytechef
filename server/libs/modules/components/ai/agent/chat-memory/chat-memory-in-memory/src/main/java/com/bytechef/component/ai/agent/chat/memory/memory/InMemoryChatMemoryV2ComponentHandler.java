@@ -27,18 +27,19 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.SessionChatMemoryComponentDefinition;
 import com.bytechef.platform.component.definition.ai.agent.TenantRoutingSessionRepository;
-import com.google.auto.service.AutoService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@AutoService(ComponentHandler.class)
+@Component("inMemoryChatMemory_v2_ComponentHandler")
 public class InMemoryChatMemoryV2ComponentHandler implements ComponentHandler {
 
     private final SessionChatMemoryComponentDefinition componentDefinition;
 
-    public InMemoryChatMemoryV2ComponentHandler() {
+    public InMemoryChatMemoryV2ComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         TenantRoutingSessionRepository sessionRepository = new TenantRoutingSessionRepository(
             tenantId -> InMemorySessionRepository.builder()
                 .build());
@@ -54,7 +55,9 @@ public class InMemoryChatMemoryV2ComponentHandler implements ComponentHandler {
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .version(2)
                 .actions(SessionChatMemoryActions.of("in-memory-chat-memory", sessionRepositoryResolver, false))
-                .clusterElements(SessionChatMemory.of("In Memory Chat Memory", sessionRepositoryResolver, null)));
+                .clusterElements(
+                    SessionChatMemory.of(
+                        "In Memory Chat Memory", sessionRepositoryResolver, clusterElementDefinitionService)));
     }
 
     @Override
