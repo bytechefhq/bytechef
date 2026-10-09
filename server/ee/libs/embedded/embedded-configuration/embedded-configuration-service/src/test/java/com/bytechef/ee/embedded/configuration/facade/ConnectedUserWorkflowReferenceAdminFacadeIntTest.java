@@ -78,9 +78,11 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,6 +171,8 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
     @Autowired
     private ConnectionService connectionService;
 
+    private final Map<Long, Connection> embeddedConnections = new ConcurrentHashMap<>();
+
     @Autowired
     private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
 
@@ -226,10 +230,23 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
         ConnectedUser connectedUser = connectedUserService.createConnectedUser(
             "reference-admin-user-" + UUID.randomUUID(), Environment.PRODUCTION);
 
-        connectedUserConnectionService.create(
-            Objects.requireNonNull(connectedUser.getId()), NEXT_CONNECTION_ID.getAndIncrement());
+        long connectionId = NEXT_CONNECTION_ID.getAndIncrement();
+
+        registerEmbeddedConnection(connectionId, Environment.PRODUCTION);
+
+        connectedUserConnectionService.create(Objects.requireNonNull(connectedUser.getId()), connectionId);
 
         return connectedUser;
+    }
+
+    private void registerEmbeddedConnection(long connectionId, Environment environment) {
+        Connection connection = new Connection();
+
+        connection.setEnvironmentId(environment.ordinal());
+        connection.setId(connectionId);
+        connection.setType(PlatformType.EMBEDDED);
+
+        embeddedConnections.put(connectionId, connection);
     }
 
     private void givenSlackAutomationWorkflowEnvironment() {
@@ -250,6 +267,15 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
                         .componentName("slack")
                         .id(connectionId)
                         .build())
+                    .toList();
+            });
+        when(connectionService.getConnections(anyList()))
+            .thenAnswer(invocation -> {
+                List<Long> connectionIds = invocation.getArgument(0);
+
+                return connectionIds.stream()
+                    .map(embeddedConnections::get)
+                    .filter(Objects::nonNull)
                     .toList();
             });
         when(connectionService.getConnection(anyLong()))
