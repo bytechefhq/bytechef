@@ -1,4 +1,5 @@
-import {render, screen} from '@testing-library/react';
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const {executionQueryMock} = vi.hoisted(() => ({executionQueryMock: vi.fn()}));
@@ -8,7 +9,9 @@ vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
 }));
 
 vi.mock('../WorkflowExecutionSheetContent', () => ({
-    default: () => <div data-testid="sheet-content" />,
+    default: ({headerActions}: {headerActions?: React.ReactNode}) => (
+        <div data-testid="sheet-content">{headerActions}</div>
+    ),
 }));
 
 vi.mock('../WorkflowExecutionSheetWorkflowPanel', () => ({
@@ -33,7 +36,7 @@ describe('WorkflowExecutionDetail', () => {
     it('shows a loading state while the execution is loading', () => {
         executionQueryMock.mockReturnValue({data: undefined, isLoading: true});
 
-        render(<WorkflowExecutionDetail workflowExecutionId={501} />);
+        render(<WorkflowExecutionDetail workflowExecutionId={501} />, {wrapper: TooltipProvider});
 
         expect(screen.getByTestId('workflow-execution-detail-loading')).toBeInTheDocument();
     });
@@ -52,7 +55,7 @@ describe('WorkflowExecutionDetail', () => {
             isLoading: false,
         });
 
-        render(<WorkflowExecutionDetail workflowExecutionId={77} />);
+        render(<WorkflowExecutionDetail workflowExecutionId={77} />, {wrapper: TooltipProvider});
 
         expect(screen.getByTestId('sheet-content')).toBeInTheDocument();
     });
@@ -63,9 +66,29 @@ describe('WorkflowExecutionDetail', () => {
             isLoading: false,
         });
 
-        render(<WorkflowExecutionDetail workflowExecutionId={5} />);
+        render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
 
         expect(screen.getByTestId('sheet-content')).toBeInTheDocument();
+    });
+
+    it('hides and shows the workflow panel with the toggle in the execution panel', () => {
+        executionQueryMock.mockReturnValue({
+            data: {id: 5, job: {id: '5', taskExecutions: []}, workflow: {label: 'Order intake'}},
+            isLoading: false,
+        });
+
+        render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
+
+        expect(screen.getByTestId('workflow-panel')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Hide workflow'}));
+
+        expect(screen.queryByTestId('workflow-panel')).not.toBeInTheDocument();
+        expect(screen.getByTestId('sheet-content')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Show workflow'}));
+
+        expect(screen.getByTestId('workflow-panel')).toBeInTheDocument();
     });
 
     it('leaves the panel out until there is a job or a trigger execution to show', () => {
@@ -74,7 +97,7 @@ describe('WorkflowExecutionDetail', () => {
             isLoading: false,
         });
 
-        render(<WorkflowExecutionDetail workflowExecutionId={5} />);
+        render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
 
         expect(screen.queryByTestId('sheet-content')).not.toBeInTheDocument();
     });

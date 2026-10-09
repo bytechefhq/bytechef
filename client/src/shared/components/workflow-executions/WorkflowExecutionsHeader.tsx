@@ -3,8 +3,15 @@ import {groupTaskExecutionAttempts} from '@/shared/components/workflow-execution
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {CheckIcon, LoaderCircleIcon} from 'lucide-react';
+import {ReactNode} from 'react';
 
-const WorkflowExecutionsHeader = ({job, triggerExecution}: {job?: Job; triggerExecution?: TriggerExecution}) => {
+interface WorkflowExecutionsHeaderProps {
+    actions?: ReactNode;
+    job?: Job;
+    triggerExecution?: TriggerExecution;
+}
+
+const WorkflowExecutionsHeader = ({actions, job, triggerExecution}: WorkflowExecutionsHeaderProps) => {
     const startTime = job?.startDate?.getTime();
     const endTime = job?.endDate?.getTime();
 
@@ -60,6 +67,8 @@ const WorkflowExecutionsHeader = ({job, triggerExecution}: {job?: Job; triggerEx
 
                 <span>{`${taskExecutionsCount} task${taskExecutionsCount > 1 ? 's' : ''} executed`}</span>
             </div>
+
+            {actions && <div className="ml-auto flex items-center">{actions}</div>}
         </header>
     );
 };
