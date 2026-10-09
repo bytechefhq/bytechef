@@ -164,8 +164,22 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
         private final List<InvocableHandlerMethod> invocableHandlerMethods = new ArrayList<>();
 
         public void receive(Message<?> message) throws Exception {
+            Exception firstException = null;
+
             for (InvocableHandlerMethod invocableHandlerMethod : invocableHandlerMethods) {
-                invocableHandlerMethod.invoke(message);
+                try {
+                    invocableHandlerMethod.invoke(message);
+                } catch (Exception exception) {
+                    if (firstException == null) {
+                        firstException = exception;
+                    } else {
+                        firstException.addSuppressed(exception);
+                    }
+                }
+            }
+
+            if (firstException != null) {
+                throw firstException;
             }
         }
 
