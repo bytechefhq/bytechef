@@ -84,7 +84,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
-    public McpServer createEmbeddedMcpServer(String name, Environment environment, boolean enabled) {
+    public McpServer createEmbeddedMcpServer(String name, Environment environment, Boolean enabled) {
         return mcpServerService.create(name, PlatformType.EMBEDDED, environment, enabled);
     }
 

@@ -24,7 +24,7 @@ public interface EmbeddedMcpServerFacade {
 
     McpComponent createEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools);
 
-    McpServer createEmbeddedMcpServer(String name, Environment environment, boolean enabled);
+    McpServer createEmbeddedMcpServer(String name, Environment environment, Boolean enabled);
 
     void deleteEmbeddedMcpComponent(long mcpComponentId);
 
