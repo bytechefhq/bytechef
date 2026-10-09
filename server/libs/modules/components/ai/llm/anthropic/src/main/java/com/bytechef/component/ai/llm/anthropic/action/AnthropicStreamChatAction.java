@@ -21,6 +21,7 @@ import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstant
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.util.ModelUtils;
+import com.bytechef.component.ai.llm.util.StreamChatUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -48,40 +49,6 @@ public class AnthropicStreamChatAction {
 
         Flow.Publisher<?> publisher = CHAT_MODEL.stream(inputParameters, connectionParameters, context);
 
-        return emitter -> publisher.subscribe(
-            new Flow.Subscriber<Object>() {
-
-                private Flow.Subscription subscription;
-
-                @Override
-                public void onSubscribe(Flow.Subscription subscription) {
-                    this.subscription = subscription;
-
-                    emitter.addTimeoutListener(subscription::cancel);
-
-                    subscription.request(Long.MAX_VALUE);
-                }
-
-                @Override
-                public void onNext(Object item) {
-                    try {
-                        emitter.send(item);
-                    } catch (Exception exception) {
-                        context.log(log -> log.trace(exception.getMessage(), exception));
-
-                        subscription.cancel();
-                    }
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-                    emitter.error(throwable);
-                }
-
-                @Override
-                public void onComplete() {
-                    emitter.complete();
-                }
-            });
+        return StreamChatUtils.createSseEmitterHandler(publisher, inputParameters, context);
     }
 }

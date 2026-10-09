@@ -17,6 +17,9 @@
 package com.bytechef.component.ai.llm.util;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -27,11 +30,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -133,5 +138,30 @@ class ModelUtilsTest {
         when(inputParameters.getString(REASONING_EFFORT, "medium")).thenReturn("high");
 
         assertEquals("high", ModelUtils.getReasoningEffort(inputParameters));
+    }
+
+    @Test
+    void testGetChatResponseReturnsTheTextForATextResponse() {
+        when(parameters.getRequiredFromPath(RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class))
+            .thenReturn(ResponseFormat.TEXT);
+
+        assertEquals("answer", ModelUtils.toChatResponse("answer", parameters, true, context));
+    }
+
+    @Test
+    void testGetChatResponseReturnsNullWithoutText() {
+        assertNull(ModelUtils.toChatResponse(null, parameters, false, context));
+    }
+
+    @Test
+    void testGetChatResponseParsesAStructuredResponse() {
+        when(parameters.getRequiredFromPath(RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class))
+            .thenReturn(ResponseFormat.JSON);
+        when(parameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class))
+            .thenReturn("{\"type\":\"object\",\"properties\":{\"color\":{\"type\":\"string\"}}}");
+
+        assertEquals(
+            Map.of("color", "blue"),
+            ModelUtils.toChatResponse("{\"color\":\"blue\"}", parameters, true, context));
     }
 }
