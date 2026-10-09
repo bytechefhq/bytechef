@@ -1,4 +1,5 @@
 import {fireEvent, render, screen, within} from '@testing-library/react';
+import {type ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionLogsContent from '../WorkflowExecutionLogsContent';
@@ -25,10 +26,12 @@ vi.mock('@/shared/middleware/graphql', () => ({
 vi.mock('@/shared/components/JsonView', () => ({
     default: ({
         collapsed,
+        fallback,
         shouldCollapse,
         src,
     }: {
         collapsed?: boolean | number;
+        fallback?: ReactNode;
         shouldCollapse?: (field: {src: object}) => boolean;
         src: object;
     }) => (
@@ -37,7 +40,9 @@ vi.mock('@/shared/components/JsonView', () => ({
             data-nested-collapsed={String(!!shouldCollapse?.({src: {}}))}
             data-root-collapsed={String(!!shouldCollapse?.({src}))}
             data-testid="json-view"
-        />
+        >
+            <div data-testid="json-view-fallback">{fallback}</div>
+        </div>
     ),
 }));
 
@@ -180,6 +185,25 @@ describe('WorkflowExecutionLogsContent', () => {
 
         expect(jsonView()).toHaveAttribute('data-root-collapsed', 'true');
         expect(jsonView()).toHaveAttribute('data-nested-collapsed', 'false');
+    });
+
+    it('keeps a collapsed entry collapsed while the JSON viewer is still loading', () => {
+        jobFileLogsQueryMock.mockReturnValue({
+            data: {jobFileLogs: {content: [logEntry('INFO', '{"toolName":"TodoWrite"}')]}},
+            error: undefined,
+            isLoading: false,
+        });
+
+        render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" />);
+
+        const fallback = () => screen.getByTestId('json-view-fallback');
+
+        expect(fallback()).toHaveTextContent('{…}');
+        expect(fallback()).not.toHaveTextContent('TodoWrite');
+
+        fireEvent.click(screen.getByRole('button', {name: 'Expand all'}));
+
+        expect(fallback()).toHaveTextContent('{"toolName":"TodoWrite"}');
     });
 
     it('shows the expand toggle as a single button that switches between expand and collapse', () => {
