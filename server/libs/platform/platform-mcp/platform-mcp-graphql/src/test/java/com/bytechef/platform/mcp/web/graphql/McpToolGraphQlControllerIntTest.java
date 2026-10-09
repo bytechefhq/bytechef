@@ -136,6 +136,8 @@ class McpToolGraphQlControllerIntTest {
             createMockMcpTool(1L, "tool1", Map.of("param1", "value1"), 1L),
             createMockMcpTool(2L, "tool2", Map.of("param2", "value2"), 2L));
 
+        when(mcpComponentService.getMcpComponents()).thenReturn(
+            List.of(createMcpComponent(1L, 1L), createMcpComponent(2L, 1L)));
         when(mcpToolService.getMcpTools()).thenReturn(mockTools);
 
         // When & Then
@@ -326,6 +328,58 @@ class McpToolGraphQlControllerIntTest {
         }
 
         @Test
+        void testMcpToolRejectsEmbeddedMcpTool() {
+            assertRejected("""
+                query {
+                    mcpTool(id: "2") {
+                        id
+                    }
+                }
+                """);
+        }
+
+        @Test
+        void testMcpToolsByComponentIdRejectsEmbeddedMcpComponent() {
+            assertRejected("""
+                query {
+                    mcpToolsByComponentId(mcpComponentId: "2") {
+                        id
+                    }
+                }
+                """);
+
+            verify(mcpToolService, never()).getMcpComponentMcpTools(anyLong());
+        }
+
+        @Test
+        void testMcpToolsOmitsEmbeddedMcpTools() {
+            McpServer embeddedMcpServer = createMcpServer(PlatformType.EMBEDDED);
+
+            embeddedMcpServer.setId(EMBEDDED_MCP_SERVER_ID);
+
+            when(mcpServerService.getMcpServers(PlatformType.EMBEDDED)).thenReturn(List.of(embeddedMcpServer));
+            when(mcpComponentService.getMcpComponents()).thenReturn(
+                List.of(createMcpComponent(1L, 1L),
+                    createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID)));
+            when(mcpToolService.getMcpTools()).thenReturn(
+                List.of(
+                    createMockMcpTool(1L, "automation-tool", Map.of(), 1L),
+                    createMockMcpTool(2L, "embedded-tool", Map.of(), EMBEDDED_MCP_COMPONENT_ID)));
+
+            graphQlTester.document("""
+                query {
+                    mcpTools {
+                        id
+                    }
+                }
+                """)
+                .execute()
+                .path("mcpTools[*].id")
+                .entityList(String.class)
+                .containsExactly("1");
+        }
+
+        @Test
         void testCreateMcpToolRejectsEmbeddedMcpComponent() {
             assertRejected("""
                 mutation {
@@ -385,6 +439,14 @@ class McpToolGraphQlControllerIntTest {
 
     private static McpComponent createMcpComponent(long mcpServerId) {
         return new McpComponent("component", 1, mcpServerId, null);
+    }
+
+    private static McpComponent createMcpComponent(long id, long mcpServerId) {
+        McpComponent mcpComponent = createMcpComponent(mcpServerId);
+
+        mcpComponent.setId(id);
+
+        return mcpComponent;
     }
 
     private static McpServer createMcpServer(PlatformType type) {

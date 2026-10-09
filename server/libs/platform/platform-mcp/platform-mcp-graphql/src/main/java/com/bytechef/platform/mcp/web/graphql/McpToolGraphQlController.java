@@ -26,6 +26,8 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -53,17 +55,36 @@ public class McpToolGraphQlController {
 
     @QueryMapping
     public McpTool mcpTool(@Argument long id) {
-        return mcpToolService.fetchMcpTool(id)
+        McpTool mcpTool = mcpToolService.fetchMcpTool(id)
             .orElse(null);
+
+        if (mcpTool != null) {
+            checkMcpComponentNotEmbedded(mcpTool.getMcpComponentId());
+        }
+
+        return mcpTool;
     }
 
     @QueryMapping
     public List<McpTool> mcpTools() {
-        return mcpToolService.getMcpTools();
+        Set<Long> embeddedMcpServerIds = McpServerTypeUtils.getEmbeddedMcpServerIds(mcpServerService);
+
+        Set<Long> nonEmbeddedMcpComponentIds = mcpComponentService.getMcpComponents()
+            .stream()
+            .filter(mcpComponent -> !embeddedMcpServerIds.contains(mcpComponent.getMcpServerId()))
+            .map(McpComponent::getId)
+            .collect(Collectors.toSet());
+
+        return mcpToolService.getMcpTools()
+            .stream()
+            .filter(mcpTool -> nonEmbeddedMcpComponentIds.contains(mcpTool.getMcpComponentId()))
+            .toList();
     }
 
     @QueryMapping
     public List<McpTool> mcpToolsByComponentId(@Argument long mcpComponentId) {
+        checkMcpComponentNotEmbedded(mcpComponentId);
+
         return mcpToolService.getMcpComponentMcpTools(mcpComponentId);
     }
 

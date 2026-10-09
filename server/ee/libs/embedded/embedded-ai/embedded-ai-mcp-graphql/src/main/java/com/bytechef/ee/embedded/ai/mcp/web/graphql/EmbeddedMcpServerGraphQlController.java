@@ -42,6 +42,11 @@ class EmbeddedMcpServerGraphQlController {
     }
 
     @QueryMapping
+    List<McpComponent> embeddedMcpComponentsByServerId(@Argument long mcpServerId) {
+        return embeddedMcpServerFacade.getEmbeddedMcpServerMcpComponents(mcpServerId);
+    }
+
+    @QueryMapping
     List<McpServer> embeddedMcpServers() {
         return embeddedMcpServerFacade.getEmbeddedMcpServers();
     }
@@ -49,6 +54,11 @@ class EmbeddedMcpServerGraphQlController {
     @QueryMapping
     List<Tag> embeddedMcpServerTags() {
         return embeddedMcpServerFacade.getEmbeddedMcpServerTags();
+    }
+
+    @QueryMapping
+    List<McpTool> embeddedMcpToolsByComponentId(@Argument long mcpComponentId) {
+        return embeddedMcpServerFacade.getEmbeddedMcpComponentMcpTools(mcpComponentId);
     }
 
     @QueryMapping
