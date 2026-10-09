@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-service"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
 
     implementation(project(":server:libs:modules:components:accelo"))
     implementation(project(":server:libs:modules:components:active-campaign"))
