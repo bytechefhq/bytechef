@@ -1,5 +1,6 @@
 import {AutomationHubThemeI} from '@/ee/pages/embedded/automation-hub/stores/useAutomationHubStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
 
 export interface EmbedInitParamsI {
@@ -60,6 +61,8 @@ export function useEmbedHandshake(onInit: (params: EmbedInitParamsI) => void, en
 
     const embedded = useApplicationInfoStore((state) => state.embedded);
 
+    const queryClient = useQueryClient();
+
     onInitRef.current = onInit;
 
     useEffect(() => {
@@ -94,6 +97,10 @@ export function useEmbedHandshake(onInit: (params: EmbedInitParamsI) => void, en
                 const environment = params.environment || 'PRODUCTION';
                 const jwtToken = params.jwtToken;
 
+                const identityChanged =
+                    sessionStorage.getItem('environment') !== environment ||
+                    sessionStorage.getItem('jwtToken') !== (jwtToken || null);
+
                 if (jwtToken) {
                     sessionStorage.setItem('jwtToken', jwtToken);
                 } else {
@@ -101,6 +108,10 @@ export function useEmbedHandshake(onInit: (params: EmbedInitParamsI) => void, en
                 }
 
                 sessionStorage.setItem('environment', environment);
+
+                if (identityChanged) {
+                    void queryClient.resetQueries();
+                }
 
                 onInitRef.current(params);
             }
@@ -127,5 +138,5 @@ export function useEmbedHandshake(onInit: (params: EmbedInitParamsI) => void, en
         return () => {
             window.removeEventListener('message', listener);
         };
-    }, [embedded, enabled]);
+    }, [embedded, enabled, queryClient]);
 }
