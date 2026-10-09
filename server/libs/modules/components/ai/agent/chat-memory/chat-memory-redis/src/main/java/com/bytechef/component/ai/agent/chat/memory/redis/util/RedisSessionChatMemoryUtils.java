@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.redis.session.util;
+package com.bytechef.component.ai.agent.chat.memory.redis.util;
 
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.DEFAULT_KEY_PREFIX;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.HOST;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.KEY_PREFIX;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.PASSWORD;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.PORT;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.USERNAME;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.DEFAULT_KEY_PREFIX;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.HOST;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.KEY_PREFIX;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.PASSWORD;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.PORT;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.USERNAME;
 
 import com.bytechef.commons.util.ClientCacheSettings;
 import com.bytechef.commons.util.ClientCacheUtils;
@@ -51,8 +51,12 @@ public class RedisSessionChatMemoryUtils {
     public static SessionRepository getSessionRepository(Parameters connectionParameters) {
         return RedisSessionRepository.builder()
             .jedis(getSharedRedisClient(connectionParameters))
-            .keyPrefix(connectionParameters.getString(KEY_PREFIX, DEFAULT_KEY_PREFIX))
+            .keyPrefix(getSessionKeyPrefix(connectionParameters))
             .build();
+    }
+
+    static String getSessionKeyPrefix(Parameters connectionParameters) {
+        return connectionParameters.getString(KEY_PREFIX, DEFAULT_KEY_PREFIX) + "session:";
     }
 
     static RedisClient getSharedRedisClient(Parameters connectionParameters) {
