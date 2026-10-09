@@ -50,6 +50,15 @@ describe('getPropertyInputPlaceholder', () => {
         ).toBe('From 1 to 128000');
     });
 
+    it('ignores a default that is not a primitive', () => {
+        expect(getPropertyInputPlaceholder({defaultValue: {key: 'value'}})).toBe('Type something...');
+        expect(getPropertyInputPlaceholder({defaultValue: ['a', 'b']})).toBe('Type something...');
+    });
+
+    it('shows a boolean default', () => {
+        expect(getPropertyInputPlaceholder({defaultValue: false})).toBe('Default: false');
+    });
+
     it('ignores an empty default', () => {
         expect(getPropertyInputPlaceholder({defaultValue: ''})).toBe('Type something...');
         expect(getPropertyInputPlaceholder({defaultValue: null})).toBe('Type something...');
