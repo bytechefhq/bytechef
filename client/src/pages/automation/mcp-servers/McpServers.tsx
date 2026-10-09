@@ -47,9 +47,9 @@ const McpServers = () => {
 
     useEffect(() => {
         return registerPostTurn(Source.MCP_SERVER, () => {
-            queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
-            queryClient.invalidateQueries({queryKey: ['mcpProjects']});
-            queryClient.invalidateQueries({queryKey: ['mcpProjectsByServerId']});
+            void queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+            void queryClient.invalidateQueries({queryKey: ['mcpProjects']});
+            void queryClient.invalidateQueries({queryKey: ['mcpProjectsByServerId']});
         });
     }, [queryClient, registerPostTurn]);
 
