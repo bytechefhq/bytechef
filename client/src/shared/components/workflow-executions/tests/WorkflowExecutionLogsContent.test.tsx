@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionLogsContent from '../WorkflowExecutionLogsContent';
@@ -23,7 +23,9 @@ vi.mock('@/shared/middleware/graphql', () => ({
 }));
 
 vi.mock('@/shared/components/JsonView', () => ({
-    default: () => <div data-testid="json-view" />,
+    default: ({collapsed}: {collapsed?: boolean | number}) => (
+        <div data-collapsed={String(collapsed)} data-testid="json-view" />
+    ),
 }));
 
 const idleQuery = {data: undefined, error: undefined, isLoading: false};
@@ -40,6 +42,15 @@ const logPage = (message: string, componentName: string) => ({
             triggerExecutionId: '77',
         },
     ],
+});
+
+const logEntry = (level: string, message: string) => ({
+    componentName: 'aiAgent',
+    componentOperationName: 'streamChat',
+    level,
+    message,
+    taskExecutionId: '10',
+    timestamp: '2026-10-09T12:00:00Z',
 });
 
 describe('WorkflowExecutionLogsContent', () => {
@@ -111,5 +122,42 @@ describe('WorkflowExecutionLogsContent', () => {
 
         expect(triggerExecutionFileLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
         expect(editorJobFileLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: true});
+    });
+
+    it('hides the entries of a level that is switched off', () => {
+        jobFileLogsQueryMock.mockReturnValue({
+            data: {jobFileLogs: {content: [logEntry('INFO', 'info message'), logEntry('DEBUG', 'debug message')]}},
+            error: undefined,
+            isLoading: false,
+        });
+
+        render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" />);
+
+        fireEvent.click(screen.getByRole('button', {name: 'DEBUG (1)'}));
+
+        expect(screen.queryByText('debug message')).not.toBeInTheDocument();
+        expect(screen.getByText('info message')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'DEBUG (1)'}));
+
+        expect(screen.getByText('debug message')).toBeInTheDocument();
+    });
+
+    it('expands and collapses every JSON entry at once', () => {
+        jobFileLogsQueryMock.mockReturnValue({
+            data: {jobFileLogs: {content: [logEntry('INFO', '{"toolName":"TodoWrite"}')]}},
+            error: undefined,
+            isLoading: false,
+        });
+
+        render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" />);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Expand all'}));
+
+        expect(screen.getByTestId('json-view')).toHaveAttribute('data-collapsed', 'false');
+
+        fireEvent.click(screen.getByRole('button', {name: 'Collapse all'}));
+
+        expect(screen.getByTestId('json-view')).toHaveAttribute('data-collapsed', 'true');
     });
 });
