@@ -31,6 +31,7 @@ import com.bytechef.platform.ai.tool.TaskTools;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -41,6 +42,12 @@ import org.springframework.context.annotation.Bean;
  * @author Ivica Cardic
  */
 class ManagementMcpServerToolCallbackProviderTest {
+
+    private static final List<String> WORKSPACE_SCOPED_TOOL_NAMES = List.of(
+        "listProjects", "getProject", "searchProjects", "getProjectStatus", "createProject", "updateProject",
+        "deleteProject", "publishProject", "getWorkflow", "listWorkflows", "searchWorkflows",
+        "createProjectWorkflow", "deleteWorkflow", "updateWorkflow", "saveWorkflowTestConnection",
+        "updateScriptComponentCode");
 
     @Test
     void includesContributedCallbacksAlongsideDirectTools() {
@@ -96,5 +103,29 @@ class ManagementMcpServerToolCallbackProviderTest {
         assertThat(mcpAsyncServerMethod.isAnnotationPresent(Bean.class))
             .as("mcpAsyncServer() must remain a @Bean so the MCP endpoint is wired")
             .isTrue();
+    }
+
+    @Nested
+    class WorkspaceScopedToolsTest {
+
+        @Test
+        void testProjectWorkflowAndScriptToolsAcceptWorkspaceId() {
+            ManagementMcpServerConfiguration configuration = new ManagementMcpServerConfiguration(
+                mock(ComponentTools.class), mock(ProjectTools.class), mock(ProjectWorkflowTools.class),
+                mock(TaskTools.class), mock(TaskDispatcherTools.class), mock(ScriptTools.class),
+                mock(ClusterElementTools.class), List.of());
+
+            List<ToolDefinition> toolDefinitions = Arrays.stream(configuration.toolCallbackProvider()
+                .getToolCallbacks())
+                .map(ToolCallback::getToolDefinition)
+                .filter(toolDefinition -> WORKSPACE_SCOPED_TOOL_NAMES.contains(toolDefinition.name()))
+                .toList();
+
+            assertThat(toolDefinitions)
+                .extracting(ToolDefinition::name)
+                .containsExactlyInAnyOrderElementsOf(WORKSPACE_SCOPED_TOOL_NAMES);
+            assertThat(toolDefinitions)
+                .allSatisfy(toolDefinition -> assertThat(toolDefinition.inputSchema()).contains("workspaceId"));
+        }
     }
 }
