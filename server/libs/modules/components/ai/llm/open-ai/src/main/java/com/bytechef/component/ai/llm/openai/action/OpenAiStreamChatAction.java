@@ -19,10 +19,9 @@ package com.bytechef.component.ai.llm.openai.action;
 import static com.bytechef.component.ai.llm.openai.action.OpenAiChatAction.CHAT_MODEL;
 import static com.bytechef.component.ai.llm.openai.constant.OpenAiConstants.ASK_PROPERTIES;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.llm.util.ModelUtils;
+import com.bytechef.component.ai.llm.util.StreamChatUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -40,7 +39,7 @@ public class OpenAiStreamChatAction {
         .title("Ask (stream)")
         .description("Ask anything you want and stream the response.")
         .properties(ASK_PROPERTIES)
-        .output(outputSchema(string()), sampleOutput("Sample stream"))
+        .output(ModelUtils::output)
         .help("", "https://docs.bytechef.io/reference/components/open-ai_v1#ask-stream")
         .perform(OpenAiStreamChatAction::perform);
 
@@ -52,40 +51,6 @@ public class OpenAiStreamChatAction {
 
         Flow.Publisher<?> publisher = CHAT_MODEL.stream(inputParameters, connectionParameters, context);
 
-        return emitter -> publisher.subscribe(
-            new Flow.Subscriber<Object>() {
-
-                private Flow.Subscription subscription;
-
-                @Override
-                public void onSubscribe(Flow.Subscription subscription) {
-                    this.subscription = subscription;
-
-                    emitter.addTimeoutListener(subscription::cancel);
-
-                    subscription.request(Long.MAX_VALUE);
-                }
-
-                @Override
-                public void onNext(Object item) {
-                    try {
-                        emitter.send(item);
-                    } catch (Exception exception) {
-                        context.log(log -> log.trace(exception.getMessage(), exception));
-
-                        subscription.cancel();
-                    }
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-                    emitter.error(throwable);
-                }
-
-                @Override
-                public void onComplete() {
-                    emitter.complete();
-                }
-            });
+        return StreamChatUtils.createSseEmitterHandler(publisher, inputParameters, context);
     }
 }
