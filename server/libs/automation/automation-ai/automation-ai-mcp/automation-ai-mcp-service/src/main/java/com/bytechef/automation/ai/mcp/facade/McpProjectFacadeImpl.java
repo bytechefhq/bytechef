@@ -26,6 +26,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -52,13 +54,15 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     private final McpServerService mcpServerService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
     public McpProjectFacadeImpl(
         McpProjectAuditPublisher mcpProjectAuditPublisher, McpProjectService mcpProjectService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         ProjectDeploymentService projectDeploymentService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ProjectWorkflowService projectWorkflowService) {
 
         this.mcpProjectAuditPublisher = mcpProjectAuditPublisher;
         this.mcpProjectService = mcpProjectService;
@@ -66,6 +70,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         this.mcpServerService = mcpServerService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
@@ -73,6 +78,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
+
+        validateProjectVersionWorkflowIds(projectId, projectVersion, selectedWorkflowIds);
 
         McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
 
@@ -168,6 +175,18 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
             }
         }
 
+        List<String> addedWorkflowIds = selectedWorkflowIds.stream()
+            .filter(workflowId -> !existingWorkflowIdMap.containsKey(workflowId))
+            .toList();
+
+        if (!addedWorkflowIds.isEmpty()) {
+            ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
+                Objects.requireNonNull(mcpProject.getProjectDeploymentId()));
+
+            validateProjectVersionWorkflowIds(
+                projectDeployment.getProjectId(), projectDeployment.getProjectVersion(), addedWorkflowIds);
+        }
+
         Set<String> selectedWorkflowIdSet = new HashSet<>(selectedWorkflowIds);
 
         for (String workflowId : selectedWorkflowIds) {
@@ -240,5 +259,20 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         return createMcpProject(
             targetMcpServerId, sourceDeployment.getProjectId(), sourceDeployment.getProjectVersion(),
             selectedWorkflowIds);
+    }
+
+    private void validateProjectVersionWorkflowIds(long projectId, int projectVersion, List<String> workflowIds) {
+        Set<String> projectVersionWorkflowIds = new HashSet<>(
+            projectWorkflowService.getProjectWorkflowIds(projectId, projectVersion));
+
+        List<String> foreignWorkflowIds = workflowIds.stream()
+            .filter(workflowId -> !projectVersionWorkflowIds.contains(workflowId))
+            .toList();
+
+        if (!foreignWorkflowIds.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Workflows " + foreignWorkflowIds + " do not belong to version " + projectVersion + " of project " +
+                    projectId);
+        }
     }
 }
