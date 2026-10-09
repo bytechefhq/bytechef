@@ -17,6 +17,7 @@
 package com.bytechef.message.broker.redis.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -28,10 +29,16 @@ import com.bytechef.message.route.MessageRoute;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.DefaultMessage;
+import org.springframework.data.redis.connection.stream.Consumer;
+import org.springframework.data.redis.connection.stream.MapRecord;
+import org.springframework.data.redis.connection.stream.RecordId;
+import org.springframework.data.redis.connection.stream.StreamOffset;
+import org.springframework.data.redis.connection.stream.StreamReadOptions;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
@@ -42,6 +49,7 @@ class RedisListenerEndpointRegistrarTest {
 
     private static final String CHANNEL_NAME = "test_channel";
     private static final String CONSUMER_GROUP = "message_event_group";
+    private static final String STREAM_NAME = "test_stream";
 
     private final List<Object> firstReceivedMessages = new ArrayList<>();
     private final RedisMessageDeserializer redisMessageDeserializer = mock(RedisMessageDeserializer.class);
@@ -93,6 +101,48 @@ class RedisListenerEndpointRegistrarTest {
 
         assertThat(firstReceivedMessages).isEmpty();
         assertThat(secondReceivedMessages).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testEachStreamRecordIsDeliveredToASingleDelegate() {
+        RedisListenerEndpointRegistrar streamRedisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
+            redisMessageDeserializer, stringRedisTemplate, Runnable::run);
+
+        MessageRoute streamMessageRoute = new TestMessageRoute(MessageRoute.Exchange.MESSAGE, STREAM_NAME);
+
+        streamRedisListenerEndpointRegistrar.registerListenerEndpoint(
+            streamMessageRoute, new FirstMessageHandler(), "handle");
+        streamRedisListenerEndpointRegistrar.registerListenerEndpoint(
+            streamMessageRoute, new SecondMessageHandler(), "handle");
+
+        when(redisMessageDeserializer.deserialize("raw-message-1")).thenReturn("payload-1");
+        when(redisMessageDeserializer.deserialize("raw-message-2")).thenReturn("payload-2");
+
+        List<MapRecord<String, Object, Object>> records = List.of(
+            createStreamRecord("1-0", "raw-message-1"), createStreamRecord("2-0", "raw-message-2"));
+
+        when(streamOperations.read(any(Consumer.class), any(StreamReadOptions.class), any(StreamOffset.class)))
+            .thenReturn(records)
+            .thenAnswer(invocation -> {
+                streamRedisListenerEndpointRegistrar.stop();
+
+                return List.of();
+            });
+
+        streamRedisListenerEndpointRegistrar.start();
+
+        assertThat(firstReceivedMessages).containsExactly("payload-1");
+        assertThat(secondReceivedMessages).containsExactly("payload-2");
+
+        verify(streamOperations).acknowledge(STREAM_NAME, CONSUMER_GROUP, RecordId.of("1-0"));
+        verify(streamOperations).acknowledge(STREAM_NAME, CONSUMER_GROUP, RecordId.of("2-0"));
+    }
+
+    private static MapRecord<String, Object, Object> createStreamRecord(String recordId, String message) {
+        MapRecord<String, Object, Object> mapRecord = MapRecord.create(STREAM_NAME, Map.of("message", message));
+
+        return mapRecord.withId(RecordId.of(recordId));
     }
 
     public class FirstMessageHandler {
