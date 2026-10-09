@@ -11,7 +11,11 @@ import {
 } from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {McpServer, useCreateEmbeddedMcpServerMutation, useUpdateMcpServerMutation} from '@/shared/middleware/graphql';
+import {
+    McpServer,
+    useCreateEmbeddedMcpServerMutation,
+    useUpdateEmbeddedMcpServerMutation,
+} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
@@ -55,11 +59,11 @@ const McpServerDialog = ({
     const queryClient = useQueryClient();
 
     const createEmbeddedMcpServerMutation = useCreateEmbeddedMcpServerMutation();
-    const updateMcpServerMutation = useUpdateMcpServerMutation();
+    const updateEmbeddedMcpServerMutation = useUpdateEmbeddedMcpServerMutation();
 
     const onSubmit = async (values: FormValuesType) => {
         if (mcpServer) {
-            updateMcpServerMutation.mutate(
+            updateEmbeddedMcpServerMutation.mutate(
                 {
                     id: mcpServer.id,
                     input: {

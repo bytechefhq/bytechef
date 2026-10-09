@@ -4,7 +4,7 @@ import Switch from '@/components/Switch/Switch';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import McpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {McpTool, useUpdateMcpToolEnabledMutation} from '@/shared/middleware/graphql';
+import {McpTool, useUpdateEmbeddedMcpToolEnabledMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {BoltIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
@@ -17,7 +17,7 @@ interface McpComponentToolListItemProps {
     connectionId?: string | null;
     connectionRequired?: boolean;
     description?: string | null;
-    enabledSwitchVisible?: boolean;
+    embedded?: boolean;
     mcpTool: McpTool;
 }
 
@@ -27,13 +27,14 @@ const McpComponentToolListItem = ({
     connectionId,
     connectionRequired,
     description,
-    enabledSwitchVisible,
+    embedded,
     mcpTool,
 }: McpComponentToolListItemProps) => {
     const [isEnablePending, setIsEnablePending] = useState(false);
 
     const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
         useMcpProjectComponentToolDropdownMenu({
+            embedded,
             mcpTool,
         });
 
@@ -41,7 +42,7 @@ const McpComponentToolListItem = ({
 
     const queryClient = useQueryClient();
 
-    const updateMcpToolEnabledMutation = useUpdateMcpToolEnabledMutation();
+    const updateEmbeddedMcpToolEnabledMutation = useUpdateEmbeddedMcpToolEnabledMutation();
 
     const popoverId = `component-tool-${mcpTool.id}`;
     const isPopoverOpen = activePopoverId === popoverId;
@@ -51,7 +52,7 @@ const McpComponentToolListItem = ({
     const handleEnabledChange = (value: boolean) => {
         setIsEnablePending(true);
 
-        updateMcpToolEnabledMutation.mutate(
+        updateEmbeddedMcpToolEnabledMutation.mutate(
             {enabled: value, id: mcpTool.id},
             {
                 onSettled: () => {
@@ -75,7 +76,7 @@ const McpComponentToolListItem = ({
                     </div>
 
                     <div className="flex shrink-0 items-center gap-0.5">
-                        {enabledSwitchVisible && (
+                        {embedded && (
                             <Switch
                                 aria-label="Enable tool"
                                 checked={mcpTool.enabled}
@@ -116,6 +117,7 @@ const McpComponentToolListItem = ({
                         componentVersion={componentVersion}
                         connectionId={connectionId}
                         connectionRequired={connectionRequired}
+                        embedded={embedded}
                         mcpTool={mcpTool}
                         onClose={closePopover}
                     />

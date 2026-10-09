@@ -1,9 +1,9 @@
 import {
     ComponentDefinition,
     McpComponent,
-    useCreateMcpComponentWithToolsMutation,
+    useCreateEmbeddedMcpComponentMutation,
     useMcpToolsByComponentIdQuery,
-    useUpdateMcpComponentWithToolsMutation,
+    useUpdateEmbeddedMcpComponentMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -51,11 +51,11 @@ const useMcpComponentDialog = ({
         queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
     };
 
-    const createMcpComponentWithToolsMutation = useCreateMcpComponentWithToolsMutation({
+    const createEmbeddedMcpComponentMutation = useCreateEmbeddedMcpComponentMutation({
         onSuccess: invalidateMcpQueries,
     });
 
-    const updateMcpComponentWithToolsMutation = useUpdateMcpComponentWithToolsMutation({
+    const updateEmbeddedMcpComponentMutation = useUpdateEmbeddedMcpComponentMutation({
         onSuccess: invalidateMcpQueries,
     });
 
@@ -106,7 +106,7 @@ const useMcpComponentDialog = ({
         }
 
         if (mcpComponent?.id) {
-            updateMcpComponentWithToolsMutation.mutate(
+            updateEmbeddedMcpComponentMutation.mutate(
                 {
                     id: mcpComponent.id.toString(),
                     input: {
@@ -123,7 +123,7 @@ const useMcpComponentDialog = ({
                 {onSuccess: handleSaveSuccess}
             );
         } else {
-            createMcpComponentWithToolsMutation.mutate(
+            createEmbeddedMcpComponentMutation.mutate(
                 {
                     input: {
                         componentName: selectedComponent.name,

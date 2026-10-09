@@ -14,6 +14,7 @@ interface McpComponentToolPropertiesPopoverProps {
     componentVersion: number;
     connectionId?: string | null;
     connectionRequired?: boolean;
+    embedded?: boolean;
     mcpTool: McpTool;
     onClose: () => void;
 }
@@ -23,11 +24,12 @@ const McpComponentToolPropertiesPopover = ({
     componentVersion,
     connectionId,
     connectionRequired,
+    embedded,
     mcpTool,
     onClose,
 }: McpComponentToolPropertiesPopoverProps) => {
     const {control, form, formState, handleFormSubmit, handleSubmit, isLoading, properties} =
-        useMcpComponentToolPropertiesPopover(componentName, componentVersion, mcpTool, onClose);
+        useMcpComponentToolPropertiesPopover(componentName, componentVersion, mcpTool, onClose, embedded);
 
     const formValues = form.watch();
 

@@ -1,9 +1,9 @@
-import {McpServer, useUpdateMcpServerUrlMutation} from '@/shared/middleware/graphql';
+import {McpServer, useUpdateEmbeddedMcpServerUrlMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
 const useMcpServerList = (mcpServers: McpServer[]) => {
-    const updateMcpServerUrlMutation = useUpdateMcpServerUrlMutation({});
+    const updateEmbeddedMcpServerUrlMutation = useUpdateEmbeddedMcpServerUrlMutation({});
 
     const queryClient = useQueryClient();
 
@@ -17,7 +17,7 @@ const useMcpServerList = (mcpServers: McpServer[]) => {
 
     const createHandleRefresh = (mcpServerId: string): (() => void) => {
         return () => {
-            updateMcpServerUrlMutation.mutate(
+            updateEmbeddedMcpServerUrlMutation.mutate(
                 {
                     id: mcpServerId,
                 },
