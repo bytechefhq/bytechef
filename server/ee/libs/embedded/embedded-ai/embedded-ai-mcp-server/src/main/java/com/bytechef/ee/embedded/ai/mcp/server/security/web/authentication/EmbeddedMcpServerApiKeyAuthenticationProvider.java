@@ -47,6 +47,10 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
 
         McpServer mcpServer = getMcpServer(embeddedMcpServerApiKeyAuthenticationToken.getMcpServerSecretKey());
 
+        if (!mcpServer.isEnabled()) {
+            throw new BadCredentialsException("MCP server is disabled");
+        }
+
         if (!mcpServer.isAuthenticationRequired()) {
             return McpAnonymousAuthenticationToken.ofEmbeddedMcpServer(mcpServer.getId());
         }
