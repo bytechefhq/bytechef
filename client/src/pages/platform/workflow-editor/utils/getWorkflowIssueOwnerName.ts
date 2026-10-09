@@ -1,3 +1,4 @@
+import {getNestedClusterElements} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 
 import {WorkflowIssueI} from '../stores/useWorkflowIssuesStore';
@@ -27,7 +28,7 @@ function collectClusterElementRootNames(
             }
 
             collectClusterElementRootNames(
-                clusterElementItem.clusterElements,
+                getNestedClusterElements(clusterElementItem),
                 clusterRootName,
                 clusterElementRootNames
             );
