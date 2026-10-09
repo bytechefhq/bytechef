@@ -29,6 +29,7 @@ import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -49,10 +50,11 @@ class McpProjectFacadeTest {
     private final ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
         mock(ProjectDeploymentWorkflowService.class);
+    private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
 
     private final McpProjectFacade mcpProjectFacade = new McpProjectFacadeImpl(
         mcpProjectAuditPublisher, mcpProjectService, mcpProjectWorkflowService, mcpServerService,
-        projectDeploymentService, projectDeploymentWorkflowService);
+        projectDeploymentService, projectDeploymentWorkflowService, projectWorkflowService);
 
     @Test
     void testCreateMcpProjectUsesMcpServerEnvironment() {

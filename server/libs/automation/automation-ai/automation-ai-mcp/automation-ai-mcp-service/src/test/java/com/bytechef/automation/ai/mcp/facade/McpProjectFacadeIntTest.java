@@ -33,10 +33,12 @@ import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
@@ -46,6 +48,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -90,6 +93,9 @@ public class McpProjectFacadeIntTest {
     private ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository;
 
     @Autowired
+    private ProjectWorkflowRepository projectWorkflowRepository;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     private Project project;
@@ -113,6 +119,12 @@ public class McpProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
+        projectWorkflowRepository.saveAll(
+            List.of(
+                new ProjectWorkflow(project.getId(), 1, "workflow1", UUID.randomUUID()),
+                new ProjectWorkflow(project.getId(), 1, "workflow2", UUID.randomUUID()),
+                new ProjectWorkflow(project.getId(), 2, "workflow3", UUID.randomUUID())));
+
         projectDeployment = new ProjectDeployment();
         projectDeployment.setName("test-deployment");
         projectDeployment.setDescription("test deployment");
@@ -130,6 +142,7 @@ public class McpProjectFacadeIntTest {
         mcpProjectRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
+        projectWorkflowRepository.deleteAll();
         projectRepository.deleteAll();
         workspaceRepository.deleteAll();
         categoryRepository.deleteAll();
@@ -196,7 +209,7 @@ public class McpProjectFacadeIntTest {
             mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
 
         McpProject mcpProject2 = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), project.getId(), 2, List.of("workflow2"));
+            mcpServer.getId(), project.getId(), 2, List.of("workflow3"));
 
         assertThat(mcpProject1).isNotNull();
         assertThat(mcpProject2).isNotNull();
@@ -257,6 +270,64 @@ public class McpProjectFacadeIntTest {
             mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
 
         assertThat(mcpProjectWorkflowsAfter).hasSize(2);
+    }
+
+    @Nested
+    class WorkflowOwnership {
+
+        @Test
+        void testCreateMcpProjectRejectsAWorkflowOfAnotherProject() {
+            Project otherProject = projectRepository.save(
+                Project.builder()
+                    .categoryId(project.getCategoryId())
+                    .name("other-project")
+                    .workspaceId(project.getWorkspaceId())
+                    .build());
+
+            projectWorkflowRepository.save(new ProjectWorkflow(otherProject.getId(), 1, "foreign", UUID.randomUUID()));
+
+            long mcpProjectCount = mcpProjectRepository.count();
+            long projectDeploymentCount = projectDeploymentRepository.count();
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.createMcpProject(
+                    mcpServer.getId(), project.getId(), 1, List.of("workflow1", "foreign")))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("foreign");
+
+            assertThat(mcpProjectRepository.count()).isEqualTo(mcpProjectCount);
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
+            assertThat(projectDeploymentWorkflowRepository.count()).isZero();
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsAWorkflowOfAnotherProjectVersion() {
+            long projectDeploymentCount = projectDeploymentRepository.count();
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.createMcpProject(mcpServer.getId(), project.getId(), 2, List.of("workflow1")))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("workflow1");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
+        }
+
+        @Test
+        void testUpdateMcpProjectRejectsAWorkflowOfAnotherProjectVersion() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 2, List.of("workflow3"));
+
+            long projectDeploymentWorkflowCount = projectDeploymentWorkflowRepository.count();
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of("workflow3", "workflow1")))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("workflow1");
+
+            assertThat(projectDeploymentWorkflowRepository.count()).isEqualTo(projectDeploymentWorkflowCount);
+            assertThat(mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId())).hasSize(1);
+        }
     }
 
     @Test
