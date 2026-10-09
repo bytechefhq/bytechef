@@ -302,6 +302,38 @@ class JobSyncExecutorTest {
     }
 
     @Test
+    void testCheckForErrorReportsTheFailedTaskWhenALaterTaskExecutionDidNotFail() {
+        long jobId = 616L;
+
+        Job failedJob = new Job();
+
+        failedJob.setId(jobId);
+        failedJob.setStatus(Job.Status.FAILED);
+        failedJob.setError(new ExecutionError("Job failed", List.of()));
+
+        TaskExecution failedTaskExecution = new TaskExecution();
+
+        failedTaskExecution.setId(1L);
+        failedTaskExecution.setStatus(TaskExecution.Status.FAILED);
+        failedTaskExecution.setError(new ExecutionError("Branch task failed", List.of()));
+
+        TaskExecution completedTaskExecution = new TaskExecution();
+
+        completedTaskExecution.setId(2L);
+        completedTaskExecution.setStatus(TaskExecution.Status.COMPLETED);
+
+        when(jobService.getJob(jobId)).thenReturn(failedJob);
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId))
+            .thenReturn(java.util.Optional.of(completedTaskExecution));
+        when(taskExecutionService.getJobTaskExecutions(jobId))
+            .thenReturn(List.of(failedTaskExecution, completedTaskExecution));
+
+        assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Branch task failed");
+    }
+
+    @Test
     void testCheckForErrorThrowsWhenJobFailedWithNoErrorDetails() {
         long jobId = 707L;
 
