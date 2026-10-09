@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.jdbc.session.util;
+package com.bytechef.component.ai.agent.chat.memory.jdbc.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,6 +30,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -96,7 +98,24 @@ class SessionChatMemoryUtilsTest {
         assertThatThrownBy(
             () -> SessionChatMemoryUtils.getDataSource(extensions, Map.of(), clusterElementDefinitionService))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("dataSource_1");
+                .hasMessage(
+                    "The Data Source dataSource_1 of JDBC Chat Memory has no connection; select a database " +
+                        "connection for it.");
+    }
+
+    @Test
+    void testCreateSessionRepositoryRejectsAnOracleDataSource() throws SQLException {
+        DataSource oracleDataSource = mock(DataSource.class);
+        Connection connection = mock(Connection.class);
+        DatabaseMetaData databaseMetaData = mock(DatabaseMetaData.class);
+
+        when(oracleDataSource.getConnection()).thenReturn(connection);
+        when(connection.getMetaData()).thenReturn(databaseMetaData);
+        when(databaseMetaData.getDatabaseProductName()).thenReturn("Oracle");
+
+        assertThatThrownBy(() -> SessionChatMemoryUtils.createSessionRepository(oracleDataSource))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("JDBC Chat Memory v2 does not support Oracle; use JDBC Chat Memory v1");
     }
 
     @Test
