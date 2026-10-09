@@ -10,7 +10,7 @@ import {getDisplayValue, hasDialogContentValue} from '@/shared/components/workfl
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {AlertCircleIcon, ExpandIcon, ScrollTextIcon, SquarePenIcon} from 'lucide-react';
-import {useCallback, useMemo} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 interface WorkflowExecutionsTabsPanelProps {
     activeTab: TabValueType;
@@ -43,6 +43,8 @@ const WorkflowExecutionsTabsPanel = ({
     setDialogOpen,
     triggerExecution,
 }: WorkflowExecutionsTabsPanelProps) => {
+    const [logsToolbarContainer, setLogsToolbarContainer] = useState<HTMLDivElement | null>(null);
+
     const resolvedInput = selectedItemInput !== undefined ? selectedItemInput : selectedItem?.input;
     const resolvedOutput = selectedItemOutput !== undefined ? selectedItemOutput : selectedItem?.output;
 
@@ -185,6 +187,8 @@ const WorkflowExecutionsTabsPanel = ({
                     </TabsTrigger>
                 </TabsList>
 
+                {activeTab === 'logs' && <div className="ml-2 min-w-0 flex-1" ref={setLogsToolbarContainer} />}
+
                 {hasDialogContent && (
                     <div className="flex items-center gap-x-2">
                         <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
@@ -275,6 +279,7 @@ const WorkflowExecutionsTabsPanel = ({
                                 taskExecutionId={
                                     selectedItem && 'workflowTask' in selectedItem ? selectedItem.id : undefined
                                 }
+                                toolbarContainer={logsToolbarContainer}
                                 triggerExecutionId={isTriggerExecution ? triggerExecution?.id : undefined}
                             />
                         )}
