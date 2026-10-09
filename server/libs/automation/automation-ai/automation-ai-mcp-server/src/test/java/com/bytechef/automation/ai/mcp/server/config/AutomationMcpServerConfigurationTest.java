@@ -139,6 +139,35 @@ class AutomationMcpServerConfigurationTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void testDisabledMcpServerServesNoTools() {
+        McpServer mcpServer = new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, false);
+
+        mcpServer.setId(1L);
+
+        McpServerService mcpServerService = mock(McpServerService.class);
+        McpComponentService mcpComponentService = mock(McpComponentService.class);
+        McpToolService mcpToolService = mock(McpToolService.class);
+        McpProjectService mcpProjectService = mock(McpProjectService.class);
+        WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
+        AutomationMcpToolFacade mcpToolFacade = mock(AutomationMcpToolFacade.class);
+        ObjectProvider<McpServerWorkspaceToolCallbackContributor> workspaceToolProviders =
+            (ObjectProvider<McpServerWorkspaceToolCallbackContributor>) mock(ObjectProvider.class);
+
+        when(mcpServerService.getMcpServer("secret")).thenReturn(mcpServer);
+
+        List<McpServerFeatures.AsyncToolSpecification> toolSpecifications =
+            AutomationMcpServerConfiguration.buildToolSpecifications(
+                "secret", Set.of(), mcpComponentService, mcpProjectService, mcpServerService, mcpToolService,
+                mcpToolFacade, workspaceToolProviders, workspaceMcpServerService);
+
+        assertThat(toolSpecifications).isEmpty();
+        verify(mcpComponentService, never()).getMcpServerMcpComponents(1L);
+        verify(mcpProjectService, never()).getMcpServerMcpProjects(1L);
+        verify(workspaceMcpServerService, never()).fetchWorkspaceIdByMcpServerId(1L);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void testDisabledMcpToolIsNotListed() {
         McpServer mcpServer = new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
 
@@ -311,6 +340,7 @@ class AutomationMcpServerConfigurationTest {
     private static McpServer enforcingServer() {
         McpServer mcpServer = new McpServer();
 
+        mcpServer.setEnabled(true);
         mcpServer.setEnforceToolAuthorization(true);
 
         return mcpServer;
