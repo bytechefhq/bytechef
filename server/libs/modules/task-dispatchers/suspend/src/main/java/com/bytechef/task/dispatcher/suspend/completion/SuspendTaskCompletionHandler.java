@@ -122,6 +122,9 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
         Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
 
         jobMetadata.put(MetadataConstants.JOB_RESUME_ID, jobResumeIdString);
+        jobMetadata.put(
+            MetadataConstants.STREAMING_RESUME,
+            MapUtils.getBoolean(suspend.continueParameters(), MetadataConstants.STREAMING_RESUME, false));
         jobMetadata.put(MetadataConstants.TASK_EXECUTION_RESUME_ID, taskExecution.getId());
 
         job = jobService.getJob(jobId);
@@ -130,9 +133,9 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
 
         jobService.update(job);
 
-        job = jobService.setStatusToStopped(jobId);
+        jobService.setStatusToStopped(jobId);
 
-        eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, job.getStatus()));
+        eventPublisher.publishEvent(JobStatusApplicationEvent.suspended(jobId));
 
         if (log.isDebugEnabled()) {
             log.debug("Suspend completion handler completed for job id={}", jobId);

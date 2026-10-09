@@ -18,6 +18,7 @@ package com.bytechef.platform.coordinator.config;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.coordinator.event.listener.NotificationJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.SseStreamApplicationEventListener;
@@ -83,7 +84,9 @@ public class PlatformCoordinatorConfiguration {
     }
 
     @Bean
-    SseStreamApplicationEventListener sseStreamApplicationEventListener(MessageBroker messageBroker) {
-        return new SseStreamApplicationEventListener(messageBroker);
+    SseStreamApplicationEventListener sseStreamApplicationEventListener(
+        MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+
+        return new SseStreamApplicationEventListener(messageBroker, taskExecutionService);
     }
 }

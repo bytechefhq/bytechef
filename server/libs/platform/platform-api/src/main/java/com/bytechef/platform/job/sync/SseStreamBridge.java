@@ -46,6 +46,16 @@ public interface SseStreamBridge {
     }
 
     /**
+     * Invoked when a streamed job suspends, for example to wait for an approval or for an answer to a question, so the
+     * stream ends without a result. Only callers that can tell a suspend from a completion invoke it; the in-process
+     * sync path reports both through {@link #onComplete()}. The default implementation treats the suspend as a
+     * completion.
+     */
+    default void onSuspend() {
+        onComplete();
+    }
+
+    /**
      * Invoked when an error occurs during the streaming process. This method serves as a lifecycle callback that allows
      * handling of exceptions or errors that may arise while processing the stream. <br/>
      * Implementations of this method are expected to provide custom error-handling logic such as logging the error,
