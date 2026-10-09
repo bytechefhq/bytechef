@@ -133,6 +133,7 @@ public class ContextFactoryImpl implements ContextFactory {
             .builder(
                 componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
                 eventPublisher, getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment))
+            .approvalTokens(approvalTokensProvider.getIfAvailable())
             .clusterElementResolver(clusterElementResolver)
             .componentConnection(componentConnection)
             .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
