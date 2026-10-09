@@ -70,7 +70,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
             .keyId(keyId)
             .and()
             .subject(externalUserId)
-            .claim("environmentId", environmentId)
+            .claim(ENVIRONMENT_ID_CLAIM, environmentId)
             .claim("integrationId", integrationId)
             .expiration(new Date(System.currentTimeMillis() + JWT_TTL_MILLIS))
             .signWith(keyPair.getPrivate())

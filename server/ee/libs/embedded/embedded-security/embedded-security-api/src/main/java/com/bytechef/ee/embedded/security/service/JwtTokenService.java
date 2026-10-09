@@ -22,6 +22,8 @@ import org.jspecify.annotations.Nullable;
  */
 public interface JwtTokenService {
 
+    String ENVIRONMENT_ID_CLAIM = "environmentId";
+
     String generateJwtToken(String externalUserId, long integrationId, int environmentId, String tenantId);
 
     @Nullable
