@@ -1712,9 +1712,9 @@ export type Mutation = {
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
-  updateMcpToolEnabled?: Maybe<McpTool>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
+  updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
 };
 
 
@@ -2552,12 +2552,6 @@ export type MutationUpdateMcpToolArgs = {
 };
 
 
-export type MutationUpdateMcpToolEnabledArgs = {
-  enabled: Scalars['Boolean']['input'];
-  id: Scalars['ID']['input'];
-};
-
-
 export type MutationUpdateUserArgs = {
   login: Scalars['String']['input'];
   role: Scalars['String']['input'];
@@ -2567,6 +2561,12 @@ export type MutationUpdateUserArgs = {
 export type MutationUpdateWorkspaceApiKeyArgs = {
   apiKeyId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateWorkspaceMcpToolEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
 };
 
 export type NodeValidationIssue = {
