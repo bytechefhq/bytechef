@@ -16,8 +16,10 @@
 
 package com.bytechef.platform.mcp.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.configuration.domain.Environment;
@@ -91,6 +93,24 @@ public class McpServerTagGraphQlControllerIntTest {
 
         verify(mcpServerService).getMcpServers(PlatformType.AUTOMATION);
         verify(tagService).getTags(any());
+    }
+
+    @Test
+    void testGetMcpServerTagsRejectsEmbeddedType() {
+        this.graphQlTester
+            .document("""
+                query {
+                    mcpServerTags(type: EMBEDDED) {
+                        id
+                        name
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .satisfy(errors -> assertThat(errors).hasSize(1));
+
+        verifyNoInteractions(mcpServerService, tagService);
     }
 
     @Test

@@ -17,7 +17,11 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.mcp.domain.McpComponent;
+import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
+import com.bytechef.platform.mcp.service.McpComponentService;
+import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -34,10 +38,16 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class McpToolGraphQlController {
 
+    private final McpComponentService mcpComponentService;
+    private final McpServerService mcpServerService;
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
-    public McpToolGraphQlController(McpToolService mcpToolService) {
+    public McpToolGraphQlController(
+        McpComponentService mcpComponentService, McpServerService mcpServerService, McpToolService mcpToolService) {
+
+        this.mcpComponentService = mcpComponentService;
+        this.mcpServerService = mcpServerService;
         this.mcpToolService = mcpToolService;
     }
 
@@ -59,6 +69,8 @@ public class McpToolGraphQlController {
 
     @MutationMapping
     public McpTool createMcpTool(@Argument McpToolInput input) {
+        checkMcpComponentNotEmbedded(input.mcpComponentId());
+
         Map<String, Object> parameters = input.parameters() != null ? input.parameters() : Map.of();
 
         return mcpToolService.create(new McpTool(input.name(), parameters, input.mcpComponentId()));
@@ -69,6 +81,8 @@ public class McpToolGraphQlController {
         McpTool mcpTool = mcpToolService.fetchMcpTool(id)
             .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
 
+        checkMcpComponentNotEmbedded(mcpTool.getMcpComponentId());
+
         mcpToolService.delete(mcpTool);
 
         return true;
@@ -76,6 +90,12 @@ public class McpToolGraphQlController {
 
     @MutationMapping
     public McpTool updateMcpTool(@Argument long id, @Argument McpToolInput input) {
+        McpTool currentMcpTool = mcpToolService.fetchMcpTool(id)
+            .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
+
+        checkMcpComponentNotEmbedded(currentMcpTool.getMcpComponentId());
+        checkMcpComponentNotEmbedded(input.mcpComponentId());
+
         Map<String, Object> parameters = input.parameters() != null ? input.parameters() : Map.of();
 
         McpTool mcpTool = new McpTool(input.name(), parameters, input.mcpComponentId());
@@ -89,12 +109,12 @@ public class McpToolGraphQlController {
         return mcpToolService.update(mcpTool);
     }
 
-    @MutationMapping
-    public McpTool updateMcpToolEnabled(@Argument long id, @Argument boolean enabled) {
-        mcpToolService.updateEnabled(id, enabled);
+    private void checkMcpComponentNotEmbedded(long mcpComponentId) {
+        McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpComponentId);
 
-        return mcpToolService.fetchMcpTool(id)
-            .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
+        McpServer mcpServer = mcpServerService.getMcpServer(mcpComponent.getMcpServerId());
+
+        McpServerTypeUtils.checkNotEmbedded(mcpServer.getType());
     }
 
     @SuppressFBWarnings("EI")

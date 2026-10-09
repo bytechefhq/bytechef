@@ -16,10 +16,14 @@
 
 package com.bytechef.platform.mcp.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.configuration.domain.Environment;
@@ -31,6 +35,8 @@ import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationShare
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -61,6 +67,12 @@ public class McpServerGraphQlControllerIntTest {
 
     @Autowired
     private McpServerService mcpServerService;
+
+    @BeforeEach
+    void beforeEach() {
+        when(mcpServerService.getMcpServer(anyLong())).thenReturn(
+            createMockMcpServer(1L, "Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true));
+    }
 
     @Test
     void testGetMcpServerById() {
@@ -237,6 +249,132 @@ public class McpServerGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(mcpServerFacade).deleteMcpServer(1L);
+    }
+
+    @Test
+    void testUpdateMcpServerUrl() {
+        McpServer mcpServer = createMockMcpServer(
+            1L, "Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        when(mcpServerService.getMcpServer(1L)).thenReturn(mcpServer);
+        when(mcpServerService.update(mcpServer)).thenReturn(mcpServer);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpServerUrl(id: "1")
+                }
+                """)
+            .execute()
+            .path("updateMcpServerUrl")
+            .entity(String.class)
+            .satisfies(url -> assertThat(url).contains("/api/automation/"));
+
+        verify(mcpServerService).update(mcpServer);
+    }
+
+    @Nested
+    class EmbeddedMcpServerTest {
+
+        @BeforeEach
+        void beforeEach() {
+            when(mcpServerService.getMcpServer(1L)).thenReturn(
+                createMockMcpServer(1L, "Embedded", PlatformType.EMBEDDED, Environment.DEVELOPMENT, true));
+        }
+
+        @Test
+        void testGetMcpServerByIdRejectsEmbeddedMcpServer() {
+            assertRejected("""
+                query {
+                    mcpServer(id: "1") {
+                        id
+                        secretKey
+                    }
+                }
+                """);
+        }
+
+        @Test
+        void testGetMcpServersRejectsEmbeddedType() {
+            assertRejected("""
+                query {
+                    mcpServers(type: EMBEDDED) {
+                        id
+                        secretKey
+                    }
+                }
+                """);
+
+            verify(mcpServerService, never()).getMcpServers(any(), any());
+        }
+
+        @Test
+        void testCreateMcpServerRejectsEmbeddedType() {
+            assertRejected("""
+                mutation {
+                    createMcpServer(input: {name: "Embedded", type: EMBEDDED, environmentId: "0", enabled: true}) {
+                        id
+                    }
+                }
+                """);
+
+            verify(mcpServerService, never()).create(anyString(), any(), any(), any());
+        }
+
+        @Test
+        void testUpdateMcpServerRejectsEmbeddedMcpServer() {
+            assertRejected("""
+                mutation {
+                    updateMcpServer(id: "1", input: {name: "Renamed", enabled: false}) {
+                        id
+                    }
+                }
+                """);
+
+            verify(mcpServerService, never()).update(anyLong(), any(), any());
+        }
+
+        @Test
+        void testUpdateMcpServerTagsRejectsEmbeddedMcpServer() {
+            assertRejected("""
+                mutation {
+                    updateMcpServerTags(id: "1", tags: [{name: "tag"}]) {
+                        id
+                    }
+                }
+                """);
+
+            verifyNoInteractions(mcpServerFacade);
+        }
+
+        @Test
+        void testUpdateMcpServerUrlRejectsEmbeddedMcpServer() {
+            assertRejected("""
+                mutation {
+                    updateMcpServerUrl(id: "1")
+                }
+                """);
+
+            verify(mcpServerService, never()).update(any(McpServer.class));
+        }
+
+        @Test
+        void testDeleteMcpServerRejectsEmbeddedMcpServer() {
+            assertRejected("""
+                mutation {
+                    deleteMcpServer(id: "1")
+                }
+                """);
+
+            verifyNoInteractions(mcpServerFacade);
+        }
+
+        private void assertRejected(String document) {
+            graphQlTester.document(document)
+                .execute()
+                .errors()
+                .satisfy(errors -> assertThat(errors).hasSize(1));
+        }
     }
 
     private McpServer createMockMcpServer(
