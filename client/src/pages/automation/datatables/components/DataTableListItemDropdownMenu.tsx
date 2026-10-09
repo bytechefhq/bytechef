@@ -1,13 +1,11 @@
 import Button from '@/components/Button/Button';
-
-import '@/shared/styles/dropdownMenu.css';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import useDataTableListItemDropdownMenu from '@/pages/automation/datatables/components/hooks/useDataTableListItemDropdownMenu';
 import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
@@ -30,27 +28,20 @@ const DataTableListItemDropdownMenu = ({baseName, dataTableId}: DataTableListIte
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem className="dropdown-menu-item" onClick={handleRenameClick}>
-                    <EditIcon /> Rename
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<EditIcon />} label="Rename" onClick={handleRenameClick} />
 
-                <DropdownMenuItem className="dropdown-menu-item" onClick={handleDuplicateClick}>
-                    <CopyIcon /> Duplicate
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onClick={handleDuplicateClick} />
 
-                <DropdownMenuItem className="dropdown-menu-item" onClick={handleExportCsvClick}>
-                    <DownloadIcon /> Export CSV
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<DownloadIcon />} label="Export CSV" onClick={handleExportCsvClick} />
 
-                <DropdownMenuSeparator className="m-0" />
+                <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
+                    icon={<Trash2Icon />}
+                    label="Delete"
                     onClick={handleDeleteClick}
                     variant="destructive"
-                >
-                    <Trash2Icon /> Delete
-                </DropdownMenuItem>
+                />
             </DropdownMenuContent>
         </DropdownMenu>
     );

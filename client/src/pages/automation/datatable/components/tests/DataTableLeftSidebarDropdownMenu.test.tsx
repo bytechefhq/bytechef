@@ -131,9 +131,18 @@ describe('DataTableLeftSidebarDropdownMenu', () => {
 
             await user.click(triggerButton);
 
-            const deleteItem = screen.getByText('Delete').closest('[role="menuitem"]');
+            expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+        });
 
-            expect(deleteItem).toHaveClass('dropdown-menu-item-destructive');
+        it('should render with the design-system DropdownMenu', async () => {
+            const user = userEvent.setup();
+
+            render(<DataTableLeftSidebarDropdownMenu {...defaultProps} />);
+
+            await user.click(screen.getByRole('button', {name: 'Table menu'}));
+
+            expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+            expect(screen.getByRole('menuitem', {name: 'Rename'})).toBeInTheDocument();
         });
     });
 });

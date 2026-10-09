@@ -1,6 +1,11 @@
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {MoreVertical} from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
+import {MoreVerticalIcon} from 'lucide-react';
 
 interface ColumnHeaderCellProps {
     columnId: string;
@@ -21,20 +26,19 @@ const ColumnHeaderCell = ({columnId, columnName, onDelete, onRename}: ColumnHead
                     <DropdownMenuTrigger asChild>
                         <Button
                             aria-label={`Column ${columnName} menu`}
-                            icon={<MoreVertical className="size-4" />}
+                            icon={<MoreVerticalIcon className="size-4" />}
                             variant="ghost"
                         />
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onRename(columnId, columnName)}>Rename</DropdownMenuItem>
+                        <DropdownMenuItem label="Rename" onClick={() => onRename(columnId, columnName)} />
 
                         <DropdownMenuItem
-                            className="text-content-destructive focus:text-content-destructive-primary"
+                            label="Delete"
                             onClick={() => onDelete(columnId, columnName)}
-                        >
-                            Delete
-                        </DropdownMenuItem>
+                            variant="destructive"
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

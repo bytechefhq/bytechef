@@ -51,6 +51,16 @@ describe('DataTableListItemDropdownMenu', () => {
         expect(screen.getByText('Delete')).toBeInTheDocument();
     });
 
+    it('should render with the design-system DropdownMenu', async () => {
+        render(<DataTableListItemDropdownMenu baseName="orders" dataTableId="123" />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Table menu'}));
+
+        expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Rename'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+    });
+
     it('should call handleRenameClick when clicking Rename', async () => {
         render(<DataTableListItemDropdownMenu baseName="orders" dataTableId="123" />);
 
