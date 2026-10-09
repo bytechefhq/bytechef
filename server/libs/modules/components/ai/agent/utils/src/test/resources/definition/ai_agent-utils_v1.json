@@ -1390,9 +1390,9 @@
     "properties": null,
     "title": "Todo Write Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
