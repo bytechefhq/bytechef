@@ -2801,8 +2801,10 @@ export type Query = {
   editorJobFileLogs: LogPage;
   editorJobFileLogsExist: Scalars['Boolean']['output'];
   editorTaskExecutionFileLogs: Array<LogEntry>;
+  embeddedMcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
   embeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
+  embeddedMcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
   endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
   environments?: Maybe<Array<Maybe<Environment>>>;
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
@@ -3211,6 +3213,16 @@ export type QueryEditorJobFileLogsExistArgs = {
 export type QueryEditorTaskExecutionFileLogsArgs = {
   jobId: Scalars['ID']['input'];
   taskExecutionId: Scalars['ID']['input'];
+};
+
+
+export type QueryEmbeddedMcpComponentsByServerIdArgs = {
+  mcpServerId: Scalars['ID']['input'];
+};
+
+
+export type QueryEmbeddedMcpToolsByComponentIdArgs = {
+  mcpComponentId: Scalars['ID']['input'];
 };
 
 
