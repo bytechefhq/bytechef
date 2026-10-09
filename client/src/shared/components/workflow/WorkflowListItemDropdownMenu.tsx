@@ -5,10 +5,8 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
-
-import '@/shared/styles/dropdownMenu.css';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 
@@ -45,22 +43,19 @@ const WorkflowListItemDropdownMenu = ({
                     />
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="p-0">
-                    <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
-                        <EditIcon /> Edit
-                    </DropdownMenuItem>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
 
                     {children}
 
-                    <DropdownMenuSeparator className="m-0" />
+                    <DropdownMenuSeparator />
 
                     <DropdownMenuItem
-                        className="dropdown-menu-item-destructive"
+                        icon={<Trash2Icon />}
+                        label="Delete"
                         onClick={() => setShowDeleteWorkflowAlertDialog(true)}
                         variant="destructive"
-                    >
-                        <Trash2Icon /> Delete
-                    </DropdownMenuItem>
+                    />
                 </DropdownMenuContent>
             </DropdownMenu>
 

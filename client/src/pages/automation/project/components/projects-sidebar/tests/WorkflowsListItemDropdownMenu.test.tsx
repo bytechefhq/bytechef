@@ -134,6 +134,16 @@ afterEach(() => {
 });
 
 describe('WorkflowsListItemDropdownMenu', () => {
+    it('should render with the design-system DropdownMenu', async () => {
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Duplicate'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+    });
+
     it('offers Edit, Duplicate, Share, Share with Community, Export and Delete', async () => {
         renderMenu();
 

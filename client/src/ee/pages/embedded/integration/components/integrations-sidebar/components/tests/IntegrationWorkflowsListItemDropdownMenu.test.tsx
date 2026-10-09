@@ -95,6 +95,16 @@ afterEach(() => {
 });
 
 describe('IntegrationWorkflowsListItemDropdownMenu', () => {
+    it('should render with the design-system DropdownMenu', async () => {
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Export'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+    });
+
     it('offers Edit, Export and Delete', async () => {
         renderMenu();
 

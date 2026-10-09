@@ -1,4 +1,4 @@
-import {DropdownMenuItem} from '@/components/ui/dropdown-menu';
+import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import WorkflowListItemDropdownMenu from '@/shared/components/workflow/WorkflowListItemDropdownMenu';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -14,7 +14,7 @@ const renderMenu = (overrides: {dialogs?: React.ReactNode; onDelete?: () => void
             onEditClick={onEditClick}
             workflowLabel="Workflow One"
         >
-            <DropdownMenuItem>Export</DropdownMenuItem>
+            <DropdownMenuItem label="Export" />
         </WorkflowListItemDropdownMenu>
     );
 
@@ -35,6 +35,17 @@ afterEach(() => {
 });
 
 describe('WorkflowListItemDropdownMenu', () => {
+    it('should render with the design-system DropdownMenu', async () => {
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Export'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+    });
+
     it('labels the trigger with the workflow label', () => {
         renderMenu();
 

@@ -59,3 +59,12 @@ it('should call setSortBy with correct value when a sort option is selected', as
         expect(mockSetSortBy).toHaveBeenCalledWith('date-created');
     });
 });
+
+it('should render with the design-system DropdownMenu', async () => {
+    renderWorkflowsListFilter('', 'last-edited');
+
+    await userEvent.click(screen.getByLabelText('Sort by'));
+
+    expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+    expect(screen.getByRole('menuitem', {name: 'Date created'})).toHaveClass('text-content-neutral-primary');
+});

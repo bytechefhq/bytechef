@@ -1,4 +1,4 @@
-import {DropdownMenuItem} from '@/components/ui/dropdown-menu';
+import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
 import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
@@ -6,8 +6,6 @@ import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries
 import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowListItemDropdownMenu from '@/shared/components/workflow/WorkflowListItemDropdownMenu';
-
-import '@/shared/styles/dropdownMenu.css';
 import {useQueryClient} from '@tanstack/react-query';
 import {DownloadIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -106,11 +104,10 @@ const IntegrationWorkflowsListItemDropdownMenu = ({
             workflowLabel={workflow.label}
         >
             <DropdownMenuItem
-                className="dropdown-menu-item"
+                icon={<DownloadIcon />}
+                label="Export"
                 onClick={() => (window.location.href = `/api/embedded/internal/workflows/${workflow.id}/export`)}
-            >
-                <DownloadIcon /> Export
-            </DropdownMenuItem>
+            />
         </WorkflowListItemDropdownMenu>
     );
 };

@@ -1,6 +1,11 @@
 import Button from '@/components/Button/Button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Input} from '@/components/Input/Input';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SORT_OPTIONS} from '@/shared/constants';
 import {CheckIcon, ListFilterIcon, SearchIcon} from 'lucide-react';
@@ -49,7 +54,7 @@ const WorkflowsListFilter = forwardRef<HTMLInputElement, WorkflowsListFilterProp
                     <DropdownMenuContent align="end">
                         {SORT_OPTIONS.map((option) => (
                             <DropdownMenuItem
-                                className="flex cursor-pointer items-center justify-between rounded-none hover:bg-surface-neutral-primary-hover"
+                                className="justify-between"
                                 key={option.value}
                                 onClick={() => setSortBy(option.value)}
                             >
