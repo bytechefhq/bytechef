@@ -52,21 +52,21 @@ export function AppSidebarWorkspaceSelect() {
         setCurrentWorkspaceId(+value);
 
         if (currentType === PlatformType.AUTOMATION) {
-            navigate(`/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
+            void navigate(
+                `/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`
+            );
         }
     };
 
     useEffect(() => {
-        if (workspaces && workspaces.length > 0) {
-            if (currentWorkspaceId) {
-                if (!workspaces.map((workspace) => workspace.id!).find((id) => id === currentWorkspaceId)) {
-                    if (workspaces[0]?.id) {
-                        setCurrentWorkspaceId(workspaces[0]?.id);
-                    }
-                }
-            } else if (workspaces[0]?.id && !currentWorkspaceId) {
-                setCurrentWorkspaceId(workspaces[0]?.id);
-            }
+        const firstWorkspaceId = workspaces?.[0]?.id;
+
+        if (!firstWorkspaceId) {
+            return;
+        }
+
+        if (!workspaces.some((workspace) => workspace.id === currentWorkspaceId)) {
+            setCurrentWorkspaceId(firstWorkspaceId);
         }
     }, [currentWorkspaceId, workspaces, setCurrentWorkspaceId]);
 
@@ -123,7 +123,7 @@ export function AppSidebarWorkspaceSelect() {
 
                     <DropdownMenuItem
                         className="cursor-pointer pl-8"
-                        onClick={() => navigate('/automation/settings/workspaces')}
+                        onClick={() => void navigate('/automation/settings/workspaces')}
                     >
                         <SettingsIcon className="absolute left-2 size-3.5" />
 

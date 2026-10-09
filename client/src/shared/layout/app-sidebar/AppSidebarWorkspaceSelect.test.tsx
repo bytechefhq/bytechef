@@ -5,6 +5,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {AppSidebarWorkspaceSelect} from './AppSidebarWorkspaceSelect';
 
 const hoisted = vi.hoisted(() => ({
+    currentWorkspaceId: 1 as number | undefined,
     edition: 'EE',
     setCurrentWorkspaceIdMock: vi.fn(),
     workspaces: [] as {id: number; name: string}[],
@@ -29,7 +30,10 @@ vi.mock('@/shared/stores/useAuthenticationStore', () => ({
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: vi.fn(
         (selector: (state: {currentWorkspaceId: number | undefined; setCurrentWorkspaceId: () => void}) => unknown) =>
-            selector({currentWorkspaceId: 1, setCurrentWorkspaceId: hoisted.setCurrentWorkspaceIdMock})
+            selector({
+                currentWorkspaceId: hoisted.currentWorkspaceId,
+                setCurrentWorkspaceId: hoisted.setCurrentWorkspaceIdMock,
+            })
     ),
 }));
 
@@ -59,6 +63,7 @@ describe('AppSidebarWorkspaceSelect', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        hoisted.currentWorkspaceId = 1;
         hoisted.edition = 'EE';
         hoisted.workspaces = [
             {id: 1, name: 'Default'},
@@ -108,5 +113,36 @@ describe('AppSidebarWorkspaceSelect', () => {
         await user.click(await screen.findByRole('menuitem', {name: 'Manage Workspaces'}));
 
         expect(await screen.findByText('Workspaces settings page')).toBeInTheDocument();
+    });
+
+    it('keeps the current workspace when it is still available', () => {
+        renderWorkspaceSelect();
+
+        expect(hoisted.setCurrentWorkspaceIdMock).not.toHaveBeenCalled();
+    });
+
+    it('selects the first workspace when none is selected', () => {
+        hoisted.currentWorkspaceId = undefined;
+
+        renderWorkspaceSelect();
+
+        expect(hoisted.setCurrentWorkspaceIdMock).toHaveBeenCalledWith(1);
+    });
+
+    it('selects the first workspace when the current one is no longer available', () => {
+        hoisted.currentWorkspaceId = 99;
+
+        renderWorkspaceSelect();
+
+        expect(hoisted.setCurrentWorkspaceIdMock).toHaveBeenCalledWith(1);
+    });
+
+    it('leaves the selection alone while there are no workspaces', () => {
+        hoisted.currentWorkspaceId = undefined;
+        hoisted.workspaces = [];
+
+        renderWorkspaceSelect();
+
+        expect(hoisted.setCurrentWorkspaceIdMock).not.toHaveBeenCalled();
     });
 });
