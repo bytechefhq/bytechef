@@ -1,0 +1,100 @@
+# Test-only GraphQL base operations and minimal type stubs for GraphQL slice tests.
+
+type Query {
+    _placeholder: Boolean
+}
+
+type Mutation {
+    _placeholder: Boolean
+}
+
+scalar Long
+scalar Map
+
+enum PlatformType {
+    AUTOMATION
+    EMBEDDED
+}
+
+type ComponentDefinition {
+    name: String
+}
+
+type Integration {
+    id: ID
+}
+
+type IntegrationWorkflow {
+    id: ID
+}
+
+interface Property {
+    name: String
+}
+
+type StringProperty implements Property {
+    name: String
+}
+
+type Workflow {
+    id: String
+}
+
+type Tag {
+    id: ID
+    name: String
+}
+
+input TagInput {
+    id: ID
+    name: String!
+}
+
+type McpComponent {
+    id: ID!
+    componentName: String!
+    componentVersion: Int!
+    mcpServerId: ID!
+}
+
+input McpComponentWithToolsInput {
+    componentName: String!
+    componentVersion: Int!
+    mcpServerId: ID!
+    connectionId: ID
+    tools: [McpToolInputForComponent!]!
+    version: Int
+}
+
+input McpToolInputForComponent {
+    name: String!
+    parameters: Map
+}
+
+type McpServer {
+    id: ID!
+    name: String!
+    type: PlatformType!
+    enabled: Boolean!
+    secretKey: String!
+}
+
+input McpServerUpdateInput {
+    name: String
+    enabled: Boolean
+}
+
+type McpTool {
+    id: ID!
+    name: String!
+    enabled: Boolean!
+    mcpComponentId: ID!
+    parameters: Map
+}
+
+input McpToolInput {
+    mcpComponentId: ID!
+    name: String!
+    parameters: Map
+    version: Int
+}
