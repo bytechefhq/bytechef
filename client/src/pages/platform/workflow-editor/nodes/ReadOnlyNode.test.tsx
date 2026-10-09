@@ -34,6 +34,32 @@ describe('ReadOnlyNode', () => {
         expect(screen.getByText('aiAgent_1')).toBeInTheDocument();
     });
 
+    it('shows the workflow node name of a trigger as defined in the workflow', () => {
+        renderReadOnlyNode({
+            componentName: 'chat',
+            label: 'Chat',
+            name: 'chat_1',
+            operationName: 'newChatRequest',
+            trigger: true,
+            workflowNodeName: 'chat_1',
+        });
+
+        expect(screen.getByText('chat_1')).toBeInTheDocument();
+        expect(screen.queryByText('trigger_1')).not.toBeInTheDocument();
+    });
+
+    it('shows the workflow node name of the default manual trigger', () => {
+        renderReadOnlyNode({
+            componentName: 'manual',
+            label: 'Manual',
+            name: 'manual',
+            trigger: true,
+            workflowNodeName: 'trigger_1',
+        });
+
+        expect(screen.getByText('trigger_1')).toBeInTheDocument();
+    });
+
     it('shows an icon for every cluster element of a cluster root', () => {
         renderReadOnlyNode({
             clusterElements: {
