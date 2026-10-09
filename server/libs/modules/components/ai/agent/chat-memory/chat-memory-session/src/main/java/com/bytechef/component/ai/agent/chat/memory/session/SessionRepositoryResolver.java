@@ -16,14 +16,18 @@
 
 package com.bytechef.component.ai.agent.chat.memory.session;
 
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.ComponentConnection;
+import java.util.Map;
+import org.springframework.ai.session.SessionRepository;
 
-public class SessionChatMemoryComponentHandlerTest {
+/**
+ * @author Ivica Cardic
+ */
+@FunctionalInterface
+public interface SessionRepositoryResolver {
 
-    @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/session-chat-memory_v1.json", new SessionChatMemoryComponentHandler(null).getDefinition());
-    }
+    SessionRepository resolve(
+        Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+        Map<String, ComponentConnection> componentConnections) throws Exception;
 }

@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.definition;
 
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
-import static com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction.SESSION_REPOSITORY;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
@@ -31,6 +30,6 @@ public interface SessionChatMemoryComponentDefinition extends ClusterRootCompone
 
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
-        return List.of(SESSION_REPOSITORY, SUMMARIZER_MODEL);
+        return List.of(SUMMARIZER_MODEL);
     }
 }
