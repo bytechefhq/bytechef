@@ -10,4 +10,6 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
+
+    testImplementation(project(":server:libs:test:test-support"))
 }

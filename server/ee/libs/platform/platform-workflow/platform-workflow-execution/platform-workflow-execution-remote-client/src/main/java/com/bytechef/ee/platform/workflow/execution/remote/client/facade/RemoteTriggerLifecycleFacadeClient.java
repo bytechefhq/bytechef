@@ -7,12 +7,14 @@
 
 package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,40 +36,69 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
     }
 
     @Override
-    public void executeTriggerDisable(
+    public boolean executeTriggerDisable(
         String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
-        Map<String, ?> triggerParameters, Long connectionId) {
+        Map<String, ?> triggerParameters, @Nullable Long connectionId) {
 
-        post(
-            TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-enable",
+        Boolean disabled = loadBalancedRestClient.post(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-disable")
+                .build(),
             new TriggerRequest(
-                workflowId, workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, null, -1));
+                workflowId, workflowExecutionId.toString(), triggerWorkflowNodeType, triggerParameters, connectionId,
+                null, -1),
+            Boolean.class);
+
+        return Boolean.TRUE.equals(disabled);
     }
 
     @Override
-    public void executeTriggerEnable(
+    public boolean executeTriggerEnableUndo(
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
+        Map<String, ?> triggerParameters, @Nullable Long connectionId, WebhookEnableOutput enableOutput,
+        @Nullable Object previousTriggerState) {
+
+        Boolean undone = loadBalancedRestClient.post(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-enable-undo")
+                .build(),
+            new TriggerEnableUndoRequest(
+                workflowId, workflowExecutionId.toString(), triggerWorkflowNodeType, triggerParameters, connectionId,
+                enableOutput, previousTriggerState),
+            Boolean.class);
+
+        return Boolean.TRUE.equals(undone);
+    }
+
+    @Override
+    public @Nullable WebhookEnableOutput executeTriggerEnable(
         String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl, long environmentId) {
 
-        post(
-            TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-enable",
-            new TriggerRequest(
-                workflowId, workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, webhookUrl,
-                environmentId));
-    }
-
-    private void post(String path, TriggerRequest workflowExecutionId) {
-        loadBalancedRestClient.post(
+        return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
-                .path(path)
+                .path(TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-enable")
                 .build(),
-            workflowExecutionId);
+            new TriggerRequest(
+                workflowId, workflowExecutionId.toString(), triggerWorkflowNodeType, triggerParameters, connectionId,
+                webhookUrl, environmentId),
+            WebhookEnableOutput.class);
     }
 
     @SuppressFBWarnings("EI")
     private record TriggerRequest(
-        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
-        Map<String, ?> triggerParameters, long connectionId, String webhookUrl, long environmentId) {
+        String workflowId, String workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
+        Map<String, ?> triggerParameters, @Nullable Long connectionId, @Nullable String webhookUrl,
+        long environmentId) {
+    }
+
+    @SuppressFBWarnings("EI")
+    private record TriggerEnableUndoRequest(
+        String workflowId, String workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
+        Map<String, ?> triggerParameters, @Nullable Long connectionId, WebhookEnableOutput enableOutput,
+        @Nullable Object previousTriggerState) {
     }
 }

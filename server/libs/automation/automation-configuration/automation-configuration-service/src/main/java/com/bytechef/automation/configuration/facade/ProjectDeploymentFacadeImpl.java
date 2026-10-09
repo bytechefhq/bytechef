@@ -36,6 +36,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
@@ -58,8 +59,10 @@ import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,13 +70,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.LongSupplier;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -100,9 +112,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
+    private final TriggerStateService triggerStateService;
     private final String webhookUrl;
     private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
+    private final TransactionTemplate requiresNewTransactionTemplate;
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentFacadeImpl(
@@ -113,7 +127,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
-        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
+        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
+        PlatformTransactionManager transactionManager, TriggerStateService triggerStateService) {
 
         this.connectionService = connectionService;
         this.evaluator = evaluator;
@@ -130,9 +145,16 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
+        this.triggerStateService = triggerStateService;
         this.webhookUrl = applicationProperties.getWebhookUrl();
         this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        this.requiresNewTransactionTemplate = transactionTemplate;
     }
 
     @Override
@@ -210,67 +232,29 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     public void deleteProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
 
-        if (projectDeployment.isEnabled()) {
-            enableProjectDeployment(projectDeployment.getId(), false);
-        }
+        changeWorkflowTriggers(workflowTriggerJournal -> {
+            if (projectDeployment.isEnabled()) {
+                enableProjectDeployment(projectDeployment.getId(), false, workflowTriggerJournal);
+            }
 
-        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
-            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(id);
-
-        List<Long> jobIds = principalJobService.getJobIds(id, PlatformType.AUTOMATION);
-
-        for (long jobId : jobIds) {
-            triggerExecutionService.deleteJobTriggerExecution(jobId);
-
-            principalJobService.deletePrincipalJobs(jobId, PlatformType.AUTOMATION);
-        }
-
-        List<Long> orderedJobIds = jobIds.stream()
-            .distinct()
-            .sorted(Comparator.reverseOrder())
-            .toList();
-
-        for (long jobId : orderedJobIds) {
-            jobFacade.deleteJob(jobId);
-        }
-
-        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
-            projectDeploymentWorkflowService.delete(projectDeploymentWorkflow.getId());
-        }
-
-        projectDeploymentService.delete(id);
-
-// TODO find a way to delete all tags not referenced anymore
-//        project.getTagIds()
-//            .forEach(tagService::delete);
+            deleteProjectDeploymentRows(id);
+        });
     }
 
     @Override
     public void enableProjectDeployment(long projectDeploymentId, boolean enable) {
-        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
-            .getProjectDeploymentWorkflows(projectDeploymentId);
-
-        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
-            if (!projectDeploymentWorkflow.isEnabled()) {
-                continue;
-            }
-
-            if (enable) {
-                enableWorkflowTriggers(projectDeploymentWorkflow);
-            } else {
-                disableWorkflowTriggers(projectDeploymentWorkflow);
-            }
-        }
-
-        projectDeploymentService.updateEnabled(projectDeploymentId, enable);
+        changeWorkflowTriggers(
+            workflowTriggerJournal -> enableProjectDeployment(projectDeploymentId, enable, workflowTriggerJournal));
     }
 
     @Override
     public void enableProjectDeploymentWorkflow(long projectDeploymentId, String workflowId, boolean enable) {
-        ProjectDeploymentWorkflow projectDeploymentWorkflow = doEnableProjectDeploymentWorkflow(
-            projectDeploymentId, workflowId, enable);
+        changeWorkflowTriggers(workflowTriggerJournal -> {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = doEnableProjectDeploymentWorkflow(
+                projectDeploymentId, workflowId, enable, workflowTriggerJournal);
 
-        projectDeploymentWorkflowService.updateEnabled(projectDeploymentWorkflow.getId(), enable);
+            projectDeploymentWorkflowService.updateEnabled(projectDeploymentWorkflow.getId(), enable);
+        });
     }
 
     @Override
@@ -471,6 +455,62 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectDeployment projectDeployment, int oldProjectVersion,
         List<ProjectDeploymentWorkflow> projectDeploymentWorkflows, List<ProjectWorkflow> allProjectWorkflows) {
 
+        changeWorkflowTriggers(
+            workflowTriggerJournal -> checkProjectDeploymentWorkflows(
+                projectDeployment, oldProjectVersion, projectDeploymentWorkflows, allProjectWorkflows,
+                workflowTriggerJournal));
+    }
+
+    private void changeWorkflowTriggers(Consumer<WorkflowTriggerJournal> triggerChange) {
+        WorkflowTriggerJournal workflowTriggerJournal = new WorkflowTriggerJournal();
+        boolean synchronizationActive = TransactionSynchronizationManager.isSynchronizationActive();
+
+        try {
+            triggerChange.accept(workflowTriggerJournal);
+        } catch (RuntimeException exception) {
+            if (synchronizationActive) {
+                workflowTriggerJournal.discardDisabledWorkflows();
+
+                registerJournalSynchronization(workflowTriggerJournal);
+            } else {
+                workflowTriggerJournal.undo(exception);
+            }
+
+            throw exception;
+        }
+
+        if (synchronizationActive) {
+            registerJournalSynchronization(workflowTriggerJournal);
+        } else {
+            workflowTriggerJournal.stopRunningJobs();
+        }
+    }
+
+    private void registerJournalSynchronization(WorkflowTriggerJournal workflowTriggerJournal) {
+        if (workflowTriggerJournal.isEmpty()) {
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new WorkflowTriggerJournalSynchronization(workflowTriggerJournal, getNextJournalSynchronizationOrder()));
+    }
+
+    private static int getNextJournalSynchronizationOrder() {
+        List<TransactionSynchronization> transactionSynchronizations =
+            TransactionSynchronizationManager.getSynchronizations();
+
+        long journalSynchronizationCount = transactionSynchronizations.stream()
+            .filter(WorkflowTriggerJournalSynchronization.class::isInstance)
+            .count();
+
+        return Ordered.LOWEST_PRECEDENCE - Math.toIntExact(journalSynchronizationCount);
+    }
+
+    private void checkProjectDeploymentWorkflows(
+        ProjectDeployment projectDeployment, int oldProjectVersion,
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows, List<ProjectWorkflow> allProjectWorkflows,
+        WorkflowTriggerJournal workflowTriggerJournal) {
+
         List<ProjectDeploymentWorkflow> oldProjectDeploymentWorkflows = List.of();
 
         if (oldProjectVersion != -1) {
@@ -517,8 +557,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
 
                 if (projectDeployment.isEnabled() && projectDeploymentWorkflow.isEnabled()) {
-                    enableProjectDeploymentWorkflow(
-                        projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
+                    ProjectDeploymentWorkflow enabledProjectDeploymentWorkflow = doEnableProjectDeploymentWorkflow(
+                        projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true,
+                        workflowTriggerJournal);
+
+                    projectDeploymentWorkflowService.updateEnabled(enabledProjectDeploymentWorkflow.getId(), true);
                 }
             } else {
                 String oldWorkflowId = oldProjectDeploymentWorkflow.getWorkflowId();
@@ -532,18 +575,20 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 if (projectDeploymentWorkflow.isEnabled()) {
                     if (projectDeployment.isEnabled() && wasEnabled) {
                         doEnableProjectDeploymentWorkflow(
-                            projectDeployment.getId(), oldWorkflowId, false);
+                            projectDeployment.getId(), oldWorkflowId, false, workflowTriggerJournal);
                     }
 
                     projectDeploymentWorkflowService.update(oldProjectDeploymentWorkflow);
 
                     if (projectDeployment.isEnabled()) {
                         doEnableProjectDeploymentWorkflow(
-                            projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
+                            projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true,
+                            workflowTriggerJournal);
                     }
                 } else {
                     if (wasEnabled) {
-                        doEnableProjectDeploymentWorkflow(projectDeployment.getId(), oldWorkflowId, false);
+                        doEnableProjectDeploymentWorkflow(
+                            projectDeployment.getId(), oldWorkflowId, false, workflowTriggerJournal);
                     }
 
                     projectDeploymentWorkflowService.update(oldProjectDeploymentWorkflow);
@@ -575,7 +620,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
                 if (oldProjectDeploymentWorkflow.isEnabled()) {
                     doEnableProjectDeploymentWorkflow(
-                        projectDeployment.getId(), oldProjectDeploymentWorkflow.getWorkflowId(), false);
+                        projectDeployment.getId(), oldProjectDeploymentWorkflow.getWorkflowId(), false,
+                        workflowTriggerJournal);
                 }
 
                 projectDeploymentWorkflowService.delete(oldProjectDeploymentWorkflow.getId());
@@ -593,26 +639,75 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return tagIds.contains(tag.getId());
     }
 
-    private void disableWorkflowTriggers(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+    private void deleteProjectDeploymentRows(long projectDeploymentId) {
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentId);
+
+        List<Long> jobIds = principalJobService.getJobIds(projectDeploymentId, PlatformType.AUTOMATION);
+
+        for (long jobId : jobIds) {
+            triggerExecutionService.deleteJobTriggerExecution(jobId);
+
+            principalJobService.deletePrincipalJobs(jobId, PlatformType.AUTOMATION);
+        }
+
+        List<Long> orderedJobIds = jobIds.stream()
+            .distinct()
+            .sorted(Comparator.reverseOrder())
+            .toList();
+
+        for (long jobId : orderedJobIds) {
+            jobFacade.deleteJob(jobId);
+        }
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            projectDeploymentWorkflowService.delete(projectDeploymentWorkflow.getId());
+        }
+
+        projectDeploymentService.delete(projectDeploymentId);
+    }
+
+    private boolean disableWorkflowTrigger(WorkflowTriggerRegistration workflowTriggerRegistration) {
+        return triggerLifecycleFacade.executeTriggerDisable(
+            workflowTriggerRegistration.workflowId(), workflowTriggerRegistration.workflowExecutionId(),
+            workflowTriggerRegistration.workflowNodeType(), workflowTriggerRegistration.triggerParameters(),
+            workflowTriggerRegistration.connectionId());
+    }
+
+    private static IllegalStateException newTriggerNotDisabledException(
+        WorkflowTriggerRegistration workflowTriggerRegistration) {
+
+        WorkflowExecutionId workflowExecutionId = workflowTriggerRegistration.workflowExecutionId();
+
+        return new IllegalStateException(
+            "Trigger %s of workflow %s could not be disabled, so its current state was kept".formatted(
+                workflowExecutionId.getTriggerName(), workflowTriggerRegistration.workflowId()));
+    }
+
+    private void disableWorkflowTriggers(
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, LongSupplier environmentIdSupplier,
+        WorkflowTriggerJournal workflowTriggerJournal) {
+
         Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-            WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
-                projectWorkflow.getUuidAsString(), workflowTrigger.getName());
+            WorkflowTriggerRegistration workflowTriggerRegistration = toWorkflowTriggerRegistration(
+                projectDeploymentWorkflow, workflow.getId(), projectWorkflow, workflowTrigger,
+                WorkflowNodeType.ofType(workflowTrigger.getType()));
 
-            triggerLifecycleFacade.executeTriggerDisable(
-                workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
-                getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger));
+            boolean disarmed = disableWorkflowTrigger(workflowTriggerRegistration);
+
+            if (disarmed && !isManualTrigger(workflowTriggerRegistration.workflowNodeType())) {
+                workflowTriggerJournal.recordDisarmed(workflowTriggerRegistration, environmentIdSupplier);
+            }
         }
     }
 
     private ProjectDeploymentWorkflow doEnableProjectDeploymentWorkflow(
-        long projectDeploymentId, String workflowId, boolean enable) {
+        long projectDeploymentId, String workflowId, boolean enable, WorkflowTriggerJournal workflowTriggerJournal) {
 
         ProjectDeploymentWorkflow projectDeploymentWorkflow =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
@@ -655,18 +750,55 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         if (projectDeployment.isEnabled()) {
             if (enable) {
-                enableWorkflowTriggers(projectDeploymentWorkflow);
+                enableWorkflowTriggers(projectDeploymentWorkflow, workflowTriggerJournal);
             } else {
-                disableWorkflowTriggers(projectDeploymentWorkflow);
-                // Also stop any currently running jobs for this workflow under this project deployment
-                stopRunningJobs(projectDeploymentWorkflow);
+                long environmentId = projectDeployment.getEnvironmentId();
+
+                disableWorkflowTriggers(projectDeploymentWorkflow, () -> environmentId, workflowTriggerJournal);
+
+                workflowTriggerJournal.recordDisabledWorkflow(projectDeploymentWorkflow);
             }
         }
 
         return projectDeploymentWorkflow;
     }
 
-    private void enableWorkflowTriggers(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+    private void enableProjectDeployment(
+        long projectDeploymentId, boolean enable, WorkflowTriggerJournal workflowTriggerJournal) {
+
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflows(projectDeploymentId);
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            if (!projectDeploymentWorkflow.isEnabled()) {
+                continue;
+            }
+
+            if (enable) {
+                enableWorkflowTriggers(projectDeploymentWorkflow, workflowTriggerJournal);
+            } else {
+                disableWorkflowTriggers(
+                    projectDeploymentWorkflow, () -> getEnvironmentId(projectDeploymentId), workflowTriggerJournal);
+            }
+        }
+
+        projectDeploymentService.updateEnabled(projectDeploymentId, enable);
+    }
+
+    private @Nullable WebhookEnableOutput enableWorkflowTrigger(
+        WorkflowTriggerRegistration workflowTriggerRegistration, long environmentId) {
+
+        WorkflowExecutionId workflowExecutionId = workflowTriggerRegistration.workflowExecutionId();
+
+        return triggerLifecycleFacade.executeTriggerEnable(
+            workflowTriggerRegistration.workflowId(), workflowExecutionId,
+            workflowTriggerRegistration.workflowNodeType(), workflowTriggerRegistration.triggerParameters(),
+            workflowTriggerRegistration.connectionId(), getWebhookUrl(workflowExecutionId), environmentId);
+    }
+
+    private void enableWorkflowTriggers(
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, WorkflowTriggerJournal workflowTriggerJournal) {
+
         Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
         validateProjectDeploymentWorkflowInputs(projectDeploymentWorkflow.getInputs(), workflow);
@@ -679,26 +811,35 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-            if (Objects.equals(workflowNodeType.name(), "manual")) {
+            if (isManualTrigger(workflowNodeType)) {
                 continue;
             }
 
-            WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
-                projectWorkflow.getUuidAsString(), workflowTrigger.getName());
+            WorkflowTriggerRegistration workflowTriggerRegistration = toWorkflowTriggerRegistration(
+                projectDeploymentWorkflow, workflow.getId(), projectWorkflow, workflowTrigger, workflowNodeType);
 
-            triggerLifecycleFacade.executeTriggerEnable(
-                workflow.getId(), workflowExecutionId, workflowNodeType,
-                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
-                getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger),
-                getWebhookUrl(workflowExecutionId), projectDeployment.getEnvironmentId());
+            Object previousTriggerState = triggerStateService.fetchValue(
+                workflowTriggerRegistration.workflowExecutionId())
+                .orElse(null);
+
+            WebhookEnableOutput armedTriggerState = enableWorkflowTrigger(
+                workflowTriggerRegistration, projectDeployment.getEnvironmentId());
+
+            workflowTriggerJournal.recordArmed(workflowTriggerRegistration, previousTriggerState, armedTriggerState);
         }
     }
 
-    private void stopRunningJobs(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
-        List<Long> principalIds = List.of(projectDeploymentWorkflow.getProjectDeploymentId());
-        List<String> workflowIds = List.of(projectDeploymentWorkflow.getWorkflowId());
+    private long getEnvironmentId(long projectDeploymentId) {
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
 
+        return projectDeployment.getEnvironmentId();
+    }
+
+    private List<Long> getRunningJobIds(long projectDeploymentId, String workflowId) {
+        List<Long> principalIds = List.of(projectDeploymentId);
+        List<String> workflowIds = List.of(workflowId);
+
+        List<Long> runningJobIds = new ArrayList<>();
         int pageNumber = 0;
 
         while (true) {
@@ -711,9 +852,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 break;
             }
 
-            for (Long jobId : jobIds) {
-                jobFacade.stopJob(jobId);
-            }
+            runningJobIds.addAll(jobIds);
 
             if (page.hasNext()) {
                 pageNumber++;
@@ -721,6 +860,50 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 break;
             }
         }
+
+        return runningJobIds;
+    }
+
+    private static boolean isManualTrigger(WorkflowNodeType workflowNodeType) {
+        return Objects.equals(workflowNodeType.name(), "manual");
+    }
+
+    private void stopRunningJobs(DisabledWorkflow disabledWorkflow) {
+        for (Long jobId : disabledWorkflow.runningJobIds()) {
+            try {
+                jobFacade.stopJob(jobId);
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Failed to stop job {} of workflow {} of project deployment {} after disabling the workflow",
+                    jobId, disabledWorkflow.workflowId(), disabledWorkflow.projectDeploymentId(), exception);
+            }
+        }
+    }
+
+    private WorkflowTriggerRegistration toWorkflowTriggerRegistration(
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, String workflowId, ProjectWorkflow projectWorkflow,
+        WorkflowTrigger workflowTrigger, WorkflowNodeType workflowNodeType) {
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
+            projectWorkflow.getUuidAsString(), workflowTrigger.getName());
+        Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
+            projectDeploymentWorkflow.getInputs(), evaluator);
+        Long connectionId = getConnectionId(
+            projectDeploymentWorkflow.getProjectDeploymentId(), workflowId, workflowTrigger);
+
+        return new WorkflowTriggerRegistration(
+            workflowId, workflowExecutionId, workflowNodeType, triggerParameters, connectionId);
+    }
+
+    private boolean undoWebhookTriggerEnable(
+        WorkflowTriggerRegistration workflowTriggerRegistration, WebhookEnableOutput armedTriggerState,
+        @Nullable Object previousTriggerState) {
+
+        return triggerLifecycleFacade.executeTriggerEnableUndo(
+            workflowTriggerRegistration.workflowId(), workflowTriggerRegistration.workflowExecutionId(),
+            workflowTriggerRegistration.workflowNodeType(), workflowTriggerRegistration.triggerParameters(),
+            workflowTriggerRegistration.connectionId(), armedTriggerState, previousTriggerState);
     }
 
     private List<Tag> filterTags(List<Tag> tags, ProjectDeployment projectDeployment) {
@@ -925,6 +1108,174 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 if (value instanceof String string) {
                     Assert.hasText(string, "Missing required param: " + input.name());
                 }
+            }
+        }
+    }
+
+    private record WorkflowTriggerRegistration(
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType workflowNodeType,
+        Map<String, ?> triggerParameters, @Nullable Long connectionId) {
+    }
+
+    private record DisabledWorkflow(long projectDeploymentId, String workflowId, List<Long> runningJobIds) {
+    }
+
+    private record WorkflowTriggerUndo(
+        WorkflowTriggerRegistration workflowTriggerRegistration, String description, Runnable action) {
+    }
+
+    private final class WorkflowTriggerJournal {
+
+        private final List<DisabledWorkflow> disabledWorkflows = new ArrayList<>();
+        private final List<WorkflowTriggerUndo> workflowTriggerUndos = new ArrayList<>();
+
+        private void recordArmed(
+            WorkflowTriggerRegistration workflowTriggerRegistration, @Nullable Object previousTriggerState,
+            @Nullable WebhookEnableOutput armedTriggerState) {
+
+            if (armedTriggerState == null) {
+                workflowTriggerUndos.add(
+                    new WorkflowTriggerUndo(
+                        workflowTriggerRegistration, "disable", () -> {
+                            if (!disableWorkflowTrigger(workflowTriggerRegistration)) {
+                                throw newTriggerNotDisabledException(workflowTriggerRegistration);
+                            }
+                        }));
+
+                return;
+            }
+
+            workflowTriggerUndos.add(
+                new WorkflowTriggerUndo(
+                    workflowTriggerRegistration,
+                    previousTriggerState == null ? "disable" : "disable and restore the previous state of", () -> {
+                        if (!undoWebhookTriggerEnable(
+                            workflowTriggerRegistration, armedTriggerState, previousTriggerState)) {
+
+                            throw newTriggerNotDisabledException(workflowTriggerRegistration);
+                        }
+                    }));
+        }
+
+        private void discardDisabledWorkflows() {
+            disabledWorkflows.clear();
+        }
+
+        private boolean hasTriggerChanges() {
+            return !workflowTriggerUndos.isEmpty();
+        }
+
+        private boolean isEmpty() {
+            return !hasTriggerChanges() && disabledWorkflows.stream()
+                .allMatch(disabledWorkflow -> disabledWorkflow.runningJobIds()
+                    .isEmpty());
+        }
+
+        private void recordDisabledWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+            long projectDeploymentId = projectDeploymentWorkflow.getProjectDeploymentId();
+            String workflowId = projectDeploymentWorkflow.getWorkflowId();
+
+            disabledWorkflows.add(
+                new DisabledWorkflow(
+                    projectDeploymentId, workflowId, getRunningJobIds(projectDeploymentId, workflowId)));
+        }
+
+        private void recordDisarmed(
+            WorkflowTriggerRegistration workflowTriggerRegistration, LongSupplier environmentIdSupplier) {
+
+            workflowTriggerUndos.add(
+                new WorkflowTriggerUndo(
+                    workflowTriggerRegistration, "re-enable",
+                    () -> enableWorkflowTrigger(workflowTriggerRegistration, environmentIdSupplier.getAsLong())));
+        }
+
+        private void stopRunningJobs() {
+            for (DisabledWorkflow disabledWorkflow : disabledWorkflows) {
+                ProjectDeploymentFacadeImpl.this.stopRunningJobs(disabledWorkflow);
+            }
+        }
+
+        private void undo(RuntimeException failure) {
+            undo(failure, "a project deployment change failed");
+        }
+
+        private void undoAfterRollback() {
+            undo(null, "the transaction of a project deployment change rolled back");
+        }
+
+        private void undo(@Nullable RuntimeException failure, String cause) {
+            for (WorkflowTriggerUndo workflowTriggerUndo : workflowTriggerUndos.reversed()) {
+                try {
+                    Runnable action = workflowTriggerUndo.action();
+
+                    action.run();
+                } catch (RuntimeException exception) {
+                    if (failure != null && exception != failure) {
+                        failure.addSuppressed(exception);
+                    }
+
+                    WorkflowTriggerRegistration workflowTriggerRegistration =
+                        workflowTriggerUndo.workflowTriggerRegistration();
+                    WorkflowExecutionId workflowExecutionId = workflowTriggerRegistration.workflowExecutionId();
+
+                    log.warn(
+                        "Failed to {} trigger {} of workflow {} while restoring the trigger registrations after {}",
+                        workflowTriggerUndo.description(), workflowExecutionId.getTriggerName(),
+                        workflowTriggerRegistration.workflowId(), cause, exception);
+                }
+            }
+        }
+
+        private List<String> getWorkflowIds() {
+            return workflowTriggerUndos.stream()
+                .map(workflowTriggerUndo -> workflowTriggerUndo.workflowTriggerRegistration()
+                    .workflowId())
+                .distinct()
+                .toList();
+        }
+    }
+
+    private final class WorkflowTriggerJournalSynchronization implements TransactionSynchronization {
+
+        private final int order;
+        private final WorkflowTriggerJournal workflowTriggerJournal;
+
+        private WorkflowTriggerJournalSynchronization(WorkflowTriggerJournal workflowTriggerJournal, int order) {
+            this.order = order;
+            this.workflowTriggerJournal = workflowTriggerJournal;
+        }
+
+        @Override
+        public int getOrder() {
+            return order;
+        }
+
+        @Override
+        public void afterCommit() {
+            workflowTriggerJournal.stopRunningJobs();
+        }
+
+        @Override
+        public void afterCompletion(int status) {
+            if (!workflowTriggerJournal.hasTriggerChanges()) {
+                return;
+            }
+
+            if (status == STATUS_ROLLED_BACK) {
+                try {
+                    requiresNewTransactionTemplate.executeWithoutResult(
+                        transactionStatus -> workflowTriggerJournal.undoAfterRollback());
+                } catch (RuntimeException exception) {
+                    log.warn(
+                        "Failed to restore the trigger registrations of workflows {} after the transaction of a " +
+                            "project deployment change rolled back",
+                        workflowTriggerJournal.getWorkflowIds(), exception);
+                }
+            } else if (status == STATUS_UNKNOWN) {
+                log.warn(
+                    "The outcome of the transaction of a project deployment change is unknown; the trigger " +
+                        "registrations of workflows {} may not match the stored deployment",
+                    workflowTriggerJournal.getWorkflowIds());
             }
         }
     }
