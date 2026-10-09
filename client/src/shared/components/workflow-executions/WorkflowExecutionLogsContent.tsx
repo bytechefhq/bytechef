@@ -150,7 +150,15 @@ const LogEntryMessage = ({collapsed, message}: {collapsed?: boolean; message: st
             <div className="flex-1 overflow-x-auto text-nowrap">
                 <JsonView
                     collapsed={false}
-                    fallback={<span className="text-sm">{message}</span>}
+                    fallback={
+                        collapsed ? (
+                            <span className="font-mono text-sm text-muted-foreground">
+                                {Array.isArray(parsedJson) ? '[…]' : '{…}'}
+                            </span>
+                        ) : (
+                            <span className="text-sm">{message}</span>
+                        )
+                    }
                     name={false}
                     shouldCollapse={collapsed ? (field) => field.src === parsedJson : undefined}
                     src={parsedJson}
