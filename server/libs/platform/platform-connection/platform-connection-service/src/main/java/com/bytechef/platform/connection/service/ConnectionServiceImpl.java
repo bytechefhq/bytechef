@@ -261,37 +261,4 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         return connectionRepository.save(connection);
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Connection> getInactiveConnections(List<Long> connectionIds) {
-        if (connectionIds == null || connectionIds.isEmpty()) {
-            return List.of();
-        }
-
-        return connectionRepository.findAllByIdIn(connectionIds)
-            .stream()
-            .filter(connection -> connection.getStatus() != ConnectionStatus.ACTIVE)
-            .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public void validateConnectionsActive(List<Long> connectionIds) {
-        List<Connection> inactive = getInactiveConnections(connectionIds);
-
-        if (inactive.isEmpty()) {
-            return;
-        }
-
-        String detail = inactive.stream()
-            .map(connection -> "id=%s status=%s".formatted(connection.getId(), connection.getStatus()))
-            .reduce((left, right) -> left + ", " + right)
-            .orElse("");
-
-        throw new ConfigurationException(
-            "Workflow execution blocked: %d non-ACTIVE connection(s): %s. Reassign or reactivate to resume."
-                .formatted(inactive.size(), detail),
-            ConnectionErrorType.CONNECTION_NOT_ACTIVE);
-    }
 }
