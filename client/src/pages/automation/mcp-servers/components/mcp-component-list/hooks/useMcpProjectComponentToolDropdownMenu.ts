@@ -17,7 +17,7 @@ export default function useMcpProjectComponentToolDropdownMenu({
 
     const handleDeleteSuccess = () => {
         queryClient.invalidateQueries({
-            queryKey: ['mcpComponentsByServerId'],
+            queryKey: [embedded ? 'embeddedMcpComponentsByServerId' : 'mcpComponentsByServerId'],
         });
 
         setShowDeleteDialog(false);

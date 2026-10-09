@@ -125,6 +125,42 @@ describe('McpComponentToolListItem', () => {
         expect(screen.queryByRole('switch')).not.toBeInTheDocument();
     });
 
+    it('renders the enabled switch checked for an enabled embedded tool', () => {
+        render(
+            <QueryClientProvider client={new QueryClient()}>
+                <McpActivePopoverProvider>
+                    <McpComponentToolListItem
+                        componentName="affinity"
+                        componentVersion={1}
+                        connectionId={null}
+                        embedded
+                        mcpTool={mcpTool}
+                    />
+                </McpActivePopoverProvider>
+            </QueryClientProvider>
+        );
+
+        expect(screen.getByRole('switch')).toBeChecked();
+    });
+
+    it('renders the enabled switch unchecked for a disabled embedded tool', () => {
+        render(
+            <QueryClientProvider client={new QueryClient()}>
+                <McpActivePopoverProvider>
+                    <McpComponentToolListItem
+                        componentName="affinity"
+                        componentVersion={1}
+                        connectionId={null}
+                        embedded
+                        mcpTool={{...mcpTool, enabled: false}}
+                    />
+                </McpActivePopoverProvider>
+            </QueryClientProvider>
+        );
+
+        expect(screen.getByRole('switch')).not.toBeChecked();
+    });
+
     it('disables the tool via the enabled switch', () => {
         const queryClient = new QueryClient();
 
@@ -155,7 +191,7 @@ describe('McpComponentToolListItem', () => {
 
         mutateOptions.onSuccess();
 
-        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['mcpComponentsByServerId']});
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['embeddedMcpComponentsByServerId']});
     });
 
     it('routes deletes and property updates through the embedded operations for an embedded tool', () => {

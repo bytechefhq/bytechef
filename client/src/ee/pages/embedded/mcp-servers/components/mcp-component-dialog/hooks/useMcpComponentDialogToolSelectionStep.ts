@@ -1,4 +1,4 @@
-import {ComponentDefinition, McpTool, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
+import {ComponentDefinition, EmbeddedMcpToolsByComponentIdQuery, McpTool} from '@/shared/middleware/graphql';
 import {ClusterElementDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useEffect, useMemo, useRef} from 'react';
@@ -17,7 +17,7 @@ const useMcpComponentDialogToolSelectionStep = ({
     selectedComponent,
     selectedTools,
 }: {
-    existingTools?: McpToolsByComponentIdQuery;
+    existingTools?: EmbeddedMcpToolsByComponentIdQuery;
     onToolsChange: (tools: SelectedToolI[]) => void;
     selectedComponent: ComponentDefinition | null;
     selectedTools: SelectedToolI[];
@@ -87,11 +87,11 @@ const useMcpComponentDialogToolSelectionStep = ({
 
     useEffect(() => {
         if (
-            existingTools?.mcpToolsByComponentId &&
-            existingTools?.mcpToolsByComponentId?.length > 0 &&
+            existingTools?.embeddedMcpToolsByComponentId &&
+            existingTools?.embeddedMcpToolsByComponentId?.length > 0 &&
             toolElements.length > 0
         ) {
-            const preSelectedTools = existingTools.mcpToolsByComponentId
+            const preSelectedTools = existingTools.embeddedMcpToolsByComponentId
                 .map((existingTool: McpTool | null) => {
                     const toolElement = toolElements.find((tool) => tool.name === existingTool!.name);
 
