@@ -9,6 +9,12 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -21,12 +27,18 @@ import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigura
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -63,6 +75,9 @@ class ConnectionAdminFacadeIntTest {
 
     @Autowired
     private ConnectionFacade connectionFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @MockitoBean
     private ConnectedUserConnectionService connectedUserConnectionService;
@@ -106,6 +121,7 @@ class ConnectionAdminFacadeIntTest {
 
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(connectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(7L);
+        when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection(7L, PlatformType.EMBEDDED)));
 
         assertThat(connectionAdminFacade.createConnection(connectionDTO, true)).isEqualTo(7L);
 
@@ -142,12 +158,78 @@ class ConnectionAdminFacadeIntTest {
         assertThatThrownBy(() -> connectionAdminFacade.updateConnection(7L, "name", List.of(), null, 0))
             .isInstanceOf(AccessDeniedException.class);
 
-        verifyNoInteractions(connectionFacade, connectedUserConnectionService);
+        verifyNoInteractions(connectionFacade, connectionService, connectedUserConnectionService);
+    }
+
+    private static Connection connection(long id, PlatformType type) {
+        Connection connection = new Connection();
+
+        connection.setId(id);
+        connection.setType(type);
+
+        return connection;
     }
 
     private static void authenticate(Authentication authentication) {
         SecurityContextHolder.getContext()
             .setAuthentication(authentication);
+    }
+
+    @Nested
+    class EmbeddedTypeGuard {
+
+        private static final long AUTOMATION_CONNECTION_ID = 8L;
+        private static final long UNKNOWN_CONNECTION_ID = 9L;
+
+        @BeforeEach
+        void beforeEach() {
+            authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+            when(connectionService.fetchConnection(AUTOMATION_CONNECTION_ID))
+                .thenReturn(Optional.of(connection(AUTOMATION_CONNECTION_ID, PlatformType.AUTOMATION)));
+            when(connectionService.fetchConnection(UNKNOWN_CONNECTION_ID)).thenReturn(Optional.empty());
+        }
+
+        @Test
+        void testDeleteConnectionRejectsAutomationConnection() {
+            assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(AUTOMATION_CONNECTION_ID))
+                .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).delete(anyLong());
+            verify(connectedUserConnectionService, never()).deleteByConnectionId(anyLong());
+        }
+
+        @Test
+        void testGetConnectionRejectsAutomationConnection() {
+            assertThatThrownBy(() -> connectionAdminFacade.getConnection(AUTOMATION_CONNECTION_ID))
+                .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).getConnection(anyLong());
+        }
+
+        @Test
+        void testUpdateConnectionRejectsAutomationConnection() {
+            assertThatThrownBy(
+                () -> connectionAdminFacade.updateConnection(AUTOMATION_CONNECTION_ID, "name", List.of(), true, 0))
+                    .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).update(anyLong(), anyString(), any(), anyInt());
+            verify(connectedUserConnectionService, never()).updateShared(anyLong(), anyBoolean());
+        }
+
+        @Test
+        void testUnknownConnectionIsRejectedLikeAnAutomationConnection() {
+            assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(UNKNOWN_CONNECTION_ID))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Connection id=%s not found".formatted(UNKNOWN_CONNECTION_ID));
+            assertThatThrownBy(() -> connectionAdminFacade.getConnection(AUTOMATION_CONNECTION_ID))
+                .hasMessage("Connection id=%s not found".formatted(AUTOMATION_CONNECTION_ID));
+
+            verify(connectionFacade, never()).delete(anyLong());
+        }
     }
 
     @Configuration

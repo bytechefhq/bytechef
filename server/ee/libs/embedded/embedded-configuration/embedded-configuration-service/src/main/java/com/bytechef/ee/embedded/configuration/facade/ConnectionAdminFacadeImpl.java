@@ -9,12 +9,15 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,13 +36,16 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectionFacade connectionFacade;
+    private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionAdminFacadeImpl(
-        ConnectedUserConnectionService connectedUserConnectionService, ConnectionFacade connectionFacade) {
+        ConnectedUserConnectionService connectedUserConnectionService, ConnectionFacade connectionFacade,
+        ConnectionService connectionService) {
 
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectionFacade = connectionFacade;
+        this.connectionService = connectionService;
     }
 
     @Override
@@ -57,6 +63,8 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     @Override
     @Transactional
     public void deleteConnection(long id) {
+        requireEmbedded(id);
+
         connectedUserConnectionService.deleteByConnectionId(id);
 
         connectionFacade.delete(id);
@@ -64,6 +72,8 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
     @Override
     public ConnectionDTO getConnection(long id) {
+        requireEmbedded(id);
+
         return connectionFacade.getConnection(id);
     }
 
@@ -84,10 +94,23 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     @Override
     @Transactional
     public void updateConnection(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version) {
+        requireEmbedded(id);
+
         connectionFacade.update(id, name, tags, version);
 
         if (shared != null) {
             connectedUserConnectionService.updateShared(id, shared);
+        }
+    }
+
+    private void requireEmbedded(long id) {
+        boolean embedded = connectionService.fetchConnection(id)
+            .map(Connection::getType)
+            .filter(type -> type == PlatformType.EMBEDDED)
+            .isPresent();
+
+        if (!embedded) {
+            throw new NoSuchElementException("Connection id=%s not found".formatted(id));
         }
     }
 }
