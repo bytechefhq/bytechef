@@ -1009,6 +1009,13 @@ export type ConnectedUserProjectsQueryVariables = Exact<{
 
 export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, connectedUserId: string, enabled: boolean, lastExecutionDate: string | null, projectId: string, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }> }> };
 
+export type CreateEmbeddedMcpComponentMutationVariables = Exact<{
+  input: Types.McpComponentWithToolsInput;
+}>;
+
+
+export type CreateEmbeddedMcpComponentMutation = { createEmbeddedMcpComponent: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
+
 export type CreateEmbeddedMcpServerMutationVariables = Exact<{
   input: Types.CreateEmbeddedMcpServerInput;
 }>;
@@ -1038,12 +1045,26 @@ export type DeleteConnectedUserProjectWorkflowMutationVariables = Exact<{
 
 export type DeleteConnectedUserProjectWorkflowMutation = { deleteConnectedUserProjectWorkflow: boolean | null };
 
+export type DeleteEmbeddedMcpComponentMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteEmbeddedMcpComponentMutation = { deleteEmbeddedMcpComponent: boolean | null };
+
 export type DeleteEmbeddedMcpServerMutationVariables = Exact<{
   mcpServerId: string | number;
 }>;
 
 
 export type DeleteEmbeddedMcpServerMutation = { deleteEmbeddedMcpServer: boolean | null };
+
+export type DeleteEmbeddedMcpToolMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteEmbeddedMcpToolMutation = { deleteEmbeddedMcpTool: boolean | null };
 
 export type DeleteMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
   id: string | number;
@@ -1171,6 +1192,53 @@ export type ToolEligibleIntegrationVersionWorkflowsQueryVariables = Exact<{
 
 
 export type ToolEligibleIntegrationVersionWorkflowsQuery = { toolEligibleIntegrationVersionWorkflows: Array<{ id: string, integrationWorkflowId: string, label: string }> };
+
+export type UpdateEmbeddedMcpComponentMutationVariables = Exact<{
+  id: string | number;
+  input: Types.McpComponentWithToolsInput;
+}>;
+
+
+export type UpdateEmbeddedMcpComponentMutation = { updateEmbeddedMcpComponent: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
+
+export type UpdateEmbeddedMcpServerMutationVariables = Exact<{
+  id: string | number;
+  input: Types.McpServerUpdateInput;
+}>;
+
+
+export type UpdateEmbeddedMcpServerMutation = { updateEmbeddedMcpServer: { id: string, name: string, enabled: boolean } | null };
+
+export type UpdateEmbeddedMcpServerTagsMutationVariables = Exact<{
+  id: string | number;
+  tags: Array<Types.TagInput> | Types.TagInput;
+}>;
+
+
+export type UpdateEmbeddedMcpServerTagsMutation = { updateEmbeddedMcpServerTags: Array<{ id: string } | null> | null };
+
+export type UpdateEmbeddedMcpServerUrlMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type UpdateEmbeddedMcpServerUrlMutation = { updateEmbeddedMcpServerUrl: { id: string, url: string } | null };
+
+export type UpdateEmbeddedMcpToolMutationVariables = Exact<{
+  id: string | number;
+  input: Types.McpToolInput;
+}>;
+
+
+export type UpdateEmbeddedMcpToolMutation = { updateEmbeddedMcpTool: { id: string, name: string, mcpComponentId: string, parameters: any, version: number | null } | null };
+
+export type UpdateEmbeddedMcpToolEnabledMutationVariables = Exact<{
+  id: string | number;
+  enabled: boolean;
+}>;
+
+
+export type UpdateEmbeddedMcpToolEnabledMutation = { updateEmbeddedMcpToolEnabled: { id: string, enabled: boolean } | null };
 
 export type UpdateIntegrationWorkflowPermissionExpressionMutationVariables = Exact<{
   integrationWorkflowId: string | number;
@@ -1727,14 +1795,6 @@ export type UpdateMcpToolMutationVariables = Exact<{
 
 
 export type UpdateMcpToolMutation = { updateMcpTool: { id: string, name: string, mcpComponentId: string, parameters: any, version: number | null } | null };
-
-export type UpdateMcpToolEnabledMutationVariables = Exact<{
-  id: string | number;
-  enabled: boolean;
-}>;
-
-
-export type UpdateMcpToolEnabledMutation = { updateMcpToolEnabled: { id: string, enabled: boolean } | null };
 
 export type ValidateWorkflowQueryVariables = Exact<{
   workflowDefinition: string;
@@ -5481,6 +5541,37 @@ export const useConnectedUserProjectsQuery = <
   }
     )};
 
+export const CreateEmbeddedMcpComponentDocument = new TypedDocumentString(`
+    mutation createEmbeddedMcpComponent($input: McpComponentWithToolsInput!) {
+  createEmbeddedMcpComponent(input: $input) {
+    id
+    componentName
+    componentVersion
+    title
+    mcpServerId
+    connectionId
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useCreateEmbeddedMcpComponentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateEmbeddedMcpComponentMutation, TError, CreateEmbeddedMcpComponentMutationVariables, TContext>) => {
+    
+    return useMutation<CreateEmbeddedMcpComponentMutation, TError, CreateEmbeddedMcpComponentMutationVariables, TContext>(
+      {
+    mutationKey: ['createEmbeddedMcpComponent'],
+    mutationFn: (variables?: CreateEmbeddedMcpComponentMutationVariables) => fetcher<CreateEmbeddedMcpComponentMutation, CreateEmbeddedMcpComponentMutationVariables>(CreateEmbeddedMcpComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const CreateEmbeddedMcpServerDocument = new TypedDocumentString(`
     mutation createEmbeddedMcpServer($input: CreateEmbeddedMcpServerInput!) {
   createEmbeddedMcpServer(input: $input) {
@@ -5570,6 +5661,25 @@ export const useDeleteConnectedUserProjectWorkflowMutation = <
   }
     )};
 
+export const DeleteEmbeddedMcpComponentDocument = new TypedDocumentString(`
+    mutation deleteEmbeddedMcpComponent($id: ID!) {
+  deleteEmbeddedMcpComponent(id: $id)
+}
+    `);
+
+export const useDeleteEmbeddedMcpComponentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteEmbeddedMcpComponentMutation, TError, DeleteEmbeddedMcpComponentMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteEmbeddedMcpComponentMutation, TError, DeleteEmbeddedMcpComponentMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteEmbeddedMcpComponent'],
+    mutationFn: (variables?: DeleteEmbeddedMcpComponentMutationVariables) => fetcher<DeleteEmbeddedMcpComponentMutation, DeleteEmbeddedMcpComponentMutationVariables>(DeleteEmbeddedMcpComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const DeleteEmbeddedMcpServerDocument = new TypedDocumentString(`
     mutation deleteEmbeddedMcpServer($mcpServerId: ID!) {
   deleteEmbeddedMcpServer(mcpServerId: $mcpServerId)
@@ -5585,6 +5695,25 @@ export const useDeleteEmbeddedMcpServerMutation = <
       {
     mutationKey: ['deleteEmbeddedMcpServer'],
     mutationFn: (variables?: DeleteEmbeddedMcpServerMutationVariables) => fetcher<DeleteEmbeddedMcpServerMutation, DeleteEmbeddedMcpServerMutationVariables>(DeleteEmbeddedMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteEmbeddedMcpToolDocument = new TypedDocumentString(`
+    mutation deleteEmbeddedMcpTool($id: ID!) {
+  deleteEmbeddedMcpTool(id: $id)
+}
+    `);
+
+export const useDeleteEmbeddedMcpToolMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteEmbeddedMcpToolMutation, TError, DeleteEmbeddedMcpToolMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteEmbeddedMcpToolMutation, TError, DeleteEmbeddedMcpToolMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteEmbeddedMcpTool'],
+    mutationFn: (variables?: DeleteEmbeddedMcpToolMutationVariables) => fetcher<DeleteEmbeddedMcpToolMutation, DeleteEmbeddedMcpToolMutationVariables>(DeleteEmbeddedMcpToolDocument, variables)(),
     ...options
   }
     )};
@@ -6116,6 +6245,150 @@ export const useToolEligibleIntegrationVersionWorkflowsQuery = <
       {
     queryKey: ['toolEligibleIntegrationVersionWorkflows', variables],
     queryFn: fetcher<ToolEligibleIntegrationVersionWorkflowsQuery, ToolEligibleIntegrationVersionWorkflowsQueryVariables>(ToolEligibleIntegrationVersionWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedMcpComponentDocument = new TypedDocumentString(`
+    mutation updateEmbeddedMcpComponent($id: ID!, $input: McpComponentWithToolsInput!) {
+  updateEmbeddedMcpComponent(id: $id, input: $input) {
+    id
+    componentName
+    componentVersion
+    title
+    mcpServerId
+    connectionId
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useUpdateEmbeddedMcpComponentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedMcpComponentMutation, TError, UpdateEmbeddedMcpComponentMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedMcpComponentMutation, TError, UpdateEmbeddedMcpComponentMutationVariables, TContext>(
+      {
+    mutationKey: ['updateEmbeddedMcpComponent'],
+    mutationFn: (variables?: UpdateEmbeddedMcpComponentMutationVariables) => fetcher<UpdateEmbeddedMcpComponentMutation, UpdateEmbeddedMcpComponentMutationVariables>(UpdateEmbeddedMcpComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedMcpServerDocument = new TypedDocumentString(`
+    mutation updateEmbeddedMcpServer($id: ID!, $input: McpServerUpdateInput!) {
+  updateEmbeddedMcpServer(id: $id, input: $input) {
+    id
+    name
+    enabled
+  }
+}
+    `);
+
+export const useUpdateEmbeddedMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedMcpServerMutation, TError, UpdateEmbeddedMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedMcpServerMutation, TError, UpdateEmbeddedMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['updateEmbeddedMcpServer'],
+    mutationFn: (variables?: UpdateEmbeddedMcpServerMutationVariables) => fetcher<UpdateEmbeddedMcpServerMutation, UpdateEmbeddedMcpServerMutationVariables>(UpdateEmbeddedMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedMcpServerTagsDocument = new TypedDocumentString(`
+    mutation updateEmbeddedMcpServerTags($id: ID!, $tags: [TagInput!]!) {
+  updateEmbeddedMcpServerTags(id: $id, tags: $tags) {
+    id
+  }
+}
+    `);
+
+export const useUpdateEmbeddedMcpServerTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedMcpServerTagsMutation, TError, UpdateEmbeddedMcpServerTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedMcpServerTagsMutation, TError, UpdateEmbeddedMcpServerTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateEmbeddedMcpServerTags'],
+    mutationFn: (variables?: UpdateEmbeddedMcpServerTagsMutationVariables) => fetcher<UpdateEmbeddedMcpServerTagsMutation, UpdateEmbeddedMcpServerTagsMutationVariables>(UpdateEmbeddedMcpServerTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedMcpServerUrlDocument = new TypedDocumentString(`
+    mutation updateEmbeddedMcpServerUrl($id: ID!) {
+  updateEmbeddedMcpServerUrl(id: $id) {
+    id
+    url
+  }
+}
+    `);
+
+export const useUpdateEmbeddedMcpServerUrlMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedMcpServerUrlMutation, TError, UpdateEmbeddedMcpServerUrlMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedMcpServerUrlMutation, TError, UpdateEmbeddedMcpServerUrlMutationVariables, TContext>(
+      {
+    mutationKey: ['updateEmbeddedMcpServerUrl'],
+    mutationFn: (variables?: UpdateEmbeddedMcpServerUrlMutationVariables) => fetcher<UpdateEmbeddedMcpServerUrlMutation, UpdateEmbeddedMcpServerUrlMutationVariables>(UpdateEmbeddedMcpServerUrlDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedMcpToolDocument = new TypedDocumentString(`
+    mutation updateEmbeddedMcpTool($id: ID!, $input: McpToolInput!) {
+  updateEmbeddedMcpTool(id: $id, input: $input) {
+    id
+    name
+    mcpComponentId
+    parameters
+    version
+  }
+}
+    `);
+
+export const useUpdateEmbeddedMcpToolMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedMcpToolMutation, TError, UpdateEmbeddedMcpToolMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedMcpToolMutation, TError, UpdateEmbeddedMcpToolMutationVariables, TContext>(
+      {
+    mutationKey: ['updateEmbeddedMcpTool'],
+    mutationFn: (variables?: UpdateEmbeddedMcpToolMutationVariables) => fetcher<UpdateEmbeddedMcpToolMutation, UpdateEmbeddedMcpToolMutationVariables>(UpdateEmbeddedMcpToolDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedMcpToolEnabledDocument = new TypedDocumentString(`
+    mutation updateEmbeddedMcpToolEnabled($id: ID!, $enabled: Boolean!) {
+  updateEmbeddedMcpToolEnabled(id: $id, enabled: $enabled) {
+    id
+    enabled
+  }
+}
+    `);
+
+export const useUpdateEmbeddedMcpToolEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedMcpToolEnabledMutation, TError, UpdateEmbeddedMcpToolEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedMcpToolEnabledMutation, TError, UpdateEmbeddedMcpToolEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['updateEmbeddedMcpToolEnabled'],
+    mutationFn: (variables?: UpdateEmbeddedMcpToolEnabledMutationVariables) => fetcher<UpdateEmbeddedMcpToolEnabledMutation, UpdateEmbeddedMcpToolEnabledMutationVariables>(UpdateEmbeddedMcpToolEnabledDocument, variables)(),
     ...options
   }
     )};
@@ -8394,28 +8667,6 @@ export const useUpdateMcpToolMutation = <
       {
     mutationKey: ['updateMcpTool'],
     mutationFn: (variables?: UpdateMcpToolMutationVariables) => fetcher<UpdateMcpToolMutation, UpdateMcpToolMutationVariables>(UpdateMcpToolDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpdateMcpToolEnabledDocument = new TypedDocumentString(`
-    mutation updateMcpToolEnabled($id: ID!, $enabled: Boolean!) {
-  updateMcpToolEnabled(id: $id, enabled: $enabled) {
-    id
-    enabled
-  }
-}
-    `);
-
-export const useUpdateMcpToolEnabledMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>(
-      {
-    mutationKey: ['updateMcpToolEnabled'],
-    mutationFn: (variables?: UpdateMcpToolEnabledMutationVariables) => fetcher<UpdateMcpToolEnabledMutation, UpdateMcpToolEnabledMutationVariables>(UpdateMcpToolEnabledDocument, variables)(),
     ...options
   }
     )};
