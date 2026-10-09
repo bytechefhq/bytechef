@@ -409,12 +409,14 @@ class ManagementMcpServerSecurityConfigurerIntTest {
         }
 
         @Test
-        void testInitializeWithoutBearerTokenWhenLegacyPropertyOmitsAuthenticationRequiredSucceeds() throws Exception {
+        void testInitializeWithoutBearerTokenWhenLegacyPropertyOmitsAuthenticationRequiredIsRejected()
+            throws Exception {
+
             mockProperty(null);
 
             HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, null, null);
 
-            assertThat(httpResponse.statusCode()).isEqualTo(200);
+            assertThat(httpResponse.statusCode()).isEqualTo(401);
         }
 
         private void mockProperty(Boolean authenticationRequired) {

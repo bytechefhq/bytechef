@@ -34,6 +34,6 @@ public final class ManagementMcpServerAuthentication {
             return true;
         }
 
-        return Boolean.TRUE.equals(property.get(AUTHENTICATION_REQUIRED));
+        return !Boolean.FALSE.equals(property.get(AUTHENTICATION_REQUIRED));
     }
 }

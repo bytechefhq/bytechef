@@ -67,13 +67,13 @@ class ManagementMcpAuthenticationRequiredResolverTest {
     }
 
     @Test
-    void testDoesNotRequireAuthenticationWhenLegacyPropertyOmitsTheEntry() {
+    void testRequiresAuthenticationWhenLegacyPropertyOmitsTheEntry() {
         mockProperty(null);
 
         Optional<Boolean> authenticationRequired = managementMcpAuthenticationRequiredResolver
             .resolveAuthenticationRequired(mockRequest("/api/management/" + MCP_SERVER_SECRET_KEY + "/mcp"));
 
-        assertThat(authenticationRequired).hasValue(false);
+        assertThat(authenticationRequired).hasValue(true);
     }
 
     @Test
