@@ -12,12 +12,10 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
-import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -26,7 +24,6 @@ import {
     BlendIcon,
     ChevronsUpDownIcon,
     ClipboardCheckIcon,
-    DiamondIcon,
     HelpCircleIcon,
     SettingsIcon,
     User2Icon,
@@ -56,12 +53,6 @@ export function AppSidebarFooter() {
             setCurrentEnvironmentId: state.setCurrentEnvironmentId,
         }))
     );
-    const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore(
-        useShallow((state) => ({
-            currentWorkspaceId: state.currentWorkspaceId,
-            setCurrentWorkspaceId: state.setCurrentWorkspaceId,
-        }))
-    );
 
     const analytics = useAnalytics();
 
@@ -73,8 +64,6 @@ export function AppSidebarFooter() {
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: environmentsQuery} = useEnvironmentsQuery();
-
-    const {data: workspaces} = useGetUserWorkspacesQuery(account?.id!, !!account);
 
     const handleLogOutClick = async () => {
         analytics.reset();
@@ -100,14 +89,6 @@ export function AppSidebarFooter() {
         }
     };
 
-    const handleWorkspaceValueChange = (value: string) => {
-        setCurrentWorkspaceId(+value);
-
-        if (currentType === PlatformType.AUTOMATION) {
-            navigate(`/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
-        }
-    };
-
     useEffect(() => {
         const environments = environmentsQuery?.environments;
 
@@ -123,20 +104,6 @@ export function AppSidebarFooter() {
             }
         }
     }, [currentEnvironmentId, environmentsQuery?.environments, setCurrentEnvironmentId]);
-
-    useEffect(() => {
-        if (workspaces && workspaces.length > 0) {
-            if (currentWorkspaceId) {
-                if (!workspaces.map((workspace) => workspace.id!).find((id) => id === currentWorkspaceId)) {
-                    if (workspaces[0]?.id) {
-                        setCurrentWorkspaceId(workspaces[0]?.id);
-                    }
-                }
-            } else if (workspaces[0]?.id && !currentWorkspaceId) {
-                setCurrentWorkspaceId(workspaces[0]?.id);
-            }
-        }
-    }, [currentWorkspaceId, workspaces, setCurrentWorkspaceId]);
 
     return (
         <DropdownMenu>
@@ -200,46 +167,6 @@ export function AppSidebarFooter() {
 
                                         <DropdownMenuRadioItem value="1">Embedded</DropdownMenuRadioItem>
                                     </DropdownMenuRadioGroup>
-                                </DropdownMenuSubContent>
-                            </DropdownMenuPortal>
-                        </DropdownMenuSub>
-
-                        <DropdownMenuSeparator />
-                    </>
-                )}
-
-                {pathname.startsWith('/automation') && application?.edition === 'EE' && workspaces && (
-                    <>
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
-                                <DiamondIcon className="size-5" />
-
-                                {`Workspace: ${workspaces.find((w) => w.id === currentWorkspaceId)?.name}`}
-                            </DropdownMenuSubTrigger>
-
-                            <DropdownMenuPortal>
-                                <DropdownMenuSubContent>
-                                    <DropdownMenuRadioGroup
-                                        onValueChange={handleWorkspaceValueChange}
-                                        value={currentWorkspaceId?.toString()}
-                                    >
-                                        {workspaces.map((workspace) => (
-                                            <DropdownMenuRadioItem key={workspace.id} value={workspace.id!.toString()}>
-                                                {workspace.name}
-                                            </DropdownMenuRadioItem>
-                                        ))}
-                                    </DropdownMenuRadioGroup>
-
-                                    <DropdownMenuSeparator />
-
-                                    <DropdownMenuItem
-                                        className="pl-8"
-                                        onClick={() => navigate('/automation/settings/workspaces')}
-                                    >
-                                        <SettingsIcon className="absolute left-2 size-3.5" />
-
-                                        <span>Manage Workspaces</span>
-                                    </DropdownMenuItem>
                                 </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                         </DropdownMenuSub>

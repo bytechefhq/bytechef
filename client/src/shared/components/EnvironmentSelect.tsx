@@ -80,14 +80,16 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
                     className={twMerge(
                         'h-auto gap-1 p-2 hover:bg-sidebar-accent focus-visible:border-sidebar-ring focus-visible:ring-sidebar-ring/50 data-[state=open]:bg-sidebar-accent dark:hover:bg-sidebar-accent',
                         isCompact && 'px-1',
-                        isIcon && 'p-1'
+                        isIcon &&
+                            'size-auto rounded-full p-0 hover:bg-transparent data-[state=open]:bg-transparent dark:hover:bg-transparent'
                     )}
                     variant="ghost"
                 >
                     {isIcon ? (
                         <Badge
                             aria-label={currentConfig.label}
-                            icon={<CurrentIcon className="size-3" />}
+                            className="size-5 rounded-full p-0.5"
+                            icon={<CurrentIcon className="!size-2.5" />}
                             styleType={currentConfig.styleType}
                             weight="semibold"
                         />
@@ -106,7 +108,7 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
                 </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align={isCompact || isIcon ? 'start' : 'end'} className="w-72">
+            <DropdownMenuContent align="start" className="w-72">
                 <DropdownMenuRadioGroup
                     onValueChange={(value) => {
                         const nextEnvironmentId = +value;
