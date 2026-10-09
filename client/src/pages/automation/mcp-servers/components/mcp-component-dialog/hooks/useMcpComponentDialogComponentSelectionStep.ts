@@ -22,14 +22,6 @@ const useMcpComponentDialogComponentSelectionStep = (open: boolean) => {
             return false;
         }
 
-        const contributesNonToolElements = Object.entries(clusterElementsCount).some(
-            ([clusterElementType, count]) => clusterElementType !== 'TOOLS' && count > 0
-        );
-
-        if (contributesNonToolElements) {
-            return false;
-        }
-
         const searchLower = searchTerm.toLowerCase();
 
         const nameMatch = component.name.toLowerCase().includes(searchLower);
