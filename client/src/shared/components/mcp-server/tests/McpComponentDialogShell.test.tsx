@@ -116,6 +116,16 @@ describe('McpComponentDialogShell', () => {
             expect(screen.getByText('1 tool selected')).toBeInTheDocument();
         });
 
+        it('should place the tool count apart from the actions', () => {
+            render(<McpComponentDialogShell {...defaultProps} currentStep="tools" selectedToolCount={2} />);
+
+            const toolCount = screen.getByText('2 tools selected');
+            const footer = toolCount.closest('[data-slot="dialog-footer"]');
+
+            expect(footer?.firstElementChild).toContainElement(toolCount);
+            expect(footer?.lastElementChild).toContainElement(screen.getByRole('button', {name: 'Save'}));
+        });
+
         it('should offer Back when adding a component', () => {
             render(<McpComponentDialogShell {...defaultProps} currentStep="tools" />);
 

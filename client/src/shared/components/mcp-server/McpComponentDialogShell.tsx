@@ -84,25 +84,27 @@ const McpComponentDialogShell = ({
                         </ScrollArea>
                     </DialogBody>
 
-                    <DialogFooter>
-                        {currentStep === 'tools' && (
-                            <div className="flex w-full justify-between">
-                                <div className="text-sm text-muted-foreground">
+                    <DialogFooter
+                        startContent={
+                            currentStep === 'tools' && (
+                                <span className="text-sm text-muted-foreground">
                                     {selectedToolCount} tool{selectedToolCount !== 1 ? 's' : ''} selected
-                                </div>
+                                </span>
+                            )
+                        }
+                    >
+                        {currentStep === 'tools' && (
+                            <>
+                                <DialogCancelButton />
 
-                                <div className="flex space-x-2">
-                                    <DialogCancelButton />
+                                {!editing && <Button label="Back" onClick={onBack} variant="outline" />}
 
-                                    {!editing && <Button label="Back" onClick={onBack} variant="outline" />}
-
-                                    <Button
-                                        disabled={selectedToolCount === 0}
-                                        label={editing ? 'Update' : 'Save'}
-                                        onClick={onSave}
-                                    />
-                                </div>
-                            </div>
+                                <Button
+                                    disabled={selectedToolCount === 0}
+                                    label={editing ? 'Update' : 'Save'}
+                                    onClick={onSave}
+                                />
+                            </>
                         )}
                     </DialogFooter>
                 </DialogMain>
