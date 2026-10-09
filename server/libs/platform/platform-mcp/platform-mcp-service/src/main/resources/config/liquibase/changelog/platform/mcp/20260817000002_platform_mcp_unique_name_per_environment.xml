@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260817000002-1" author="Ivica Cardic">
+        <dropUniqueConstraint tableName="mcp_server" constraintName="uk_mcp_server_name"/>
+        <addUniqueConstraint constraintName="uk_mcp_server_name_environment" tableName="mcp_server" columnNames="name,environment"/>
+    </changeSet>
+</databaseChangeLog>
