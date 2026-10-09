@@ -1,4 +1,4 @@
-import reactLogo from '@/assets/logo.svg';
+import Button from '@/components/Button/Button';
 import {
     Sidebar,
     SidebarContent,
@@ -12,15 +12,17 @@ import {
     SidebarRail,
     useSidebar,
 } from '@/components/ui/sidebar';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {type LucideIcon} from 'lucide-react';
+import {type LucideIcon, PanelLeftCloseIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 
 import {AppSidebarFooter} from './AppSidebarFooter';
+import {AppSidebarWorkspaceSelect} from './AppSidebarWorkspaceSelect';
 
 export interface AppSidebarNavItemI {
     href: string;
@@ -37,7 +39,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
 
     const navigate = useNavigate();
 
-    const {isMobile, state} = useSidebar();
+    const {isMobile, state, toggleSidebar} = useSidebar();
 
     const currentEnvironmentId = useEnvironmentStore((environmentState) => environmentState.currentEnvironmentId);
 
@@ -77,16 +79,27 @@ export function AppSidebar({navigation}: AppSidebarProps) {
     return (
         <Sidebar className="h-full" collapsible="icon">
             <SidebarHeader>
-                <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-1">
-                    <Link className="flex items-center gap-2 py-1" to="/">
-                        <span className="flex size-10 shrink-0 items-center justify-center">
-                            <img alt="ByteChef" className="size-8 max-w-none shrink-0" src={reactLogo} />
-                        </span>
+                <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-3">
+                    <AppSidebarWorkspaceSelect />
 
-                        <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">ByteChef</span>
-                    </Link>
+                    <EnvironmentSelect onChange={handleEnvironmentChange} variant="icon" />
 
-                    <EnvironmentSelect onChange={handleEnvironmentChange} variant={collapsed ? 'icon' : 'compact'} />
+                    {!collapsed && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    aria-label="Close sidebar"
+                                    className="size-auto shrink-0 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-5"
+                                    icon={<PanelLeftCloseIcon />}
+                                    onClick={toggleSidebar}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent side="right">Close sidebar</TooltipContent>
+                        </Tooltip>
+                    )}
                 </div>
             </SidebarHeader>
 

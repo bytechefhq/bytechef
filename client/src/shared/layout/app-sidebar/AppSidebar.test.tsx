@@ -14,6 +14,10 @@ vi.mock('./AppSidebarFooter', () => ({
     AppSidebarFooter: () => null,
 }));
 
+vi.mock('./AppSidebarWorkspaceSelect', () => ({
+    AppSidebarWorkspaceSelect: () => <div data-testid="workspace-select" />,
+}));
+
 vi.mock('@/shared/components/EnvironmentSelect', () => ({
     default: ({onChange, variant}: {onChange?: (environmentId: number) => void; variant?: string}) => (
         <div data-testid="environment-select">
@@ -75,11 +79,26 @@ describe('AppSidebar', () => {
         expect(screen.getByRole('link', {name: 'AI Hub'})).toHaveAttribute('href', '/automation/ai-hub');
     });
 
+    it('renders the workspace selector in the header', () => {
+        renderSidebar(true);
+
+        expect(screen.getByTestId('workspace-select')).toBeInTheDocument();
+    });
+
+    it('closes the expanded sidebar from the header button', () => {
+        renderSidebar(true);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Close sidebar'}));
+
+        expect(screen.queryByRole('button', {name: 'Close sidebar'})).not.toBeInTheDocument();
+        expect(screen.getByTestId('environment-select')).toHaveTextContent('icon');
+    });
+
     describe('environment', () => {
-        it('renders the compact selector beside the wordmark when the rail is expanded', () => {
+        it('renders the icon-only selector between the workspace selector and the close button', () => {
             renderSidebar(true);
 
-            expect(screen.getByTestId('environment-select')).toHaveTextContent('compact');
+            expect(screen.getByTestId('environment-select')).toHaveTextContent('icon');
         });
 
         it('falls back to the icon-only selector on the collapsed rail', () => {
