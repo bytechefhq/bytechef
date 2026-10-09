@@ -55,6 +55,8 @@ public class ClusterElementDefinitionModel {
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
 
+  private @Nullable Boolean testable;
+
   public ClusterElementDefinitionModel() {
     super();
   }
@@ -330,6 +332,27 @@ public class ClusterElementDefinitionModel {
     this.properties = properties;
   }
 
+  public ClusterElementDefinitionModel testable(@Nullable Boolean testable) {
+    this.testable = testable;
+    return this;
+  }
+
+  /**
+   * Can the cluster element be run on its own to test it.
+   * @return testable
+   */
+  
+  @Schema(name = "testable", description = "Can the cluster element be run on its own to test it.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("testable")
+  public @Nullable Boolean getTestable() {
+    return testable;
+  }
+
+  @JsonProperty("testable")
+  public void setTestable(@Nullable Boolean testable) {
+    this.testable = testable;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -350,12 +373,13 @@ public class ClusterElementDefinitionModel {
         Objects.equals(this.outputSchemaDefined, clusterElementDefinition.outputSchemaDefined) &&
         Objects.equals(this.title, clusterElementDefinition.title) &&
         Objects.equals(this.type, clusterElementDefinition.type) &&
-        Objects.equals(this.properties, clusterElementDefinition.properties);
+        Objects.equals(this.properties, clusterElementDefinition.properties) &&
+        Objects.equals(this.testable, clusterElementDefinition.testable);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, icon, outputDefined, outputFunctionDefined, outputSchemaDefined, title, type, properties);
+    return Objects.hash(componentName, componentVersion, description, help, name, icon, outputDefined, outputFunctionDefined, outputSchemaDefined, title, type, properties, testable);
   }
 
   @Override
@@ -374,6 +398,7 @@ public class ClusterElementDefinitionModel {
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+    sb.append("    testable: ").append(toIndentedString(testable)).append("\n");
     sb.append("}");
     return sb.toString();
   }

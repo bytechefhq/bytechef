@@ -20,7 +20,13 @@ import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
+import com.bytechef.component.definition.ai.agent.ToolFunction;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
+import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +69,45 @@ class ClusterElementDefinitionTest {
         assertEquals("Test", result.getTitle());
         assertEquals("A test element", result.getDescription());
         assertEquals(TOOLS, result.getType());
+    }
+
+    @Test
+    void testIsTestableForAToolFunction() {
+        assertTrue(createClusterElementDefinition(mock(ToolFunction.class)).isTestable());
+    }
+
+    @Test
+    void testIsTestableIsFalseForAToolCallbackProviderFunction() {
+        assertFalse(createClusterElementDefinition(mock(ToolCallbackProviderFunction.class)).isTestable());
+    }
+
+    @Test
+    void testIsTestableIsFalseForAMultipleConnectionsToolCallbackProviderFunction() {
+        ClusterElementDefinition clusterElementDefinition = createClusterElementDefinition(
+            mock(MultipleConnectionsToolCallbackProviderFunction.class));
+
+        assertFalse(clusterElementDefinition.isTestable());
+    }
+
+    @Test
+    void testWithPrependedPropertiesKeepsTestable() {
+        ClusterElementDefinition clusterElementDefinition = createClusterElementDefinition(
+            mock(ToolCallbackProviderFunction.class));
+
+        ClusterElementDefinition result = clusterElementDefinition.withPrependedProperties(
+            List.of(Property.toProperty(string("bar"))));
+
+        assertFalse(result.isTestable());
+    }
+
+    private static ClusterElementDefinition createClusterElementDefinition(Object element) {
+        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =
+            clusterElement("test")
+                .title("Test")
+                .type(TOOLS)
+                .object(() -> element);
+
+        return new ClusterElementDefinition(clusterElementDefinition, "comp", 1, "icon");
     }
 
     private static ClusterElementDefinition createClusterElementDefinition() {
