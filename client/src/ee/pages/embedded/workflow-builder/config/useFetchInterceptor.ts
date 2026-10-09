@@ -1,3 +1,4 @@
+import {getEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -60,14 +61,16 @@ export default function useFetchInterceptor() {
                 }
 
                 if (url.includes('/internal/') || url.includes('/graphql') || url.includes('/api/embedded/v1/')) {
+                    const {environment, jwtToken} = getEmbedCredentials();
+
                     return [
                         url,
                         {
                             ...config,
                             headers: {
                                 ...config.headers,
-                                Authorization: `Bearer ${sessionStorage.getItem('jwtToken') || ''}`,
-                                'X-ENVIRONMENT': sessionStorage.getItem('environment')?.toUpperCase() || '',
+                                Authorization: `Bearer ${jwtToken || ''}`,
+                                'X-ENVIRONMENT': environment?.toUpperCase() || '',
                             },
                         },
                     ];

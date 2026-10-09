@@ -1,3 +1,4 @@
+import {resetEmbedCredentials, setEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
 import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
 import {act, renderHook} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -78,6 +79,8 @@ describe('useFetchInterceptor (embedded)', () => {
 
     afterEach(() => {
         delete import.meta.env.VITE_API_BASE_PATH;
+        resetEmbedCredentials();
+        sessionStorage.clear();
     });
 
     describe('registration', () => {
@@ -98,8 +101,7 @@ describe('useFetchInterceptor (embedded)', () => {
 
     describe('request interceptor', () => {
         it('adds Authorization and X-ENVIRONMENT headers for internal URLs', () => {
-            sessionStorage.setItem('jwtToken', 'test-jwt');
-            sessionStorage.setItem('environment', 'production');
+            setEmbedCredentials({environment: 'production', jwtToken: 'test-jwt'});
 
             renderHook(() => useFetchInterceptor());
 
@@ -111,14 +113,10 @@ describe('useFetchInterceptor (embedded)', () => {
                     'X-ENVIRONMENT': 'PRODUCTION',
                 })
             );
-
-            sessionStorage.removeItem('jwtToken');
-            sessionStorage.removeItem('environment');
         });
 
         it('adds Authorization and X-ENVIRONMENT headers for embedded public API URLs', () => {
-            sessionStorage.setItem('jwtToken', 'test-jwt');
-            sessionStorage.setItem('environment', 'production');
+            setEmbedCredentials({environment: 'production', jwtToken: 'test-jwt'});
 
             renderHook(() => useFetchInterceptor());
 
@@ -130,9 +128,37 @@ describe('useFetchInterceptor (embedded)', () => {
                     'X-ENVIRONMENT': 'PRODUCTION',
                 })
             );
+        });
 
-            sessionStorage.removeItem('jwtToken');
-            sessionStorage.removeItem('environment');
+        it('ignores credentials that another embedded frame of the same origin left in sessionStorage', () => {
+            setEmbedCredentials({environment: 'production', jwtToken: 'own-frame-jwt'});
+
+            sessionStorage.setItem('jwtToken', 'other-frame-jwt');
+            sessionStorage.setItem('environment', 'staging');
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = hoisted.registeredHandlers!.request('/api/embedded/v1/connections', {headers: {}});
+
+            expect((result as [string, Record<string, unknown>])[1].headers).toEqual(
+                expect.objectContaining({
+                    Authorization: 'Bearer own-frame-jwt',
+                    'X-ENVIRONMENT': 'PRODUCTION',
+                })
+            );
+        });
+
+        it('sends an empty bearer token before the embedding page has sent EMBED_INIT', () => {
+            renderHook(() => useFetchInterceptor());
+
+            const result = hoisted.registeredHandlers!.request('/graphql', {headers: {}});
+
+            expect((result as [string, Record<string, unknown>])[1].headers).toEqual(
+                expect.objectContaining({
+                    Authorization: 'Bearer ',
+                    'X-ENVIRONMENT': '',
+                })
+            );
         });
 
         it('does not add auth headers for non-internal URLs', () => {
