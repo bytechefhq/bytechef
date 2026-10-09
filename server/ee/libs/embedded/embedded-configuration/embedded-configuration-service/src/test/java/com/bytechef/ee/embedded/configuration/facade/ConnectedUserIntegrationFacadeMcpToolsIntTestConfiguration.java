@@ -10,12 +10,14 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
+import static org.mockito.Mockito.mock;
 
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.encryption.EncryptionImpl;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -87,11 +89,18 @@ public class ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration {
     @Bean
     ConnectedUserIntegrationFacadeImpl connectedUserIntegrationFacade(
         ClusterElementDefinitionService clusterElementDefinitionService, McpComponentService mcpComponentService,
-        McpServerService mcpServerService, McpToolService mcpToolService) {
+        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
+        McpToolService mcpToolService) {
 
         return new ConnectedUserIntegrationFacadeImpl(
             clusterElementDefinitionService, null, null, null, null, null, null, null, null, null, null, null,
-            mcpComponentService, null, null, null, mcpServerService, mcpToolService, null, null, null, null, null);
+            mcpComponentService, null, null, mcpIntegrationInstanceToolService, mcpServerService, mcpToolService, null,
+            null, null, null, null);
+    }
+
+    @Bean
+    McpIntegrationInstanceToolService mcpIntegrationInstanceToolService() {
+        return mock(McpIntegrationInstanceToolService.class);
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

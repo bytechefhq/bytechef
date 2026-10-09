@@ -256,6 +256,28 @@ public class ConnectedUserMcpServerFacadeIntTest {
     }
 
     @Test
+    public void testGetConnectedUserMcpServersOmitsGloballyDisabledTools() {
+        McpTool getEmailTool = mcpToolRepository.findAll()
+            .stream()
+            .filter(mcpTool -> "getEmail".equals(mcpTool.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        getEmailTool.setEnabled(false);
+
+        mcpToolRepository.save(getEmailTool);
+
+        List<ConnectedUserMcpServerDTO> connectedUserMcpServers =
+            connectedUserMcpServerFacade.getConnectedUserMcpServers(connectedUserId);
+
+        ConnectedUserMcpServerDTO toolsConnectedUserMcpServer = connectedUserMcpServers.getFirst();
+
+        assertThat(toolsConnectedUserMcpServer.tools())
+            .extracting(ConnectedUserMcpServerToolDTO::name)
+            .containsExactly("searchEmail");
+    }
+
+    @Test
     public void testEnableConnectedUserMcpServerFlipsOnlyWorkflowsInOtherState() {
         connectedUserMcpServerFacade.enableConnectedUserMcpServer(connectedUserId, workflowsMcpServer.getId(), true);
 

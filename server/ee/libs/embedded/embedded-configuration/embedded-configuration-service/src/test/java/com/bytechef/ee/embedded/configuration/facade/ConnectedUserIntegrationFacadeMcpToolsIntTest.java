@@ -8,7 +8,10 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
@@ -44,6 +47,9 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
     @Autowired
     private McpComponentRepository mcpComponentRepository;
+
+    @Autowired
+    private McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
 
     @Autowired
     private McpServerRepository mcpServerRepository;
@@ -92,6 +98,39 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
         createMcpTool(PlatformType.AUTOMATION, true, "sendEmail");
 
         assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME)).isEmpty();
+    }
+
+    @Test
+    void testGetMcpToolsSkipsGloballyDisabledTools() {
+        McpTool enabledMcpTool = createMcpTool(PlatformType.EMBEDDED, true, "sendEmail");
+
+        createDisabledMcpTool(enabledMcpTool.getMcpComponentId(), "getEmail");
+
+        assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME))
+            .extracting(ConnectedUserIntegrationDTO.McpToolInfo::id)
+            .containsExactly(enabledMcpTool.getId());
+    }
+
+    @Test
+    void testGetMcpInstanceToolsSkipsGloballyDisabledTools() {
+        McpTool enabledMcpTool = createMcpTool(PlatformType.EMBEDDED, true, "sendEmail");
+        McpTool disabledMcpTool = createDisabledMcpTool(enabledMcpTool.getMcpComponentId(), "getEmail");
+
+        when(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(1L)).thenReturn(
+            List.of(
+                new McpIntegrationInstanceTool(1L, enabledMcpTool.getId(), true),
+                new McpIntegrationInstanceTool(1L, disabledMcpTool.getId(), true)));
+
+        assertThat(connectedUserIntegrationFacade.getMcpInstanceTools(1L)).containsExactly(
+            new ConnectedUserIntegrationDTO.McpInstanceToolInfo(enabledMcpTool.getId(), true));
+    }
+
+    private McpTool createDisabledMcpTool(long mcpComponentId, String name) {
+        McpTool mcpTool = new McpTool(name, Map.of(), mcpComponentId);
+
+        mcpTool.setEnabled(false);
+
+        return mcpToolRepository.save(mcpTool);
     }
 
     private McpTool createMcpTool(PlatformType type, boolean enabled, String name) {

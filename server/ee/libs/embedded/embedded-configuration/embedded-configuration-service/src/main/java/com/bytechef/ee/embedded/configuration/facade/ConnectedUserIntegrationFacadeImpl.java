@@ -441,6 +441,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .filter(mcpComponent -> isEmbeddedMcpServerEnabled(mcpComponent.getMcpServerId()))
             .flatMap(mcpComponent -> mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
                 .stream()
+                .filter(McpTool::isEnabled)
                 .map(mcpTool -> {
                     ClusterElementDefinition clusterElementDefinition =
                         clusterElementDefinitionService.getClusterElementDefinition(
@@ -450,6 +451,26 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                         mcpTool.getId(), mcpTool.getName(), clusterElementDefinition.getTitle(),
                         clusterElementDefinition.getDescription());
                 }))
+            .toList();
+    }
+
+    List<ConnectedUserIntegrationDTO.McpInstanceToolInfo> getMcpInstanceTools(long integrationInstanceId) {
+        return mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId)
+            .stream()
+            .filter(mcpIntegrationInstanceTool -> {
+                McpTool mcpTool = mcpToolService.fetchMcpTool(mcpIntegrationInstanceTool.getMcpToolId())
+                    .orElse(null);
+
+                if (mcpTool == null || !mcpTool.isEnabled()) {
+                    return false;
+                }
+
+                McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
+
+                return isEmbeddedMcpServerEnabled(mcpComponent.getMcpServerId());
+            })
+            .map(mcpIntegrationInstanceTool -> new ConnectedUserIntegrationDTO.McpInstanceToolInfo(
+                mcpIntegrationInstanceTool.getMcpToolId(), mcpIntegrationInstanceTool.isEnabled()))
             .toList();
     }
 
@@ -511,25 +532,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                 long integrationInstanceId = integrationInstance.integrationInstance()
                     .getId();
 
-                List<ConnectedUserIntegrationDTO.McpInstanceToolInfo> mcpInstanceTools =
-                    mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId)
-                        .stream()
-                        .filter(mcpIntegrationInstanceTool -> {
-                            McpTool mcpTool = mcpToolService.fetchMcpTool(mcpIntegrationInstanceTool.getMcpToolId())
-                                .orElse(null);
-
-                            if (mcpTool == null) {
-                                return false;
-                            }
-
-                            McpComponent mcpComponent =
-                                mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
-
-                            return isEmbeddedMcpServerEnabled(mcpComponent.getMcpServerId());
-                        })
-                        .map(mcpIntegrationInstanceTool -> new ConnectedUserIntegrationDTO.McpInstanceToolInfo(
-                            mcpIntegrationInstanceTool.getMcpToolId(), mcpIntegrationInstanceTool.isEnabled()))
-                        .toList();
+                List<ConnectedUserIntegrationDTO.McpInstanceToolInfo> mcpInstanceTools = getMcpInstanceTools(
+                    integrationInstanceId);
 
                 List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow> mcpInstanceWorkflows =
                     integrationInstanceWorkflowService.getIntegrationInstanceWorkflows(integrationInstanceId)
