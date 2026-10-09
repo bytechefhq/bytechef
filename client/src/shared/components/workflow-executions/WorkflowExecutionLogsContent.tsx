@@ -349,7 +349,7 @@ const WorkflowExecutionLogsContent = ({
     const toolbar = (
         <div
             className={twMerge(
-                'flex shrink-0 items-center gap-2',
+                'flex shrink-0 items-center gap-1',
                 !toolbarContainer && 'border-b border-stroke-neutral-secondary p-2'
             )}
         >
