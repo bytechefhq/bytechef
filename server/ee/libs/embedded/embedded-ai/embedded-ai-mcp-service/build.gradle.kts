@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
     implementation(project(":server:libs:platform:platform-api"))

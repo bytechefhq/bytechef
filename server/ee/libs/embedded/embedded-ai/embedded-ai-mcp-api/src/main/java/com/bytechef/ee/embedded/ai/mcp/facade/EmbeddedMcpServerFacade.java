@@ -9,7 +9,9 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 
@@ -20,13 +22,31 @@ import java.util.List;
  */
 public interface EmbeddedMcpServerFacade {
 
+    McpComponent createEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools);
+
     McpServer createEmbeddedMcpServer(String name, Environment environment, boolean enabled);
 
+    void deleteEmbeddedMcpComponent(long mcpComponentId);
+
     void deleteEmbeddedMcpServer(long mcpServerId);
+
+    void deleteEmbeddedMcpTool(long mcpToolId);
 
     List<McpServer> getEmbeddedMcpServers();
 
     List<Tag> getEmbeddedMcpServerTags();
 
     List<ComponentDefinition> getMcpComponentDefinitions();
+
+    McpComponent updateEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools);
+
+    McpServer updateEmbeddedMcpServer(long mcpServerId, String name, Boolean enabled);
+
+    McpServer updateEmbeddedMcpServerSecretKey(long mcpServerId);
+
+    List<Tag> updateEmbeddedMcpServerTags(long mcpServerId, List<Tag> tags);
+
+    McpTool updateEmbeddedMcpTool(McpTool mcpTool);
+
+    McpTool updateEmbeddedMcpToolEnabled(long mcpToolId, boolean enabled);
 }

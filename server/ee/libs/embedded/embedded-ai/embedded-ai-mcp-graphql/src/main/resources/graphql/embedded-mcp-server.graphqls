@@ -5,8 +5,17 @@ extend type Query {
 }
 
 extend type Mutation {
+    createEmbeddedMcpComponent(input: McpComponentWithToolsInput!): McpComponent
     createEmbeddedMcpServer(input: CreateEmbeddedMcpServerInput!): McpServer
+    deleteEmbeddedMcpComponent(id: ID!): Boolean
     deleteEmbeddedMcpServer(mcpServerId: ID!): Boolean
+    deleteEmbeddedMcpTool(id: ID!): Boolean
+    updateEmbeddedMcpComponent(id: ID!, input: McpComponentWithToolsInput!): McpComponent
+    updateEmbeddedMcpServer(id: ID!, input: McpServerUpdateInput!): McpServer
+    updateEmbeddedMcpServerTags(id: ID!, tags: [TagInput!]!): [Tag]
+    updateEmbeddedMcpServerUrl(id: ID!): McpServer
+    updateEmbeddedMcpTool(id: ID!, input: McpToolInput!): McpTool
+    updateEmbeddedMcpToolEnabled(id: ID!, enabled: Boolean!): McpTool
 }
 
 input CreateEmbeddedMcpServerInput {
