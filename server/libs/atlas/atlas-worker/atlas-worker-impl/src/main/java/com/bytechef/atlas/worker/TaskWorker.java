@@ -208,13 +208,15 @@ public class TaskWorker {
                 for (TaskExecutionPostOutputProcessor taskExecutionPostOutputProcessor : taskExecutionPostOutputProcessors) {
                     output = taskExecutionPostOutputProcessor.process(taskExecution, output);
                 }
+            }
 
-                if (output != null) {
-                    taskExecution.setOutput(
-                        taskFileStorage.storeTaskExecutionOutput(
-                            Objects.requireNonNull(taskExecution.getJobId()),
-                            Objects.requireNonNull(taskExecution.getId()), output));
-                }
+            if (output == null) {
+                taskExecution.setOutput(null);
+            } else {
+                taskExecution.setOutput(
+                    taskFileStorage.storeTaskExecutionOutput(
+                        Objects.requireNonNull(taskExecution.getJobId()),
+                        Objects.requireNonNull(taskExecution.getId()), output));
             }
 
             taskExecution.setEndDate(Instant.now());

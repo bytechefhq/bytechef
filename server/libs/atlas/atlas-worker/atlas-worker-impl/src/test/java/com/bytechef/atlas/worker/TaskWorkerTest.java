@@ -51,6 +51,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -94,6 +95,37 @@ public class TaskWorkerTest {
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
         Assertions.assertEquals(24 * 60 * 60 * 1000L, worker.calculateTimeout(taskExecution));
+    }
+
+    @Test
+    public void testOnTaskExecutionEventClearsTheOutputOfAPreviousRunWhenTheTaskProducesNone() {
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
+        AtomicReference<TaskExecution> completedTaskExecutionReference = new AtomicReference<>();
+
+        syncMessageBroker.receive(
+            TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+            event -> completedTaskExecutionReference.set(((TaskExecutionCompleteEvent) event).getTaskExecution()));
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, event -> {});
+
+        TaskWorker worker = new TaskWorker(
+            null, EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            NEW_SINGLE_THREAD_EXECUTOR::execute, task -> taskExecution -> "streamed",
+            taskFileStorage, List.of((taskExecution, output) -> null));
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
+            .build();
+
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
+        taskExecution.setOutput(taskFileStorage.storeTaskExecutionOutput(4567L, 1234L, "previous run"));
+
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
+
+        TaskExecution completedTaskExecution = completedTaskExecutionReference.get();
+
+        Assertions.assertNotNull(completedTaskExecution);
+        Assertions.assertNull(completedTaskExecution.getOutput());
     }
 
     @Test
