@@ -1529,6 +1529,7 @@ export type Mutation = {
   createAutomationWorkflowProject: Scalars['ID']['output'];
   createAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   createDataTable: Scalars['Boolean']['output'];
+  createEmbeddedMcpComponent?: Maybe<McpComponent>;
   createEmbeddedMcpServer?: Maybe<McpServer>;
   createIdentityProvider: IdentityProviderType;
   createKnowledgeBase?: Maybe<KnowledgeBase>;
@@ -1557,7 +1558,9 @@ export type Mutation = {
   deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
+  deleteEmbeddedMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  deleteEmbeddedMcpTool?: Maybe<Scalars['Boolean']['output']>;
   deleteIdentityProvider: Scalars['Boolean']['output'];
   deleteJobFileLogs: Scalars['Boolean']['output'];
   deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
@@ -1625,6 +1628,12 @@ export type Mutation = {
   updateAutomationWorkflowProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
+  updateEmbeddedMcpComponent?: Maybe<McpComponent>;
+  updateEmbeddedMcpServer?: Maybe<McpServer>;
+  updateEmbeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
+  updateEmbeddedMcpServerUrl?: Maybe<McpServer>;
+  updateEmbeddedMcpTool?: Maybe<McpTool>;
+  updateEmbeddedMcpToolEnabled?: Maybe<McpTool>;
   updateIdentityProvider: IdentityProviderType;
   updateIntegrationWorkflowPermissionExpression?: Maybe<IntegrationWorkflow>;
   updateKnowledgeBase?: Maybe<KnowledgeBase>;
@@ -1642,7 +1651,6 @@ export type Mutation = {
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
-  updateMcpToolEnabled?: Maybe<McpTool>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
 };
@@ -1765,6 +1773,11 @@ export type MutationCreateAutomationWorkflowProjectWorkflowArgs = {
 
 export type MutationCreateDataTableArgs = {
   input: CreateDataTableInput;
+};
+
+
+export type MutationCreateEmbeddedMcpComponentArgs = {
+  input: McpComponentWithToolsInput;
 };
 
 
@@ -1913,8 +1926,18 @@ export type MutationDeleteDataTableRowArgs = {
 };
 
 
+export type MutationDeleteEmbeddedMcpComponentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteEmbeddedMcpServerArgs = {
   mcpServerId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteEmbeddedMcpToolArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2326,6 +2349,41 @@ export type MutationUpdateDataTableTagsArgs = {
 };
 
 
+export type MutationUpdateEmbeddedMcpComponentArgs = {
+  id: Scalars['ID']['input'];
+  input: McpComponentWithToolsInput;
+};
+
+
+export type MutationUpdateEmbeddedMcpServerArgs = {
+  id: Scalars['ID']['input'];
+  input: McpServerUpdateInput;
+};
+
+
+export type MutationUpdateEmbeddedMcpServerTagsArgs = {
+  id: Scalars['ID']['input'];
+  tags: Array<TagInput>;
+};
+
+
+export type MutationUpdateEmbeddedMcpServerUrlArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateEmbeddedMcpToolArgs = {
+  id: Scalars['ID']['input'];
+  input: McpToolInput;
+};
+
+
+export type MutationUpdateEmbeddedMcpToolEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateIdentityProviderArgs = {
   id: Scalars['ID']['input'];
   input: IdentityProviderInput;
@@ -2416,12 +2474,6 @@ export type MutationUpdateMcpServerUrlArgs = {
 export type MutationUpdateMcpToolArgs = {
   id: Scalars['ID']['input'];
   input: McpToolInput;
-};
-
-
-export type MutationUpdateMcpToolEnabledArgs = {
-  enabled: Scalars['Boolean']['input'];
-  id: Scalars['ID']['input'];
 };
 
 
