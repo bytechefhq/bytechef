@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -38,6 +39,7 @@ import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -226,6 +228,48 @@ public class McpComponentServiceIntTest {
                 .isInstanceOf(AccessDeniedException.class);
 
             verify(permissionEvaluator).hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"));
+        }
+
+        @Test
+        void testUpdateIsDeniedWhenTheComponentBelongsToAnotherServer() {
+            McpComponent existingMcpComponent = mcpComponentRepository.save(getMcpComponent());
+
+            McpServer otherMcpServer = mcpServerRepository.save(
+                new McpServer("other-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
+
+            long otherMcpServerId = Validate.notNull(otherMcpServer.getId(), "id");
+
+            when(permissionEvaluator.hasPermission(any(), eq(otherMcpServerId), eq("McpServer"), eq("MCP_EDIT")))
+                .thenReturn(true);
+
+            McpComponent mcpComponent = new McpComponent("test-component", 1, otherMcpServerId, null);
+
+            mcpComponent.setId(existingMcpComponent.getId());
+            mcpComponent.setRequiredAuthorities(Set.of("ROLE_TAMPERED"));
+
+            assertThatThrownBy(() -> mcpComponentService.update(mcpComponent))
+                .isInstanceOf(AccessDeniedException.class);
+
+            McpComponent storedMcpComponent = mcpComponentRepository.findById(existingMcpComponent.getId())
+                .orElseThrow();
+
+            assertThat(storedMcpComponent.getRequiredAuthorities()).isEmpty();
+        }
+
+        @Test
+        void testUpdateIsAllowedForAnEditorOfTheComponent() {
+            McpComponent existingMcpComponent = mcpComponentRepository.save(getMcpComponent());
+
+            long mcpComponentId = Validate.notNull(existingMcpComponent.getId(), "id");
+
+            when(permissionEvaluator.hasPermission(any(), eq(mcpComponentId), eq("McpComponent"), eq("MCP_EDIT")))
+                .thenReturn(true);
+
+            existingMcpComponent.setRequiredAuthorities(Set.of("ROLE_REVIEWER"));
+
+            McpComponent updatedMcpComponent = mcpComponentService.update(existingMcpComponent);
+
+            assertThat(updatedMcpComponent.getRequiredAuthorities()).containsExactly("ROLE_REVIEWER");
         }
 
         @Test
