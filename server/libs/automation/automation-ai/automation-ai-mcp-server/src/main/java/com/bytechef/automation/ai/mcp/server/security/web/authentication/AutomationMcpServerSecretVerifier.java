@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
@@ -62,7 +63,7 @@ public class AutomationMcpServerSecretVerifier implements McpServerSecretVerifie
         String secretKey = mcpServer.getSecretKey();
 
         return Optional.of(
-            mcpServer.isEnabled() && secretKey != null &&
+            mcpServer.isEnabled() && mcpServer.getType() == PlatformType.AUTOMATION && secretKey != null &&
                 MessageDigest.isEqual(
                     secretKey.getBytes(StandardCharsets.UTF_8), mcpServerSecretKey.getBytes(StandardCharsets.UTF_8)));
     }

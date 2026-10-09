@@ -32,6 +32,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -188,7 +189,7 @@ public class AutomationMcpServerConfiguration {
 
         McpServer mcpServer = mcpServerService.getMcpServer(secretKey);
 
-        if (!mcpServer.isEnabled()) {
+        if (!mcpServer.isEnabled() || mcpServer.getType() != PlatformType.AUTOMATION) {
             return List.of();
         }
 

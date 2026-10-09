@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.tenant.domain.TenantKey;
@@ -67,6 +68,16 @@ class AutomationMcpAuthenticationRequiredResolverTest {
     }
 
     @Test
+    void testRequiresAuthenticationForAnEmbeddedServerOptingOutOfAuthentication() {
+        mockMcpServer(false, PlatformType.EMBEDDED);
+
+        Optional<Boolean> authenticationRequired = automationMcpAuthenticationRequiredResolver
+            .resolveAuthenticationRequired(mockRequest("/api/automation/" + MCP_SERVER_SECRET_KEY + "/mcp"));
+
+        assertThat(authenticationRequired).hasValue(true);
+    }
+
+    @Test
     void testRequiresAuthenticationWhenPathSecretIsNotATenantKey() {
         Optional<Boolean> authenticationRequired = automationMcpAuthenticationRequiredResolver
             .resolveAuthenticationRequired(mockRequest("/api/automation/not-a-tenant-key/mcp"));
@@ -85,8 +96,13 @@ class AutomationMcpAuthenticationRequiredResolverTest {
     }
 
     private void mockMcpServer(boolean authenticationRequired) {
+        mockMcpServer(authenticationRequired, PlatformType.AUTOMATION);
+    }
+
+    private void mockMcpServer(boolean authenticationRequired, PlatformType type) {
         McpServer mcpServer = mock(McpServer.class);
 
+        when(mcpServer.getType()).thenReturn(type);
         when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
         when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
     }

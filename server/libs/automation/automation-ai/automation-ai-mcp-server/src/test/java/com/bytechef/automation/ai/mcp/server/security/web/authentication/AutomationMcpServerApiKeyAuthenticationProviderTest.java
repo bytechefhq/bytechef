@@ -84,6 +84,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
     void testAuthenticateWithoutAuthenticationRequiredReturnsAnonymous() {
         McpServer mcpServer = mock(McpServer.class);
 
+        when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
         when(mcpServer.isAuthenticationRequired()).thenReturn(false);
         when(mcpServer.isEnabled()).thenReturn(true);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
@@ -112,6 +113,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
 
         McpServer mcpServer = mock(McpServer.class);
 
+        when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
         when(mcpServer.isEnabled()).thenReturn(false);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
 
@@ -123,8 +125,36 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
     void testAuthenticateWithDisabledMcpServerFailsEvenWhenAuthenticationIsNotRequired() {
         McpServer mcpServer = mock(McpServer.class);
 
+        when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
         when(mcpServer.isAuthenticationRequired()).thenReturn(false);
         when(mcpServer.isEnabled()).thenReturn(false);
+        when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+    }
+
+    @Test
+    void testAuthenticateWithEmbeddedMcpServerSecretKeyFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
+
+        McpServer mcpServer = mcpServerService.getMcpServer("server-secret");
+
+        when(mcpServer.getType()).thenReturn(PlatformType.EMBEDDED);
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithEmbeddedMcpServerSecretKeyFailsEvenWhenAuthenticationIsNotRequired() {
+        McpServer mcpServer = mock(McpServer.class);
+
+        when(mcpServer.getType()).thenReturn(PlatformType.EMBEDDED);
+        when(mcpServer.isAuthenticationRequired()).thenReturn(false);
+        when(mcpServer.isEnabled()).thenReturn(true);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
 
         assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
@@ -189,6 +219,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
     private void mockMcpServer(Environment environment) {
         McpServer mcpServer = mock(McpServer.class);
 
+        when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
         when(mcpServer.getEnvironment()).thenReturn(environment);
         when(mcpServer.isAuthenticationRequired()).thenReturn(true);
         when(mcpServer.isEnabled()).thenReturn(true);

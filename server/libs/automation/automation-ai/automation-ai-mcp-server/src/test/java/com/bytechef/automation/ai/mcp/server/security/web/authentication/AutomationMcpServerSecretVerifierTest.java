@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.tenant.domain.TenantKey;
@@ -56,6 +57,14 @@ class AutomationMcpServerSecretVerifierTest {
     }
 
     @Test
+    void testEmbeddedServerIsRejected() {
+        mockMcpServer(true, MCP_SERVER_SECRET_KEY, PlatformType.EMBEDDED);
+
+        assertThat(automationMcpServerSecretVerifier.verifyMcpServerSecret(automationRequest(MCP_SERVER_SECRET_KEY)))
+            .contains(false);
+    }
+
+    @Test
     void testServerWithDifferentSecretKeyIsRejected() {
         mockMcpServer(true, String.valueOf(TenantKey.of("acme")));
 
@@ -84,8 +93,13 @@ class AutomationMcpServerSecretVerifierTest {
     }
 
     private void mockMcpServer(boolean enabled, String secretKey) {
+        mockMcpServer(enabled, secretKey, PlatformType.AUTOMATION);
+    }
+
+    private void mockMcpServer(boolean enabled, String secretKey, PlatformType type) {
         McpServer mcpServer = mock(McpServer.class);
 
+        when(mcpServer.getType()).thenReturn(type);
         when(mcpServer.isEnabled()).thenReturn(enabled);
         when(mcpServer.getSecretKey()).thenReturn(secretKey);
         when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
