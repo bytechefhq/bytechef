@@ -30,10 +30,13 @@ import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -176,6 +179,60 @@ class WorkspaceScopeResolverTest {
         assertThat(((WorkspaceScopeResolver.Rejected) workspaceScope).response())
             .contains("Unknown environment")
             .contains("NOPE");
+    }
+
+    @Nested
+    class ResolveWorkspaceTest {
+
+        @Test
+        void testContextWorkspaceIsResolvedWhenNoWorkspaceIsRequested() {
+            when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(
+                List.of(workspace(7L, "Mine"), workspace(10L, "Also mine")));
+
+            WorkspaceScopeResolver.WorkspaceScope workspaceScope = workspaceScopeResolver.resolveWorkspace(
+                null, workspaceToolContext(10L));
+
+            assertThat(workspaceScope).isEqualTo(new WorkspaceScopeResolver.Resolved(10L, 0L));
+        }
+
+        @Test
+        void testRequestedWorkspaceOtherThanTheContextWorkspaceIsRejected() {
+            when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(
+                List.of(workspace(7L, "Mine"), workspace(10L, "Also mine")));
+
+            WorkspaceScopeResolver.WorkspaceScope workspaceScope = workspaceScopeResolver.resolveWorkspace(
+                7L, workspaceToolContext(10L));
+
+            assertThat(workspaceScope).isInstanceOf(WorkspaceScopeResolver.Rejected.class);
+            assertThat(((WorkspaceScopeResolver.Rejected) workspaceScope).response()).contains("error");
+        }
+
+        @Test
+        void testContextWorkspaceTheCallerCannotAccessIsRejected() {
+            when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(List.of(workspace(7L, "Mine")));
+
+            WorkspaceScopeResolver.WorkspaceScope workspaceScope = workspaceScopeResolver.resolveWorkspace(
+                null, workspaceToolContext(8L));
+
+            assertThat(workspaceScope).isInstanceOf(WorkspaceScopeResolver.Rejected.class);
+            assertThat(((WorkspaceScopeResolver.Rejected) workspaceScope).response()).contains("not accessible");
+        }
+
+        @Test
+        void testRequestedWorkspaceIsResolvedWithoutContext() {
+            when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(
+                List.of(workspace(7L, "Mine"), workspace(10L, "Also mine")));
+
+            assertThat(workspaceScopeResolver.resolveWorkspace(10L, null))
+                .isEqualTo(new WorkspaceScopeResolver.Resolved(10L, 0L));
+            assertThat(workspaceScopeResolver.resolveWorkspace(8L, null))
+                .isInstanceOf(WorkspaceScopeResolver.Rejected.class);
+        }
+
+        private static ToolContext workspaceToolContext(long workspaceId) {
+            return new ToolContext(
+                Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, workspaceId));
+        }
     }
 
     private static Workspace workspace(long id, String name) {

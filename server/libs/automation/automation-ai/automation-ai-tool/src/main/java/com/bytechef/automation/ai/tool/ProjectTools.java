@@ -27,7 +27,6 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
-import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -40,8 +39,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -64,24 +65,31 @@ public class ProjectTools {
     private final ProjectFacade projectFacade;
     private final ProjectService projectService;
     private final TagService tagService;
+    private final WorkspaceScopeResolver workspaceScopeResolver;
 
     @SuppressFBWarnings("EI")
     public ProjectTools(
         CategoryService categoryService, ProjectDeploymentService projectDeploymentService, ProjectFacade projectFacade,
-        ProjectService projectService, TagService tagService) {
+        ProjectService projectService, TagService tagService, WorkspaceScopeResolver workspaceScopeResolver) {
 
         this.categoryService = categoryService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectFacade = projectFacade;
         this.projectService = projectService;
         this.tagService = tagService;
+        this.workspaceScopeResolver = workspaceScopeResolver;
     }
 
     @Tool(
-        description = "List all projects in ByteChef. Returns a list of projects with their basic information including id, name, description, and status.")
-    public List<ProjectInfo> listProjects() {
+        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status.")
+    public List<ProjectInfo> listProjects(
+        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        ToolContext toolContext) {
+
+        long resolvedWorkspaceId = resolveWorkspaceId(workspaceId, toolContext, ProjectToolErrorType.LIST_PROJECTS);
+
         try {
-            List<Project> projects = projectService.getProjects();
+            List<Project> projects = getWorkspaceProjects(resolvedWorkspaceId);
 
             List<ProjectInfo> projectInfos = projects.stream()
                 .map(ProjectTools::getProjectInfo)
@@ -103,10 +111,13 @@ public class ProjectTools {
     @Tool(
         description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
     public ProjectDetailInfo getProject(
-        @ToolParam(description = "The ID of the project to retrieve") long projectId) {
+        @ToolParam(description = "The ID of the project to retrieve") long projectId,
+        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        ToolContext toolContext) {
+
+        Project project = getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.GET_PROJECT);
 
         try {
-            Project project = projectService.getProject(projectId);
             List<ProjectVersion> projectVersions = projectService.getProjectVersions(projectId);
 
             if (log.isDebugEnabled()) {
@@ -139,12 +150,16 @@ public class ProjectTools {
     }
 
     @Tool(
-        description = "Full-text search across all projects. Returns a list of projects matching the search query in name or description.")
+        description = "Full-text search across the projects of a workspace. Returns a list of projects matching the search query in name or description.")
     public List<ProjectInfo> searchProjects(
-        @ToolParam(description = "The search query to match against project names and descriptions") String query) {
+        @ToolParam(description = "The search query to match against project names and descriptions") String query,
+        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        ToolContext toolContext) {
+
+        long resolvedWorkspaceId = resolveWorkspaceId(workspaceId, toolContext, ProjectToolErrorType.SEARCH_PROJECTS);
 
         try {
-            List<Project> allProjects = projectService.getProjects();
+            List<Project> allProjects = getWorkspaceProjects(resolvedWorkspaceId);
             query = query.toLowerCase();
 
             String lowerQuery = query.trim();
@@ -181,10 +196,14 @@ public class ProjectTools {
     @Tool(
         description = "Get project deployment and execution status. Returns detailed status information including deployment environments and their states.")
     public ProjectStatusInfo getProjectStatus(
-        @ToolParam(description = "The ID of the project to get status for") long projectId) {
+        @ToolParam(description = "The ID of the project to get status for") long projectId,
+        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        ToolContext toolContext) {
+
+        Project project =
+            getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.GET_PROJECT_STATUS);
 
         try {
-            Project project = projectService.getProject(projectId);
             List<ProjectDeployment> deployments = projectDeploymentService.getProjectDeployments(projectId);
 
             List<ProjectDeploymentStatusInfo> deploymentStatuses = deployments.stream()
@@ -225,8 +244,11 @@ public class ProjectTools {
         @ToolParam(description = "The name of the new project") String name,
         @ToolParam(required = false, description = "The description of the new project") String description,
         @ToolParam(required = false, description = "The category ID for the project") Long categoryId,
-        @ToolParam(required = false, description = "The workspace ID for the project") Long workspaceId,
-        @ToolParam(required = false, description = "The tag IDs to associate with the project") List<Long> tagIds) {
+        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        @ToolParam(required = false, description = "The tag IDs to associate with the project") List<Long> tagIds,
+        ToolContext toolContext) {
+
+        long resolvedWorkspaceId = resolveWorkspaceId(workspaceId, toolContext, ProjectToolErrorType.CREATE_PROJECT);
 
         try {
             Project.Builder projectBuilder = Project.builder()
@@ -244,11 +266,7 @@ public class ProjectTools {
                 projectBuilder.categoryId(categoryId);
             }
 
-            if (workspaceId != null) {
-                projectBuilder.workspaceId(workspaceId);
-            } else {
-                projectBuilder.workspaceId(Workspace.DEFAULT_WORKSPACE_ID);
-            }
+            projectBuilder.workspaceId(resolvedWorkspaceId);
 
             if (tagIds != null && !tagIds.isEmpty()) {
                 projectBuilder.tagIds(tagIds);
@@ -284,10 +302,14 @@ public class ProjectTools {
         @ToolParam(required = false, description = "The new name of the project") String name,
         @ToolParam(required = false, description = "The new description of the project") String description,
         @ToolParam(required = false, description = "The new category ID for the project") Long categoryId,
-        @ToolParam(required = false, description = "The new tag IDs to associate with the project") List<Long> tagIds) {
+        @ToolParam(required = false, description = "The new tag IDs to associate with the project") List<Long> tagIds,
+        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        ToolContext toolContext) {
+
+        Project existingProject =
+            getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.UPDATE_PROJECT);
 
         try {
-            Project existingProject = projectService.getProject(projectId);
 
             if (name != null) {
                 name = name.trim();
@@ -334,10 +356,13 @@ public class ProjectTools {
     @Tool(
         description = "Delete a project and all its workflows. Returns a confirmation message.")
     public String deleteProject(
-        @ToolParam(description = "The ID of the project to delete") long projectId) {
+        @ToolParam(description = "The ID of the project to delete") long projectId,
+        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        ToolContext toolContext) {
+
+        Project project = getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.DELETE_PROJECT);
 
         try {
-            Project project = projectService.getProject(projectId);
             String projectName = project.getName();
 
             projectFacade.deleteProject(projectId);
@@ -360,7 +385,11 @@ public class ProjectTools {
         description = "Publish a project version for deployment. Returns the published project version information.")
     public ProjectPublishInfo publishProject(
         @ToolParam(description = "The ID of the project to publish") long projectId,
-        @ToolParam(required = false, description = "The description for this published version") String description) {
+        @ToolParam(required = false, description = "The description for this published version") String description,
+        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        ToolContext toolContext) {
+
+        getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.PUBLISH_PROJECT);
 
         try {
             int publishedVersion = projectFacade.publishProject(projectId, description, false);
@@ -382,6 +411,26 @@ public class ProjectTools {
             throw new ExecutionException(
                 "Failed to publish project: " + e.getMessage(), e, ProjectToolErrorType.PUBLISH_PROJECT);
         }
+    }
+
+    private long resolveWorkspaceId(
+        @Nullable Long workspaceId, @Nullable ToolContext toolContext, ProjectToolErrorType projectToolErrorType) {
+
+        return ProjectWorkspaceScope.resolveWorkspaceId(
+            workspaceScopeResolver, workspaceId, toolContext, projectToolErrorType);
+    }
+
+    private Project getWorkspaceProject(
+        long projectId, @Nullable Long workspaceId, @Nullable ToolContext toolContext,
+        ProjectToolErrorType projectToolErrorType) {
+
+        return ProjectWorkspaceScope.getWorkspaceProject(
+            projectService, projectId, resolveWorkspaceId(workspaceId, toolContext, projectToolErrorType),
+            projectToolErrorType);
+    }
+
+    private List<Project> getWorkspaceProjects(long workspaceId) {
+        return ProjectWorkspaceScope.getWorkspaceProjects(projectService, workspaceId);
     }
 
     private static ProjectInfo getProjectInfo(Project project) {

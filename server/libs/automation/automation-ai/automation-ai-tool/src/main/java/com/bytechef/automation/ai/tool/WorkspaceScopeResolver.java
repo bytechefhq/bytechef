@@ -117,6 +117,27 @@ public class WorkspaceScopeResolver {
         return new Resolved(workspaceId, environmentId);
     }
 
+    public WorkspaceScope resolveWorkspace(@Nullable Long requestedWorkspaceId, @Nullable ToolContext toolContext) {
+        AutomationToolInvocationContext invocationContext = AutomationToolInvocationContext.fromToolContext(
+            toolContext);
+
+        Long contextWorkspaceId = invocationContext == null ? null : invocationContext.workspaceId();
+
+        if (contextWorkspaceId == null) {
+            return resolve(requestedWorkspaceId, null);
+        }
+
+        if (requestedWorkspaceId != null && !requestedWorkspaceId.equals(contextWorkspaceId)) {
+            return new Rejected(
+                ToolErrors.toolError(
+                    jsonMapper,
+                    "Workspace " + requestedWorkspaceId + " is not the workspace " + contextWorkspaceId +
+                        " this conversation is scoped to."));
+        }
+
+        return resolve(contextWorkspaceId, null);
+    }
+
     private Optional<List<Workspace>> getCandidateWorkspaces() {
         if (isAnonymousManagementMcpPrincipal()) {
             return Optional.of(workspaceService.getWorkspaces());
