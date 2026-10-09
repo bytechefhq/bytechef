@@ -47,6 +47,7 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -134,15 +135,28 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
     private ConnectionFacade connectionFacade;
 
     @Autowired
+    private ConnectionService connectionService;
+
+    @Autowired
     private WorkflowService workflowService;
 
     private final Map<Long, String> componentNamesByConnectionId = new ConcurrentHashMap<>();
+    private final Map<Long, Connection> embeddedConnections = new ConcurrentHashMap<>();
     private long connectedUserId;
 
     @BeforeEach
     void setUp() {
         connectedUserId = createConnectedUser();
 
+        when(connectionService.getConnections(anyList()))
+            .thenAnswer(invocation -> {
+                List<Long> connectionIds = invocation.getArgument(0);
+
+                return connectionIds.stream()
+                    .map(embeddedConnections::get)
+                    .filter(Objects::nonNull)
+                    .toList();
+            });
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED)))
             .thenAnswer(invocation -> {
                 List<Long> connectionIds = invocation.getArgument(0);
@@ -306,7 +320,19 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
     private void givenOwnedConnection(long ownerConnectedUserId, long connectionId, String componentName) {
         componentNamesByConnectionId.put(connectionId, componentName);
 
+        registerEmbeddedConnection(connectionId, Environment.PRODUCTION);
+
         connectedUserConnectionService.create(ownerConnectedUserId, connectionId);
+    }
+
+    private void registerEmbeddedConnection(long connectionId, Environment environment) {
+        Connection connection = new Connection();
+
+        connection.setEnvironmentId(environment.ordinal());
+        connection.setId(connectionId);
+        connection.setType(PlatformType.EMBEDDED);
+
+        embeddedConnections.put(connectionId, connection);
     }
 
     private String givenWorkflowWithSlots(WorkflowNode... workflowNodes) {

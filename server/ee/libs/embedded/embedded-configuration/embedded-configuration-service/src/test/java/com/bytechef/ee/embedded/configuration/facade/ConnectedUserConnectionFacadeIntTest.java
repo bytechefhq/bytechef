@@ -171,7 +171,19 @@ class ConnectedUserConnectionFacadeIntTest {
     @Autowired
     private IntegrationService integrationService;
 
-    private final Map<Long, Connection> sharedConnections = new HashMap<>();
+    private final Map<Long, Connection> connections = new HashMap<>();
+
+    @BeforeEach
+    void beforeEach() {
+        when(connectionService.getConnections(anyList())).thenAnswer(invocation -> {
+            List<Long> requestedConnectionIds = invocation.getArgument(0);
+
+            return requestedConnectionIds.stream()
+                .map(connections::get)
+                .filter(Objects::nonNull)
+                .toList();
+        });
+    }
 
     @AfterEach
     void afterEach() {
@@ -189,8 +201,8 @@ class ConnectedUserConnectionFacadeIntTest {
         long sharedConnectionId = 81003L;
         long unownedConnectionId = 81004L;
 
-        connectedUserConnectionService.create(connectedUserId, ownedConnectionAId);
-        connectedUserConnectionService.create(connectedUserId, ownedConnectionBId);
+        createConnectedUserConnection(connectedUserId, ownedConnectionAId, Environment.PRODUCTION);
+        createConnectedUserConnection(connectedUserId, ownedConnectionBId, Environment.PRODUCTION);
 
         stubSharedConnections(Environment.PRODUCTION, sharedConnectionId);
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED)))
@@ -225,7 +237,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
         createIntegrationInstance(connectedUserId, 82010L, Environment.PRODUCTION);
 
-        connectedUserConnectionService.create(connectedUserId, 82011L);
+        createConnectedUserConnection(connectedUserId, 82011L, Environment.PRODUCTION);
 
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED))).thenReturn(List.of());
 
@@ -244,7 +256,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
         createIntegrationInstance(connectedUserId, 82110L, Environment.PRODUCTION);
 
-        connectedUserConnectionService.create(connectedUserId, 82111L);
+        createConnectedUserConnection(connectedUserId, 82111L, Environment.PRODUCTION);
 
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED))).thenReturn(List.of());
 
@@ -265,7 +277,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
         createIntegrationInstance(connectedUserId, 82210L, Environment.PRODUCTION);
 
-        connectedUserConnectionService.create(connectedUserId, 82211L);
+        createConnectedUserConnection(connectedUserId, 82211L, Environment.PRODUCTION);
 
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED))).thenReturn(List.of());
 
@@ -284,7 +296,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
         createIntegrationInstance(connectedUserId, 82310L, Environment.PRODUCTION);
 
-        connectedUserConnectionService.create(connectedUserId, 82311L);
+        createConnectedUserConnection(connectedUserId, 82311L, Environment.PRODUCTION);
 
         stubSharedConnections(Environment.PRODUCTION, 82312L);
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED))).thenReturn(List.of());
@@ -316,6 +328,38 @@ class ConnectedUserConnectionFacadeIntTest {
         verify(connectionFacade).getConnections(captor.capture(), eq(PlatformType.EMBEDDED));
 
         assertThat(captor.getValue()).containsExactlyInAnyOrder(82410L, 82412L);
+    }
+
+    @Test
+    void testOwnedConnectionFromAnotherEnvironmentIsNeitherListedNorMutable() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createIntegrationInstance(connectedUserId, 82450L, Environment.PRODUCTION);
+        createConnectedUserConnection(connectedUserId, 82451L, Environment.PRODUCTION);
+        createConnectedUserConnection(connectedUserId, 82452L, Environment.DEVELOPMENT);
+
+        stubEchoingConnectionFacade();
+
+        assertThat(connectedUserConnectionFacade.getConnections(connectedUserId, null, List.of()))
+            .extracting(ConnectionDTO::id)
+            .containsExactly(82450L, 82451L);
+        assertThat(connectedUserConnectionFacade.getConnections(connectedUserId, null, List.of(82452L)))
+            .isEmpty();
+        assertThat(connectedUserConnectionFacade.getOwnedConnectionIds(connectedUserId))
+            .containsExactly(82450L, 82451L);
+
+        assertThrows(
+            NoSuchElementException.class,
+            () -> connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, 82452L));
+        assertThrows(
+            NoSuchElementException.class,
+            () -> connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+                connectedUserId, 82452L, Map.of("apiKey", "new")));
+
+        verify(connectionFacade, never()).delete(any());
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
+
+        assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).contains(82452L);
     }
 
     @Test
@@ -411,7 +455,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
         createIntegrationInstance(connectedUserId, 82910L, Environment.PRODUCTION);
 
-        connectedUserConnectionService.create(connectedUserId, 82920L);
+        createConnectedUserConnection(connectedUserId, 82920L, Environment.PRODUCTION);
 
         when(connectionFacade.getConnections(List.of(82910L, 82920L), PlatformType.EMBEDDED)).thenReturn(List.of());
 
@@ -579,7 +623,15 @@ class ConnectedUserConnectionFacadeIntTest {
         return connectedUser.getId();
     }
 
+    private void createConnectedUserConnection(long connectedUserId, long connectionId, Environment environment) {
+        registerConnection(connectionId, environment, PlatformType.EMBEDDED);
+
+        connectedUserConnectionService.create(connectedUserId, connectionId);
+    }
+
     private void createIntegrationInstance(long connectedUserId, long connectionId, Environment environment) {
+        registerConnection(connectionId, environment, PlatformType.EMBEDDED);
+
         String componentName = "integration-" + UUID.randomUUID();
 
         Integration integration = new Integration();
@@ -607,7 +659,7 @@ class ConnectedUserConnectionFacadeIntTest {
         long connectedUserId, List<Long> connectedUserConnectionIds, List<Long> integrationInstanceConnectionIds) {
 
         for (long connectedUserConnectionId : connectedUserConnectionIds) {
-            connectedUserConnectionService.create(connectedUserId, connectedUserConnectionId);
+            createConnectedUserConnection(connectedUserId, connectedUserConnectionId, Environment.PRODUCTION);
         }
 
         for (long integrationInstanceConnectionId : integrationInstanceConnectionIds) {
@@ -646,24 +698,19 @@ class ConnectedUserConnectionFacadeIntTest {
 
     private void stubSharedConnections(Environment environment, long... connectionIds) {
         for (long connectionId : connectionIds) {
-            Connection connection = connection(connectionId);
-
-            connection.setEnvironmentId(environment.ordinal());
-            connection.setType(PlatformType.EMBEDDED);
-
-            sharedConnections.put(connectionId, connection);
+            registerConnection(connectionId, environment, PlatformType.EMBEDDED);
 
             connectedUserConnectionService.updateShared(connectionId, true);
         }
+    }
 
-        when(connectionService.getConnections(anyList())).thenAnswer(invocation -> {
-            List<Long> requestedConnectionIds = invocation.getArgument(0);
+    private void registerConnection(long connectionId, Environment environment, PlatformType type) {
+        Connection connection = connection(connectionId);
 
-            return requestedConnectionIds.stream()
-                .map(sharedConnections::get)
-                .filter(Objects::nonNull)
-                .toList();
-        });
+        connection.setEnvironmentId(environment.ordinal());
+        connection.setType(type);
+
+        connections.put(connectionId, connection);
     }
 
     @Configuration
@@ -700,8 +747,8 @@ class ConnectedUserConnectionFacadeIntTest {
             connectedUserADevelopmentId = createConnectedUser(externalUserAId, Environment.DEVELOPMENT);
             connectedUserBId = createConnectedUser(externalUserBId, Environment.PRODUCTION);
 
-            connectedUserConnectionService.create(connectedUserAId, CONNECTED_USER_A_CONNECTION_ID);
-            connectedUserConnectionService.create(connectedUserBId, CONNECTED_USER_B_CONNECTION_ID);
+            createConnectedUserConnection(connectedUserAId, CONNECTED_USER_A_CONNECTION_ID, Environment.PRODUCTION);
+            createConnectedUserConnection(connectedUserBId, CONNECTED_USER_B_CONNECTION_ID, Environment.PRODUCTION);
 
             when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED)))
                 .thenReturn(CONNECTION_ID);

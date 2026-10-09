@@ -17,8 +17,8 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,37 +48,50 @@ public class ConnectedUserConnectionMembership {
 
     @Transactional(readOnly = true)
     public Set<Long> getConnectionIds(long connectedUserId, Environment environment) {
-        List<IntegrationInstance> integrationInstances =
-            integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId, environment);
+        Set<Long> connectionIds = getUnfilteredOwnedConnectionIds(connectedUserId, environment);
 
-        Set<Long> connectionIds = getOwnedConnectionIds(connectedUserId, integrationInstances);
+        connectionIds.addAll(connectedUserConnectionService.getSharedConnectionIds());
 
-        Set<Long> sharedConnectionIds = connectedUserConnectionService.getSharedConnectionIds();
-
-        if (!sharedConnectionIds.isEmpty()) {
-            for (Connection connection : connectionService.getConnections(new ArrayList<>(sharedConnectionIds))) {
-                if (connection.getType() == PlatformType.EMBEDDED &&
-                    connection.getEnvironmentId() == environment.ordinal()) {
-
-                    connectionIds.add(connection.getId());
-                }
-            }
-        }
-
-        return connectionIds;
+        return filterByEnvironment(connectionIds, environment);
     }
 
     @Transactional(readOnly = true)
     public Set<Long> getOwnedConnectionIds(long connectedUserId, Environment environment) {
-        return getOwnedConnectionIds(
-            connectedUserId,
-            integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId, environment));
+        return filterByEnvironment(getUnfilteredOwnedConnectionIds(connectedUserId, environment), environment);
     }
 
-    private Set<Long> getOwnedConnectionIds(long connectedUserId, List<IntegrationInstance> integrationInstances) {
+    private Set<Long> filterByEnvironment(Set<Long> connectionIds, Environment environment) {
+        Set<Long> filteredConnectionIds = new LinkedHashSet<>();
+
+        if (connectionIds.isEmpty()) {
+            return filteredConnectionIds;
+        }
+
+        Set<Long> sameEnvironmentConnectionIds = new HashSet<>();
+
+        for (Connection connection : connectionService.getConnections(new ArrayList<>(connectionIds))) {
+            if (connection.getType() == PlatformType.EMBEDDED &&
+                connection.getEnvironmentId() == environment.ordinal()) {
+
+                sameEnvironmentConnectionIds.add(connection.getId());
+            }
+        }
+
+        for (Long connectionId : connectionIds) {
+            if (sameEnvironmentConnectionIds.contains(connectionId)) {
+                filteredConnectionIds.add(connectionId);
+            }
+        }
+
+        return filteredConnectionIds;
+    }
+
+    private Set<Long> getUnfilteredOwnedConnectionIds(long connectedUserId, Environment environment) {
         Set<Long> connectionIds = new LinkedHashSet<>();
 
-        for (IntegrationInstance integrationInstance : integrationInstances) {
+        for (IntegrationInstance integrationInstance : integrationInstanceService.getConnectedUserIntegrationInstances(
+            connectedUserId, environment)) {
+
             connectionIds.add(integrationInstance.getConnectionId());
         }
 
