@@ -24,6 +24,7 @@ import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/p
 import {reconstructControlledExpressionValue} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/controlledExpressionValue';
 import {getMentionsInputPlaceholder} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/mentionsInputPlaceholder';
 import getControlledToolFieldState from '@/pages/platform/workflow-editor/components/properties/getControlledToolFieldState';
+import getPropertyInputPlaceholder from '@/pages/platform/workflow-editor/components/properties/getPropertyInputPlaceholder';
 import getPropertyKey from '@/pages/platform/workflow-editor/components/properties/getPropertyKey';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
@@ -879,11 +880,14 @@ const Property = ({
                             minLength={minLength}
                             name={calculatedPath}
                             onChange={handleInputChange}
-                            placeholder={
-                                isNumericalInput && minValue && maxValue
-                                    ? `From ${minValue} to ${maxValue}`
-                                    : placeholder || `Type ${isNumericalInput ? 'a number' : 'something'}...`
-                            }
+                            placeholder={getPropertyInputPlaceholder({
+                                defaultValue,
+                                isNumericalInput,
+                                maxValue,
+                                minValue,
+                                placeholder,
+                                required,
+                            })}
                             ref={inputRef}
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
