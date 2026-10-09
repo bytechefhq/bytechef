@@ -15,7 +15,10 @@ export default function getPropertyInputPlaceholder({
     placeholder,
     required,
 }: GetPropertyInputPlaceholderPropsI): string {
-    const range = isNumericalInput && minValue && maxValue ? `From ${minValue} to ${maxValue}` : undefined;
+    const range =
+        isNumericalInput && typeof minValue === 'number' && typeof maxValue === 'number'
+            ? `From ${minValue} to ${maxValue}`
+            : undefined;
 
     const hasDefaultValue = !required && defaultValue !== undefined && defaultValue !== null && defaultValue !== '';
 

@@ -18,7 +18,10 @@ describe('getPropertyInputPlaceholder', () => {
         );
     });
 
-    // An empty optional field is left unset, so the placeholder is the only place to say what the default is.
+    it('shows a range with a zero bound', () => {
+        expect(getPropertyInputPlaceholder({isNumericalInput: true, maxValue: 1, minValue: 0})).toBe('From 0 to 1');
+    });
+
     it('shows the default of an optional property', () => {
         expect(getPropertyInputPlaceholder({defaultValue: 'gpt-4o', placeholder: 'Model name'})).toBe(
             'Default: gpt-4o'
@@ -35,8 +38,6 @@ describe('getPropertyInputPlaceholder', () => {
         expect(getPropertyInputPlaceholder({defaultValue: 0, isNumericalInput: true})).toBe('Default: 0');
     });
 
-    // A required property with a default has that default saved into the workflow, so the field is never left
-    // empty because of a missing value.
     it('does not show the default of a required property', () => {
         expect(
             getPropertyInputPlaceholder({
