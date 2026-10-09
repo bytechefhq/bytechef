@@ -45,6 +45,7 @@ const McpComponentToolListItem = ({
     const updateEmbeddedMcpToolEnabledMutation = useUpdateEmbeddedMcpToolEnabledMutation();
 
     const popoverId = `component-tool-${mcpTool.id}`;
+    const toolLabel = mcpTool.title || mcpTool.name;
     const isPopoverOpen = activePopoverId === popoverId;
 
     useCloseActivePopoverOnUnmount(isPopoverOpen);
@@ -70,7 +71,7 @@ const McpComponentToolListItem = ({
             <Popover onOpenChange={(open) => !open && closePopover()} open={isPopoverOpen}>
                 <div className="flex items-center gap-2 py-0.5">
                     <div className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate text-sm font-medium">{mcpTool.title || mcpTool.name}</span>
+                        <span className="truncate text-sm font-medium">{toolLabel}</span>
 
                         {description && <span className="truncate text-xs text-muted-foreground">{description}</span>}
                     </div>
@@ -78,7 +79,7 @@ const McpComponentToolListItem = ({
                     <div className="flex shrink-0 items-center gap-0.5">
                         {embedded && (
                             <Switch
-                                aria-label="Enable tool"
+                                aria-label={`Enable ${toolLabel}`}
                                 checked={mcpTool.enabled}
                                 disabled={isEnablePending}
                                 onCheckedChange={handleEnabledChange}
