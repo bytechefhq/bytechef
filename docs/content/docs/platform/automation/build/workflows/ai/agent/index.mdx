@@ -136,7 +136,6 @@ The AI Agent registers six types. Each type binds to a Java functional interface
 |---|---|---|---|---|---|---|
 | `MODEL` | `model` | Model | `ModelFunction` → `Model<?, ?>` | Yes | No | The LLM the agent calls to generate completions. Encapsulates the provider SDK, model parameters (temperature, max tokens), and response formatting. |
 | `CHAT_MEMORY` | `chatMemory` | Memory | `ChatMemoryFunction` → `BaseChatMemoryAdvisor` | No | No | An advisor that loads prior conversation turns into the model context and writes new turns back to the backend after each call. |
-| `SESSION_REPOSITORY` | `sessionRepository` | Session Repository | `SessionRepositoryFunction` | Yes | No | The storage backend for the Session chat memory - nested inside the Session memory child, not attached to the agent directly, and required by that child rather than by the agent. |
 | `RAG` | `rag` | RAG | `RagFunction` → `Advisor` | No | Yes | An advisor that retrieves relevant documents from a knowledge source and appends them to the prompt before the model call. |
 | `GUARDRAILS` | `guardrails` | Guardrails | `GuardrailsFunction` → `Advisor` | No | Yes | An advisor that validates input and/or output text against safety rules - blocking the request (Check For Violations) or rewriting matches in place (Sanitize Text). |
 | `TOOLS` | `tools` | Tools | `BaseToolFunction` (marker) | No | Yes | A list of actions the model can invoke during a turn. Each tool is exposed to the model as a callable function with a name, description, and JSON-schema parameter spec. |
@@ -202,7 +201,14 @@ Chat memory lets an agent recall earlier turns of the same conversation. The slo
 | Neo4j | [neo4jChatMemory/v1](/reference/components/neo4j-chat-memory_v1) | Graph-backed; useful when conversation context links into other graph entities. |
 | AWS S3 | [awsChatMemory/v1](/reference/components/aws-chat-memory_v1) | Persists transcripts to Amazon S3, routed to a per-tenant bucket; durable object storage for long-lived conversations. |
 | Vector Store | [vectorStoreChatMemory/v1](/reference/components/vector-store-chat-memory_v1) | Recalls semantically similar prior turns instead of raw chronological history. |
-| Session *(coming soon)* | [sessionChatMemory/v1](/reference/components/session-chat-memory_v1) | Session-scoped memory that hosts a nested **Session Repository** child for storage - pick a repository backend (Built-in, In-Memory, JDBC, Redis, or AWS S3) inside the Session memory element. |
+
+**Version 2** *(coming soon)*. Built-in, In-Memory, JDBC, Redis and AWS S3 chat memory also come in a version 2 -
+[chatMemory/v2](/reference/components/chat-memory_v2), [inMemoryChatMemory/v2](/reference/components/in-memory-chat-memory_v2),
+[jdbcChatMemory/v2](/reference/components/jdbc-chat-memory_v2), [redisChatMemory/v2](/reference/components/redis-chat-memory_v2)
+and [awsChatMemory/v2](/reference/components/aws-chat-memory_v2) - that keep each conversation as a session of events. Version 2
+can compact long histories (sliding window, turn window, token count, or recursive summarization with an optional
+summarizer **Model** child), can give the agent a conversation search tool, and has the same four actions. History stored
+by version 1 is not visible to version 2. MongoDB, Cassandra, Neo4j and Vector Store chat memory have version 1 only.
 
 {/* TODO screenshot: - agent/agent-chat-memory.png showing a Chat Memory child wired into the AI Agent. */}
 

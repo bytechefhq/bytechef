@@ -63,19 +63,19 @@ fragment while this heading was hidden - give it back.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_AI_MEMORY_PROVIDER` | Where AI agent chat memory is stored (`in_memory`, `jdbc`, `redis`, `aws`). `BYTECHEF_DATABASE=h2` defaults this to `in_memory` because the `spring_ai_chat_memory` table used by the Chat Memory component is created only on PostgreSQL; the built-in session tables (`ai_session`, `ai_session_event`) are created on both PostgreSQL and H2 | `jdbc` (`in_memory` on H2) |
+| `BYTECHEF_AI_MEMORY_PROVIDER` | Where AI agent chat memory is stored (`in_memory`, `jdbc`, `redis`, `aws`). `BYTECHEF_DATABASE=h2` defaults this to `in_memory` because the `spring_ai_chat_memory` table used by the Chat Memory component is created only on PostgreSQL; the session tables of Chat Memory v2 (`ai_session`, `ai_session_event`) are created on both PostgreSQL and H2 | `jdbc` (`in_memory` on H2) |
 | `BYTECHEF_AI_MEMORY_AWS_ACCESS_KEY_ID` | AWS access key ID of the S3 client used when the provider is `aws` (sensitive). Must be set together with `BYTECHEF_AI_MEMORY_AWS_SECRET_ACCESS_KEY`; when both are unset, `BYTECHEF_CLOUD_AWS_ACCESS_KEY_ID`/`BYTECHEF_CLOUD_AWS_SECRET_ACCESS_KEY` are used, and when those are unset too, the AWS default credentials provider chain | - |
 | `BYTECHEF_AI_MEMORY_AWS_BUCKET_PREFIX` | Prefix of the per-tenant S3 bucket (`<prefix>-<tenantId>`) that stores chat memory when the provider is `aws`. S3 bucket names are global, so pick a prefix no other AWS account uses | `bytechef-chat-memory` |
-| `BYTECHEF_AI_MEMORY_AWS_KEY_PREFIX` | Key prefix prepended to every object the chat memory and built-in session chat memory repositories store in S3 when the provider is `aws` | - |
+| `BYTECHEF_AI_MEMORY_AWS_KEY_PREFIX` | Key prefix prepended to every object Chat Memory v1 and v2 store in S3 when the provider is `aws` | - |
 | `BYTECHEF_AI_MEMORY_AWS_REGION` | AWS region of the S3 client used when the provider is `aws`. Falls back to `BYTECHEF_CLOUD_AWS_REGION`, then to the AWS default region provider chain | - |
 | `BYTECHEF_AI_MEMORY_AWS_SECRET_ACCESS_KEY` | AWS secret access key of the S3 client used when the provider is `aws` (sensitive). Must be set together with `BYTECHEF_AI_MEMORY_AWS_ACCESS_KEY_ID`; see that variable for the fallback | - |
-| `BYTECHEF_AI_MEMORY_AWS_SESSION_BUCKET_PREFIX` | Prefix of the per-tenant S3 bucket that the built-in session chat memory repository uses when the provider is `aws`. The bucket is named `<prefix>-<tenantId>`; when that is not a valid S3 bucket name, it is sanitized (lowercased, invalid characters replaced with hyphens, shortened if too long) and suffixed with a hash. S3 bucket names are global, so pick a prefix no other AWS account uses | `bytechef-session` |
+| `BYTECHEF_AI_MEMORY_AWS_SESSION_BUCKET_PREFIX` | Prefix of the per-tenant S3 bucket that Chat Memory v2 uses when the provider is `aws`. The bucket is named `<prefix>-<tenantId>`; when that is not a valid S3 bucket name, it is sanitized (lowercased, invalid characters replaced with hyphens, shortened if too long) and suffixed with a hash. S3 bucket names are global, so pick a prefix no other AWS account uses | `bytechef-session` |
 | `BYTECHEF_AI_MEMORY_REDIS_HOST` | Redis server hostname used when the provider is `redis` | `localhost` |
 | `BYTECHEF_AI_MEMORY_REDIS_PORT` | Redis server port used when the provider is `redis` | `6379` |
 | `BYTECHEF_AI_MEMORY_REDIS_USERNAME` | Redis ACL username used when the provider is `redis`; requires `BYTECHEF_AI_MEMORY_REDIS_PASSWORD` | - |
 | `BYTECHEF_AI_MEMORY_REDIS_PASSWORD` | Redis password used when the provider is `redis` (sensitive) | - |
-| `BYTECHEF_AI_MEMORY_REDIS_SESSION_KEY_PREFIX` | Key prefix of the built-in session chat memory repository when the provider is `redis`; its keys start with `<prefix><tenantId>:` | `bytechef-session:` |
-| `BYTECHEF_AI_MEMORY_SESSION_MAX_ARCHIVED_EVENTS` | Maximum number of archived (compacted-away) events the built-in session chat memory repository keeps per session when the provider is `redis` or `aws`; older archived events are deleted | `1000` |
+| `BYTECHEF_AI_MEMORY_REDIS_SESSION_KEY_PREFIX` | Key prefix of Chat Memory v2 when the provider is `redis`; its keys start with `<prefix><tenantId>:` | `bytechef-session:` |
+| `BYTECHEF_AI_MEMORY_SESSION_MAX_ARCHIVED_EVENTS` | Maximum number of archived (compacted-away) events Chat Memory v2 keeps per session when the provider is `redis` or `aws`; older archived events are deleted | `1000` |
 
 ## AI Knowledge Base Configuration
 
