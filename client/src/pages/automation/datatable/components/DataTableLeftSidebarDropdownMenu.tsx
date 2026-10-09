@@ -1,8 +1,11 @@
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {MoreVertical, Pencil, Trash2} from 'lucide-react';
-
-import '@/shared/styles/dropdownMenu.css';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
+import {MoreVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 
 import useDeleteDataTableAlertDialog from '../hooks/useDeleteDataTableAlertDialog';
 import useRenameDataTableDialog from '../hooks/useRenameDataTableDialog';
@@ -22,23 +25,25 @@ const DataTableLeftSidebarDropdownMenu = ({tableId, tableName}: Props) => {
                 <Button
                     aria-label="Table menu"
                     className="w-6 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
-                    icon={<MoreVertical className="h-4" />}
+                    icon={<MoreVerticalIcon className="h-4" />}
                     size="iconSm"
                     variant="ghost"
                 />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem className="dropdown-menu-item" onSelect={() => handleRenameOpen(tableId, tableName)}>
-                    <Pencil className="mr-2 size-4" /> Rename
-                </DropdownMenuItem>
+                <DropdownMenuItem
+                    icon={<PencilIcon />}
+                    label="Rename"
+                    onSelect={() => handleRenameOpen(tableId, tableName)}
+                />
 
                 <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
+                    icon={<Trash2Icon />}
+                    label="Delete"
                     onSelect={() => handleDeleteOpen(tableId, tableName)}
-                >
-                    <Trash2 className="mr-2 size-4 text-content-destructive" /> Delete
-                </DropdownMenuItem>
+                    variant="destructive"
+                />
             </DropdownMenuContent>
         </DropdownMenu>
     );

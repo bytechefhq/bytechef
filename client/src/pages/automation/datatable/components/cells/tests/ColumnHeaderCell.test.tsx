@@ -56,6 +56,18 @@ describe('ColumnHeaderCell', () => {
             expect(screen.getByText('Delete')).toBeInTheDocument();
         });
 
+        it('should render with the design-system DropdownMenu', async () => {
+            const user = userEvent.setup();
+
+            render(<ColumnHeaderCell {...defaultProps} />);
+
+            await user.click(screen.getByRole('button', {name: 'Column Test Column menu'}));
+
+            expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+            expect(screen.getByRole('menuitem', {name: 'Rename'})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+        });
+
         it('should call onRename with correct arguments when rename is clicked', async () => {
             const user = userEvent.setup();
             const mockOnRename = vi.fn();
