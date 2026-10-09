@@ -318,6 +318,9 @@ public interface ActionDefinition {
              *             or protocol.
              */
             void send(Object data);
+
+            default void setOutput(Object output) {
+            }
         }
     }
 

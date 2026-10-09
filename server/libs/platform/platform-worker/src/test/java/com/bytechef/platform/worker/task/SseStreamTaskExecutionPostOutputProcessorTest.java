@@ -201,6 +201,43 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
     }
 
     @Test
+    void testProcessReturnsTheOutputTheStreamSetWhenItCompletes() {
+        TenantContext.setCurrentTenantId("public");
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .build();
+
+        taskExecution.setJobId(100L);
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            emitter -> {
+                emitter.send("answer");
+                emitter.setOutput("answer");
+                emitter.complete();
+            },
+            mock(ActionContextAware.class));
+
+        assertEquals("answer", processor.process(taskExecution, suspendAwareSseEmitterHandler));
+    }
+
+    @Test
+    void testProcessReturnsNoOutputWhenTheStreamFails() {
+        TenantContext.setCurrentTenantId("public");
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .build();
+
+        taskExecution.setJobId(100L);
+
+        ActionDefinition.SseEmitterHandler sseEmitterHandler = emitter -> {
+            emitter.setOutput("partial");
+            emitter.error(new RuntimeException("test error"));
+        };
+
+        assertNull(processor.process(taskExecution, sseEmitterHandler));
+    }
+
+    @Test
     void testProcessWithSuspendAwareSseEmitterHandlerThrowsAfterAStreamError() {
         TenantContext.setCurrentTenantId("public");
 

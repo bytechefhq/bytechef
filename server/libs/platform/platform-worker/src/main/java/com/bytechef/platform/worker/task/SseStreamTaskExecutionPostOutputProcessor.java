@@ -84,11 +84,17 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
             }
         }
 
-        if (streamCompleted.get() && !streamFailed.get() && suspend == null) {
-            sendEvent(jobId, SseStreamEvent.EVENT_TYPE_COMPLETE, null, tenantId);
+        if (suspend != null) {
+            return suspend;
         }
 
-        return suspend;
+        if (!streamCompleted.get() || streamFailed.get()) {
+            return null;
+        }
+
+        sendEvent(jobId, SseStreamEvent.EVENT_TYPE_COMPLETE, null, tenantId);
+
+        return emitter instanceof SseEmitterAdapter sseEmitterAdapter ? sseEmitterAdapter.getOutput() : null;
     }
 
     private void addListeners(
@@ -184,6 +190,7 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
         private final CopyOnWriteArrayList<Runnable> timeoutListeners = new CopyOnWriteArrayList<>();
 
         private volatile boolean completed;
+        private volatile @Nullable Object output;
         private @Nullable Long timeout;
 
         public SseEmitterAdapter() {
@@ -240,8 +247,17 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
             complete();
         }
 
+        public @Nullable Object getOutput() {
+            return output;
+        }
+
         public @Nullable Long getTimeout() {
             return timeout;
+        }
+
+        @Override
+        public void setOutput(Object output) {
+            this.output = output;
         }
 
         @Override
