@@ -86,8 +86,6 @@ describe('useProperty required property default value', () => {
         expect(saveProperty).toHaveBeenCalledWith(expect.objectContaining({path: 'maxTokens', value: 16000}));
     });
 
-    // PropertyDynamicProperties hands a dynamic property its definition default as parameterValue even when the
-    // workflow has nothing stored at its path.
     it('saves the default of a required dynamic property that is missing from stored parameters', () => {
         setCurrentNodeParameters({model: 'claude-sonnet-5-5', settings: {}});
 
