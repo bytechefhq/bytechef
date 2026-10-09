@@ -81,6 +81,7 @@ interface JsonViewProps {
     enableClipboard?: boolean;
     fallback?: ReactNode;
     name?: string | false;
+    shouldCollapse?: (field: {src: object}) => boolean;
     sortKeys?: boolean;
     src: object;
     style?: CSSProperties;
@@ -92,6 +93,7 @@ const JsonView = ({
     enableClipboard = false,
     fallback = <span className="block p-4 text-sm text-muted-foreground">Loading...</span>,
     name,
+    shouldCollapse,
     sortKeys,
     src,
     style,
@@ -108,6 +110,7 @@ const JsonView = ({
                 collapsed={resolvedCollapsed}
                 enableClipboard={enableClipboard}
                 name={name}
+                shouldCollapse={shouldCollapse}
                 sortKeys={sortKeys}
                 src={src}
                 style={style}

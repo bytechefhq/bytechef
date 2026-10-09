@@ -23,8 +23,21 @@ vi.mock('@/shared/middleware/graphql', () => ({
 }));
 
 vi.mock('@/shared/components/JsonView', () => ({
-    default: ({collapsed}: {collapsed?: boolean | number}) => (
-        <div data-collapsed={String(collapsed)} data-testid="json-view" />
+    default: ({
+        collapsed,
+        shouldCollapse,
+        src,
+    }: {
+        collapsed?: boolean | number;
+        shouldCollapse?: (field: {src: object}) => boolean;
+        src: object;
+    }) => (
+        <div
+            data-collapsed={String(collapsed)}
+            data-nested-collapsed={String(!!shouldCollapse?.({src: {}}))}
+            data-root-collapsed={String(!!shouldCollapse?.({src}))}
+            data-testid="json-view"
+        />
     ),
 }));
 
@@ -152,15 +165,21 @@ describe('WorkflowExecutionLogsContent', () => {
 
         render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" />);
 
-        expect(screen.getByTestId('json-view')).toHaveAttribute('data-collapsed', 'true');
+        const jsonView = () => screen.getByTestId('json-view');
+
+        expect(jsonView()).toHaveAttribute('data-collapsed', 'false');
+        expect(jsonView()).toHaveAttribute('data-root-collapsed', 'true');
+        expect(jsonView()).toHaveAttribute('data-nested-collapsed', 'false');
 
         fireEvent.click(screen.getByRole('button', {name: 'Expand all'}));
 
-        expect(screen.getByTestId('json-view')).toHaveAttribute('data-collapsed', 'false');
+        expect(jsonView()).toHaveAttribute('data-collapsed', 'false');
+        expect(jsonView()).toHaveAttribute('data-root-collapsed', 'false');
 
         fireEvent.click(screen.getByRole('button', {name: 'Collapse all'}));
 
-        expect(screen.getByTestId('json-view')).toHaveAttribute('data-collapsed', 'true');
+        expect(jsonView()).toHaveAttribute('data-root-collapsed', 'true');
+        expect(jsonView()).toHaveAttribute('data-nested-collapsed', 'false');
     });
 
     it('shows the expand toggle as a single button that switches between expand and collapse', () => {

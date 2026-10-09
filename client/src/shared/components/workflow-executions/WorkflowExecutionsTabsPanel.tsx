@@ -187,7 +187,7 @@ const WorkflowExecutionsTabsPanel = ({
                     </TabsTrigger>
                 </TabsList>
 
-                {activeTab === 'logs' && <div className="ml-2 min-w-0 flex-1" ref={setLogsToolbarContainer} />}
+                {activeTab === 'logs' && <div className="ml-6 min-w-0 flex-1" ref={setLogsToolbarContainer} />}
 
                 {hasDialogContent && (
                     <div className="flex items-center gap-x-2">
