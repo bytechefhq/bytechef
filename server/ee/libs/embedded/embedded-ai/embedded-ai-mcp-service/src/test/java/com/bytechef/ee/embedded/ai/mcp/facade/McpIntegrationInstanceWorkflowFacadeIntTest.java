@@ -27,6 +27,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowServiceImpl;
+import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
@@ -39,6 +40,8 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
+import com.bytechef.platform.mcp.service.McpComponentServiceImpl;
+import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -336,9 +339,10 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
     @Import({
         ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class,
         IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceServiceImpl.class,
-        IntegrationInstanceWorkflowServiceImpl.class, IntegrationWorkflowServiceImpl.class,
+        IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
+        IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolFacadeImpl.class,
-        McpIntegrationInstanceWorkflowFacadeImpl.class
+        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class
     })
     static class FacadeIntTestConfiguration {
 
