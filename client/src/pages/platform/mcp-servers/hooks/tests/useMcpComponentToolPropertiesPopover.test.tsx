@@ -11,6 +11,7 @@ import useMcpComponentToolPropertiesPopover from '../useMcpComponentToolProperti
  */
 
 const hoisted = vi.hoisted(() => ({
+    embeddedMutate: vi.fn(),
     mutate: vi.fn(),
     properties: [] as Array<Record<string, unknown>>,
 }));
@@ -20,6 +21,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
         data: {clusterElementDefinition: {properties: hoisted.properties}},
         isLoading: false,
     }),
+    useUpdateEmbeddedMcpToolMutation: () => ({mutate: hoisted.embeddedMutate}),
     useUpdateMcpToolMutation: () => ({mutate: hoisted.mutate}),
 }));
 
@@ -27,7 +29,7 @@ vi.mock('@tanstack/react-query', () => ({
     useQueryClient: () => ({invalidateQueries: vi.fn()}),
 }));
 
-const renderPopoverHook = (parameters: Record<string, unknown>) => {
+const renderPopoverHook = (parameters: Record<string, unknown>, embedded?: boolean) => {
     const mcpTool = {
         id: '1',
         mcpComponentId: '1',
@@ -36,11 +38,12 @@ const renderPopoverHook = (parameters: Record<string, unknown>) => {
         version: 1,
     } as unknown as McpTool;
 
-    return renderHook(() => useMcpComponentToolPropertiesPopover('httpClient', 1, mcpTool, vi.fn()));
+    return renderHook(() => useMcpComponentToolPropertiesPopover('httpClient', 1, mcpTool, vi.fn(), embedded));
 };
 
 describe('useMcpComponentToolPropertiesPopover', () => {
     beforeEach(() => {
+        (hoisted.embeddedMutate as unknown as Mock).mockReset();
         (hoisted.mutate as unknown as Mock).mockReset();
 
         hoisted.properties = [
@@ -96,6 +99,20 @@ describe('useMcpComponentToolPropertiesPopover', () => {
                 }),
             })
         );
+    });
+
+    it('saves an embedded tool through the embedded mutation', async () => {
+        const {result} = renderPopoverHook({uri: 'https://example.com'}, true);
+
+        await waitFor(() => expect(result.current.properties).toHaveLength(3));
+
+        act(() => result.current.handleFormSubmit({uri: 'https://example.org'}));
+
+        expect(hoisted.embeddedMutate).toHaveBeenCalledWith({
+            id: '1',
+            input: {mcpComponentId: '1', name: 'post', parameters: {uri: 'https://example.org'}, version: 1},
+        });
+        expect(hoisted.mutate).not.toHaveBeenCalled();
     });
 
     it('round-trips a cleared field back to an empty string', async () => {

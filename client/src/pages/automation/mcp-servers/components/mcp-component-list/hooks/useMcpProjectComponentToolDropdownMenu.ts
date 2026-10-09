@@ -1,35 +1,47 @@
-import {McpTool, useDeleteMcpToolMutation} from '@/shared/middleware/graphql';
+import {McpTool, useDeleteEmbeddedMcpToolMutation, useDeleteMcpToolMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
 interface UseMcpProjectComponentToolDropdownMenuProps {
+    embedded?: boolean;
     mcpTool: McpTool;
 }
 
-export default function useMcpProjectComponentToolDropdownMenu({mcpTool}: UseMcpProjectComponentToolDropdownMenuProps) {
+export default function useMcpProjectComponentToolDropdownMenu({
+    embedded,
+    mcpTool,
+}: UseMcpProjectComponentToolDropdownMenuProps) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const queryClient = useQueryClient();
 
-    const deleteMcpToolMutation = useDeleteMcpToolMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
+    const handleDeleteSuccess = () => {
+        queryClient.invalidateQueries({
+            queryKey: ['mcpComponentsByServerId'],
+        });
 
-            setShowDeleteDialog(false);
-        },
+        setShowDeleteDialog(false);
+    };
+
+    const deleteEmbeddedMcpToolMutation = useDeleteEmbeddedMcpToolMutation({
+        onSuccess: handleDeleteSuccess,
+    });
+
+    const deleteMcpToolMutation = useDeleteMcpToolMutation({
+        onSuccess: handleDeleteSuccess,
     });
 
     const handleConfirmDelete = () => {
-        deleteMcpToolMutation.mutate({
-            id: mcpTool.id,
-        });
+        if (embedded) {
+            deleteEmbeddedMcpToolMutation.mutate({id: mcpTool.id});
+        } else {
+            deleteMcpToolMutation.mutate({id: mcpTool.id});
+        }
     };
 
     return {
         handleConfirmDelete,
-        isDeletePending: deleteMcpToolMutation.isPending,
+        isDeletePending: embedded ? deleteEmbeddedMcpToolMutation.isPending : deleteMcpToolMutation.isPending,
         setShowDeleteDialog,
         showDeleteDialog,
     };

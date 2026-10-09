@@ -8,34 +8,51 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {McpComponent, useDeleteMcpComponentMutation} from '@/shared/middleware/graphql';
+import {
+    McpComponent,
+    useDeleteEmbeddedMcpComponentMutation,
+    useDeleteMcpComponentMutation,
+} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 interface McpComponentListItemDropDownProps {
+    embedded?: boolean;
     mcpComponent: McpComponent;
     onEditClick: () => void;
 }
 
-const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpComponentListItemDropDownProps) => {
+const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}: McpComponentListItemDropDownProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const queryClient = useQueryClient();
 
-    const deleteMcpComponentMutation = useDeleteMcpComponentMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
-            setShowDeleteDialog(false);
-        },
+    const handleDeleteSuccess = () => {
+        queryClient.invalidateQueries({
+            queryKey: ['mcpComponentsByServerId'],
+        });
+        setShowDeleteDialog(false);
+    };
+
+    const deleteEmbeddedMcpComponentMutation = useDeleteEmbeddedMcpComponentMutation({
+        onSuccess: handleDeleteSuccess,
     });
 
+    const deleteMcpComponentMutation = useDeleteMcpComponentMutation({
+        onSuccess: handleDeleteSuccess,
+    });
+
+    const isDeletePending = embedded
+        ? deleteEmbeddedMcpComponentMutation.isPending
+        : deleteMcpComponentMutation.isPending;
+
     const handleConfirmDelete = () => {
-        deleteMcpComponentMutation.mutate({
-            id: mcpComponent.id.toString(),
-        });
+        if (embedded) {
+            deleteEmbeddedMcpComponentMutation.mutate({id: mcpComponent.id.toString()});
+        } else {
+            deleteMcpComponentMutation.mutate({id: mcpComponent.id.toString()});
+        }
     };
 
     return (
@@ -63,7 +80,7 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpCompon
             </DropdownMenu>
 
             <AlertDialog
-                isPending={deleteMcpComponentMutation.isPending}
+                isPending={isDeletePending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}

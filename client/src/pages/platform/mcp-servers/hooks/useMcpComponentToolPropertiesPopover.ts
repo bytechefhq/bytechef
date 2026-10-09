@@ -1,4 +1,9 @@
-import {McpTool, useClusterElementDefinitionQuery, useUpdateMcpToolMutation} from '@/shared/middleware/graphql';
+import {
+    McpTool,
+    useClusterElementDefinitionQuery,
+    useUpdateEmbeddedMcpToolMutation,
+    useUpdateMcpToolMutation,
+} from '@/shared/middleware/graphql';
 import {PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
@@ -38,7 +43,8 @@ export default function useMcpComponentToolPropertiesPopover(
     componentName: string,
     componentVersion: number,
     mcpTool: McpTool,
-    onClose: () => void
+    onClose: () => void,
+    embedded = false
 ) {
     const queryClient = useQueryClient();
 
@@ -48,14 +54,20 @@ export default function useMcpComponentToolPropertiesPopover(
         componentVersion,
     });
 
-    const updateMcpToolMutation = useUpdateMcpToolMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
+    const handleUpdateSuccess = () => {
+        queryClient.invalidateQueries({
+            queryKey: ['mcpComponentsByServerId'],
+        });
 
-            onClose();
-        },
+        onClose();
+    };
+
+    const updateEmbeddedMcpToolMutation = useUpdateEmbeddedMcpToolMutation({
+        onSuccess: handleUpdateSuccess,
+    });
+
+    const updateMcpToolMutation = useUpdateMcpToolMutation({
+        onSuccess: handleUpdateSuccess,
     });
 
     const properties = useMemo(() => {
@@ -104,7 +116,7 @@ export default function useMcpComponentToolPropertiesPopover(
     const {control, formState, handleSubmit} = form;
 
     const handleFormSubmit = (values: Record<string, unknown>) => {
-        updateMcpToolMutation.mutate({
+        const variables = {
             id: mcpTool.id,
             input: {
                 mcpComponentId: mcpTool.mcpComponentId,
@@ -112,7 +124,13 @@ export default function useMcpComponentToolPropertiesPopover(
                 parameters: toStoredParameters(values),
                 version: mcpTool.version,
             },
-        });
+        };
+
+        if (embedded) {
+            updateEmbeddedMcpToolMutation.mutate(variables);
+        } else {
+            updateMcpToolMutation.mutate(variables);
+        }
     };
 
     return {
