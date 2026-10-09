@@ -20,11 +20,14 @@ import com.bytechef.automation.ai.tool.exception.ScriptToolErrorType;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -38,11 +41,20 @@ import tools.jackson.databind.node.ObjectNode;
 public class ScriptTools {
     private static final Logger log = LoggerFactory.getLogger(ScriptTools.class);
 
+    private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
+    private final ProjectWorkflowService projectWorkflowService;
+    private final WorkspaceScopeResolver workspaceScopeResolver;
 
     @SuppressFBWarnings("EI")
-    public ScriptTools(ProjectWorkflowFacade projectWorkflowFacade) {
+    public ScriptTools(
+        ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService, WorkspaceScopeResolver workspaceScopeResolver) {
+
+        this.projectService = projectService;
         this.projectWorkflowFacade = projectWorkflowFacade;
+        this.projectWorkflowService = projectWorkflowService;
+        this.workspaceScopeResolver = workspaceScopeResolver;
     }
 
     @Tool(
@@ -50,7 +62,15 @@ public class ScriptTools {
     public WorkflowInfo updateScriptComponentCode(
         @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(description = "The new code") String code,
-        @ToolParam(description = "The name of the script node") String scriptName) {
+        @ToolParam(description = "The name of the script node") String scriptName,
+        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        ToolContext toolContext) {
+
+        ProjectWorkspaceScope.checkWorkspaceWorkflow(
+            projectService, projectWorkflowService, workflowId,
+            ProjectWorkspaceScope.resolveWorkspaceId(
+                workspaceScopeResolver, workspaceId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT),
+            ScriptToolErrorType.UPDATE_SCRIPT);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
