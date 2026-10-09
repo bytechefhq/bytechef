@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.aws.session.util;
+package com.bytechef.component.ai.agent.chat.memory.aws.util;
 
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.ACCESS_KEY_ID;
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.BUCKET;
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.DEFAULT_KEY_PREFIX;
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.KEY_PREFIX;
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.REGION;
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.SECRET_ACCESS_KEY;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.ACCESS_KEY_ID;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.BUCKET;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.KEY_PREFIX;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.REGION;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.SECRET_ACCESS_KEY;
 
 import com.bytechef.commons.util.ClientCacheSettings;
 import com.bytechef.commons.util.ClientCacheUtils;
@@ -57,8 +56,12 @@ public class AwsSessionChatMemoryUtils {
         return S3SessionRepository.builder()
             .s3Client(s3Client)
             .bucketName(connectionParameters.getRequiredString(BUCKET))
-            .keyPrefix(connectionParameters.getString(KEY_PREFIX, DEFAULT_KEY_PREFIX))
+            .keyPrefix(getSessionKeyPrefix(connectionParameters))
             .build();
+    }
+
+    static String getSessionKeyPrefix(Parameters connectionParameters) {
+        return connectionParameters.getString(KEY_PREFIX, "") + "session/";
     }
 
     static S3Client getSharedS3Client(Parameters connectionParameters) {
