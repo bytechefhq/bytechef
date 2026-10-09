@@ -1,6 +1,8 @@
 extend type Query {
+    embeddedMcpComponentsByServerId(mcpServerId: ID!): [McpComponent]
     embeddedMcpServers: [McpServer]
     embeddedMcpServerTags: [Tag]
+    embeddedMcpToolsByComponentId(mcpComponentId: ID!): [McpTool]
     mcpComponentDefinitions: [ComponentDefinition!]!
 }
 

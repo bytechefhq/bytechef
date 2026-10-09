@@ -181,6 +181,44 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
     class McpComponentTest {
 
         @Test
+        void testEmbeddedMcpComponentsByServerId() {
+            when(embeddedMcpServerFacade.getEmbeddedMcpServerMcpComponents(1L))
+                .thenReturn(List.of(createMcpComponent()));
+
+            graphQlTester.document("""
+                query {
+                    embeddedMcpComponentsByServerId(mcpServerId: "1") {
+                        id
+                        componentName
+                    }
+                }
+                """)
+                .execute()
+                .path("embeddedMcpComponentsByServerId[0].componentName")
+                .entity(String.class)
+                .isEqualTo("gmail");
+
+            verify(embeddedMcpServerFacade).getEmbeddedMcpServerMcpComponents(1L);
+        }
+
+        @Test
+        void testEmbeddedMcpComponentsByServerIdReportsDeniedAccess() {
+            when(embeddedMcpServerFacade.getEmbeddedMcpServerMcpComponents(1L))
+                .thenThrow(new AccessDeniedException("denied"));
+
+            graphQlTester.document("""
+                query {
+                    embeddedMcpComponentsByServerId(mcpServerId: "1") {
+                        id
+                    }
+                }
+                """)
+                .execute()
+                .errors()
+                .satisfy(errors -> assertThat(errors).hasSize(1));
+        }
+
+        @Test
         void testCreateEmbeddedMcpComponent() {
             when(embeddedMcpServerFacade.createEmbeddedMcpComponent(any(), anyList()))
                 .thenReturn(createMcpComponent());
@@ -272,6 +310,26 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
 
     @Nested
     class McpToolTest {
+
+        @Test
+        void testEmbeddedMcpToolsByComponentId() {
+            when(embeddedMcpServerFacade.getEmbeddedMcpComponentMcpTools(2L)).thenReturn(List.of(createMcpTool(true)));
+
+            graphQlTester.document("""
+                query {
+                    embeddedMcpToolsByComponentId(mcpComponentId: "2") {
+                        id
+                        enabled
+                    }
+                }
+                """)
+                .execute()
+                .path("embeddedMcpToolsByComponentId[0].enabled")
+                .entity(Boolean.class)
+                .isEqualTo(true);
+
+            verify(embeddedMcpServerFacade).getEmbeddedMcpComponentMcpTools(2L);
+        }
 
         @Test
         void testUpdateEmbeddedMcpTool() {
