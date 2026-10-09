@@ -59,9 +59,12 @@ const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, trig
                     />
 
                     <fieldset className="mt-4 space-y-2 border-0 p-0 px-1">
-                        <label className="text-sm font-medium">Required Authorities</label>
+                        <label className="text-sm font-medium" htmlFor="mcp-component-required-authorities">
+                            Required Authorities
+                        </label>
 
                         <MultiSelect
+                            id="mcp-component-required-authorities"
                             onValueChange={setRequiredAuthorities}
                             options={authorityOptions}
                             optionsLoading={authoritiesLoading}

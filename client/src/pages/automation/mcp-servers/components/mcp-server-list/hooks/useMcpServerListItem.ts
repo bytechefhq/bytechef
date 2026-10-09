@@ -24,8 +24,8 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const deleteWorkspaceMcpServerMutation = useDeleteWorkspaceMcpServerMutation();
     const updateMcpServerTagsMutation = useUpdateMcpServerTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
-            queryClient.invalidateQueries({queryKey: ['workspaceMcpServerTags']});
+            void queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+            void queryClient.invalidateQueries({queryKey: ['workspaceMcpServerTags']});
         },
     });
 
@@ -44,7 +44,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
                     setIsEnablePending(false);
                 },
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+                    void queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                 },
             }
         );
@@ -66,7 +66,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
                     setIsPending(false);
                 },
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+                    void queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                     setShowDeleteDialog(false);
                 },
             }
