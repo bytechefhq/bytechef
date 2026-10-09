@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -46,25 +47,27 @@ public class McpServerSubAgentConfiguration {
 
     @Bean
     @ConditionalOnBean({
-        McpProjectService.class, McpProjectWorkflowService.class
+        McpProjectService.class, McpProjectWorkflowService.class, WorkspaceMcpServerFacade.class
     })
     ChatClient mcpServerBuildSubAgentChatClient(
         ChatModel chatModel, McpProjectService mcpProjectService,
         McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService) {
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService,
+        WorkspaceMcpServerFacade workspaceMcpServerFacade) {
 
         return ChatClient.builder(chatModel)
             .defaultSystem(readPrompt(promptResource))
             .defaultTools(
                 new ListMcpProjectWorkflowsToolCallback(
-                    mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService, workflowService),
+                    mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService, workflowService,
+                    workspaceMcpServerFacade),
                 new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowService))
             .build();
     }
 
     @Bean
     @ConditionalOnBean({
-        McpProjectService.class, McpProjectWorkflowService.class
+        McpProjectService.class, McpProjectWorkflowService.class, WorkspaceMcpServerFacade.class
     })
     IntelligentToolChatClientFactory mcpServerBuildSubAgentChatClientFactory(
         @Qualifier("mcpServerBuildSubAgentChatClient") ChatClient mcpServerBuildSubAgentChatClient) {

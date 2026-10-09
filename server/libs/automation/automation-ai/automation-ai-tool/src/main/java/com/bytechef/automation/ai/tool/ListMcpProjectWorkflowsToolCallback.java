@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -30,6 +31,7 @@ import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,17 +74,20 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final WorkflowService workflowService;
+    private final WorkspaceMcpServerFacade workspaceMcpServerFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ListMcpProjectWorkflowsToolCallback(
         McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService) {
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService,
+        WorkspaceMcpServerFacade workspaceMcpServerFacade) {
 
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.workflowService = workflowService;
+        this.workspaceMcpServerFacade = workspaceMcpServerFacade;
     }
 
     @Override
@@ -110,6 +115,20 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
                 return ToolErrors.toolError(jsonMapper, "mcpServerId is required");
             }
 
+            AutomationToolInvocationContext context = AutomationToolInvocationContext.fromToolContext(toolContext);
+
+            Long workspaceId = context == null ? null : context.workspaceId();
+
+            if (workspaceId == null) {
+                return ToolErrors.toolError(
+                    jsonMapper, "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
+            }
+
+            if (!isWorkspaceMcpServer(workspaceId, mcpServerId)) {
+                return ToolErrors.toolError(
+                    jsonMapper, "MCP server " + mcpServerId + " not found in the current workspace");
+            }
+
             List<McpProjectWorkflowSummary> summaries = new ArrayList<>();
 
             for (McpProject mcpProject : mcpProjectService.getMcpServerMcpProjects(mcpServerId)) {
@@ -129,6 +148,13 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
             return ToolErrors.runtimeFailure(
                 jsonMapper, ListMcpProjectWorkflowsToolCallback.class, TOOL_NAME, exception);
         }
+    }
+
+    private boolean isWorkspaceMcpServer(long workspaceId, long mcpServerId) {
+        List<McpServer> workspaceMcpServers = workspaceMcpServerFacade.getWorkspaceMcpServers(workspaceId);
+
+        return workspaceMcpServers.stream()
+            .anyMatch(mcpServer -> Objects.equals(mcpServer.getId(), mcpServerId));
     }
 
     private McpProjectWorkflowSummary toSummary(McpProject mcpProject, McpProjectWorkflow mcpProjectWorkflow) {

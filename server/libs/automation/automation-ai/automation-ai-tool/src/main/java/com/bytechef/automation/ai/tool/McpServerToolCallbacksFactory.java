@@ -59,7 +59,8 @@ public class McpServerToolCallbacksFactory {
 
         toolCallbacks.add(new ListMcpServersToolCallback(workspaceMcpServerFacade));
         toolCallbacks.add(new ListMcpProjectWorkflowsToolCallback(
-            mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService, workflowService));
+            mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService, workflowService,
+            workspaceMcpServerFacade));
 
         return toolCallbacks;
     }

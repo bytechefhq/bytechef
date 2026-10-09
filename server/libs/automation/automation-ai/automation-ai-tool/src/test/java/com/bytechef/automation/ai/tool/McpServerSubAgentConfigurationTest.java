@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.ai.copilot.tool.ConfigureMcpServerToolCallback;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -45,7 +46,8 @@ final class McpServerSubAgentConfigurationTest {
         assertThatNoException().isThrownBy(
             () -> configuration.mcpServerBuildSubAgentChatClient(
                 mock(ChatModel.class), mock(McpProjectService.class), mock(McpProjectWorkflowService.class),
-                mock(ProjectDeploymentWorkflowService.class), mock(WorkflowService.class)));
+                mock(ProjectDeploymentWorkflowService.class), mock(WorkflowService.class),
+                mock(WorkspaceMcpServerFacade.class)));
     }
 
     @Test

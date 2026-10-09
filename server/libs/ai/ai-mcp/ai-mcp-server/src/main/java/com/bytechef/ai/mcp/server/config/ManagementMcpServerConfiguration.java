@@ -81,8 +81,9 @@ public class ManagementMcpServerConfiguration {
             listMcpProjectWorkflows(mcpServerId) shows each attached workflow's current mapping state. \
             configureMcpServer never creates the server, attaches workflows to it, or enables it — those are \
             the flat tools above.
-            listMcpServers and createMcpServer additionally accept an optional workspaceId (and \
-            environment) since MCP servers are workspace-scoped: omit it when the account has exactly one \
+            listMcpServers, createMcpServer and listMcpProjectWorkflows additionally accept an optional \
+            workspaceId (and environment) since MCP servers are workspace-scoped: omit it when the account \
+            has exactly one \
             workspace, otherwise retry with an explicit workspaceId from the workspace_required error's \
             'workspaces' field.
             Most tools require workspace context: if a tool returns a workspace_required error, retry with one \

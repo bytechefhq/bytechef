@@ -47,7 +47,8 @@ public class ToolCallbackContributorConfiguration {
 
     private static final String MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME = "updateMcpProjectWorkflowParameters";
 
-    private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of("listMcpServers", "createMcpServer");
+    private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of(
+        "listMcpServers", "createMcpServer", "listMcpProjectWorkflows");
 
     private static final Set<String> WORKSPACE_SCOPED_DEPLOYMENT_TOOL_NAMES = Set.of("listProjectDeployments");
 

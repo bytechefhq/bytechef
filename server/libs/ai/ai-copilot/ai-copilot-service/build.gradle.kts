@@ -139,4 +139,6 @@ dependencies {
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
 
     implementation(project(":server:libs:core:tenant:tenant-api"))
+
+    testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
 }
