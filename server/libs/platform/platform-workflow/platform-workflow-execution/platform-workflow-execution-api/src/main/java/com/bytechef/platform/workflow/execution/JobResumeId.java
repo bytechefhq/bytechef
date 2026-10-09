@@ -47,9 +47,13 @@ public class JobResumeId implements Serializable {
     }
 
     public static JobResumeId of(long jobId) {
+        return of(TenantContext.getCurrentTenantId(), jobId);
+    }
+
+    public static JobResumeId of(String tenantId, long jobId) {
         UUID uuid = UUID.randomUUID();
 
-        return new JobResumeId(TenantContext.getCurrentTenantId(), jobId, uuid.toString());
+        return new JobResumeId(tenantId, jobId, uuid.toString());
     }
 
     public static JobResumeId parse(String id) {
