@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import useKnowledgeBaseDocumentChunkListItemDropdownMenu from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentChunkListItemDropdownMenu';
 import {KnowledgeBaseDocumentChunk} from '@/shared/middleware/graphql';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
@@ -25,20 +25,12 @@ const KnowledgeBaseDocumentChunkListItemDropdownMenu = ({
                 <Button aria-label="More Chunk Actions" icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="p-0">
-                <DropdownMenuItem className="dropdown-menu-item" onClick={handleEdit}>
-                    <EditIcon /> Edit
-                </DropdownMenuItem>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={handleEdit} />
 
-                <DropdownMenuSeparator className="m-0" />
+                <DropdownMenuSeparator />
 
-                <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
-                    onClick={handleDelete}
-                    variant="destructive"
-                >
-                    <Trash2Icon /> Delete
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={handleDelete} variant="destructive" />
             </DropdownMenuContent>
         </DropdownMenu>
     );

@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import useKnowledgeBaseDocumentListItemDropdownMenu from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItemDropdownMenu';
 import {EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
@@ -27,20 +27,19 @@ const KnowledgeBaseDocumentListItemDropdownMenu = ({documentId}: KnowledgeBaseDo
                 />
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="p-0">
-                <DropdownMenuSeparator className="m-0" />
+            <DropdownMenuContent align="end">
+                <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
+                    icon={<Trash2Icon />}
+                    label="Delete"
                     onClick={(event) => {
                         event.stopPropagation();
 
                         handleDelete();
                     }}
                     variant="destructive"
-                >
-                    <Trash2Icon /> Delete
-                </DropdownMenuItem>
+                />
             </DropdownMenuContent>
         </DropdownMenu>
     );

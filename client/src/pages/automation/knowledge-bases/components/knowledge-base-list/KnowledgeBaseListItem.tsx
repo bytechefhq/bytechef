@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import EditKnowledgeBaseDialog from '@/pages/automation/knowledge-base/components/EditKnowledgeBaseDialog';
 import KnowledgeBaseListItemDeleteDialog from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemDeleteDialog';
@@ -106,24 +106,21 @@ const KnowledgeBaseListItem = ({knowledgeBase, remainingTags, tags}: KnowledgeBa
                                 />
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end" className="p-0">
-                                <DropdownMenuItem className="dropdown-menu-item" onClick={handleEditClick}>
-                                    <EditIcon /> Edit
-                                </DropdownMenuItem>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={handleEditClick} />
 
-                                <DropdownMenuSeparator className="m-0" />
+                                <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item-destructive"
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
                                     onClick={(event) => {
                                         event.stopPropagation();
 
                                         handleShowDeleteDialog();
                                     }}
                                     variant="destructive"
-                                >
-                                    <Trash2Icon /> Delete
-                                </DropdownMenuItem>
+                                />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
