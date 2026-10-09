@@ -86,6 +86,54 @@ describe('useProperty required property default value', () => {
         expect(saveProperty).toHaveBeenCalledWith(expect.objectContaining({path: 'maxTokens', value: 16000}));
     });
 
+    // PropertyDynamicProperties hands a dynamic property its definition default as parameterValue even when the
+    // workflow has nothing stored at its path.
+    it('saves the default of a required dynamic property that is missing from stored parameters', () => {
+        setCurrentNodeParameters({model: 'claude-sonnet-5-5', settings: {}});
+
+        const {result} = renderHook(
+            () =>
+                useProperty({
+                    dynamicPropertySource: 'settings',
+                    objectName: 'settings',
+                    parameterValue: 16000 as never,
+                    path: 'settings',
+                    property: maxTokensProperty,
+                }),
+            {wrapper}
+        );
+
+        expect(result.current.inputValue).toBe(16000);
+
+        act(() => {
+            vi.advanceTimersByTime(250);
+        });
+
+        expect(saveProperty).toHaveBeenCalledWith(expect.objectContaining({path: 'settings.maxTokens', value: 16000}));
+    });
+
+    it('keeps an explicit value of a required dynamic property', () => {
+        setCurrentNodeParameters({model: 'claude-sonnet-5-5', settings: {maxTokens: 4096}});
+
+        renderHook(
+            () =>
+                useProperty({
+                    dynamicPropertySource: 'settings',
+                    objectName: 'settings',
+                    parameterValue: 4096 as never,
+                    path: 'settings',
+                    property: maxTokensProperty,
+                }),
+            {wrapper}
+        );
+
+        act(() => {
+            vi.advanceTimersByTime(250);
+        });
+
+        expect(saveProperty).not.toHaveBeenCalled();
+    });
+
     it('keeps a stored value of a required property', () => {
         setCurrentNodeParameters({maxTokens: 4096, model: 'claude-sonnet-5-5'});
 
