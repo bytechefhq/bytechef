@@ -28,11 +28,14 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.mcp.client.util.McpClientUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -47,7 +50,7 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 class McpClientToolTest {
 
     @Test
-    void testToolCallKeepsTheConversationIdOutOfTheMcpMeta() throws Exception {
+    void testToolCallKeepsTheConversationIdAndTheAgentToolContextOutOfTheMcpMeta() throws Exception {
         McpSyncClient mcpSyncClient = mock(McpSyncClient.class);
 
         McpSchema.Tool tool = McpSchema.Tool.builder("search", Map.of("type", "object"))
@@ -92,7 +95,12 @@ class McpClientToolTest {
 
         toolCallbacks[0].call(
             "{}",
-            new ToolContext(Map.of(ChatMemory.CONVERSATION_ID, "conversation-1", "tenantHint", "tenant-1")));
+            new ToolContext(
+                Map.of(
+                    ChatMemory.CONVERSATION_ID, "conversation-1", "tenantHint", "tenant-1",
+                    AiAgentToolContextKey.ACTION_CONTEXT, new Object(),
+                    AiAgentToolContextKey.SSE_EMITTER_REFERENCE, new AtomicReference<>(),
+                    AiAgentToolContextKey.SSE_BUFFERED_EVENTS, new ConcurrentLinkedQueue<>())));
 
         ArgumentCaptor<McpSchema.CallToolRequest> callToolRequestArgumentCaptor = ArgumentCaptor.forClass(
             McpSchema.CallToolRequest.class);
@@ -102,7 +110,9 @@ class McpClientToolTest {
         McpSchema.CallToolRequest callToolRequest = callToolRequestArgumentCaptor.getValue();
 
         assertThat(callToolRequest.meta())
-            .doesNotContainKey(ChatMemory.CONVERSATION_ID)
+            .doesNotContainKeys(
+                ChatMemory.CONVERSATION_ID, AiAgentToolContextKey.ACTION_CONTEXT,
+                AiAgentToolContextKey.SSE_EMITTER_REFERENCE, AiAgentToolContextKey.SSE_BUFFERED_EVENTS)
             .containsEntry("tenantHint", "tenant-1");
     }
 }

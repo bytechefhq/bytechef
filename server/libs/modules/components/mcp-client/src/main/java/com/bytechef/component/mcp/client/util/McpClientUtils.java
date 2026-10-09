@@ -47,6 +47,7 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.mcp.client.constant.McpClientConstants;
+import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
@@ -233,6 +234,9 @@ public class McpClientUtils {
             Map<String, Object> mcpMeta = new HashMap<>(defaultConverter.convert(toolContext));
 
             mcpMeta.remove(ChatMemory.CONVERSATION_ID);
+            mcpMeta.remove(AiAgentToolContextKey.ACTION_CONTEXT);
+            mcpMeta.remove(AiAgentToolContextKey.SSE_BUFFERED_EVENTS);
+            mcpMeta.remove(AiAgentToolContextKey.SSE_EMITTER_REFERENCE);
 
             return mcpMeta;
         };
