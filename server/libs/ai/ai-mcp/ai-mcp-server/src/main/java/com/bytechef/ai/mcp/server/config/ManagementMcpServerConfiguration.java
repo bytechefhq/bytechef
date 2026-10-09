@@ -86,6 +86,11 @@ public class ManagementMcpServerConfiguration {
             has exactly one \
             workspace, otherwise retry with an explicit workspaceId from the workspace_required error's \
             'workspaces' field.
+            The project, workflow and script tools (listProjects, searchProjects, getProject, createProject, \
+            listWorkflows, searchWorkflows, getWorkflow, createProjectWorkflow, updateWorkflow, \
+            updateScriptComponentCode and the rest) likewise act within a single workspace and accept an \
+            optional workspaceId: they only list projects and workflows of that workspace and reject a project \
+            or workflow id that belongs to another one.
             Most tools require workspace context: if a tool returns a workspace_required error, retry with one \
             of the workspaceId values listed in its 'workspaces' field.""";
 
