@@ -46,12 +46,13 @@ class EmbeddedApiKeyAuthenticationConverterTest {
     private static final String JWT_TENANT_ID = "jwt_tenant";
 
     private EmbeddedApiKeyAuthenticationConverter converter;
+    private JwtTokenService jwtTokenService;
     private HttpServletRequest request;
     private SigningKeyService signingKeyService;
 
     @BeforeEach
     void setUp() {
-        JwtTokenService jwtTokenService = mock(JwtTokenService.class);
+        jwtTokenService = mock(JwtTokenService.class);
         signingKeyService = mock(SigningKeyService.class);
 
         converter = new EmbeddedApiKeyAuthenticationConverter(jwtTokenService, signingKeyService);
@@ -232,6 +233,59 @@ class EmbeddedApiKeyAuthenticationConverterTest {
     }
 
     @Test
+    void testConvertWithServerMintedJwtTokenForAnotherEnvironmentThrowsBadCredentialsException()
+        throws NoSuchAlgorithmException {
+
+        String jwtToken = createServerMintedJwt("user-a", Environment.DEVELOPMENT.ordinal());
+
+        assertThatThrownBy(() -> convertWithJwt(jwtToken, "/api/embedded/v1/connections", "PRODUCTION"))
+            .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testConvertWithServerMintedJwtTokenForTheRequestEnvironmentReturnsAuthentication()
+        throws NoSuchAlgorithmException {
+
+        String jwtToken = createServerMintedJwt("user-a", Environment.STAGING.ordinal());
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) convertWithJwt(
+            jwtToken, "/api/embedded/v1/connections", "STAGING");
+
+        assertThat(token.getExternalUserId()).isEqualTo("user-a");
+        assertThat(token.getEnvironmentId()).isEqualTo(Environment.STAGING.ordinal());
+    }
+
+    @Test
+    void testConvertWithJwtTokenWithNonNumericEnvironmentClaimThrowsBadCredentialsException()
+        throws NoSuchAlgorithmException {
+
+        String jwtToken = createServerMintedJwt("user-a", "PRODUCTION");
+
+        assertThatThrownBy(() -> convertWithJwt(jwtToken, "/api/embedded/v1/connections", "PRODUCTION"))
+            .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testConvertWithJwtTokenWithoutEnvironmentClaimUsesTheRequestEnvironment() throws NoSuchAlgorithmException {
+        KeyPair keyPair = generateKeyPair();
+
+        String jwtToken = Jwts.builder()
+            .header()
+            .keyId(EncodingUtils.base64EncodeToString(JWT_TENANT_ID + ":keyId"))
+            .and()
+            .subject("user-a")
+            .signWith(keyPair.getPrivate())
+            .compact();
+
+        when(signingKeyService.getPublicKey(anyString(), anyLong())).thenReturn(keyPair.getPublic());
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) convertWithJwt(
+            jwtToken, "/api/embedded/v1/connections", "DEVELOPMENT");
+
+        assertThat(token.getEnvironmentId()).isEqualTo(Environment.DEVELOPMENT.ordinal());
+    }
+
+    @Test
     void testJwtTokenPatternMatchesValidJwt() {
         String validJwt = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyMTIzIn0.signature";
 
@@ -341,6 +395,40 @@ class EmbeddedApiKeyAuthenticationConverterTest {
 
         verifyNoInteractions(connectedUserService);
         verifyNoInteractions(apiKeyService);
+    }
+
+    private Authentication convertWithJwt(String jwtToken, String requestUri, String environment) {
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + jwtToken);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(environment);
+        when(request.getRequestURI()).thenReturn(requestUri);
+
+        return converter.convert(request);
+    }
+
+    private String createServerMintedJwt(String subject, Object environmentIdClaim) throws NoSuchAlgorithmException {
+        String keyId = EncodingUtils.base64EncodeToString(JWT_TENANT_ID + ":server");
+
+        KeyPair keyPair = generateKeyPair();
+
+        when(jwtTokenService.getPublicKey(keyId)).thenReturn(keyPair.getPublic());
+
+        return Jwts.builder()
+            .header()
+            .keyId(keyId)
+            .and()
+            .subject(subject)
+            .claim(JwtTokenService.ENVIRONMENT_ID_CLAIM, environmentIdClaim)
+            .claim("integrationId", 1L)
+            .signWith(keyPair.getPrivate())
+            .compact();
+    }
+
+    private static KeyPair generateKeyPair() throws NoSuchAlgorithmException {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+
+        keyPairGenerator.initialize(2048);
+
+        return keyPairGenerator.generateKeyPair();
     }
 
     private Authentication convertWithJwt(String subject, String requestUri) throws NoSuchAlgorithmException {
