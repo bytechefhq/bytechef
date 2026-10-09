@@ -202,11 +202,7 @@ public final class SessionChatMemoryActions {
         SessionService sessionService = createSessionService(sessionRepository);
 
         if (sessionService.findById(conversationId) == null) {
-            sessionService.create(
-                CreateSessionRequest.builder()
-                    .id(conversationId)
-                    .userId(inputParameters.getString(USER_ID, DEFAULT_USER_ID_VALUE))
-                    .build());
+            createSession(sessionService, conversationId, inputParameters.getString(USER_ID, DEFAULT_USER_ID_VALUE));
         }
 
         for (Message message : newMessages) {
@@ -216,6 +212,20 @@ public final class SessionChatMemoryActions {
         List<Message> messages = sessionService.getMessages(conversationId);
 
         return Map.of(CONVERSATION_ID, conversationId, "messageCount", messages.size());
+    }
+
+    private static void createSession(SessionService sessionService, String conversationId, String userId) {
+        try {
+            sessionService.create(
+                CreateSessionRequest.builder()
+                    .id(conversationId)
+                    .userId(userId)
+                    .build());
+        } catch (IllegalStateException illegalStateException) {
+            if (sessionService.findById(conversationId) == null) {
+                throw illegalStateException;
+            }
+        }
     }
 
     static Object performGetMessages(Parameters inputParameters, SessionRepository sessionRepository) {

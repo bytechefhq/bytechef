@@ -30,14 +30,18 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionRepository;
+import org.springframework.ai.session.compaction.CompactionPlan;
 
 /**
  * @author Ivica Cardic
@@ -80,6 +84,30 @@ class SessionChatMemoryActionsTest {
 
         assertThat(listed).containsEntry("conversationIds", List.of("conversation-1"))
             .containsEntry("count", 1);
+    }
+
+    @Test
+    void testAddMessagesAppendsWhenAnotherWriterCreatesTheSessionFirst() throws Exception {
+        SessionRepository racingSessionRepository = new RacingSessionRepository(sessionRepository);
+
+        List<ActionDefinition> racingActionDefinitions = SessionChatMemoryActions.of(
+            "test-chat-memory",
+            (inputParameters, connectionParameters, extensions, componentConnections) -> racingSessionRepository,
+            false);
+
+        ActionDefinition addMessagesActionDefinition = racingActionDefinitions.getFirst();
+
+        PerformFunction performFunction = (PerformFunction) addMessagesActionDefinition.getPerform()
+            .orElseThrow();
+
+        Object result = performFunction.apply(
+            MockParametersFactory.create(
+                Map.of(
+                    CONVERSATION_ID, "conversation-1",
+                    MESSAGES, List.of(Map.of(MESSAGE_ROLE, "user", MESSAGE_CONTENT, "hello")))),
+            MockParametersFactory.create(Map.of()), mock(ActionContext.class));
+
+        assertThat(result).isEqualTo(Map.of(CONVERSATION_ID, "conversation-1", "messageCount", 1));
     }
 
     @Test
@@ -186,5 +214,82 @@ class SessionChatMemoryActionsTest {
         return performFunction.apply(
             MockParametersFactory.create(inputParameters), MockParametersFactory.create(Map.of()),
             mock(ActionContext.class));
+    }
+
+    private static final class RacingSessionRepository implements SessionRepository {
+
+        private final SessionRepository delegate;
+        private boolean firstLookup = true;
+
+        private RacingSessionRepository(SessionRepository delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public Session save(Session session) {
+            return delegate.save(session);
+        }
+
+        @Override
+        public boolean saveIfAbsent(Session session) {
+            return delegate.saveIfAbsent(session);
+        }
+
+        @Override
+        public @Nullable Session findById(String sessionId) {
+            if (firstLookup) {
+                firstLookup = false;
+
+                delegate.saveIfAbsent(
+                    Session.builder()
+                        .id(sessionId)
+                        .userId("other-writer")
+                        .build());
+
+                return null;
+            }
+
+            return delegate.findById(sessionId);
+        }
+
+        @Override
+        public List<Session> findByUserId(String userId) {
+            return delegate.findByUserId(userId);
+        }
+
+        @Override
+        public void delete(String sessionId) {
+            delegate.delete(sessionId);
+        }
+
+        @Override
+        public int deleteExpiredSessions(Instant before) {
+            return delegate.deleteExpiredSessions(before);
+        }
+
+        @Override
+        public void appendEvent(SessionEvent event) {
+            delegate.appendEvent(event);
+        }
+
+        @Override
+        public boolean applyCompaction(String sessionId, CompactionPlan plan, long expectedVersion) {
+            return delegate.applyCompaction(sessionId, plan, expectedVersion);
+        }
+
+        @Override
+        public long getEventVersion(String sessionId) {
+            return delegate.getEventVersion(sessionId);
+        }
+
+        @Override
+        public List<SessionEvent> findEvents(String sessionId, EventFilter filter) {
+            return delegate.findEvents(sessionId, filter);
+        }
+
+        @Override
+        public List<SessionEvent> findEventsByUserId(String userId, EventFilter filter) {
+            return delegate.findEventsByUserId(userId, filter);
+        }
     }
 }
