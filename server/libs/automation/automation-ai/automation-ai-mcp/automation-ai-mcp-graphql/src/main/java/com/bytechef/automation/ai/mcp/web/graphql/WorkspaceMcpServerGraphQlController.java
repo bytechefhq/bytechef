@@ -21,6 +21,7 @@ import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -71,6 +72,11 @@ public class WorkspaceMcpServerGraphQlController {
         workspaceMcpServerFacade.deleteWorkspaceMcpServer(mcpServerId);
 
         return true;
+    }
+
+    @MutationMapping
+    public McpTool updateWorkspaceMcpToolEnabled(@Argument long id, @Argument boolean enabled) {
+        return workspaceMcpServerFacade.updateWorkspaceMcpToolEnabled(id, enabled);
     }
 
     public record CreateWorkspaceMcpServerInput(

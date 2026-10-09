@@ -20,6 +20,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 
@@ -59,6 +60,8 @@ public interface WorkspaceMcpServerFacade {
         Long workspaceId);
 
     McpServer updateWorkspaceMcpServer(Long mcpServerId, String name, Boolean enabled);
+
+    McpTool updateWorkspaceMcpToolEnabled(long mcpToolId, boolean enabled);
 
     /**
      * Deletes an MCP server and removes it from all workspaces.
