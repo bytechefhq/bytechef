@@ -93,6 +93,30 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
     }
 
     @Test
+    void testAuthenticateRejectsDisabledMcpServerWhenAuthenticationNotRequired() {
+        mockMcpServer(PlatformType.EMBEDDED, false, false);
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+                new EmbeddedMcpServerApiKeyAuthenticationToken(
+                    ENVIRONMENT_ID, null, "public", MCP_SERVER_SECRET_KEY)))
+            .withMessage("MCP server is disabled");
+    }
+
+    @Test
+    void testAuthenticateRejectsDisabledMcpServerWhenAuthenticationRequired() {
+        mockMcpServer(PlatformType.EMBEDDED, true, false);
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+                new EmbeddedMcpServerApiKeyAuthenticationToken(
+                    ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY)))
+            .withMessage("MCP server is disabled");
+
+        verify(connectedUserService, never()).fetchConnectedUser(anyString(), anyLong());
+    }
+
+    @Test
     void testAuthenticateRejectsNonEmbeddedMcpServer() {
         mockMcpServer(PlatformType.AUTOMATION, false);
 
@@ -139,11 +163,16 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
     }
 
     private void mockMcpServer(PlatformType type, boolean authenticationRequired) {
+        mockMcpServer(type, authenticationRequired, true);
+    }
+
+    private void mockMcpServer(PlatformType type, boolean authenticationRequired, boolean enabled) {
         McpServer mcpServer = mock(McpServer.class);
 
         when(mcpServer.getId()).thenReturn(MCP_SERVER_ID);
         when(mcpServer.getType()).thenReturn(type);
         when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
+        when(mcpServer.isEnabled()).thenReturn(enabled);
         when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
     }
 }
