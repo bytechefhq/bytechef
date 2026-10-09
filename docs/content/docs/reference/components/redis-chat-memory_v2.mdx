@@ -1,0 +1,259 @@
+---
+title: "Redis Chat Memory"
+description: "Redis Chat Memory stores session-based conversation history in Redis."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: redisChatMemory/v2
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING | The Redis username (optional, for Redis 6.0+ ACL). | false |
+| password | Password | STRING | The Redis password. | false |
+
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Add Messages
+Name: addMessages
+
+`Adds messages to a conversation, creating the conversation if it does not exist.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| conversationId | Conversation ID | STRING | The unique identifier for the conversation. | true |
+| userId | User ID | STRING | User id assigned to the conversation when it is created. | false |
+| messages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(role), STRING\(content)&#125;] </details> | The messages to add to the conversation. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Messages",
+  "name" : "addMessages",
+  "parameters" : {
+    "conversationId" : "",
+    "userId" : "",
+    "messages" : [ {
+      "role" : "",
+      "content" : ""
+    } ]
+  },
+  "type" : "redisChatMemory/v2/addMessages"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| messageCount | INTEGER |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationId" : "",
+  "messageCount" : 1
+}
+```
+
+
+
+
+### Get Messages
+Name: getMessages
+
+`Retrieves the messages of a conversation.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| conversationId | Conversation ID | STRING | The unique identifier for the conversation. | true |
+| includeCompactedHistory | Include compacted history | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When off, only the messages the agent currently sees are returned. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Messages",
+  "name" : "getMessages",
+  "parameters" : {
+    "conversationId" : "",
+    "includeCompactedHistory" : false
+  },
+  "type" : "redisChatMemory/v2/getMessages"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(role), STRING\(content)&#125;] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationId" : "",
+  "messages" : [ {
+    "role" : "",
+    "content" : ""
+  } ]
+}
+```
+
+
+
+
+### Delete Conversation
+Name: deleteConversation
+
+`Deletes a conversation and all of its messages.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| conversationId | Conversation ID | STRING | The unique identifier for the conversation. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Conversation",
+  "name" : "deleteConversation",
+  "parameters" : {
+    "conversationId" : ""
+  },
+  "type" : "redisChatMemory/v2/deleteConversation"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationId" : "",
+  "deleted" : false
+}
+```
+
+
+
+
+### List Conversations
+Name: listConversations
+
+`Lists the conversation IDs of a user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| userId | User ID | STRING | Lists the conversations of this user. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Conversations",
+  "name" : "listConversations",
+  "parameters" : {
+    "userId" : ""
+  },
+  "type" : "redisChatMemory/v2/listConversations"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationIds | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| count | INTEGER |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationIds" : [ "" ],
+  "count" : 1
+}
+```
+
+
+
+
+
+

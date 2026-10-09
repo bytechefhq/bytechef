@@ -806,8 +806,8 @@ public class ApplicationProperties {
             private Redis redis = new Redis();
 
             /**
-             * Maximum number of archived (compacted-away) events kept in a session document by the built-in session
-             * chat memory repository when the provider is redis or aws.
+             * Maximum number of archived (compacted-away) events kept in a session document by Chat Memory v2 when the
+             * provider is redis or aws.
              */
             private Integer sessionMaxArchivedEvents;
 
@@ -874,7 +874,7 @@ public class ApplicationProperties {
                 private String keyPrefix;
 
                 /**
-                 * Prefix used to derive the per-tenant S3 bucket name of the built-in session repository.
+                 * Prefix used to derive the per-tenant S3 bucket name of Chat Memory v2.
                  */
                 private String sessionBucketPrefix;
 
@@ -938,7 +938,7 @@ public class ApplicationProperties {
                 private String host;
 
                 /**
-                 * Key prefix of the built-in session repository; its keys start with {@code <prefix><tenantId>:}.
+                 * Key prefix of Chat Memory v2; its keys start with {@code <prefix><tenantId>:}.
                  */
                 private String sessionKeyPrefix;
 
