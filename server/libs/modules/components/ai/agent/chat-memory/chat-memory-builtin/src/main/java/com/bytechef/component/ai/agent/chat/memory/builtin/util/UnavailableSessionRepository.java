@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.builtin.session.util;
+package com.bytechef.component.ai.agent.chat.memory.builtin.util;
 
 import java.time.Instant;
 import java.util.List;
