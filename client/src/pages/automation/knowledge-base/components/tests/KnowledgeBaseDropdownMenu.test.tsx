@@ -43,14 +43,26 @@ vi.mock('@/components/Button/Button', () => ({
     ),
 }));
 
-vi.mock('@/components/ui/dropdown-menu', () => ({
+vi.mock('@/components/DropdownMenu/DropdownMenu', () => ({
     DropdownMenu: ({children}: {children: React.ReactNode}) => <div data-testid="dropdown-menu">{children}</div>,
     DropdownMenuContent: ({children}: {children: React.ReactNode}) => (
         <div data-testid="dropdown-content">{children}</div>
     ),
-    DropdownMenuItem: ({children, onClick}: {children: React.ReactNode; className?: string; onClick?: () => void}) => (
+    DropdownMenuItem: ({
+        children,
+        icon,
+        label,
+        onClick,
+    }: {
+        children?: React.ReactNode;
+        icon?: React.ReactNode;
+        label?: string;
+        onClick?: () => void;
+    }) => (
         <button data-testid="dropdown-item" onClick={onClick}>
-            {children}
+            {icon}
+
+            {label ?? children}
         </button>
     ),
     DropdownMenuSeparator: () => <hr data-testid="dropdown-separator" />,

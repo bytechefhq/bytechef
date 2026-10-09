@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import EditKnowledgeBaseDialog from '@/pages/automation/knowledge-base/components/EditKnowledgeBaseDialog';
 import KnowledgeBaseDeleteAlertDialog from '@/pages/automation/knowledge-base/components/KnowledgeBaseDeleteAlertDialog';
 import useKnowledgeBaseDropdownMenu from '@/pages/automation/knowledge-base/components/hooks/useKnowledgeBaseDropdownMenu';
@@ -38,20 +38,17 @@ const KnowledgeBaseDropdownMenu = ({knowledgeBase}: KnowledgeBaseDropdownMenuPro
                     />
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="p-0">
-                    <DropdownMenuItem className="dropdown-menu-item" onClick={handleShowEditDialog}>
-                        <EditIcon /> Edit
-                    </DropdownMenuItem>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={handleShowEditDialog} />
 
-                    <DropdownMenuSeparator className="m-0" />
+                    <DropdownMenuSeparator />
 
                     <DropdownMenuItem
-                        className="dropdown-menu-item-destructive"
+                        icon={<Trash2Icon />}
+                        label="Delete"
                         onClick={handleShowDeleteDialog}
                         variant="destructive"
-                    >
-                        <Trash2Icon /> Delete
-                    </DropdownMenuItem>
+                    />
                 </DropdownMenuContent>
             </DropdownMenu>
 

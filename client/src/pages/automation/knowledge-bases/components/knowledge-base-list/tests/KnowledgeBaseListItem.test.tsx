@@ -51,14 +51,26 @@ vi.mock('@/components/Button/Button', () => ({
     ),
 }));
 
-vi.mock('@/components/ui/dropdown-menu', () => ({
+vi.mock('@/components/DropdownMenu/DropdownMenu', () => ({
     DropdownMenu: ({children}: {children: React.ReactNode}) => <div data-testid="dropdown-menu">{children}</div>,
     DropdownMenuContent: ({children}: {children: React.ReactNode}) => (
         <div data-testid="dropdown-content">{children}</div>
     ),
-    DropdownMenuItem: ({children, onClick}: {children: React.ReactNode; className?: string; onClick?: () => void}) => (
+    DropdownMenuItem: ({
+        children,
+        icon,
+        label,
+        onClick,
+    }: {
+        children?: React.ReactNode;
+        icon?: React.ReactNode;
+        label?: string;
+        onClick?: () => void;
+    }) => (
         <button data-testid="dropdown-item" onClick={onClick}>
-            {children}
+            {icon}
+
+            {label ?? children}
         </button>
     ),
     DropdownMenuSeparator: () => <hr />,
@@ -200,6 +212,35 @@ describe('KnowledgeBaseListItem', () => {
         );
 
         expect(screen.getByTestId('dropdown-menu')).toBeInTheDocument();
+    });
+
+    it('calls handleEditClick when Edit is clicked', async () => {
+        render(
+            <KnowledgeBaseListItem
+                knowledgeBase={mockKnowledgeBase}
+                remainingTags={mockRemainingTags}
+                tags={mockTags}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Edit'}));
+
+        expect(hoisted.handleEditClick).toHaveBeenCalled();
+    });
+
+    it('calls handleShowDeleteDialog without opening the knowledge base when Delete is clicked', async () => {
+        render(
+            <KnowledgeBaseListItem
+                knowledgeBase={mockKnowledgeBase}
+                remainingTags={mockRemainingTags}
+                tags={mockTags}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
+
+        expect(hoisted.handleShowDeleteDialog).toHaveBeenCalled();
+        expect(hoisted.handleKnowledgeBaseClick).not.toHaveBeenCalled();
     });
 
     it('calls handleKnowledgeBaseClick when item is clicked', async () => {

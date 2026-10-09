@@ -106,7 +106,7 @@ describe('KnowledgeBaseDocumentChunkListItemDropdownMenu menu items', () => {
         const trigger = screen.getByRole('button', {name: 'More Chunk Actions'});
         await userEvent.click(trigger);
 
-        const editMenuItem = screen.getByText('Edit').closest('[class*="dropdown-menu-item"]');
+        const editMenuItem = screen.getByRole('menuitem', {name: 'Edit'});
 
         expect(editMenuItem).toBeInTheDocument();
     });
@@ -117,8 +117,17 @@ describe('KnowledgeBaseDocumentChunkListItemDropdownMenu menu items', () => {
         const trigger = screen.getByRole('button', {name: 'More Chunk Actions'});
         await userEvent.click(trigger);
 
-        const deleteMenuItem = screen.getByText('Delete').closest('[class*="dropdown-menu-item-destructive"]');
+        const deleteMenuItem = screen.getByRole('menuitem', {name: 'Delete'});
 
-        expect(deleteMenuItem).toBeInTheDocument();
+        expect(deleteMenuItem).toHaveClass('text-content-destructive-primary');
+    });
+
+    it('should render with the design-system DropdownMenu', async () => {
+        renderComponent();
+
+        await userEvent.click(screen.getByRole('button', {name: 'More Chunk Actions'}));
+
+        expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
     });
 });

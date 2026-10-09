@@ -92,9 +92,17 @@ describe('KnowledgeBaseDocumentListItemDropdownMenu styling', () => {
         const trigger = screen.getByRole('button', {name: 'More Document Actions'});
         await userEvent.click(trigger);
 
-        const deleteMenuItem = screen.getByText('Delete').closest('[class*="dropdown-menu-item-destructive"]');
+        const deleteMenuItem = screen.getByRole('menuitem', {name: 'Delete'});
 
-        expect(deleteMenuItem).toBeInTheDocument();
+        expect(deleteMenuItem).toHaveClass('text-content-destructive-primary');
+    });
+
+    it('should render with the design-system DropdownMenu', async () => {
+        renderComponent();
+
+        await userEvent.click(screen.getByRole('button', {name: 'More Document Actions'}));
+
+        expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
     });
 });
 
