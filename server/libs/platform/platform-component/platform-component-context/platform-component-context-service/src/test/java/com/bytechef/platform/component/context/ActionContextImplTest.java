@@ -22,11 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.execution.ApprovalId;
+import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.tenant.TenantContext;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,6 +40,8 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Ivica Cardic
  */
 class ActionContextImplTest {
+
+    private static final String TENANT_ID = "000001";
 
     @Test
     void testGetSuspendCarriesTheJobResumeIdOfTheIssuedResumeUrl() {
@@ -90,6 +97,34 @@ class ActionContextImplTest {
 
         assertNotNull(actionContext.getResumeUrl());
         assertNull(actionContext.getSuspend());
+    }
+
+    @Test
+    void testGetResumeUrlUsesTheTenantTheContextWasCreatedIn() {
+        ActionContextImpl actionContext = TenantContext.callWithTenantId(TENANT_ID, () -> createActionContext());
+
+        String resumeUrl = CompletableFuture.supplyAsync(actionContext::getResumeUrl)
+            .join();
+
+        assertNotNull(resumeUrl);
+
+        JobResumeId jobResumeId = JobResumeId.parse(resumeUrl.substring(resumeUrl.lastIndexOf('/') + 1));
+
+        assertEquals(TENANT_ID, jobResumeId.getTenantId());
+    }
+
+    @Test
+    void testApprovalLinksUseTheTenantTheContextWasCreatedIn() {
+        ActionContextImpl actionContext = TenantContext.callWithTenantId(TENANT_ID, () -> createActionContext());
+
+        Links links = CompletableFuture.supplyAsync(() -> actionContext.approval(approval -> approval.generateLinks()))
+            .join();
+
+        String approvalLink = links.approvalLink();
+
+        ApprovalId approvalId = ApprovalId.parse(approvalLink.substring(approvalLink.lastIndexOf('/') + 1));
+
+        assertEquals(TENANT_ID, approvalId.getTenantId());
     }
 
     private static ActionContextImpl createActionContext() {
