@@ -16,20 +16,28 @@
 
 package com.bytechef.platform.workflow.execution.facade;
 
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface TriggerLifecycleFacade {
 
-    void executeTriggerDisable(
+    boolean executeTriggerDisable(
         String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
-        Map<String, ?> triggerParameters, Long connectionId);
+        Map<String, ?> triggerParameters, @Nullable Long connectionId);
 
-    void executeTriggerEnable(
+    boolean executeTriggerEnableUndo(
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
+        Map<String, ?> triggerParameters, @Nullable Long connectionId, WebhookEnableOutput enableOutput,
+        @Nullable Object previousTriggerState);
+
+    @Nullable
+    WebhookEnableOutput executeTriggerEnable(
         String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl, long environmentId);
 }

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.workflow.execution.remote.web.rest.facade;
 
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
@@ -39,8 +40,8 @@ public class RemoteTriggerLifecycleFacadeController {
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/execute-trigger-disable")
-    public void executeTriggerDisable(@RequestBody TriggerRequest triggerRequest) {
-        triggerLifecycleFacade.executeTriggerDisable(
+    public boolean executeTriggerDisable(@RequestBody TriggerRequest triggerRequest) {
+        return triggerLifecycleFacade.executeTriggerDisable(
             triggerRequest.workflowId, WorkflowExecutionId.parse(triggerRequest.workflowExecutionId),
             triggerRequest.triggerWorkflowNodeType,
             triggerRequest.triggerParameters, triggerRequest.connectionId);
@@ -48,9 +49,21 @@ public class RemoteTriggerLifecycleFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
+        value = "/execute-trigger-enable-undo")
+    public boolean executeTriggerEnableUndo(@RequestBody TriggerEnableUndoRequest triggerEnableUndoRequest) {
+        return triggerLifecycleFacade.executeTriggerEnableUndo(
+            triggerEnableUndoRequest.workflowId,
+            WorkflowExecutionId.parse(triggerEnableUndoRequest.workflowExecutionId),
+            triggerEnableUndoRequest.triggerWorkflowNodeType, triggerEnableUndoRequest.triggerParameters,
+            triggerEnableUndoRequest.connectionId, triggerEnableUndoRequest.enableOutput,
+            triggerEnableUndoRequest.previousTriggerState);
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
         value = "/execute-trigger-enable")
-    public void executeTriggerEnable(@RequestBody TriggerRequest triggerRequest) {
-        triggerLifecycleFacade.executeTriggerEnable(
+    public @Nullable WebhookEnableOutput executeTriggerEnable(@RequestBody TriggerRequest triggerRequest) {
+        return triggerLifecycleFacade.executeTriggerEnable(
             triggerRequest.workflowId, WorkflowExecutionId.parse(triggerRequest.workflowExecutionId),
             triggerRequest.triggerWorkflowNodeType,
             triggerRequest.triggerParameters, triggerRequest.connectionId, triggerRequest.webhookUrl,
@@ -62,5 +75,12 @@ public class RemoteTriggerLifecycleFacadeController {
         String workflowId, String workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, @Nullable Long connectionId, @Nullable String webhookUrl,
         long environmentId) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record TriggerEnableUndoRequest(
+        String workflowId, String workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
+        Map<String, ?> triggerParameters, @Nullable Long connectionId, WebhookEnableOutput enableOutput,
+        @Nullable Object previousTriggerState) {
     }
 }

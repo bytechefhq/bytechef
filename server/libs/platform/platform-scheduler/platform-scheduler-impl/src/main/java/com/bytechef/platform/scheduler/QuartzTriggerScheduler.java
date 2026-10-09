@@ -96,7 +96,14 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
             .startAt(Date.from(webhookExpirationDate))
             .build();
 
-        schedule(jobDetail, trigger);
+        try {
+            scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException exception) {
+            throw new IllegalStateException(
+                "Unable to schedule the refresh of dynamic webhook trigger with workflowExecutionId: " +
+                    workflowExecutionId,
+                exception);
+        }
     }
 
     @Override
@@ -182,15 +189,19 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
     private void schedule(JobDetail jobDetail, Trigger trigger) {
         try {
-            if (scheduler.checkExists(jobDetail.getKey())) {
-                scheduler.deleteJob(jobDetail.getKey());
-            }
-
-            scheduler.scheduleJob(jobDetail, trigger);
-
-            log.trace("Re-scheduled trigger job with key: {}", jobDetail.getKey());
+            scheduleJob(jobDetail, trigger);
         } catch (SchedulerException e) {
             log.error("Unable to re-schedule trigger job with key: {}", jobDetail.getKey(), e);
         }
+    }
+
+    private void scheduleJob(JobDetail jobDetail, Trigger trigger) throws SchedulerException {
+        if (scheduler.checkExists(jobDetail.getKey())) {
+            scheduler.deleteJob(jobDetail.getKey());
+        }
+
+        scheduler.scheduleJob(jobDetail, trigger);
+
+        log.trace("Re-scheduled trigger job with key: {}", jobDetail.getKey());
     }
 }

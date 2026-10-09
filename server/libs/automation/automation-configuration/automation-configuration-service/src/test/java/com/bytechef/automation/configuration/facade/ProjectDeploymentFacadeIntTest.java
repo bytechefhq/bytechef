@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -24,11 +25,14 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.calls;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.domain.Job;
@@ -47,22 +51,26 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.repository.TagRepository;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -70,6 +78,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Ivica Cardic
@@ -82,7 +93,6 @@ import org.springframework.data.domain.PageRequest;
 @Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
 public class ProjectDeploymentFacadeIntTest {
-
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -132,6 +142,12 @@ public class ProjectDeploymentFacadeIntTest {
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
 
+    @Autowired
+    private PlatformTransactionManager platformTransactionManager;
+
+    @Autowired
+    private TriggerStateService triggerStateService;
+
     @AfterEach
     public void afterEach() {
         projectDeploymentWorkflowRepository.deleteAll();
@@ -142,7 +158,6 @@ public class ProjectDeploymentFacadeIntTest {
 
         categoryRepository.deleteAll();
         tagRepository.deleteAll();
-
     }
 
     @BeforeEach
@@ -153,19 +168,11 @@ public class ProjectDeploymentFacadeIntTest {
             categoryRepository, projectFacade, projectRepository, projectDeploymentFacade, projectWorkflowFacade,
             projectWorkflowRepository);
 
-        // Default stub: no running jobs unless explicitly mocked by a test
         when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), anyBoolean(), anyInt()))
             .thenReturn(Page.empty());
 
-        // Mock trigger definition service to throw for unknown triggers (prevents NPE in getStaticWebhookUrl)
         when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
             .thenThrow(new IllegalArgumentException("Trigger definition not found"));
-    }
-
-    @Disabled
-    @Test
-    public void testCreateProjectDeployment() {
-        // TODO
     }
 
     @Test
@@ -252,12 +259,6 @@ public class ProjectDeploymentFacadeIntTest {
             });
     }
 
-    @Disabled
-    @Test
-    public void testCreateProjectDeploymentJob() {
-        // TODO
-    }
-
     @Test
     public void testDeleteProjectDeployment() {
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
@@ -306,27 +307,8 @@ public class ProjectDeploymentFacadeIntTest {
         verify(jobFacade).deleteJob(childJobId);
     }
 
-    @Disabled
-    @Test
-    public void testGetProjectDeployment() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testGetProjectDeploymentTags() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testSearchProjectDeployments() {
-        // TODO
-    }
-
     @Test
     public void testUpdateProjectDeploymentWorkflowEnabledToEnabledShouldDisableAndReEnable() {
-        // Given - Create a project with a workflow
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
@@ -340,10 +322,8 @@ public class ProjectDeploymentFacadeIntTest {
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, true);
 
-        // When - Update the same workflow (enabled to enabled transition)
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, true);
 
-        // Then - Verify the workflow is still enabled
         ProjectDeploymentDTO updatedDeployment = projectDeploymentFacade.getProjectDeployment(
             projectDeploymentDTO.id());
 
@@ -358,7 +338,6 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testUpdateProjectDeploymentWorkflowDisabledToEnabledShouldOnlyEnable() {
-        // Given - Create a project with a workflow
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
@@ -372,10 +351,8 @@ public class ProjectDeploymentFacadeIntTest {
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, false);
 
-        // When - Enable the workflow (disabled to enabled transition)
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, true);
 
-        // Then - Verify the workflow is enabled
         ProjectDeploymentDTO updatedDeployment = projectDeploymentFacade.getProjectDeployment(
             projectDeploymentDTO.id());
 
@@ -390,7 +367,6 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testDisablingWorkflowStopsRunningJobs() {
-        // Given - Create a project with a workflow and enable deployment + workflow
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
@@ -406,7 +382,6 @@ public class ProjectDeploymentFacadeIntTest {
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(deploymentId, workflowId, true);
 
-        // And mock PrincipalJobService to return STARTED job IDs for this deployment/workflow
         List<Long> runningJobIds = List.of(101L, 202L);
 
         when(
@@ -415,17 +390,156 @@ public class ProjectDeploymentFacadeIntTest {
                 eq(List.of(workflowId)), eq(false), eq(0)))
                     .thenReturn(new PageImpl<>(runningJobIds, PageRequest.of(0, 20), runningJobIds.size()));
 
-        // When - Disable the workflow
         projectDeploymentFacade.enableProjectDeploymentWorkflow(deploymentId, workflowId, false);
 
-        // Then - verify each running job was stopped
         verify(jobFacade).stopJob(101L);
         verify(jobFacade).stopJob(202L);
     }
 
     @Test
+    public void testEnableRolledBackByTheSurroundingTransactionDisarmsTheTriggersItArmed() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeploymentWithTriggers(
+            workspace.getId(), projectDTO);
+
+        long projectDeploymentId = projectDeploymentDTO.id();
+        String workflowId = projectDeploymentDTO.projectDeploymentWorkflows()
+            .getFirst()
+            .workflowId();
+
+        reset(triggerLifecycleFacade);
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+        IllegalStateException callerFailure = new IllegalStateException("a later write of the caller failed");
+
+        assertThatThrownBy(() -> transactionTemplate.executeWithoutResult(transactionStatus -> {
+            projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+            verify(triggerLifecycleFacade, never()).executeTriggerDisable(any(), any(), any(), any(), any());
+
+            throw callerFailure;
+        })).isSameAs(callerFailure);
+
+        ProjectDeploymentDTO rolledBackProjectDeployment = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        assertThat(rolledBackProjectDeployment.enabled()).isFalse();
+
+        ArgumentCaptor<WorkflowExecutionId> armedWorkflowExecutionIdCaptor = ArgumentCaptor.captor();
+        InOrder inOrder = inOrder(triggerLifecycleFacade);
+
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                eq(workflowId), armedWorkflowExecutionIdCaptor.capture(), any(), any(), any(), any(), anyLong());
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerDisable(eq(workflowId), eq(armedWorkflowExecutionIdCaptor.getValue()), any(), any(), any());
+        verifyNoMoreInteractions(triggerLifecycleFacade);
+        verify(jobFacade, never()).stopJob(anyLong());
+    }
+
+    @Test
+    public void testEnableRolledBackByTheSurroundingTransactionUndoesTheArmedWebhookEnableInANewTransaction() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeploymentWithTriggers(
+            workspace.getId(), projectDTO);
+
+        long projectDeploymentId = projectDeploymentDTO.id();
+        String workflowId = projectDeploymentDTO.projectDeploymentWorkflows()
+            .getFirst()
+            .workflowId();
+
+        reset(triggerLifecycleFacade);
+
+        WebhookEnableOutput armedWebhookEnableOutput = new WebhookEnableOutput(
+            Map.of("id", "subscription-armed-in-the-rolled-back-transaction"), null);
+
+        when(triggerStateService.fetchValue(any())).thenReturn(Optional.empty());
+        when(triggerLifecycleFacade.executeTriggerEnable(any(), any(), any(), any(), any(), any(), anyLong()))
+            .thenReturn(armedWebhookEnableOutput);
+
+        List<Boolean> undoSynchronizationActive = new ArrayList<>();
+
+        when(triggerLifecycleFacade.executeTriggerEnableUndo(any(), any(), any(), any(), any(), any(), any()))
+            .thenAnswer(invocation -> {
+                undoSynchronizationActive.add(TransactionSynchronizationManager.isSynchronizationActive());
+
+                return true;
+            });
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+        IllegalStateException callerFailure = new IllegalStateException("a later write of the caller failed");
+
+        assertThatThrownBy(() -> transactionTemplate.executeWithoutResult(transactionStatus -> {
+            projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+            verify(triggerLifecycleFacade, never()).executeTriggerEnableUndo(
+                any(), any(), any(), any(), any(), any(), any());
+
+            throw callerFailure;
+        })).isSameAs(callerFailure);
+
+        ArgumentCaptor<WorkflowExecutionId> armedWorkflowExecutionIdCaptor = ArgumentCaptor.captor();
+        InOrder inOrder = inOrder(triggerLifecycleFacade);
+
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                eq(workflowId), armedWorkflowExecutionIdCaptor.capture(), any(), any(), any(), any(), anyLong());
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnableUndo(
+                eq(workflowId), eq(armedWorkflowExecutionIdCaptor.getValue()), any(), any(), any(),
+                eq(armedWebhookEnableOutput), isNull());
+        verifyNoMoreInteractions(triggerLifecycleFacade);
+        verify(triggerStateService, never()).save(any(), any());
+
+        assertThat(undoSynchronizationActive).containsExactly(true);
+    }
+
+    @Test
+    public void testDisableWorkflowCommittedByTheSurroundingTransactionStopsItsJobsAfterCommitAndUndoesNothing() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeploymentWithTriggers(
+            workspace.getId(), projectDTO);
+
+        long projectDeploymentId = projectDeploymentDTO.id();
+        String workflowId = projectDeploymentDTO.projectDeploymentWorkflows()
+            .getFirst()
+            .workflowId();
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+        when(
+            principalJobService.getJobIds(
+                eq(Job.Status.STARTED), eq(null), eq(null), eq(List.of(projectDeploymentId)),
+                eq(PlatformType.AUTOMATION), eq(List.of(workflowId)), eq(false), eq(0)))
+                    .thenReturn(new PageImpl<>(List.of(101L), PageRequest.of(0, 20), 1));
+
+        reset(triggerLifecycleFacade);
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.executeWithoutResult(transactionStatus -> {
+            projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, false);
+
+            verify(jobFacade, never()).stopJob(anyLong());
+        });
+
+        verify(jobFacade).stopJob(101L);
+        verify(triggerLifecycleFacade).executeTriggerDisable(eq(workflowId), any(), any(), any(), any());
+        verifyNoMoreInteractions(triggerLifecycleFacade);
+
+        ProjectDeploymentDTO committedProjectDeployment = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        assertThat(committedProjectDeployment.projectDeploymentWorkflows())
+            .singleElement()
+            .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.enabled()).isFalse());
+    }
+
+    @Test
     public void testUpdateProjectDeploymentWorkflowEnabledToDisabledShouldDisable() {
-        // Given - Create a project with a workflow
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
@@ -439,10 +553,8 @@ public class ProjectDeploymentFacadeIntTest {
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, true);
 
-        // When - Disable the workflow (enabled to disabled transition)
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, false);
 
-        // Then - Verify the workflow is disabled
         ProjectDeploymentDTO updatedDeployment = projectDeploymentFacade.getProjectDeployment(
             projectDeploymentDTO.id());
 
@@ -457,7 +569,6 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testUpdateProjectDeploymentWorkflowProjectDeploymentDisabledShouldNotAffectTriggers() {
-        // Given - Create a project with a workflow
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
@@ -469,10 +580,8 @@ public class ProjectDeploymentFacadeIntTest {
             .getFirst()
             .workflowId();
 
-        // When - Enable the workflow while project deployment is disabled
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), workflowId, true);
 
-        // Then - Verify the workflow is enabled but triggers should not be affected
         ProjectDeploymentDTO updatedDeployment = projectDeploymentFacade.getProjectDeployment(
             projectDeploymentDTO.id());
 
@@ -486,15 +595,8 @@ public class ProjectDeploymentFacadeIntTest {
             });
     }
 
-    @Disabled
-    @Test
-    public void testUpdateProjectDeploymentTags() {
-        // TODO
-    }
-
     @Test
     public void testWorkflowLastExecutionDateFiltersJobsByDeploymentId() {
-        // Given - Create a project with a workflow and deploy it
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
@@ -502,7 +604,6 @@ public class ProjectDeploymentFacadeIntTest {
 
         long deploymentId = projectDeploymentDTO.id();
 
-        // And mock job execution - simulate a job that ran in this deployment
         long jobIdForThisDeployment = 12345L;
         Instant executionTime = Instant.parse("2024-06-15T10:30:00Z");
 
@@ -515,15 +616,11 @@ public class ProjectDeploymentFacadeIntTest {
         when(jobService.getJob(jobIdForThisDeployment))
             .thenReturn(mockJob);
 
-        // When - Get the project deployment (which fetches workflow execution dates)
         ProjectDeploymentDTO result = projectDeploymentFacade.getProjectDeployment(deploymentId);
 
-        // Then - Verify that fetchLastWorkflowJobId was called with THIS deployment's ID
-        // This ensures execution dates are filtered by deployment, not fetched globally
         verify(principalJobService, atLeastOnce()).fetchLastWorkflowJobId(
             eq(deploymentId), anyList(), eq(PlatformType.AUTOMATION));
 
-        // And the workflow should have the execution date from the mocked job
         assertThat(result.projectDeploymentWorkflows())
             .hasSize(1)
             .first()
@@ -532,10 +629,8 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testWorkflowLastExecutionDateIsolatedBetweenDeployments() {
-        // Given - Create a project with a workflow
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
-        // And create TWO deployments (simulating different environments)
         ProjectDeploymentDTO deployment1 = projectDeploymentFacadeHelper.createProjectDeployment(
             workspace.getId(), projectDTO);
 
@@ -545,7 +640,6 @@ public class ProjectDeploymentFacadeIntTest {
         long deployment1Id = deployment1.id();
         long deployment2Id = deployment2.id();
 
-        // And mock different job executions for each deployment
         long jobIdForDeployment1 = 1001L;
         long jobIdForDeployment2 = 2002L;
         Instant executionTime1 = Instant.parse("2024-06-01T10:00:00Z");
@@ -559,7 +653,6 @@ public class ProjectDeploymentFacadeIntTest {
 
         mockJob2.setEndDate(executionTime2);
 
-        // Reset mocks to clear default stub
         reset(principalJobService);
 
         when(principalJobService.fetchLastWorkflowJobId(eq(deployment1Id), anyList(), eq(PlatformType.AUTOMATION)))
@@ -572,15 +665,12 @@ public class ProjectDeploymentFacadeIntTest {
         when(jobService.getJob(jobIdForDeployment2))
             .thenReturn(mockJob2);
 
-        // Re-stub getJobIds for other tests
         when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), anyBoolean(), anyInt()))
             .thenReturn(Page.empty());
 
-        // When - Get each deployment
         ProjectDeploymentDTO result1 = projectDeploymentFacade.getProjectDeployment(deployment1Id);
         ProjectDeploymentDTO result2 = projectDeploymentFacade.getProjectDeployment(deployment2Id);
 
-        // Then - Each deployment should have its OWN execution date, not mixed up
         assertThat(result1.projectDeploymentWorkflows())
             .first()
             .satisfies(workflow -> assertThat(workflow.lastExecutionDate()).isEqualTo(executionTime1));
@@ -589,7 +679,6 @@ public class ProjectDeploymentFacadeIntTest {
             .first()
             .satisfies(workflow -> assertThat(workflow.lastExecutionDate()).isEqualTo(executionTime2));
 
-        // Verify the correct deployment IDs were used in the queries
         verify(principalJobService, atLeastOnce()).fetchLastWorkflowJobId(
             eq(deployment1Id), anyList(), eq(PlatformType.AUTOMATION));
         verify(principalJobService, atLeastOnce()).fetchLastWorkflowJobId(
@@ -598,7 +687,6 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testUpdateProjectVersionWithWorkflowDisabledShouldDisableTriggers() {
-        // Given - Create a project with a trigger-enabled workflow and publish v1
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeploymentWithTriggers(
@@ -612,10 +700,8 @@ public class ProjectDeploymentFacadeIntTest {
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), v1WorkflowId, true);
 
-        // And publish v2
         projectFacade.publishProject(projectDTO.id(), "Published v2 for test", false);
 
-        // And get the v2 workflow ID and the workflow UUID
         List<ProjectWorkflow> v2ProjectWorkflows = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
             projectDTO.id(), 2);
 
@@ -624,7 +710,6 @@ public class ProjectDeploymentFacadeIntTest {
         String v2WorkflowId = v2ProjectWorkflow.getWorkflowId();
         String workflowUuid = v2ProjectWorkflow.getUuidAsString();
 
-        // When - Reset mock to clear calls from the enable step, then update to v2 with workflow disabled
         reset(triggerLifecycleFacade);
 
         ProjectDeploymentWorkflowDTO disabledWorkflowDTO = new ProjectDeploymentWorkflowDTO(
@@ -647,7 +732,6 @@ public class ProjectDeploymentFacadeIntTest {
 
         projectDeploymentFacade.updateProjectDeployment(updateDTO);
 
-        // Then - Verify the deployment workflow is now disabled
         ProjectDeploymentDTO updatedDeployment = projectDeploymentFacade.getProjectDeployment(
             projectDeploymentDTO.id());
 
@@ -656,13 +740,11 @@ public class ProjectDeploymentFacadeIntTest {
             .first()
             .satisfies(workflow -> assertThat(workflow.enabled()).isFalse());
 
-        // And verify that trigger disable was called for the previously-enabled workflow
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerDisable(any(), any(), any(), any(), any());
     }
 
     @Test
     public void testUpdateProjectVersionWithWorkflowStillEnabledShouldReenableTriggers() {
-        // Given - Create a project with a trigger-enabled workflow and publish v1
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeploymentWithTriggers(
@@ -676,10 +758,8 @@ public class ProjectDeploymentFacadeIntTest {
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentDTO.id(), v1WorkflowId, true);
 
-        // And publish v2
         projectFacade.publishProject(projectDTO.id(), "Published v2 for test", false);
 
-        // And get the v2 workflow ID and the workflow UUID
         List<ProjectWorkflow> v2ProjectWorkflows = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
             projectDTO.id(), 2);
 
@@ -688,7 +768,6 @@ public class ProjectDeploymentFacadeIntTest {
         String v2WorkflowId = v2ProjectWorkflow.getWorkflowId();
         String workflowUuid = v2ProjectWorkflow.getUuidAsString();
 
-        // When - Reset mock to clear calls from the enable step, then update to v2 with workflow still enabled
         reset(triggerLifecycleFacade);
 
         ProjectDeploymentWorkflowDTO enabledWorkflowDTO = new ProjectDeploymentWorkflowDTO(
@@ -711,7 +790,6 @@ public class ProjectDeploymentFacadeIntTest {
 
         projectDeploymentFacade.updateProjectDeployment(updateDTO);
 
-        // Then - Verify the workflow is still enabled with the new v2 workflow ID
         ProjectDeploymentDTO updatedDeployment = projectDeploymentFacade.getProjectDeployment(
             projectDeploymentDTO.id());
 
@@ -723,7 +801,6 @@ public class ProjectDeploymentFacadeIntTest {
                 assertThat(workflow.workflowId()).isEqualTo(v2WorkflowId);
             });
 
-        // And verify that old triggers were disabled and new triggers were enabled
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerDisable(any(), any(), any(), any(), any());
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerEnable(
             any(), any(), any(), any(), any(), any(), anyLong());
