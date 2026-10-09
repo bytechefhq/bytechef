@@ -1141,7 +1141,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The time-to-live for chat messages (e.g., '24h', '7d', '30m'). Leave empty for no expiration.",
+      "description": "The time-to-live for chat messages (e.g., '24h', '7d', '30m'). Leave empty for no expiration. Applies to version 1 only.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
