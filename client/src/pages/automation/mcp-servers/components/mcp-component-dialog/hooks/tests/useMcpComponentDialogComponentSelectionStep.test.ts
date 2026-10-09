@@ -41,16 +41,16 @@ describe('useMcpComponentDialogComponentSelectionStep', () => {
         expect(selectableNames()).toEqual([]);
     });
 
-    // AI Agent Utils contributes CLAUDE_CODE_TOOLS alongside the TOOLS derived from its own actions.
-    it('excludes a component contributing cluster elements of a non-tool type', () => {
+    // Airtable also contributes data stream SOURCE and DESTINATION elements; its tools are still callable.
+    it('offers a component that contributes cluster elements of other types alongside its tools', () => {
         hoisted.components = [
             componentDefinition({
-                clusterElementsCount: {CLAUDE_CODE_TOOLS: 8, TOOLS: 5},
-                name: 'aiAgentUtils',
+                clusterElementsCount: {DESTINATION: 1, SOURCE: 1, TOOLS: 4},
+                name: 'airtable',
             }),
         ];
 
-        expect(selectableNames()).toEqual([]);
+        expect(selectableNames()).toEqual(['airtable']);
     });
 
     it('excludes a component that exposes no tools at all', () => {
