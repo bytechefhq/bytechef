@@ -1,0 +1,21 @@
+query embeddedMcpComponentsByServerId($mcpServerId: ID!) {
+    embeddedMcpComponentsByServerId(mcpServerId: $mcpServerId) {
+        id
+        componentName
+        componentVersion
+        title
+        connectionId
+        lastModifiedDate
+        mcpServerId
+        mcpTools {
+            id
+            enabled
+            mcpComponentId
+            name
+            parameters
+            title
+            version
+        }
+        version
+    }
+}
