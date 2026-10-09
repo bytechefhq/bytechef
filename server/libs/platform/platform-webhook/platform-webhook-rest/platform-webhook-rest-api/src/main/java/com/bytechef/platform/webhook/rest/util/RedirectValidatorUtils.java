@@ -66,6 +66,10 @@ public final class RedirectValidatorUtils {
             return false;
         }
 
+        if (containsUnsafeCharacters(redirectUrl)) {
+            return false;
+        }
+
         // Block protocol-relative URLs (//evil.com) which can bypass validation
         if (redirectUrl.startsWith("//")) {
             return false;
@@ -92,7 +96,7 @@ public final class RedirectValidatorUtils {
 
             if (host == null) {
                 // Relative URL without host - safe
-                return true;
+                return uri.getScheme() == null;
             }
 
             // Same-host redirect is always allowed
@@ -146,7 +150,39 @@ public final class RedirectValidatorUtils {
 
         // Also check for relative paths without leading slash (e.g., "page.html")
         // but exclude URLs with schemes (http:, https:, etc.)
-        return !url.contains("://") && !url.startsWith("//");
+        return !hasScheme(url) && !url.startsWith("//");
+    }
+
+    private static boolean hasScheme(String url) {
+        for (int index = 0; index < url.length(); index++) {
+            char character = url.charAt(index);
+
+            if (character == ':') {
+                return true;
+            }
+
+            if (character == '/' || character == '?' || character == '#') {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean containsUnsafeCharacters(String url) {
+        if (!url.equals(url.strip())) {
+            return true;
+        }
+
+        for (int index = 0; index < url.length(); index++) {
+            char character = url.charAt(index);
+
+            if (character == '\\' || Character.isISOControl(character)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

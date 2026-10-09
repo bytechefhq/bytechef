@@ -181,4 +181,40 @@ class RedirectValidatorUtilsTest {
     void testUrlWithPort() {
         assertThat(RedirectValidatorUtils.isValidRedirect("https://example.com:8080/page", SERVER_HOST)).isTrue();
     }
+
+    @Test
+    void testBackslashUrlBlocked() {
+        assertThat(RedirectValidatorUtils.isValidRedirect("\\\\evil.com", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("/\\evil.com", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("\\/evil.com", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("https:\\\\evil.com", SERVER_HOST)).isFalse();
+    }
+
+    @Test
+    void testControlCharacterUrlBlocked() {
+        assertThat(RedirectValidatorUtils.isValidRedirect("/\t/evil.com", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("/\n/evil.com", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("/\r/evil.com", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("/\u0000/evil.com", SERVER_HOST)).isFalse();
+    }
+
+    @Test
+    void testLeadingOrTrailingWhitespaceUrlBlocked() {
+        assertThat(RedirectValidatorUtils.isValidRedirect(" //evil.com", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("\t//evil.com", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("/dashboard ", SERVER_HOST)).isFalse();
+    }
+
+    @Test
+    void testSchemeWithoutAuthorityBlocked() {
+        assertThat(RedirectValidatorUtils.isValidRedirect("https:evil.com", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("http:evil.com/phishing", SERVER_HOST)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidRedirect("https:/evil.com", SERVER_HOST)).isFalse();
+    }
+
+    @Test
+    void testRelativePathWithColonAfterSlashAllowed() {
+        assertThat(RedirectValidatorUtils.isValidRedirect("/page:1", SERVER_HOST)).isTrue();
+        assertThat(RedirectValidatorUtils.isValidRedirect("page?time=10:00", SERVER_HOST)).isTrue();
+    }
 }
