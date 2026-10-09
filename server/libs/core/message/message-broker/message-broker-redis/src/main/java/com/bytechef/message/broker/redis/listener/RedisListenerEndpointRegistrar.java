@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
     private final RedisMessageDeserializer redisMessageDeserializer;
     private volatile boolean stopped;
+    private final Map<String, AtomicInteger> streamInvokerSequenceMap = new HashMap<>();
     private final Map<String, List<Consumer<String>>> streamInvokersMap = new HashMap<>();
     private final StringRedisTemplate stringRedisTemplate;
     private final TaskExecutor taskExecutor;
@@ -131,7 +133,9 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
                         for (MapRecord<String, Object, Object> message : messages) {
                             Map<Object, Object> value = message.getValue();
 
-                            dispatch(entry.getValue(), (String) value.get("message"));
+                            Consumer<String> streamInvoker = getNextStreamInvoker(entry.getKey(), entry.getValue());
+
+                            streamInvoker.accept((String) value.get("message"));
 
                             stringObjectObjectStreamOperations.acknowledge(
                                 entry.getKey(), CONSUMER_GROUP, message.getId());
@@ -150,6 +154,13 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
         for (Consumer<String> invoker : invokers) {
             invoker.accept(message);
         }
+    }
+
+    private Consumer<String> getNextStreamInvoker(String routeName, List<Consumer<String>> invokers) {
+        AtomicInteger streamInvokerSequence = streamInvokerSequenceMap.computeIfAbsent(
+            routeName, key -> new AtomicInteger());
+
+        return invokers.get(Math.floorMod(streamInvokerSequence.getAndIncrement(), invokers.size()));
     }
 
     private void invoke(Object delegate, String methodName, String messageString) {
