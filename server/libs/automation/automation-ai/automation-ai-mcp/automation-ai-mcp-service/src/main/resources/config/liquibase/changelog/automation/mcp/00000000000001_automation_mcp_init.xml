@@ -67,6 +67,7 @@
         </createTable>
 
         <addUniqueConstraint constraintName="uk_mcp_project_workflow_project_deployment_workflow" tableName="mcp_project_workflow" columnNames="mcp_project_id,project_deployment_workflow_id" />
+        <rollback/>
     </changeSet>
 
     <changeSet id="20240604153111-1" author="Ivica Cardic" contextFilter="mono">
@@ -82,5 +83,6 @@
             constraintName="fk_mcp_project_project_deployment"
             referencedTableName="project_deployment"
             referencedColumnNames="id"/>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
