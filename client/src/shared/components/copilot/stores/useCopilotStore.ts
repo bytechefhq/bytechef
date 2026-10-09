@@ -210,7 +210,7 @@ export const useCopilotStore = create<CopilotStateI>()(
                     return state;
                 }
 
-                const top = state.conversationStack[state.conversationStack.length - 1];
+                const top = state.conversationStack.at(-1);
 
                 if (top?.token !== token) {
                     return state;
