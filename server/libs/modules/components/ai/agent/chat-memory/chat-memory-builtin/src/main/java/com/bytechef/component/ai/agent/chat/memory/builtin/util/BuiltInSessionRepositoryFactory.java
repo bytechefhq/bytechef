@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.builtin.session.util;
+package com.bytechef.component.ai.agent.chat.memory.builtin.util;
 
 import com.bytechef.component.ai.agent.chat.memory.jdbc.session.util.SessionChatMemoryUtils;
 import com.bytechef.platform.component.definition.ai.agent.TenantRoutingSessionRepository;

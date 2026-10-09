@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.builtin.session.util;
+package com.bytechef.component.ai.agent.chat.memory.builtin.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
