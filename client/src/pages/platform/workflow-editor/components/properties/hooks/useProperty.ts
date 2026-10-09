@@ -1382,7 +1382,7 @@ export const useProperty = ({
             required &&
             !hidden &&
             canSaveDefaultValue &&
-            parameterValue === undefined &&
+            (parameterValue === undefined || parameterValue === defaultValue) &&
             (storedValue === undefined || storedValue === null) &&
             defaultValue !== '';
 
