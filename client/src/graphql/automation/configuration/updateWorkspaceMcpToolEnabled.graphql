@@ -1,0 +1,6 @@
+mutation updateWorkspaceMcpToolEnabled($id: ID!, $enabled: Boolean!) {
+    updateWorkspaceMcpToolEnabled(id: $id, enabled: $enabled) {
+        id
+        enabled
+    }
+}
