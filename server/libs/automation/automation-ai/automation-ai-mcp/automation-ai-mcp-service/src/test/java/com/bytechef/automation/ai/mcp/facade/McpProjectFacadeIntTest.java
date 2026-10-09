@@ -166,6 +166,18 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
+    public void testCreateMcpProjectEnablesTheProjectDeployment() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
+
+        ProjectDeployment mcpProjectDeployment = projectDeploymentRepository
+            .findById(mcpProject.getProjectDeploymentId())
+            .orElseThrow();
+
+        assertThat(mcpProjectDeployment.isEnabled()).isTrue();
+    }
+
+    @Test
     public void testCreateMcpProjectEmptyWorkflowList() {
         List<String> selectedWorkflowIds = List.of();
 

@@ -25,8 +25,10 @@ import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -47,7 +49,8 @@ import org.springframework.context.annotation.Import;
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = McpProjectIntTestConfiguration.class)
+@SpringBootTest(
+    classes = McpProjectIntTestConfiguration.class, properties = "bytechef.workflow.repository.jdbc.enabled=true")
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
 public class McpProjectDeploymentDeleteEventListenerIntTest {
@@ -75,6 +78,9 @@ public class McpProjectDeploymentDeleteEventListenerIntTest {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private ProjectWorkflowFacade projectWorkflowFacade;
 
     @Autowired
     private WorkspaceRepository workspaceRepository;
@@ -110,8 +116,12 @@ public class McpProjectDeploymentDeleteEventListenerIntTest {
 
     @Test
     public void testDeleteProjectDeletesMcpProjectDeployment() {
+        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
+            project.getId(), """
+                {"label": "MCP tool", "triggers": [], "tasks": []}""");
+
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
+            mcpServer.getId(), project.getId(), 1, List.of(projectWorkflow.getWorkflowId()));
 
         long projectDeploymentId = mcpProject.getProjectDeploymentId();
 

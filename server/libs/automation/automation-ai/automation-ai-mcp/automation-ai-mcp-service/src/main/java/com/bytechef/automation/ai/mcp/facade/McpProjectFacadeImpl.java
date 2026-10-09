@@ -82,9 +82,10 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         projectDeployment.setProjectId(projectId);
         projectDeployment.setProjectVersion(projectVersion);
         projectDeployment.setEnvironment(mcpServer.getEnvironment());
-        projectDeployment.setEnabled(true);
 
         projectDeployment = projectDeploymentService.create(projectDeployment);
+
+        projectDeploymentService.updateEnabled(projectDeployment.getId(), true);
 
         McpProject mcpProject = new McpProject(projectDeployment.getId(), mcpServerId);
 
