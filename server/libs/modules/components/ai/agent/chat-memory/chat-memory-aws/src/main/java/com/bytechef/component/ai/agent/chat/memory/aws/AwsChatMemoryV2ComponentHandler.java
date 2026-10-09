@@ -29,20 +29,23 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.SessionChatMemoryComponentDefinition;
-import com.google.auto.service.AutoService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@AutoService(ComponentHandler.class)
+@Component(AWS_CHAT_MEMORY + "_v2_ComponentHandler")
 public class AwsChatMemoryV2ComponentHandler implements ComponentHandler {
 
-    private static final SessionRepositoryResolver SESSION_REPOSITORY_RESOLVER =
-        (inputParameters, connectionParameters, extensions, componentConnections) -> AwsSessionChatMemoryUtils
-            .getSessionRepository(connectionParameters);
+    private final SessionChatMemoryComponentDefinition componentDefinition;
 
-    private static final SessionChatMemoryComponentDefinition COMPONENT_DEFINITION =
-        new AwsChatMemoryV2ComponentDefinition(
+    public AwsChatMemoryV2ComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
+        SessionRepositoryResolver sessionRepositoryResolver =
+            (inputParameters, connectionParameters, extensions, componentConnections) -> AwsSessionChatMemoryUtils
+                .getSessionRepository(connectionParameters);
+
+        this.componentDefinition = new AwsChatMemoryV2ComponentDefinition(
             component(AWS_CHAT_MEMORY)
                 .title("AWS S3 Chat Memory")
                 .description("Stores session-based conversation history as JSON objects in an Amazon S3 bucket.")
@@ -50,12 +53,15 @@ public class AwsChatMemoryV2ComponentHandler implements ComponentHandler {
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .version(2)
                 .connection(AwsChatMemoryConnection.CONNECTION_DEFINITION)
-                .actions(SessionChatMemoryActions.of("aws-chat-memory", SESSION_REPOSITORY_RESOLVER, false))
-                .clusterElements(SessionChatMemory.of("AWS S3 Chat Memory", SESSION_REPOSITORY_RESOLVER, null)));
+                .actions(SessionChatMemoryActions.of("aws-chat-memory", sessionRepositoryResolver, false))
+                .clusterElements(
+                    SessionChatMemory.of(
+                        "AWS S3 Chat Memory", sessionRepositoryResolver, clusterElementDefinitionService)));
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
     }
 
     private static class AwsChatMemoryV2ComponentDefinition extends AbstractComponentDefinitionWrapper
