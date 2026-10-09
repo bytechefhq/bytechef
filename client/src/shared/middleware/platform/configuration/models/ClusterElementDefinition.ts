@@ -106,6 +106,12 @@ export interface ClusterElementDefinition {
      * @memberof ClusterElementDefinition
      */
     properties?: Array<Property>;
+    /**
+     * Can the cluster element be run on its own to test it.
+     * @type {boolean}
+     * @memberof ClusterElementDefinition
+     */
+    testable?: boolean;
 }
 
 /**
@@ -142,6 +148,7 @@ export function ClusterElementDefinitionFromJSONTyped(json: any, ignoreDiscrimin
         'title': json['title'] == null ? undefined : json['title'],
         'type': json['type'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
+        'testable': json['testable'] == null ? undefined : json['testable'],
     };
 }
 
@@ -168,6 +175,7 @@ export function ClusterElementDefinitionToJSONTyped(value?: ClusterElementDefini
         'title': value['title'],
         'type': value['type'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
+        'testable': value['testable'],
     };
 }
 
