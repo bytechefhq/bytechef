@@ -1,0 +1,15 @@
+mutation createEmbeddedMcpComponent($input: McpComponentWithToolsInput!) {
+    createEmbeddedMcpComponent(input: $input) {
+        id
+        componentName
+        componentVersion
+        title
+        mcpServerId
+        connectionId
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+        version
+    }
+}

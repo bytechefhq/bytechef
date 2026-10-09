@@ -1,0 +1,3 @@
+mutation deleteEmbeddedMcpTool($id: ID!) {
+    deleteEmbeddedMcpTool(id: $id)
+}
