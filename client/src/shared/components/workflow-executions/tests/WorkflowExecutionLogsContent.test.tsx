@@ -1,4 +1,4 @@
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, within} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionLogsContent from '../WorkflowExecutionLogsContent';
@@ -159,5 +159,39 @@ describe('WorkflowExecutionLogsContent', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Collapse all'}));
 
         expect(screen.getByTestId('json-view')).toHaveAttribute('data-collapsed', 'true');
+    });
+
+    it('shows the expand toggle as a single button that switches between expand and collapse', () => {
+        jobFileLogsQueryMock.mockReturnValue({
+            data: {jobFileLogs: {content: [logEntry('INFO', '{"toolName":"TodoWrite"}')]}},
+            error: undefined,
+            isLoading: false,
+        });
+
+        render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" />);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Expand all'}));
+
+        expect(screen.queryByRole('button', {name: 'Expand all'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Collapse all'})).toBeInTheDocument();
+    });
+
+    it('renders its toolbar into the container the tabs row provides', () => {
+        jobFileLogsQueryMock.mockReturnValue({
+            data: {jobFileLogs: {content: [logEntry('DEBUG', 'debug message')]}},
+            error: undefined,
+            isLoading: false,
+        });
+
+        const toolbarContainer = document.createElement('div');
+
+        document.body.appendChild(toolbarContainer);
+
+        render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" toolbarContainer={toolbarContainer} />);
+
+        expect(within(toolbarContainer).getByRole('button', {name: 'DEBUG (1)'})).toBeInTheDocument();
+        expect(within(toolbarContainer).getByRole('button', {name: 'Expand all'})).toBeInTheDocument();
+
+        toolbarContainer.remove();
     });
 });

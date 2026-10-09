@@ -22,12 +22,14 @@ import {
     MessageSquareIcon,
 } from 'lucide-react';
 import {useMemo, useState} from 'react';
+import {createPortal} from 'react-dom';
 import {twMerge} from 'tailwind-merge';
 
 interface WorkflowExecutionLogsContentProps {
     isEditorEnvironment?: boolean;
     jobId?: string;
     taskExecutionId?: string;
+    toolbarContainer?: HTMLElement | null;
     triggerExecutionId?: string;
 }
 
@@ -232,6 +234,7 @@ const WorkflowExecutionLogsContent = ({
     isEditorEnvironment,
     jobId,
     taskExecutionId,
+    toolbarContainer,
     triggerExecutionId,
 }: WorkflowExecutionLogsContentProps) => {
     const [collapsed, setCollapsed] = useState<boolean | undefined>(undefined);
@@ -303,6 +306,8 @@ const WorkflowExecutionLogsContent = ({
         [hiddenLevels, logs]
     );
 
+    const allExpanded = collapsed === false;
+
     const handleCollapsedChange = (nextCollapsed: boolean) => {
         setCollapsed(nextCollapsed);
         setExpansionVersion(expansionVersion + 1);
@@ -340,49 +345,48 @@ const WorkflowExecutionLogsContent = ({
         );
     }
 
+    const toolbar = (
+        <div
+            className={twMerge(
+                'flex shrink-0 items-center gap-1',
+                !toolbarContainer && 'border-b border-stroke-neutral-secondary p-2'
+            )}
+        >
+            {levelCounts.map(({count, level}) => {
+                const levelVisible = !hiddenLevels.includes(level);
+
+                return (
+                    <Button
+                        aria-pressed={levelVisible}
+                        className={twMerge(
+                            'border-0',
+                            levelVisible ? LOG_LEVEL_BADGE_CONFIG[level].className : 'line-through opacity-60'
+                        )}
+                        icon={LOG_LEVEL_BADGE_CONFIG[level].icon}
+                        key={level}
+                        label={`${level} (${count})`}
+                        onClick={() => handleLevelToggle(level)}
+                        size="xs"
+                        variant="ghost"
+                    />
+                );
+            })}
+
+            <Button
+                aria-label={allExpanded ? 'Collapse all' : 'Expand all'}
+                className="ml-auto"
+                icon={allExpanded ? <ChevronsDownUpIcon /> : <ChevronsUpDownIcon />}
+                onClick={() => handleCollapsedChange(allExpanded)}
+                size="iconXs"
+                title={allExpanded ? 'Collapse all' : 'Expand all'}
+                variant="ghost"
+            />
+        </div>
+    );
+
     return (
         <div className="flex h-full min-h-0 flex-col">
-            <div className="flex shrink-0 items-center gap-1 border-b border-stroke-neutral-secondary p-2">
-                {levelCounts.map(({count, level}) => {
-                    const levelVisible = !hiddenLevels.includes(level);
-
-                    return (
-                        <Button
-                            aria-pressed={levelVisible}
-                            className={twMerge(
-                                'border-0',
-                                levelVisible ? LOG_LEVEL_BADGE_CONFIG[level].className : 'line-through opacity-60'
-                            )}
-                            icon={LOG_LEVEL_BADGE_CONFIG[level].icon}
-                            key={level}
-                            label={`${level} (${count})`}
-                            onClick={() => handleLevelToggle(level)}
-                            size="xs"
-                            variant="ghost"
-                        />
-                    );
-                })}
-
-                <div className="ml-auto flex items-center gap-1">
-                    <Button
-                        aria-label="Expand all"
-                        icon={<ChevronsUpDownIcon />}
-                        onClick={() => handleCollapsedChange(false)}
-                        size="iconXs"
-                        title="Expand all"
-                        variant="ghost"
-                    />
-
-                    <Button
-                        aria-label="Collapse all"
-                        icon={<ChevronsDownUpIcon />}
-                        onClick={() => handleCollapsedChange(true)}
-                        size="iconXs"
-                        title="Collapse all"
-                        variant="ghost"
-                    />
-                </div>
-            </div>
+            {toolbarContainer ? createPortal(toolbar, toolbarContainer) : toolbar}
 
             <ScrollArea className="min-h-0 flex-1">
                 <div className="divide-y divide-stroke-neutral-secondary">
