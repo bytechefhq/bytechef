@@ -113,11 +113,6 @@ public class ModelUtils {
 
         Object response = null;
         Map<String, Object> guardrailMetadata = Map.of();
-        ResponseFormat responseFormat = TEXT;
-
-        if (responseFormatRequired) {
-            responseFormat = parameters.getRequiredFromPath(RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
-        }
 
         try {
             ChatResponse chatResponse = callResponseSpec.chatResponse();
@@ -127,29 +122,12 @@ public class ModelUtils {
 
                 guardrailMetadata = extractGuardrailMetadata(chatResponse);
 
-                if (responseFormat == TEXT) {
-                    Generation result = chatResponse.getResult();
+                Generation result = chatResponse.getResult();
 
-                    if (result != null) {
-                        AssistantMessage output = result.getOutput();
+                if (result != null) {
+                    AssistantMessage output = result.getOutput();
 
-                        response = output.getText();
-                    }
-                } else {
-                    Generation result = chatResponse.getResult();
-
-                    if (result != null) {
-                        AssistantMessage output = result.getOutput();
-
-                        String text = output.getText();
-
-                        if (text != null) {
-                            JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
-                                parameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
-
-                            response = converter.convert(text);
-                        }
-                    }
+                    response = toChatResponse(output.getText(), parameters, responseFormatRequired, context);
                 }
             }
         } catch (org.springframework.ai.retry.NonTransientAiException e) {
@@ -197,6 +175,25 @@ public class ModelUtils {
         } catch (RuntimeException runtimeException) {
             return null;
         }
+    }
+
+    public static @Nullable Object toChatResponse(
+        @Nullable String text, Parameters parameters, boolean responseFormatRequired, Context context) {
+
+        ResponseFormat responseFormat = TEXT;
+
+        if (responseFormatRequired) {
+            responseFormat = parameters.getRequiredFromPath(RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+        }
+
+        if (text == null || responseFormat == TEXT) {
+            return text;
+        }
+
+        JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
+            parameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
+
+        return converter.convert(text);
     }
 
     /**
