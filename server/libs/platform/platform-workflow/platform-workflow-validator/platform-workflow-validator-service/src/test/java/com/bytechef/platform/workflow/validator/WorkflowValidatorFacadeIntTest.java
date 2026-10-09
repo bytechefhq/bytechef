@@ -167,6 +167,54 @@ class WorkflowValidatorFacadeIntTest {
             .isInstanceOf(ConfigurationException.class);
     }
 
+    @ParameterizedTest
+    @ValueSource(
+        strings = {
+            """
+                {"label":"t","triggers":[],"tasks":[{"name":"condition_1","type":"condition/v1",
+                 "parameters":{"caseTrue":[{"name":"__nested","type":"logger/v1/info"}],"caseFalse":[]}}]}
+                """,
+            """
+                {"label":"t","triggers":[],"tasks":[{"name":"loop_1","type":"loop/v1",
+                 "parameters":{"iteratee":[{"name":"vars","type":"logger/v1/info"}]}}]}
+                """,
+            """
+                {"label":"t","triggers":[],"tasks":[{"name":"branch_1","type":"branch/v1",
+                 "parameters":{"cases":[{"key":"a","tasks":[{"name":"__nested","type":"logger/v1/info"}]}],
+                 "default":[]}}]}
+                """,
+            """
+                {"label":"t","triggers":[],"tasks":[{"name":"parallel_1","type":"parallel/v1",
+                 "parameters":{"tasks":[{"name":"__nested","type":"logger/v1/info"}]}}]}
+                """,
+            """
+                {"label":"t","triggers":[],"tasks":[{"name":"forkJoin_1","type":"fork-join/v1",
+                 "parameters":{"branches":[[{"name":"__nested","type":"logger/v1/info"}]]}}]}
+                """,
+            """
+                {"label":"t","triggers":[],"tasks":[{"name":"loop_1","type":"loop/v1",
+                 "parameters":{"iteratee":[{"name":"condition_1","type":"condition/v1",
+                 "parameters":{"caseFalse":[{"name":"__deep","type":"logger/v1/info"}]}}]}}]}
+                """
+        })
+    void testValidateNoReservedNodeNamesRejectsReservedNameNestedInTaskDispatcher(String definition) {
+        assertThatThrownBy(() -> workflowValidatorFacade.validateNoReservedNodeNames(definition))
+            .asInstanceOf(type(ConfigurationException.class))
+            .extracting(ConfigurationException::getErrorKey)
+            .isEqualTo(WorkflowValidatorErrorType.RESERVED_NODE_NAME.getErrorKey());
+    }
+
+    @Test
+    void testValidateNoReservedNodeNamesAcceptsOrdinaryNamesNestedInTaskDispatcher() {
+        String definition = """
+            {"label":"t","triggers":[],"tasks":[{"name":"condition_1","type":"condition/v1",
+             "parameters":{"caseTrue":[{"name":"task_1","type":"logger/v1/info"}],"caseFalse":[]}}]}
+            """;
+
+        assertThatCode(() -> workflowValidatorFacade.validateNoReservedNodeNames(definition))
+            .doesNotThrowAnyException();
+    }
+
     @Test
     void testValidateNoReservedNodeNamesAcceptsOrdinaryNames() {
         String definition = """
