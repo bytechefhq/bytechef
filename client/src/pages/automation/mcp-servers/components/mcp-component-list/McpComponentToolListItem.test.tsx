@@ -1,15 +1,17 @@
 import {McpActivePopoverProvider, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
 import {McpTool} from '@/shared/middleware/graphql';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 import {useState} from 'react';
-import {describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import McpComponentToolListItem from './McpComponentToolListItem';
 
-const {dropdownMenuHookMock, mutateMock} = vi.hoisted(() => ({
+const {deleteDialogState, dropdownMenuHookMock, mutateMock, setShowDeleteDialogMock} = vi.hoisted(() => ({
+    deleteDialogState: {showDeleteDialog: false},
     dropdownMenuHookMock: vi.fn(),
     mutateMock: vi.fn(),
+    setShowDeleteDialogMock: vi.fn(),
 }));
 
 vi.mock('./hooks/useMcpProjectComponentToolDropdownMenu', () => ({
@@ -19,8 +21,8 @@ vi.mock('./hooks/useMcpProjectComponentToolDropdownMenu', () => ({
         return {
             handleConfirmDelete: vi.fn(),
             isDeletePending: false,
-            setShowDeleteDialog: vi.fn(),
-            showDeleteDialog: false,
+            setShowDeleteDialog: setShowDeleteDialogMock,
+            showDeleteDialog: deleteDialogState.showDeleteDialog,
         };
     },
 }));
@@ -71,7 +73,29 @@ const Harness = () => {
     );
 };
 
+const renderEmbeddedToolListItem = (tool: McpTool = mcpTool) =>
+    render(
+        <QueryClientProvider client={new QueryClient()}>
+            <McpActivePopoverProvider>
+                <McpComponentToolListItem
+                    componentName="affinity"
+                    componentVersion={1}
+                    connectionId={null}
+                    embedded
+                    mcpTool={tool}
+                />
+            </McpActivePopoverProvider>
+        </QueryClientProvider>
+    );
+
 describe('McpComponentToolListItem', () => {
+    beforeEach(() => {
+        mutateMock.mockClear();
+        setShowDeleteDialogMock.mockClear();
+
+        deleteDialogState.showDeleteDialog = false;
+    });
+
     it('passes connectionRequired through to the tool properties popover', () => {
         render(
             <QueryClientProvider client={new QueryClient()}>
@@ -214,5 +238,38 @@ describe('McpComponentToolListItem', () => {
         fireEvent.click(screen.getByTitle('Configure'));
 
         expect(screen.getByText('tool-properties-popover')).toHaveAttribute('data-embedded', 'true');
+    });
+
+    it('keeps the enabled switch disabled until the toggle settles', () => {
+        renderEmbeddedToolListItem({...mcpTool, enabled: false});
+
+        fireEvent.click(screen.getByRole('switch'));
+
+        expect(mutateMock).toHaveBeenCalledWith({enabled: true, id: '42'}, expect.anything());
+        expect(screen.getByRole('switch')).toBeDisabled();
+
+        const mutateOptions = mutateMock.mock.calls[0][1];
+
+        act(() => mutateOptions.onSettled());
+
+        expect(screen.getByRole('switch')).toBeEnabled();
+    });
+
+    it('opens the delete confirmation from the delete button', () => {
+        renderEmbeddedToolListItem();
+
+        fireEvent.click(screen.getByTitle('Delete'));
+
+        expect(setShowDeleteDialogMock).toHaveBeenCalledWith(true);
+    });
+
+    it('closes the delete confirmation when it is cancelled', () => {
+        deleteDialogState.showDeleteDialog = true;
+
+        renderEmbeddedToolListItem();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        expect(setShowDeleteDialogMock).toHaveBeenCalledWith(false);
     });
 });
