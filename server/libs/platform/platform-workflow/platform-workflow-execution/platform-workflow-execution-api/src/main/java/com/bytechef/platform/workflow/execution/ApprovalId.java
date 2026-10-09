@@ -42,9 +42,13 @@ public class ApprovalId implements Serializable {
     }
 
     public static ApprovalId of(long jobId, boolean approved) {
+        return of(TenantContext.getCurrentTenantId(), jobId, approved);
+    }
+
+    public static ApprovalId of(String tenantId, long jobId, boolean approved) {
         UUID uuid = UUID.randomUUID();
 
-        return new ApprovalId(TenantContext.getCurrentTenantId(), jobId, uuid.toString(), approved);
+        return new ApprovalId(tenantId, jobId, uuid.toString(), approved);
     }
 
     public static ApprovalId parse(String id) {

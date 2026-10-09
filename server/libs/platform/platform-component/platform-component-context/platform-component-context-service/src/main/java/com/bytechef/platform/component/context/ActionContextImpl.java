@@ -30,6 +30,7 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
@@ -69,6 +70,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable String publicUrl;
     private final long taskExecutionId;
     private final TempFileStorage tempFileStorage;
+    private final String tenantId;
     private final @Nullable Tracer tracer;
     private final @Nullable String workflowId;
     private final @Nullable Long environmentId;
@@ -89,10 +91,11 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.logFileStorageWriter = builder.logFileStorageWriter;
         this.taskExecutionId = builder.taskExecutionId;
         this.tempFileStorage = builder.tempFileStorage;
+        this.tenantId = TenantContext.getCurrentTenantId();
         this.tracer = builder.tracer;
 
         if (builder.jobId != null && builder.publicUrl != null) {
-            this.approval = new ApprovalImpl(builder.jobId, builder.publicUrl);
+            this.approval = new ApprovalImpl(tenantId, builder.jobId, builder.publicUrl);
         }
 
         this.data = new DataImpl(
@@ -324,7 +327,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         String currentJobResumeId = this.jobResumeId;
 
         if (currentJobResumeId == null) {
-            JobResumeId jobResumeId = JobResumeId.of(jobId);
+            JobResumeId jobResumeId = JobResumeId.of(tenantId, jobId);
 
             currentJobResumeId = jobResumeId.toString();
 
@@ -446,15 +449,15 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             .build();
     }
 
-    private record ApprovalImpl(long jobId, String publicUrl) implements Approval {
+    private record ApprovalImpl(String tenantId, long jobId, String publicUrl) implements Approval {
 
         @Override
         public Links generateLinks() {
             String url = "%s/approvals/%s";
 
             return new Links(
-                url.formatted(publicUrl, ApprovalId.of(jobId, true)),
-                url.formatted(publicUrl, ApprovalId.of(jobId, false)));
+                url.formatted(publicUrl, ApprovalId.of(tenantId, jobId, true)),
+                url.formatted(publicUrl, ApprovalId.of(tenantId, jobId, false)));
         }
     }
 
