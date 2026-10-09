@@ -1,3 +1,8 @@
+import {
+    getEmbedCredentials,
+    resetEmbedCredentials,
+    setEmbedCredentials,
+} from '@/ee/pages/embedded/shared/embedCredentials';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query';
 import {act, renderHook, waitFor} from '@testing-library/react';
@@ -27,6 +32,7 @@ describe('useEmbedHandshake', () => {
     beforeEach(() => {
         queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
 
+        resetEmbedCredentials();
         sessionStorage.clear();
 
         applicationInfoStore.setState({embedded: {allowedParentOrigins: []}});
@@ -36,6 +42,7 @@ describe('useEmbedHandshake', () => {
 
     afterEach(() => {
         vi.restoreAllMocks();
+        resetEmbedCredentials();
         sessionStorage.clear();
         delete import.meta.env.VITE_EMBEDDED_PARENT_ORIGINS;
 
@@ -71,7 +78,7 @@ describe('useEmbedHandshake', () => {
             dispatchEmbedInit('https://evil.example', parent);
 
             expect(onInit).not.toHaveBeenCalled();
-            expect(sessionStorage.getItem('jwtToken')).toBeNull();
+            expect(getEmbedCredentials().jwtToken).toBeNull();
         });
 
         it('accepts EMBED_INIT from an origin that the server allows', () => {
@@ -84,7 +91,7 @@ describe('useEmbedHandshake', () => {
             dispatchEmbedInit('https://b.example', parent);
 
             expect(onInit).toHaveBeenCalledWith(expect.objectContaining({jwtToken: 'jwt-1'}));
-            expect(sessionStorage.getItem('jwtToken')).toBe('jwt-1');
+            expect(getEmbedCredentials().jwtToken).toBe('jwt-1');
         });
 
         it('uses the server-configured origins instead of the build-time origins', () => {
@@ -127,7 +134,7 @@ describe('useEmbedHandshake', () => {
 
             expect(parent.postMessage).not.toHaveBeenCalled();
             expect(onInit).not.toHaveBeenCalled();
-            expect(sessionStorage.getItem('jwtToken')).toBeNull();
+            expect(getEmbedCredentials().jwtToken).toBeNull();
         });
 
         it('starts the handshake with the server-configured origins once the configuration loads', () => {
@@ -256,8 +263,8 @@ describe('useEmbedHandshake', () => {
             );
         });
 
-        expect(sessionStorage.getItem('jwtToken')).toBe('jwt-1');
-        expect(sessionStorage.getItem('environment')).toBe('staging');
+        expect(getEmbedCredentials().jwtToken).toBe('jwt-1');
+        expect(getEmbedCredentials().environment).toBe('staging');
         expect(onInit).toHaveBeenCalledWith(
             expect.objectContaining({environment: 'staging', jwtToken: 'jwt-1', tabs: {connections: false}})
         );
@@ -279,7 +286,7 @@ describe('useEmbedHandshake', () => {
             );
         });
 
-        expect(sessionStorage.getItem('environment')).toBe('PRODUCTION');
+        expect(getEmbedCredentials().environment).toBe('PRODUCTION');
     });
 
     it('forwards params and clears a previously stored token when EMBED_INIT carries no token', () => {
@@ -287,7 +294,7 @@ describe('useEmbedHandshake', () => {
         vi.spyOn(window, 'parent', 'get').mockReturnValue(parent);
         const onInit = vi.fn();
 
-        sessionStorage.setItem('jwtToken', 'previous-user-jwt');
+        setEmbedCredentials({environment: 'PRODUCTION', jwtToken: 'previous-user-jwt'});
 
         renderHook(() => useEmbedHandshake(onInit), {wrapper});
 
@@ -301,8 +308,8 @@ describe('useEmbedHandshake', () => {
             );
         });
 
-        expect(sessionStorage.getItem('jwtToken')).toBeNull();
-        expect(sessionStorage.getItem('environment')).toBe('PRODUCTION');
+        expect(getEmbedCredentials().jwtToken).toBeNull();
+        expect(getEmbedCredentials().environment).toBe('PRODUCTION');
         expect(onInit).toHaveBeenCalledWith(expect.objectContaining({includeComponents: ['slack']}));
     });
 
@@ -324,7 +331,7 @@ describe('useEmbedHandshake', () => {
         });
 
         expect(onInit).not.toHaveBeenCalled();
-        expect(sessionStorage.getItem('jwtToken')).toBeNull();
+        expect(getEmbedCredentials().jwtToken).toBeNull();
     });
 
     it('ignores EMBED_INIT from an origin that is not in the allow-list', () => {
@@ -347,7 +354,7 @@ describe('useEmbedHandshake', () => {
         });
 
         expect(onInit).not.toHaveBeenCalled();
-        expect(sessionStorage.getItem('jwtToken')).toBeNull();
+        expect(getEmbedCredentials().jwtToken).toBeNull();
     });
 
     it('accepts EMBED_INIT from an origin that is in the allow-list', () => {
@@ -442,9 +449,52 @@ describe('useEmbedHandshake', () => {
         sendInit({environment: 'STAGING', jwtToken: 'jwt-1'});
         sendInit({environment: 'DEVELOPMENT', jwtToken: 'jwt-2'});
 
-        expect(sessionStorage.getItem('jwtToken')).toBe('jwt-2');
-        expect(sessionStorage.getItem('environment')).toBe('DEVELOPMENT');
+        expect(getEmbedCredentials().jwtToken).toBe('jwt-2');
+        expect(getEmbedCredentials().environment).toBe('DEVELOPMENT');
         expect(onInit).toHaveBeenCalledTimes(2);
+    });
+
+    it('keeps the credentials out of sessionStorage that same-origin embedded frames of the host tab share', () => {
+        const parent = {postMessage: vi.fn()} as unknown as Window;
+        vi.spyOn(window, 'parent', 'get').mockReturnValue(parent);
+
+        renderHook(() => useEmbedHandshake(vi.fn()), {wrapper});
+
+        act(() => {
+            window.dispatchEvent(
+                new MessageEvent('message', {
+                    data: {params: {environment: 'STAGING', jwtToken: 'jwt-1'}, type: 'EMBED_INIT'},
+                    origin: 'https://host.example',
+                    source: parent,
+                })
+            );
+        });
+
+        expect(sessionStorage.getItem('jwtToken')).toBeNull();
+        expect(sessionStorage.getItem('environment')).toBeNull();
+        expect(getEmbedCredentials()).toEqual({environment: 'STAGING', jwtToken: 'jwt-1'});
+    });
+
+    it('is not affected by credentials that another embedded frame writes to sessionStorage', () => {
+        const parent = {postMessage: vi.fn()} as unknown as Window;
+        vi.spyOn(window, 'parent', 'get').mockReturnValue(parent);
+
+        renderHook(() => useEmbedHandshake(vi.fn()), {wrapper});
+
+        act(() => {
+            window.dispatchEvent(
+                new MessageEvent('message', {
+                    data: {params: {environment: 'STAGING', jwtToken: 'jwt-1'}, type: 'EMBED_INIT'},
+                    origin: 'https://host.example',
+                    source: parent,
+                })
+            );
+        });
+
+        sessionStorage.setItem('jwtToken', 'other-frame-jwt');
+        sessionStorage.setItem('environment', 'DEVELOPMENT');
+
+        expect(getEmbedCredentials()).toEqual({environment: 'STAGING', jwtToken: 'jwt-1'});
     });
 
     it('ignores a message from the parent that carries no data', () => {
@@ -480,7 +530,7 @@ describe('useEmbedHandshake', () => {
             const parent = {postMessage: vi.fn()} as unknown as Window;
             vi.spyOn(window, 'parent', 'get').mockReturnValue(parent);
 
-            const fetchAutomations = vi.fn(async () => `automations of ${sessionStorage.getItem('jwtToken')}`);
+            const fetchAutomations = vi.fn(async () => `automations of ${getEmbedCredentials().jwtToken}`);
 
             const {result} = renderHook(
                 () => {

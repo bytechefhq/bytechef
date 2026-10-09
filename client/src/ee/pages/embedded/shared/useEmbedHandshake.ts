@@ -1,4 +1,5 @@
 import {AutomationHubThemeI} from '@/ee/pages/embedded/automation-hub/stores/useAutomationHubStore';
+import {getEmbedCredentials, setEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
@@ -95,19 +96,14 @@ export function useEmbedHandshake(onInit: (params: EmbedInitParamsI) => void, en
                 const params = (event.data.params ?? {}) as EmbedInitParamsI;
 
                 const environment = params.environment || 'PRODUCTION';
-                const jwtToken = params.jwtToken;
+                const jwtToken = params.jwtToken || null;
+
+                const previousCredentials = getEmbedCredentials();
 
                 const identityChanged =
-                    sessionStorage.getItem('environment') !== environment ||
-                    sessionStorage.getItem('jwtToken') !== (jwtToken || null);
+                    previousCredentials.environment !== environment || previousCredentials.jwtToken !== jwtToken;
 
-                if (jwtToken) {
-                    sessionStorage.setItem('jwtToken', jwtToken);
-                } else {
-                    sessionStorage.removeItem('jwtToken');
-                }
-
-                sessionStorage.setItem('environment', environment);
+                setEmbedCredentials({environment, jwtToken});
 
                 if (identityChanged) {
                     void queryClient.resetQueries();
