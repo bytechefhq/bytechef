@@ -1,0 +1,11 @@
+query embeddedMcpToolsByComponentId($mcpComponentId: ID!) {
+    embeddedMcpToolsByComponentId(mcpComponentId: $mcpComponentId) {
+        id
+        enabled
+        name
+        title
+        mcpComponentId
+        parameters
+        version
+    }
+}
