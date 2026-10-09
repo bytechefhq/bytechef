@@ -2080,6 +2080,9 @@ components:
               type: "array"
               items:
                 $ref: "#/components/schemas/Property"
+            testable:
+              description: "Can the cluster element be run on its own to test it."
+              type: "boolean"
     ClusterElementDefinitionBasic:
       description: "A cluster element basic definition."
       type: "object"
