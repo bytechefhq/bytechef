@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.jdbc.session.util;
+package com.bytechef.component.ai.agent.chat.memory.jdbc.util;
 
 import static com.bytechef.platform.component.definition.ai.agent.DataSourceFunction.DATA_SOURCE;
 
@@ -52,6 +52,9 @@ import tools.jackson.databind.json.JsonMapper;
 public class SessionChatMemoryUtils {
 
     private static final Duration POOLED_CONNECTION_IDLE_TIMEOUT = Duration.ofMinutes(10);
+    private static final String ORACLE = "Oracle";
+    private static final String ORACLE_NOT_SUPPORTED_MESSAGE =
+        "JDBC Chat Memory v2 does not support Oracle; use JDBC Chat Memory v1";
     private static final int POOL_MAXIMUM_SIZE = 5;
 
     private static final Cache<DataSourceKey, PooledSessionRepository> SESSION_REPOSITORIES =
@@ -67,6 +70,10 @@ public class SessionChatMemoryUtils {
     }
 
     public static SessionRepository createSessionRepository(DataSource dataSource) {
+        if (ORACLE.equals(getDatabaseProductName(dataSource))) {
+            throw new IllegalStateException(ORACLE_NOT_SUPPORTED_MESSAGE);
+        }
+
         return JdbcSessionRepository.builder()
             .dataSource(dataSource)
             .jsonMapper(JsonMapper.builder()
@@ -118,8 +125,8 @@ public class SessionChatMemoryUtils {
 
         if (componentConnection == null) {
             throw new IllegalStateException(
-                "The Data Source " + workflowNodeName + " of JDBC Session Chat Memory has no connection; select a " +
-                    "database connection for it.");
+                "The Data Source " + workflowNodeName + " of JDBC Chat Memory has no connection; select a database " +
+                    "connection for it.");
         }
 
         return dataSourceFunction.apply(
@@ -160,25 +167,27 @@ public class SessionChatMemoryUtils {
     }
 
     private static String resolveSchemaScript(DataSource dataSource) {
-        String productName;
-
-        try {
-            productName = JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductName);
-        } catch (MetaDataAccessException metaDataAccessException) {
-            throw new IllegalStateException(
-                "Failed to read the database product name for the session chat memory schema",
-                metaDataAccessException);
-        }
+        String productName = getDatabaseProductName(dataSource);
 
         String schemaName = switch (productName) {
             case "MySQL", "MariaDB" -> "schema-mysql.sql";
             case "H2" -> "schema-h2.sql";
             case "PostgreSQL" -> "schema-postgresql.sql";
+            case ORACLE -> throw new IllegalStateException(ORACLE_NOT_SUPPORTED_MESSAGE);
             default -> throw new IllegalStateException(
-                "Session chat memory does not support the " + productName + " database");
+                "JDBC Chat Memory v2 does not support the " + productName + " database");
         };
 
         return "org/springframework/ai/session/jdbc/" + schemaName;
+    }
+
+    private static String getDatabaseProductName(DataSource dataSource) {
+        try {
+            return JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductName);
+        } catch (MetaDataAccessException metaDataAccessException) {
+            throw new IllegalStateException(
+                "Failed to read the database product name for the JDBC Chat Memory schema", metaDataAccessException);
+        }
     }
 
     record DataSourceKey(String url, @Nullable String username, @Nullable String password) {
