@@ -121,3 +121,12 @@ it('checks no workflow without a current integration workflow', async () => {
         'false'
     );
 });
+
+it('renders with the design-system DropdownMenu', async () => {
+    renderIntegrationItemSelect();
+
+    await userEvent.click(screen.getByLabelText('Integration item select'));
+
+    expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+    expect(screen.getByRole('menuitemradio', {name: 'Workflow 2'})).toHaveClass('text-content-neutral-primary');
+});

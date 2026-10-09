@@ -83,3 +83,12 @@ it('shows a skeleton while the current workflow label is loading', () => {
 
     expect(screen.queryByText('Workflow 1')).not.toBeInTheDocument();
 });
+
+it('renders with the design-system DropdownMenu', async () => {
+    renderProjectItemSelect();
+
+    await userEvent.click(screen.getByLabelText('Project item select'));
+
+    expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+    expect(screen.getByRole('menuitemradio', {name: 'Workflow 2'})).toHaveClass('text-content-neutral-primary');
+});
