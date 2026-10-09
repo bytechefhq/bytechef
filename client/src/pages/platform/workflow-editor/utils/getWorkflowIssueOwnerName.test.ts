@@ -50,6 +50,53 @@ describe('getClusterElementRootNames', () => {
         expect(getClusterElementRootNames([conditionTask]).get('openAi_1')).toBe('aiAgent_1');
     });
 
+    it('maps nested cluster elements of server task DTOs, which carry them in extensions', () => {
+        const serverAiAgentTask = {
+            clusterElements: {
+                tools: [
+                    {
+                        componentName: 'aiAgentUtils',
+                        extensions: {
+                            clusterElements: {
+                                model: {name: 'anthropic_2', type: 'anthropic/v1/model'},
+                                subagent: [
+                                    {
+                                        clusterElements: {
+                                            model: {name: 'anthropic_4', type: 'anthropic/v1/model'},
+                                        },
+                                        name: 'aiAgentUtils_3',
+                                        type: 'aiAgentUtils/v1/subagentTool',
+                                    },
+                                ],
+                            },
+                        },
+                        workflowNodeName: 'aiAgentUtils_1',
+                    },
+                ],
+            },
+            name: 'aiAgent_1',
+            parameters: {},
+            type: 'aiAgent/v1/streamChat',
+        } as unknown as WorkflowTask;
+
+        const clusterElementRootNames = getClusterElementRootNames([serverAiAgentTask]);
+
+        expect(clusterElementRootNames).toEqual(
+            new Map([
+                ['aiAgentUtils_1', 'aiAgent_1'],
+                ['aiAgentUtils_3', 'aiAgent_1'],
+                ['anthropic_2', 'aiAgent_1'],
+                ['anthropic_4', 'aiAgent_1'],
+            ])
+        );
+        expect(
+            getWorkflowIssueOwnerName(
+                {nodeName: 'aiAgent_1', propertyPath: 'aiAgentUtils_1.aiAgentUtils_3.anthropic_4.maxTokens'},
+                clusterElementRootNames
+            )
+        ).toBe('anthropic_4');
+    });
+
     it('maps cluster elements of server task DTOs that use workflowNodeName', () => {
         const serverAiAgentTask = {
             clusterElements: {
