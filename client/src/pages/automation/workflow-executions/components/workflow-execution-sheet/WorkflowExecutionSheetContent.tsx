@@ -101,7 +101,7 @@ const WorkflowExecutionSheetContent = ({
                 <ResizablePanelGroup orientation="horizontal">
                     <ResizablePanel
                         className="flex min-h-0 flex-col overflow-hidden"
-                        defaultSize={25}
+                        defaultSize={26}
                         groupResizeBehavior="preserve-pixel-size"
                         minSize={15}
                     >
@@ -168,7 +168,7 @@ const WorkflowExecutionSheetContent = ({
 
                     <ResizableHandle />
 
-                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={75} minSize={20}>
+                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={74} minSize={20}>
                         <WorkflowExecutionsTabsPanel
                             activeTab={activeTab}
                             dialogOpen={dialogOpen}
