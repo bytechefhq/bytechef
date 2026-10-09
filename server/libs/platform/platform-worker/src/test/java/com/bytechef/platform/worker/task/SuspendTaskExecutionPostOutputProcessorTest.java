@@ -73,7 +73,7 @@ class SuspendTaskExecutionPostOutputProcessorTest {
         assertTrue(taskExecution.getMetadata()
             .containsKey(MetadataConstants.JOB_RESUME_ID));
 
-        verify(triggerScheduler).scheduleOneTimeTask(any(Instant.class), anyMap(), anyLong());
+        verify(triggerScheduler).scheduleOneTimeTask(expiresAt, Map.of(), 100L);
     }
 
     @Test
