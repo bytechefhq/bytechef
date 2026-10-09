@@ -20,6 +20,8 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
+import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ public final class ClusterElementDefinition {
     private OutputResponse outputResponse;
     private boolean outputSchemaDefined;
     private List<? extends Property> properties;
+    private boolean testable;
     private String title;
     private ClusterElementType type;
 
@@ -77,6 +80,7 @@ public final class ClusterElementDefinition {
             clusterElementDefinition.getProperties()
                 .orElse(List.of()),
             Property::toProperty);
+        this.testable = isTestable(clusterElementDefinition.getElement());
         this.title = clusterElementDefinition.getTitle()
             .orElse(null);
         this.type = clusterElementDefinition.getType();
@@ -101,6 +105,7 @@ public final class ClusterElementDefinition {
         mergedProperties.addAll(clusterElementDefinition.properties);
 
         this.properties = mergedProperties;
+        this.testable = clusterElementDefinition.testable;
         this.title = clusterElementDefinition.title;
         this.type = clusterElementDefinition.type;
     }
@@ -116,7 +121,8 @@ public final class ClusterElementDefinition {
             Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
             outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
             Objects.equals(outputResponse, that.outputResponse) && outputSchemaDefined == that.outputSchemaDefined &&
-            Objects.equals(properties, that.properties) && Objects.equals(title, that.title) &&
+            Objects.equals(properties, that.properties) && testable == that.testable &&
+            Objects.equals(title, that.title) &&
             Objects.equals(type, that.type);
     }
 
@@ -124,7 +130,7 @@ public final class ClusterElementDefinition {
     public int hashCode() {
         return Objects.hash(
             componentName, componentVersion, description, icon, name, outputDefined, outputFunctionDefined,
-            outputResponse, outputSchemaDefined, properties, title, type);
+            outputResponse, outputSchemaDefined, properties, testable, title, type);
     }
 
     public String getComponentName() {
@@ -186,6 +192,10 @@ public final class ClusterElementDefinition {
         return outputSchemaDefined;
     }
 
+    public boolean isTestable() {
+        return testable;
+    }
+
     @Override
     public String toString() {
         return "ClusterElementDefinition{" +
@@ -200,7 +210,13 @@ public final class ClusterElementDefinition {
             ", outputFunctionDefined=" + outputFunctionDefined +
             ", outputSchemaDefined=" + outputSchemaDefined +
             ", outputResponse=" + outputResponse +
+            ", testable=" + testable +
             '}';
+    }
+
+    private static boolean isTestable(@Nullable Object element) {
+        return !(element instanceof ToolCallbackProviderFunction ||
+            element instanceof MultipleConnectionsToolCallbackProviderFunction);
     }
 
     private static OutputResponse toOutputResponse(
