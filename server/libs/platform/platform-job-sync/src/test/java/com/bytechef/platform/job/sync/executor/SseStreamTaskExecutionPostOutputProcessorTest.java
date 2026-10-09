@@ -137,6 +137,33 @@ class SseStreamTaskExecutionPostOutputProcessorTest {
     }
 
     @Test
+    void testProcessReturnsTheOutputTheStreamSetWhenItCompletes() {
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            emitter -> {
+                emitter.send("answer");
+                emitter.setOutput(Map.of("response", "answer"));
+                emitter.complete();
+            },
+            mock(ActionContextAware.class));
+
+        Object result = processor.process(createTaskExecution(), suspendAwareSseEmitterHandler);
+
+        assertThat(result).isEqualTo(Map.of("response", "answer"));
+
+        verify(sseStreamBridge).onComplete();
+    }
+
+    @Test
+    void testProcessReturnsNoOutputWhenTheStreamFails() {
+        ActionDefinition.SseEmitterHandler sseEmitterHandler = emitter -> {
+            emitter.setOutput("partial");
+            emitter.error(new RuntimeException("agent failed"));
+        };
+
+        assertThat(processor.process(createTaskExecution(), sseEmitterHandler)).isNull();
+    }
+
+    @Test
     void testProcessWithAFailedStreamReportsOnlyTheError() {
         RuntimeException streamException = new RuntimeException("agent failed");
 

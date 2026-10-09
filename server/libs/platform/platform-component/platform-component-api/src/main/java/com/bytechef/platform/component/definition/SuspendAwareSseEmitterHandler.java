@@ -122,5 +122,10 @@ public final class SuspendAwareSseEmitterHandler implements SseEmitterHandler {
         public void send(Object data) {
             sseEmitter.send(data);
         }
+
+        @Override
+        public void setOutput(Object output) {
+            sseEmitter.setOutput(output);
+        }
     }
 }

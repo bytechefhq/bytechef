@@ -171,11 +171,17 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
 
         if (suspend != null) {
             notifySseStreamBridges(key, SseStreamBridge::onSuspend);
-        } else if (streamCompleted.get() && !streamFailed.get()) {
-            notifySseStreamBridges(key, SseStreamBridge::onComplete);
+
+            return suspend;
         }
 
-        return suspend;
+        if (!streamCompleted.get() || streamFailed.get()) {
+            return null;
+        }
+
+        notifySseStreamBridges(key, SseStreamBridge::onComplete);
+
+        return emitter.getOutput();
     }
 
     private void notifySseStreamBridges(String key, Consumer<SseStreamBridge> sseStreamBridgeConsumer) {

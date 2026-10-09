@@ -50,6 +50,7 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
     private volatile boolean timedOut;
     private volatile boolean errored;
     private volatile @Nullable Throwable lastError;
+    private volatile @Nullable Object output;
 
     public SseEmitter() {
         this.timeout = null;
@@ -147,8 +148,17 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
         complete();
     }
 
+    public @Nullable Object getOutput() {
+        return output;
+    }
+
     public @Nullable Long getTimeout() {
         return timeout;
+    }
+
+    @Override
+    public void setOutput(Object output) {
+        this.output = output;
     }
 
     @Override
