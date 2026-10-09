@@ -104,6 +104,10 @@ public class McpClientTool {
 
         McpToolFilter toolFilter = createToolFilter(inputParameters);
 
+        return createToolCallbackProvider(mcpSyncClient, toolFilter);
+    }
+
+    static ToolCallbackProvider createToolCallbackProvider(McpSyncClient mcpSyncClient, McpToolFilter toolFilter) {
         return SyncMcpToolCallbackProvider.builder()
             .mcpClients(mcpSyncClient)
             .toolFilter(toolFilter)
