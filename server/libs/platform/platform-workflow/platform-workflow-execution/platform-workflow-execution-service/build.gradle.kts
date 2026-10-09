@@ -1,4 +1,5 @@
 dependencies {
+    api("org.springframework:spring-tx")
     api (project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     implementation("org.apache.commons:commons-lang3")

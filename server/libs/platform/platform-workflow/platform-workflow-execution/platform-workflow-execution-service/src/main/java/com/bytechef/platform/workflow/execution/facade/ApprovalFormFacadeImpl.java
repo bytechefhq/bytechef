@@ -29,15 +29,18 @@ import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionOperations;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Ivica Cardic
  */
 @Service
-@Transactional(readOnly = true)
 public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
     private static final String ENVIRONMENT_ID_METADATA_KEY = "environmentId";
@@ -45,51 +48,77 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final TaskStateService taskStateService;
+    private final TransactionOperations transactionOperations;
+
+    @Autowired
+    @SuppressFBWarnings("EI")
+    public ApprovalFormFacadeImpl(
+        JobService jobService, TaskExecutionService taskExecutionService, TaskStateService taskStateService,
+        PlatformTransactionManager platformTransactionManager) {
+
+        this(jobService, taskExecutionService, taskStateService,
+            createReadOnlyTransactionTemplate(platformTransactionManager));
+    }
 
     @SuppressFBWarnings("EI")
     public ApprovalFormFacadeImpl(
-        JobService jobService, TaskExecutionService taskExecutionService, TaskStateService taskStateService) {
+        JobService jobService, TaskExecutionService taskExecutionService, TaskStateService taskStateService,
+        TransactionOperations transactionOperations) {
 
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskStateService = taskStateService;
+        this.transactionOperations = transactionOperations;
     }
 
     @Override
     public Map<String, ?> getApprovalForm(String id) {
         JobResumeId jobResumeId = JobResumeId.parse(id);
 
-        return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
-            Job job = jobService.getJob(jobResumeId.getJobId());
+        return TenantContext.callWithTenantId(
+            jobResumeId.getTenantId(),
+            () -> Objects.requireNonNull(transactionOperations.execute(transactionStatus -> {
+                Job job = jobService.getJob(jobResumeId.getJobId());
 
-            if (job.getStatus() != Job.Status.STOPPED) {
-                throw new IllegalStateException(
-                    "Approval form is no longer available; job " + jobResumeId.getJobId() + " is " + job.getStatus());
-            }
+                if (job.getStatus() != Job.Status.STOPPED) {
+                    throw new IllegalStateException(
+                        "Approval form is no longer available; job " + jobResumeId.getJobId() + " is "
+                            + job.getStatus());
+                }
 
-            Map<String, ?> jobMetadata = job.getMetadata();
+                Map<String, ?> jobMetadata = job.getMetadata();
 
-            if (!jobResumeId.matches((String) jobMetadata.get(MetadataConstants.JOB_RESUME_ID))) {
-                throw new IllegalStateException(
-                    "Approval form is no longer available; the resume id of job " + jobResumeId.getJobId() +
-                        " does not match");
-            }
+                if (!jobResumeId.matches((String) jobMetadata.get(MetadataConstants.JOB_RESUME_ID))) {
+                    throw new IllegalStateException(
+                        "Approval form is no longer available; the resume id of job " + jobResumeId.getJobId() +
+                            " does not match");
+                }
 
-            TaskExecution taskExecution = taskExecutionService.getTaskExecution(
-                MapUtils.getLong(jobMetadata, MetadataConstants.TASK_EXECUTION_RESUME_ID));
+                TaskExecution taskExecution = taskExecutionService.getTaskExecution(
+                    MapUtils.getLong(jobMetadata, MetadataConstants.TASK_EXECUTION_RESUME_ID));
 
-            Map<String, Object> result = new HashMap<>(getFormParameters(jobResumeId, taskExecution));
+                Map<String, Object> result = new HashMap<>(getFormParameters(jobResumeId, taskExecution));
 
-            Map<String, ?> taskExecutionMetadata = taskExecution.getMetadata();
+                Map<String, ?> taskExecutionMetadata = taskExecution.getMetadata();
 
-            Object environmentId = taskExecutionMetadata.get(ENVIRONMENT_ID_METADATA_KEY);
+                Object environmentId = taskExecutionMetadata.get(ENVIRONMENT_ID_METADATA_KEY);
 
-            if (environmentId != null) {
-                result.put(ENVIRONMENT_ID_METADATA_KEY, environmentId);
-            }
+                if (environmentId != null) {
+                    result.put(ENVIRONMENT_ID_METADATA_KEY, environmentId);
+                }
 
-            return result;
-        });
+                return result;
+            })));
+    }
+
+    private static TransactionTemplate createReadOnlyTransactionTemplate(
+        PlatformTransactionManager platformTransactionManager) {
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.setReadOnly(true);
+
+        return transactionTemplate;
     }
 
     @SuppressWarnings("unchecked")
