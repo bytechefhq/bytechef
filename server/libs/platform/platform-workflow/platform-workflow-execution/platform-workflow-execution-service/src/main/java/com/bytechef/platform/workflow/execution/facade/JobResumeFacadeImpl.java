@@ -27,19 +27,23 @@ import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.LongConsumer;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionOperations;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Ivica Cardic
  */
 @Service
-@Transactional
 public class JobResumeFacadeImpl implements JobResumeFacade {
 
     private static final Logger log = LoggerFactory.getLogger(JobResumeFacadeImpl.class);
@@ -47,14 +51,26 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final JobFacade jobFacade;
     private final JobService jobService;
+    private final TransactionOperations transactionOperations;
+
+    @Autowired
+    @SuppressFBWarnings("EI")
+    public JobResumeFacadeImpl(
+        ApplicationEventPublisher applicationEventPublisher, JobFacade jobFacade, JobService jobService,
+        PlatformTransactionManager platformTransactionManager) {
+
+        this(applicationEventPublisher, jobFacade, jobService, new TransactionTemplate(platformTransactionManager));
+    }
 
     @SuppressFBWarnings("EI")
     public JobResumeFacadeImpl(
-        ApplicationEventPublisher applicationEventPublisher, JobFacade jobFacade, JobService jobService) {
+        ApplicationEventPublisher applicationEventPublisher, JobFacade jobFacade, JobService jobService,
+        TransactionOperations transactionOperations) {
 
         this.applicationEventPublisher = applicationEventPublisher;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
+        this.transactionOperations = transactionOperations;
     }
 
     @Override
@@ -65,7 +81,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
             return JobResumeOutcome.INVALID_ID;
         }
 
-        return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
+        return callInTenantTransaction(jobResumeId, transactionStatus -> {
             Job job = jobService.getJob(jobResumeId.getJobId());
 
             JobResumeOutcome rejectedOutcome = getRejectedOutcome(job, jobResumeId);
@@ -84,7 +100,14 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
             consumeJobResumeId(job);
 
-            jobFacade.resumeJob(jobResumeId.getJobId());
+            Long taskExecutionResumeId = MapUtils.getLong(
+                job.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID);
+
+            if (taskExecutionResumeId == null) {
+                jobFacade.resumeJob(jobResumeId.getJobId());
+            } else {
+                jobFacade.resumeJob(jobResumeId.getJobId(), taskExecutionResumeId, null);
+            }
 
             applicationEventPublisher.publishEvent(new JobResumedEvent(id));
 
@@ -113,7 +136,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
             return JobResumeOutcome.INVALID_ID;
         }
 
-        return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
+        return callInTenantTransaction(jobResumeId, transactionStatus -> {
             Job job = jobService.getJob(jobResumeId.getJobId());
 
             JobResumeOutcome rejectedOutcome = getRejectedOutcome(job, jobResumeId);
@@ -140,6 +163,12 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
             return JobResumeOutcome.OK;
         });
+    }
+
+    private <T> T callInTenantTransaction(JobResumeId jobResumeId, TransactionCallback<T> transactionCallback) {
+        return TenantContext.callWithTenantId(
+            jobResumeId.getTenantId(),
+            () -> Objects.requireNonNull(transactionOperations.execute(transactionCallback)));
     }
 
     private void consumeJobResumeId(Job job) {

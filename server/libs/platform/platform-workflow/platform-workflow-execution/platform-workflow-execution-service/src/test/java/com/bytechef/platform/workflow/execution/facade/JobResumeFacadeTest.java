@@ -36,7 +36,9 @@ import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.tenant.TenantContext;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.LongConsumer;
@@ -47,6 +49,9 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.support.SimpleTransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionOperations;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -58,6 +63,7 @@ public class JobResumeFacadeTest {
 
     private static final long JOB_ID = 42L;
     private static final long TASK_EXECUTION_ID = 7L;
+    private static final String TENANT_ID = "000001";
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
@@ -70,6 +76,18 @@ public class JobResumeFacadeTest {
 
     private JobResumeFacadeImpl jobResumeFacade;
 
+    private final List<String> transactionTenantIds = new ArrayList<>();
+
+    private final TransactionOperations transactionOperations = new TransactionOperations() {
+
+        @Override
+        public <T> T execute(TransactionCallback<T> transactionCallback) {
+            transactionTenantIds.add(TenantContext.getCurrentTenantId());
+
+            return transactionCallback.doInTransaction(new SimpleTransactionStatus());
+        }
+    };
+
     static {
         ObjectMapper objectMapper = JsonMapper.builder()
             .build();
@@ -79,7 +97,30 @@ public class JobResumeFacadeTest {
 
     @BeforeEach
     void setUp() {
-        jobResumeFacade = new JobResumeFacadeImpl(applicationEventPublisher, jobFacade, jobService);
+        jobResumeFacade = new JobResumeFacadeImpl(
+            applicationEventPublisher, jobFacade, jobService, transactionOperations);
+    }
+
+    @Test
+    public void testResumeJobOpensItsTransactionUnderTheTenantOfTheResumeId() {
+        JobResumeId jobResumeId = TenantContext.callWithTenantId(TENANT_ID, () -> JobResumeId.of(JOB_ID));
+
+        when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.COMPLETED, jobResumeId.toString()));
+
+        jobResumeFacade.resumeJob(jobResumeId.toString(), Map.of());
+
+        assertThat(transactionTenantIds).containsExactly(TENANT_ID);
+    }
+
+    @Test
+    public void testResumeExpiredJobOpensItsTransactionUnderTheTenantOfTheResumeId() {
+        JobResumeId jobResumeId = TenantContext.callWithTenantId(TENANT_ID, () -> JobResumeId.of(JOB_ID));
+
+        when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.COMPLETED, jobResumeId.toString()));
+
+        jobResumeFacade.resumeExpiredJob(jobResumeId.toString());
+
+        assertThat(transactionTenantIds).containsExactly(TENANT_ID);
     }
 
     @Test
@@ -430,9 +471,30 @@ public class JobResumeFacadeTest {
         inOrder.verify(jobService)
             .update(job);
         inOrder.verify(jobFacade)
-            .resumeJob(JOB_ID);
+            .resumeJob(JOB_ID, TASK_EXECUTION_ID, null);
         inOrder.verify(applicationEventPublisher)
             .publishEvent(new JobResumedEvent(jobResumeId.toString()));
+
+        verify(jobFacade, never()).resumeJob(JOB_ID);
+    }
+
+    @Test
+    public void testResumeExpiredJobRestartsTheJobWhenNoSuspendedTaskExecutionIsStored() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        Map<String, Object> metadata = new HashMap<>(job.getMetadata());
+
+        metadata.remove(MetadataConstants.TASK_EXECUTION_RESUME_ID);
+
+        job.setMetadata(metadata);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        assertThat(jobResumeFacade.resumeExpiredJob(jobResumeId.toString())).isEqualTo(JobResumeOutcome.OK);
+
+        verify(jobFacade).resumeJob(JOB_ID);
     }
 
     @Test

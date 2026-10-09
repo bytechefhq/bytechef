@@ -112,6 +112,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.transaction.support.TransactionOperations;
 import reactor.core.publisher.Flux;
 import tools.jackson.databind.ObjectMapper;
 
@@ -233,7 +234,7 @@ class AiAgentChatActionIntTest {
             event -> {},
             new JobFacadeImpl(
                 eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService),
-            jobService);
+            jobService, TransactionOperations.withoutTransaction());
     }
 
     @Test
@@ -274,7 +275,7 @@ class AiAgentChatActionIntTest {
         assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
 
         ApprovalFormFacadeImpl approvalFormFacade = new ApprovalFormFacadeImpl(
-            jobService, taskExecutionService, taskStateService);
+            jobService, taskExecutionService, taskStateService, TransactionOperations.withoutTransaction());
 
         Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(getJobResumeId(suspendedJob));
 
@@ -321,6 +322,8 @@ class AiAgentChatActionIntTest {
         assertThat(outputs.get("answer")).isEqualTo(FINAL_ANSWER);
         assertThat(getApprovalToolResponse(scriptedChatModel.getPrompts()
             .get(1))).contains("NO_RESPONSE");
+        assertThat(taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(suspendedJob.getId())))
+            .hasSize(1);
     }
 
     @Test
