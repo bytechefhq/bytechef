@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -30,7 +31,9 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.tenant.TenantContext;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -233,6 +236,36 @@ class ContextTest {
         jobLessContext.flushLogEntries();
 
         verifyNoMoreInteractions(logFileStorageWriter);
+    }
+
+    @Test
+    void testEntriesLoggedFromAnotherThreadAreStoredUnderTheTenantThatCreatedTheContext() throws InterruptedException {
+        TempFileStorage tempFileStorage = mock(TempFileStorage.class);
+
+        ContextImpl tenantContext = TenantContext.callWithTenantId(
+            "000001", () -> new ContextImpl(
+                "aiAgent", 1, "streamChat", null, JOB_ID, TASK_EXECUTION_ID, false,
+                new HttpClientExecutor(mock(ApplicationContext.class), tempFileStorage), tempFileStorage,
+                logFileStorageWriter, true, null));
+
+        List<String> storingTenantIds = new CopyOnWriteArrayList<>();
+
+        doAnswer(invocation -> storingTenantIds.add(TenantContext.getCurrentTenantId()))
+            .when(logFileStorageWriter)
+            .storeLogEntries(anyLong(), anyLong(), anyList());
+
+        TenantContext.runWithTenantId("000001", () -> {
+            tenantContext.log(log -> log.info("during perform"));
+
+            tenantContext.flushLogEntries();
+        });
+
+        Thread streamThread = Thread.ofVirtual()
+            .start(() -> tenantContext.log(log -> log.info("tool executed while the stream is consumed")));
+
+        streamThread.join();
+
+        assertEquals(List.of("000001", "000001"), storingTenantIds);
     }
 
     private List<LogEntry> capturedBatch() {

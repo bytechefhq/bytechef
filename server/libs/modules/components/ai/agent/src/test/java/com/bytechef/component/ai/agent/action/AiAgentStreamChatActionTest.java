@@ -37,7 +37,9 @@ import static com.bytechef.component.definition.ActionDefinition.SseEmitterHandl
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -53,6 +55,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.ai.tool.AiAgentToolContext.SseTransport;
@@ -339,10 +342,113 @@ class AiAgentStreamChatActionTest {
         verify(emitter, times(1)).send(any());
     }
 
+    @Test
+    void testStreamRunsUnderTheTenantOfTheCallingThread() throws InterruptedException {
+        ContextRegistry contextRegistry = ContextRegistry.getInstance();
+
+        contextRegistry.registerThreadLocalAccessor(new TenantContextThreadLocalAccessor());
+
+        Hooks.enableAutomaticContextPropagation();
+
+        try {
+            Flux<Object> tenantFlux = TenantContext.callWithTenantId(
+                "000001", () -> AiAgentStreamChatAction.withExecutionContext(
+                    Flux.<Object>just("chunk")
+                        .publishOn(Schedulers.boundedElastic())
+                        .map(chunk -> TenantContext.getCurrentTenantId())));
+
+            AtomicReference<@Nullable List<Object>> tenantIdsReference = new AtomicReference<>();
+
+            Thread subscriberThread = Thread.ofVirtual()
+                .start(() -> tenantIdsReference.set(
+                    tenantFlux.collectList()
+                        .block()));
+
+            subscriberThread.join();
+
+            assertThat(tenantIdsReference.get()).containsExactly("000001");
+        } finally {
+            Hooks.disableAutomaticContextPropagation();
+        }
+    }
+
     private static ChatResponse chatResponse(String text) {
         return ChatResponse.builder()
             .generations(List.of(new Generation(new AssistantMessage(text))))
             .build();
+    }
+
+    @Nested
+    @ExtendWith(ObjectMapperSetupExtension.class)
+    class LogTests {
+
+        @Test
+        void testToolExecutionIsLoggedWithItsOutput() {
+            ActionContext context = mock(ActionContext.class);
+            Context.Log log = mockLog(context);
+
+            ToolExecutionListener toolExecutionListener = AiAgentStreamChatAction.createToolExecutionListener(
+                new SseTransport(), new AiAgentStreamChatAction.TurnTextSeparator(), context);
+
+            toolExecutionListener.onToolExecution(
+                new ToolExecutionEvent(
+                    "todoWrite", Map.of("todos", List.of(Map.of("content", "Assess", "status", "in_progress"))),
+                    "{\"status\":\"ok\"}", null, null));
+
+            ArgumentCaptor<String> messageArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
+            verify(log).info(messageArgumentCaptor.capture());
+
+            assertThat(messageArgumentCaptor.getValue()).contains(
+                "\"toolName\":\"todoWrite\"", "\"inputs\":{\"todos\":[", "\"output\":\"{\\\"status\\\":\\\"ok\\\"}\"");
+        }
+
+        @Test
+        void testStreamedResponseTextIsLoggedWhenTheStreamCompletes() {
+            ActionContext context = mock(ActionContext.class);
+            Context.Log log = mockLog(context);
+            SseEmitter emitter = mock(SseEmitter.class);
+
+            AiAgentStreamChatAction
+                .createSseHandler(
+                    Flux.just("All three tasks", Map.of("__eventType", "guardrail"), " are done."),
+                    new SseTransport(), context)
+                .handle(emitter);
+
+            InOrder inOrder = inOrder(log, emitter);
+
+            inOrder.verify(log)
+                .info("AI agent response: {}", "All three tasks are done.");
+            inOrder.verify(emitter)
+                .complete();
+        }
+
+        @Test
+        void testStreamWithoutTextLogsNoResponse() {
+            ActionContext context = mock(ActionContext.class);
+            Context.Log log = mockLog(context);
+
+            AiAgentStreamChatAction
+                .createSseHandler(Flux.empty(), new SseTransport(), context)
+                .handle(mock(SseEmitter.class));
+
+            verify(log, never()).info(anyString(), any(Object[].class));
+        }
+
+        private static Context.Log mockLog(ActionContext context) {
+            Context.Log log = mock(Context.Log.class);
+
+            doAnswer(invocation -> {
+                Context.ContextConsumer<Context.Log> logConsumer = invocation.getArgument(0);
+
+                logConsumer.accept(log);
+
+                return null;
+            }).when(context)
+                .log(any());
+
+            return log;
+        }
     }
 
     @Nested
