@@ -18,13 +18,16 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Set;
@@ -73,13 +76,31 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    public McpComponent createEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools) {
+        getEmbeddedMcpServer(mcpComponent.getMcpServerId());
+
+        return mcpServerFacade.create(mcpComponent, mcpTools);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public McpServer createEmbeddedMcpServer(String name, Environment environment, boolean enabled) {
         return mcpServerService.create(name, PlatformType.EMBEDDED, environment, enabled);
     }
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    public void deleteEmbeddedMcpComponent(long mcpComponentId) {
+        checkEmbeddedMcpComponent(mcpComponentId);
+
+        mcpServerFacade.deleteMcpComponent(mcpComponentId);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public void deleteEmbeddedMcpServer(long mcpServerId) {
+        getEmbeddedMcpServer(mcpServerId);
+
         for (var mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
             for (var mcpTool : mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())) {
                 mcpIntegrationInstanceToolService.deleteByMcpToolId(mcpTool.getId());
@@ -87,6 +108,14 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         }
 
         mcpServerFacade.deleteMcpServer(mcpServerId);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public void deleteEmbeddedMcpTool(long mcpToolId) {
+        McpTool mcpTool = getEmbeddedMcpTool(mcpToolId);
+
+        mcpToolService.delete(mcpTool);
     }
 
     @Override
@@ -129,5 +158,84 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
         return componentDefinitionService.getComponentDefinitions(
             true, null, null, null, componentNames, PlatformType.EMBEDDED);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public McpComponent updateEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools) {
+        checkEmbeddedMcpComponent(mcpComponent.getId());
+        getEmbeddedMcpServer(mcpComponent.getMcpServerId());
+
+        return mcpServerFacade.update(mcpComponent, mcpTools);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public McpServer updateEmbeddedMcpServer(long mcpServerId, String name, Boolean enabled) {
+        getEmbeddedMcpServer(mcpServerId);
+
+        return mcpServerService.update(mcpServerId, name, enabled);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public McpServer updateEmbeddedMcpServerSecretKey(long mcpServerId) {
+        McpServer mcpServer = getEmbeddedMcpServer(mcpServerId);
+
+        mcpServer.setSecretKey(String.valueOf(TenantKey.of()));
+
+        return mcpServerService.update(mcpServer);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public List<Tag> updateEmbeddedMcpServerTags(long mcpServerId, List<Tag> tags) {
+        getEmbeddedMcpServer(mcpServerId);
+
+        return mcpServerFacade.updateMcpServerTags(mcpServerId, tags);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public McpTool updateEmbeddedMcpTool(McpTool mcpTool) {
+        getEmbeddedMcpTool(mcpTool.getId());
+        checkEmbeddedMcpComponent(mcpTool.getMcpComponentId());
+
+        return mcpToolService.update(mcpTool);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public McpTool updateEmbeddedMcpToolEnabled(long mcpToolId, boolean enabled) {
+        getEmbeddedMcpTool(mcpToolId);
+
+        mcpToolService.updateEnabled(mcpToolId, enabled);
+
+        return getEmbeddedMcpTool(mcpToolId);
+    }
+
+    private void checkEmbeddedMcpComponent(long mcpComponentId) {
+        McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpComponentId);
+
+        getEmbeddedMcpServer(mcpComponent.getMcpServerId());
+    }
+
+    private McpServer getEmbeddedMcpServer(long mcpServerId) {
+        McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+
+        if (mcpServer.getType() != PlatformType.EMBEDDED) {
+            throw new IllegalArgumentException("MCP server %s is not an embedded MCP server".formatted(mcpServerId));
+        }
+
+        return mcpServer;
+    }
+
+    private McpTool getEmbeddedMcpTool(long mcpToolId) {
+        McpTool mcpTool = mcpToolService.fetchMcpTool(mcpToolId)
+            .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + mcpToolId));
+
+        checkEmbeddedMcpComponent(mcpTool.getMcpComponentId());
+
+        return mcpTool;
     }
 }

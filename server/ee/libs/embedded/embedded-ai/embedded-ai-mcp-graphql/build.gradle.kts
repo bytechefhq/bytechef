@@ -12,4 +12,10 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
+
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("org.springframework.security:spring-security-core")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
+    testImplementation(project(":server:libs:test:test-int-support"))
 }
