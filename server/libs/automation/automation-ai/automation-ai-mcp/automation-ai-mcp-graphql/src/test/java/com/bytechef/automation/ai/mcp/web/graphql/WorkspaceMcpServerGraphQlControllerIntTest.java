@@ -29,7 +29,9 @@ import com.bytechef.automation.ai.mcp.web.graphql.config.AutomationMcpGraphQlTes
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -187,6 +189,34 @@ class WorkspaceMcpServerGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(workspaceMcpServerFacade).deleteWorkspaceMcpServer(mcpServerId);
+    }
+
+    @Test
+    void testUpdateWorkspaceMcpToolEnabled() {
+        McpTool mcpTool = new McpTool(5L, "test-tool", Map.of(), 3L);
+
+        mcpTool.setEnabled(false);
+
+        when(workspaceMcpServerFacade.updateWorkspaceMcpToolEnabled(5L, false)).thenReturn(mcpTool);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateWorkspaceMcpToolEnabled(id: "5", enabled: false) {
+                        id
+                        enabled
+                    }
+                }
+                """)
+            .execute()
+            .path("updateWorkspaceMcpToolEnabled.id")
+            .entity(String.class)
+            .isEqualTo("5")
+            .path("updateWorkspaceMcpToolEnabled.enabled")
+            .entity(Boolean.class)
+            .isEqualTo(false);
+
+        verify(workspaceMcpServerFacade).updateWorkspaceMcpToolEnabled(5L, false);
     }
 
     private McpServer createMockMcpServer(Long id, String name) {

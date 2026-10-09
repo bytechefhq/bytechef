@@ -1,6 +1,0 @@
-mutation updateMcpToolEnabled($id: ID!, $enabled: Boolean!) {
-    updateMcpToolEnabled(id: $id, enabled: $enabled) {
-        id
-        enabled
-    }
-}

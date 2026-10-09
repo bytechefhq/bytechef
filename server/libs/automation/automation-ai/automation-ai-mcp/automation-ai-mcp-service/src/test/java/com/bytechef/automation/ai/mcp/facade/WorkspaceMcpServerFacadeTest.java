@@ -25,7 +25,9 @@ import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
+import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.tag.service.TagService;
 import org.junit.jupiter.api.Test;
 
@@ -39,8 +41,9 @@ class WorkspaceMcpServerFacadeTest {
         when(mcpServerService.update(3L, "New name", true)).thenReturn(updated);
 
         WorkspaceMcpServerFacadeImpl facade = new WorkspaceMcpServerFacadeImpl(
-            mock(McpProjectFacade.class), mock(McpProjectService.class), mock(McpServerFacade.class),
-            mcpServerService, mock(TagService.class), mock(WorkspaceMcpServerService.class));
+            mock(McpComponentService.class), mock(McpProjectFacade.class), mock(McpProjectService.class),
+            mock(McpServerFacade.class), mcpServerService, mock(McpToolService.class), mock(TagService.class),
+            mock(WorkspaceMcpServerService.class));
 
         McpServer result = facade.updateWorkspaceMcpServer(3L, "New name", true);
 

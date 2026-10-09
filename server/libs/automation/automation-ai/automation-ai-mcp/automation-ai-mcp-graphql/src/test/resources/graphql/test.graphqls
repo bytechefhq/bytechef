@@ -34,6 +34,7 @@ type Mutation {
     # WorkspaceMcpServer mutations
     createWorkspaceMcpServer(input: CreateWorkspaceMcpServerInput!): McpServer
     deleteWorkspaceMcpServer(mcpServerId: ID!): Boolean
+    updateWorkspaceMcpToolEnabled(id: ID!, enabled: Boolean!): McpTool
 
     # McpProject mutations
     createMcpProject(input: CreateMcpProjectInput!): McpProject
@@ -89,6 +90,14 @@ type McpServer {
     lastModifiedBy: String
     lastModifiedDate: Long
     version: Int
+}
+
+type McpTool {
+    id: ID!
+    name: String!
+    parameters: Map
+    enabled: Boolean!
+    mcpComponentId: ID!
 }
 
 type McpProject {

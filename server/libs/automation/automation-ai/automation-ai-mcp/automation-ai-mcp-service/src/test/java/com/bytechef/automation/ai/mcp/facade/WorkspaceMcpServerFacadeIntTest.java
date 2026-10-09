@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,10 +35,15 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
+import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -66,7 +72,13 @@ public class WorkspaceMcpServerFacadeIntTest {
     private WorkspaceMcpServerRepository workspaceMcpServerRepository;
 
     @Autowired
+    private McpComponentRepository mcpComponentRepository;
+
+    @Autowired
     private McpServerRepository mcpServerRepository;
+
+    @Autowired
+    private McpToolRepository mcpToolRepository;
 
     @Autowired
     private WorkspaceRepository workspaceRepository;
@@ -77,6 +89,8 @@ public class WorkspaceMcpServerFacadeIntTest {
     void setUp() {
         // Clean up before each test
         workspaceMcpServerRepository.deleteAll();
+        mcpToolRepository.deleteAll();
+        mcpComponentRepository.deleteAll();
         mcpServerRepository.deleteAll();
         workspaceRepository.deleteAll();
 
@@ -96,6 +110,8 @@ public class WorkspaceMcpServerFacadeIntTest {
     void tearDown() {
         // Clean up after each test
         workspaceMcpServerRepository.deleteAll();
+        mcpToolRepository.deleteAll();
+        mcpComponentRepository.deleteAll();
         mcpServerRepository.deleteAll();
         workspaceRepository.deleteAll();
     }
@@ -276,11 +292,62 @@ public class WorkspaceMcpServerFacadeIntTest {
         }
 
         @Test
+        void testUpdateWorkspaceMcpToolEnabledRequiresToolEditor() {
+            McpTool mcpTool = createMcpTool(PlatformType.AUTOMATION);
+
+            when(permissionEvaluator.hasPermission(any(), eq(mcpTool.getId()), eq("McpTool"), eq("MCP_EDIT")))
+                .thenReturn(false);
+
+            assertThatThrownBy(() -> workspaceMcpServerFacade.updateWorkspaceMcpToolEnabled(mcpTool.getId(), false))
+                .isInstanceOf(AccessDeniedException.class);
+
+            assertTrue(isMcpToolEnabled(mcpTool.getId()));
+        }
+
+        @Test
+        void testUpdateWorkspaceMcpToolEnabledRejectsEmbeddedMcpTool() {
+            McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED);
+
+            assertThatThrownBy(() -> workspaceMcpServerFacade.updateWorkspaceMcpToolEnabled(mcpTool.getId(), false))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("is not an automation MCP server");
+
+            assertTrue(isMcpToolEnabled(mcpTool.getId()));
+        }
+
+        @Test
+        void testUpdateWorkspaceMcpToolEnabledUpdatesAutomationMcpTool() {
+            McpTool mcpTool = createMcpTool(PlatformType.AUTOMATION);
+
+            McpTool updatedMcpTool = workspaceMcpServerFacade.updateWorkspaceMcpToolEnabled(mcpTool.getId(), false);
+
+            assertFalse(updatedMcpTool.isEnabled());
+            assertFalse(isMcpToolEnabled(mcpTool.getId()));
+        }
+
+        @Test
         void testDeleteRequiresServerEditor() {
             when(permissionEvaluator.hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"))).thenReturn(false);
 
             assertThatThrownBy(() -> workspaceMcpServerFacade.deleteWorkspaceMcpServer(3L))
                 .isInstanceOf(AccessDeniedException.class);
+        }
+
+        private McpTool createMcpTool(PlatformType platformType) {
+            McpServer mcpServer = mcpServerRepository.save(
+                new McpServer("Test Server", platformType, Environment.DEVELOPMENT));
+
+            McpComponent mcpComponent = mcpComponentRepository.save(
+                new McpComponent("testComponent", 1, mcpServer.getId(), null));
+
+            return mcpToolRepository.save(new McpTool("testTool", Map.of(), mcpComponent.getId()));
+        }
+
+        private boolean isMcpToolEnabled(long mcpToolId) {
+            McpTool mcpTool = mcpToolRepository.findById(mcpToolId)
+                .orElseThrow();
+
+            return mcpTool.isEnabled();
         }
     }
 }

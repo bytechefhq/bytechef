@@ -58,7 +58,6 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpToolId, 'McpTool', 'MCP_EDIT')")
     public void updateEnabled(long mcpToolId, boolean enabled) {
         McpTool mcpTool = OptionalUtils.get(mcpToolRepository.findById(mcpToolId));
 
