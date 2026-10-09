@@ -21,8 +21,11 @@ vi.mock('react-router-dom', () => ({
     useSearchParams: () => [new URLSearchParams(''), vi.fn()],
 }));
 
+const mockApplicationInfoState = vi.hoisted(() => ({templatesSubmissionForm: {workflows: ''}}));
+
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
-    useApplicationInfoStore: () => null,
+    useApplicationInfoStore: (selector: (state: typeof mockApplicationInfoState) => unknown) =>
+        selector(mockApplicationInfoState),
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
@@ -89,6 +92,10 @@ vi.mock('@/shared/components/workflow/WorkflowDialog', () => ({
     default: () => <div data-testid="workflow-dialog" />,
 }));
 
+vi.mock('@/pages/automation/project/components/WorkflowShareDialog', () => ({
+    WorkflowShareDialog: () => <div data-testid="workflow-share-dialog" />,
+}));
+
 vi.mock('@/shared/components/DeleteWorkflowAlertDialog', () => ({
     default: ({onClose}: {onClose: () => void}) => (
         <div data-testid="delete-workflow-dialog">
@@ -130,6 +137,8 @@ const renderProjectWorkflowListItem = () => {
 describe('ProjectWorkflowListItem', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        mockApplicationInfoState.templatesSubmissionForm.workflows = '';
     });
 
     it('should render workflow label', () => {
@@ -156,6 +165,72 @@ describe('ProjectWorkflowListItem', () => {
         const link = screen.getByRole('link');
 
         expect(link).toHaveAttribute('href', '/automation/projects/1/project-workflows/101?');
+    });
+
+    describe('menu', () => {
+        const openMenu = async () => {
+            renderProjectWorkflowListItem();
+
+            await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
+        };
+
+        it('should render with the design-system DropdownMenu', async () => {
+            await openMenu();
+
+            expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+            expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+        });
+
+        it('should open the edit dialog when Edit is clicked', async () => {
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+
+            expect(screen.getByTestId('workflow-dialog')).toBeInTheDocument();
+        });
+
+        it('should duplicate the workflow when Duplicate is clicked', async () => {
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Duplicate'}));
+
+            expect(mockDuplicateMutate).toHaveBeenCalledWith({id: 1, workflowId: 'workflow-1'});
+        });
+
+        it('should open the share dialog when Share is clicked', async () => {
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Share'}));
+
+            expect(screen.getByTestId('workflow-share-dialog')).toBeInTheDocument();
+        });
+
+        it('should not render Share with Community without a submission form', async () => {
+            await openMenu();
+
+            expect(screen.queryByRole('menuitem', {name: 'Share with Community'})).not.toBeInTheDocument();
+        });
+
+        it('should open the submission form when Share with Community is clicked', async () => {
+            mockApplicationInfoState.templatesSubmissionForm.workflows = 'https://example.com/form';
+
+            const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Share with Community'}));
+
+            expect(openSpy).toHaveBeenCalledWith('https://example.com/form', '_blank');
+
+            openSpy.mockRestore();
+        });
+
+        it('should render an Export row', async () => {
+            await openMenu();
+
+            expect(screen.getByRole('menuitem', {name: 'Export'})).toBeInTheDocument();
+        });
     });
 
     describe('delete dialog', () => {

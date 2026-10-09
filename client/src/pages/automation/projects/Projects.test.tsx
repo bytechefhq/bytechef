@@ -5,6 +5,20 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+const mockProjectsState = vi.hoisted(() => ({
+    navigate: vi.fn(),
+    projects: [] as unknown[],
+}));
+
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+
+    return {
+        ...actual,
+        useNavigate: () => mockProjectsState.navigate,
+    };
+});
+
 // Mock the necessary stores and hooks
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,7 +62,7 @@ vi.mock('@/shared/queries/automation/projects.queries', () => ({
         projects: ['projects'],
     },
     useGetWorkspaceProjectsQuery: () => ({
-        data: [],
+        data: mockProjectsState.projects,
         error: null,
         isLoading: false,
     }),
@@ -81,6 +95,10 @@ vi.mock('@/shared/mutations/automation/projects.mutations', async () => {
 
 vi.mock('@/pages/automation/project/loadProject', () => ({default: vi.fn()}));
 
+vi.mock('@/pages/automation/projects/components/project-list/ProjectList', () => ({
+    default: () => <div data-testid="project-list" />,
+}));
+
 vi.mock('sonner', () => ({toast: vi.fn()}));
 
 const createTestQueryClient = () =>
@@ -97,6 +115,8 @@ let queryClient: QueryClient;
 beforeEach(() => {
     queryClient = createTestQueryClient();
     mockImportMutate.mockClear();
+    mockProjectsState.navigate.mockClear();
+    mockProjectsState.projects = [];
 });
 
 afterEach(() => {
@@ -190,5 +210,54 @@ describe('Projects empty states', () => {
 
         expect(screen.getByText('No Matching Projects')).toBeInTheDocument();
         expect(screen.queryByText('Get started by creating a new project.')).not.toBeInTheDocument();
+    });
+});
+
+describe('Projects menus', () => {
+    const openMenu = async () => {
+        await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
+    };
+
+    describe.each([
+        ['empty state', [] as unknown[]],
+        ['header', [{id: 1, name: 'Project'}]],
+    ])('%s menu', (_name, projects) => {
+        beforeEach(() => {
+            mockProjectsState.projects = projects;
+        });
+
+        it('should render with the design-system DropdownMenu', async () => {
+            renderProjects();
+
+            await openMenu();
+
+            expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+            expect(screen.getByRole('menuitem', {name: 'From Template'})).toHaveClass('text-content-neutral-primary');
+            expect(screen.getByRole('menuitem', {name: 'Import Project'})).toBeInTheDocument();
+        });
+
+        it('should navigate to the templates when From Template is clicked', async () => {
+            renderProjects();
+
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'From Template'}));
+
+            expect(mockProjectsState.navigate).toHaveBeenCalledWith('templates');
+        });
+
+        it('should open the file picker when Import Project is clicked', async () => {
+            const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click');
+
+            renderProjects();
+
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Import Project'}));
+
+            expect(clickSpy).toHaveBeenCalled();
+
+            clickSpy.mockRestore();
+        });
     });
 });

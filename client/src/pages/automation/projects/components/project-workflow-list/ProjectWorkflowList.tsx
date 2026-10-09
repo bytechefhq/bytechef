@@ -1,7 +1,12 @@
 import Button from '@/components/Button/Button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import EmptyList from '@/components/EmptyList';
 import {ButtonGroup} from '@/components/ui/button-group';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConverterN8nToWorkflow';
@@ -191,24 +196,20 @@ const ProjectWorkflowList = ({
                                                 ></Button>
                                             </DropdownMenuTrigger>
 
-                                            <DropdownMenuContent
-                                                align="start"
-                                                alignOffset={alignOffset}
-                                                className="p-0"
-                                            >
+                                            <DropdownMenuContent align="start" alignOffset={alignOffset}>
                                                 <DropdownMenuItem
-                                                    className="dropdown-menu-item"
+                                                    icon={<LayoutTemplateIcon />}
+                                                    label="From Template"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
 
                                                         navigate(`./${project.id}/templates`);
                                                     }}
-                                                >
-                                                    <LayoutTemplateIcon /> From Template
-                                                </DropdownMenuItem>
+                                                />
 
                                                 <DropdownMenuItem
-                                                    className="dropdown-menu-item"
+                                                    icon={<UploadIcon />}
+                                                    label="Import Workflow"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
 
@@ -216,16 +217,15 @@ const ProjectWorkflowList = ({
                                                             hiddenFileInputRef.current.click();
                                                         }
                                                     }}
-                                                >
-                                                    <UploadIcon /> Import Workflow
-                                                </DropdownMenuItem>
+                                                />
 
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <span className="block">
                                                             <DropdownMenuItem
-                                                                className="dropdown-menu-item"
                                                                 disabled={importN8nWorkflowDisabled}
+                                                                icon={<UploadIcon />}
+                                                                label="Import n8n Workflow"
                                                                 onClick={(event) => {
                                                                     event.stopPropagation();
 
@@ -233,9 +233,7 @@ const ProjectWorkflowList = ({
                                                                         converterHiddenFileInputRef.current.click();
                                                                     }
                                                                 }}
-                                                            >
-                                                                <UploadIcon /> Import n8n Workflow
-                                                            </DropdownMenuItem>
+                                                            />
                                                         </span>
                                                     </TooltipTrigger>
 

@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
@@ -22,8 +22,6 @@ import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-
-import '@/shared/styles/dropdownMenu.css';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Share2Icon, Trash2Icon} from 'lucide-react';
@@ -161,66 +159,60 @@ const ProjectWorkflowListItem = ({
                         <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="p-0">
+                    <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<EditIcon />}
+                            label="Edit"
                             onClick={() => {
                                 setShowEditDialog(true);
                             }}
-                        >
-                            <EditIcon /> Edit
-                        </DropdownMenuItem>
+                        />
 
                         {project && workflow && (
                             <DropdownMenuItem
-                                className="dropdown-menu-item"
+                                icon={<CopyIcon />}
+                                label="Duplicate"
                                 onClick={() =>
                                     duplicateWorkflowMutation.mutate({
                                         id: project.id!,
                                         workflowId: workflow.id!,
                                     })
                                 }
-                            >
-                                <CopyIcon /> Duplicate
-                            </DropdownMenuItem>
+                            />
                         )}
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<Share2Icon />}
+                            label="Share"
                             onClick={() => setShowWorkflowShareDialog(true)}
-                        >
-                            <Share2Icon /> Share
-                        </DropdownMenuItem>
+                        />
 
                         {templatesSubmissionForm && (
                             <DropdownMenuItem
-                                className="dropdown-menu-item"
+                                icon={<Share2Icon />}
+                                label="Share with Community"
                                 onClick={() => window.open(templatesSubmissionForm, '_blank')}
-                            >
-                                <Share2Icon /> Share with Community
-                            </DropdownMenuItem>
+                            />
                         )}
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<DownloadIcon />}
+                            label="Export"
                             onClick={() =>
                                 (window.location.href = `/api/automation/internal/workflows/${workflow.id}/export`)
                             }
-                        >
-                            <DownloadIcon /> Export
-                        </DropdownMenuItem>
+                        />
 
-                        <DropdownMenuSeparator className="m-0" />
+                        <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item-destructive"
+                            icon={<Trash2Icon />}
+                            label="Delete"
                             onClick={() => {
                                 setShowDeleteDialog(true);
                             }}
                             variant="destructive"
-                        >
-                            <Trash2Icon /> Delete
-                        </DropdownMenuItem>
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
