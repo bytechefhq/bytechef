@@ -62,7 +62,4 @@ public interface ConnectionService {
 
     Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters);
 
-    List<Connection> getInactiveConnections(List<Long> connectionIds);
-
-    void validateConnectionsActive(List<Long> connectionIds);
 }
