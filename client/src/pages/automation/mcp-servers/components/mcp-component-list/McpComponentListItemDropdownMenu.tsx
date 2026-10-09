@@ -30,7 +30,7 @@ const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}:
 
     const handleDeleteSuccess = () => {
         queryClient.invalidateQueries({
-            queryKey: ['mcpComponentsByServerId'],
+            queryKey: [embedded ? 'embeddedMcpComponentsByServerId' : 'mcpComponentsByServerId'],
         });
         setShowDeleteDialog(false);
     };
