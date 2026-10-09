@@ -152,6 +152,8 @@ describe('WorkflowExecutionLogsContent', () => {
 
         render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" />);
 
+        expect(screen.getByTestId('json-view')).toHaveAttribute('data-collapsed', 'true');
+
         fireEvent.click(screen.getByRole('button', {name: 'Expand all'}));
 
         expect(screen.getByTestId('json-view')).toHaveAttribute('data-collapsed', 'false');

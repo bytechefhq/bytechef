@@ -237,7 +237,7 @@ const WorkflowExecutionLogsContent = ({
     toolbarContainer,
     triggerExecutionId,
 }: WorkflowExecutionLogsContentProps) => {
-    const [collapsed, setCollapsed] = useState<boolean | undefined>(undefined);
+    const [collapsed, setCollapsed] = useState(true);
     const [expansionVersion, setExpansionVersion] = useState(0);
     const [hiddenLevels, setHiddenLevels] = useState<LogLevel[]>([]);
     const [page] = useState(0);
