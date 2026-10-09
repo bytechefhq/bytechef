@@ -65,6 +65,27 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
     class McpServerTest {
 
         @Test
+        void testCreateEmbeddedMcpServerWithoutEnabled() {
+            when(embeddedMcpServerFacade.createEmbeddedMcpServer("Server", Environment.DEVELOPMENT, null))
+                .thenReturn(createMcpServer("Server"));
+
+            graphQlTester.document("""
+                mutation {
+                    createEmbeddedMcpServer(input: {name: "Server", environmentId: "0"}) {
+                        id
+                        name
+                    }
+                }
+                """)
+                .execute()
+                .path("createEmbeddedMcpServer.name")
+                .entity(String.class)
+                .isEqualTo("Server");
+
+            verify(embeddedMcpServerFacade).createEmbeddedMcpServer("Server", Environment.DEVELOPMENT, null);
+        }
+
+        @Test
         void testUpdateEmbeddedMcpServer() {
             when(embeddedMcpServerFacade.updateEmbeddedMcpServer(1L, "Renamed", false))
                 .thenReturn(createMcpServer("Renamed"));
