@@ -2915,6 +2915,28 @@ describe('getElkLayoutElements with cluster roots', () => {
         expect(positionOf(result.nodes, 'task2').y - rootBottom).toBe(CHAIN_GAP);
     });
 
+    it('keeps the chain handle column straight through a configured read-only root', async () => {
+        const nodes: Node[] = [
+            {...taskNode('task1'), type: 'readonly'},
+            {...clusterRootNode('aiAgent_1', true), type: 'readonly'},
+            {...taskNode('task2'), type: 'readonly'},
+        ];
+
+        const edges: Edge[] = [edge('task1', 'aiAgent_1'), edge('aiAgent_1', 'task2')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1000, direction: 'TB', edges, nodes});
+
+        const taskHandleX = positionOf(result.nodes, 'task1').x + 36;
+
+        expect(positionOf(result.nodes, 'aiAgent_1').x + 120).toBe(taskHandleX);
+        expect(positionOf(result.nodes, 'task2').x + 36).toBe(taskHandleX);
+
+        const rootTop = positionOf(result.nodes, 'aiAgent_1').y;
+
+        expect(rootTop - (positionOf(result.nodes, 'task1').y + 72)).toBe(CHAIN_GAP);
+        expect(positionOf(result.nodes, 'task2').y - (rootTop + 100)).toBe(CHAIN_GAP);
+    });
+
     it('treats an unconfigured root exactly like a plain task node', async () => {
         const nodes: Node[] = [taskNode('task1'), clusterRootNode('aiAgent_1', false), taskNode('task2')];
 

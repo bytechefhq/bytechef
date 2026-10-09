@@ -25,8 +25,8 @@ import {
 import {
     CHAIN_CENTERING_MAX_SLACK,
     applySavedPositions,
-    hasConfiguredClusterElements,
     isNodePositioned,
+    rendersClusterElements,
 } from './postDagreConstraints';
 import {toWorkflowNodeNamePrefix} from './workflowNodeNameUtils';
 
@@ -407,7 +407,7 @@ function getElkNodeSize(node: Node, direction: LayoutDirectionType): {height: nu
         // DOM box is 28px tall but 72px wide (mx-[22px] margins around the "+"),
         // so the main-axis footprint differs by direction
         mainAxisSize = direction === 'TB' ? PLACEHOLDER_NODE_HEIGHT : NODE_ANCHOR_SIZE;
-    } else if (node.type === 'clusterRoot') {
+    } else if (rendersClusterElements(node)) {
         // A configured cluster root's rendered box exceeds the 72px anchor
         // (icon row inside the button), so its footprint keeps the same 14px
         // slack per side that gives anchors the 80px node→node read
@@ -793,7 +793,7 @@ function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {heigh
     // axis with no dagre-style −85/−23 compensation. Unconfigured roots render
     // the plain 72px icon box. LR cross stays the 72px anchor band (dagre's
     // −23 offset shows LR chain alignment targets the icon band).
-    if (node.type === 'clusterRoot' && hasConfiguredClusterElements(node)) {
+    if (rendersClusterElements(node)) {
         if (direction === 'LR') {
             return {height: NODE_ANCHOR_SIZE, width: CLUSTER_ROOT_RENDERED_MAIN_SIZE};
         }
