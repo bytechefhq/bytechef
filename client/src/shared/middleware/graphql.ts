@@ -634,6 +634,14 @@ export type UpdateWorkspaceApiKeyMutationVariables = Exact<{
 
 export type UpdateWorkspaceApiKeyMutation = { updateWorkspaceApiKey: boolean };
 
+export type UpdateWorkspaceMcpToolEnabledMutationVariables = Exact<{
+  id: string | number;
+  enabled: boolean;
+}>;
+
+
+export type UpdateWorkspaceMcpToolEnabledMutation = { updateWorkspaceMcpToolEnabled: { id: string, enabled: boolean } | null };
+
 export type WorkflowChatProjectDeploymentWorkflowQueryVariables = Exact<{
   id: string;
 }>;
@@ -1861,14 +1869,6 @@ export type UpdateMcpToolMutationVariables = Exact<{
 
 
 export type UpdateMcpToolMutation = { updateMcpTool: { id: string, name: string, mcpComponentId: string, parameters: any, version: number | null } | null };
-
-export type UpdateMcpToolEnabledMutationVariables = Exact<{
-  id: string | number;
-  enabled: boolean;
-}>;
-
-
-export type UpdateMcpToolEnabledMutation = { updateMcpToolEnabled: { id: string, enabled: boolean } | null };
 
 export type ValidateWorkflowQueryVariables = Exact<{
   workflowDefinition: string;
@@ -4284,6 +4284,28 @@ export const useUpdateWorkspaceApiKeyMutation = <
       {
     mutationKey: ['updateWorkspaceApiKey'],
     mutationFn: (variables?: UpdateWorkspaceApiKeyMutationVariables) => fetcher<UpdateWorkspaceApiKeyMutation, UpdateWorkspaceApiKeyMutationVariables>(UpdateWorkspaceApiKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceMcpToolEnabledDocument = new TypedDocumentString(`
+    mutation updateWorkspaceMcpToolEnabled($id: ID!, $enabled: Boolean!) {
+  updateWorkspaceMcpToolEnabled(id: $id, enabled: $enabled) {
+    id
+    enabled
+  }
+}
+    `);
+
+export const useUpdateWorkspaceMcpToolEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceMcpToolEnabledMutation, TError, UpdateWorkspaceMcpToolEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceMcpToolEnabledMutation, TError, UpdateWorkspaceMcpToolEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWorkspaceMcpToolEnabled'],
+    mutationFn: (variables?: UpdateWorkspaceMcpToolEnabledMutationVariables) => fetcher<UpdateWorkspaceMcpToolEnabledMutation, UpdateWorkspaceMcpToolEnabledMutationVariables>(UpdateWorkspaceMcpToolEnabledDocument, variables)(),
     ...options
   }
     )};
@@ -8982,28 +9004,6 @@ export const useUpdateMcpToolMutation = <
       {
     mutationKey: ['updateMcpTool'],
     mutationFn: (variables?: UpdateMcpToolMutationVariables) => fetcher<UpdateMcpToolMutation, UpdateMcpToolMutationVariables>(UpdateMcpToolDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpdateMcpToolEnabledDocument = new TypedDocumentString(`
-    mutation updateMcpToolEnabled($id: ID!, $enabled: Boolean!) {
-  updateMcpToolEnabled(id: $id, enabled: $enabled) {
-    id
-    enabled
-  }
-}
-    `);
-
-export const useUpdateMcpToolEnabledMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>(
-      {
-    mutationKey: ['updateMcpToolEnabled'],
-    mutationFn: (variables?: UpdateMcpToolEnabledMutationVariables) => fetcher<UpdateMcpToolEnabledMutation, UpdateMcpToolEnabledMutationVariables>(UpdateMcpToolEnabledDocument, variables)(),
     ...options
   }
     )};
