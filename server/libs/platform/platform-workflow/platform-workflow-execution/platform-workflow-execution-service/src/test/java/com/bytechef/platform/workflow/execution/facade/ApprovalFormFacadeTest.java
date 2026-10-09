@@ -33,11 +33,17 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.transaction.support.SimpleTransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionOperations;
 
 /**
  * @author Ivica Cardic
@@ -47,13 +53,37 @@ class ApprovalFormFacadeTest {
 
     private static final long JOB_ID = 42L;
     private static final long TASK_EXECUTION_ID = 7L;
+    private static final String TENANT_ID = "000001";
+
+    private final List<String> transactionTenantIds = new ArrayList<>();
+
+    private final TransactionOperations transactionOperations = new TransactionOperations() {
+
+        @Override
+        public <T> T execute(TransactionCallback<T> transactionCallback) {
+            transactionTenantIds.add(TenantContext.getCurrentTenantId());
+
+            return transactionCallback.doInTransaction(new SimpleTransactionStatus());
+        }
+    };
 
     private final JobService jobService = mock(JobService.class);
     private final TaskExecution taskExecution = mock(TaskExecution.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     private final TaskStateService taskStateService = mock(TaskStateService.class);
     private final ApprovalFormFacade approvalFormFacade = new ApprovalFormFacadeImpl(
-        jobService, taskExecutionService, taskStateService);
+        jobService, taskExecutionService, taskStateService, transactionOperations);
+
+    @Test
+    void testGetApprovalFormOpensItsTransactionUnderTheTenantOfTheResumeId() {
+        JobResumeId jobResumeId = TenantContext.callWithTenantId(TENANT_ID, () -> JobResumeId.of(JOB_ID));
+
+        when(jobService.getJob(JOB_ID)).thenReturn(mock(Job.class));
+
+        assertThatThrownBy(() -> approvalFormFacade.getApprovalForm(jobResumeId.toString()));
+
+        assertThat(transactionTenantIds).containsExactly(TENANT_ID);
+    }
 
     @Test
     void testGetApprovalFormRejectsAResumeIdThatDoesNotMatch() {
