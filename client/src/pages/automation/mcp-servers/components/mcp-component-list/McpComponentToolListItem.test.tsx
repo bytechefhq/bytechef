@@ -7,13 +7,13 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import McpComponentToolListItem from './McpComponentToolListItem';
 
-const {deleteDialogState, dropdownMenuHookMock, mutateMock, setShowDeleteDialogMock, sharedMutateMock} = vi.hoisted(
+const {deleteDialogState, dropdownMenuHookMock, mutateMock, setShowDeleteDialogMock, workspaceMutateMock} = vi.hoisted(
     () => ({
         deleteDialogState: {showDeleteDialog: false},
         dropdownMenuHookMock: vi.fn(),
         mutateMock: vi.fn(),
         setShowDeleteDialogMock: vi.fn(),
-        sharedMutateMock: vi.fn(),
+        workspaceMutateMock: vi.fn(),
     })
 );
 
@@ -41,7 +41,7 @@ vi.mock('@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopov
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useUpdateEmbeddedMcpToolEnabledMutation: () => ({mutate: mutateMock}),
-    useUpdateMcpToolEnabledMutation: () => ({mutate: sharedMutateMock}),
+    useUpdateWorkspaceMcpToolEnabledMutation: () => ({mutate: workspaceMutateMock}),
 }));
 
 const mcpTool = {enabled: true, id: '42', name: 'createOpportunity', title: 'Create Opportunity'} as McpTool;
@@ -222,7 +222,7 @@ describe('McpComponentToolListItem', () => {
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['embeddedMcpComponentsByServerId']});
     });
 
-    it('disables an automation tool through the shared enabled switch', () => {
+    it('disables an automation tool through the workspace MCP tool operation', () => {
         mutateMock.mockClear();
 
         const queryClient = new QueryClient();
@@ -245,13 +245,13 @@ describe('McpComponentToolListItem', () => {
 
         fireEvent.click(screen.getByRole('switch'));
 
-        expect(sharedMutateMock).toHaveBeenCalledWith(
+        expect(workspaceMutateMock).toHaveBeenCalledWith(
             {enabled: false, id: '42'},
             expect.objectContaining({onSettled: expect.any(Function), onSuccess: expect.any(Function)})
         );
         expect(mutateMock).not.toHaveBeenCalled();
 
-        const mutateOptions = sharedMutateMock.mock.calls[0][1];
+        const mutateOptions = workspaceMutateMock.mock.calls[0][1];
 
         mutateOptions.onSuccess();
 

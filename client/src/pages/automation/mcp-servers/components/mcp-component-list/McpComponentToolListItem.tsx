@@ -7,7 +7,7 @@ import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/cont
 import {
     McpTool,
     useUpdateEmbeddedMcpToolEnabledMutation,
-    useUpdateMcpToolEnabledMutation,
+    useUpdateWorkspaceMcpToolEnabledMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {BoltIcon, Trash2Icon} from 'lucide-react';
@@ -49,7 +49,7 @@ const McpComponentToolListItem = ({
     const queryClient = useQueryClient();
 
     const updateEmbeddedMcpToolEnabledMutation = useUpdateEmbeddedMcpToolEnabledMutation();
-    const updateMcpToolEnabledMutation = useUpdateMcpToolEnabledMutation();
+    const updateWorkspaceMcpToolEnabledMutation = useUpdateWorkspaceMcpToolEnabledMutation();
 
     const popoverId = `component-tool-${mcpTool.id}`;
     const toolLabel = mcpTool.title || mcpTool.name;
@@ -77,7 +77,7 @@ const McpComponentToolListItem = ({
         if (embedded) {
             updateEmbeddedMcpToolEnabledMutation.mutate({enabled: value, id: mcpTool.id}, mutateOptions);
         } else {
-            updateMcpToolEnabledMutation.mutate({enabled: value, id: mcpTool.id}, mutateOptions);
+            updateWorkspaceMcpToolEnabledMutation.mutate({enabled: value, id: mcpTool.id}, mutateOptions);
         }
     };
 
