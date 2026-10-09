@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.aws.session.util;
+package com.bytechef.component.ai.agent.chat.memory.aws.util;
 
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.ACCESS_KEY_ID;
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.BUCKET;
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.KEY_PREFIX;
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.REGION;
-import static com.bytechef.component.ai.agent.chat.memory.aws.session.constant.AwsSessionChatMemoryConstants.SECRET_ACCESS_KEY;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.ACCESS_KEY_ID;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.BUCKET;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.KEY_PREFIX;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.REGION;
+import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.SECRET_ACCESS_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -96,7 +96,7 @@ class AwsSessionChatMemoryUtilsTest {
 
         GetObjectRequest getObjectRequest = getObjectRequestCaptor.getValue();
 
-        assertThat(getObjectRequest.key()).startsWith("spring-ai-session/");
+        assertThat(getObjectRequest.key()).isEqualTo("session/session-1.json");
     }
 
     @Test
@@ -118,7 +118,7 @@ class AwsSessionChatMemoryUtilsTest {
 
         GetObjectRequest getObjectRequest = getObjectRequestCaptor.getValue();
 
-        assertThat(getObjectRequest.key()).startsWith("memory/");
+        assertThat(getObjectRequest.key()).isEqualTo("memory/session/session-1.json");
     }
 
     @Test
@@ -182,5 +182,16 @@ class AwsSessionChatMemoryUtilsTest {
         tasks.clear();
 
         pendingTasks.forEach(Runnable::run);
+    }
+
+    @Test
+    void testSessionDocumentsLiveUnderTheSessionSubPrefixOfTheConnectionKeyPrefix() {
+        assertThat(
+            AwsSessionChatMemoryUtils.getSessionKeyPrefix(MockParametersFactory.create(Map.of("bucket", "memory"))))
+                .isEqualTo("session/");
+        assertThat(
+            AwsSessionChatMemoryUtils.getSessionKeyPrefix(
+                MockParametersFactory.create(Map.of("bucket", "memory", "keyPrefix", "acme/"))))
+                    .isEqualTo("acme/session/");
     }
 }
