@@ -79,6 +79,8 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
                 throw new BadCredentialsException("Token subject does not match the external user in the request path");
             }
 
+            verifyEnvironmentClaim(payload, environment);
+
             JwsHeader header = jws.getHeader();
 
             TenantKey tenantKey = TenantKey.parse(header.getKeyId());
@@ -128,6 +130,20 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
         }
 
         return pathExternalUserId;
+    }
+
+    private static void verifyEnvironmentClaim(Claims payload, Environment environment) {
+        if (!payload.containsKey(JwtTokenService.ENVIRONMENT_ID_CLAIM)) {
+            return;
+        }
+
+        Object environmentIdClaim = payload.get(JwtTokenService.ENVIRONMENT_ID_CLAIM);
+
+        if (!(environmentIdClaim instanceof Number environmentId) ||
+            environmentId.longValue() != environment.ordinal()) {
+
+            throw new BadCredentialsException("Token environment does not match the request environment");
+        }
     }
 
     private Jws<Claims> getJws(String secretKey, long environmentId) {
