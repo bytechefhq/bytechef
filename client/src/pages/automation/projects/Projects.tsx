@@ -1,9 +1,14 @@
 import Button from '@/components/Button/Button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {ButtonGroup} from '@/components/ui/button-group';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
 import loadProject from '@/pages/automation/project/loadProject';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
@@ -145,15 +150,17 @@ const Projects = () => {
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={() => navigate(`templates`)}>
-                                            <LayoutTemplateIcon className="mr-2 size-4" />
-                                            From Template
-                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            icon={<LayoutTemplateIcon />}
+                                            label="From Template"
+                                            onClick={() => navigate(`templates`)}
+                                        />
 
-                                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                            <UploadIcon className="mr-2 size-4" />
-                                            Import Project
-                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            icon={<UploadIcon />}
+                                            label="Import Project"
+                                            onClick={() => fileInputRef.current?.click()}
+                                        />
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
@@ -211,14 +218,17 @@ const Projects = () => {
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="start" alignOffset={alignOffset}>
-                                        <DropdownMenuItem onClick={() => navigate(`templates`)}>
-                                            <LayoutTemplateIcon className="mr-2 size-4" />
-                                            From Template
-                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            icon={<LayoutTemplateIcon />}
+                                            label="From Template"
+                                            onClick={() => navigate(`templates`)}
+                                        />
 
-                                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                            <UploadIcon className="mr-2 size-4" /> Import Project
-                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            icon={<UploadIcon />}
+                                            label="Import Project"
+                                            onClick={() => fileInputRef.current?.click()}
+                                        />
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
