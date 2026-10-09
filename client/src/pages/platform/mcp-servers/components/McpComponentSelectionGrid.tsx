@@ -47,6 +47,18 @@ const McpComponentSelectionGrid = <T extends McpSelectableComponentI>({
                 <div className="col-span-full flex min-h-96 items-center justify-center">
                     <LoadingIcon className="size-6" />
                 </div>
+            ) : components.length === 0 ? (
+                <div className="col-span-full flex min-h-96 flex-col items-center justify-center gap-2 text-center">
+                    <PackageIcon className="size-10 text-muted-foreground" />
+
+                    <p className="text-sm font-medium">No components found</p>
+
+                    <p className="text-sm text-muted-foreground">
+                        {searchTerm
+                            ? `No components match "${searchTerm}". Try a different search term.`
+                            : 'There are no components with tools available.'}
+                    </p>
+                </div>
             ) : (
                 components.map((component) => (
                     <Card
