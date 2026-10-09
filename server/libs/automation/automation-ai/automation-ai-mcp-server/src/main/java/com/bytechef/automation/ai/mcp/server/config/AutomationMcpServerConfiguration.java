@@ -188,6 +188,10 @@ public class AutomationMcpServerConfiguration {
 
         McpServer mcpServer = mcpServerService.getMcpServer(secretKey);
 
+        if (!mcpServer.isEnabled()) {
+            return List.of();
+        }
+
         List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
 
         authorizedComponents(
