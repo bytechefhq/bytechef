@@ -158,6 +158,52 @@ describe('useKnowledgeBaseDocumentListItem', () => {
 
             expect(typeof result.current.handleDocumentListItemClick).toBe('function');
         });
+
+        it('ignores clicks that come from a portaled menu', () => {
+            const {result} = renderHook(() =>
+                useKnowledgeBaseDocumentListItem({document: createMockDocument() as never})
+            );
+
+            const triggerClick = vi.fn();
+
+            result.current.chunksCollapsibleTriggerRef.current = {
+                click: triggerClick,
+                contains: () => false,
+            } as unknown as HTMLButtonElement;
+
+            const menu = document.createElement('div');
+
+            menu.setAttribute('role', 'menu');
+
+            const menuItem = document.createElement('div');
+
+            menu.appendChild(menuItem);
+
+            result.current.handleDocumentListItemClick({
+                target: menuItem,
+            } as unknown as React.MouseEvent<HTMLDivElement>);
+
+            expect(triggerClick).not.toHaveBeenCalled();
+        });
+
+        it('toggles the chunks collapsible when a non-interactive area is clicked', () => {
+            const {result} = renderHook(() =>
+                useKnowledgeBaseDocumentListItem({document: createMockDocument() as never})
+            );
+
+            const triggerClick = vi.fn();
+
+            result.current.chunksCollapsibleTriggerRef.current = {
+                click: triggerClick,
+                contains: () => false,
+            } as unknown as HTMLButtonElement;
+
+            result.current.handleDocumentListItemClick({
+                target: document.createElement('div'),
+            } as unknown as React.MouseEvent<HTMLDivElement>);
+
+            expect(triggerClick).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe('handleDocumentListItemKeyDown', () => {

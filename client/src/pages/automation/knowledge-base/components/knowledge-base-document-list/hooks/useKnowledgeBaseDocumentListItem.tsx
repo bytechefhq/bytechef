@@ -49,7 +49,7 @@ export default function useKnowledgeBaseDocumentListItem({document}: UseKnowledg
 
         const interactiveSelectors = [
             '[data-interactive]',
-            '.dropdown-menu-item',
+            '[role="menu"]',
             '[data-radix-dropdown-menu-item]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
