@@ -36,6 +36,7 @@ import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.util.SchemaUtils;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -681,6 +682,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
         @SuppressWarnings("PMD.LogVariableNameWithPrivateStaticFinalModifiers")
         private final org.slf4j.Logger log;
         private final long taskExecutionId;
+        private final String tenantId;
         private final @Nullable Long triggerExecutionId;
 
         public LogImpl(
@@ -697,6 +699,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
                 "com.bytechef.component." + componentName +
                     (componentOperationName == null ? "" : "." + componentOperationName));
             this.taskExecutionId = taskExecutionId;
+            this.tenantId = TenantContext.getCurrentTenantId();
             this.triggerExecutionId = triggerExecutionId;
         }
 
@@ -857,7 +860,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
             }
 
             if (!logEntriesToStore.isEmpty()) {
-                logFileStorageWriter.storeLogEntries(getStorageJobId(), getStorageTaskExecutionId(), logEntriesToStore);
+                storeLogEntries(logFileStorageWriter, logEntriesToStore);
             }
 
             logFileStorageWriter.awaitPendingWrites(getStorageJobId(), getStorageTaskExecutionId());
@@ -912,8 +915,15 @@ class ContextImpl implements Context, LogEntryBufferAware {
             }
 
             if (logEntriesToStore != null) {
-                logFileStorageWriter.storeLogEntries(getStorageJobId(), getStorageTaskExecutionId(), logEntriesToStore);
+                storeLogEntries(logFileStorageWriter, logEntriesToStore);
             }
+        }
+
+        private void storeLogEntries(LogFileStorageWriter logFileStorageWriter, List<LogEntry> logEntriesToStore) {
+            TenantContext.runWithTenantId(
+                tenantId,
+                () -> logFileStorageWriter.storeLogEntries(
+                    getStorageJobId(), getStorageTaskExecutionId(), logEntriesToStore));
         }
     }
 

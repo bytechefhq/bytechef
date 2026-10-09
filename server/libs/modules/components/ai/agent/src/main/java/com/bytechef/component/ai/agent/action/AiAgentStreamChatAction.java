@@ -157,6 +157,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
             toolExecutionLogEntry.put("confidence", toolExecutionEvent.confidence());
             toolExecutionLogEntry.put("inputs", toolExecutionEvent.inputs());
+            toolExecutionLogEntry.put("output", toolExecutionEvent.output());
             toolExecutionLogEntry.put("reasoning", toolExecutionEvent.reasoning());
             toolExecutionLogEntry.put("toolName", toolExecutionEvent.toolName());
 
@@ -194,6 +195,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             effectivePublisher.subscribe(
                 new Flow.Subscriber<Object>() {
 
+                    private final StringBuilder responseTextBuilder = new StringBuilder();
                     private Flow.@Nullable Subscription subscription;
 
                     @Override
@@ -207,6 +209,10 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
                     @Override
                     public void onNext(Object item) {
+                        if (item instanceof String text) {
+                            responseTextBuilder.append(text);
+                        }
+
                         try {
                             emitter.send(item);
                         } catch (Exception exception) {
@@ -231,6 +237,12 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
                     @Override
                     public void onComplete() {
+                        if (!responseTextBuilder.isEmpty()) {
+                            String responseText = responseTextBuilder.toString();
+
+                            context.log(log -> log.info("AI agent response: {}", responseText));
+                        }
+
                         emitter.complete();
                     }
                 });

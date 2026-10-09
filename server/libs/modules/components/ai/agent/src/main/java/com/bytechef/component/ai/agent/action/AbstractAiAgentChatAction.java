@@ -67,6 +67,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -233,7 +234,7 @@ public abstract class AbstractAiAgentChatAction {
         return new IllegalStateException(message, cause);
     }
 
-    private static ToolCallback createObservableToolCallback(
+    static ToolCallback createObservableToolCallback(
         ToolCallback delegate, AtomicReference<@Nullable AgentThinking> thinkingReference,
         ToolExecutionListener toolExecutionListener, ActionContext context) {
 
@@ -272,7 +273,17 @@ public abstract class AbstractAiAgentChatAction {
                     inputs = Map.of("rawInput", toolInput);
                 }
 
-                String result = execution.get();
+                String result;
+
+                try {
+                    result = execution.get();
+                } catch (RuntimeException exception) {
+                    if (!isToolSuspensionFailure(exception)) {
+                        logToolFailure(toolDefinition.name(), inputs, exception, context);
+                    }
+
+                    throw exception;
+                }
 
                 AgentThinking agentThinking = thinkingReference.getAndSet(null);
 
@@ -687,6 +698,32 @@ public abstract class AbstractAiAgentChatAction {
                 return propagateToolSuspensionFailure(() -> delegate.call(toolInput, toolContext));
             }
         };
+    }
+
+    private static boolean isToolSuspensionFailure(Throwable throwable) {
+        Throwable cause = throwable;
+
+        while (cause != null) {
+            if (cause instanceof ToolSuspensionException) {
+                return true;
+            }
+
+            cause = cause.getCause();
+        }
+
+        return false;
+    }
+
+    private static void logToolFailure(
+        String toolName, Map<String, Object> inputs, RuntimeException exception, ActionContext context) {
+
+        Map<String, @Nullable Object> toolFailureLogEntry = new LinkedHashMap<>();
+
+        toolFailureLogEntry.put("error", exception.getMessage());
+        toolFailureLogEntry.put("inputs", inputs);
+        toolFailureLogEntry.put("toolName", toolName);
+
+        context.log(log -> log.error(JsonUtils.write(toolFailureLogEntry), exception));
     }
 
     private static String propagateToolSuspensionFailure(Supplier<String> toolCall) {
