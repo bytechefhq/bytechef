@@ -26,6 +26,7 @@ import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseD
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseLoadAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseSearchAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseUpdateAction;
+import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseLoadTool;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseSearchTool;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseUpdateTool;
 import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore;
@@ -112,6 +113,9 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
                             knowledgeBaseService))
                     .clusterElements(
+                        KnowledgeBaseLoadTool.of(
+                            vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
+                            knowledgeBaseFileStorage, knowledgeBaseService),
                         KnowledgeBaseSearchTool.of(
                             vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
                         KnowledgeBaseUpdateTool.of(
