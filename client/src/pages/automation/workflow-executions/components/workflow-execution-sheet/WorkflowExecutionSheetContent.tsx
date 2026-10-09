@@ -16,7 +16,7 @@ import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/mid
 import {useGetWorkflowExecutionTaskExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {TabValueType} from '@/shared/types';
 import {WorkflowIcon} from 'lucide-react';
-import {useCallback, useMemo} from 'react';
+import {ReactNode, useCallback, useMemo} from 'react';
 
 interface WorkflowExecutionSheetContentProps {
     activeTab: TabValueType;
@@ -25,6 +25,7 @@ interface WorkflowExecutionSheetContentProps {
     handleBreadcrumbNavigate: (index: number) => void;
     handleSeeExecutions: (childJob: Job) => void;
     handleTaskClick: (taskExecution: TaskExecution | TriggerExecution) => void;
+    headerActions?: ReactNode;
     isTriggerExecution: boolean;
     job?: Job;
     jobFailedWithNoExecutions: boolean;
@@ -46,6 +47,7 @@ const WorkflowExecutionSheetContent = ({
     handleBreadcrumbNavigate,
     handleSeeExecutions,
     handleTaskClick,
+    headerActions,
     isTriggerExecution,
     job,
     jobFailedWithNoExecutions,
@@ -89,7 +91,7 @@ const WorkflowExecutionSheetContent = ({
 
     return (
         <div className="flex size-full flex-col">
-            <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
+            <WorkflowExecutionsHeader actions={headerActions} job={job} triggerExecution={triggerExecution} />
 
             {jobFailedWithNoExecutions ? (
                 <div className="flex-1 p-4">

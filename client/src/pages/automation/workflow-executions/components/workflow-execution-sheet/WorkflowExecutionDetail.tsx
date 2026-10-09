@@ -1,7 +1,11 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {PanelRightCloseIcon, PanelRightOpenIcon} from 'lucide-react';
+import {useState} from 'react';
 
 import WorkflowExecutionSheetContent from './WorkflowExecutionSheetContent';
 import WorkflowExecutionSheetWorkflowPanel from './WorkflowExecutionSheetWorkflowPanel';
@@ -13,6 +17,8 @@ interface WorkflowExecutionDetailProps {
 }
 
 const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: WorkflowExecutionDetailProps) => {
+    const [workflowPanelVisible, setWorkflowPanelVisible] = useState(true);
+
     const {
         activeTab,
         deepestFailedExecution,
@@ -59,6 +65,25 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                             handleBreadcrumbNavigate={handleBreadcrumbNavigate}
                             handleSeeExecutions={handleSeeExecutions}
                             handleTaskClick={handleTaskClick}
+                            headerActions={
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            aria-label={workflowPanelVisible ? 'Hide workflow' : 'Show workflow'}
+                                            icon={
+                                                workflowPanelVisible ? <PanelRightCloseIcon /> : <PanelRightOpenIcon />
+                                            }
+                                            onClick={() => setWorkflowPanelVisible(!workflowPanelVisible)}
+                                            size="iconSm"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>
+                                        {workflowPanelVisible ? 'Hide workflow' : 'Show workflow'}
+                                    </TooltipContent>
+                                </Tooltip>
+                            }
                             isTriggerExecution={isTriggerExecution}
                             job={job}
                             jobFailedWithNoExecutions={jobFailedWithNoExecutions}
@@ -75,21 +100,25 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                     )}
                 </ResizablePanel>
 
-                <ResizableHandle className="w-1.5 bg-transparent" />
+                {workflowPanelVisible && (
+                    <>
+                        <ResizableHandle className="w-1.5 bg-transparent" />
 
-                <ResizablePanel
-                    className="flex min-h-0 flex-col overflow-hidden rounded-lg"
-                    defaultSize={35}
-                    minSize={15}
-                >
-                    {workflowExecution && (
-                        <WorkflowReadOnlyProvider
-                            value={{useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery}}
+                        <ResizablePanel
+                            className="flex min-h-0 flex-col overflow-hidden rounded-lg"
+                            defaultSize={35}
+                            minSize={15}
                         >
-                            <WorkflowExecutionSheetWorkflowPanel workflowExecution={workflowExecution} />
-                        </WorkflowReadOnlyProvider>
-                    )}
-                </ResizablePanel>
+                            {workflowExecution && (
+                                <WorkflowReadOnlyProvider
+                                    value={{useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery}}
+                                >
+                                    <WorkflowExecutionSheetWorkflowPanel workflowExecution={workflowExecution} />
+                                </WorkflowReadOnlyProvider>
+                            )}
+                        </ResizablePanel>
+                    </>
+                )}
             </ResizablePanelGroup>
         </div>
     );
