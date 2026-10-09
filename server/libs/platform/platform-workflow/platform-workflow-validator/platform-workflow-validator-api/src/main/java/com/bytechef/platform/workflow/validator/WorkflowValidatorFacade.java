@@ -98,6 +98,8 @@ public interface WorkflowValidatorFacade {
      */
     List<String> getInvalidInputNames(String workflow);
 
+    List<String> getReservedNodeNames(String workflow);
+
     /**
      * Save-time guard that rejects a workflow whose input names the expression evaluator cannot resolve. Delegates to
      * {@link #getInvalidInputNames(String)} so the guard and the editor's inline validation agree on what counts as a
@@ -201,40 +203,7 @@ public interface WorkflowValidatorFacade {
         return reservedInputNames;
     }
 
-    private List<String> getReservedNodeNames(String workflow) {
-        List<String> reservedNodeNames = new ArrayList<>();
-
-        try {
-            JsonNode workflowJsonNode = readWorkflowTree(workflow);
-
-            collectReservedNodeNames(workflowJsonNode.get("triggers"), reservedNodeNames);
-            collectReservedNodeNames(workflowJsonNode.get("tasks"), reservedNodeNames);
-        } catch (Exception e) {
-            return List.of();
-        }
-
-        return reservedNodeNames;
-    }
-
-    private static void collectReservedNodeNames(JsonNode nodesJsonNode, List<String> reservedNodeNames) {
-        if (nodesJsonNode == null || !nodesJsonNode.isArray()) {
-            return;
-        }
-
-        for (JsonNode nodeJsonNode : nodesJsonNode) {
-            if (!nodeJsonNode.isObject()) {
-                continue;
-            }
-
-            JsonNode nameJsonNode = nodeJsonNode.get("name");
-
-            if (nameJsonNode != null && nameJsonNode.isString() && isReservedName(nameJsonNode.asString())) {
-                reservedNodeNames.add(nameJsonNode.asString());
-            }
-        }
-    }
-
-    private static boolean isReservedName(String name) {
+    static boolean isReservedName(String name) {
         return name.startsWith("__") || name.equals(JobInputConstants.VARIABLES_INPUT);
     }
 

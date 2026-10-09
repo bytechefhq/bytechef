@@ -29,6 +29,7 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Marko Kriskovic
@@ -698,6 +699,42 @@ public class WorkflowValidator {
             }
         }
 
+        collectTriggerAndTaskNames(workflowJsonNode, nodeNames);
+
+        Set<String> seenNames = new HashSet<>();
+        Set<String> duplicateNames = new LinkedHashSet<>();
+
+        for (String nodeName : nodeNames) {
+            if (!seenNames.add(nodeName)) {
+                duplicateNames.add(nodeName);
+            }
+        }
+
+        return new ArrayList<>(duplicateNames);
+    }
+
+    public static List<String> getReservedNodeNames(String workflow) {
+        try {
+            JsonMapper jsonMapper = JsonMapper.builder()
+                .build();
+
+            return getReservedNodeNames(jsonMapper.readTree(workflow));
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    static List<String> getReservedNodeNames(JsonNode workflowJsonNode) {
+        List<String> nodeNames = new ArrayList<>();
+
+        collectTriggerAndTaskNames(workflowJsonNode, nodeNames);
+
+        return nodeNames.stream()
+            .filter(WorkflowValidatorFacade::isReservedName)
+            .toList();
+    }
+
+    private static void collectTriggerAndTaskNames(JsonNode workflowJsonNode, List<String> nodeNames) {
         JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
 
         if (triggersJsonNode != null && triggersJsonNode.isArray()) {
@@ -711,17 +748,6 @@ public class WorkflowValidator {
         if (tasksJsonNode != null && tasksJsonNode.isArray()) {
             collectTaskNames(tasksJsonNode, nodeNames);
         }
-
-        Set<String> seenNames = new HashSet<>();
-        Set<String> duplicateNames = new LinkedHashSet<>();
-
-        for (String nodeName : nodeNames) {
-            if (!seenNames.add(nodeName)) {
-                duplicateNames.add(nodeName);
-            }
-        }
-
-        return new ArrayList<>(duplicateNames);
     }
 
     /**

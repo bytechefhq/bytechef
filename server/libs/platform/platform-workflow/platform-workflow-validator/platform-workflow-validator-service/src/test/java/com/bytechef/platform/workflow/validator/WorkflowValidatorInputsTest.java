@@ -743,6 +743,11 @@ class WorkflowValidatorInputsTest {
             public List<String> getInvalidInputNames(String workflow) {
                 return WorkflowValidator.getInvalidInputNames(workflow);
             }
+
+            @Override
+            public List<String> getReservedNodeNames(String workflow) {
+                return List.of();
+            }
         };
     }
 
