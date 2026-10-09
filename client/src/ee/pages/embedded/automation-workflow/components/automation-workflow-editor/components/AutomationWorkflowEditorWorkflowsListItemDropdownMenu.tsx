@@ -1,4 +1,4 @@
-import {DropdownMenuItem} from '@/components/ui/dropdown-menu';
+import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import AutomationWorkflowDialog, {
     AutomationWorkflowFormValuesI,
 } from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-dialog/AutomationWorkflowDialog';
@@ -9,8 +9,6 @@ import {
     useDuplicateAutomationWorkflowProjectWorkflowMutation,
     useUpdateAutomationWorkflowProjectWorkflowMutation,
 } from '@/shared/middleware/graphql';
-
-import '@/shared/styles/dropdownMenu.css';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -112,9 +110,7 @@ const AutomationWorkflowEditorWorkflowsListItemDropdownMenu = ({
             onEditClick={() => setShowEditWorkflowDialog(true)}
             workflowLabel={workflow.label ?? workflow.workflowUuid}
         >
-            <DropdownMenuItem className="dropdown-menu-item" onClick={handleDuplicateWorkflowClick}>
-                <CopyIcon /> Duplicate
-            </DropdownMenuItem>
+            <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onClick={handleDuplicateWorkflowClick} />
         </WorkflowListItemDropdownMenu>
     );
 };

@@ -1,4 +1,4 @@
-import {DropdownMenuItem} from '@/components/ui/dropdown-menu';
+import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowListItemDropdownMenu from '@/shared/components/workflow/WorkflowListItemDropdownMenu';
@@ -12,8 +12,6 @@ import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-
-import '@/shared/styles/dropdownMenu.css';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, DownloadIcon, Share2Icon} from 'lucide-react';
@@ -138,36 +136,31 @@ const WorkflowsListItemDropdownMenu = ({currentWorkflowId, project, workflow}: W
             workflowLabel={workflow.label}
         >
             <DropdownMenuItem
-                className="dropdown-menu-item"
+                icon={<CopyIcon />}
+                label="Duplicate"
                 onClick={() =>
                     duplicateWorkflowMutation.mutate({
                         id: projectId,
                         workflowId: workflow.id!,
                     })
                 }
-            >
-                <CopyIcon /> Duplicate
-            </DropdownMenuItem>
+            />
 
-            <DropdownMenuItem className="dropdown-menu-item" onClick={() => setShowWorkflowShareDialog(true)}>
-                <Share2Icon /> Share
-            </DropdownMenuItem>
+            <DropdownMenuItem icon={<Share2Icon />} label="Share" onClick={() => setShowWorkflowShareDialog(true)} />
 
             {templatesSubmissionForm && (
                 <DropdownMenuItem
-                    className="dropdown-menu-item"
+                    icon={<Share2Icon />}
+                    label="Share with Community"
                     onClick={() => window.open(templatesSubmissionForm, '_blank')}
-                >
-                    <Share2Icon /> Share with Community
-                </DropdownMenuItem>
+                />
             )}
 
             <DropdownMenuItem
-                className="dropdown-menu-item"
+                icon={<DownloadIcon />}
+                label="Export"
                 onClick={() => (window.location.href = `/api/automation/internal/workflows/${workflow.id}/export`)}
-            >
-                <DownloadIcon /> Export
-            </DropdownMenuItem>
+            />
         </WorkflowListItemDropdownMenu>
     );
 };
