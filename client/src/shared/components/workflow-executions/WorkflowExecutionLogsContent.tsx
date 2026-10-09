@@ -149,9 +149,10 @@ const LogEntryMessage = ({collapsed, message}: {collapsed?: boolean; message: st
         return (
             <div className="flex-1 overflow-x-auto text-nowrap">
                 <JsonView
-                    collapsed={collapsed}
+                    collapsed={false}
                     fallback={<span className="text-sm">{message}</span>}
                     name={false}
+                    shouldCollapse={collapsed ? (field) => field.src === parsedJson : undefined}
                     src={parsedJson}
                 />
             </div>
@@ -348,7 +349,7 @@ const WorkflowExecutionLogsContent = ({
     const toolbar = (
         <div
             className={twMerge(
-                'flex shrink-0 items-center gap-1',
+                'flex shrink-0 items-center gap-2',
                 !toolbarContainer && 'border-b border-stroke-neutral-secondary p-2'
             )}
         >
