@@ -17,7 +17,7 @@ interface WorkflowExecutionDetailProps {
 }
 
 const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: WorkflowExecutionDetailProps) => {
-    const [workflowPanelVisible, setWorkflowPanelVisible] = useState(true);
+    const [workflowPanelVisible, setWorkflowPanelVisible] = useState(false);
 
     const {
         activeTab,

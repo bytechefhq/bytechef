@@ -71,7 +71,7 @@ describe('WorkflowExecutionDetail', () => {
         expect(screen.getByTestId('sheet-content')).toBeInTheDocument();
     });
 
-    it('hides and shows the workflow panel with the toggle in the execution panel', () => {
+    it('starts with the workflow panel hidden and shows or hides it with the toggle', () => {
         executionQueryMock.mockReturnValue({
             data: {id: 5, job: {id: '5', taskExecutions: []}, workflow: {label: 'Order intake'}},
             isLoading: false,
@@ -79,16 +79,16 @@ describe('WorkflowExecutionDetail', () => {
 
         render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
 
+        expect(screen.queryByTestId('workflow-panel')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Show workflow'}));
+
         expect(screen.getByTestId('workflow-panel')).toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', {name: 'Hide workflow'}));
 
         expect(screen.queryByTestId('workflow-panel')).not.toBeInTheDocument();
         expect(screen.getByTestId('sheet-content')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByRole('button', {name: 'Show workflow'}));
-
-        expect(screen.getByTestId('workflow-panel')).toBeInTheDocument();
     });
 
     it('leaves the panel out until there is a job or a trigger execution to show', () => {
