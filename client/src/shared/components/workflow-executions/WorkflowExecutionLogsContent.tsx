@@ -1,4 +1,5 @@
 import Badge from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import JsonView from '@/shared/components/JsonView';
 import {
@@ -11,7 +12,15 @@ import {
     useJobFileLogsQuery,
     useTriggerExecutionFileLogsQuery,
 } from '@/shared/middleware/graphql';
-import {AlertCircleIcon, AlertTriangleIcon, BugIcon, InfoIcon, MessageSquareIcon} from 'lucide-react';
+import {
+    AlertCircleIcon,
+    AlertTriangleIcon,
+    BugIcon,
+    ChevronsDownUpIcon,
+    ChevronsUpDownIcon,
+    InfoIcon,
+    MessageSquareIcon,
+} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -102,6 +111,8 @@ const LOG_LEVEL_BADGE_CONFIG = {
     },
 };
 
+const LOG_LEVELS = [LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warn, LogLevel.Error];
+
 const LogLevelBadge = ({level}: {level: LogLevel}) => {
     const {className, icon} = LOG_LEVEL_BADGE_CONFIG[level] || LOG_LEVEL_BADGE_CONFIG[LogLevel.Info];
 
@@ -129,13 +140,18 @@ const tryParseJson = (message: string): object | null => {
     }
 };
 
-const LogEntryMessage = ({message}: {message: string}) => {
+const LogEntryMessage = ({collapsed, message}: {collapsed?: boolean; message: string}) => {
     const parsedJson = useMemo(() => tryParseJson(message), [message]);
 
     if (parsedJson) {
         return (
             <div className="flex-1 overflow-x-auto text-nowrap">
-                <JsonView fallback={<span className="text-sm">{message}</span>} name={false} src={parsedJson} />
+                <JsonView
+                    collapsed={collapsed}
+                    fallback={<span className="text-sm">{message}</span>}
+                    name={false}
+                    src={parsedJson}
+                />
             </div>
         );
     }
@@ -143,8 +159,14 @@ const LogEntryMessage = ({message}: {message: string}) => {
     return <span className="min-w-0 flex-1 text-sm break-words">{message}</span>;
 };
 
-const LogEntryRow = ({entry, showComponentName}: {entry: LogEntry; showComponentName: boolean}) => {
-    const [isExpanded, setIsExpanded] = useState(false);
+interface LogEntryRowProps {
+    collapsed?: boolean;
+    entry: LogEntry;
+    showComponentName: boolean;
+}
+
+const LogEntryRow = ({collapsed, entry, showComponentName}: LogEntryRowProps) => {
+    const [isExpanded, setIsExpanded] = useState(collapsed === false);
     const hasError = entry.exceptionType || entry.exceptionMessage || entry.stackTrace;
 
     return (
@@ -170,7 +192,7 @@ const LogEntryRow = ({entry, showComponentName}: {entry: LogEntry; showComponent
                     </span>
                 )}
 
-                <LogEntryMessage message={entry.message} />
+                <LogEntryMessage collapsed={collapsed} message={entry.message} />
             </div>
 
             {isExpanded && hasError && (
@@ -212,6 +234,9 @@ const WorkflowExecutionLogsContent = ({
     taskExecutionId,
     triggerExecutionId,
 }: WorkflowExecutionLogsContentProps) => {
+    const [collapsed, setCollapsed] = useState<boolean | undefined>(undefined);
+    const [expansionVersion, setExpansionVersion] = useState(0);
+    const [hiddenLevels, setHiddenLevels] = useState<LogLevel[]>([]);
     const [page] = useState(0);
     const [size] = useState(100);
 
@@ -264,6 +289,33 @@ const WorkflowExecutionLogsContent = ({
 
     const logs = useMemo(() => logsData?.content || [], [logsData]);
 
+    const levelCounts = useMemo(
+        () =>
+            LOG_LEVELS.map((level) => ({
+                count: logs.filter((logEntry) => logEntry.level === level).length,
+                level,
+            })).filter((levelCount) => levelCount.count > 0),
+        [logs]
+    );
+
+    const visibleLogs = useMemo(
+        () => logs.filter((logEntry) => !hiddenLevels.includes(logEntry.level)),
+        [hiddenLevels, logs]
+    );
+
+    const handleCollapsedChange = (nextCollapsed: boolean) => {
+        setCollapsed(nextCollapsed);
+        setExpansionVersion(expansionVersion + 1);
+    };
+
+    const handleLevelToggle = (level: LogLevel) => {
+        setHiddenLevels(
+            hiddenLevels.includes(level)
+                ? hiddenLevels.filter((hiddenLevel) => hiddenLevel !== level)
+                : [...hiddenLevels, level]
+        );
+    };
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center p-4">
@@ -289,21 +341,66 @@ const WorkflowExecutionLogsContent = ({
     }
 
     return (
-        <ScrollArea className="h-full">
-            <div className="divide-y divide-stroke-neutral-secondary">
-                {logs.map((logEntry, index) => (
-                    <LogEntryRow
-                        entry={logEntry}
-                        key={`${logEntry.timestamp}-${index}`}
-                        showComponentName={!taskExecutionId && !isTriggerLogs}
+        <div className="flex h-full min-h-0 flex-col">
+            <div className="flex shrink-0 items-center gap-1 border-b border-stroke-neutral-secondary p-2">
+                {levelCounts.map(({count, level}) => {
+                    const levelVisible = !hiddenLevels.includes(level);
+
+                    return (
+                        <Button
+                            aria-pressed={levelVisible}
+                            className={twMerge(
+                                'border-0',
+                                levelVisible ? LOG_LEVEL_BADGE_CONFIG[level].className : 'line-through opacity-60'
+                            )}
+                            icon={LOG_LEVEL_BADGE_CONFIG[level].icon}
+                            key={level}
+                            label={`${level} (${count})`}
+                            onClick={() => handleLevelToggle(level)}
+                            size="xs"
+                            variant="ghost"
+                        />
+                    );
+                })}
+
+                <div className="ml-auto flex items-center gap-1">
+                    <Button
+                        aria-label="Expand all"
+                        icon={<ChevronsUpDownIcon />}
+                        onClick={() => handleCollapsedChange(false)}
+                        size="iconXs"
+                        title="Expand all"
+                        variant="ghost"
                     />
-                ))}
+
+                    <Button
+                        aria-label="Collapse all"
+                        icon={<ChevronsDownUpIcon />}
+                        onClick={() => handleCollapsedChange(true)}
+                        size="iconXs"
+                        title="Collapse all"
+                        variant="ghost"
+                    />
+                </div>
             </div>
 
-            <ScrollBar orientation="horizontal" />
+            <ScrollArea className="min-h-0 flex-1">
+                <div className="divide-y divide-stroke-neutral-secondary">
+                    {visibleLogs.map((logEntry, index) => (
+                        <LogEntryRow
+                            collapsed={collapsed}
+                            entry={logEntry}
+                            key={`${logEntry.timestamp}-${index}-${expansionVersion}`}
+                            showComponentName={!taskExecutionId && !isTriggerLogs}
+                        />
+                    ))}
+                </div>
 
-            <ScrollBar orientation="vertical" />
-        </ScrollArea>
+                <ScrollBar orientation="horizontal" />
+
+                <ScrollBar orientation="vertical" />
+            </ScrollArea>
+        </div>
     );
 };
 
