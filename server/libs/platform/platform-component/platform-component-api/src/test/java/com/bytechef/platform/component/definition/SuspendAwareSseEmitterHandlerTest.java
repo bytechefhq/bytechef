@@ -64,6 +64,22 @@ class SuspendAwareSseEmitterHandlerTest {
     }
 
     @Test
+    void testHandlePassesTheOutputToTheUnderlyingEmitter() {
+        SseEmitter sseEmitter = mock(SseEmitter.class);
+
+        SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler = new SuspendAwareSseEmitterHandler(
+            emitter -> {
+                emitter.setOutput("answer");
+                emitter.complete();
+            },
+            mock(ActionContextAware.class));
+
+        suspendAwareSseEmitterHandler.handle(sseEmitter);
+
+        verify(sseEmitter).setOutput("answer");
+    }
+
+    @Test
     void testGetSuspendOrThrowThrowsWithTheStreamErrorAsCause() {
         ActionContextAware actionContext = mock(ActionContextAware.class);
 
