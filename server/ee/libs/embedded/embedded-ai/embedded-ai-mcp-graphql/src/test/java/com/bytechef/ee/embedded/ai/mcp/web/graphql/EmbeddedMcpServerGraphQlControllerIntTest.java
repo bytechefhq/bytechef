@@ -263,6 +263,36 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
         }
 
         @Test
+        void testCreateEmbeddedMcpComponentWithoutToolParameters() {
+            when(embeddedMcpServerFacade.createEmbeddedMcpComponent(any(), anyList()))
+                .thenReturn(createMcpComponent());
+
+            graphQlTester.document("""
+                mutation {
+                    createEmbeddedMcpComponent(input: {
+                        componentName: "gmail", componentVersion: 1, mcpServerId: "1", connectionId: "7",
+                        tools: [{name: "sendEmail"}]
+                    }) {
+                        id
+                    }
+                }
+                """)
+                .execute()
+                .path("createEmbeddedMcpComponent.id")
+                .entity(String.class)
+                .isEqualTo("2");
+
+            @SuppressWarnings("unchecked")
+            ArgumentCaptor<List<McpTool>> mcpToolsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+
+            verify(embeddedMcpServerFacade).createEmbeddedMcpComponent(any(), mcpToolsArgumentCaptor.capture());
+
+            assertThat(mcpToolsArgumentCaptor.getValue())
+                .singleElement()
+                .satisfies(mcpTool -> assertThat(mcpTool.getParameters()).isEmpty());
+        }
+
+        @Test
         void testUpdateEmbeddedMcpComponent() {
             when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), anyList()))
                 .thenReturn(createMcpComponent());
