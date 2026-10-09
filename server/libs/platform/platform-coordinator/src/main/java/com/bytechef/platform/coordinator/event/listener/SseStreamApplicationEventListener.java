@@ -21,11 +21,16 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +42,14 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
     private static final Logger log = LoggerFactory.getLogger(SseStreamApplicationEventListener.class);
 
     private final MessageBroker messageBroker;
+    private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
-    public SseStreamApplicationEventListener(MessageBroker messageBroker) {
+    public SseStreamApplicationEventListener(
+        MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+
         this.messageBroker = messageBroker;
+        this.taskExecutionService = taskExecutionService;
     }
 
     @Override
@@ -53,20 +62,56 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
     }
 
     private void publishJobStatusEvent(JobStatusApplicationEvent jobStatusApplicationEvent) {
-        try {
-            Job.Status status = jobStatusApplicationEvent.getStatus();
+        long jobId = jobStatusApplicationEvent.getJobId();
+        Job.Status status = jobStatusApplicationEvent.getStatus();
 
+        try {
             SseStreamEvent sseStreamEvent = new SseStreamEvent(
-                jobStatusApplicationEvent.getJobId(), SseStreamEvent.EVENT_TYPE_JOB_STATUS, status.name());
+                jobId, SseStreamEvent.EVENT_TYPE_JOB_STATUS, status.name());
 
             sseStreamEvent.putMetadata(TenantContext.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
 
+            if (status == Job.Status.FAILED) {
+                String errorMessage = getFailedTaskErrorMessage(jobId);
+
+                if (errorMessage != null) {
+                    sseStreamEvent.putMetadata(SseStreamEvent.METADATA_ERROR_MESSAGE, errorMessage);
+                }
+            } else if (status == Job.Status.STOPPED) {
+                sseStreamEvent.putMetadata(
+                    SseStreamEvent.METADATA_SUSPENDED, jobStatusApplicationEvent.isSuspended());
+            }
+
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
-            if (log.isTraceEnabled()) {
-                log.trace(exception.getMessage(), exception);
+            log.warn("Failed to publish the {} status SSE event of job {}", status, jobId, exception);
+        }
+    }
+
+    private @Nullable String getFailedTaskErrorMessage(long jobId) {
+        List<TaskExecution> taskExecutions;
+
+        try {
+            taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+        } catch (Exception exception) {
+            log.warn("Failed to look up the failed task of job {}", jobId, exception);
+
+            return null;
+        }
+
+        String errorMessage = null;
+
+        for (TaskExecution taskExecution : taskExecutions) {
+            ExecutionError executionError = taskExecution.getError();
+
+            if (taskExecution.getStatus() == TaskExecution.Status.FAILED && executionError != null &&
+                executionError.getMessage() != null) {
+
+                errorMessage = executionError.getMessage();
             }
         }
+
+        return errorMessage;
     }
 
     private void publishTaskStartedEvent(TaskStartedApplicationEvent taskStartedApplicationEvent) {
@@ -84,9 +129,7 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
 
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
-            if (log.isTraceEnabled()) {
-                log.trace(exception.getMessage(), exception);
-            }
+            log.warn("Failed to publish the task started SSE event of job {}", jobId, exception);
         }
     }
 }
