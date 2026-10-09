@@ -5,6 +5,7 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <changeSet id="20260727120000-1" author="Ivica Cardic">
+        <validCheckSum>9:3edf3ffd87fdf530328b275b843fa1a7</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="connected_user_project_workflow" columnName="automation_workflow_uuid"/>
@@ -28,6 +29,7 @@
         <rollback/>
     </changeSet>
     <changeSet id="20260727120000-3" author="Ivica Cardic">
+        <validCheckSum>9:befd18aa57645584335405ea3c7134d9</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM information_schema.table_constraints
@@ -48,6 +50,7 @@
     </changeSet>
 
     <changeSet id="20260727120000-4" author="Ivica Cardic">
+        <validCheckSum>9:2e3bd2f4f56d3f52c29163507f70f318</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists tableName="connected_user_project_workflow"
