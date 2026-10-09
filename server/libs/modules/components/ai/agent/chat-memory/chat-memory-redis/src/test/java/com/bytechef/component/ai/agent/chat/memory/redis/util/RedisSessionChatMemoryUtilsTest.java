@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.redis.session.util;
+package com.bytechef.component.ai.agent.chat.memory.redis.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -153,5 +153,17 @@ class RedisSessionChatMemoryUtilsTest {
         tasks.clear();
 
         pendingTasks.forEach(Runnable::run);
+    }
+
+    @Test
+    void testSessionKeysLiveUnderTheSessionSubPrefixOfTheConnectionKeyPrefix() {
+        assertThat(
+            RedisSessionChatMemoryUtils.getSessionKeyPrefix(
+                MockParametersFactory.create(Map.of("host", "localhost", "port", 6379))))
+                    .isEqualTo("bytechef-chat-memory:session:");
+        assertThat(
+            RedisSessionChatMemoryUtils.getSessionKeyPrefix(
+                MockParametersFactory.create(Map.of("host", "localhost", "port", 6379, "keyPrefix", "acme:"))))
+                    .isEqualTo("acme:session:");
     }
 }

@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.redis.session.connection;
+package com.bytechef.component.ai.agent.chat.memory.redis.connection;
 
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.DEFAULT_KEY_PREFIX;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.HOST;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.KEY_PREFIX;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.PASSWORD;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.PORT;
-import static com.bytechef.component.ai.agent.chat.memory.redis.session.constant.RedisSessionChatMemoryConstants.USERNAME;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.DEFAULT_KEY_PREFIX;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.HOST;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.KEY_PREFIX;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.PASSWORD;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.PORT;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.TIME_TO_LIVE;
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -34,7 +35,7 @@ import com.bytechef.component.definition.Property.ControlType;
 /**
  * @author Ivica Cardic
  */
-public class RedisSessionChatMemoryConnection {
+public final class RedisChatMemoryConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(
@@ -50,8 +51,14 @@ public class RedisSessionChatMemoryConnection {
                 .required(true),
             string(KEY_PREFIX)
                 .label("Key Prefix")
-                .description("Prefix prepended to every session key.")
+                .description("The prefix for Redis keys used to store chat messages.")
                 .defaultValue(DEFAULT_KEY_PREFIX)
+                .required(false),
+            string(TIME_TO_LIVE)
+                .label("Time to Live")
+                .description(
+                    "The time-to-live for chat messages (e.g., '24h', '7d', '30m'). Leave empty for no expiration. " +
+                        "Applies to version 1 only.")
                 .required(false))
         .authorizations(
             authorization(AuthorizationType.CUSTOM)
@@ -62,10 +69,10 @@ public class RedisSessionChatMemoryConnection {
                         .required(false),
                     string(PASSWORD)
                         .label("Password")
-                        .description("The Redis password. Required when Username is set.")
+                        .description("The Redis password.")
                         .controlType(ControlType.PASSWORD)
                         .required(false)));
 
-    private RedisSessionChatMemoryConnection() {
+    private RedisChatMemoryConnection() {
     }
 }
