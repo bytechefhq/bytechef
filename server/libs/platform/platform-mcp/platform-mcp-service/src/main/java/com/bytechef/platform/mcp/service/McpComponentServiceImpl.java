@@ -46,7 +46,7 @@ public class McpComponentServiceImpl implements McpComponentService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
+    @PreAuthorize("hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')")
     public McpComponent update(McpComponent mcpComponent) {
         McpComponent currentMcpComponent = OptionalUtils.get(mcpComponentRepository.findById(mcpComponent.getId()));
 
