@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.ai.mcp.facade.EmbeddedMcpServerFacade;
+import com.bytechef.graphql.error.GraphQlBadRequestException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -111,6 +112,11 @@ class EmbeddedMcpServerGraphQlController {
 
     @MutationMapping
     McpComponent updateEmbeddedMcpComponent(@Argument long id, @Argument McpComponentWithToolsInput input) {
+        if (input.version() == null) {
+            throw new GraphQlBadRequestException(
+                "MISSING_FIELD", "version is required to update MCP component " + id, Map.of("field", "version"));
+        }
+
         McpComponent mcpComponent = new McpComponent(
             input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId(),
             input.version());
@@ -178,7 +184,7 @@ class EmbeddedMcpServerGraphQlController {
     @SuppressFBWarnings("EI")
     record McpComponentWithToolsInput(
         String componentName, int componentVersion, Long mcpServerId, Long connectionId,
-        List<McpToolInputForComponent> tools, int version) {
+        List<McpToolInputForComponent> tools, Integer version) {
     }
 
     record McpServerUpdateInput(String name, Boolean enabled) {

@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -290,6 +291,24 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
             assertThat(mcpComponent.getId()).isEqualTo(2L);
             assertThat(mcpComponent.getMcpServerId()).isEqualTo(1L);
             assertThat(mcpComponent.getVersion()).isEqualTo(3);
+        }
+
+        @Test
+        void testUpdateEmbeddedMcpComponentWithoutVersion() {
+            graphQlTester.document("""
+                mutation {
+                    updateEmbeddedMcpComponent(id: "2", input: {
+                        componentName: "gmail", componentVersion: 1, mcpServerId: "1", tools: []
+                    }) {
+                        id
+                    }
+                }
+                """)
+                .execute()
+                .errors()
+                .satisfy(errors -> assertThat(errors).hasSize(1));
+
+            verify(embeddedMcpServerFacade, never()).updateEmbeddedMcpComponent(any(), anyList());
         }
 
         @Test
