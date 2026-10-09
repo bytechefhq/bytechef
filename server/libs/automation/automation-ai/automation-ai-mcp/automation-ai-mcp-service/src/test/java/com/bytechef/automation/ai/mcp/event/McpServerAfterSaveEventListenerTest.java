@@ -16,8 +16,11 @@
 
 package com.bytechef.automation.ai.mcp.event;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,11 +29,14 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.service.McpServerService;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
+import org.springframework.data.relational.core.mapping.event.BeforeConvertEvent;
 
 /**
  * Unit test for {@link McpServerAfterSaveEventListener}.
@@ -39,14 +45,17 @@ import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
  */
 public class McpServerAfterSaveEventListenerTest {
 
+    private static final long MCP_SERVER_ID = 1L;
+
     private final McpProjectService mcpProjectService = mock(McpProjectService.class);
+    private final McpServerService mcpServerService = mock(McpServerService.class);
     private final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
 
     @Test
     public void testOnAfterSaveEnabledServerEnablesProjectDeployments() {
         // Given
         McpServerAfterSaveEventListener listener = new McpServerAfterSaveEventListener(
-            mcpProjectService, projectDeploymentFacade);
+            mcpProjectService, mcpServerService, projectDeploymentFacade);
 
         McpServer mcpServer = new McpServer();
         mcpServer.setId(1L);
@@ -75,7 +84,7 @@ public class McpServerAfterSaveEventListenerTest {
     public void testOnAfterSaveDisabledServerDisablesProjectDeployments() {
         // Given
         McpServerAfterSaveEventListener listener = new McpServerAfterSaveEventListener(
-            mcpProjectService, projectDeploymentFacade);
+            mcpProjectService, mcpServerService, projectDeploymentFacade);
 
         McpServer mcpServer = new McpServer();
         mcpServer.setId(1L);
@@ -104,7 +113,7 @@ public class McpServerAfterSaveEventListenerTest {
     public void testOnAfterSaveServerWithNoProjectsNoFacadeCalls() {
         // Given
         McpServerAfterSaveEventListener listener = new McpServerAfterSaveEventListener(
-            mcpProjectService, projectDeploymentFacade);
+            mcpProjectService, mcpServerService, projectDeploymentFacade);
 
         McpServer mcpServer = new McpServer();
         mcpServer.setId(1L);
@@ -129,7 +138,7 @@ public class McpServerAfterSaveEventListenerTest {
     public void testOnAfterSaveMultipleProjectsWithDifferentDeployments() {
         // Given
         McpServerAfterSaveEventListener listener = new McpServerAfterSaveEventListener(
-            mcpProjectService, projectDeploymentFacade);
+            mcpProjectService, mcpServerService, projectDeploymentFacade);
 
         McpServer mcpServer = new McpServer();
         mcpServer.setId(2L);
@@ -154,5 +163,106 @@ public class McpServerAfterSaveEventListenerTest {
         verify(projectDeploymentFacade).enableProjectDeployment(eq(300L), eq(true));
         verify(projectDeploymentFacade).enableProjectDeployment(eq(400L), eq(true));
         verify(projectDeploymentFacade).enableProjectDeployment(eq(500L), eq(true));
+    }
+
+    @Test
+    public void testRenamingAnEnabledServerTouchesNoProjectDeployment() {
+        givenStoredMcpServer(true);
+        givenProjectDeployments(100L);
+
+        McpServer renamedMcpServer = mcpServer(true);
+
+        renamedMcpServer.setName("renamed");
+
+        saveThroughListener(renamedMcpServer);
+
+        verify(projectDeploymentFacade, never()).enableProjectDeployment(anyLong(), anyBoolean());
+    }
+
+    @Test
+    public void testSavingADisabledServerThatStaysDisabledTouchesNoProjectDeployment() {
+        givenStoredMcpServer(false);
+        givenProjectDeployments(100L);
+
+        saveThroughListener(mcpServer(false));
+
+        verify(projectDeploymentFacade, never()).enableProjectDeployment(anyLong(), anyBoolean());
+    }
+
+    @Test
+    public void testAFlagRecordedForOneSaveNeverDecidesAnotherSaveOfTheSameId() {
+        givenStoredMcpServer(true);
+        givenProjectDeployments(100L);
+
+        McpServerAfterSaveEventListener mcpServerAfterSaveEventListener = new McpServerAfterSaveEventListener(
+            mcpProjectService, mcpServerService, projectDeploymentFacade);
+
+        mcpServerAfterSaveEventListener.onBeforeConvert(new BeforeConvertEvent<>(mcpServer(true)));
+
+        mcpServerAfterSaveEventListener.onAfterSave(afterSaveEvent(mcpServer(true)));
+
+        verify(projectDeploymentFacade).enableProjectDeployment(100L, true);
+    }
+
+    @Test
+    public void testEnablingADisabledServerEnablesItsProjectDeployments() {
+        givenStoredMcpServer(false);
+        givenProjectDeployments(100L, 200L);
+
+        saveThroughListener(mcpServer(true));
+
+        verify(projectDeploymentFacade).enableProjectDeployment(100L, true);
+        verify(projectDeploymentFacade).enableProjectDeployment(200L, true);
+    }
+
+    @Test
+    public void testDisablingAServerDisablesItsProjectDeployments() {
+        givenStoredMcpServer(true);
+        givenProjectDeployments(100L);
+
+        saveThroughListener(mcpServer(false));
+
+        verify(projectDeploymentFacade).enableProjectDeployment(100L, false);
+    }
+
+    private void givenProjectDeployments(long... projectDeploymentIds) {
+        List<McpProject> mcpProjects = new ArrayList<>();
+
+        for (long projectDeploymentId : projectDeploymentIds) {
+            mcpProjects.add(new McpProject(projectDeploymentId, MCP_SERVER_ID));
+        }
+
+        when(mcpProjectService.getMcpServerMcpProjects(MCP_SERVER_ID)).thenReturn(mcpProjects);
+    }
+
+    private void givenStoredMcpServer(boolean enabled) {
+        when(mcpServerService.getMcpServer(MCP_SERVER_ID)).thenReturn(mcpServer(enabled));
+    }
+
+    private void saveThroughListener(McpServer mcpServer) {
+        McpServerAfterSaveEventListener mcpServerAfterSaveEventListener = new McpServerAfterSaveEventListener(
+            mcpProjectService, mcpServerService, projectDeploymentFacade);
+
+        mcpServerAfterSaveEventListener.onBeforeConvert(new BeforeConvertEvent<>(mcpServer));
+
+        mcpServerAfterSaveEventListener.onAfterSave(afterSaveEvent(mcpServer));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static AfterSaveEvent<McpServer> afterSaveEvent(McpServer mcpServer) {
+        AfterSaveEvent<McpServer> afterSaveEvent = mock(AfterSaveEvent.class);
+
+        when(afterSaveEvent.getEntity()).thenReturn(mcpServer);
+
+        return afterSaveEvent;
+    }
+
+    private static McpServer mcpServer(boolean enabled) {
+        McpServer mcpServer = new McpServer();
+
+        mcpServer.setId(MCP_SERVER_ID);
+        mcpServer.setEnabled(enabled);
+
+        return mcpServer;
     }
 }
