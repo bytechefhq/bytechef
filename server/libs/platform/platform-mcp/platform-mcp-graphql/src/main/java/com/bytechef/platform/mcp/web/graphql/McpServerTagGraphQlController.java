@@ -53,6 +53,8 @@ public class McpServerTagGraphQlController {
             return List.of();
         }
 
+        McpServerTypeUtils.checkNotEmbedded(type);
+
         List<McpServer> mcpServers = mcpServerService.getMcpServers(type);
 
         List<Long> tagIds = mcpServers.stream()
