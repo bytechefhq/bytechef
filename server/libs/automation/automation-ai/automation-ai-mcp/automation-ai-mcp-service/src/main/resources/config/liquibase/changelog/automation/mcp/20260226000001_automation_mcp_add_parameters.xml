@@ -13,5 +13,6 @@
         <addColumn tableName="mcp_project_workflow">
             <column name="parameters" type="TEXT"/>
         </addColumn>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
