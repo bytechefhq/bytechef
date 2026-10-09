@@ -375,6 +375,7 @@ const WorkflowExecutionLogsContent = ({
 
             <Button
                 aria-label={allExpanded ? 'Collapse all' : 'Expand all'}
+                className="ml-3"
                 icon={allExpanded ? <ChevronsDownUpIcon /> : <ChevronsUpDownIcon />}
                 onClick={() => handleCollapsedChange(allExpanded)}
                 size="iconXs"
