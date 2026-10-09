@@ -20,10 +20,13 @@ export default function getPropertyInputPlaceholder({
             ? `From ${minValue} to ${maxValue}`
             : undefined;
 
-    const hasDefaultValue = !required && defaultValue !== undefined && defaultValue !== null && defaultValue !== '';
+    const isPrimitiveDefaultValue =
+        typeof defaultValue === 'string' || typeof defaultValue === 'number' || typeof defaultValue === 'boolean';
 
-    if (hasDefaultValue) {
-        return range ? `Default: ${defaultValue} · ${range}` : `Default: ${defaultValue}`;
+    const formattedDefaultValue = isPrimitiveDefaultValue ? String(defaultValue) : '';
+
+    if (!required && formattedDefaultValue) {
+        return range ? `Default: ${formattedDefaultValue} · ${range}` : `Default: ${formattedDefaultValue}`;
     }
 
     return range || placeholder || `Type ${isNumericalInput ? 'a number' : 'something'}...`;
