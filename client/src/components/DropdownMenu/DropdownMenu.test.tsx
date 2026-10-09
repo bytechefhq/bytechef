@@ -1,4 +1,5 @@
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {composeStories} from '@storybook/react-vite';
 import {BlendIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 import {type ReactNode} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -18,6 +19,7 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from './DropdownMenu';
+import * as stories from './DropdownMenu.stories';
 
 const renderOpenMenu = (children: ReactNode, contentClassName?: string) =>
     render(
@@ -261,6 +263,21 @@ describe('DropdownMenuSub', () => {
         expect(subContent).not.toHaveClass('shadow-lg');
         expect(subContent).not.toHaveClass('bg-popover');
     });
+
+    it('should render custom children before the chevron', () => {
+        renderOpenMenu(
+            <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                    <span>Mode</span>
+                </DropdownMenuSubTrigger>
+            </DropdownMenuSub>
+        );
+
+        const subTrigger = screen.getByRole('menuitem', {name: 'Mode'});
+
+        expect(subTrigger.firstElementChild).toHaveTextContent('Mode');
+        expect(subTrigger.lastElementChild).toHaveClass('lucide-chevron-right');
+    });
 });
 
 describe('DropdownMenuCheckboxItem', () => {
@@ -274,6 +291,16 @@ describe('DropdownMenuCheckboxItem', () => {
             'cursor-pointer gap-2 rounded-md py-1.5 pl-8 text-sm text-content-neutral-primary'
         );
         expect(checkboxItem).not.toHaveClass('focus:bg-accent');
+    });
+
+    it('should render custom children', () => {
+        renderOpenMenu(
+            <DropdownMenuCheckboxItem checked={false}>
+                <span>Flows</span>
+            </DropdownMenuCheckboxItem>
+        );
+
+        expect(screen.getByRole('menuitemcheckbox', {name: 'Flows'})).toHaveAttribute('data-state', 'unchecked');
     });
 });
 
@@ -312,6 +339,75 @@ describe('DropdownMenuRadioItem', () => {
         expect(radioItem).toHaveClass('px-3 [&>span:first-child]:hidden');
         expect(radioItem).not.toHaveClass('pl-8');
         expect(radioItem).not.toHaveClass('pr-2');
+    });
+
+    it('should render custom children', () => {
+        renderOpenMenu(
+            <DropdownMenuRadioGroup value="embedded">
+                <DropdownMenuRadioItem value="embedded">
+                    <span>Embedded</span>
+                </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+        );
+
+        expect(screen.getByRole('menuitemradio', {name: 'Embedded'})).toHaveAttribute('data-state', 'checked');
+    });
+});
+
+describe('DropdownMenu stories', () => {
+    const {CheckboxItems, CustomRow, ItemStates, LabelsAndShortcuts, NodeMenu, Submenu} = composeStories(stories);
+
+    it('should render the node menu items in order', () => {
+        render(<NodeMenu />);
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual([
+            'Replace',
+            'Rename',
+            'Info',
+            'Delete',
+        ]);
+    });
+
+    it('should disable only the disabled item states', () => {
+        render(<ItemStates />);
+
+        expect(screen.getByRole('menuitem', {name: 'Disabled'})).toHaveAttribute('data-disabled');
+        expect(screen.getByRole('menuitem', {name: 'Disabled destructive'})).toHaveAttribute('data-disabled');
+        expect(screen.getByRole('menuitem', {name: 'Destructive'})).not.toHaveAttribute('data-disabled');
+    });
+
+    it('should render the label and shortcuts', () => {
+        render(<LabelsAndShortcuts />);
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual(['Copy⌘C', 'Paste⌘V']);
+    });
+
+    it('should open the submenu with the keyboard', async () => {
+        render(<Submenu />);
+
+        screen.getByRole('menuitem', {name: 'Mode'}).focus();
+
+        await userEvent.keyboard('{ArrowRight}');
+
+        expect(await screen.findByRole('menuitemradio', {name: 'Automation'})).toHaveAttribute('data-state', 'checked');
+    });
+
+    it('should add and remove checked categories', async () => {
+        render(<CheckboxItems />);
+
+        await userEvent.click(screen.getByRole('menuitemcheckbox', {name: 'Actions'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Filter'}));
+        await userEvent.click(screen.getByRole('menuitemcheckbox', {name: 'Triggers'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Filter'}));
+
+        expect(screen.getByRole('menuitemcheckbox', {name: 'Actions'})).toHaveAttribute('data-state', 'checked');
+        expect(screen.getByRole('menuitemcheckbox', {name: 'Triggers'})).toHaveAttribute('data-state', 'unchecked');
+    });
+
+    it('should render the custom row', () => {
+        render(<CustomRow />);
+
+        expect(screen.getAllByRole('menuitem')[0]).toHaveTextContent('Paste AfterHTTP Client (httpClient_1)');
     });
 });
 
