@@ -19,7 +19,6 @@ package com.bytechef.platform.mcp.web.graphql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -39,6 +38,7 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationSharedMocks;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlMethodSecurityTestConfiguration;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
+import graphql.ErrorType;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -303,31 +303,24 @@ class McpToolGraphQlControllerIntTest {
     }
 
     @Test
-    void testUpdateMcpToolEnabled() {
-        McpTool mcpTool = createMockMcpTool(1L, "test-tool", Map.of("param1", "value1"), 1L);
-
-        mcpTool.setEnabled(false);
-
-        when(mcpToolService.fetchMcpTool(1L)).thenReturn(Optional.of(mcpTool));
-
+    void testUpdateMcpToolEnabledIsNotInSchema() {
         this.graphQlTester
             .document("""
                 mutation {
                     updateMcpToolEnabled(id: "1", enabled: false) {
                         id
-                        enabled
                     }
                 }
                 """)
             .execute()
-            .path("updateMcpToolEnabled.id")
-            .entity(String.class)
-            .isEqualTo("1")
-            .path("updateMcpToolEnabled.enabled")
-            .entity(Boolean.class)
-            .isEqualTo(false);
+            .errors()
+            .satisfy(errors -> assertThat(errors)
+                .anySatisfy(error -> {
+                    assertThat(error.getErrorType()).isEqualTo(ErrorType.ValidationError);
+                    assertThat(error.getMessage()).contains("updateMcpToolEnabled");
+                }));
 
-        verify(mcpToolService).updateEnabled(1L, false);
+        verifyNoInteractions(mcpToolService);
     }
 
     @Nested
@@ -449,19 +442,6 @@ class McpToolGraphQlControllerIntTest {
                 """);
 
             verify(mcpToolService, never()).delete(any(McpTool.class));
-        }
-
-        @Test
-        void testUpdateMcpToolEnabledRejectsEmbeddedMcpTool() {
-            assertRejected("""
-                mutation {
-                    updateMcpToolEnabled(id: "2", enabled: false) {
-                        id
-                    }
-                }
-                """);
-
-            verify(mcpToolService, never()).updateEnabled(anyLong(), anyBoolean());
         }
 
         private void assertRejected(String document) {
