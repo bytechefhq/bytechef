@@ -16,17 +16,25 @@
 
 package com.bytechef.platform.component.context;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Approval;
+import com.bytechef.component.definition.ActionContext.Approval.Links;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
@@ -37,7 +45,9 @@ import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import io.micrometer.tracing.Tracer;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.CacheManager;
@@ -111,5 +121,46 @@ class ContextFactoryTest {
         verify(logFileStorage).storeLogEntries(eq(1L), eq(10L), anyList());
         verify(editorLogFileStorage).storeLogEntries(eq(2L), eq(20L), anyList());
         verify(triggerLogFileStorage, never()).storeLogEntries(anyLong(), anyLong(), any());
+    }
+
+    @Nested
+    @SuppressWarnings("deprecation")
+    class ClusterElementApprovalLinksTest {
+
+        @Test
+        void testAClusterElementOfAnActionSignsApprovalLinksWithTheConfiguredApprovalTokens() {
+            ApplicationProperties applicationProperties = mock(ApplicationProperties.class);
+
+            when(applicationProperties.getPublicUrl()).thenReturn("https://example.com");
+
+            ApprovalTokens approvalTokens = mock(ApprovalTokens.class);
+
+            when(approvalTokens.toSignedTokenIfConfigured(anyString())).thenReturn(Optional.of("signed-token"));
+
+            @SuppressWarnings("unchecked")
+            ObjectProvider<ApprovalTokens> approvalTokensProvider = mock(ObjectProvider.class);
+
+            when(approvalTokensProvider.getIfAvailable()).thenReturn(approvalTokens);
+
+            ContextFactory signingContextFactory = new ContextFactoryImpl(
+                mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class),
+                mock(DataStorage.class), editorLogFileStorage, mock(EditorTempFileStorage.class),
+                mock(ApplicationEventPublisher.class), approvalTokensProvider, logFileStorage,
+                mock(TempFileStorage.class), mock(Tracer.class), triggerLogFileStorage);
+
+            ActionContext actionContext = signingContextFactory.createActionContext(
+                "aiAgent", 1, "chat", null, null, 1L, 10L, "workflowId", null, null, PlatformType.AUTOMATION, false);
+
+            ClusterElementContext clusterElementContext = ((ActionContextAware) actionContext).toClusterElementContext(
+                "approvalTool", 1, "approvalElement", null);
+
+            ActionContext toolActionContext = ((ClusterElementContextAware) clusterElementContext).toActionContext(
+                "approval", 1, "requestApproval", null);
+
+            Links links = toolActionContext.approval(Approval::generateLinks);
+
+            assertThat(links.approvalLink()).isEqualTo("https://example.com/approvals/signed-token");
+            assertThat(links.disapprovalLink()).isEqualTo("https://example.com/approvals/signed-token");
+        }
     }
 }

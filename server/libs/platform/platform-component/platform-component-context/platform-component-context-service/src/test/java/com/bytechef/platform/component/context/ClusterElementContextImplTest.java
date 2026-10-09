@@ -25,10 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Approval;
+import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
@@ -41,9 +44,12 @@ import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
@@ -430,5 +436,64 @@ class ClusterElementContextImplTest {
         assertThrows(RuntimeException.class, () -> context.nested(nested -> {
             throw new Exception("Test exception");
         }));
+    }
+
+    @Nested
+    @SuppressWarnings("deprecation")
+    class ApprovalLinksTest {
+
+        @Test
+        void testToActionContextSignsApprovalLinksWithTheApprovalTokens() {
+            ApprovalTokens approvalTokens = mockApprovalTokens();
+
+            ClusterElementContextImpl context = ClusterElementContextImpl.builder(
+                "testComponent", 1, "testElement", false,
+                cacheManager, dataStorage, eventPublisher, httpClientExecutor, tempFileStorage)
+                .approvalTokens(approvalTokens)
+                .jobId(200L)
+                .publicUrl("https://example.com")
+                .build();
+
+            ActionContext actionContext = context.toActionContext("newComponent", 2, "newAction", null);
+
+            Links links = actionContext.approval(Approval::generateLinks);
+
+            assertTrue(links.approvalLink()
+                .endsWith("/approvals/signed-token"));
+            assertTrue(links.disapprovalLink()
+                .endsWith("/approvals/signed-token"));
+        }
+
+        @Test
+        void testToClusterElementContextKeepsTheApprovalTokens() {
+            ApprovalTokens approvalTokens = mockApprovalTokens();
+
+            ClusterElementContextImpl context = ClusterElementContextImpl.builder(
+                "testComponent", 1, "testElement", false,
+                cacheManager, dataStorage, eventPublisher, httpClientExecutor, tempFileStorage)
+                .approvalTokens(approvalTokens)
+                .jobId(200L)
+                .publicUrl("https://example.com")
+                .build();
+
+            ClusterElementContext clusterElementContext = context.toClusterElementContext(
+                "nestedComponent", 1, "nestedElement", null);
+
+            ActionContext actionContext = ((ClusterElementContextAware) clusterElementContext).toActionContext(
+                "newComponent", 2, "newAction", null);
+
+            Links links = actionContext.approval(Approval::generateLinks);
+
+            assertTrue(links.approvalLink()
+                .endsWith("/approvals/signed-token"));
+        }
+
+        private ApprovalTokens mockApprovalTokens() {
+            ApprovalTokens approvalTokens = mock(ApprovalTokens.class);
+
+            when(approvalTokens.toSignedTokenIfConfigured(anyString())).thenReturn(Optional.of("signed-token"));
+
+            return approvalTokens;
+        }
     }
 }

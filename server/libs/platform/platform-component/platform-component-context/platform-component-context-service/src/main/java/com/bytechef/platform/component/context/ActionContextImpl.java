@@ -451,6 +451,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             .builder(
                 componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
                 eventPublisher, httpClientExecutor, tempFileStorage)
+            .approvalTokens(approvalTokens)
             .componentConnection(componentConnection)
             .environmentId(environmentId)
             .jobId(jobId)
