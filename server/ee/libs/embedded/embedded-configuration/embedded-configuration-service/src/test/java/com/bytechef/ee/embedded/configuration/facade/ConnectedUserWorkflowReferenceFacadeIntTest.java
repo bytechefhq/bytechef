@@ -102,6 +102,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -211,6 +212,8 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     @Autowired
     private ConnectionService connectionService;
 
+    private final Map<Long, Connection> embeddedConnections = new ConcurrentHashMap<>();
+
     @Autowired
     private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
 
@@ -265,6 +268,15 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                         .componentName("slack")
                         .id(connectionId)
                         .build())
+                    .toList();
+            });
+        when(connectionService.getConnections(anyList()))
+            .thenAnswer(invocation -> {
+                List<Long> connectionIds = invocation.getArgument(0);
+
+                return connectionIds.stream()
+                    .map(embeddedConnections::get)
+                    .filter(Objects::nonNull)
                     .toList();
             });
         when(connectionService.getConnection(anyLong()))
@@ -1101,9 +1113,21 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     private long givenOwnedConnection(ConnectedUser connectedUser) {
         long connectionId = NEXT_CONNECTION_ID.getAndIncrement();
 
+        registerEmbeddedConnection(connectionId, connectedUser.getEnvironment());
+
         connectedUserConnectionService.create(Objects.requireNonNull(connectedUser.getId()), connectionId);
 
         return connectionId;
+    }
+
+    private void registerEmbeddedConnection(long connectionId, Environment environment) {
+        Connection connection = new Connection();
+
+        connection.setEnvironmentId(environment.ordinal());
+        connection.setId(connectionId);
+        connection.setType(PlatformType.EMBEDDED);
+
+        embeddedConnections.put(connectionId, connection);
     }
 
     private static String newExternalUserId() {
