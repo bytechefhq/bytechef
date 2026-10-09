@@ -349,7 +349,7 @@ const WorkflowExecutionLogsContent = ({
     const toolbar = (
         <div
             className={twMerge(
-                'flex shrink-0 items-center gap-1',
+                'flex shrink-0 items-center justify-end gap-1',
                 !toolbarContainer && 'border-b border-stroke-neutral-secondary p-2'
             )}
         >
@@ -375,7 +375,6 @@ const WorkflowExecutionLogsContent = ({
 
             <Button
                 aria-label={allExpanded ? 'Collapse all' : 'Expand all'}
-                className="ml-auto"
                 icon={allExpanded ? <ChevronsDownUpIcon /> : <ChevronsUpDownIcon />}
                 onClick={() => handleCollapsedChange(allExpanded)}
                 size="iconXs"
