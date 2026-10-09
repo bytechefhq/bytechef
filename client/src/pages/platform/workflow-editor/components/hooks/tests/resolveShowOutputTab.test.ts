@@ -40,6 +40,16 @@ describe('resolveShowOutputTab', () => {
         ).toBe(true);
     });
 
+    it('hides the tab for a tool that cannot be run on its own', () => {
+        expect(
+            resolveShowOutputTab({
+                clusterElementType: CLUSTER_ELEMENT_TYPE_TOOLS,
+                clusterRootWorkflowNodeName: 'aiAgent_1',
+                operationDefinition: {outputDefined: false, testable: false},
+            })
+        ).toBe(false);
+    });
+
     it('hides the tab for a tool when no cluster root is resolved', () => {
         expect(resolveShowOutputTab({clusterElementType: CLUSTER_ELEMENT_TYPE_TOOLS})).toBe(false);
     });

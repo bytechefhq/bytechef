@@ -3,7 +3,7 @@ import {CLUSTER_ELEMENT_TYPE_TOOLS} from '@/shared/constants';
 interface ResolveShowOutputTabProps {
     clusterElementType?: string;
     clusterRootWorkflowNodeName?: string;
-    operationDefinition?: {outputDefined?: boolean};
+    operationDefinition?: {outputDefined?: boolean; testable?: boolean};
     taskDispatcher?: boolean;
 }
 
@@ -18,6 +18,10 @@ export default function resolveShowOutputTab({
     }
 
     if (clusterElementType === CLUSTER_ELEMENT_TYPE_TOOLS && !clusterRootWorkflowNodeName) {
+        return false;
+    }
+
+    if (clusterElementType === CLUSTER_ELEMENT_TYPE_TOOLS && operationDefinition?.testable === false) {
         return false;
     }
 

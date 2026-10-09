@@ -19,6 +19,7 @@ Name | Type
 `title` | string
 `type` | string
 `properties` | [Array&lt;Property&gt;](Property.md)
+`testable` | boolean
 
 ## Example
 
@@ -39,6 +40,7 @@ const example = {
   "title": null,
   "type": null,
   "properties": null,
+  "testable": null,
 } satisfies ClusterElementDefinition
 
 console.log(example)
