@@ -67,5 +67,6 @@
         </createTable>
 
         <addUniqueConstraint constraintName="uk_mcp_integration_workflow_iic_workflow" tableName="mcp_integration_workflow" columnNames="mcp_integration_id,integration_instance_configuration_workflow_id" />
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
