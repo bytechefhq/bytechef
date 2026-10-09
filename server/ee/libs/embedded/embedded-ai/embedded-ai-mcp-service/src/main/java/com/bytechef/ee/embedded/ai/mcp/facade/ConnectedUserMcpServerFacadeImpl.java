@@ -224,6 +224,10 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
 
                 McpTool mcpTool = mcpToolOptional.get();
 
+                if (!mcpTool.isEnabled()) {
+                    continue;
+                }
+
                 McpComponent mcpComponent = mcpComponentCache.computeIfAbsent(
                     mcpTool.getMcpComponentId(), mcpComponentService::getMcpComponent);
 

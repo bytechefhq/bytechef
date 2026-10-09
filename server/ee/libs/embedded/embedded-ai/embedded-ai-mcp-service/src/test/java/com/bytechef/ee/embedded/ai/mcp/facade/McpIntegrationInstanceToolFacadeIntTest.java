@@ -267,6 +267,22 @@ class McpIntegrationInstanceToolFacadeIntTest {
             .containsExactly(tuple(mcpToolId, true));
     }
 
+    @Test
+    void testEnableMcpIntegrationInstanceToolRejectsGloballyDisabledTool() {
+        McpTool mcpTool = mcpToolRepository.findById(mcpToolId)
+            .orElseThrow();
+
+        mcpTool.setEnabled(false);
+
+        mcpToolRepository.save(mcpTool);
+
+        assertThatThrownBy(() -> mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(
+            integrationInstanceId, mcpToolId, true))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(countMcpIntegrationInstanceTools()).isZero();
+    }
+
     private int countMcpIntegrationInstanceTools() {
         Integer count =
             jdbcTemplate.queryForObject("SELECT COUNT(*) FROM mcp_integration_instance_tool", Integer.class);
