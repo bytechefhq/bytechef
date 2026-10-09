@@ -107,14 +107,4 @@ public class ConnectionServiceImpl implements ConnectionService {
     public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters) {
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public List<Connection> getInactiveConnections(List<Long> connectionIds) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void validateConnectionsActive(List<Long> connectionIds) {
-        throw new UnsupportedOperationException();
-    }
 }
