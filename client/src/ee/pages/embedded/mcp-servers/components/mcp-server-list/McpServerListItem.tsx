@@ -32,7 +32,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
         showDeleteDialog,
         showEditDialog,
         toolsCollapsibleTriggerRef,
-        updateMcpServerTagsMutation,
+        updateEmbeddedMcpServerTagsMutation,
     } = useMcpServerListItem(mcpServer);
 
     return (
@@ -82,7 +82,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                                         tags={(mcpServer.tags ?? []).map((tag) => {
                                             return {id: parseInt(tag!.id), name: tag!.name};
                                         })}
-                                        updateTagsMutation={updateMcpServerTagsMutation}
+                                        updateTagsMutation={updateEmbeddedMcpServerTagsMutation}
                                     />
                                 </div>
                             </div>

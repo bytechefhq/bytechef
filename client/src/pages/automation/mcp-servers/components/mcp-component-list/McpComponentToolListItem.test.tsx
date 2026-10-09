@@ -7,26 +7,35 @@ import {describe, expect, it, vi} from 'vitest';
 
 import McpComponentToolListItem from './McpComponentToolListItem';
 
-const {mutateMock} = vi.hoisted(() => ({mutateMock: vi.fn()}));
+const {dropdownMenuHookMock, mutateMock} = vi.hoisted(() => ({
+    dropdownMenuHookMock: vi.fn(),
+    mutateMock: vi.fn(),
+}));
 
 vi.mock('./hooks/useMcpProjectComponentToolDropdownMenu', () => ({
-    default: () => ({
-        handleConfirmDelete: vi.fn(),
-        isDeletePending: false,
-        setShowDeleteDialog: vi.fn(),
-        showDeleteDialog: false,
-    }),
+    default: (props: unknown) => {
+        dropdownMenuHookMock(props);
+
+        return {
+            handleConfirmDelete: vi.fn(),
+            isDeletePending: false,
+            setShowDeleteDialog: vi.fn(),
+            showDeleteDialog: false,
+        };
+    },
 }));
 
 vi.mock('@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover', () => ({
-    default: ({connectionRequired}: {connectionRequired?: boolean}) => (
-        <div data-connection-required={String(connectionRequired)}>tool-properties-popover</div>
+    default: ({connectionRequired, embedded}: {connectionRequired?: boolean; embedded?: boolean}) => (
+        <div data-connection-required={String(connectionRequired)} data-embedded={String(embedded)}>
+            tool-properties-popover
+        </div>
     ),
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
-    useUpdateMcpToolEnabledMutation: () => ({mutate: mutateMock}),
+    useUpdateEmbeddedMcpToolEnabledMutation: () => ({mutate: mutateMock}),
 }));
 
 const mcpTool = {enabled: true, id: '42', name: 'createOpportunity', title: 'Create Opportunity'} as McpTool;
@@ -128,7 +137,7 @@ describe('McpComponentToolListItem', () => {
                         componentName="affinity"
                         componentVersion={1}
                         connectionId={null}
-                        enabledSwitchVisible
+                        embedded
                         mcpTool={mcpTool}
                     />
                 </McpActivePopoverProvider>
@@ -147,5 +156,27 @@ describe('McpComponentToolListItem', () => {
         mutateOptions.onSuccess();
 
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['mcpComponentsByServerId']});
+    });
+
+    it('routes deletes and property updates through the embedded operations for an embedded tool', () => {
+        render(
+            <QueryClientProvider client={new QueryClient()}>
+                <McpActivePopoverProvider>
+                    <McpComponentToolListItem
+                        componentName="affinity"
+                        componentVersion={1}
+                        connectionId={null}
+                        embedded
+                        mcpTool={mcpTool}
+                    />
+                </McpActivePopoverProvider>
+            </QueryClientProvider>
+        );
+
+        expect(dropdownMenuHookMock).toHaveBeenCalledWith({embedded: true, mcpTool});
+
+        fireEvent.click(screen.getByTitle('Configure'));
+
+        expect(screen.getByText('tool-properties-popover')).toHaveAttribute('data-embedded', 'true');
     });
 });

@@ -71,6 +71,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                 </Tooltip>
 
                 <McpComponentListItemDropdownMenu
+                    embedded
                     mcpComponent={mcpComponent}
                     onEditClick={() => setShowEditDialog(true)}
                 />

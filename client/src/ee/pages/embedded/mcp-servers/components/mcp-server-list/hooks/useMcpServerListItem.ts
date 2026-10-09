@@ -2,8 +2,8 @@ import useMcpServerListItemClick from '@/shared/components/mcp-server/hooks/useM
 import {
     McpServer,
     useDeleteEmbeddedMcpServerMutation,
-    useUpdateMcpServerMutation,
-    useUpdateMcpServerTagsMutation,
+    useUpdateEmbeddedMcpServerMutation,
+    useUpdateEmbeddedMcpServerTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -19,9 +19,9 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
 
     const {handleMcpServerListItemClick, toolsCollapsibleTriggerRef} = useMcpServerListItemClick();
 
-    const updateMcpServerMutation = useUpdateMcpServerMutation();
+    const updateEmbeddedMcpServerMutation = useUpdateEmbeddedMcpServerMutation();
     const deleteEmbeddedMcpServerMutation = useDeleteEmbeddedMcpServerMutation();
-    const updateMcpServerTagsMutation = useUpdateMcpServerTagsMutation({
+    const updateEmbeddedMcpServerTagsMutation = useUpdateEmbeddedMcpServerTagsMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['mcpServers']});
             queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
@@ -32,7 +32,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const handleOnCheckedChange = async (value: boolean) => {
         setIsEnablePending(true);
 
-        updateMcpServerMutation.mutate(
+        updateEmbeddedMcpServerMutation.mutate(
             {
                 id: mcpServer.id,
                 input: {
@@ -74,7 +74,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
         showDeleteDialog,
         showEditDialog,
         toolsCollapsibleTriggerRef,
-        updateMcpServerTagsMutation,
+        updateEmbeddedMcpServerTagsMutation,
     };
 };
 
