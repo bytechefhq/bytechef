@@ -66,17 +66,15 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
-import com.bytechef.exception.ExecutionException;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
-import com.bytechef.platform.job.sync.exception.JobErrorType;
-import com.bytechef.platform.job.sync.exception.TaskExecutionErrorType;
 import com.bytechef.platform.worker.task.CallableResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
+import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -690,74 +688,7 @@ public class JobSyncExecutor {
     }
 
     private void checkForError(Job job) {
-        long jobId = Validate.notNull(job.getId(), "id");
-
-        TaskExecution taskExecution = taskExecutionService
-            .fetchLastJobTaskExecution(jobId)
-            .orElse(null);
-
-        boolean taskExecutionFailed =
-            taskExecution != null && taskExecution.getStatus() == TaskExecution.Status.FAILED;
-
-        if (taskExecutionFailed) {
-            ExecutionError error = taskExecution.getError();
-
-            if (error != null && error.getMessage() != null) {
-                throw new ExecutionException(error.getMessage(), TaskExecutionErrorType.TASK_EXECUTION_FAILED);
-            }
-        }
-
-        if (taskExecutionFailed || job.getStatus() == Job.Status.FAILED) {
-            String errorMessage = findFailedTaskExecutionErrorMessage(
-                taskExecutionService.getJobTaskExecutions(jobId));
-
-            if (errorMessage != null) {
-                throw new ExecutionException(errorMessage, TaskExecutionErrorType.TASK_EXECUTION_FAILED);
-            }
-        }
-
-        if (taskExecutionFailed) {
-            String message =
-                "Task execution failed for job " + job.getId() + " but no error details are available.";
-
-            if (log.isWarnEnabled()) {
-                log.warn(
-                    "Detected FAILED task execution without error details for jobId={}, taskExecutionId={}",
-                    job.getId(), taskExecution.getId());
-            }
-
-            throw new ExecutionException(message, TaskExecutionErrorType.TASK_EXECUTION_FAILED);
-        }
-
-        if (job.getStatus() == Job.Status.FAILED) {
-            ExecutionError error = job.getError();
-
-            if (error != null && error.getMessage() != null) {
-                throw new ExecutionException(error.getMessage(), JobErrorType.JOB_FAILED);
-            }
-
-            String message = "Job " + job.getId() + " failed but no error details are available.";
-
-            if (log.isWarnEnabled()) {
-                log.warn("Detected FAILED job without error details for jobId={}", job.getId());
-            }
-
-            throw new ExecutionException(message, JobErrorType.JOB_FAILED);
-        }
-    }
-
-    private static @Nullable String findFailedTaskExecutionErrorMessage(List<TaskExecution> taskExecutions) {
-        for (TaskExecution taskExecution : taskExecutions.reversed()) {
-            ExecutionError error = taskExecution.getError();
-
-            if (taskExecution.getStatus() == TaskExecution.Status.FAILED && error != null &&
-                error.getMessage() != null) {
-
-                return error.getMessage();
-            }
-        }
-
-        return null;
+        JobExecutionErrors.checkForError(job, taskExecutionService);
     }
 
     private static <T> Cache<String, CopyOnWriteArrayList<T>> createCache() {
