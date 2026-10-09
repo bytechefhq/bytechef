@@ -1369,14 +1369,28 @@ export const useProperty = ({
             setIsFormulaMode(true);
         }
 
-        const shouldSaveHiddenProperty =
-            hidden &&
-            encodedPath &&
+        const canSaveDefaultValue =
+            !!encodedPath &&
             (objectName === undefined || dynamicPropertySource === objectName) &&
-            (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
-            safeResolvePath(encodedParameters, encodedPath) !== defaultValue;
+            !!(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation);
 
-        if (shouldSaveHiddenProperty) {
+        const storedValue = encodedPath ? safeResolvePath(encodedParameters, encodedPath) : undefined;
+
+        const shouldSaveHiddenProperty = hidden && canSaveDefaultValue && storedValue !== defaultValue;
+
+        const shouldSaveRequiredDefaultValue =
+            required &&
+            !hidden &&
+            canSaveDefaultValue &&
+            parameterValue === undefined &&
+            (storedValue === undefined || storedValue === null) &&
+            defaultValue !== '';
+
+        if (shouldSaveRequiredDefaultValue) {
+            resolveParameterValue(defaultValue);
+        }
+
+        if (shouldSaveHiddenProperty || shouldSaveRequiredDefaultValue) {
             const saveDefaultValue = () => {
                 saveProperty({
                     path: path!,
