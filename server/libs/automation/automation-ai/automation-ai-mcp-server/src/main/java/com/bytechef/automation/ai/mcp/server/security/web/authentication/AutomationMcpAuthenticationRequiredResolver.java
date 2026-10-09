@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
@@ -57,7 +58,7 @@ public class AutomationMcpAuthenticationRequiredResolver implements McpAuthentic
             McpServer mcpServer = TenantContext.callWithTenantId(
                 tenantKey.getTenantId(), () -> mcpServerService.getMcpServer(mcpServerSecretKey));
 
-            return Optional.of(mcpServer.isAuthenticationRequired());
+            return Optional.of(mcpServer.getType() != PlatformType.AUTOMATION || mcpServer.isAuthenticationRequired());
         } catch (Exception exception) {
             return Optional.of(true);
         }

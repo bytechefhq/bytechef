@@ -225,6 +225,32 @@ class AutomationMcpServerSecurityConfigurerIntTest {
         }
 
         @Test
+        void testRequestWithValidApiKeyForAnEmbeddedMcpServerSecretKeyIsRejected() throws Exception {
+            mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+            mockMcpServer(Environment.PRODUCTION, PlatformType.EMBEDDED, true);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .header("Authorization", "Bearer " + API_SECRET_KEY))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        @Test
+        void testRequestWithoutBearerTokenForAnEmbeddedMcpServerSecretKeyIsRejected() throws Exception {
+            mockMcpServer(Environment.PRODUCTION, PlatformType.EMBEDDED, false);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY)))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        @Test
         void testRequestWithoutBearerTokenResolvesMcpServerInsidePathTenant() throws Exception {
             List<String> mcpServerLookupTenantIds = mockOtherTenantMcpServer(false);
 
@@ -304,17 +330,23 @@ class AutomationMcpServerSecurityConfigurerIntTest {
         }
 
         private void mockMcpServer(Environment environment) {
+            mockMcpServer(environment, PlatformType.AUTOMATION, true);
+        }
+
+        private void mockMcpServer(Environment environment, PlatformType type, boolean authenticationRequired) {
             McpServer mcpServer = mock(McpServer.class);
 
+            when(mcpServer.getType()).thenReturn(type);
             when(mcpServer.getEnvironment()).thenReturn(environment);
             when(mcpServer.isEnabled()).thenReturn(true);
-            when(mcpServer.isAuthenticationRequired()).thenReturn(true);
+            when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
             when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
         }
 
         private List<String> mockOtherTenantMcpServer(boolean authenticationRequired) {
             McpServer mcpServer = mock(McpServer.class);
 
+            when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
             when(mcpServer.getEnvironment()).thenReturn(Environment.PRODUCTION);
             when(mcpServer.isEnabled()).thenReturn(true);
             when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
@@ -642,6 +674,7 @@ class AutomationMcpServerSecurityConfigurerIntTest {
         private McpServer mockMcpServer(Environment environment, boolean authenticationRequired) {
             McpServer mcpServer = mock(McpServer.class);
 
+            when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
             when(mcpServer.getEnvironment()).thenReturn(environment);
             when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
             when(mcpServer.isEnabled()).thenReturn(true);
