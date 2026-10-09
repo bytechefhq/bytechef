@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -29,6 +30,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowServiceImpl;
+import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
@@ -42,6 +44,8 @@ import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
+import com.bytechef.platform.mcp.service.McpComponentServiceImpl;
+import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -283,6 +287,51 @@ class McpIntegrationInstanceToolFacadeIntTest {
         assertThat(countMcpIntegrationInstanceTools()).isZero();
     }
 
+    @Test
+    void testEnableMcpIntegrationInstanceToolRejectsToolOfAnotherIntegration() {
+        McpServer foreignMcpServer = mcpServerRepository.save(
+            new McpServer("Slack", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
+
+        McpComponent foreignMcpComponent = mcpComponentRepository.save(
+            new McpComponent("slack", 1, foreignMcpServer.getId(), null));
+
+        McpTool foreignMcpTool = mcpToolRepository.save(
+            new McpTool("sendMessage", Map.of(), foreignMcpComponent.getId()));
+
+        long foreignMcpToolId = Objects.requireNonNull(foreignMcpTool.getId());
+
+        assertThatThrownBy(() -> mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(
+            integrationInstanceId, foreignMcpToolId, true))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("does not belong to integration instance");
+
+        verify(mcpIntegrationInstanceToolService, never()).createMcpIntegrationInstanceTool(
+            integrationInstanceId, foreignMcpToolId, true);
+
+        assertThat(countMcpIntegrationInstanceTools()).isZero();
+    }
+
+    @Test
+    void testEnableMcpIntegrationInstanceToolRejectsToolOfANonEmbeddedMcpServer() {
+        McpServer automationMcpServer = mcpServerRepository.save(
+            new McpServer("Automation", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
+
+        McpComponent automationMcpComponent = mcpComponentRepository.save(
+            new McpComponent("gmail", 1, automationMcpServer.getId(), null));
+
+        McpTool automationMcpTool = mcpToolRepository.save(
+            new McpTool("searchEmail", Map.of(), automationMcpComponent.getId()));
+
+        long automationMcpToolId = Objects.requireNonNull(automationMcpTool.getId());
+
+        assertThatThrownBy(() -> mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(
+            integrationInstanceId, automationMcpToolId, true))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("does not belong to integration instance");
+
+        assertThat(countMcpIntegrationInstanceTools()).isZero();
+    }
+
     private int countMcpIntegrationInstanceTools() {
         Integer count =
             jdbcTemplate.queryForObject("SELECT COUNT(*) FROM mcp_integration_instance_tool", Integer.class);
@@ -335,9 +384,10 @@ class McpIntegrationInstanceToolFacadeIntTest {
     @Import({
         ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class,
         IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceServiceImpl.class,
-        IntegrationInstanceWorkflowServiceImpl.class, IntegrationWorkflowServiceImpl.class,
+        IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
+        IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolFacadeImpl.class,
-        McpIntegrationInstanceWorkflowFacadeImpl.class
+        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class
     })
     static class FacadeIntTestConfiguration {
 
