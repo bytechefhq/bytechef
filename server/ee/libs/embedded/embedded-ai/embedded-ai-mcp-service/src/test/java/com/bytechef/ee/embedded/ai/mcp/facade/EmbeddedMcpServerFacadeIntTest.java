@@ -209,6 +209,17 @@ class EmbeddedMcpServerFacadeIntTest {
         }
 
         @Test
+        void testCreateEmbeddedMcpServerWithoutEnabled() {
+            McpServer mcpServer = createMcpServer(EMBEDDED_MCP_SERVER_ID, PlatformType.EMBEDDED);
+
+            when(mcpServerService.create("Embedded", PlatformType.EMBEDDED, Environment.DEVELOPMENT, null))
+                .thenReturn(mcpServer);
+
+            assertThat(embeddedMcpServerFacade.createEmbeddedMcpServer("Embedded", Environment.DEVELOPMENT, null))
+                .isSameAs(mcpServer);
+        }
+
+        @Test
         void testDeleteEmbeddedMcpComponent() {
             embeddedMcpServerFacade.deleteEmbeddedMcpComponent(EMBEDDED_MCP_COMPONENT_ID);
 
