@@ -5,8 +5,8 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {Download, MoreVertical, Pencil, Trash2, Upload} from 'lucide-react';
+} from '@/components/DropdownMenu/DropdownMenu';
+import {DownloadIcon, MoreVerticalIcon, PencilIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 
 interface DataTableActionsMenuProps {
     onDeleteTable: () => void;
@@ -26,34 +26,26 @@ const DataTableActionsMenu = ({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button aria-label="More actions" icon={<MoreVertical className="h-4 w-4" />} variant="ghost" />
+                <Button aria-label="More actions" icon={<MoreVerticalIcon className="h-4 w-4" />} variant="ghost" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onImportCsv}>
-                    <Upload className="mr-2 size-4" /> Import CSV
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<UploadIcon />} label="Import CSV" onClick={onImportCsv} />
 
-                <DropdownMenuItem onClick={onExportCsv}>
-                    <Download className="mr-2 h-4 w-4" /> Export CSV
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<DownloadIcon />} label="Export CSV" onClick={onExportCsv} />
 
-                {tableId && (
-                    <DropdownMenuItem onClick={onRenameTable}>
-                        <Pencil className="mr-2 h-4 w-4" /> Rename Table
-                    </DropdownMenuItem>
-                )}
+                {tableId && <DropdownMenuItem icon={<PencilIcon />} label="Rename Table" onClick={onRenameTable} />}
 
                 {tableId && (
                     <>
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="text-content-destructive focus:text-content-destructive-primary"
+                            icon={<Trash2Icon />}
+                            label="Delete Table"
                             onClick={onDeleteTable}
-                        >
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete Table
-                        </DropdownMenuItem>
+                            variant="destructive"
+                        />
                     </>
                 )}
             </DropdownMenuContent>

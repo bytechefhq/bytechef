@@ -36,6 +36,22 @@ describe('DataTableActionsMenu', () => {
         });
     });
 
+    describe('design system', () => {
+        it('should render with the design-system DropdownMenu', async () => {
+            const user = userEvent.setup();
+
+            render(<DataTableActionsMenu {...defaultProps} />);
+
+            await user.click(screen.getByRole('button', {name: 'More actions'}));
+
+            expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+            expect(screen.getByRole('menuitem', {name: 'Import CSV'})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Delete Table'})).toHaveClass(
+                'text-content-destructive-primary'
+            );
+        });
+    });
+
     describe('menu items when tableId is provided', () => {
         it('should show all menu items when trigger is clicked', async () => {
             const user = userEvent.setup();
