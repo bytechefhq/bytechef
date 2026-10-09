@@ -82,6 +82,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
+import org.reactivestreams.Subscription;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
@@ -288,6 +289,104 @@ class AiAgentStreamChatActionTest {
         verify(emitter).send("chunk-2");
         verify(emitter).complete();
         verify(emitter, never()).error(any());
+    }
+
+    @Test
+    void testStreamCompletionSetsTheOutputBeforeCompleting() {
+        SseEmitter emitter = mock(SseEmitter.class);
+
+        AiAgentStreamChatAction
+            .createSseHandler(Flux.just("chunk"), new SseTransport(), () -> "answer", mock(ActionContext.class))
+            .handle(emitter);
+
+        InOrder inOrder = inOrder(emitter);
+
+        inOrder.verify(emitter)
+            .setOutput("answer");
+        inOrder.verify(emitter)
+            .complete();
+    }
+
+    @Test
+    void testStreamCompletionStillCompletesWhenTheOutputCannotBeBuilt() {
+        SseEmitter emitter = mock(SseEmitter.class);
+
+        AiAgentStreamChatAction
+            .createSseHandler(
+                Flux.just("chunk"), new SseTransport(), () -> {
+                    throw new IllegalStateException("not valid JSON");
+                },
+                mock(ActionContext.class))
+            .handle(emitter);
+
+        verify(emitter, never()).setOutput(any());
+        verify(emitter).complete();
+    }
+
+    @Test
+    void testAFailedSendSetsNoOutputEvenWhenThePublisherCompletesAfterwards() {
+        SseEmitter emitter = mock(SseEmitter.class);
+
+        doThrow(new IllegalStateException("disconnected")).when(emitter)
+            .send(any());
+
+        Flux<Object> cancellationIgnoringUpstream = Flux.from(subscriber -> {
+            subscriber.onSubscribe(new Subscription() {
+
+                @Override
+                public void request(long n) {
+                }
+
+                @Override
+                public void cancel() {
+                }
+            });
+
+            subscriber.onNext("chunk");
+            subscriber.onComplete();
+        });
+
+        AiAgentStreamChatAction
+            .createSseHandler(cancellationIgnoringUpstream, new SseTransport(), () -> "answer",
+                mock(ActionContext.class))
+            .handle(emitter);
+
+        verify(emitter).error(any());
+        verify(emitter, never()).setOutput(any());
+        verify(emitter, never()).complete();
+    }
+
+    @Test
+    void testFailedStreamSetsNoOutput() {
+        SseEmitter emitter = mock(SseEmitter.class);
+
+        AiAgentStreamChatAction
+            .createSseHandler(
+                Flux.error(new IllegalStateException("model failed")), new SseTransport(), () -> "answer",
+                mock(ActionContext.class))
+            .handle(emitter);
+
+        verify(emitter, never()).setOutput(any());
+        verify(emitter).error(any());
+    }
+
+    @Test
+    void testTurnTextSeparatorKeepsOnlyTheTextAfterTheLastToolExecution() {
+        AiAgentStreamChatAction.TurnTextSeparator turnTextSeparator = new AiAgentStreamChatAction.TurnTextSeparator();
+
+        turnTextSeparator.apply("I'll look it up.");
+        turnTextSeparator.markToolExecuted();
+        turnTextSeparator.apply("The answer ");
+        turnTextSeparator.apply("is 42.");
+
+        assertThat(turnTextSeparator.getTurnText()).isEqualTo("The answer is 42.");
+    }
+
+    @Test
+    void testToOutputWrapsTheResponseWithGuardrailMetadata() {
+        assertThat(AiAgentStreamChatAction.toOutput("answer", Map.of())).isEqualTo("answer");
+        assertThat(AiAgentStreamChatAction.toOutput("answer", Map.of("piiDetected", true)))
+            .isEqualTo(Map.of("response", "answer", "guardrail", Map.of("piiDetected", true)));
     }
 
     @Test
