@@ -136,6 +136,7 @@
             constraintName="fk_mcp_server_tag_tag"
             referencedTableName="tag"
             referencedColumnNames="id"/>
+        <rollback/>
     </changeSet>
 
     <changeSet id="20250313170121-1" author="Ivica Cardic" contextFilter="mono">
@@ -151,5 +152,6 @@
             constraintName="fk_mcp_component_connection"
             referencedTableName="connection"
             referencedColumnNames="id"/>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
