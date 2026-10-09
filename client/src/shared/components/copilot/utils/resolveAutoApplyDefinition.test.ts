@@ -52,6 +52,12 @@ describe('resolveAutoApplyDefinition', () => {
         expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
     });
 
+    it('returns null when the fenced block is neither valid JSON nor valid YAML', () => {
+        const messages = [assistant('```json\n{"tasks": [\n```')];
+
+        expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
+    });
+
     it('accepts a fenced yaml document', () => {
         const messages = [assistant('```yaml\nlabel: x\ntasks: []\n```')];
 
