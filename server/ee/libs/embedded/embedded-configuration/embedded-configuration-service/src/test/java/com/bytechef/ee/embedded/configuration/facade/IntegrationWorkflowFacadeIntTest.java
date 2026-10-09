@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,6 +76,7 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.validator.WorkflowValidator;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -170,6 +172,9 @@ class IntegrationWorkflowFacadeIntTest {
     @BeforeEach
     void beforeEach() {
         authenticate(tenantAdmin());
+
+        when(workflowValidatorFacade.getReservedNodeNames(anyString()))
+            .thenAnswer(invocation -> WorkflowValidator.getReservedNodeNames(invocation.getArgument(0)));
     }
 
     @AfterEach
