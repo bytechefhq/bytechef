@@ -19,12 +19,11 @@ package com.bytechef.platform.workflow.execution.token;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.nio.charset.StandardCharsets;
+import com.bytechef.commons.util.EncodingUtils;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.Base64;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -55,9 +54,7 @@ class ApprovalTokensTest {
         String token = approvalTokens.toSignedToken(INNER, TTL);
 
         String[] parts = token.split("\\.");
-        String forgedPayload = Base64.getUrlEncoder()
-            .withoutPadding()
-            .encodeToString("tenant:99:uuid-123:true".getBytes(StandardCharsets.UTF_8));
+        String forgedPayload = EncodingUtils.urlEncodeBase64ToString("tenant:99:uuid-123:true");
         String forged = parts[0] + "." + parts[1] + "." + forgedPayload + "." + parts[3];
 
         assertThat(approvalTokens.parseSignedToken(forged)).isEmpty();
@@ -118,7 +115,6 @@ class ApprovalTokensTest {
     }
 
     private static String base64Secret(String raw) {
-        return Base64.getEncoder()
-            .encodeToString(raw.getBytes(StandardCharsets.UTF_8));
+        return EncodingUtils.base64EncodeToString(raw);
     }
 }

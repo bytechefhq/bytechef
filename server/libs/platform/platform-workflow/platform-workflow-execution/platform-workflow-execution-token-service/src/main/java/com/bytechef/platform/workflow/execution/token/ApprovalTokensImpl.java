@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.token;
 
+import com.bytechef.commons.util.EncodingUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -24,7 +25,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import javax.crypto.Mac;
@@ -202,8 +202,7 @@ public final class ApprovalTokensImpl implements ApprovalTokens {
             return null;
         }
 
-        byte[] decodedSecret = Base64.getDecoder()
-            .decode(secret);
+        byte[] decodedSecret = EncodingUtils.base64Decode(secret);
 
         if (decodedSecret.length < MINIMUM_SECRET_LENGTH) {
             throw new IllegalStateException(
@@ -230,15 +229,12 @@ public final class ApprovalTokensImpl implements ApprovalTokens {
     }
 
     private static String toUrlSafeBase64(byte[] bytes) {
-        return Base64.getUrlEncoder()
-            .withoutPadding()
-            .encodeToString(bytes);
+        return EncodingUtils.urlEncodeBase64ToString(bytes);
     }
 
     private static byte @Nullable [] fromUrlSafeBase64(String value) {
         try {
-            return Base64.getUrlDecoder()
-                .decode(value);
+            return EncodingUtils.urlDecodeBase64FromString(value);
         } catch (IllegalArgumentException illegalArgumentException) {
             return null;
         }
