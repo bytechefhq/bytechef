@@ -21,9 +21,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
+import com.bytechef.automation.ai.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
+import com.bytechef.automation.ai.mcp.repository.WorkspaceMcpServerRepository;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -83,6 +85,9 @@ class McpProjectDeploymentDeleteEventListenerIntTest {
     private ProjectWorkflowFacade projectWorkflowFacade;
 
     @Autowired
+    private WorkspaceMcpServerRepository workspaceMcpServerRepository;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     private McpServer mcpServer;
@@ -94,6 +99,8 @@ class McpProjectDeploymentDeleteEventListenerIntTest {
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
         Workspace workspace = workspaceRepository.save(new Workspace("test-workspace"));
+
+        workspaceMcpServerRepository.save(new WorkspaceMcpServer(mcpServer.getId(), workspace.getId()));
 
         project = projectRepository.save(
             Project.builder()
@@ -107,6 +114,7 @@ class McpProjectDeploymentDeleteEventListenerIntTest {
     void afterEach() {
         mcpProjectWorkflowRepository.deleteAll();
         mcpProjectRepository.deleteAll();
+        workspaceMcpServerRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
         projectRepository.deleteAll();

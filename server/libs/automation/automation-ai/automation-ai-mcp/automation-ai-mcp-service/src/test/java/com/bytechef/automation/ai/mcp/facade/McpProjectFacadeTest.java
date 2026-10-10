@@ -33,6 +33,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -70,6 +71,8 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(ObjectMapperSetupExtension.class)
 class McpProjectFacadeTest {
 
+    private static final long WORKSPACE_ID = 500L;
+
     private final ComponentConnectionFacade componentConnectionFacade = mock(ComponentConnectionFacade.class);
     private final ConnectionService connectionService = mock(ConnectionService.class);
     private final McpProjectAuditPublisher mcpProjectAuditPublisher = mock(McpProjectAuditPublisher.class);
@@ -84,17 +87,20 @@ class McpProjectFacadeTest {
     private final WorkflowService workflowService = mock(WorkflowService.class);
     private final WorkflowTestConfigurationService workflowTestConfigurationService =
         mock(WorkflowTestConfigurationService.class);
+    private final WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
 
     private final McpProjectFacade mcpProjectFacade = new McpProjectFacadeImpl(
         componentConnectionFacade, connectionService, mcpProjectAuditPublisher, mcpProjectService,
         mcpProjectWorkflowService, mcpServerService, projectDeploymentService, projectDeploymentWorkflowService,
-        projectService, projectWorkflowService, workflowService, workflowTestConfigurationService);
+        projectService, projectWorkflowService, workflowService, workflowTestConfigurationService,
+        workspaceMcpServerService);
 
     @BeforeEach
     void beforeEach() {
         when(mcpServerService.getMcpServer(1L)).thenReturn(
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.PRODUCTION));
         when(projectService.getProject(100L)).thenReturn(project(3));
+        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.of(WORKSPACE_ID));
         when(projectDeploymentService.create(any(ProjectDeployment.class)))
             .thenAnswer(invocation -> {
                 ProjectDeployment projectDeployment = invocation.getArgument(0);
@@ -135,6 +141,33 @@ class McpProjectFacadeTest {
         ProjectDeployment projectDeployment = projectDeploymentArgumentCaptor.getValue();
 
         assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
+    }
+
+    @Nested
+    class WorkspaceIsolation {
+
+        @Test
+        void testCreateMcpProjectRejectsAnMcpServerOfAnotherWorkspace() {
+            when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.of(501L));
+
+            assertThatIllegalArgumentException()
+                .isThrownBy(() -> mcpProjectFacade.createMcpProject(1L, 100L, 1, List.of()))
+                .withMessageContaining("not in the same workspace");
+
+            verify(projectDeploymentService, never()).create(any(ProjectDeployment.class));
+            verify(mcpProjectService, never()).create(any(McpProject.class));
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsAnMcpServerWithoutWorkspace() {
+            when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.empty());
+
+            assertThatIllegalArgumentException()
+                .isThrownBy(() -> mcpProjectFacade.createMcpProject(1L, 100L, 1, List.of()))
+                .withMessageContaining("not in the same workspace");
+
+            verify(projectDeploymentService, never()).create(any(ProjectDeployment.class));
+        }
     }
 
     @Nested
@@ -362,6 +395,7 @@ class McpProjectFacadeTest {
         Project project = Project.builder()
             .id(100L)
             .name("project")
+            .workspaceId(WORKSPACE_ID)
             .build();
 
         for (int index = 0; index < publishedProjectVersionCount; index++) {
