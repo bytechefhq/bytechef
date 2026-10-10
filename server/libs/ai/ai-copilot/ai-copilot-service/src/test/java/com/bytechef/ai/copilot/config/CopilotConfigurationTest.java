@@ -27,6 +27,7 @@ import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
 import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
@@ -53,8 +54,10 @@ class CopilotConfigurationTest {
 
     private final CopilotConfiguration copilotConfiguration = new CopilotConfiguration(
         PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
-        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, mock(WorkflowValidatorTools.class),
-        mock(WorkflowInstructionTools.class), mock(ConnectionDefinitionService.class),
+        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
+        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
+        mock(WorkflowValidatorTools.class), mock(WorkflowInstructionTools.class),
+        mock(ConnectionDefinitionService.class),
         mock(WorkspaceConnectionFacade.class), mock(ComponentDefinitionService.class),
         mock(ActionDefinitionService.class), mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
         mock(TriggerDefinitionFacade.class), mock(PropertyOptionsResolver.class),
@@ -66,7 +69,8 @@ class CopilotConfigurationTest {
             mock(ChatMemory.class), mock(ChatModel.class),
             CopilotConfigurationTest.<IntelligentToolChatClientFactory>emptyProvider(),
             PROMPT_RESOURCE, mock(SecurityContextRehydrator.class),
-            CopilotConfigurationTest.<OverrideChatClientResolver>emptyProvider());
+            CopilotConfigurationTest.<OverrideChatClientResolver>emptyProvider(),
+            CopilotConfigurationTest.<SubAgentChatModelResolver>emptyProvider());
 
         assertThat(mcpServerSpringAIAgent.getAgentId()).isEqualTo("mcp_server_build");
     }
