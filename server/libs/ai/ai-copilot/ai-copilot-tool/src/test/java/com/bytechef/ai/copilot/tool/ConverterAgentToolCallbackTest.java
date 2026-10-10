@@ -64,7 +64,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(synthesised);
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"convert this n8n workflow\"}");
 
@@ -73,7 +73,7 @@ class ConverterAgentToolCallbackTest {
 
     @Test
     void testCallReturnsErrorWhenRequestIsBlank() {
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> mock(ChatClient.class));
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("{\"request\":\"   \"}");
 
@@ -84,7 +84,7 @@ class ConverterAgentToolCallbackTest {
 
     @Test
     void testCallReturnsErrorOnInvalidJson() {
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> mock(ChatClient.class));
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("not-json");
 
@@ -104,7 +104,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(null);
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -126,7 +126,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(new RuntimeException("conversion engine failure"));
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -155,7 +155,7 @@ class ConverterAgentToolCallbackTest {
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -179,7 +179,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -204,11 +204,11 @@ class ConverterAgentToolCallbackTest {
 
         AtomicInteger factoryCalls = new AtomicInteger();
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> {
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> {
             factoryCalls.incrementAndGet();
 
             return chatClient;
-        });
+        }, null);
 
         String firstResult = callback.call("{\"request\":\"convert this n8n workflow\"}");
         String secondResult = callback.call("{\"request\":\"convert that make workflow\"}");
@@ -220,7 +220,7 @@ class ConverterAgentToolCallbackTest {
 
     @Test
     void testToolDefinitionExposesConverterAgentNameAndRequestSchema() {
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> mock(ChatClient.class));
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         assertThat(callback.getToolDefinition()
             .name()).isEqualTo("importWorkflow");
@@ -249,7 +249,7 @@ class ConverterAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(upstreamException);
 
-        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> chatClient);
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 

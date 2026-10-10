@@ -16,7 +16,9 @@
 
 package com.bytechef.ai.copilot.tool.catalog;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 
 /**
  * @author Ivica Cardic
@@ -24,5 +26,5 @@ import org.springframework.ai.chat.client.ChatClient;
 @FunctionalInterface
 public interface IntelligentToolChatClientFactory {
 
-    ChatClient get();
+    ChatClient get(@Nullable ChatModel chatModel);
 }

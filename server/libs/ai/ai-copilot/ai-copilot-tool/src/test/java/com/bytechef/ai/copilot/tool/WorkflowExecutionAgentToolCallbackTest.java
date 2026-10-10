@@ -60,7 +60,7 @@ class WorkflowExecutionAgentToolCallbackTest {
         when(responseSpec.content()).thenReturn(synthesised);
 
         WorkflowExecutionAgentToolCallback callback =
-            new WorkflowExecutionAgentToolCallback(() -> chatClient);
+            new WorkflowExecutionAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"why did the last run fail?\"}");
 
@@ -70,25 +70,23 @@ class WorkflowExecutionAgentToolCallbackTest {
     @Test
     void testCallReturnsErrorWhenRequestIsBlank() {
         WorkflowExecutionAgentToolCallback callback =
-            new WorkflowExecutionAgentToolCallback(() -> mock(ChatClient.class));
+            new WorkflowExecutionAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("{\"request\":\"   \"}");
 
-        assertThat(result)
-            .contains("error")
-            .containsIgnoringCase("request is required");
+        assertThat(result).contains("error");
+        assertThat(result).containsIgnoringCase("request is required");
     }
 
     @Test
     void testCallReturnsErrorOnInvalidJson() {
         WorkflowExecutionAgentToolCallback callback =
-            new WorkflowExecutionAgentToolCallback(() -> mock(ChatClient.class));
+            new WorkflowExecutionAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("not-json");
 
-        assertThat(result)
-            .contains("error")
-            .containsIgnoringCase("invalid tool input");
+        assertThat(result).contains("error");
+        assertThat(result).containsIgnoringCase("invalid tool input");
     }
 
     @Test
@@ -103,7 +101,7 @@ class WorkflowExecutionAgentToolCallbackTest {
         when(responseSpec.content()).thenReturn(null);
 
         WorkflowExecutionAgentToolCallback callback =
-            new WorkflowExecutionAgentToolCallback(() -> chatClient);
+            new WorkflowExecutionAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -126,7 +124,7 @@ class WorkflowExecutionAgentToolCallbackTest {
         when(responseSpec.content()).thenThrow(new RuntimeException("execution facade unavailable"));
 
         WorkflowExecutionAgentToolCallback callback =
-            new WorkflowExecutionAgentToolCallback(() -> chatClient);
+            new WorkflowExecutionAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -156,7 +154,7 @@ class WorkflowExecutionAgentToolCallbackTest {
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
         WorkflowExecutionAgentToolCallback callback =
-            new WorkflowExecutionAgentToolCallback(() -> chatClient);
+            new WorkflowExecutionAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -175,7 +173,7 @@ class WorkflowExecutionAgentToolCallbackTest {
         when(responseSpec.content()).thenReturn("ok");
 
         WorkflowExecutionAgentToolCallback callback =
-            new WorkflowExecutionAgentToolCallback(() -> chatClient);
+            new WorkflowExecutionAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -185,7 +183,7 @@ class WorkflowExecutionAgentToolCallbackTest {
     @Test
     void testToolDefinitionExposesWorkflowExecutionAgentNameAndRequestSchema() {
         WorkflowExecutionAgentToolCallback callback =
-            new WorkflowExecutionAgentToolCallback(() -> mock(ChatClient.class));
+            new WorkflowExecutionAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         assertThat(callback.getToolDefinition()
             .name()).isEqualTo("debugWorkflowExecution");
@@ -215,7 +213,7 @@ class WorkflowExecutionAgentToolCallbackTest {
         when(responseSpec.content()).thenThrow(upstreamException);
 
         WorkflowExecutionAgentToolCallback callback =
-            new WorkflowExecutionAgentToolCallback(() -> chatClient);
+            new WorkflowExecutionAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 

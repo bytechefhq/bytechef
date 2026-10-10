@@ -121,7 +121,7 @@ class IntelligentToolCatalogTest {
     @Test
     void testBuildToolCallbackDoesNotResolveTheRawChatClientFactoryEagerly() {
         AtomicInteger rawFactoryResolutionCount = new AtomicInteger();
-        IntelligentToolChatClientFactory rawChatClientFactory = () -> {
+        IntelligentToolChatClientFactory rawChatClientFactory = chatModel -> {
             rawFactoryResolutionCount.incrementAndGet();
 
             return mock(ChatClient.class);
@@ -146,7 +146,7 @@ class IntelligentToolCatalogTest {
 
     private static FakeIntelligentToolDefinition buildDefinition(String name, ChatClient chatClient) {
         return new FakeIntelligentToolDefinition(
-            name, Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) () -> chatClient));
+            name, Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient));
     }
 
     private static BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> identityChatClientDecorator() {
@@ -197,7 +197,7 @@ class IntelligentToolCatalogTest {
 
         @Override
         public ToolCallback create(IntelligentToolChatClientFactory chatClientFactory) {
-            capturedChatClient = chatClientFactory.get();
+            capturedChatClient = chatClientFactory.get(null);
 
             return toolCallback;
         }
