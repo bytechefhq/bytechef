@@ -17,16 +17,12 @@
 package com.bytechef.automation.ai.mcp.event;
 
 import com.bytechef.automation.ai.mcp.domain.McpProject;
-import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
-import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
-import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
 import org.springframework.data.relational.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.Identifier;
@@ -42,21 +38,13 @@ import org.springframework.stereotype.Component;
 public class McpServerBeforeDeleteEventListener extends AbstractRelationalEventListener<McpServer> {
 
     private final McpProjectService mcpProjectService;
-    private final McpProjectWorkflowService mcpProjectWorkflowService;
-    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
-    private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
 
     @SuppressFBWarnings("EI")
     public McpServerBeforeDeleteEventListener(
-        McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        ProjectDeploymentService projectDeploymentService, ProjectDeploymentFacade projectDeploymentFacade) {
+        McpProjectService mcpProjectService, ProjectDeploymentFacade projectDeploymentFacade) {
 
         this.mcpProjectService = mcpProjectService;
-        this.mcpProjectWorkflowService = mcpProjectWorkflowService;
-        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
-        this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentFacade = projectDeploymentFacade;
     }
 
@@ -71,21 +59,8 @@ public class McpServerBeforeDeleteEventListener extends AbstractRelationalEventL
         List<McpProject> mcpProjects = mcpProjectService.getMcpServerMcpProjects(mcpServerId);
 
         for (McpProject mcpProject : mcpProjects) {
-            projectDeploymentFacade.enableProjectDeployment(mcpProject.getProjectDeploymentId(), false);
-
-            List<McpProjectWorkflow> mcpProjectWorkflows = mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(
-                mcpProject.getId());
-
-            for (McpProjectWorkflow mcpProjectWorkflow : mcpProjectWorkflows) {
-                ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
-                    .getProjectDeploymentWorkflow(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
-
-                mcpProjectWorkflowService.delete(mcpProjectWorkflow.getId());
-                projectDeploymentWorkflowService.delete(projectDeploymentWorkflow.getId());
-            }
-
-            mcpProjectService.delete(mcpProject.getId());
-            projectDeploymentService.delete(mcpProject.getProjectDeploymentId());
+            projectDeploymentFacade.deleteProjectDeployment(
+                Objects.requireNonNull(mcpProject.getProjectDeploymentId()));
         }
     }
 }

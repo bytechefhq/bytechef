@@ -21,9 +21,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.automation.ai.mcp.config.McpIntTestWorkflows;
 import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
@@ -59,6 +61,9 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Optional;
@@ -93,6 +98,9 @@ class McpProjectFacadeIntTest {
     private ConnectionService connectionService;
 
     @Autowired
+    private JobFacade jobFacade;
+
+    @Autowired
     private McpProjectFacade mcpProjectFacade;
 
     @Autowired
@@ -105,6 +113,9 @@ class McpProjectFacadeIntTest {
     private McpServerRepository mcpServerRepository;
 
     @Autowired
+    private PrincipalJobService principalJobService;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
@@ -115,6 +126,12 @@ class McpProjectFacadeIntTest {
 
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
+
+    @Autowired
+    private TriggerExecutionService triggerExecutionService;
+
+    @Autowired
+    private TriggerLifecycleFacade triggerLifecycleFacade;
 
     @Autowired
     private WorkspaceMcpServerRepository workspaceMcpServerRepository;
@@ -817,6 +834,62 @@ class McpProjectFacadeIntTest {
                 clonedMcpProject.getProjectDeploymentId()))
                     .extracting(ProjectDeploymentWorkflow::getWorkflowId)
                     .containsExactly(workflowId1);
+        }
+    }
+
+    @Nested
+    class SystemDeploymentCleanup {
+
+        @Test
+        void testDeleteMcpProjectDeletesTheJobsAndDisablesTheTriggersOfItsSystemDeployment() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            long projectDeploymentId = mcpProject.getProjectDeploymentId();
+
+            when(principalJobService.getJobIds(projectDeploymentId, PlatformType.AUTOMATION))
+                .thenReturn(List.of(42L, 43L));
+
+            mcpProjectFacade.deleteMcpProject(mcpProject.getId());
+
+            verifySystemDeploymentCleanedUp(projectDeploymentId);
+
+            assertThat(mcpProjectRepository.findById(mcpProject.getId())).isEmpty();
+        }
+
+        @Test
+        void testDeleteMcpServerDeletesTheJobsAndDisablesTheTriggersOfItsSystemDeployments() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            long projectDeploymentId = mcpProject.getProjectDeploymentId();
+
+            when(principalJobService.getJobIds(projectDeploymentId, PlatformType.AUTOMATION))
+                .thenReturn(List.of(42L, 43L));
+
+            workspaceMcpServerRepository.deleteAll();
+
+            mcpServerRepository.deleteById(mcpServer.getId());
+
+            verifySystemDeploymentCleanedUp(projectDeploymentId);
+
+            assertThat(mcpProjectRepository.findById(mcpProject.getId())).isEmpty();
+            assertThat(mcpServerRepository.findById(mcpServer.getId())).isEmpty();
+        }
+
+        private void verifySystemDeploymentCleanedUp(long projectDeploymentId) {
+            verify(triggerLifecycleFacade).executeTriggerDisable(eq(workflowId1), any(), any(), any(), any());
+            verify(triggerExecutionService).deleteJobTriggerExecution(42L);
+            verify(triggerExecutionService).deleteJobTriggerExecution(43L);
+            verify(principalJobService).deletePrincipalJobs(42L, PlatformType.AUTOMATION);
+            verify(principalJobService).deletePrincipalJobs(43L, PlatformType.AUTOMATION);
+            verify(jobFacade).deleteJob(42L);
+            verify(jobFacade).deleteJob(43L);
+
+            assertThat(mcpProjectWorkflowRepository.findAll()).isEmpty();
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+                .isEmpty();
+            assertThat(projectDeploymentRepository.findById(projectDeploymentId)).isEmpty();
         }
     }
 
