@@ -16,6 +16,9 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvent;
 import com.bytechef.automation.ai.mcp.audit.McpProjectAuditPublisher;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
@@ -25,20 +28,33 @@ import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -51,6 +67,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class McpProjectFacadeImpl implements McpProjectFacade {
 
+    private final ComponentConnectionFacade componentConnectionFacade;
+    private final ConnectionService connectionService;
     private final McpProjectAuditPublisher mcpProjectAuditPublisher;
     private final McpProjectService mcpProjectService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
@@ -59,15 +77,21 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
+    private final WorkflowService workflowService;
+    private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public McpProjectFacadeImpl(
+        ComponentConnectionFacade componentConnectionFacade, ConnectionService connectionService,
         McpProjectAuditPublisher mcpProjectAuditPublisher, McpProjectService mcpProjectService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
-        ProjectWorkflowService projectWorkflowService) {
+        ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
+        this.componentConnectionFacade = componentConnectionFacade;
+        this.connectionService = connectionService;
         this.mcpProjectAuditPublisher = mcpProjectAuditPublisher;
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
@@ -76,6 +100,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
+        this.workflowService = workflowService;
+        this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
@@ -89,6 +115,9 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         validateProjectVersionWorkflowIds(projectId, projectVersion, selectedWorkflowIds);
 
         McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+
+        Map<String, List<ProjectDeploymentWorkflowConnection>> workflowConnectionsMap = resolveConnections(
+            projectId, selectedWorkflowIds, mcpServer.getEnvironment());
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
@@ -105,15 +134,9 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
         mcpProject = mcpProjectService.create(mcpProject);
 
-        for (String workflowId : selectedWorkflowIds) {
-            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
-
-            projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
-            projectDeploymentWorkflow.setWorkflowId(workflowId);
-            projectDeploymentWorkflow.setEnabled(true);
-            projectDeploymentWorkflow.setInputs(Map.of());
-
-            projectDeploymentWorkflow = projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
+        for (Map.Entry<String, List<ProjectDeploymentWorkflowConnection>> entry : workflowConnectionsMap.entrySet()) {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = createProjectDeploymentWorkflow(
+                projectDeployment.getId(), entry.getKey(), entry.getValue());
 
             mcpProjectWorkflowService.create(mcpProject.getId(), projectDeploymentWorkflow.getId());
         }
@@ -186,29 +209,28 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
             .filter(workflowId -> !existingWorkflowIdMap.containsKey(workflowId))
             .toList();
 
+        Map<String, List<ProjectDeploymentWorkflowConnection>> addedWorkflowConnectionsMap = Map.of();
+
         if (!addedWorkflowIds.isEmpty()) {
             ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
                 Objects.requireNonNull(mcpProject.getProjectDeploymentId()));
 
             validateProjectVersionWorkflowIds(
                 projectDeployment.getProjectId(), projectDeployment.getProjectVersion(), addedWorkflowIds);
+
+            addedWorkflowConnectionsMap = resolveConnections(
+                projectDeployment.getProjectId(), addedWorkflowIds, projectDeployment.getEnvironment());
         }
 
         Set<String> selectedWorkflowIdSet = new HashSet<>(selectedWorkflowIds);
 
-        for (String workflowId : selectedWorkflowIds) {
-            if (!existingWorkflowIdMap.containsKey(workflowId)) {
-                ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+        for (Map.Entry<String, List<ProjectDeploymentWorkflowConnection>> entry : addedWorkflowConnectionsMap
+            .entrySet()) {
 
-                projectDeploymentWorkflow.setProjectDeploymentId(mcpProject.getProjectDeploymentId());
-                projectDeploymentWorkflow.setWorkflowId(workflowId);
-                projectDeploymentWorkflow.setEnabled(true);
-                projectDeploymentWorkflow.setInputs(Map.of());
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = createProjectDeploymentWorkflow(
+                mcpProject.getProjectDeploymentId(), entry.getKey(), entry.getValue());
 
-                projectDeploymentWorkflow = projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
-
-                mcpProjectWorkflowService.create(mcpProjectId, projectDeploymentWorkflow.getId());
-            }
+            mcpProjectWorkflowService.create(mcpProjectId, projectDeploymentWorkflow.getId());
         }
 
         for (Map.Entry<String, McpProjectWorkflow> entry : existingWorkflowIdMap.entrySet()) {
@@ -266,6 +288,117 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         return createMcpProject(
             targetMcpServerId, sourceDeployment.getProjectId(), sourceDeployment.getProjectVersion(),
             selectedWorkflowIds);
+    }
+
+    private ProjectDeploymentWorkflow createProjectDeploymentWorkflow(
+        long projectDeploymentId, String workflowId, List<ProjectDeploymentWorkflowConnection> connections) {
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setConnections(connections);
+        projectDeploymentWorkflow.setEnabled(true);
+        projectDeploymentWorkflow.setInputs(Map.of());
+        projectDeploymentWorkflow.setProjectDeploymentId(projectDeploymentId);
+        projectDeploymentWorkflow.setWorkflowId(workflowId);
+
+        return projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
+    }
+
+    private List<ComponentConnection> getComponentConnections(Workflow workflow) {
+        List<ComponentConnection> componentConnections = new ArrayList<>();
+
+        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
+            componentConnections.addAll(componentConnectionFacade.getComponentConnections(workflowTrigger));
+        }
+
+        for (WorkflowTask workflowTask : workflow.getTasks(true)) {
+            componentConnections.addAll(componentConnectionFacade.getComponentConnections(workflowTask));
+        }
+
+        return componentConnections;
+    }
+
+    private List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
+        long projectId, String workflowId, Environment environment) {
+
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+
+        String lastWorkflowId = projectWorkflowService
+            .fetchLastProjectWorkflowId(projectId, projectWorkflow.getUuidAsString())
+            .orElse(workflowId);
+
+        return workflowTestConfigurationService.fetchWorkflowTestConfiguration(lastWorkflowId, environment.ordinal())
+            .map(WorkflowTestConfiguration::getConnections)
+            .orElse(List.of());
+    }
+
+    private boolean isConnectionUsable(
+        long connectionId, ComponentConnection componentConnection, Environment environment) {
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        return connection.getEnvironmentId() == environment.ordinal() &&
+            Objects.equals(connection.getComponentName(), componentConnection.componentName());
+    }
+
+    private static boolean isSameConnectionSlot(
+        WorkflowTestConfigurationConnection workflowTestConfigurationConnection,
+        ComponentConnection componentConnection) {
+
+        return Objects.equals(
+            workflowTestConfigurationConnection.getWorkflowNodeName(), componentConnection.workflowNodeName()) &&
+            Objects.equals(workflowTestConfigurationConnection.getWorkflowConnectionKey(), componentConnection.key());
+    }
+
+    private List<ProjectDeploymentWorkflowConnection> resolveConnections(
+        long projectId, String workflowId, Environment environment) {
+
+        List<ComponentConnection> componentConnections = getComponentConnections(
+            workflowService.getWorkflow(workflowId));
+
+        if (componentConnections.isEmpty()) {
+            return List.of();
+        }
+
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
+            getWorkflowTestConfigurationConnections(projectId, workflowId, environment);
+
+        List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections = new ArrayList<>();
+
+        for (ComponentConnection componentConnection : componentConnections) {
+            Optional<Long> connectionId = workflowTestConfigurationConnections.stream()
+                .filter(workflowTestConfigurationConnection -> isSameConnectionSlot(
+                    workflowTestConfigurationConnection, componentConnection))
+                .map(WorkflowTestConfigurationConnection::getConnectionId)
+                .filter(Objects::nonNull)
+                .filter(curConnectionId -> isConnectionUsable(curConnectionId, componentConnection, environment))
+                .findFirst();
+
+            if (connectionId.isPresent()) {
+                projectDeploymentWorkflowConnections.add(
+                    new ProjectDeploymentWorkflowConnection(
+                        connectionId.get(), componentConnection.key(), componentConnection.workflowNodeName()));
+            } else if (componentConnection.required()) {
+                throw new IllegalArgumentException(
+                    "Workflow " + workflowId + " requires a " + componentConnection.componentName() +
+                        " connection for " + componentConnection.workflowNodeName() + " in the " + environment +
+                        " environment; select one in the workflow editor before exposing it as an MCP tool");
+            }
+        }
+
+        return projectDeploymentWorkflowConnections;
+    }
+
+    private Map<String, List<ProjectDeploymentWorkflowConnection>> resolveConnections(
+        long projectId, List<String> workflowIds, Environment environment) {
+
+        Map<String, List<ProjectDeploymentWorkflowConnection>> workflowConnectionsMap = new LinkedHashMap<>();
+
+        for (String workflowId : workflowIds) {
+            workflowConnectionsMap.put(workflowId, resolveConnections(projectId, workflowId, environment));
+        }
+
+        return workflowConnectionsMap;
     }
 
     private void validateProjectVersionPublished(long projectId, int projectVersion) {
