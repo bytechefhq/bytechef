@@ -25,13 +25,11 @@ import com.bytechef.ai.copilot.tool.context.ScopedToolContextKeys;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
-import com.bytechef.platform.component.tool.ComponentTools;
 import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -101,10 +99,6 @@ public final class CopilotToolContextUtils {
         putIfNotNull(
             toolContext, ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY,
             NumberUtils.asLong(state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID)));
-
-        if (ScopedProjectToolContext.isConfined(new ToolContext(toolContext))) {
-            toolContext.put(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, Boolean.TRUE);
-        }
 
         if (!toolContext.isEmpty()) {
             LookupPropertyTracker.install(toolContext);
