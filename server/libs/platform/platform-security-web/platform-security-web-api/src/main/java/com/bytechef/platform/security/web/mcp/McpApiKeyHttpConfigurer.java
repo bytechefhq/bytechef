@@ -16,13 +16,20 @@
 
 package com.bytechef.platform.security.web.mcp;
 
+import java.util.List;
 import java.util.regex.Pattern;
+import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.AuthenticationConverter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
@@ -67,5 +74,24 @@ public class McpApiKeyHttpConfigurer extends AbstractHttpConfigurer<McpApiKeyHtt
                 authenticationConverter);
 
         http.addFilterBefore(tenantAwareApiKeyAuthenticationFilter, BasicAuthenticationFilter.class);
+
+        McpAuthenticationGuardFilter mcpAuthenticationGuardFilter = new McpAuthenticationGuardFilter(
+            RegexRequestMatcher.regexMatcher(pathPatternRegex),
+            List.of(ApiKeyAuthenticationToken.class, JwtAuthenticationToken.class,
+                McpAnonymousAuthenticationToken.class),
+            getAuthenticationEntryPoint(http));
+
+        http.addFilterBefore(mcpAuthenticationGuardFilter, AuthorizationFilter.class);
+    }
+
+    private static AuthenticationEntryPoint getAuthenticationEntryPoint(HttpSecurity http) {
+        McpAuthenticationEntryPoint mcpAuthenticationEntryPoint = http.getSharedObject(
+            McpAuthenticationEntryPoint.class);
+
+        if (mcpAuthenticationEntryPoint == null) {
+            return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
+        }
+
+        return mcpAuthenticationEntryPoint;
     }
 }
