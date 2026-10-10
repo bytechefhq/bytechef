@@ -22,11 +22,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.ai.copilot.tool.ConfigureMcpServerToolCallback;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
-import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
-import com.bytechef.automation.ai.mcp.service.McpProjectService;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
-import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import java.lang.reflect.Field;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
@@ -45,9 +41,7 @@ final class McpServerSubAgentConfigurationTest {
     void testMcpServerBuildSubAgentChatClientIsBuilt() {
         assertThatNoException().isThrownBy(
             () -> configuration.mcpServerBuildSubAgentChatClient(
-                mock(ChatModel.class), mock(McpProjectService.class), mock(McpProjectWorkflowService.class),
-                mock(ProjectDeploymentWorkflowService.class), mock(WorkflowService.class),
-                mock(WorkspaceMcpServerFacade.class)));
+                mock(ChatModel.class), mock(McpProjectWorkflowFacade.class)));
     }
 
     @Test
