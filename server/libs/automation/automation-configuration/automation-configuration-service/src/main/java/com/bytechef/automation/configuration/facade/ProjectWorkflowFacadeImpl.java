@@ -53,6 +53,7 @@ import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
@@ -85,6 +86,7 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,6 +116,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     private final WorkflowFacade workflowFacade;
     private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
+    private final ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowValidatorFacade workflowValidatorFacade;
 
@@ -127,7 +130,9 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         ProjectWorkflowService projectWorkflowService, SharedTemplateFileStorage sharedTemplateFileStorage,
         SharedTemplateService sharedTemplateService, WorkflowCacheManager workflowCacheManager,
         WorkflowFacade workflowFacade, List<WorkflowPreDeleteListener> workflowPreDeleteListeners,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        WorkflowService workflowService,
+        ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider,
+        WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowValidatorFacade workflowValidatorFacade) {
 
         this.componentDefinitionHelper = componentDefinitionHelper;
@@ -145,6 +150,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         this.workflowFacade = workflowFacade;
         this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowService = workflowService;
+        this.workflowTestConfigurationFacadeProvider = workflowTestConfigurationFacadeProvider;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowValidatorFacade = workflowValidatorFacade;
     }
@@ -344,6 +350,15 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public long getWorkflowProjectId(String workflowId) {
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+
+        return projectWorkflow.getProjectId();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<ProjectWorkflowDTO> getProjectWorkflows() {
         return projectWorkflowService.getProjectWorkflows()
@@ -503,6 +518,18 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             template.authorName, template.authorEmail, template.authorRole, template.authorSocialLinks,
             categories, componentDefinitions, template.description, id, template.lastModifiedDate,
             template.projectVersion, publicUrl, toWorkflowDTO(workflow, componentDefinitions));
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')")
+    public void saveWorkflowTestConnection(
+        String workflowId, String workflowNodeName, String connectionKey, long connectionId, long environmentId) {
+
+        WorkflowTestConfigurationFacade workflowTestConfigurationFacade =
+            workflowTestConfigurationFacadeProvider.getObject();
+
+        workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
+            workflowId, workflowNodeName, connectionKey, connectionId, environmentId);
     }
 
     @Override
