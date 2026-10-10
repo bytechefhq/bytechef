@@ -18,7 +18,6 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,9 +53,6 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
         }
 
         return ChatClient.builder(chatModel)
-            .defaultOptions(
-                ChatOptions.builder()
-                    .model(model))
             .build();
     }
 
@@ -83,7 +79,8 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
         return resolveChatModel(defaultModel.provider(), defaultModel.model(), environment);
     }
 
-    private @Nullable ChatModel resolveChatModel(String providerKey, String model, int environment) {
+    @Override
+    public @Nullable ChatModel resolveChatModel(String providerKey, String model, int environment) {
         Provider provider = Arrays.stream(Provider.values())
             .filter(curProvider -> Objects.equals(curProvider.getKey(), providerKey))
             .findFirst()
