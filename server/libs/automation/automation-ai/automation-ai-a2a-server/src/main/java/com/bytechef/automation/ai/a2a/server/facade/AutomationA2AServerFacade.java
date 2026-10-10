@@ -265,6 +265,10 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
             return A2AAgentResult.ofInputRequired(describePendingApproval(job), taskReference);
         }
 
+        if (isPausedOnWait(job)) {
+            return inProgressResult(taskReference);
+        }
+
         try {
             JobExecutionErrors.checkForError(job, taskExecutionService);
             JobExecutionErrors.checkCompleted(job);
@@ -366,6 +370,14 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
     }
 
     private static boolean isPausedOnApproval(Job job) {
+        return isSuspended(job) && Boolean.TRUE.equals(job.getMetadata(MetadataConstants.APPROVAL_RESUME));
+    }
+
+    private static boolean isPausedOnWait(Job job) {
+        return isSuspended(job) && !Boolean.TRUE.equals(job.getMetadata(MetadataConstants.APPROVAL_RESUME));
+    }
+
+    private static boolean isSuspended(Job job) {
         return job.getStatus() == Job.Status.STOPPED && job.getMetadata(MetadataConstants.JOB_RESUME_ID) != null;
     }
 

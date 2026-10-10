@@ -22,6 +22,7 @@ package com.bytechef.platform.component.constant;
 public class MetadataConstants {
 
     public static final String APPROVAL_FORM_PARAMETERS = "approvalFormParameters";
+    public static final String APPROVAL_RESUME = "__bytechef_approval_resume__";
     public static final String CALLABLE_RESPONSE = "__callableResponse";
     public static final String CONNECTION_IDS = "connectionIds";
     public static final String CONSUMED_JOB_RESUME_ID = "consumedJobResumeId";
