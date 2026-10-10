@@ -308,7 +308,9 @@ public class WorkspaceMcpServerFacadeIntTest {
         void testUpdateWorkspaceMcpToolEnabledRejectsEmbeddedMcpTool() {
             McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED);
 
-            assertThatThrownBy(() -> workspaceMcpServerFacade.updateWorkspaceMcpToolEnabled(mcpTool.getId(), false))
+            long mcpToolId = mcpTool.getId();
+
+            assertThatThrownBy(() -> workspaceMcpServerFacade.updateWorkspaceMcpToolEnabled(mcpToolId, false))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("is not an automation MCP server");
 
