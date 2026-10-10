@@ -13,6 +13,7 @@ import FormLookupValuesWatcher from '@/pages/platform/workflow-editor/components
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties';
+import PropertyDynamicSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicSwitch';
 import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';
 import PropertyMultiSelect from '@/pages/platform/workflow-editor/components/properties/components/PropertyMultiSelect';
 import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
@@ -122,6 +123,7 @@ const Property = ({
         handleControlledNativeFromAiClick,
         handleControlledNativeKeyDown,
         handleDeleteCustomPropertyClick,
+        handleDynamicSwitch,
         handleFormulaSwitch,
         handleFromAiClick,
         handleFromAiToggle,
@@ -134,6 +136,7 @@ const Property = ({
         handleSelectChange,
         handleSelectKeyDown,
         handleSinglePillAbandoned,
+        hasDynamicSwitch,
         hasError,
         hidden,
         inputMode,
@@ -273,7 +276,7 @@ const Property = ({
             return;
         }
 
-        startPillEntry();
+        startPillEntry('$');
     };
 
     const handleContainerLocalEntriesChange = useCallback((hasLocalEntries: boolean) => {
@@ -291,18 +294,29 @@ const Property = ({
         !containerHasLocalEntries &&
         isPillContainerEmpty();
 
-    const containerPillHint = showContainerPillHint ? (
-        <p
-            className={twMerge(
-                'rounded-md border border-dashed border-stroke-neutral-secondary px-3 py-2 text-xs text-muted-foreground outline-none',
-                controlType === 'JSON_SCHEMA_BUILDER' ? 'mt-2' : 'mb-2',
-                nativePillTarget.isRegistered && 'ring-2 ring-ring'
-            )}
-            tabIndex={-1}
-        >
-            Drop or click a data pill, or type $
-        </p>
-    ) : null;
+    const showDynamicSwitch =
+        hasDynamicSwitch &&
+        !isFromAi &&
+        !isFormulaMode &&
+        (controlType === 'SELECT' || mentionInput || (!containerHasLocalEntries && isPillContainerEmpty()));
+
+    const dynamicSwitch = showDynamicSwitch ? (
+        <PropertyDynamicSwitch dynamic={mentionInput} handleClick={handleDynamicSwitch} />
+    ) : undefined;
+
+    // An array item's object has no label row to hold a Dynamic switch, so it keeps the hint.
+    const containerPillHint =
+        showContainerPillHint && !hasDynamicSwitch ? (
+            <p
+                className={twMerge(
+                    'mb-2 rounded-md border border-dashed border-stroke-neutral-secondary px-3 py-2 text-xs text-muted-foreground outline-none',
+                    nativePillTarget.isRegistered && 'ring-2 ring-ring'
+                )}
+                tabIndex={-1}
+            >
+                Drop or click a data pill, or type $
+            </p>
+        ) : null;
 
     const requiredRule = required ? ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED : false;
 
@@ -384,6 +398,7 @@ const Property = ({
                     defaultValue={parameterValue !== undefined ? parameterValue : defaultValue}
                     deletePropertyButton={deletePropertyButton}
                     description={description}
+                    dynamicSwitch={dynamicSwitch}
                     error={hasError}
                     errorMessage={errorMessage}
                     expressionEnabled={expressionEnabled}
@@ -429,7 +444,7 @@ const Property = ({
                                     </span>
                                 )}
 
-                                {(label || description || (showFormulaSwitch && !control)) && (
+                                {(label || description || dynamicSwitch || (showFormulaSwitch && !control)) && (
                                     <div className="flex w-full items-center justify-between">
                                         <div className="flex items-center">
                                             {label && (
@@ -460,6 +475,8 @@ const Property = ({
                                         </div>
 
                                         <div className="flex items-center gap-1">
+                                            {dynamicSwitch}
+
                                             {showFormulaSwitch && !control && (
                                                 <PropertyFormulaSwitch
                                                     formulaMode={isFormulaMode}
@@ -481,7 +498,7 @@ const Property = ({
                             </div>
                         )}
 
-                    {controlType !== 'JSON_SCHEMA_BUILDER' && containerPillHint}
+                    {containerPillHint}
 
                     {!control && controlType === 'ARRAY_BUILDER' && calculatedPath && (
                         <ArrayProperty
@@ -1103,6 +1120,7 @@ const Property = ({
                     {!control && controlType === 'JSON_SCHEMA_BUILDER' && (
                         <PropertyJsonSchemaBuilder
                             description={description}
+                            dynamicSwitch={dynamicSwitch}
                             error={hasError}
                             errorMessage={errorMessage}
                             handleInputTypeSwitchButtonClick={showFormulaSwitch ? handleFormulaSwitch : undefined}
@@ -1121,14 +1139,13 @@ const Property = ({
                         />
                     )}
 
-                    {controlType === 'JSON_SCHEMA_BUILDER' && containerPillHint}
-
                     {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
                         <PropertyComboBox
                             arrayIndex={arrayIndex}
                             defaultValue={defaultValue}
                             deletePropertyButton={withFromAiButton(nativeFromAiButton)}
                             description={description}
+                            dynamicSwitch={dynamicSwitch}
                             error={hasError}
                             errorMessage={errorMessage}
                             handleInputTypeSwitchButtonClick={handleFormulaSwitch}
@@ -1160,6 +1177,7 @@ const Property = ({
                             defaultValue={defaultValue?.toString()}
                             deletePropertyButton={withFromAiButton(nativeFromAiButton)}
                             description={description}
+                            dynamicSwitch={dynamicSwitch}
                             handleInputTypeSwitchButtonClick={handleFormulaSwitch}
                             label={label || name}
                             leadingIcon={typeIcon}

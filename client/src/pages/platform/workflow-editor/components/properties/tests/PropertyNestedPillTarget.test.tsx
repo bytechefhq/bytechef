@@ -519,7 +519,7 @@ describe('pill target inside an object or array builder', () => {
         expect(savedPaths()).toEqual([]);
     });
 
-    it('deleting the pill that holds a whole empty array brings the empty builder back', async () => {
+    it('deleting the pill that holds a whole empty array keeps the editor until Dynamic is turned off', async () => {
         setParameters({counts: []});
 
         const {container} = renderUncontrolled(arrayProperty);
@@ -544,6 +544,13 @@ describe('pill target inside an object or array builder', () => {
 
         await settle();
 
+        expect(container.querySelector('.ProseMirror')).not.toBeNull();
+        expect(screen.getByRole('switch', {name: 'Text'})).toBeChecked();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
         expect(container.querySelector('.ProseMirror')).toBeNull();
         expect(screen.getByRole('button', {name: /add array item/i})).toBeInTheDocument();
     });
@@ -561,7 +568,6 @@ describe('pill target inside an object or array builder', () => {
         fireEvent.click(labelElement);
 
         expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget?.acceptsPill()).toBe(true);
-        expect(screen.getByText('Drop or click a data pill, or type $')).toHaveClass('ring-2');
 
         (saveProperty as unknown as Mock).mockClear();
 
@@ -572,7 +578,7 @@ describe('pill target inside an object or array builder', () => {
         expect(savedPaths()).toEqual(['counts']);
         expect(saveProperty).toHaveBeenCalledWith(expect.objectContaining({value: '${trigger_1.items}'}));
         expect(container.querySelector('input[type=number]')).toBeNull();
-        expect(screen.queryByText('Drop or click a data pill, or type $')).toBeNull();
+        expect(screen.getByRole('switch', {name: 'Text'})).toBeChecked();
     });
 
     it('clicking the add item button of an empty array adds an item and leaves no accepting container target', async () => {
@@ -594,28 +600,29 @@ describe('pill target inside an object or array builder', () => {
         expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget?.acceptsPill() ?? false).toBe(false);
     });
 
-    it('shows the data pill hint on an empty array and hides it once an item exists', async () => {
+    it('shows the Dynamic switch on an empty array and hides it once an item exists', async () => {
         setParameters({counts: []});
 
         renderUncontrolled(arrayProperty);
 
         await settle();
 
-        expect(screen.getByText('Drop or click a data pill, or type $')).toBeInTheDocument();
+        expect(screen.getByRole('switch', {name: 'Text'})).not.toBeChecked();
+        expect(screen.queryByText('Drop or click a data pill, or type $')).toBeNull();
 
         fireEvent.click(screen.getByRole('button', {name: /add array item/i}));
 
         await settle();
 
-        expect(screen.queryByText('Drop or click a data pill, or type $')).toBeNull();
+        expect(screen.queryByRole('switch', {name: 'Text'})).toBeNull();
     });
 
-    it('does not show the data pill hint on a non-empty array', async () => {
+    it('does not show the Dynamic switch on a non-empty array', async () => {
         renderUncontrolled(arrayProperty);
 
         await settle();
 
-        expect(screen.queryByText('Drop or click a data pill, or type $')).toBeNull();
+        expect(screen.queryByRole('switch', {name: 'Text'})).toBeNull();
     });
 
     it('a click on a nested field of a non-empty object registers the nested field, not the object', async () => {

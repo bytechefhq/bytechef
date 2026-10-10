@@ -14,6 +14,7 @@ interface PropertySelectProps {
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
+    dynamicSwitch?: ReactNode;
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
@@ -31,6 +32,7 @@ const PropertySelect = ({
     defaultValue,
     deletePropertyButton,
     description,
+    dynamicSwitch,
     handleInputTypeSwitchButtonClick,
     label,
     leadingIcon,
@@ -64,7 +66,9 @@ const PropertySelect = ({
                     )}
                 </div>
 
-                <div className="flex items-center">
+                <div className="flex items-center gap-1">
+                    {dynamicSwitch}
+
                     {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
                         <PropertyFormulaSwitch formulaMode={false} handleClick={handleInputTypeSwitchButtonClick} />
                     )}
