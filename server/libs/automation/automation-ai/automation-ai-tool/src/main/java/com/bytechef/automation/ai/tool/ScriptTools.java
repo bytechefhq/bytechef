@@ -25,7 +25,6 @@ import com.bytechef.exception.ExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -40,12 +39,10 @@ public class ScriptTools {
     private static final Logger log = LoggerFactory.getLogger(ScriptTools.class);
 
     private final ProjectWorkflowFacade projectWorkflowFacade;
-    private final ScopedProjectGuard scopedProjectGuard;
 
     @SuppressFBWarnings("EI")
-    public ScriptTools(ProjectWorkflowFacade projectWorkflowFacade, ScopedProjectGuard scopedProjectGuard) {
+    public ScriptTools(ProjectWorkflowFacade projectWorkflowFacade) {
         this.projectWorkflowFacade = projectWorkflowFacade;
-        this.scopedProjectGuard = scopedProjectGuard;
     }
 
     @Tool(
@@ -53,11 +50,7 @@ public class ScriptTools {
     public WorkflowInfo updateScriptComponentCode(
         @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(description = "The new code") String code,
-        @ToolParam(description = "The name of the script node") String scriptName,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
-
-        scopedProjectGuard.checkWorkflow(workflowId, workspaceId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT);
+        @ToolParam(description = "The name of the script node") String scriptName) {
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
