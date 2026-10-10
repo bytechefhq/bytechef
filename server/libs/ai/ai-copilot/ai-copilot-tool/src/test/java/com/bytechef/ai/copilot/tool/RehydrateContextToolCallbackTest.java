@@ -298,7 +298,9 @@ class RehydrateContextToolCallbackTest {
 
         Map<String, Object> map = new AgentToolInvocationContext(null, 1L, null, null, "acme").toToolContext();
 
-        assertThatThrownBy(() -> wrapped.call("{}", new ToolContext(map)))
+        ToolContext toolContext = new ToolContext(map);
+
+        assertThatThrownBy(() -> wrapped.call("{}", toolContext))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("boom");
 

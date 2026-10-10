@@ -38,7 +38,8 @@ class DeleteKnowledgeBaseDocumentToolCallbackTest {
         String description = toolCallback.getToolDefinition()
             .description();
 
-        assertThat(description).containsIgnoringCase("irreversible");
-        assertThat(description).containsIgnoringCase("confirm");
+        assertThat(description)
+            .containsIgnoringCase("irreversible")
+            .containsIgnoringCase("confirm");
     }
 }

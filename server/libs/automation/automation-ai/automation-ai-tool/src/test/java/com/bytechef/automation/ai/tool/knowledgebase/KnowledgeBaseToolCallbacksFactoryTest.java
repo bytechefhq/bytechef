@@ -43,8 +43,9 @@ class KnowledgeBaseToolCallbacksFactoryTest {
     void readListExcludesMutations() {
         List<String> names = toolNames(factory.readToolCallbacks());
 
-        assertThat(names).contains("listKnowledgeBases", "queryKnowledgeBase");
-        assertThat(names).doesNotContain("createKnowledgeBase", "deleteKnowledgeBase", "addKnowledgeBaseDocument");
+        assertThat(names)
+            .contains("listKnowledgeBases", "queryKnowledgeBase")
+            .doesNotContain("createKnowledgeBase", "deleteKnowledgeBase", "addKnowledgeBaseDocument");
     }
 
     @Test

@@ -60,8 +60,9 @@ class UpdateMcpProjectWorkflowParametersToolCallbackTest {
     void testMissingIdReturnsError() {
         String result = toolCallback.call("{\"toolName\": \"get_weather\"}");
 
-        assertThat(result).contains("error");
-        assertThat(result).contains("mcpProjectWorkflowId is required");
+        assertThat(result)
+            .contains("error")
+            .contains("mcpProjectWorkflowId is required");
 
         verify(mcpProjectWorkflowService, never()).updateParameters(anyLong(), anyMap());
     }
@@ -70,8 +71,9 @@ class UpdateMcpProjectWorkflowParametersToolCallbackTest {
     void testBlankToolNameReturnsError() {
         String result = toolCallback.call("{\"mcpProjectWorkflowId\": 1, \"toolName\": \"  \"}");
 
-        assertThat(result).contains("error");
-        assertThat(result).contains("toolName must not be blank");
+        assertThat(result)
+            .contains("error")
+            .contains("toolName must not be blank");
 
         verify(mcpProjectWorkflowService, never()).updateParameters(anyLong(), anyMap());
     }
@@ -82,8 +84,9 @@ class UpdateMcpProjectWorkflowParametersToolCallbackTest {
 
         String result = toolCallback.call("{\"mcpProjectWorkflowId\": 99, \"toolName\": \"get_weather\"}");
 
-        assertThat(result).contains("error");
-        assertThat(result).contains("McpProjectWorkflow not found");
+        assertThat(result)
+            .contains("error")
+            .contains("McpProjectWorkflow not found");
 
         verify(mcpProjectWorkflowService, never()).updateParameters(anyLong(), anyMap());
     }
@@ -115,9 +118,10 @@ class UpdateMcpProjectWorkflowParametersToolCallbackTest {
 
         Map<String, Object> mergedParameters = parametersCaptor.getValue();
 
-        assertThat(mergedParameters).containsEntry("toolName", "get_weather");
-        assertThat(mergedParameters).containsEntry("toolDescription", "Fetch weather");
-        assertThat(mergedParameters).containsEntry("city", "fromAi('city', 'STRING', {required: true})");
+        assertThat(mergedParameters)
+            .containsEntry("toolName", "get_weather")
+            .containsEntry("toolDescription", "Fetch weather")
+            .containsEntry("city", "fromAi('city', 'STRING', {required: true})");
 
         assertThat(result).contains("get_weather");
     }
@@ -151,8 +155,8 @@ class UpdateMcpProjectWorkflowParametersToolCallbackTest {
         Map<String, Object> mergedParameters = parametersCaptor.getValue();
 
         assertThat(mergedParameters)
-            .containsEntry("city", "fromAi('city', 'STRING', {description: 'City name', required: true})");
-        assertThat(mergedParameters).containsEntry("unit", "C");
-        assertThat(mergedParameters).containsEntry("toolName", "get_weather");
+            .containsEntry("city", "fromAi('city', 'STRING', {description: 'City name', required: true})")
+            .containsEntry("unit", "C")
+            .containsEntry("toolName", "get_weather");
     }
 }

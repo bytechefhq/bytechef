@@ -81,8 +81,9 @@ class WorkspaceScopedSubAgentToolCallbackTest {
     void testBlankRequestReturnsError() {
         String result = toolCallback.call("{\"request\": \" \"}");
 
-        assertThat(result).contains("error");
-        assertThat(result).contains("request is required");
+        assertThat(result)
+            .contains("error")
+            .contains("request is required");
         assertThat(delegate.capturedContext).isNull();
     }
 
@@ -189,9 +190,10 @@ class WorkspaceScopedSubAgentToolCallbackTest {
 
         String result = toolCallback.call("{\"request\": \"list servers\"}");
 
-        assertThat(result).contains("workspace_required");
-        assertThat(result).contains("Alpha");
-        assertThat(result).contains("Beta");
+        assertThat(result)
+            .contains("workspace_required")
+            .contains("Alpha")
+            .contains("Beta");
         assertThat(delegate.capturedContext).isNull();
     }
 

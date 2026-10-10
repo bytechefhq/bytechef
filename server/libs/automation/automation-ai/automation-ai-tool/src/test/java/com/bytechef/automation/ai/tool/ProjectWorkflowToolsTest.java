@@ -155,7 +155,7 @@ class ProjectWorkflowToolsTest {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-2", 9L, WORKSPACE_ID);
 
-            ProjectWorkflowDTO dto = buildDto("wf-uuid-2", 88L, "Updated Flow", 3);
+            ProjectWorkflowDTO dto = buildDto("wf-uuid-2", 88L, 3);
 
             when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(dto);
             when(projectWorkflowService.getProjectWorkflow(88L)).thenThrow(new RuntimeException("lookup boom"));
@@ -454,12 +454,6 @@ class ProjectWorkflowToolsTest {
     }
 
     private static ProjectWorkflowDTO buildDto(String workflowUuid, long projectWorkflowId, int version) {
-        return buildDto(workflowUuid, projectWorkflowId, null, version);
-    }
-
-    private static ProjectWorkflowDTO buildDto(
-        String workflowUuid, long projectWorkflowId, @SuppressWarnings("unused") String label, int version) {
-
         Workflow workflow = new Workflow(workflowUuid, WORKFLOW_DTO_DEFINITION, Workflow.Format.JSON);
 
         workflow.setVersion(version);
