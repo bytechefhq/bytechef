@@ -124,6 +124,10 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
         String name, PlatformType type, Environment environment, Boolean enabled, Boolean authenticationRequired,
         Long workspaceId) {
 
+        if (type != PlatformType.AUTOMATION) {
+            throw new IllegalArgumentException("Workspace MCP servers must be automation MCP servers: " + type);
+        }
+
         McpServer mcpServer = new McpServer(name, type, environment);
 
         if (enabled != null) {

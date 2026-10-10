@@ -292,6 +292,29 @@ public class WorkspaceMcpServerFacadeIntTest {
         }
 
         @Test
+        void testCreateRejectsEmbeddedMcpServer() {
+            assertThatThrownBy(() -> workspaceMcpServerFacade.createWorkspaceMcpServer(
+                "server", PlatformType.EMBEDDED, Environment.DEVELOPMENT, true, null, testWorkspaceId))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("must be automation MCP servers");
+
+            assertEquals(0, mcpServerRepository.count());
+            assertTrue(workspaceMcpServerRepository.findAllByWorkspaceId(testWorkspaceId)
+                .isEmpty());
+        }
+
+        @Test
+        void testCreateCreatesAutomationMcpServer() {
+            McpServer mcpServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
+                "server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, testWorkspaceId);
+
+            assertEquals(PlatformType.AUTOMATION, mcpServer.getType());
+            assertEquals(1, mcpServerRepository.count());
+            assertEquals(1, workspaceMcpServerRepository.findAllByWorkspaceId(testWorkspaceId)
+                .size());
+        }
+
+        @Test
         void testUpdateWorkspaceMcpToolEnabledRequiresToolEditor() {
             McpTool mcpTool = createMcpTool(PlatformType.AUTOMATION);
 
