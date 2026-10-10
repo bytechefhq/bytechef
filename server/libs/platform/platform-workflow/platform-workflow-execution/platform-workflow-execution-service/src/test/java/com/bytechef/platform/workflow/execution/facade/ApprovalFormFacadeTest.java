@@ -100,7 +100,12 @@ class ApprovalFormFacadeTest {
 
         when(jobService.getJob(JOB_ID)).thenReturn(mock(Job.class));
 
-        assertThatThrownBy(() -> approvalFormFacade.getApprovalForm(jobResumeId.toString()));
+        String id = jobResumeId.toString();
+
+        assertThatThrownBy(() -> approvalFormFacade.getApprovalForm(id))
+            .isInstanceOf(RuntimeException.class)
+            .hasRootCauseInstanceOf(IllegalStateException.class)
+            .hasRootCauseMessage("Approval form is no longer available; job " + JOB_ID + " is null");
 
         assertThat(transactionTenantIds).containsExactly(TENANT_ID);
     }
@@ -170,7 +175,9 @@ class ApprovalFormFacadeTest {
 
         Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(signedToken);
 
-        assertThat(approvalForm.get("formTitle")).isEqualTo("Approve order");
+        assertThat(approvalForm)
+            .extractingByKey("formTitle")
+            .isEqualTo("Approve order");
 
         verify(jobService).getJob(JOB_ID);
     }
@@ -202,7 +209,9 @@ class ApprovalFormFacadeTest {
 
         Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(jobResumeId.toString());
 
-        assertThat(approvalForm.get("formTitle")).isEqualTo("Approve order");
+        assertThat(approvalForm)
+            .extractingByKey("formTitle")
+            .isEqualTo("Approve order");
     }
 
     private ObjectProvider<ApprovalTokens> approvalTokensProvider() {

@@ -67,7 +67,7 @@ import tools.jackson.databind.json.JsonMapper;
  * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
-public class JobResumeFacadeTest {
+class JobResumeFacadeTest {
 
     private static final long JOB_ID = 42L;
     private static final long TASK_EXECUTION_ID = 7L;
@@ -116,7 +116,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsOkForSignedToken() {
+    void testResumeJobReturnsOkForSignedToken() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
@@ -135,7 +135,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsInvalidIdForTamperedSignedToken() {
+    void testResumeJobReturnsInvalidIdForTamperedSignedToken() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         String tamperedToken =
@@ -151,7 +151,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsInvalidIdForUnsignedTokenWhenSigningRequired() {
+    void testResumeJobReturnsInvalidIdForUnsignedTokenWhenSigningRequired() {
         ApprovalTokens requiredApprovalTokens = new ApprovalTokensImpl(
             Clock.systemUTC(), SIGNING_SECRET, List.of(), Duration.ofHours(1), Duration.ofSeconds(30), true);
 
@@ -168,7 +168,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobAcceptsTheStoredUnsignedIdWhenSigningRequired() {
+    void testResumeExpiredJobAcceptsTheStoredUnsignedIdWhenSigningRequired() {
         ApprovalTokens requiredApprovalTokens = new ApprovalTokensImpl(
             Clock.systemUTC(), SIGNING_SECRET, List.of(), Duration.ofHours(1), Duration.ofSeconds(30), true);
 
@@ -186,7 +186,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobAcceptsRawTokenWhenApprovalTokensAbsent() {
+    void testResumeJobAcceptsRawTokenWhenApprovalTokensAbsent() {
         JobResumeFacadeImpl unsignedJobResumeFacade = new JobResumeFacadeImpl(
             applicationEventPublisher, approvalTokensProvider(null), jobFacade, jobService, transactionOperations);
 
@@ -202,7 +202,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobOpensItsTransactionUnderTheTenantOfTheResumeId() {
+    void testResumeJobOpensItsTransactionUnderTheTenantOfTheResumeId() {
         JobResumeId jobResumeId = TenantContext.callWithTenantId(TENANT_ID, () -> JobResumeId.of(JOB_ID));
 
         when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.COMPLETED, jobResumeId.toString()));
@@ -213,7 +213,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobOpensItsTransactionUnderTheTenantOfTheResumeId() {
+    void testResumeExpiredJobOpensItsTransactionUnderTheTenantOfTheResumeId() {
         JobResumeId jobResumeId = TenantContext.callWithTenantId(TENANT_ID, () -> JobResumeId.of(JOB_ID));
 
         when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.COMPLETED, jobResumeId.toString()));
@@ -224,7 +224,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsInvalidIdForUnparseableToken() {
+    void testResumeJobReturnsInvalidIdForUnparseableToken() {
         JobResumeOutcome outcome = jobResumeFacade.resumeJob("not-a-token", Map.of());
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
@@ -234,7 +234,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsGoneWhenJobNotStopped() {
+    void testResumeJobReturnsGoneWhenJobNotStopped() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.COMPLETED, jobResumeId.toString());
@@ -250,7 +250,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsNotYetSuspendedWhileJobIsStillRunning() {
+    void testResumeJobReturnsNotYetSuspendedWhileJobIsStillRunning() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STARTED, null);
@@ -266,7 +266,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobStreamingReturnsNotYetSuspendedWhileJobIsStillRunning() {
+    void testResumeJobStreamingReturnsNotYetSuspendedWhileJobIsStillRunning() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STARTED, null, true);
@@ -285,7 +285,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsInvalidIdWhenStoredMetadataMissing() {
+    void testResumeJobReturnsInvalidIdWhenStoredMetadataMissing() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, null);
@@ -301,7 +301,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsInvalidIdWhenUuidMismatch() {
+    void testResumeJobReturnsInvalidIdWhenUuidMismatch() {
         JobResumeId suppliedJobResumeId = JobResumeId.of(JOB_ID);
         JobResumeId storedJobResumeId = JobResumeId.of(JOB_ID);
 
@@ -318,7 +318,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsInvalidIdWhenTenantMismatch() {
+    void testResumeJobReturnsInvalidIdWhenTenantMismatch() {
         String currentTenantId = TenantContext.getCurrentTenantId();
         UUID sharedUuid = UUID.randomUUID();
 
@@ -338,7 +338,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsOkWhenTokenMatches() {
+    void testResumeJobReturnsOkWhenTokenMatches() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
@@ -362,7 +362,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsGoneForAnAlreadyConsumedResumeIdWhileTheJobRuns() {
+    void testResumeJobReturnsGoneForAnAlreadyConsumedResumeIdWhileTheJobRuns() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STARTED, null);
@@ -380,7 +380,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsGoneForAnAlreadyConsumedResumeIdAfterTheJobSuspendedAgain() {
+    void testResumeJobReturnsGoneForAnAlreadyConsumedResumeIdAfterTheJobSuspendedAgain() {
         JobResumeId consumedJobResumeId = JobResumeId.of(JOB_ID);
         JobResumeId currentJobResumeId = JobResumeId.of(JOB_ID);
 
@@ -402,7 +402,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsJobFailedWhenTheJobFailed() {
+    void testResumeJobReturnsJobFailedWhenTheJobFailed() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.FAILED, jobResumeId.toString());
@@ -418,7 +418,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobIgnoresTheStreamingResumeFlag() {
+    void testResumeJobIgnoresTheStreamingResumeFlag() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString(), false);
@@ -435,7 +435,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobStreamingCallsJobIdConsumerBeforeResumingTheJob() {
+    void testResumeJobStreamingCallsJobIdConsumerBeforeResumingTheJob() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString(), true);
@@ -463,7 +463,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobStreamingDoesNotCallJobIdConsumerForAnInvalidId() {
+    void testResumeJobStreamingDoesNotCallJobIdConsumerForAnInvalidId() {
         LongConsumer jobIdConsumer = mock(LongConsumer.class);
 
         JobResumeOutcome outcome = jobResumeFacade.resumeJobStreaming("not-a-token", Map.of(), jobIdConsumer);
@@ -475,7 +475,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobStreamingDoesNotCallJobIdConsumerForATokenMismatch() {
+    void testResumeJobStreamingDoesNotCallJobIdConsumerForATokenMismatch() {
         JobResumeId suppliedJobResumeId = JobResumeId.of(JOB_ID);
         JobResumeId storedJobResumeId = JobResumeId.of(JOB_ID);
 
@@ -495,7 +495,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobStreamingDoesNotCallJobIdConsumerWhenJobIsGone() {
+    void testResumeJobStreamingDoesNotCallJobIdConsumerWhenJobIsGone() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.COMPLETED, jobResumeId.toString(), true);
@@ -514,7 +514,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobStreamingReturnsStreamingNotAllowedWithoutStreamingResumeMetadata() {
+    void testResumeJobStreamingReturnsStreamingNotAllowedWithoutStreamingResumeMetadata() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
@@ -534,7 +534,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobStreamingReturnsStreamingNotAllowedWhenStreamingResumeIsFalse() {
+    void testResumeJobStreamingReturnsStreamingNotAllowedWhenStreamingResumeIsFalse() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString(), false);
@@ -554,7 +554,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobResumesAJobStillWaitingOnTheSuspendAndConsumesTheResumeId() {
+    void testResumeExpiredJobResumesAJobStillWaitingOnTheSuspendAndConsumesTheResumeId() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
@@ -579,7 +579,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobRestartsTheJobWhenNoSuspendedTaskExecutionIsStored() {
+    void testResumeExpiredJobRestartsTheJobWhenNoSuspendedTaskExecutionIsStored() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
@@ -598,7 +598,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobReturnsNotYetSuspendedWhileTheJobIsStillRunning() {
+    void testResumeExpiredJobReturnsNotYetSuspendedWhileTheJobIsStillRunning() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.STARTED, null));
@@ -613,7 +613,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobDoesNotRestartAFailedJob() {
+    void testResumeExpiredJobDoesNotRestartAFailedJob() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.FAILED, jobResumeId.toString()));
@@ -627,7 +627,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobReturnsInvalidIdForAStoppedJobWithoutAStoredResumeId() {
+    void testResumeExpiredJobReturnsInvalidIdForAStoppedJobWithoutAStoredResumeId() {
         JobResumeId expiredJobResumeId = JobResumeId.of(JOB_ID);
 
         when(jobService.getJob(JOB_ID)).thenReturn(jobOf(Job.Status.STOPPED, null));
@@ -641,7 +641,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobDoesNotResumeAJobSuspendedAgainOnANewResumeId() {
+    void testResumeExpiredJobDoesNotResumeAJobSuspendedAgainOnANewResumeId() {
         JobResumeId expiredJobResumeId = JobResumeId.of(JOB_ID);
         JobResumeId currentJobResumeId = JobResumeId.of(JOB_ID);
 
@@ -655,7 +655,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobDoesNotResumeAnAlreadyAnsweredSuspend() {
+    void testResumeExpiredJobDoesNotResumeAnAlreadyAnsweredSuspend() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STARTED, null);
@@ -672,7 +672,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeJobReturnsGoneForAnAnswerAfterTheSuspendExpired() {
+    void testResumeJobReturnsGoneForAnAnswerAfterTheSuspendExpired() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
         Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
@@ -691,7 +691,7 @@ public class JobResumeFacadeTest {
     }
 
     @Test
-    public void testResumeExpiredJobReturnsInvalidIdForAnUnparseableId() {
+    void testResumeExpiredJobReturnsInvalidIdForAnUnparseableId() {
         JobResumeOutcome outcome = jobResumeFacade.resumeExpiredJob("not-a-token");
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
