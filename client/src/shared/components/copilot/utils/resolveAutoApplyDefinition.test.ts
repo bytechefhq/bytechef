@@ -68,13 +68,69 @@ describe('resolveAutoApplyDefinition', () => {
 
     it('picks the most recent assistant reply when several exist', () => {
         const messages = [
-            assistant('```json\n{"tasks": ["old"]}\n```'),
+            assistant('```json\n{"tasks": [{"name": "old_1", "type": "delay/v1/delay"}]}\n```'),
             user('change it'),
-            assistant('```json\n{"tasks": ["new"]}\n```'),
+            assistant('```json\n{"tasks": [{"name": "new_1", "type": "delay/v1/delay"}]}\n```'),
         ];
 
         expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBe(
-            '{"tasks": ["new"]}'
+            '{"tasks": [{"name": "new_1", "type": "delay/v1/delay"}]}'
         );
+    });
+
+    describe('workflow shape validation', () => {
+        it('returns null for a JSON object that is not a workflow', () => {
+            const messages = [assistant('```json\n{"notes": "Remember to add a delay step"}\n```')];
+
+            expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
+        });
+
+        it('returns null for a YAML mapping that is not a workflow', () => {
+            const messages = [assistant('```yaml\nnotes: remember to add a delay step\n```')];
+
+            expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
+        });
+
+        it('returns null when tasks is not an array', () => {
+            const messages = [assistant('```json\n{"tasks": {"name": "delay_1", "type": "delay/v1/delay"}}\n```')];
+
+            expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
+        });
+
+        it('returns null when a task is missing its type', () => {
+            const messages = [assistant('```json\n{"tasks": [{"name": "delay_1"}]}\n```')];
+
+            expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
+        });
+
+        it('returns null when a task is not an object', () => {
+            const messages = [assistant('```json\n{"tasks": ["delay_1"]}\n```')];
+
+            expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
+        });
+
+        it('returns null when triggers is present but not an array of nodes', () => {
+            const messages = [assistant('```json\n{"tasks": [], "triggers": [{"name": "trigger_1"}]}\n```')];
+
+            expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
+        });
+
+        it('accepts a workflow with named and typed triggers and tasks', () => {
+            const definition =
+                '{"label": "x", "tasks": [{"name": "delay_1", "parameters": {}, "type": "delay/v1/delay"}], ' +
+                '"triggers": [{"name": "trigger_1", "type": "manual/v1/manual"}]}';
+
+            const messages = [assistant('```json\n' + definition + '\n```')];
+
+            expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBe(definition);
+        });
+
+        it('accepts a YAML workflow with typed tasks', () => {
+            const messages = [assistant('```yaml\ntasks:\n  - name: delay_1\n    type: delay/v1/delay\n```')];
+
+            expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBe(
+                'tasks:\n  - name: delay_1\n    type: delay/v1/delay'
+            );
+        });
     });
 });
