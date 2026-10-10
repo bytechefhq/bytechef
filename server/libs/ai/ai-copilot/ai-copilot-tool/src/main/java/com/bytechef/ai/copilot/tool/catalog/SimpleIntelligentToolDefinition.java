@@ -17,6 +17,7 @@
 package com.bytechef.ai.copilot.tool.catalog;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Set;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.tool.ToolCallback;
@@ -27,15 +28,20 @@ import org.springframework.ai.tool.ToolCallback;
 public final class SimpleIntelligentToolDefinition implements IntelligentToolDefinition {
 
     private final String name;
+    private final String agentTypeKey;
+    private final Set<IntelligentToolScope> panelScopes;
     private final Function<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoryFunction;
     private final Function<IntelligentToolChatClientFactory, ToolCallback> toolCallbackFactory;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public SimpleIntelligentToolDefinition(
-        String name, Function<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoryFunction,
+        String name, String agentTypeKey, Set<IntelligentToolScope> panelScopes,
+        Function<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoryFunction,
         Function<IntelligentToolChatClientFactory, ToolCallback> toolCallbackFactory) {
 
         this.name = name;
+        this.agentTypeKey = agentTypeKey;
+        this.panelScopes = panelScopes;
         this.chatClientFactoryFunction = chatClientFactoryFunction;
         this.toolCallbackFactory = toolCallbackFactory;
     }
@@ -43,6 +49,17 @@ public final class SimpleIntelligentToolDefinition implements IntelligentToolDef
     @Override
     public String name() {
         return name;
+    }
+
+    @Override
+    public String agentTypeKey() {
+        return agentTypeKey;
+    }
+
+    @Override
+    @SuppressFBWarnings("EI_EXPOSE_REP")
+    public Set<IntelligentToolScope> panelScopes() {
+        return panelScopes;
     }
 
     @Override

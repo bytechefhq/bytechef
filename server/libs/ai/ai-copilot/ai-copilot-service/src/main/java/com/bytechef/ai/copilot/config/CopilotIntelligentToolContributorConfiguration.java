@@ -19,15 +19,18 @@ package com.bytechef.ai.copilot.config;
 import com.bytechef.ai.copilot.tool.ClusterElementAgentToolCallback;
 import com.bytechef.ai.copilot.tool.CodeEditorAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.SkillsAgentToolCallback;
 import com.bytechef.ai.copilot.tool.WorkflowExecutionAgentToolCallback;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.SimpleIntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -53,27 +56,27 @@ class CopilotIntelligentToolContributorConfiguration {
 
         List<IntelligentToolDefinition> definitions = List.of(
             new SimpleIntelligentToolDefinition(
-                "buildWorkflow",
+                "buildWorkflow", CopilotAgentType.BUILD_WORKFLOW.key(), Set.of(IntelligentToolScope.PROJECT),
                 variant -> workflowEditorBuildFactoryProvider.getIfAvailable(),
                 chatClientFactory -> new ProjectWorkflowAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "importWorkflow",
+                "importWorkflow", CopilotAgentType.IMPORT_WORKFLOW.key(), Set.of(IntelligentToolScope.PROJECT),
                 variant -> converterBuildFactoryProvider.getIfAvailable(),
                 chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "configureClusterElement",
+                "configureClusterElement", CopilotAgentType.CONFIGURE_CLUSTER_ELEMENT.key(), Set.of(),
                 variant -> clusterElementBuildFactoryProvider.getIfAvailable(),
                 chatClientFactory -> new ClusterElementAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "writeScript",
+                "writeScript", CopilotAgentType.WRITE_SCRIPT.key(), Set.of(),
                 variant -> codeEditorBuildFactoryProvider.getIfAvailable(),
                 chatClientFactory -> new CodeEditorAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "authorSkill",
+                "authorSkill", CopilotAgentType.SKILLS.key(), Set.of(),
                 variant -> skillsBuildFactoryProvider.getIfAvailable(),
                 chatClientFactory -> new SkillsAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "debugWorkflowExecution",
+                "debugWorkflowExecution", CopilotAgentType.DEBUG_WORKFLOW_EXECUTION.key(), Set.of(),
                 variant -> workflowExecutionBuildFactoryProvider.getIfAvailable(),
                 chatClientFactory -> new WorkflowExecutionAgentToolCallback(chatClientFactory, chatModelResolver)));
 
