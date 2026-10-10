@@ -21,22 +21,27 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
-import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
+import com.bytechef.automation.ai.tool.ReadSkillsTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.ai.tool.SkillsTools;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.platform.ai.tool.BraveWebSearchTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
+import com.bytechef.platform.ai.tool.FirecrawlTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
 import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
@@ -49,9 +54,11 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
@@ -63,51 +70,104 @@ import org.springframework.core.io.Resource;
  */
 final class CopilotIntelligentToolContributorConfigurationTest {
 
-    private static final Map<String, String> FIXTURE_KEYS_BY_DEFINITION_NAME = Map.of(
-        "buildWorkflow", "workflowEditorBuild",
-        "importWorkflow", "converterBuild",
-        "configureClusterElement", "clusterElementBuild",
-        "writeScript", "codeEditorBuild",
-        "authorSkill", "skillsBuild",
-        "debugWorkflowExecution", "workflowExecutionBuild");
+    private static final List<DelegateCase> DELEGATE_CASES = List.of(
+        new DelegateCase("buildWorkflow", IntelligentToolVariant.ASK, "workflowEditorAsk"),
+        new DelegateCase("buildWorkflow", IntelligentToolVariant.BUILD, "workflowEditorBuild"),
+        new DelegateCase("importWorkflow", IntelligentToolVariant.BUILD, "converterBuild"),
+        new DelegateCase("configureClusterElement", IntelligentToolVariant.ASK, "clusterElementAsk"),
+        new DelegateCase("configureClusterElement", IntelligentToolVariant.BUILD, "clusterElementBuild"),
+        new DelegateCase("writeScript", IntelligentToolVariant.ASK, "codeEditorAsk"),
+        new DelegateCase("writeScript", IntelligentToolVariant.BUILD, "codeEditorBuild"),
+        new DelegateCase("authorSkill", IntelligentToolVariant.ASK, "skillsAsk"),
+        new DelegateCase("authorSkill", IntelligentToolVariant.BUILD, "skillsBuild"),
+        new DelegateCase("debugWorkflowExecution", IntelligentToolVariant.BUILD, "workflowExecutionBuild"));
 
     private final CopilotIntelligentToolContributorConfiguration configuration =
         new CopilotIntelligentToolContributorConfiguration();
 
     @Test
-    void testContributesSixDefinitionsWithExpectedNames() {
+    void testContributesSixDefinitionsWithExpectedNamesAndAgentTypeKeys() {
         List<IntelligentToolDefinition> definitions = definitionsWithAllProvidersPresent();
+
+        assertThat(definitions).hasSize(6);
 
         assertThat(definitions).extracting(IntelligentToolDefinition::name)
             .containsExactly(
                 "buildWorkflow", "importWorkflow", "configureClusterElement", "writeScript",
                 "authorSkill", "debugWorkflowExecution");
+
+        assertThat(definitionNamed(definitions, "buildWorkflow").agentType())
+            .isEqualTo(CopilotAgentType.BUILD_WORKFLOW);
+        assertThat(definitionNamed(definitions, "importWorkflow").agentType())
+            .isEqualTo(CopilotAgentType.IMPORT_WORKFLOW);
+        assertThat(definitionNamed(definitions, "configureClusterElement").agentType())
+            .isEqualTo(CopilotAgentType.CONFIGURE_CLUSTER_ELEMENT);
+        assertThat(definitionNamed(definitions, "writeScript").agentType())
+            .isEqualTo(CopilotAgentType.WRITE_SCRIPT);
+        assertThat(definitionNamed(definitions, "debugWorkflowExecution").agentType())
+            .isEqualTo(CopilotAgentType.DEBUG_WORKFLOW_EXECUTION);
+
+        assertThat(definitionNamed(definitions, "authorSkill").agentType())
+            .isEqualTo(CopilotAgentType.SKILLS);
+    }
+
+    @Test
+    void testConverterAgentHasNoAskVariantButHasBuildVariant() {
+        List<IntelligentToolDefinition> definitions = definitionsWithAllProvidersPresent();
+
+        IntelligentToolDefinition converterDefinition = definitionNamed(definitions, "importWorkflow");
+
+        assertThat(converterDefinition.chatClientFactory(IntelligentToolVariant.ASK)).isNull();
+        assertThat(converterDefinition.chatClientFactory(IntelligentToolVariant.BUILD)).isNotNull();
     }
 
     @Test
     void testChatClientFactoryIsNullWhenProviderHasNoBean() {
         IntelligentToolContributor contributor = configuration.copilotIntelligentToolContributor(
-            emptyProvider(), present(mock(IntelligentToolChatClientFactory.class)), emptyProvider(),
+            emptyProvider(), present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(IntelligentToolChatClientFactory.class)), emptyProvider(),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
-            present(mock(IntelligentToolChatClientFactory.class)));
+            present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class)));
 
         List<IntelligentToolDefinition> definitions = contributor.getIntelligentToolDefinitions();
 
-        assertThat(definitionNamed(definitions, "buildWorkflow").chatClientFactory(IntelligentToolVariant.BUILD))
-            .isNull();
-        assertThat(
-            definitionNamed(definitions, "configureClusterElement").chatClientFactory(IntelligentToolVariant.BUILD))
-                .isNull();
-        assertThat(definitionNamed(definitions, "importWorkflow").chatClientFactory(IntelligentToolVariant.BUILD))
-            .isNotNull();
+        IntelligentToolDefinition projectWorkflowDefinition = definitionNamed(definitions, "buildWorkflow");
+
+        assertThat(projectWorkflowDefinition.chatClientFactory(IntelligentToolVariant.ASK)).isNull();
+        assertThat(projectWorkflowDefinition.chatClientFactory(IntelligentToolVariant.BUILD)).isNotNull();
+
+        IntelligentToolDefinition clusterElementDefinition = definitionNamed(definitions, "configureClusterElement");
+
+        assertThat(clusterElementDefinition.chatClientFactory(IntelligentToolVariant.ASK)).isNull();
+        assertThat(clusterElementDefinition.chatClientFactory(IntelligentToolVariant.BUILD)).isNotNull();
+    }
+
+    @Test
+    void testPanelScopesAreProjectOnlyForProjectWorkflowAndConverterAgents() {
+        List<IntelligentToolDefinition> definitions = definitionsWithAllProvidersPresent();
+
+        for (IntelligentToolDefinition definition : definitions) {
+            if (definition.name()
+                .equals("buildWorkflow")
+                || definition.name()
+                    .equals("importWorkflow")) {
+
+                assertThat(definition.panelScopes()).containsExactly(IntelligentToolScope.PROJECT);
+            } else {
+                assertThat(definition.panelScopes()).isEmpty();
+            }
+        }
     }
 
     @Test
     void testConverterCreateDoesNotResolveTheFactoryEagerly() {
         AtomicInteger getCount = new AtomicInteger();
 
-        IntelligentToolChatClientFactory countingChatClientFactory = () -> {
+        IntelligentToolChatClientFactory countingChatClientFactory = chatModel -> {
             getCount.incrementAndGet();
 
             return mock(ChatClient.class);
@@ -124,22 +184,43 @@ final class CopilotIntelligentToolContributorConfigurationTest {
     }
 
     @Test
-    void testTheFactoryReturnsTheBeanClient() {
+    void testTheFactoryBuildsADistinctClientForAnOverrideModel() {
         RealDefinitions realDefinitions = buildRealDefinitions();
 
-        for (Map.Entry<String, String> entry : FIXTURE_KEYS_BY_DEFINITION_NAME.entrySet()) {
-            IntelligentToolChatClientFactory factory = definitionNamed(realDefinitions.definitions(), entry.getKey())
-                .chatClientFactory(IntelligentToolVariant.BUILD);
+        for (DelegateCase delegateCase : DELEGATE_CASES) {
+            IntelligentToolChatClientFactory factory =
+                definitionNamed(realDefinitions.definitions(), delegateCase.definitionName())
+                    .chatClientFactory(delegateCase.variant());
 
             assertThat(factory)
-                .as("%s chatClientFactory", entry.getKey())
+                .as("%s (%s) chatClientFactory", delegateCase.definitionName(), delegateCase.variant())
                 .isNotNull();
 
-            ChatClient beanClient = realDefinitions.beanClientsByKey()
-                .get(entry.getValue());
+            ChatClient defaultChatClient = factory.get(null);
+            ChatClient overriddenChatClient = factory.get(mock(ChatModel.class));
 
-            assertThat(factory.get())
-                .as("%s default client", entry.getKey())
+            assertThat(overriddenChatClient)
+                .as(
+                    "%s (%s) rebuilt client for an override model", delegateCase.definitionName(),
+                    delegateCase.variant())
+                .isNotSameAs(defaultChatClient);
+        }
+    }
+
+    @Test
+    void testTheFactoryReturnsTheBeanClientForANullModel() {
+        RealDefinitions realDefinitions = buildRealDefinitions();
+
+        for (DelegateCase delegateCase : DELEGATE_CASES) {
+            IntelligentToolChatClientFactory factory =
+                definitionNamed(realDefinitions.definitions(), delegateCase.definitionName())
+                    .chatClientFactory(delegateCase.variant());
+
+            ChatClient beanClient = realDefinitions.beanClientsByKey()
+                .get(delegateCase.fixtureKey());
+
+            assertThat(factory.get(null))
+                .as("%s (%s) default client", delegateCase.definitionName(), delegateCase.variant())
                 .isSameAs(beanClient);
         }
     }
@@ -151,7 +232,11 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
-            present(mock(IntelligentToolChatClientFactory.class)));
+            present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class)));
 
         return contributor.getIntelligentToolDefinitions();
     }
@@ -160,43 +245,74 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         CopilotConfiguration copilotConfiguration = realCopilotConfiguration();
         ChatModel defaultChatModel = mock(ChatModel.class);
 
+        DelegateFixture workflowEditorAsk = workflowEditorAskFixture(copilotConfiguration, defaultChatModel);
         DelegateFixture workflowEditorBuild = workflowEditorBuildFixture(copilotConfiguration, defaultChatModel);
         DelegateFixture converterBuild = converterBuildFixture(copilotConfiguration, defaultChatModel);
+        DelegateFixture clusterElementAsk = clusterElementAskFixture(copilotConfiguration, defaultChatModel);
         DelegateFixture clusterElementBuild = clusterElementBuildFixture(copilotConfiguration, defaultChatModel);
+        DelegateFixture codeEditorAsk = codeEditorAskFixture(copilotConfiguration, defaultChatModel);
         DelegateFixture codeEditorBuild = codeEditorBuildFixture(copilotConfiguration, defaultChatModel);
+        DelegateFixture skillsAsk = skillsAskFixture(copilotConfiguration, defaultChatModel);
         DelegateFixture skillsBuild = skillsBuildFixture(copilotConfiguration, defaultChatModel);
         DelegateFixture workflowExecutionBuild = workflowExecutionBuildFixture(copilotConfiguration, defaultChatModel);
 
         IntelligentToolContributor contributor = configuration.copilotIntelligentToolContributor(
-            present(workflowEditorBuild.factory()), present(converterBuild.factory()),
-            present(clusterElementBuild.factory()), present(codeEditorBuild.factory()),
-            present(skillsBuild.factory()), present(workflowExecutionBuild.factory()));
+            present(workflowEditorAsk.factory()), present(workflowEditorBuild.factory()),
+            present(converterBuild.factory()), present(clusterElementAsk.factory()),
+            present(clusterElementBuild.factory()), present(codeEditorAsk.factory()),
+            present(codeEditorBuild.factory()), present(skillsAsk.factory()), present(skillsBuild.factory()),
+            present(workflowExecutionBuild.factory()),
+            present(mock(SubAgentChatModelResolver.class)));
 
         Map<String, ChatClient> beanClientsByKey = Map.ofEntries(
+            Map.entry("workflowEditorAsk", workflowEditorAsk.beanClient()),
             Map.entry("workflowEditorBuild", workflowEditorBuild.beanClient()),
             Map.entry("converterBuild", converterBuild.beanClient()),
+            Map.entry("clusterElementAsk", clusterElementAsk.beanClient()),
             Map.entry("clusterElementBuild", clusterElementBuild.beanClient()),
+            Map.entry("codeEditorAsk", codeEditorAsk.beanClient()),
             Map.entry("codeEditorBuild", codeEditorBuild.beanClient()),
+            Map.entry("skillsAsk", skillsAsk.beanClient()),
             Map.entry("skillsBuild", skillsBuild.beanClient()),
             Map.entry("workflowExecutionBuild", workflowExecutionBuild.beanClient()));
 
         return new RealDefinitions(contributor.getIntelligentToolDefinitions(), beanClientsByKey);
     }
 
+    private static DelegateFixture workflowEditorAskFixture(
+        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+
+        ReadProjectTools readProjectTools = mock(ReadProjectTools.class);
+        ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
+        ComponentTools componentTools = mock(ComponentTools.class);
+        TaskTools taskTools = mock(TaskTools.class);
+        Optional<FirecrawlTools> firecrawlTools = Optional.empty();
+        Optional<BraveWebSearchTools> braveWebSearchTools = Optional.empty();
+        Advisor questionAnswerAdvisor = mock(Advisor.class);
+
+        ChatClient beanClient = copilotConfiguration.workflowEditorAskSubAgentChatClient(
+            chatModel, readProjectTools, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools,
+            braveWebSearchTools, questionAnswerAdvisor);
+
+        IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorAskSubAgentChatClientFactory(
+            beanClient, readProjectTools, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools,
+            braveWebSearchTools, questionAnswerAdvisor);
+
+        return new DelegateFixture(beanClient, factory);
+    }
+
     private static DelegateFixture workflowEditorBuildFixture(
         CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
 
-        ProjectTools projectTools = mock(ProjectTools.class);
         ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
         TaskTools taskTools = mock(TaskTools.class);
         ScriptTools scriptTools = mock(ScriptTools.class);
 
         ChatClient beanClient = copilotConfiguration.workflowEditorBuildSubAgentChatClient(
-            chatModel, projectTools, projectWorkflowTools, taskTools, scriptTools,
-            new ByteArrayResource("sub agent prompt".getBytes(StandardCharsets.UTF_8)));
+            chatModel, projectWorkflowTools, taskTools, scriptTools);
 
-        IntelligentToolChatClientFactory factory =
-            copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(beanClient);
+        IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(
+            beanClient, projectWorkflowTools, taskTools, scriptTools);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -204,16 +320,33 @@ final class CopilotIntelligentToolContributorConfigurationTest {
     private static DelegateFixture converterBuildFixture(
         CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
 
-        ProjectTools projectTools = mock(ProjectTools.class);
         ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
         TaskTools taskTools = mock(TaskTools.class);
         ScriptTools scriptTools = mock(ScriptTools.class);
 
         ChatClient beanClient = copilotConfiguration.converterBuildSubAgentChatClient(
-            chatModel, projectTools, projectWorkflowTools, taskTools, scriptTools);
+            chatModel, projectWorkflowTools, taskTools, scriptTools);
 
-        IntelligentToolChatClientFactory factory =
-            copilotConfiguration.converterBuildSubAgentChatClientFactory(beanClient);
+        IntelligentToolChatClientFactory factory = copilotConfiguration.converterBuildSubAgentChatClientFactory(
+            beanClient, projectWorkflowTools, taskTools, scriptTools);
+
+        return new DelegateFixture(beanClient, factory);
+    }
+
+    private static DelegateFixture clusterElementAskFixture(
+        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+
+        ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
+        ComponentTools componentTools = mock(ComponentTools.class);
+        TaskTools taskTools = mock(TaskTools.class);
+        Optional<FirecrawlTools> firecrawlTools = Optional.empty();
+        Optional<BraveWebSearchTools> braveWebSearchTools = Optional.empty();
+
+        ChatClient beanClient = copilotConfiguration.clusterElementAskSubAgentChatClient(
+            chatModel, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools, braveWebSearchTools);
+
+        IntelligentToolChatClientFactory factory = copilotConfiguration.clusterElementAskSubAgentChatClientFactory(
+            beanClient, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools, braveWebSearchTools);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -229,8 +362,25 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         ChatClient beanClient = copilotConfiguration.clusterElementBuildSubAgentChatClient(
             chatModel, clusterElementTools, readProjectWorkflowTools, componentTools, taskTools);
 
-        IntelligentToolChatClientFactory factory =
-            copilotConfiguration.clusterElementBuildSubAgentChatClientFactory(beanClient);
+        IntelligentToolChatClientFactory factory = copilotConfiguration.clusterElementBuildSubAgentChatClientFactory(
+            beanClient, clusterElementTools, readProjectWorkflowTools, componentTools, taskTools);
+
+        return new DelegateFixture(beanClient, factory);
+    }
+
+    private static DelegateFixture codeEditorAskFixture(
+        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+
+        ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
+        ComponentTools componentTools = mock(ComponentTools.class);
+        Optional<FirecrawlTools> firecrawlTools = Optional.empty();
+        Optional<BraveWebSearchTools> braveWebSearchTools = Optional.empty();
+
+        ChatClient beanClient = copilotConfiguration.codeEditorAskSubAgentChatClient(
+            chatModel, readProjectWorkflowTools, componentTools, firecrawlTools, braveWebSearchTools);
+
+        IntelligentToolChatClientFactory factory = copilotConfiguration.codeEditorAskSubAgentChatClientFactory(
+            beanClient, readProjectWorkflowTools, componentTools, firecrawlTools, braveWebSearchTools);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -245,8 +395,26 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         ChatClient beanClient = copilotConfiguration.codeEditorBuildSubAgentChatClient(
             chatModel, scriptTools, readProjectWorkflowTools, componentTools);
 
-        IntelligentToolChatClientFactory factory =
-            copilotConfiguration.codeEditorBuildSubAgentChatClientFactory(beanClient);
+        IntelligentToolChatClientFactory factory = copilotConfiguration.codeEditorBuildSubAgentChatClientFactory(
+            beanClient, scriptTools, readProjectWorkflowTools, componentTools);
+
+        return new DelegateFixture(beanClient, factory);
+    }
+
+    private static DelegateFixture skillsAskFixture(CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        ReadProjectTools readProjectTools = mock(ReadProjectTools.class);
+        ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
+        ReadSkillsTools readSkillsTools = mock(ReadSkillsTools.class);
+        Optional<FirecrawlTools> firecrawlTools = Optional.empty();
+        Optional<BraveWebSearchTools> braveWebSearchTools = Optional.empty();
+
+        ChatClient beanClient = copilotConfiguration.skillsAskSubAgentChatClient(
+            chatModel, readProjectTools, readProjectWorkflowTools, readSkillsTools, firecrawlTools,
+            braveWebSearchTools);
+
+        IntelligentToolChatClientFactory factory = copilotConfiguration.skillsAskSubAgentChatClientFactory(
+            beanClient, readProjectTools, readProjectWorkflowTools, readSkillsTools, firecrawlTools,
+            braveWebSearchTools);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -257,12 +425,13 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         ReadProjectTools readProjectTools = mock(ReadProjectTools.class);
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
         SkillsTools skillsTools = mock(SkillsTools.class);
+        ComponentTools componentTools = mock(ComponentTools.class);
 
         ChatClient beanClient = copilotConfiguration.skillsBuildSubAgentChatClient(
-            chatModel, readProjectTools, readProjectWorkflowTools, skillsTools);
+            chatModel, readProjectTools, readProjectWorkflowTools, skillsTools, componentTools);
 
-        IntelligentToolChatClientFactory factory =
-            copilotConfiguration.skillsBuildSubAgentChatClientFactory(beanClient);
+        IntelligentToolChatClientFactory factory = copilotConfiguration.skillsBuildSubAgentChatClientFactory(
+            beanClient, readProjectTools, readProjectWorkflowTools, skillsTools, componentTools);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -279,7 +448,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             chatModel, workflowExecutionTools, projectWorkflowTools, scriptTools, taskTools);
 
         IntelligentToolChatClientFactory factory =
-            copilotConfiguration.workflowExecutionBuildSubAgentChatClientFactory(beanClient);
+            copilotConfiguration.workflowExecutionBuildSubAgentChatClientFactory(
+                beanClient, workflowExecutionTools, projectWorkflowTools, scriptTools, taskTools);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -298,9 +468,11 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         TriggerDefinitionFacade triggerDefinitionFacade = mock(TriggerDefinitionFacade.class);
         PropertyOptionsResolver propertyOptionsResolver = mock(PropertyOptionsResolver.class);
         ObjectProvider<CopilotConnectionLister> connectionListerProvider = emptyProvider();
+
         return new CopilotConfiguration(
             promptResource, promptResource, promptResource, promptResource, promptResource, promptResource,
-            promptResource, promptResource, promptResource, promptResource, workflowValidatorTools,
+            promptResource, promptResource, promptResource, promptResource, promptResource, promptResource,
+            promptResource, promptResource, promptResource, promptResource, promptResource, workflowValidatorTools,
             workflowInstructionTools, connectionDefinitionService, workspaceConnectionFacade,
             componentDefinitionService, actionDefinitionService, actionDefinitionFacade, triggerDefinitionService,
             triggerDefinitionFacade, propertyOptionsResolver, connectionListerProvider,
@@ -336,5 +508,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
 
     private record RealDefinitions(List<IntelligentToolDefinition> definitions,
         Map<String, ChatClient> beanClientsByKey) {
+    }
+
+    private record DelegateCase(String definitionName, IntelligentToolVariant variant, String fixtureKey) {
     }
 }

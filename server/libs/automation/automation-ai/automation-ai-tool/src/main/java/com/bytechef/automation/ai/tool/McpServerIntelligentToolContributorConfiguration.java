@@ -45,7 +45,7 @@ class McpServerIntelligentToolContributorConfiguration {
 
         List<IntelligentToolDefinition> definitions = List.of(
             new SimpleIntelligentToolDefinition(
-                "configureMcpServer", CopilotAgentType.CONFIGURE_MCP_SERVER.key(), Set.of(),
+                "configureMcpServer", CopilotAgentType.CONFIGURE_MCP_SERVER, Set.of(),
                 variant -> mcpServerBuildFactoryProvider.getIfAvailable(),
                 chatClientFactory -> new ConfigureMcpServerToolCallback(chatClientFactory, chatModelResolver)));
 

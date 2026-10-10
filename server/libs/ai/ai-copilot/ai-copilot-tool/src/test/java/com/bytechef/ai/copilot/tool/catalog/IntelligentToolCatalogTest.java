@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.agent.tool.AgentType;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -179,7 +181,6 @@ class IntelligentToolCatalogTest {
 
         assertThat(toolCallbacks).hasSize(1);
 
-        // the factory is handed to create(...); the callback decides when to invoke it
         assertThat(received.get()).isNull();
     }
 
@@ -189,7 +190,7 @@ class IntelligentToolCatalogTest {
 
     private static FakeIntelligentToolDefinition projectScopedDefinition(ChatClient chatClient) {
         return new FakeIntelligentToolDefinition(
-            "buildWorkflow", "buildWorkflow", Set.of(IntelligentToolScope.PROJECT),
+            "buildWorkflow", CopilotAgentType.BUILD_WORKFLOW, Set.of(IntelligentToolScope.PROJECT),
             Map.of(
                 IntelligentToolVariant.ASK, (IntelligentToolChatClientFactory) chatModel -> chatClient,
                 IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient));
@@ -199,7 +200,7 @@ class IntelligentToolCatalogTest {
         ChatClient chatClient = mock(ChatClient.class);
 
         return new FakeIntelligentToolDefinition(
-            "mcp_agent", "mcp_agent", Set.of(),
+            "mcp_agent", CopilotAgentType.CONFIGURE_MCP_SERVER, Set.of(),
             Map.of(
                 IntelligentToolVariant.ASK, (IntelligentToolChatClientFactory) chatModel -> chatClient,
                 IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient));
@@ -209,15 +210,10 @@ class IntelligentToolCatalogTest {
         ChatClient chatClient = mock(ChatClient.class);
 
         return new FakeIntelligentToolDefinition(
-            "importWorkflow", "importWorkflow", Set.of(),
+            "importWorkflow", CopilotAgentType.IMPORT_WORKFLOW, Set.of(),
             Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient));
     }
 
-    /**
-     * Builds a definition over the given raw factory whose {@code create} does NOT invoke it — mirroring the real
-     * catalog contract, where {@code create} receives the factory and decides for itself when (or whether) to call it,
-     * rather than the catalog resolving it up front.
-     */
     private static IntelligentToolDefinition definitionWithFactory(IntelligentToolChatClientFactory chatClientFactory) {
         return new LazyIntelligentToolDefinition("test_tool", chatClientFactory, mock(ToolCallback.class));
     }
@@ -250,7 +246,7 @@ class IntelligentToolCatalogTest {
     private static final class FakeIntelligentToolDefinition implements IntelligentToolDefinition {
 
         private final String name;
-        private final String agentTypeKey;
+        private final AgentType agentType;
         private final Set<IntelligentToolScope> panelScopes;
         private final Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant;
         private final ToolCallback toolCallback = mock(ToolCallback.class);
@@ -259,11 +255,11 @@ class IntelligentToolCatalogTest {
         private ChatClient capturedChatClient;
 
         private FakeIntelligentToolDefinition(
-            String name, String agentTypeKey, Set<IntelligentToolScope> panelScopes,
+            String name, AgentType agentType, Set<IntelligentToolScope> panelScopes,
             Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant) {
 
             this.name = name;
-            this.agentTypeKey = agentTypeKey;
+            this.agentType = agentType;
             this.panelScopes = panelScopes;
             this.chatClientFactoriesByVariant = chatClientFactoriesByVariant;
         }
@@ -274,8 +270,8 @@ class IntelligentToolCatalogTest {
         }
 
         @Override
-        public String agentTypeKey() {
-            return agentTypeKey;
+        public AgentType agentType() {
+            return agentType;
         }
 
         @Override
@@ -298,10 +294,6 @@ class IntelligentToolCatalogTest {
         }
     }
 
-    /**
-     * Mirrors {@code importWorkflow}'s real shape: {@code create} stores the given factory for later, deferred use
-     * instead of resolving it — the property that keeps {@code importWorkflow} lazy.
-     */
     private static final class LazyIntelligentToolDefinition implements IntelligentToolDefinition {
 
         private final String name;
@@ -322,8 +314,8 @@ class IntelligentToolCatalogTest {
         }
 
         @Override
-        public String agentTypeKey() {
-            return name;
+        public AgentType agentType() {
+            return CopilotAgentType.BUILD_WORKFLOW;
         }
 
         @Override
