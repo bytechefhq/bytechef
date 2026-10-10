@@ -31,6 +31,7 @@ public class WorkflowValidatorErrorType extends AbstractErrorType {
     public static final WorkflowValidatorErrorType INVALID_INPUT_NAME = new WorkflowValidatorErrorType(101);
     public static final WorkflowValidatorErrorType RESERVED_NODE_NAME = new WorkflowValidatorErrorType(102);
     public static final WorkflowValidatorErrorType RESERVED_INPUT_NAME = new WorkflowValidatorErrorType(103);
+    public static final WorkflowValidatorErrorType VALIDATE_WORKFLOW = new WorkflowValidatorErrorType(104);
 
     public WorkflowValidatorErrorType(int errorKey) {
         super(WorkflowValidatorFacade.class, errorKey);

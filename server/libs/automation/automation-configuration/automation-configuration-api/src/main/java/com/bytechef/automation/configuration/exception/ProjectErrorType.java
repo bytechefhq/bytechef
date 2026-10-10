@@ -28,6 +28,14 @@ public class ProjectErrorType extends AbstractErrorType {
     public static final ProjectErrorType PROJECT_VERSION_NOT_PUBLISHED = new ProjectErrorType(101);
     public static final ProjectErrorType PROJECT_VERSION_DEPLOYED = new ProjectErrorType(102);
     public static final ProjectErrorType PROJECT_VERSION_WORKFLOW_NOT_FOUND = new ProjectErrorType(103);
+    public static final ProjectErrorType CREATE_PROJECT = new ProjectErrorType(104);
+    public static final ProjectErrorType DELETE_PROJECT = new ProjectErrorType(105);
+    public static final ProjectErrorType GET_PROJECT = new ProjectErrorType(106);
+    public static final ProjectErrorType GET_PROJECT_STATUS = new ProjectErrorType(107);
+    public static final ProjectErrorType LIST_PROJECTS = new ProjectErrorType(108);
+    public static final ProjectErrorType PUBLISH_PROJECT = new ProjectErrorType(109);
+    public static final ProjectErrorType SEARCH_PROJECTS = new ProjectErrorType(110);
+    public static final ProjectErrorType UPDATE_PROJECT = new ProjectErrorType(111);
 
     private ProjectErrorType(int errorKey) {
         super(Project.class, errorKey);
