@@ -96,8 +96,9 @@ class PermissionScopeRegistryTest {
             () -> Set.of(new ScopeDefinition(TestPermissionScope.X_SCOPE, WorkspaceRole.VIEWER));
         PermissionScopeProvider second =
             () -> Set.of(new ScopeDefinition(TestPermissionScope.X_SCOPE, WorkspaceRole.ADMIN));
+        List<PermissionScopeProvider> permissionScopeProviders = List.of(first, second);
 
-        assertThatThrownBy(() -> new PermissionScopeRegistry(List.of(first, second)))
+        assertThatThrownBy(() -> new PermissionScopeRegistry(permissionScopeProviders))
             .isInstanceOf(IllegalStateException.class);
     }
 

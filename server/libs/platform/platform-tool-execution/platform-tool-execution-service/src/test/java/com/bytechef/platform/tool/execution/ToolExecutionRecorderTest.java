@@ -74,11 +74,13 @@ class ToolExecutionRecorderTest {
     void testRecordErrorPublishesErrorEventAndRethrows() {
         IllegalStateException failure = new IllegalStateException("boom");
 
+        ToolExecutionEvent.Builder toolExecutionEventBuilder = ToolExecutionEvent.builder(
+            ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT, "slack_sendMessage");
+
         assertThatExceptionOfType(IllegalStateException.class)
             .isThrownBy(
                 () -> toolExecutionRecorder.record(
-                    ToolExecutionEvent.builder(
-                        ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT, "slack_sendMessage"),
+                    toolExecutionEventBuilder,
                     () -> {
                         throw failure;
                     }));
@@ -92,11 +94,13 @@ class ToolExecutionRecorderTest {
 
     @Test
     void testRecordTimeoutIsClassifiedFromCauseChain() {
+        ToolExecutionEvent.Builder toolExecutionEventBuilder = ToolExecutionEvent.builder(
+            ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW, "runWorkflow");
+
         assertThatExceptionOfType(CompletionException.class)
             .isThrownBy(
                 () -> toolExecutionRecorder.record(
-                    ToolExecutionEvent.builder(
-                        ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW, "runWorkflow"),
+                    toolExecutionEventBuilder,
                     () -> {
                         throw new CompletionException(new TimeoutException("timed out"));
                     }));
@@ -108,11 +112,13 @@ class ToolExecutionRecorderTest {
     void testErrorMessageIsTruncated() {
         String longMessage = "x".repeat(ToolExecutionEvent.ERROR_MESSAGE_MAX_LENGTH + 100);
 
+        ToolExecutionEvent.Builder toolExecutionEventBuilder = ToolExecutionEvent.builder(
+            ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT, "slack_sendMessage");
+
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(
                 () -> toolExecutionRecorder.record(
-                    ToolExecutionEvent.builder(
-                        ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT, "slack_sendMessage"),
+                    toolExecutionEventBuilder,
                     () -> {
                         throw new RuntimeException(longMessage);
                     }));

@@ -17,6 +17,7 @@
 package com.bytechef.platform.security.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.ArrayList;
@@ -209,13 +210,14 @@ class SecurityUtilsTest {
 
         SecurityContextHolder.setContext(originalContext);
 
-        try {
-            SecurityUtils.runAs(new UsernamePasswordAuthenticationToken("captured-user", ""), () -> {
-                throw new RuntimeException("supplier failure");
-            });
-        } catch (RuntimeException ignored) {
-            // expected
-        }
+        UsernamePasswordAuthenticationToken capturedAuthentication =
+            new UsernamePasswordAuthenticationToken("captured-user", "");
+
+        assertThatThrownBy(() -> SecurityUtils.runAs(capturedAuthentication, () -> {
+            throw new RuntimeException("supplier failure");
+        }))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("supplier failure");
 
         assertThat(SecurityUtils.getCurrentUserLogin()).isEqualTo("original-user");
     }
@@ -228,13 +230,13 @@ class SecurityUtilsTest {
 
         SecurityContextHolder.setContext(originalContext);
 
-        try {
-            SecurityUtils.runAs("override-user", new ArrayList<>(), () -> {
-                throw new RuntimeException("supplier failure");
-            });
-        } catch (RuntimeException ignored) {
-            // expected
-        }
+        Collection<GrantedAuthority> overrideAuthorities = new ArrayList<>();
+
+        assertThatThrownBy(() -> SecurityUtils.runAs("override-user", overrideAuthorities, () -> {
+            throw new RuntimeException("supplier failure");
+        }))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("supplier failure");
 
         assertThat(SecurityUtils.getCurrentUserLogin()).isEqualTo("original-user");
     }
@@ -267,13 +269,11 @@ class SecurityUtilsTest {
 
         SecurityContextHolder.setContext(originalContext);
 
-        try {
-            SecurityUtils.runAsSystem(() -> {
-                throw new RuntimeException("supplier failure");
-            });
-        } catch (RuntimeException ignored) {
-            // expected
-        }
+        assertThatThrownBy(() -> SecurityUtils.runAsSystem(() -> {
+            throw new RuntimeException("supplier failure");
+        }))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("supplier failure");
 
         assertThat(SecurityUtils.getCurrentUserLogin()).isEqualTo("original-user");
         assertThat(SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)).isFalse();

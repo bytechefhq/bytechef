@@ -74,8 +74,9 @@ class WorkflowExecutionAgentToolCallbackTest {
 
         String result = callback.call("{\"request\":\"   \"}");
 
-        assertThat(result).contains("error");
-        assertThat(result).containsIgnoringCase("request is required");
+        assertThat(result)
+            .contains("error")
+            .containsIgnoringCase("request is required");
     }
 
     @Test
@@ -85,8 +86,9 @@ class WorkflowExecutionAgentToolCallbackTest {
 
         String result = callback.call("not-json");
 
-        assertThat(result).contains("error");
-        assertThat(result).containsIgnoringCase("invalid tool input");
+        assertThat(result)
+            .contains("error")
+            .containsIgnoringCase("invalid tool input");
     }
 
     @Test
