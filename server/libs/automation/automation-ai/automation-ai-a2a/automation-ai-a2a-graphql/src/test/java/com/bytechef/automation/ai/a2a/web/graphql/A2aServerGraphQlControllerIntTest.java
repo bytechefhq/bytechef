@@ -17,17 +17,23 @@
 package com.bytechef.automation.ai.a2a.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
+import com.bytechef.automation.ai.a2a.facade.A2aServerFacade;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.automation.ai.a2a.web.graphql.config.AutomationA2aGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.ai.a2a.web.graphql.config.AutomationA2aGraphQlTestConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tag.domain.Tag;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +44,7 @@ import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Ivica Cardic
@@ -56,10 +63,90 @@ import org.springframework.test.context.ContextConfiguration;
 class A2aServerGraphQlControllerIntTest {
 
     @Autowired
+    private A2aServerFacade a2aServerFacade;
+
+    @Autowired
     private A2aServerService a2aServerService;
 
     @Autowired
     private GraphQlTester graphQlTester;
+
+    @Test
+    @WithMockUser
+    void testA2aServersReturnsTheTagsOfEachServer() {
+        A2aServer a2aServer = createA2aServer(5L, "agent", Environment.PRODUCTION);
+
+        when(a2aServerService.getA2aServers()).thenReturn(List.of(a2aServer));
+        when(a2aServerFacade.getA2aServerTags(List.of(a2aServer))).thenReturn(
+            Map.of(a2aServer, List.of(createTag(7L, "sales"))));
+
+        graphQlTester
+            .document("""
+                query {
+                    a2aServers {
+                        tags {
+                            id
+                            name
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("a2aServers[0].tags[0].id")
+            .entity(String.class)
+            .isEqualTo("7")
+            .path("a2aServers[0].tags[0].name")
+            .entity(String.class)
+            .isEqualTo("sales");
+    }
+
+    @Test
+    @WithMockUser
+    void testA2aServerTagsReturnsTheTagsUsedByA2aServers() {
+        when(a2aServerFacade.getA2aServerTags()).thenReturn(List.of(createTag(7L, "sales")));
+
+        graphQlTester
+            .document("""
+                query {
+                    a2aServerTags {
+                        id
+                        name
+                    }
+                }
+                """)
+            .execute()
+            .path("a2aServerTags[0].name")
+            .entity(String.class)
+            .isEqualTo("sales");
+    }
+
+    @Test
+    @WithMockUser
+    void testUpdateA2aServerTagsPassesTheExistingAndNewTagsToTheFacade() {
+        when(a2aServerFacade.updateA2aServerTags(eq(5L), any())).thenReturn(
+            List.of(createTag(7L, "sales"), createTag(8L, "support")));
+
+        graphQlTester
+            .document("""
+                mutation {
+                    updateA2aServerTags(id: 5, tags: [{id: 7, name: "sales"}, {name: "support"}]) {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .path("updateA2aServerTags[1].id")
+            .entity(String.class)
+            .isEqualTo("8");
+
+        ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.captor();
+
+        verify(a2aServerFacade).updateA2aServerTags(eq(5L), tagsArgumentCaptor.capture());
+
+        assertThat(tagsArgumentCaptor.getValue())
+            .extracting(Tag::getId, Tag::getName)
+            .containsExactly(tuple(7L, "sales"), tuple(null, "support"));
+    }
 
     @Test
     @WithMockUser
@@ -99,6 +186,29 @@ class A2aServerGraphQlControllerIntTest {
             .isEqualTo("gated-secret");
 
         verify(a2aServerService).getA2aServerSecretKey(5L);
+    }
+
+    @Test
+    @WithMockUser
+    void testA2aServersReturnsTheLastModifiedDateAsEpochMilliseconds() {
+        A2aServer a2aServer = createA2aServer(5L, "agent", Environment.PRODUCTION);
+
+        ReflectionTestUtils.setField(a2aServer, "lastModifiedDate", Instant.ofEpochMilli(1_791_000_000_000L));
+
+        when(a2aServerService.getA2aServers()).thenReturn(List.of(a2aServer));
+
+        graphQlTester
+            .document("""
+                query {
+                    a2aServers {
+                        lastModifiedDate
+                    }
+                }
+                """)
+            .execute()
+            .path("a2aServers[0].lastModifiedDate")
+            .entity(Long.class)
+            .isEqualTo(1_791_000_000_000L);
     }
 
     @Test
@@ -277,5 +387,14 @@ class A2aServerGraphQlControllerIntTest {
         a2aServer.setId(id);
 
         return a2aServer;
+    }
+
+    private static Tag createTag(long id, String name) {
+        Tag tag = new Tag();
+
+        tag.setId(id);
+        tag.setName(name);
+
+        return tag;
     }
 }

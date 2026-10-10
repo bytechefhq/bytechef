@@ -47,6 +47,9 @@ public final class McpProjectWorkflow {
     private Long projectDeploymentWorkflowId;
 
     @Column
+    private boolean enabled = true;
+
+    @Column
     private MapWrapper parameters = new MapWrapper();
 
     @CreatedBy
@@ -98,6 +101,14 @@ public final class McpProjectWorkflow {
 
     public void setProjectDeploymentWorkflowId(Long projectDeploymentWorkflowId) {
         this.projectDeploymentWorkflowId = projectDeploymentWorkflowId;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Map<String, ?> getParameters() {
@@ -172,6 +183,7 @@ public final class McpProjectWorkflow {
             "id=" + id +
             ", mcpProjectId=" + mcpProjectId +
             ", projectDeploymentWorkflowId=" + projectDeploymentWorkflowId +
+            ", enabled=" + enabled +
             ", parameters=" + parameters +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +

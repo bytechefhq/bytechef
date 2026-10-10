@@ -406,19 +406,29 @@ export type A2aProjectWorkflowsByA2aProjectIdQueryVariables = Exact<{
 }>;
 
 
-export type A2aProjectWorkflowsByA2aProjectIdQuery = { a2aProjectWorkflowsByA2aProjectId: Array<{ id: string, skillDescription: string | null, skillName: string | null, workflowId: string | null, workflowLabel: string | null } | null> | null };
+export type A2aProjectWorkflowsByA2aProjectIdQuery = { a2aProjectWorkflowsByA2aProjectId: Array<{ enabled: boolean, id: string, skillDescription: string | null, skillName: string | null, workflowId: string | null, workflowLabel: string | null } | null> | null };
+
+export type A2aProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type A2aProjectsQuery = { a2aProjects: Array<{ a2aServerId: string, id: string, projectId: string | null } | null> | null };
 
 export type A2aProjectsByServerIdQueryVariables = Exact<{
   a2aServerId: string | number;
 }>;
 
 
-export type A2aProjectsByServerIdQuery = { a2aProjectsByServerId: Array<{ id: string, projectId: string | null, projectVersion: number | null, workflowIds: Array<string> } | null> | null };
+export type A2aProjectsByServerIdQuery = { a2aProjectsByServerId: Array<{ id: string, lastModifiedDate: any, projectDeploymentId: string | null, projectId: string | null, projectVersion: number | null, workflowIds: Array<string> } | null> | null };
+
+export type A2aServerTagsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type A2aServerTagsQuery = { a2aServerTags: Array<{ id: string, name: string } | null> | null };
 
 export type A2aServersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type A2aServersQuery = { a2aServers: Array<{ authenticationRequired: boolean, description: string | null, enabled: boolean, environmentId: string, id: string, name: string, secretKey: string | null } | null> | null };
+export type A2aServersQuery = { a2aServers: Array<{ authenticationRequired: boolean, description: string | null, enabled: boolean, environmentId: string, id: string, lastModifiedDate: any, name: string, secretKey: string | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
 export type CreateA2aProjectMutationVariables = Exact<{
   input: Types.CreateA2aProjectInput;
@@ -586,7 +596,7 @@ export type McpProjectsByServerIdQueryVariables = Exact<{
 }>;
 
 
-export type McpProjectsByServerIdQuery = { mcpProjectsByServerId: Array<{ id: string, projectDeploymentId: string, mcpServerId: string, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectVersion: number | null, project: { id: string, name: string, category: { id: string | null, name: string | null } | null, tags: Array<{ id: string, name: string } | null> | null } | null, mcpProjectWorkflows: Array<{ id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters: any, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectDeploymentWorkflow: { id: string, enabled: boolean, inputs: any, projectDeploymentId: string, version: number, workflowId: string, connections: Array<{ connectionId: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow: { id: string, label: string } | null } | null> | null } | null> | null };
+export type McpProjectsByServerIdQuery = { mcpProjectsByServerId: Array<{ id: string, projectDeploymentId: string, mcpServerId: string, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectVersion: number | null, project: { id: string, name: string, category: { id: string | null, name: string | null } | null, tags: Array<{ id: string, name: string } | null> | null } | null, mcpProjectWorkflows: Array<{ id: string, enabled: boolean, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters: any, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectDeploymentWorkflow: { id: string, enabled: boolean, inputs: any, projectDeploymentId: string, version: number, workflowId: string, connections: Array<{ connectionId: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow: { id: string, label: string } | null } | null> | null } | null> | null };
 
 export type PreBuiltProjectTemplatesQueryVariables = Exact<{
   query?: string | null | undefined;
@@ -649,6 +659,14 @@ export type UpdateA2aProjectMutationVariables = Exact<{
 
 export type UpdateA2aProjectMutation = { updateA2aProject: { id: string } | null };
 
+export type UpdateA2aProjectWorkflowEnabledMutationVariables = Exact<{
+  id: string | number;
+  enabled: boolean;
+}>;
+
+
+export type UpdateA2aProjectWorkflowEnabledMutation = { updateA2aProjectWorkflowEnabled: { enabled: boolean, id: string } | null };
+
 export type UpdateA2aProjectWorkflowParametersMutationVariables = Exact<{
   id: string | number;
   input: Types.A2aProjectWorkflowParametersInput;
@@ -665,6 +683,14 @@ export type UpdateA2aServerMutationVariables = Exact<{
 
 export type UpdateA2aServerMutation = { updateA2aServer: { id: string } | null };
 
+export type UpdateA2aServerTagsMutationVariables = Exact<{
+  id: string | number;
+  tags: Array<Types.TagInput> | Types.TagInput;
+}>;
+
+
+export type UpdateA2aServerTagsMutation = { updateA2aServerTags: Array<{ id: string } | null> | null };
+
 export type UpdateMcpProjectMutationVariables = Exact<{
   id: string | number;
   input: Types.UpdateMcpProjectInput;
@@ -679,7 +705,7 @@ export type UpdateMcpProjectWorkflowMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMcpProjectWorkflowMutation = { updateMcpProjectWorkflow: { id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters: any } | null };
+export type UpdateMcpProjectWorkflowMutation = { updateMcpProjectWorkflow: { id: string, enabled: boolean, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters: any } | null };
 
 export type UpdateMcpServerMutationVariables = Exact<{
   id: string | number;
@@ -3544,6 +3570,7 @@ export const useUpdateApprovalTaskMutation = <
 export const A2aProjectWorkflowsByA2aProjectIdDocument = new TypedDocumentString(`
     query a2aProjectWorkflowsByA2aProjectId($a2aProjectId: ID!) {
   a2aProjectWorkflowsByA2aProjectId(a2aProjectId: $a2aProjectId) {
+    enabled
     id
     skillDescription
     skillName
@@ -3569,10 +3596,38 @@ export const useA2aProjectWorkflowsByA2aProjectIdQuery = <
   }
     )};
 
+export const A2aProjectsDocument = new TypedDocumentString(`
+    query a2aProjects {
+  a2aProjects {
+    a2aServerId
+    id
+    projectId
+  }
+}
+    `);
+
+export const useA2aProjectsQuery = <
+      TData = A2aProjectsQuery,
+      TError = unknown
+    >(
+      variables?: A2aProjectsQueryVariables,
+      options?: Omit<UseQueryOptions<A2aProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<A2aProjectsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<A2aProjectsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['a2aProjects'] : ['a2aProjects', variables],
+    queryFn: fetcher<A2aProjectsQuery, A2aProjectsQueryVariables>(A2aProjectsDocument, variables),
+    ...options
+  }
+    )};
+
 export const A2aProjectsByServerIdDocument = new TypedDocumentString(`
     query a2aProjectsByServerId($a2aServerId: ID!) {
   a2aProjectsByServerId(a2aServerId: $a2aServerId) {
     id
+    lastModifiedDate
+    projectDeploymentId
     projectId
     projectVersion
     workflowIds
@@ -3596,6 +3651,31 @@ export const useA2aProjectsByServerIdQuery = <
   }
     )};
 
+export const A2aServerTagsDocument = new TypedDocumentString(`
+    query a2aServerTags {
+  a2aServerTags {
+    id
+    name
+  }
+}
+    `);
+
+export const useA2aServerTagsQuery = <
+      TData = A2aServerTagsQuery,
+      TError = unknown
+    >(
+      variables?: A2aServerTagsQueryVariables,
+      options?: Omit<UseQueryOptions<A2aServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<A2aServerTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<A2aServerTagsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['a2aServerTags'] : ['a2aServerTags', variables],
+    queryFn: fetcher<A2aServerTagsQuery, A2aServerTagsQueryVariables>(A2aServerTagsDocument, variables),
+    ...options
+  }
+    )};
+
 export const A2aServersDocument = new TypedDocumentString(`
     query a2aServers {
   a2aServers {
@@ -3604,8 +3684,13 @@ export const A2aServersDocument = new TypedDocumentString(`
     enabled
     environmentId
     id
+    lastModifiedDate
     name
     secretKey
+    tags {
+      id
+      name
+    }
   }
 }
     `);
@@ -4114,6 +4199,7 @@ export const McpProjectsByServerIdDocument = new TypedDocumentString(`
     }
     mcpProjectWorkflows {
       id
+      enabled
       mcpProjectId
       projectDeploymentWorkflowId
       parameters
@@ -4434,6 +4520,28 @@ export const useUpdateA2aProjectMutation = <
   }
     )};
 
+export const UpdateA2aProjectWorkflowEnabledDocument = new TypedDocumentString(`
+    mutation updateA2aProjectWorkflowEnabled($id: ID!, $enabled: Boolean!) {
+  updateA2aProjectWorkflowEnabled(id: $id, enabled: $enabled) {
+    enabled
+    id
+  }
+}
+    `);
+
+export const useUpdateA2aProjectWorkflowEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateA2aProjectWorkflowEnabledMutation, TError, UpdateA2aProjectWorkflowEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateA2aProjectWorkflowEnabledMutation, TError, UpdateA2aProjectWorkflowEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['updateA2aProjectWorkflowEnabled'],
+    mutationFn: (variables?: UpdateA2aProjectWorkflowEnabledMutationVariables) => fetcher<UpdateA2aProjectWorkflowEnabledMutation, UpdateA2aProjectWorkflowEnabledMutationVariables>(UpdateA2aProjectWorkflowEnabledDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const UpdateA2aProjectWorkflowParametersDocument = new TypedDocumentString(`
     mutation updateA2aProjectWorkflowParameters($id: ID!, $input: A2aProjectWorkflowParametersInput!) {
   updateA2aProjectWorkflowParameters(id: $id, input: $input) {
@@ -4476,6 +4584,27 @@ export const useUpdateA2aServerMutation = <
   }
     )};
 
+export const UpdateA2aServerTagsDocument = new TypedDocumentString(`
+    mutation updateA2aServerTags($id: ID!, $tags: [TagInput!]!) {
+  updateA2aServerTags(id: $id, tags: $tags) {
+    id
+  }
+}
+    `);
+
+export const useUpdateA2aServerTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateA2aServerTagsMutation, TError, UpdateA2aServerTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateA2aServerTagsMutation, TError, UpdateA2aServerTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateA2aServerTags'],
+    mutationFn: (variables?: UpdateA2aServerTagsMutationVariables) => fetcher<UpdateA2aServerTagsMutation, UpdateA2aServerTagsMutationVariables>(UpdateA2aServerTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const UpdateMcpProjectDocument = new TypedDocumentString(`
     mutation updateMcpProject($id: ID!, $input: UpdateMcpProjectInput!) {
   updateMcpProject(id: $id, input: $input) {
@@ -4504,6 +4633,7 @@ export const UpdateMcpProjectWorkflowDocument = new TypedDocumentString(`
     mutation updateMcpProjectWorkflow($id: ID!, $input: McpProjectWorkflowUpdateInput!) {
   updateMcpProjectWorkflow(id: $id, input: $input) {
     id
+    enabled
     mcpProjectId
     projectDeploymentWorkflowId
     parameters

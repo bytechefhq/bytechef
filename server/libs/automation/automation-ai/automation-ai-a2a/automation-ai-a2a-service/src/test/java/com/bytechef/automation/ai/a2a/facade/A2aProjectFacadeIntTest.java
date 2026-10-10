@@ -78,7 +78,6 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -882,15 +881,14 @@ class A2aProjectFacadeIntTest {
                     .thenReturn(Optional.of(workflowTestConfiguration));
         }
 
-        @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
         private static String workflowDefinition(String triggerType) {
             return """
                 {
                     "label": "A2A skill",
-                    "triggers": [{"name": "newWorkflowCall_1", "type": "%s"}],
+                    "triggers": [{"name": "newWorkflowCall_1", "type": "TRIGGER_TYPE"}],
                     "tasks": []
                 }
-                """.formatted(triggerType);
+                """.replace("TRIGGER_TYPE", triggerType);
         }
 
         private ProjectDeployment createProjectDeployment(String name, int projectVersion) {

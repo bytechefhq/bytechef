@@ -1,10 +1,12 @@
 extend type Query {
     a2aServers: [A2aServer]
+    a2aServerTags: [Tag]
 }
 
 extend type Mutation {
     createA2aServer(input: CreateA2aServerInput!): A2aServer
     updateA2aServer(id: ID!, input: UpdateA2aServerInput!): A2aServer
+    updateA2aServerTags(id: ID!, tags: [TagInput!]!): [Tag]
     deleteA2aServer(id: ID!): Boolean
 }
 
@@ -16,6 +18,8 @@ type A2aServer {
     enabled: Boolean!
     authenticationRequired: Boolean!
     secretKey: String
+    lastModifiedDate: Long
+    tags: [Tag]
 }
 
 input CreateA2aServerInput {

@@ -18,13 +18,17 @@ package com.bytechef.automation.ai.a2a.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
+import com.bytechef.automation.ai.a2a.facade.A2aServerFacade;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.graphql.error.GraphQlBadRequestException;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
@@ -39,10 +43,12 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class A2aServerGraphQlController {
 
+    private final A2aServerFacade a2aServerFacade;
     private final A2aServerService a2aServerService;
 
     @SuppressFBWarnings("EI")
-    public A2aServerGraphQlController(A2aServerService a2aServerService) {
+    public A2aServerGraphQlController(A2aServerFacade a2aServerFacade, A2aServerService a2aServerService) {
+        this.a2aServerFacade = a2aServerFacade;
         this.a2aServerService = a2aServerService;
     }
 
@@ -50,6 +56,12 @@ public class A2aServerGraphQlController {
     @PreAuthorize("isAuthenticated()")
     public List<A2aServer> a2aServers() {
         return a2aServerService.getA2aServers();
+    }
+
+    @QueryMapping
+    @PreAuthorize("isAuthenticated()")
+    public List<Tag> a2aServerTags() {
+        return a2aServerFacade.getA2aServerTags();
     }
 
     @MutationMapping
@@ -93,6 +105,27 @@ public class A2aServerGraphQlController {
     }
 
     @MutationMapping
+    public List<Tag> updateA2aServerTags(@Argument long id, @Argument List<TagInput> tags) {
+        List<Tag> tagList = tags.stream()
+            .map(tagInput -> {
+                Tag tag = new Tag();
+
+                tag.setId(tagInput.id());
+                tag.setName(tagInput.name());
+
+                return tag;
+            })
+            .toList();
+
+        return a2aServerFacade.updateA2aServerTags(id, tagList);
+    }
+
+    @BatchMapping
+    public Map<A2aServer, List<Tag>> tags(List<A2aServer> a2aServers) {
+        return a2aServerFacade.getA2aServerTags(a2aServers);
+    }
+
+    @MutationMapping
     public boolean deleteA2aServer(@Argument long id) {
         a2aServerService.delete(id);
 
@@ -133,5 +166,9 @@ public class A2aServerGraphQlController {
     public record UpdateA2aServerInput(
         @Nullable String name, @Nullable String description, @Nullable Boolean enabled,
         @Nullable Boolean authenticationRequired) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record TagInput(@Nullable Long id, String name) {
     }
 }

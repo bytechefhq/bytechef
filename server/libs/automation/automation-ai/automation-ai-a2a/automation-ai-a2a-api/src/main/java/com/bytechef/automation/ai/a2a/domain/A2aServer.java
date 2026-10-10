@@ -19,7 +19,10 @@ package com.bytechef.automation.ai.a2a.domain;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.domain.TenantKey;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -28,6 +31,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -56,6 +60,9 @@ public final class A2aServer {
 
     @Column("secret_key")
     private String secretKey;
+
+    @MappedCollection(idColumn = "a2a_server_id")
+    private Set<A2aServerTag> a2aServerTags = new HashSet<>();
 
     @Column
     private UUID uuid;
@@ -147,6 +154,12 @@ public final class A2aServer {
         return secretKey;
     }
 
+    public List<Long> getTagIds() {
+        return a2aServerTags.stream()
+            .map(A2aServerTag::getTagId)
+            .toList();
+    }
+
     public UUID getUuid() {
         return uuid;
     }
@@ -185,6 +198,16 @@ public final class A2aServer {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public void setTagIds(List<Long> tagIds) {
+        a2aServerTags = new HashSet<>();
+
+        if (tagIds != null) {
+            for (long tagId : tagIds) {
+                a2aServerTags.add(new A2aServerTag(tagId));
+            }
+        }
     }
 
     public void setVersion(int version) {

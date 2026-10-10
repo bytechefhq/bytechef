@@ -503,6 +503,35 @@ class AutomationMcpToolFacadeIntTest {
     }
 
     @Test
+    void testDisabledWorkflowIsNotExposedAsATool() {
+        McpProject mcpProject = mcpProject();
+
+        McpProjectWorkflow disabledMcpProjectWorkflow = mcpProjectWorkflow(
+            20L, Map.of("toolName", "disabledTool", "toolDescription", "A disabled tool"), false);
+        McpProjectWorkflow enabledMcpProjectWorkflow = mcpProjectWorkflow(
+            21L, Map.of("toolName", "enabledTool", "toolDescription", "An enabled tool"));
+
+        stubCallableWorkflow(20L, "wf1");
+        stubCallableWorkflow(21L, "wf2");
+
+        when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
+            .thenReturn(List.of(disabledMcpProjectWorkflow, enabledMcpProjectWorkflow));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerMockedStatic = mockStatic(WorkflowTrigger.class);
+            MockedStatic<WorkflowNodeType> workflowNodeTypeMockedStatic = mockStatic(WorkflowNodeType.class)) {
+
+            stubNewWorkflowCallTrigger(workflowTriggerMockedStatic, workflowNodeTypeMockedStatic);
+
+            List<ToolCallback> toolCallbacks = facade.getFunctionToolCallbacks(mcpProject);
+
+            assertThat(toolCallbacks)
+                .extracting(toolCallback -> toolCallback.getToolDefinition()
+                    .name())
+                .containsExactly("enabledTool");
+        }
+    }
+
+    @Test
     void testCallOfWorkflowToolReadsMcpServerWithoutWorkspacePermissionChecks() {
         McpProject mcpProject = mcpProject();
 
@@ -749,8 +778,15 @@ class AutomationMcpToolFacadeIntTest {
     private static McpProjectWorkflow mcpProjectWorkflow(
         long projectDeploymentWorkflowId, Map<String, Object> parameters) {
 
+        return mcpProjectWorkflow(projectDeploymentWorkflowId, parameters, true);
+    }
+
+    private static McpProjectWorkflow mcpProjectWorkflow(
+        long projectDeploymentWorkflowId, Map<String, Object> parameters, boolean enabled) {
+
         McpProjectWorkflow mcpProjectWorkflow = mock(McpProjectWorkflow.class);
 
+        when(mcpProjectWorkflow.isEnabled()).thenReturn(enabled);
         when(mcpProjectWorkflow.getProjectDeploymentWorkflowId()).thenReturn(projectDeploymentWorkflowId);
         doReturn(parameters).when(mcpProjectWorkflow)
             .getParameters();

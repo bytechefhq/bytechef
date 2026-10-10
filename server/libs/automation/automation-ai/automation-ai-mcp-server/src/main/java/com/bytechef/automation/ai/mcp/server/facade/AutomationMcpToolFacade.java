@@ -191,6 +191,10 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         for (McpProjectWorkflow mcpProjectWorkflow : mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(
             mcpProject.getId())) {
 
+            if (!mcpProjectWorkflow.isEnabled()) {
+                continue;
+            }
+
             ProjectDeploymentWorkflow projectDeploymentWorkflow =
                 projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
                     mcpProjectWorkflow.getProjectDeploymentWorkflowId());

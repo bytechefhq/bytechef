@@ -16,8 +16,11 @@
 
 package com.bytechef.automation.ai.a2a.web.graphql.config;
 
+import com.bytechef.test.config.graphql.GraphQLScalarTypes;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 /**
@@ -27,4 +30,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @ComponentScan("com.bytechef.graphql.error")
 @EnableMethodSecurity
 public class AutomationA2aGraphQlTestConfiguration {
+
+    @Bean
+    RuntimeWiringConfigurer longScalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.longScalar());
+    }
 }

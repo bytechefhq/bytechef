@@ -199,6 +199,56 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
         verify(a2aProjectWorkflowService).updateSkill(901L, "Summarize", null);
     }
 
+    @Test
+    void testUpdateA2aProjectWorkflowEnabledDisablesTheWorkflow() {
+        A2aProjectWorkflow disabledA2aProjectWorkflow = createA2aProjectWorkflow(901L, 11L, 201L);
+
+        disabledA2aProjectWorkflow.setEnabled(false);
+
+        when(a2aProjectWorkflowService.updateEnabled(901L, false)).thenReturn(disabledA2aProjectWorkflow);
+
+        graphQlTester
+            .document("""
+                mutation {
+                    updateA2aProjectWorkflowEnabled(id: "901", enabled: false) {
+                        id
+                        enabled
+                    }
+                }
+                """)
+            .execute()
+            .path("updateA2aProjectWorkflowEnabled.id")
+            .entity(String.class)
+            .isEqualTo("901")
+            .path("updateA2aProjectWorkflowEnabled.enabled")
+            .entity(Boolean.class)
+            .isEqualTo(false);
+
+        verify(a2aProjectWorkflowService).updateEnabled(901L, false);
+    }
+
+    @Test
+    void testUpdateA2aProjectWorkflowEnabledReEnablesTheWorkflow() {
+        A2aProjectWorkflow enabledA2aProjectWorkflow = createA2aProjectWorkflow(901L, 11L, 201L);
+
+        when(a2aProjectWorkflowService.updateEnabled(901L, true)).thenReturn(enabledA2aProjectWorkflow);
+
+        graphQlTester
+            .document("""
+                mutation {
+                    updateA2aProjectWorkflowEnabled(id: "901", enabled: true) {
+                        enabled
+                    }
+                }
+                """)
+            .execute()
+            .path("updateA2aProjectWorkflowEnabled.enabled")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(a2aProjectWorkflowService).updateEnabled(901L, true);
+    }
+
     private static A2aProjectWorkflow createA2aProjectWorkflow(
         long id, long a2aProjectId, long projectDeploymentWorkflowId) {
 
