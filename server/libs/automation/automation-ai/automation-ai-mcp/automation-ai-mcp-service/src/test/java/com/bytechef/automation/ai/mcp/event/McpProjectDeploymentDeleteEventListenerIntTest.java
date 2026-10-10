@@ -126,7 +126,11 @@ class McpProjectDeploymentDeleteEventListenerIntTest {
     void testDeleteProjectDeletesMcpProjectDeployment() {
         ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
             project.getId(), """
-                {"label": "MCP tool", "triggers": [], "tasks": []}""");
+                {
+                    "label": "MCP tool",
+                    "triggers": [{"name": "newWorkflowCall_1", "type": "workflow/v1/newWorkflowCall"}],
+                    "tasks": []
+                }""");
 
         Project publishedProject = projectRepository.findById(project.getId())
             .orElseThrow();

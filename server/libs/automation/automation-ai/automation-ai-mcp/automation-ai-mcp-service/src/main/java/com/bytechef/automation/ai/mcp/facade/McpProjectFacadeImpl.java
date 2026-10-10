@@ -26,6 +26,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.ai.mcp.util.McpWorkflowUtils;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -125,6 +126,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
         validateProjectVersionWorkflowIds(projectId, projectVersion, selectedWorkflowIds);
 
+        validateCallableWorkflows(selectedWorkflowIds);
+
         McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
 
         Map<String, List<ProjectDeploymentWorkflowConnection>> workflowConnectionsMap = resolveConnections(
@@ -213,6 +216,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
             validateProjectVersionWorkflowIds(
                 projectDeployment.getProjectId(), projectDeployment.getProjectVersion(), addedWorkflowIds);
+
+            validateCallableWorkflows(addedWorkflowIds);
 
             addedWorkflowConnectionsMap = resolveConnections(
                 projectDeployment.getProjectId(), addedWorkflowIds, projectDeployment.getEnvironment());
@@ -431,6 +436,17 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         if (projectWorkspaceId == null || !projectWorkspaceId.equals(mcpServerWorkspaceId)) {
             throw new IllegalArgumentException(
                 "Project " + project.getId() + " and MCP server " + mcpServerId + " are not in the same workspace");
+        }
+    }
+
+    private void validateCallableWorkflows(List<String> workflowIds) {
+        for (String workflowId : workflowIds) {
+            Workflow workflow = workflowService.getWorkflow(workflowId);
+
+            if (McpWorkflowUtils.getCallableTrigger(workflow) == null) {
+                throw new IllegalArgumentException(
+                    "Workflow " + workflowId + " has no New Workflow Call trigger and cannot be used by an MCP server");
+            }
         }
     }
 
