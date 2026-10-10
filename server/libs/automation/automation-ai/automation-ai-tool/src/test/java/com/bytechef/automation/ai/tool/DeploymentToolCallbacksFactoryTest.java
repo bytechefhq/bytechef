@@ -37,10 +37,11 @@ class DeploymentToolCallbacksFactoryTest {
     void readListExcludesMutations() {
         List<String> names = toolNames(factory.readToolCallbacks());
 
-        assertThat(names).containsExactlyInAnyOrder("listProjectDeployments");
-        assertThat(names).doesNotContain(
-            "createProjectDeployment", "updateProjectDeployment", "deleteProjectDeployment",
-            "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow");
+        assertThat(names)
+            .containsExactlyInAnyOrder("listProjectDeployments")
+            .doesNotContain(
+                "createProjectDeployment", "updateProjectDeployment", "deleteProjectDeployment",
+                "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow");
     }
 
     @Test
