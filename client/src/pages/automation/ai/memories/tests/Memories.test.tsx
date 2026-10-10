@@ -257,20 +257,6 @@ describe('Memories page', () => {
         expect(screen.queryByText('Bob preferences')).toBeNull();
     });
 
-    it('opens the detail dialog when View is clicked', async () => {
-        const memories = [makeMemory({id: 1, title: 'Alice profile'})];
-
-        mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: memories}));
-
-        wrap(<Memories />);
-
-        await openRowMenu('Alice profile');
-
-        await userEvent.click(await screen.findByRole('menuitem', {name: /view/i}));
-
-        expect(screen.getByRole('heading', {level: 2, name: /alice profile/i})).toBeInTheDocument();
-    });
-
     it('opens the detail dialog when the row is clicked', async () => {
         const memories = [makeMemory({id: 1, title: 'Alice profile'})];
 
@@ -306,7 +292,8 @@ describe('Memories page', () => {
 
         await openRowMenu('Alice profile');
 
-        expect(await screen.findByRole('menuitem', {name: /view/i})).toBeInTheDocument();
+        expect(await screen.findByRole('menuitem', {name: /edit/i})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: /view/i})).toBeNull();
         expect(screen.queryByRole('heading', {level: 2, name: /alice profile/i})).toBeNull();
     });
 
@@ -407,11 +394,11 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        await openRowMenu('Deployment memory');
+        expect(screen.queryByRole('button', {name: /more actions for deployment memory/i})).toBeNull();
 
-        expect(await screen.findByRole('menuitem', {name: /view/i})).toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: /edit/i})).toBeNull();
-        expect(screen.queryByRole('menuitem', {name: /delete/i})).toBeNull();
+        await userEvent.click(screen.getByRole('row', {name: /deployment memory/i}));
+
+        expect(screen.getByRole('heading', {level: 2, name: /deployment memory/i})).toBeInTheDocument();
 
         await userEvent.keyboard('{Escape}');
 
@@ -451,11 +438,7 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        await openRowMenu('Deployment memory');
-
-        expect(await screen.findByRole('menuitem', {name: /view/i})).toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: /edit/i})).toBeNull();
-        expect(screen.queryByRole('menuitem', {name: /delete/i})).toBeNull();
+        expect(screen.queryByRole('button', {name: /more actions for deployment memory/i})).toBeNull();
     });
 
     const openFilterMenu = async () => {

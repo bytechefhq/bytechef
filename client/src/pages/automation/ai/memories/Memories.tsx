@@ -18,15 +18,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {formatDistanceToNow} from 'date-fns';
-import {
-    BrainIcon,
-    EllipsisVerticalIcon,
-    EyeIcon,
-    PencilIcon,
-    SearchIcon,
-    Trash2Icon,
-    TriangleAlertIcon,
-} from 'lucide-react';
+import {BrainIcon, EllipsisVerticalIcon, PencilIcon, SearchIcon, Trash2Icon, TriangleAlertIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
 import MemoryDeleteDialog from './dialogs/MemoryDeleteDialog';
@@ -123,30 +115,24 @@ const MemoriesTableRow = ({memory, mutable, onDelete, onEdit, onView}: MemoriesT
             <td className="px-4 py-2 text-sm text-muted-foreground">{relativeTime}</td>
 
             <td className="w-px px-4 py-2 text-right">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild onClick={(event) => event.stopPropagation()}>
-                        <Button
-                            aria-label={`More actions for ${memory.title}`}
-                            icon={<EllipsisVerticalIcon />}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </DropdownMenuTrigger>
+                {mutable && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild onClick={(event) => event.stopPropagation()}>
+                            <Button
+                                aria-label={`More actions for ${memory.title}`}
+                                icon={<EllipsisVerticalIcon />}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="p-0" onClick={(event) => event.stopPropagation()}>
-                        <DropdownMenuItem className="dropdown-menu-item" onClick={() => onView(memory)}>
-                            <EyeIcon /> View
-                        </DropdownMenuItem>
-
-                        {mutable && (
+                        <DropdownMenuContent align="end" className="p-0" onClick={(event) => event.stopPropagation()}>
                             <DropdownMenuItem className="dropdown-menu-item" onClick={() => onEdit(memory)}>
                                 <PencilIcon /> Edit
                             </DropdownMenuItem>
-                        )}
 
-                        {mutable && <DropdownMenuSeparator className="m-0" />}
+                            <DropdownMenuSeparator className="m-0" />
 
-                        {mutable && (
                             <DropdownMenuItem
                                 className="dropdown-menu-item-destructive"
                                 onClick={() => onDelete(memory)}
@@ -154,9 +140,9 @@ const MemoriesTableRow = ({memory, mutable, onDelete, onEdit, onView}: MemoriesT
                             >
                                 <Trash2Icon /> Delete
                             </DropdownMenuItem>
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </td>
         </tr>
     );
