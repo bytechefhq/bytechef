@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.NoSuchElementException;
 import org.jspecify.annotations.Nullable;
@@ -26,7 +27,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -55,7 +55,6 @@ public class UpdateProjectDeploymentToolCallback implements ToolCallback {
             }""";
 
     private final ProjectDeploymentFacade projectDeploymentFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public UpdateProjectDeploymentToolCallback(ProjectDeploymentFacade projectDeploymentFacade) {
@@ -79,7 +78,7 @@ public class UpdateProjectDeploymentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            UpdateProjectDeploymentInput input = jsonMapper.readValue(
+            UpdateProjectDeploymentInput input = JsonUtils.read(
                 toolInput, UpdateProjectDeploymentInput.class);
 
             String projectDeploymentIdString = input.projectDeploymentId();
@@ -146,20 +145,19 @@ public class UpdateProjectDeploymentToolCallback implements ToolCallback {
                         + " could not be updated — one of its workflows no longer exists");
             }
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new UpdateProjectDeploymentOutput(projectDeploymentId, updated.name(), updated.description()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, UpdateProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(UpdateProjectDeploymentToolCallback.class, TOOL_NAME, exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record UpdateProjectDeploymentInput(

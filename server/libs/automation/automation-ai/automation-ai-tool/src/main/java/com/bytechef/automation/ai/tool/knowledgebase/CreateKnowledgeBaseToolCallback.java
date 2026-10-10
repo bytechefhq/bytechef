@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool.knowledgebase;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
@@ -26,7 +27,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -53,7 +53,6 @@ public class CreateKnowledgeBaseToolCallback implements ToolCallback {
             }""";
 
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CreateKnowledgeBaseToolCallback(WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
@@ -77,7 +76,7 @@ public class CreateKnowledgeBaseToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            CreateKnowledgeBaseInput input = jsonMapper.readValue(toolInput, CreateKnowledgeBaseInput.class);
+            CreateKnowledgeBaseInput input = JsonUtils.read(toolInput, CreateKnowledgeBaseInput.class);
 
             String name = input.name();
 
@@ -108,14 +107,13 @@ public class CreateKnowledgeBaseToolCallback implements ToolCallback {
             KnowledgeBase createdKnowledgeBase = workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(
                 knowledgeBase, workspaceId, resolveEnvironmentId(invocationContext));
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new CreateKnowledgeBaseOutput(
                     String.valueOf(createdKnowledgeBase.getId()), createdKnowledgeBase.getName()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, CreateKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(CreateKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
         }
     }
 
@@ -126,7 +124,7 @@ public class CreateKnowledgeBaseToolCallback implements ToolCallback {
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record CreateKnowledgeBaseInput(String name, @Nullable String description) {

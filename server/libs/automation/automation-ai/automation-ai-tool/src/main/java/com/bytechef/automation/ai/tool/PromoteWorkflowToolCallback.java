@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -28,7 +29,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -67,7 +67,6 @@ public class PromoteWorkflowToolCallback implements ToolCallback {
             }""";
 
     private final ProjectDeploymentFacade projectDeploymentFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public PromoteWorkflowToolCallback(ProjectDeploymentFacade projectDeploymentFacade) {
@@ -91,7 +90,7 @@ public class PromoteWorkflowToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            PromoteWorkflowInput input = jsonMapper.readValue(toolInput, PromoteWorkflowInput.class);
+            PromoteWorkflowInput input = JsonUtils.read(toolInput, PromoteWorkflowInput.class);
 
             if (input.projectId() == null || input.projectId()
                 .isBlank()) {
@@ -143,7 +142,7 @@ public class PromoteWorkflowToolCallback implements ToolCallback {
                 projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
             }
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new PromoteWorkflowOutput(
                     projectDeploymentId, projectId, input.projectVersion(), targetEnvironment.name(), enabled));
         } catch (JacksonException exception) {
@@ -151,12 +150,12 @@ public class PromoteWorkflowToolCallback implements ToolCallback {
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(jsonMapper, PromoteWorkflowToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(PromoteWorkflowToolCallback.class, TOOL_NAME, exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record PromoteWorkflowInput(

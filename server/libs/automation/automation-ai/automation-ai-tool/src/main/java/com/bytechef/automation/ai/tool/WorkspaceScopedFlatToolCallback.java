@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,7 +29,6 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -41,7 +41,6 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
 
     private final ToolCallback delegate;
     private final WorkspaceFacade workspaceFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public WorkspaceScopedFlatToolCallback(ToolCallback delegate, WorkspaceFacade workspaceFacade) {
@@ -84,7 +83,7 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
             ObjectNode inputNode = readInputObject(toolInput);
 
             if (inputNode == null) {
-                return ToolErrors.toolError(jsonMapper, "Invalid tool input: expected a JSON object");
+                return ToolErrors.toolError("Invalid tool input: expected a JSON object");
             }
 
             ToolDefinition delegateToolDefinition = delegate.getToolDefinition();
@@ -100,8 +99,7 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
                 workspaceId = toLong(workspaceIdNode);
 
                 if (workspaceId == null) {
-                    return ToolErrors.toolError(
-                        jsonMapper, "workspaceId must be an integer workspace id, got: " + workspaceIdNode);
+                    return ToolErrors.toolError("workspaceId must be an integer workspace id, got: " + workspaceIdNode);
                 }
             }
 
@@ -113,12 +111,11 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
                 resolvedWorkspaceId = AutomationToolInvocationContext.resolveWorkspaceId(
                     workspaceId, toolContext, workspaceFacade);
             } catch (WorkspaceNotAccessibleException exception) {
-                return ToolErrors.toolError(jsonMapper, exception.getMessage());
+                return ToolErrors.toolError(exception.getMessage());
             }
 
             if (resolvedWorkspaceId == null) {
-                return ToolErrors.toolError(
-                    jsonMapper, "workspaceId is required - call listWorkspaces to find the workspace id.");
+                return ToolErrors.toolError("workspaceId is required - call listWorkspaces to find the workspace id.");
             }
 
             long environmentId;
@@ -127,31 +124,28 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
                 environmentId = AutomationToolInvocationContext.resolveEnvironmentId(
                     requestedEnvironment, toolContext);
             } catch (UnknownEnvironmentException exception) {
-                return ToolErrors.toolError(
-                    jsonMapper,
-                    "Unknown environment '" + requestedEnvironment + "'. Supported: DEVELOPMENT, STAGING, PRODUCTION");
+                return ToolErrors.toolError(exception.getMessage());
             }
 
             Map<String, Object> forwardedContext = AutomationToolInvocationContext.toForwardedContext(
                 toolContext, resolvedWorkspaceId, environmentId);
 
-            return delegate.call(jsonMapper.writeValueAsString(inputNode), new ToolContext(forwardedContext));
+            return delegate.call(JsonUtils.write(inputNode), new ToolContext(forwardedContext));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError(jsonMapper, "Invalid tool input: " + exception.getMessage());
+            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 
-            return ToolErrors.runtimeFailure(
-                jsonMapper, WorkspaceScopedFlatToolCallback.class, toolDefinition.name(), exception);
+            return ToolErrors.runtimeFailure(WorkspaceScopedFlatToolCallback.class, toolDefinition.name(), exception);
         }
     }
 
     private @Nullable ObjectNode readInputObject(@Nullable String toolInput) {
         if (toolInput == null || toolInput.isBlank()) {
-            return jsonMapper.createObjectNode();
+            return JsonUtils.createObjectNode();
         }
 
-        JsonNode node = jsonMapper.readTree(toolInput);
+        JsonNode node = JsonUtils.readTree(toolInput);
 
         return node.isObject() ? (ObjectNode) node : null;
     }
@@ -196,14 +190,14 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
     }
 
     private Set<String> getPropertyNames(String inputSchema) {
-        JsonNode propertiesNode = jsonMapper.readTree(inputSchema)
+        JsonNode propertiesNode = JsonUtils.readTree(inputSchema)
             .path("properties");
 
         return propertiesNode.isObject() ? new HashSet<>(propertiesNode.propertyNames()) : Set.of();
     }
 
     private String mergeSchema(String delegateInputSchema, Set<String> delegatePropertyNames) {
-        JsonNode schemaNode = jsonMapper.readTree(delegateInputSchema);
+        JsonNode schemaNode = JsonUtils.readTree(delegateInputSchema);
 
         if (!schemaNode.isObject()) {
             return delegateInputSchema;
@@ -234,6 +228,6 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
                         + "environment, or DEVELOPMENT.");
         }
 
-        return jsonMapper.writeValueAsString(schemaObjectNode);
+        return JsonUtils.write(schemaObjectNode);
     }
 }
