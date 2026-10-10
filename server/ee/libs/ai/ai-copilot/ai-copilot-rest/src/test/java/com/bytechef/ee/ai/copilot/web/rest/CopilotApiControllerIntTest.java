@@ -7,118 +7,88 @@
 
 package com.bytechef.ee.ai.copilot.web.rest;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.agui.json.ObjectMapperFactory;
-import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
-import com.agui.server.spring.AgUiService;
-import org.junit.jupiter.api.BeforeEach;
+import com.bytechef.ee.ai.copilot.web.rest.facade.CopilotChatFacade;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
- *
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = CopilotApiControllerIntTest.CopilotApiControllerTestConfiguration.class)
+@ContextConfiguration(classes = CopilotApiController.class)
 @TestPropertySource(properties = {
+    "bytechef.coordinator.enabled=true",
     "bytechef.edition=ee",
     "bytechef.ai.copilot.enabled=true"
 })
 @WebMvcTest(CopilotApiController.class)
 class CopilotApiControllerIntTest {
 
-    @Autowired
-    private AgUiService agUiService;
+    @MockitoBean
+    private CopilotChatFacade copilotChatFacade;
 
     @Autowired
     private MockMvc mockMvc;
 
-    @BeforeEach
-    void beforeEach() {
-        Mockito.reset(agUiService);
-
-        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
-            .thenReturn(new SseEmitter());
-    }
-
     @Test
-    @WithMockUser
-    void testMcpServerSourceRunsTheMcpServerBuildAgent() throws Exception {
+    void testChatDelegatesToTheGuardedFacade() throws Exception {
+        when(copilotChatFacade.chat(eq("workflow_editor"), any(AgUiParameters.class)))
+            .thenReturn(new SseEmitter());
+
         mockMvc
             .perform(
-                post("/internal/ai/chat/mcp_server")
-                    .with(csrf())
+                post("/internal/ai/chat/{agentId}", "workflow_editor")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"threadId\":\"thread-1\",\"state\":{\"mode\":\"ASK\"}}")
+                    .content("{\"threadId\":\"thread-1\",\"state\":{\"state\":{}}}")
                     .accept(MediaType.TEXT_EVENT_STREAM))
             .andExpect(status().isOk());
 
-        ArgumentCaptor<LocalAgent> localAgentCaptor = ArgumentCaptor.forClass(LocalAgent.class);
-
-        verify(agUiService).runAgent(localAgentCaptor.capture(), any(AgUiParameters.class));
-
-        LocalAgent localAgent = localAgentCaptor.getValue();
-
-        assertThat(localAgent.getAgentId()).isEqualTo("mcp_server_build");
+        verify(copilotChatFacade).chat(eq("workflow_editor"), any(AgUiParameters.class));
     }
 
-    @Configuration
-    @Import(CopilotApiController.class)
-    static class CopilotApiControllerTestConfiguration {
+    @Test
+    void testChatPropagatesTheFacadeAccessDenial() {
+        when(copilotChatFacade.chat(eq("workflow_editor"), any(AgUiParameters.class)))
+            .thenThrow(new AccessDeniedException("Access denied"));
 
-        @Bean
-        @Primary
-        JsonMapper jsonMapper() {
-            return JsonMapper.builder()
-                .addModule(ObjectMapperFactory.createModule())
-                .build();
-        }
+        assertThatThrownBy(() -> mockMvc.perform(
+            post("/internal/ai/chat/{agentId}", "workflow_editor")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"threadId\":\"thread-1\",\"state\":{\"state\":{}}}")
+                .accept(MediaType.TEXT_EVENT_STREAM)))
+                    .hasCauseInstanceOf(AccessDeniedException.class);
+    }
 
-        @Bean
-        AgUiService agUiService() {
-            return mock(AgUiService.class);
-        }
+    @Test
+    void testChatReturnsNotFoundForAnUnknownAgent() throws Exception {
+        when(copilotChatFacade.chat(eq("unknown"), any(AgUiParameters.class)))
+            .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown agentId: unknown"));
 
-        @Bean
-        LocalAgent mcpServerBuildAgent() {
-            return localAgent("mcp_server_build");
-        }
-
-        @Bean
-        LocalAgent skillsAskAgent() {
-            return localAgent("skills_ask");
-        }
-
-        private static LocalAgent localAgent(String agentId) {
-            LocalAgent localAgent = mock(LocalAgent.class);
-
-            when(localAgent.getAgentId()).thenReturn(agentId);
-
-            return localAgent;
-        }
+        mockMvc
+            .perform(
+                post("/internal/ai/chat/{agentId}", "unknown")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"threadId\":\"thread-1\",\"state\":{\"state\":{}}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isNotFound());
     }
 }
