@@ -17,11 +17,7 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
-import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
-import com.bytechef.automation.ai.mcp.service.McpProjectService;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
-import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -47,27 +43,22 @@ public class McpServerSubAgentConfiguration {
 
     @Bean
     @ConditionalOnBean({
-        McpProjectService.class, McpProjectWorkflowService.class, WorkspaceMcpServerFacade.class
+        McpProjectWorkflowFacade.class
     })
     ChatClient mcpServerBuildSubAgentChatClient(
-        ChatModel chatModel, McpProjectService mcpProjectService,
-        McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService,
-        WorkspaceMcpServerFacade workspaceMcpServerFacade) {
+        ChatModel chatModel, McpProjectWorkflowFacade mcpProjectWorkflowFacade) {
 
         return ChatClient.builder(chatModel)
             .defaultSystem(readPrompt(promptResource))
             .defaultTools(
-                new ListMcpProjectWorkflowsToolCallback(
-                    mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService, workflowService,
-                    workspaceMcpServerFacade),
-                new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowService))
+                new ListMcpProjectWorkflowsToolCallback(mcpProjectWorkflowFacade),
+                new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowFacade))
             .build();
     }
 
     @Bean
     @ConditionalOnBean({
-        McpProjectService.class, McpProjectWorkflowService.class, WorkspaceMcpServerFacade.class
+        McpProjectWorkflowFacade.class
     })
     IntelligentToolChatClientFactory mcpServerBuildSubAgentChatClientFactory(
         @Qualifier("mcpServerBuildSubAgentChatClient") ChatClient mcpServerBuildSubAgentChatClient) {
@@ -76,9 +67,7 @@ public class McpServerSubAgentConfiguration {
     }
 
     private String readPrompt(Resource resource) {
-        try {
-            InputStream inputStream = resource.getInputStream();
-
+        try (InputStream inputStream = resource.getInputStream()) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException exception) {
             throw new IllegalStateException(

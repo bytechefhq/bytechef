@@ -22,8 +22,8 @@ import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -76,17 +76,17 @@ public class QueryKnowledgeBaseToolCallback implements ToolCallback {
 
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
     private final KnowledgeBaseFacade knowledgeBaseFacade;
-    private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
+    private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public QueryKnowledgeBaseToolCallback(
         WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade, KnowledgeBaseFacade knowledgeBaseFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService) {
+        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade) {
 
         this.workspaceKnowledgeBaseFacade = workspaceKnowledgeBaseFacade;
         this.knowledgeBaseFacade = knowledgeBaseFacade;
-        this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
+        this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
     }
 
     @Override
@@ -209,7 +209,7 @@ public class QueryKnowledgeBaseToolCallback implements ToolCallback {
             }
 
             try {
-                KnowledgeBaseDocument document = knowledgeBaseDocumentService.getKnowledgeBaseDocument(documentId);
+                KnowledgeBaseDocument document = knowledgeBaseDocumentFacade.getKnowledgeBaseDocument(documentId);
 
                 if (document != null && document.getName() != null) {
                     documentTitlesById.put(documentId, document.getName());

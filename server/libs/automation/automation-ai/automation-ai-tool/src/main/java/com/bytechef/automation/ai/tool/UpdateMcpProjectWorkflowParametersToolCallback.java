@@ -18,11 +18,10 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -77,12 +76,12 @@ public class UpdateMcpProjectWorkflowParametersToolCallback implements ToolCallb
                 "required": ["mcpProjectWorkflowId"]
             }""";
 
-    private final McpProjectWorkflowService mcpProjectWorkflowService;
+    private final McpProjectWorkflowFacade mcpProjectWorkflowFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public UpdateMcpProjectWorkflowParametersToolCallback(McpProjectWorkflowService mcpProjectWorkflowService) {
-        this.mcpProjectWorkflowService = mcpProjectWorkflowService;
+    public UpdateMcpProjectWorkflowParametersToolCallback(McpProjectWorkflowFacade mcpProjectWorkflowFacade) {
+        this.mcpProjectWorkflowFacade = mcpProjectWorkflowFacade;
     }
 
     @Override
@@ -117,35 +116,8 @@ public class UpdateMcpProjectWorkflowParametersToolCallback implements ToolCallb
                 return ToolErrors.toolError(jsonMapper, "toolName must not be blank when supplied");
             }
 
-            McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService
-                .fetchMcpProjectWorkflow(mcpProjectWorkflowId)
-                .orElse(null);
-
-            if (mcpProjectWorkflow == null) {
-                return ToolErrors.toolError(
-                    jsonMapper, "McpProjectWorkflow not found: " + mcpProjectWorkflowId);
-            }
-
-            Map<String, Object> mergedParameters = new HashMap<>(mcpProjectWorkflow.getParameters());
-
-            if (toolName != null) {
-                mergedParameters.put(ToolConstants.TOOL_NAME, toolName);
-            }
-
-            String toolDescription = input.toolDescription();
-
-            if (toolDescription != null) {
-                mergedParameters.put(ToolConstants.TOOL_DESCRIPTION, toolDescription);
-            }
-
-            Map<String, Object> inputParameters = input.parameters();
-
-            if (inputParameters != null) {
-                mergedParameters.putAll(inputParameters);
-            }
-
-            McpProjectWorkflow updatedMcpProjectWorkflow = mcpProjectWorkflowService.updateParameters(
-                mcpProjectWorkflowId, mergedParameters);
+            McpProjectWorkflow updatedMcpProjectWorkflow = mcpProjectWorkflowFacade.updateMcpProjectWorkflowParameters(
+                mcpProjectWorkflowId, toolName, input.toolDescription(), input.parameters());
 
             Map<String, ?> updatedParameters = updatedMcpProjectWorkflow.getParameters();
 

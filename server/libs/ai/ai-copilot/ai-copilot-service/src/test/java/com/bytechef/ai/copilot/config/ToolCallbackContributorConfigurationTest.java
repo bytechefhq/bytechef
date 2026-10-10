@@ -17,10 +17,8 @@
 package com.bytechef.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,23 +31,18 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
-import com.bytechef.automation.ai.mcp.service.McpProjectService;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
-import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -116,8 +109,7 @@ class ToolCallbackContributorConfigurationTest {
     void contributesTheSevenFlatKnowledgeBaseToolsWhenFactoryPresent() {
         KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = new KnowledgeBaseToolCallbacksFactory(
             mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
-            mock(KnowledgeBaseDocumentFacade.class),
-            mock(KnowledgeBaseDocumentService.class));
+            mock(KnowledgeBaseDocumentFacade.class));
 
         McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
             presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), workspaceFacade);
@@ -142,8 +134,7 @@ class ToolCallbackContributorConfigurationTest {
     void everyKnowledgeBaseToolAcceptsWorkspaceId() {
         KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = new KnowledgeBaseToolCallbacksFactory(
             mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
-            mock(KnowledgeBaseDocumentFacade.class),
-            mock(KnowledgeBaseDocumentService.class));
+            mock(KnowledgeBaseDocumentFacade.class));
 
         McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
             presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), workspaceFacade);
@@ -211,8 +202,7 @@ class ToolCallbackContributorConfigurationTest {
     @Nested
     class McpServerCrudContributorTest {
 
-        private final McpProjectService mcpProjectService = mock(McpProjectService.class);
-        private final WorkspaceMcpServerFacade workspaceMcpServerFacade = mock(WorkspaceMcpServerFacade.class);
+        private final McpProjectWorkflowFacade mcpProjectWorkflowFacade = mock(McpProjectWorkflowFacade.class);
 
         @Test
         void testListMcpProjectWorkflowsAcceptsWorkspaceId() {
@@ -223,37 +213,19 @@ class ToolCallbackContributorConfigurationTest {
         }
 
         @Test
-        void testListMcpProjectWorkflowsRejectsAnMcpServerOutsideTheResolvedWorkspace() {
-            McpServer workspaceMcpServer = mock(McpServer.class);
-
-            when(workspaceMcpServer.getId()).thenReturn(6L);
-            when(workspaceMcpServerFacade.getWorkspaceMcpServers(7L)).thenReturn(List.of(workspaceMcpServer));
-
-            String result = getListMcpProjectWorkflowsToolCallback().call("{\"mcpServerId\": 5, \"workspaceId\": 7}");
-
-            assertThat(result).contains("MCP server 5 not found in the current workspace");
-            verify(mcpProjectService, never()).getMcpServerMcpProjects(anyLong());
-        }
-
-        @Test
-        void testListMcpProjectWorkflowsListsAnMcpServerOfTheResolvedWorkspace() {
-            McpServer workspaceMcpServer = mock(McpServer.class);
-
-            when(workspaceMcpServer.getId()).thenReturn(5L);
-            when(workspaceMcpServerFacade.getWorkspaceMcpServers(7L)).thenReturn(List.of(workspaceMcpServer));
-            when(mcpProjectService.getMcpServerMcpProjects(5L)).thenReturn(List.of());
+        void testListMcpProjectWorkflowsListsThroughTheFacadeWithTheGivenWorkspace() {
+            when(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(5L)).thenReturn(List.of());
 
             String result = getListMcpProjectWorkflowsToolCallback().call("{\"mcpServerId\": 5, \"workspaceId\": 7}");
 
             assertThat(result).isEqualTo("[]");
-            verify(mcpProjectService).getMcpServerMcpProjects(5L);
+            verify(mcpProjectWorkflowFacade).getMcpServerMcpProjectWorkflows(5L);
         }
 
         @SuppressWarnings("unchecked")
         private ToolCallback getListMcpProjectWorkflowsToolCallback() {
             McpServerToolCallbacksFactory mcpServerToolCallbacksFactory = new McpServerToolCallbacksFactory(
-                mock(McpProjectFacade.class), mcpProjectService, mock(McpProjectWorkflowService.class),
-                mock(ProjectDeploymentWorkflowService.class), mock(WorkflowService.class), workspaceMcpServerFacade);
+                mock(McpProjectFacade.class), mcpProjectWorkflowFacade, mock(WorkspaceMcpServerFacade.class));
 
             ObjectProvider<McpServerToolCallbacksFactory> provider = mock(ObjectProvider.class);
 
