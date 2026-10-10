@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
 
     testImplementation("io.micrometer:micrometer-tracing")
+    testImplementation("org.awaitility:awaitility")
     testImplementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     testImplementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
