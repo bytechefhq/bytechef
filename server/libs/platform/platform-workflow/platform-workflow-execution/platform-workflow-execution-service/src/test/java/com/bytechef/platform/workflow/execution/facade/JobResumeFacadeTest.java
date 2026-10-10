@@ -38,11 +38,9 @@ import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResume
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
 import com.bytechef.tenant.TenantContext;
-import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +69,7 @@ class JobResumeFacadeTest {
 
     private static final long JOB_ID = 42L;
     private static final long TASK_EXECUTION_ID = 7L;
-    private static final String SIGNING_SECRET = Base64.getEncoder()
-        .encodeToString("0123456789abcdef0123456789abcdef".getBytes(StandardCharsets.UTF_8));
+    private static final String SIGNING_SECRET = EncodingUtils.base64EncodeToString("0123456789abcdef0123456789abcdef");
     private static final String TENANT_ID = "000001";
 
     private final ApprovalTokens approvalTokens = new ApprovalTokensImpl(

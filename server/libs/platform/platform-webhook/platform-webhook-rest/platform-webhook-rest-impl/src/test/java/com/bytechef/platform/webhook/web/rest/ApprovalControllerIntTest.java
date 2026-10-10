@@ -25,13 +25,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
-import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
-import java.util.Base64;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,8 +52,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class ApprovalControllerIntTest {
 
     private static final long JOB_ID = 42L;
-    private static final String SIGNING_SECRET = Base64.getEncoder()
-        .encodeToString("0123456789abcdef0123456789abcdef".getBytes(StandardCharsets.UTF_8));
+    private static final String SIGNING_SECRET = EncodingUtils.base64EncodeToString("0123456789abcdef0123456789abcdef");
 
     @Autowired
     private ApprovalTokens approvalTokens;

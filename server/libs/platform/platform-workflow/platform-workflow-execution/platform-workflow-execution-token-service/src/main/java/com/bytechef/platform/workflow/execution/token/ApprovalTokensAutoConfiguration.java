@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.workflow.execution.token;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.encryption.EncryptionKey;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
-import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
@@ -86,9 +86,8 @@ public class ApprovalTokensAutoConfiguration {
 
     private static String deriveSecretFromEncryptionKey(EncryptionKey encryptionKey) {
         try {
-            byte[] masterKey = Base64.getDecoder()
-                .decode(encryptionKey.getKey()
-                    .trim());
+            byte[] masterKey = EncodingUtils.base64Decode(encryptionKey.getKey()
+                .trim());
 
             Mac mac = Mac.getInstance("HmacSHA256");
 
@@ -96,8 +95,7 @@ public class ApprovalTokensAutoConfiguration {
 
             byte[] derived = mac.doFinal(DERIVATION_LABEL.getBytes(StandardCharsets.UTF_8));
 
-            return Base64.getEncoder()
-                .encodeToString(derived);
+            return EncodingUtils.base64EncodeToString(derived);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new IllegalStateException("Failed to derive approval token signing key from EncryptionKey", e);
         }
