@@ -55,9 +55,9 @@ public class WorkflowInstructionTools {
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public WorkflowInstructionTools(
-        @Value("classpath:instruction_script_code.txt") Resource scriptCodeInstructionsResource,
-        @Value("classpath:instruction_cluster_elements.txt") Resource clusterElementsInstructionsResource,
-        @Value("classpath:instruction_workflow_build.txt") Resource workflowBuildInstructionsResource) {
+        @Value("classpath:prompt_script_code.txt") Resource scriptCodeInstructionsResource,
+        @Value("classpath:prompt_cluster_elements.txt") Resource clusterElementsInstructionsResource,
+        @Value("classpath:prompt_workflow_build.txt") Resource workflowBuildInstructionsResource) {
 
         this.scriptCodeInstructions = readResource(scriptCodeInstructionsResource);
         this.clusterElementsInstructions = readResource(clusterElementsInstructionsResource);
