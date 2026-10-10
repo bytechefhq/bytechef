@@ -66,7 +66,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 @SpringBootTest(classes = McpProjectIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
-public class McpProjectFacadeIntTest {
+class McpProjectFacadeIntTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -103,7 +103,7 @@ public class McpProjectFacadeIntTest {
     private McpServer mcpServer;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
@@ -137,7 +137,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         mcpProjectWorkflowRepository.deleteAll();
         mcpProjectRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
@@ -150,7 +150,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
-    public void testCreateMcpProject() {
+    void testCreateMcpProject() {
         List<String> selectedWorkflowIds = List.of("workflow1", "workflow2");
 
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
@@ -164,7 +164,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
-    public void testCreateMcpProjectUsesMcpServerEnvironment() {
+    void testCreateMcpProjectUsesMcpServerEnvironment() {
         McpServer productionMcpServer = mcpServerRepository.save(
             new McpServer("production-server", PlatformType.AUTOMATION, Environment.PRODUCTION));
 
@@ -179,7 +179,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
-    public void testCreateMcpProjectEnablesTheProjectDeployment() {
+    void testCreateMcpProjectEnablesTheProjectDeployment() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
             mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
 
@@ -191,7 +191,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
-    public void testCreateMcpProjectEmptyWorkflowList() {
+    void testCreateMcpProjectEmptyWorkflowList() {
         List<String> selectedWorkflowIds = List.of();
 
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
@@ -204,7 +204,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
-    public void testCreateMcpProjectMultipleVersions() {
+    void testCreateMcpProjectMultipleVersions() {
         McpProject mcpProject1 = mcpProjectFacade.createMcpProject(
             mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
 
@@ -220,7 +220,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
-    public void testUpdateMcpProjectAddWorkflow() {
+    void testUpdateMcpProjectAddWorkflow() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
             mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
 
@@ -237,7 +237,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
-    public void testUpdateMcpProjectRemoveWorkflow() {
+    void testUpdateMcpProjectRemoveWorkflow() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
             mcpServer.getId(), project.getId(), 1, List.of("workflow1", "workflow2"));
 
@@ -255,7 +255,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
-    public void testUpdateMcpProjectUnchangedWorkflows() {
+    void testUpdateMcpProjectUnchangedWorkflows() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
             mcpServer.getId(), project.getId(), 1, List.of("workflow1", "workflow2"));
 
@@ -288,12 +288,14 @@ public class McpProjectFacadeIntTest {
 
             long mcpProjectCount = mcpProjectRepository.count();
             long projectDeploymentCount = projectDeploymentRepository.count();
+            long mcpServerId = mcpServer.getId();
+            long projectId = project.getId();
+            List<String> selectedWorkflowIds = List.of("workflow1", "foreign");
 
             assertThatThrownBy(
-                () -> mcpProjectFacade.createMcpProject(
-                    mcpServer.getId(), project.getId(), 1, List.of("workflow1", "foreign")))
-                        .isInstanceOf(IllegalArgumentException.class)
-                        .hasMessageContaining("foreign");
+                () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("foreign");
 
             assertThat(mcpProjectRepository.count()).isEqualTo(mcpProjectCount);
             assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
@@ -303,9 +305,12 @@ public class McpProjectFacadeIntTest {
         @Test
         void testCreateMcpProjectRejectsAWorkflowOfAnotherProjectVersion() {
             long projectDeploymentCount = projectDeploymentRepository.count();
+            long mcpServerId = mcpServer.getId();
+            long projectId = project.getId();
+            List<String> selectedWorkflowIds = List.of("workflow1");
 
             assertThatThrownBy(
-                () -> mcpProjectFacade.createMcpProject(mcpServer.getId(), project.getId(), 2, List.of("workflow1")))
+                () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 2, selectedWorkflowIds))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("workflow1");
 
@@ -319,11 +324,12 @@ public class McpProjectFacadeIntTest {
                 mcpServer.getId(), project.getId(), 2, List.of("workflow3"));
 
             long projectDeploymentWorkflowCount = projectDeploymentWorkflowRepository.count();
+            long mcpProjectId = mcpProject.getId();
+            List<String> selectedWorkflowIds = List.of("workflow3", "workflow1");
 
-            assertThatThrownBy(
-                () -> mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of("workflow3", "workflow1")))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("workflow1");
+            assertThatThrownBy(() -> mcpProjectFacade.updateMcpProject(mcpProjectId, selectedWorkflowIds))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("workflow1");
 
             assertThat(projectDeploymentWorkflowRepository.count()).isEqualTo(projectDeploymentWorkflowCount);
             assertThat(mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId())).hasSize(1);
@@ -331,7 +337,7 @@ public class McpProjectFacadeIntTest {
     }
 
     @Test
-    public void testDeleteMcpProject() {
+    void testDeleteMcpProject() {
         McpProject mcpProject = new McpProject(projectDeployment.getId(), mcpServer.getId());
 
         mcpProject = mcpProjectRepository.save(mcpProject);

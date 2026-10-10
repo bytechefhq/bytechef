@@ -53,7 +53,7 @@ import org.springframework.context.annotation.Import;
     classes = McpProjectIntTestConfiguration.class, properties = "bytechef.workflow.repository.jdbc.enabled=true")
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
-public class McpProjectDeploymentDeleteEventListenerIntTest {
+class McpProjectDeploymentDeleteEventListenerIntTest {
 
     @Autowired
     private McpProjectFacade mcpProjectFacade;
@@ -89,7 +89,7 @@ public class McpProjectDeploymentDeleteEventListenerIntTest {
     private Project project;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
@@ -104,7 +104,7 @@ public class McpProjectDeploymentDeleteEventListenerIntTest {
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         mcpProjectWorkflowRepository.deleteAll();
         mcpProjectRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
@@ -115,7 +115,7 @@ public class McpProjectDeploymentDeleteEventListenerIntTest {
     }
 
     @Test
-    public void testDeleteProjectDeletesMcpProjectDeployment() {
+    void testDeleteProjectDeletesMcpProjectDeployment() {
         ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
             project.getId(), """
                 {"label": "MCP tool", "triggers": [], "tasks": []}""");

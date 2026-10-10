@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -196,7 +197,7 @@ class ApprovalElicitingToolSpecificationsTest {
 
         McpSchema.CallToolResult result = call(pendingApprovalResult());
 
-        verify(exchange, org.mockito.Mockito.times(3)).createElicitation(any());
+        verify(exchange, times(3)).createElicitation(any());
 
         assertThat(firstText(result)).contains("approval_required");
     }

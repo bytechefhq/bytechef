@@ -177,8 +177,10 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
 
         when(mcpServerService.getMcpServer("server-secret")).thenThrow(new IllegalStateException("database down"));
 
+        ApiKeyAuthenticationToken unauthenticatedToken = getUnauthenticatedToken();
+
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(unauthenticatedToken));
         verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
