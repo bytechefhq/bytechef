@@ -151,6 +151,17 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
         return mcpProjectWorkflowRepository.save(existingMcpProjectWorkflow);
     }
 
+    @Override
+    @PreAuthorize("hasPermission(#id, 'McpProjectWorkflow', 'MCP_EDIT')")
+    public McpProjectWorkflow updateEnabled(long id, boolean enabled) {
+        McpProjectWorkflow existingMcpProjectWorkflow = fetchMcpProjectWorkflow(id)
+            .orElseThrow(() -> new IllegalArgumentException("McpProjectWorkflow not found with id: " + id));
+
+        existingMcpProjectWorkflow.setEnabled(enabled);
+
+        return mcpProjectWorkflowRepository.save(existingMcpProjectWorkflow);
+    }
+
     private void validateProjectDeploymentWorkflow(Long mcpProjectId, Long projectDeploymentWorkflowId) {
         if (mcpProjectId == null || projectDeploymentWorkflowId == null) {
             throw new IllegalArgumentException(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);

@@ -19,9 +19,11 @@ package com.bytechef.automation.ai.mcp.web.graphql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -263,6 +265,68 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .isEqualTo(2L);
 
         verify(mcpProjectWorkflowService).update(workflowId, 2L, 456L);
+    }
+
+    @Test
+    void testUpdateMcpProjectWorkflowDisablesTheWorkflow() {
+        // Given
+        long workflowId = 1L;
+        McpProjectWorkflow disabledWorkflow = createMockMcpProjectWorkflow(workflowId, 2L, 456L);
+
+        disabledWorkflow.setEnabled(false);
+
+        when(mcpProjectWorkflowService.updateEnabled(workflowId, false)).thenReturn(disabledWorkflow);
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpProjectWorkflow(id: "1", input: {
+                        enabled: false
+                    }) {
+                        id
+                        enabled
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpProjectWorkflow.id")
+            .entity(String.class)
+            .isEqualTo("1")
+            .path("updateMcpProjectWorkflow.enabled")
+            .entity(Boolean.class)
+            .isEqualTo(false);
+
+        verify(mcpProjectWorkflowService).updateEnabled(workflowId, false);
+    }
+
+    @Test
+    void testUpdateMcpProjectWorkflowWithoutEnabledLeavesTheFlagUntouched() {
+        // Given
+        long workflowId = 1L;
+        McpProjectWorkflow mockWorkflow = createMockMcpProjectWorkflow(workflowId, 2L, 456L);
+
+        when(mcpProjectWorkflowService.update(anyLong(), anyLong(), anyLong())).thenReturn(mockWorkflow);
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpProjectWorkflow(id: "1", input: {
+                        mcpProjectId: 2,
+                        projectDeploymentWorkflowId: 456
+                    }) {
+                        id
+                        enabled
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpProjectWorkflow.enabled")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(mcpProjectWorkflowService, never()).updateEnabled(anyLong(), anyBoolean());
     }
 
     @Test

@@ -15,6 +15,7 @@ type McpProjectWorkflow {
     id: ID!
     mcpProjectId: Long!
     projectDeploymentWorkflowId: Long!
+    enabled: Boolean!
     parameters: Map
     projectDeploymentWorkflow: ProjectDeploymentWorkflow
     workflow: Workflow
@@ -34,4 +35,5 @@ input McpProjectWorkflowUpdateInput {
     mcpProjectId: Long
     projectDeploymentWorkflowId: Long
     parameters: Map
+    enabled: Boolean
 }
