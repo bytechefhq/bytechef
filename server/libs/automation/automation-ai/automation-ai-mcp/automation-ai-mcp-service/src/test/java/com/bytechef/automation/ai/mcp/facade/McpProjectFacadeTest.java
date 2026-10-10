@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvent;
 import com.bytechef.automation.ai.mcp.audit.McpProjectAuditPublisher;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
@@ -39,6 +40,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -79,6 +81,7 @@ class McpProjectFacadeTest {
     private final McpProjectService mcpProjectService = mock(McpProjectService.class);
     private final McpProjectWorkflowService mcpProjectWorkflowService = mock(McpProjectWorkflowService.class);
     private final McpServerService mcpServerService = mock(McpServerService.class);
+    private final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
     private final ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
         mock(ProjectDeploymentWorkflowService.class);
@@ -91,7 +94,8 @@ class McpProjectFacadeTest {
 
     private final McpProjectFacade mcpProjectFacade = new McpProjectFacadeImpl(
         componentConnectionFacade, connectionService, mcpProjectAuditPublisher, mcpProjectService,
-        mcpProjectWorkflowService, mcpServerService, projectDeploymentService, projectDeploymentWorkflowService,
+        mcpProjectWorkflowService, mcpServerService, projectDeploymentFacade, projectDeploymentService,
+        projectDeploymentWorkflowService,
         projectService, projectWorkflowService, workflowService, workflowTestConfigurationService,
         workspaceMcpServerService);
 
@@ -141,6 +145,22 @@ class McpProjectFacadeTest {
         ProjectDeployment projectDeployment = projectDeploymentArgumentCaptor.getValue();
 
         assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
+    }
+
+    @Test
+    void testDeleteMcpProjectDeletesItsSystemDeploymentThroughTheDeploymentFacade() {
+        McpProject mcpProject = new McpProject(10L, 1L);
+
+        mcpProject.setId(20L);
+
+        when(mcpProjectService.fetchMcpProject(20L)).thenReturn(Optional.of(mcpProject));
+
+        mcpProjectFacade.deleteMcpProject(20L);
+
+        verify(projectDeploymentFacade).deleteProjectDeployment(10L);
+        verify(projectDeploymentService, never()).delete(anyLong());
+        verify(mcpProjectService, never()).delete(anyLong());
+        verify(mcpProjectAuditPublisher).publish(McpProjectAuditEvent.MCP_PROJECT_DELETED, 20L);
     }
 
     @Nested

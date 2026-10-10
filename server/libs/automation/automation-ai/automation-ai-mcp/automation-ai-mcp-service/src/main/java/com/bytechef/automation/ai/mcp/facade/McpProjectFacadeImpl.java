@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -74,6 +75,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     private final McpProjectService mcpProjectService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final McpServerService mcpServerService;
+    private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
@@ -87,7 +89,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         ComponentConnectionFacade componentConnectionFacade, ConnectionService connectionService,
         McpProjectAuditPublisher mcpProjectAuditPublisher, McpProjectService mcpProjectService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
-        ProjectDeploymentService projectDeploymentService,
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
@@ -99,6 +101,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.mcpServerService = mcpServerService;
+        this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
@@ -164,22 +167,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
 
-        List<McpProjectWorkflow> mcpProjectWorkflows = mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(
-            mcpProjectId);
-
-        for (McpProjectWorkflow mcpProjectWorkflow : mcpProjectWorkflows) {
-            mcpProjectWorkflowService.delete(mcpProjectWorkflow.getId());
-
-            projectDeploymentWorkflowService.delete(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
-        }
-
-        mcpProjectService.delete(mcpProjectId);
-
-        Long projectDeploymentId = mcpProject.getProjectDeploymentId();
-
-        if (projectDeploymentId != null) {
-            projectDeploymentService.delete(projectDeploymentId);
-        }
+        projectDeploymentFacade.deleteProjectDeployment(Objects.requireNonNull(mcpProject.getProjectDeploymentId()));
 
         mcpProjectAuditPublisher.publish(McpProjectAuditEvent.MCP_PROJECT_DELETED, mcpProjectId);
     }
