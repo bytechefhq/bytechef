@@ -141,6 +141,8 @@ dependencies {
 
     implementation(project(":server:libs:core:tenant:tenant-api"))
 
+    implementation(project(":server:libs:ai:ai-api"))
+
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     testImplementation(project(":server:libs:test:test-support"))
 }
