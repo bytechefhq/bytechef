@@ -1504,7 +1504,6 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Nested
-    @ExtendWith(ObjectMapperSetupExtension.class)
     class ObservableToolCallbackTests {
 
         @Test

@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -25,7 +26,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -55,7 +55,6 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
 
     private final ToolCallback delegate;
     private final WorkspaceFacade workspaceFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public WorkspaceScopedSubAgentToolCallback(ToolCallback delegate, WorkspaceFacade workspaceFacade) {
@@ -85,12 +84,12 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            WorkspaceScopedInput input = jsonMapper.readValue(toolInput, WorkspaceScopedInput.class);
+            WorkspaceScopedInput input = JsonUtils.read(toolInput, WorkspaceScopedInput.class);
 
             String request = input.request();
 
             if (request == null || request.isBlank()) {
-                return ToolErrors.toolError(jsonMapper, "request is required and must not be blank");
+                return ToolErrors.toolError("request is required and must not be blank");
             }
 
             Long workspaceId;
@@ -99,12 +98,11 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
                 workspaceId = AutomationToolInvocationContext.resolveWorkspaceId(
                     input.workspaceId(), toolContext, workspaceFacade);
             } catch (WorkspaceNotAccessibleException exception) {
-                return ToolErrors.toolError(jsonMapper, exception.getMessage());
+                return ToolErrors.toolError(exception.getMessage());
             }
 
             if (workspaceId == null) {
-                return ToolErrors.toolError(
-                    jsonMapper, "workspaceId is required - call listWorkspaces to find the workspace id.");
+                return ToolErrors.toolError("workspaceId is required - call listWorkspaces to find the workspace id.");
             }
 
             long environmentId;
@@ -113,24 +111,22 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
                 environmentId = AutomationToolInvocationContext.resolveEnvironmentId(
                     input.environment(), toolContext);
             } catch (UnknownEnvironmentException exception) {
-                return ToolErrors.toolError(
-                    jsonMapper,
-                    "Unknown environment '" + input.environment() + "'. Supported: DEVELOPMENT, STAGING, PRODUCTION");
+                return ToolErrors.toolError(exception.getMessage());
             }
 
             Map<String, Object> forwardedContext = AutomationToolInvocationContext.toForwardedContext(
                 toolContext, workspaceId, environmentId);
 
-            String delegateInput = jsonMapper.writeValueAsString(Map.of("request", request));
+            String delegateInput = JsonUtils.write(Map.of("request", request));
 
             return delegate.call(delegateInput, new ToolContext(forwardedContext));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError(jsonMapper, "Invalid tool input: " + exception.getMessage());
+            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 
-            return ToolErrors.runtimeFailure(
-                jsonMapper, WorkspaceScopedSubAgentToolCallback.class, toolDefinition.name(), exception);
+            return ToolErrors.runtimeFailure(WorkspaceScopedSubAgentToolCallback.class, toolDefinition.name(),
+                exception);
         }
     }
 

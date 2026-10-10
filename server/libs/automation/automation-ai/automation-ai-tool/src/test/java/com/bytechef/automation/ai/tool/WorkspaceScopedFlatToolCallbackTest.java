@@ -19,7 +19,6 @@ package com.bytechef.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,14 +56,18 @@ class WorkspaceScopedFlatToolCallbackTest {
     private static final String ENVIRONMENT_FIELD = "environment";
 
     private final JsonMapper jsonMapper = new JsonMapper();
+    private final WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
     private ContextCapturingDelegate delegate;
     private WorkspaceScopedFlatToolCallback toolCallback;
 
     @BeforeEach
     void beforeEach() {
+        when(workspaceFacade.getMyWorkspaces()).thenReturn(
+            List.of(new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
+
         delegate = new ContextCapturingDelegate(CREATE_MCP_SERVER_SCHEMA);
 
-        toolCallback = new WorkspaceScopedFlatToolCallback(delegate, memberWorkspaceFacade());
+        toolCallback = new WorkspaceScopedFlatToolCallback(delegate, workspaceFacade);
     }
 
     @Test
@@ -98,8 +101,7 @@ class WorkspaceScopedFlatToolCallbackTest {
     @Test
     void testToolDefinitionAddsEnvironmentWhenDelegateDoesNotDeclareIt() {
         WorkspaceScopedFlatToolCallback nameOnlyToolCallback =
-            new WorkspaceScopedFlatToolCallback(new ContextCapturingDelegate(NAME_ONLY_SCHEMA),
-                memberWorkspaceFacade());
+            new WorkspaceScopedFlatToolCallback(new ContextCapturingDelegate(NAME_ONLY_SCHEMA), workspaceFacade);
 
         JsonNode schemaNode = jsonMapper.readTree(nameOnlyToolCallback.getToolDefinition()
             .inputSchema());
@@ -132,7 +134,7 @@ class WorkspaceScopedFlatToolCallbackTest {
         ContextCapturingDelegate nameOnlyDelegate = new ContextCapturingDelegate(NAME_ONLY_SCHEMA);
 
         WorkspaceScopedFlatToolCallback nameOnlyToolCallback =
-            new WorkspaceScopedFlatToolCallback(nameOnlyDelegate, memberWorkspaceFacade());
+            new WorkspaceScopedFlatToolCallback(nameOnlyDelegate, workspaceFacade);
 
         String result =
             nameOnlyToolCallback.call("{\"name\": \"x\", \"environment\": \"STAGING\", \"workspaceId\": 42}");
@@ -160,7 +162,7 @@ class WorkspaceScopedFlatToolCallbackTest {
 
         WorkspaceScopedFlatToolCallback createMcpServerToolCallback =
             new WorkspaceScopedFlatToolCallback(new CreateMcpServerToolCallback(workspaceMcpServerFacade),
-                memberWorkspaceFacade());
+                workspaceFacade);
 
         String result = createMcpServerToolCallback.call(
             "{\"name\": \"my server\", \"environment\": \"STAGING\", \"workspaceId\": 42}");
@@ -186,8 +188,7 @@ class WorkspaceScopedFlatToolCallbackTest {
         String result = toolCallback.call("{\"name\": \"my server\", \"workspaceId\": \"abc\"}");
 
         assertThat(result).contains("error")
-            .contains("workspaceId must be")
-            .doesNotContain("workspace_required");
+            .contains("workspaceId must be");
         assertThat(delegate.capturedContext).isNull();
     }
 
@@ -232,6 +233,15 @@ class WorkspaceScopedFlatToolCallbackTest {
 
         assertThat(result).contains("error")
             .contains("Workspace 42 is not the workspace 7 this conversation is scoped to.");
+        assertThat(delegate.capturedContext).isNull();
+    }
+
+    @Test
+    void testExplicitWorkspaceIdTheCallerIsNotAMemberOfIsRejected() {
+        String result = toolCallback.call("{\"name\": \"my server\", \"workspaceId\": 99}");
+
+        assertThat(result).contains("error")
+            .contains("Workspace 99 is not accessible to the caller.");
         assertThat(delegate.capturedContext).isNull();
     }
 
@@ -294,17 +304,5 @@ class WorkspaceScopedFlatToolCallbackTest {
 
             return "done";
         }
-    }
-
-    private static WorkspaceFacade memberWorkspaceFacade() {
-        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
-
-        lenient().when(workspaceFacade.getMyWorkspaces())
-            .thenReturn(
-                List.of(
-                    new Workspace(1L, "Workspace 1"), new Workspace(7L, "Workspace 7"),
-                    new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
-
-        return workspaceFacade;
     }
 }
