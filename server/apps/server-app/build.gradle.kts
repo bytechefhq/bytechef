@@ -295,6 +295,7 @@ dependencies {
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-impl"))
     implementation(project(":server:ee:libs:core:message:message-broker:message-broker-aws"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-copilot"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-server"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-rest"))
