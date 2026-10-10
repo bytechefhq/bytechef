@@ -17,7 +17,6 @@
 package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,7 +55,7 @@ class ListProjectDeploymentsToolCallbackTest {
 
         ProjectDeploymentDTO dto = new ProjectDeploymentDTO(domain);
 
-        when(facade.getWorkspaceProjectDeployments(eq(99L), eq(5L), eq(null), eq(null), eq(false)))
+        when(facade.getWorkspaceProjectDeployments(99L, 5L, null, null, false))
             .thenReturn(List.of(dto));
 
         ListProjectDeploymentsToolCallback callback = new ListProjectDeploymentsToolCallback(facade);
@@ -89,7 +88,7 @@ class ListProjectDeploymentsToolCallbackTest {
     void testProjectIdFilterIsForwardedToFacade() throws Exception {
         ProjectDeploymentFacade facade = mock(ProjectDeploymentFacade.class);
 
-        when(facade.getWorkspaceProjectDeployments(eq(99L), eq(null), eq(7L), eq(null), eq(false)))
+        when(facade.getWorkspaceProjectDeployments(99L, null, 7L, null, false))
             .thenReturn(List.of());
 
         ListProjectDeploymentsToolCallback callback = new ListProjectDeploymentsToolCallback(facade);
@@ -99,7 +98,7 @@ class ListProjectDeploymentsToolCallbackTest {
 
         callback.call("{\"projectId\":\"7\"}", toolContext);
 
-        verify(facade).getWorkspaceProjectDeployments(eq(99L), eq(null), eq(7L), eq(null), eq(false));
+        verify(facade).getWorkspaceProjectDeployments(99L, null, 7L, null, false);
     }
 
     @Test

@@ -77,8 +77,9 @@ class ListMcpProjectWorkflowsToolCallbackTest {
     void testMissingMcpServerIdReturnsError() {
         String result = toolCallback.call("{}");
 
-        assertThat(result).contains("error");
-        assertThat(result).contains("mcpServerId is required");
+        assertThat(result)
+            .contains("error")
+            .contains("mcpServerId is required");
     }
 
     @Test
@@ -111,10 +112,11 @@ class ListMcpProjectWorkflowsToolCallbackTest {
 
         String result = toolCallback.call("{\"mcpServerId\": 5}", workspaceToolContext(7L));
 
-        assertThat(result).contains("\"mcpProjectWorkflowId\":400");
-        assertThat(result).contains("get_weather");
-        assertThat(result).contains("Weather Lookup");
-        assertThat(result).contains("\"toolCallable\":false");
+        assertThat(result)
+            .contains("\"mcpProjectWorkflowId\":400")
+            .contains("get_weather")
+            .contains("Weather Lookup")
+            .contains("\"toolCallable\":false");
     }
 
     @Nested

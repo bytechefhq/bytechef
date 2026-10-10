@@ -17,7 +17,6 @@
 package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,7 +43,7 @@ class CreateMcpProjectToolCallbackTest {
 
         created.setId(99L);
 
-        when(facade.createMcpProject(eq(10L), eq(42L), eq(3), eq(List.of("wf-a", "wf-b"))))
+        when(facade.createMcpProject(10L, 42L, 3, List.of("wf-a", "wf-b")))
             .thenReturn(created);
 
         CreateMcpProjectToolCallback callback = new CreateMcpProjectToolCallback(facade);
