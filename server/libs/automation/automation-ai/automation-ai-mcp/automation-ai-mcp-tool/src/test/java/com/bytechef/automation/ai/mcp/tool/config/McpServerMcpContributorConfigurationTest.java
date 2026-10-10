@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.mcp.tool.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -30,7 +31,8 @@ import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.tool.McpServerToolCallbacksFactory;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.List;
@@ -46,13 +48,13 @@ class McpServerMcpContributorConfigurationTest {
 
     private final McpServerMcpContributorConfiguration configuration =
         new McpServerMcpContributorConfiguration();
+    private final WorkspaceFacade workspaceFacade = memberWorkspaceFacade();
 
     @Nested
     class McpServerCrudContributorTest {
 
         private final McpProjectService mcpProjectService = mock(McpProjectService.class);
         private final WorkspaceMcpServerFacade workspaceMcpServerFacade = mock(WorkspaceMcpServerFacade.class);
-        private final WorkspaceScopeResolver workspaceScopeResolver = mock(WorkspaceScopeResolver.class);
 
         @Test
         void testListMcpProjectWorkflowsAcceptsWorkspaceId() {
@@ -68,7 +70,6 @@ class McpServerMcpContributorConfigurationTest {
 
             when(workspaceMcpServer.getId()).thenReturn(6L);
             when(workspaceMcpServerFacade.getWorkspaceMcpServers(7L)).thenReturn(List.of(workspaceMcpServer));
-            when(workspaceScopeResolver.resolve(7L, null)).thenReturn(new WorkspaceScopeResolver.Resolved(7L, 0L));
 
             String result = getListMcpProjectWorkflowsToolCallback().call("{\"mcpServerId\": 5, \"workspaceId\": 7}");
 
@@ -82,7 +83,6 @@ class McpServerMcpContributorConfigurationTest {
 
             when(workspaceMcpServer.getId()).thenReturn(5L);
             when(workspaceMcpServerFacade.getWorkspaceMcpServers(7L)).thenReturn(List.of(workspaceMcpServer));
-            when(workspaceScopeResolver.resolve(7L, null)).thenReturn(new WorkspaceScopeResolver.Resolved(7L, 0L));
             when(mcpProjectService.getMcpServerMcpProjects(5L)).thenReturn(List.of());
 
             String result = getListMcpProjectWorkflowsToolCallback().call("{\"mcpServerId\": 5, \"workspaceId\": 7}");
@@ -102,7 +102,7 @@ class McpServerMcpContributorConfigurationTest {
             when(provider.getIfAvailable()).thenReturn(mcpServerToolCallbacksFactory);
 
             McpServerToolCallbackContributor contributor = configuration.mcpServerCrudMcpContributor(
-                provider, workspaceScopeResolver);
+                provider, workspaceFacade);
 
             return contributor.getToolCallbacks()
                 .stream()
@@ -112,5 +112,17 @@ class McpServerMcpContributorConfigurationTest {
                 .findFirst()
                 .orElseThrow();
         }
+    }
+
+    private static WorkspaceFacade memberWorkspaceFacade() {
+        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        lenient().when(workspaceFacade.getMyWorkspaces())
+            .thenReturn(
+                List.of(
+                    new Workspace(1L, "Workspace 1"), new Workspace(7L, "Workspace 7"),
+                    new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
+
+        return workspaceFacade;
     }
 }

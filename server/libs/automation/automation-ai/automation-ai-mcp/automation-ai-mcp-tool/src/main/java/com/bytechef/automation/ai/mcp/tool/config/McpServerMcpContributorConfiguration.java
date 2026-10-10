@@ -18,8 +18,8 @@ package com.bytechef.automation.ai.mcp.tool.config;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.mcp.tool.McpServerToolCallbacksFactory;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
 import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +42,7 @@ public class McpServerMcpContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor mcpServerCrudMcpContributor(
         ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             McpServerToolCallbacksFactory mcpServerToolCallbacksFactory = mcpServerToolCallbacksFactoryProvider
@@ -64,7 +64,7 @@ public class McpServerMcpContributorConfiguration {
 
                 toolCallbacks.add(
                     WORKSPACE_SCOPED_MCP_TOOL_NAMES.contains(name)
-                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceScopeResolver)
+                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade)
                         : toolCallback);
             }
 

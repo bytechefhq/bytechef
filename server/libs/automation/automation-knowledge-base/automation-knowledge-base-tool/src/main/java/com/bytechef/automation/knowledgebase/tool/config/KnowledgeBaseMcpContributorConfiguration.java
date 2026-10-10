@@ -17,8 +17,8 @@
 package com.bytechef.automation.knowledgebase.tool.config;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
 import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.knowledgebase.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class KnowledgeBaseMcpContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor knowledgeBaseFlatCrudMcpContributor(
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory =
@@ -50,7 +50,7 @@ public class KnowledgeBaseMcpContributorConfiguration {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
 
             for (ToolCallback toolCallback : knowledgeBaseToolCallbacksFactory.writeToolCallbacks()) {
-                toolCallbacks.add(new WorkspaceScopedFlatToolCallback(toolCallback, workspaceScopeResolver));
+                toolCallbacks.add(new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade));
             }
 
             return toolCallbacks;

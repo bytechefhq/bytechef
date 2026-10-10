@@ -17,12 +17,14 @@
 package com.bytechef.automation.configuration.tool.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.tool.DeploymentToolCallbacksFactory;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,7 @@ class DeploymentMcpContributorConfigurationTest {
 
     private final DeploymentMcpContributorConfiguration configuration =
         new DeploymentMcpContributorConfiguration();
+    private final WorkspaceFacade workspaceFacade = memberWorkspaceFacade();
 
     @Test
     void contributesTheSevenFlatDeploymentToolsWhenFactoryPresent() {
@@ -43,7 +46,7 @@ class DeploymentMcpContributorConfigurationTest {
             mock(ProjectDeploymentFacade.class));
 
         McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
-            presentFactory(deploymentToolCallbacksFactory), mock(WorkspaceScopeResolver.class));
+            presentFactory(deploymentToolCallbacksFactory), workspaceFacade);
 
         assertThat(contributor.getToolCallbacks())
             .extracting(toolCallback -> toolCallback.getToolDefinition()
@@ -56,7 +59,7 @@ class DeploymentMcpContributorConfigurationTest {
     @Test
     void deploymentContributorSkipsWhenFactoryAbsent() {
         McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
-            absentFactory(), mock(WorkspaceScopeResolver.class));
+            absentFactory(), workspaceFacade);
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
     }
@@ -67,7 +70,7 @@ class DeploymentMcpContributorConfigurationTest {
             mock(ProjectDeploymentFacade.class));
 
         McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
-            presentFactory(deploymentToolCallbacksFactory), mock(WorkspaceScopeResolver.class));
+            presentFactory(deploymentToolCallbacksFactory), workspaceFacade);
 
         List<ToolCallback> toolCallbacks = contributor.getToolCallbacks();
 
@@ -106,5 +109,17 @@ class DeploymentMcpContributorConfigurationTest {
     @SuppressWarnings("unchecked")
     private static ObjectProvider<DeploymentToolCallbacksFactory> absentFactory() {
         return mock(ObjectProvider.class);
+    }
+
+    private static WorkspaceFacade memberWorkspaceFacade() {
+        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        lenient().when(workspaceFacade.getMyWorkspaces())
+            .thenReturn(
+                List.of(
+                    new Workspace(1L, "Workspace 1"), new Workspace(7L, "Workspace 7"),
+                    new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
+
+        return workspaceFacade;
     }
 }

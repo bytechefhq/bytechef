@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.tool.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +30,8 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.tool.AutomationConfigurationAgentType;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ class CopilotAgentMcpContributorConfigurationTest {
 
     private final CopilotAgentMcpContributorConfiguration configuration =
         new CopilotAgentMcpContributorConfiguration();
+    private final WorkspaceFacade workspaceFacade = memberWorkspaceFacade();
 
     @Test
     void contributesAgentCallbacksWhenChatClientsPresent() {
@@ -58,7 +61,7 @@ class CopilotAgentMcpContributorConfigurationTest {
             intelligentDefinition("debugWorkflowExecution"), intelligentDefinition("importWorkflow"));
 
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), intelligentToolCatalog, mock(WorkspaceScopeResolver.class));
+            emptyProvider(), intelligentToolCatalog, workspaceFacade);
 
         assertThat(contributor.getToolCallbacks())
             .extracting(toolCallback -> toolCallback.getToolDefinition()
@@ -71,7 +74,7 @@ class CopilotAgentMcpContributorConfigurationTest {
     @Test
     void contributesNothingWhenAllAbsent() {
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), catalogOf(), mock(WorkspaceScopeResolver.class));
+            emptyProvider(), catalogOf(), workspaceFacade);
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
     }
@@ -84,7 +87,7 @@ class CopilotAgentMcpContributorConfigurationTest {
             intelligentDefinition("debugWorkflowExecution"), intelligentDefinition("importWorkflow"));
 
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), intelligentToolCatalog, mock(WorkspaceScopeResolver.class));
+            emptyProvider(), intelligentToolCatalog, workspaceFacade);
 
         assertThat(contributor.getToolCallbacks())
             .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
@@ -169,5 +172,17 @@ class CopilotAgentMcpContributorConfigurationTest {
         public ToolCallback create(IntelligentToolChatClientFactory chatClientFactory) {
             return toolCallback;
         }
+    }
+
+    private static WorkspaceFacade memberWorkspaceFacade() {
+        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        lenient().when(workspaceFacade.getMyWorkspaces())
+            .thenReturn(
+                List.of(
+                    new Workspace(1L, "Workspace 1"), new Workspace(7L, "Workspace 7"),
+                    new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
+
+        return workspaceFacade;
     }
 }
