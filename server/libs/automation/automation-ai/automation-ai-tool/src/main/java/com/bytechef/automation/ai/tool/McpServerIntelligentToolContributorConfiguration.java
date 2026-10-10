@@ -17,12 +17,14 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.copilot.tool.ConfigureMcpServerToolCallback;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SimpleIntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +45,7 @@ class McpServerIntelligentToolContributorConfiguration {
 
         List<IntelligentToolDefinition> definitions = List.of(
             new SimpleIntelligentToolDefinition(
-                "configureMcpServer",
+                "configureMcpServer", CopilotAgentType.CONFIGURE_MCP_SERVER.key(), Set.of(),
                 variant -> mcpServerBuildFactoryProvider.getIfAvailable(),
                 chatClientFactory -> new ConfigureMcpServerToolCallback(chatClientFactory, chatModelResolver)));
 

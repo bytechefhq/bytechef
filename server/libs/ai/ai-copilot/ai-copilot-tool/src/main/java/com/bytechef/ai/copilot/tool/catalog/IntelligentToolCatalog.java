@@ -47,8 +47,34 @@ public class IntelligentToolCatalog {
         BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
         BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator) {
 
-        return definitions.stream()
+        List<IntelligentToolDefinition> matchingDefinitions = definitions.stream()
             .filter(definition -> names.contains(definition.name()))
+            .toList();
+
+        return buildToolCallbacks(matchingDefinitions, variant, chatClientDecorator, callbackDecorator);
+    }
+
+    public List<ToolCallback> getForPanel(
+        IntelligentToolScope scope,
+        IntelligentToolVariant variant,
+        BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
+        BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator) {
+
+        List<IntelligentToolDefinition> matchingDefinitions = definitions.stream()
+            .filter(definition -> definition.panelScopes()
+                .contains(scope))
+            .toList();
+
+        return buildToolCallbacks(matchingDefinitions, variant, chatClientDecorator, callbackDecorator);
+    }
+
+    private List<ToolCallback> buildToolCallbacks(
+        List<IntelligentToolDefinition> candidateDefinitions,
+        IntelligentToolVariant variant,
+        BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
+        BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator) {
+
+        return candidateDefinitions.stream()
             .map(definition -> buildToolCallback(definition, variant, chatClientDecorator, callbackDecorator))
             .filter(Objects::nonNull)
             .toList();
