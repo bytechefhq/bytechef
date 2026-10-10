@@ -358,7 +358,37 @@ class AutomationA2AServerFacadeTest {
 
         assertThat(start(CompletableFuture.completedFuture(job), null).result()
             .join()).isInstanceOfSatisfying(
-                Completed.class, completed -> assertThat(completed.text()).isEqualTo("{result=42}"));
+                Completed.class, completed -> assertThat(completed.text()).isEqualTo("{\"result\":42}"));
+    }
+
+    @Test
+    void testCompletedRunReturnsTheTextOfASingleMessageResponse() {
+        stubServer();
+        stubExposedWorkflow("wf1", 20L, Map.of());
+
+        FileEntry outputFileEntry = mock(FileEntry.class);
+        TaskExecution taskExecution = mock(TaskExecution.class);
+
+        when(taskExecution.getMetadata()).thenAnswer(invocation -> Map.of(MetadataConstants.CALLABLE_RESPONSE, true));
+        when(taskExecution.getOutput()).thenReturn(outputFileEntry);
+        when(taskExecutionService.fetchLastJobTaskExecution(100L)).thenReturn(Optional.of(taskExecution));
+        when(taskFileStorage.readTaskExecutionOutput(outputFileEntry)).thenReturn(
+            Map.of("output", Map.of("message", "Java 25 is an LTS release.")));
+
+        A2AAgentResult agentResult = start(CompletableFuture.completedFuture(completedJob(100L)), null).result()
+            .join();
+
+        assertThat(agentResult).isInstanceOfSatisfying(
+            Completed.class, completed -> assertThat(completed.text()).isEqualTo("Java 25 is an LTS release."));
+    }
+
+    @Test
+    void testToOutputTextWritesStructuredOutputAsJson() {
+        assertThat(AutomationA2AServerFacade.toOutputText(null)).isEmpty();
+        assertThat(AutomationA2AServerFacade.toOutputText("plain")).isEqualTo("plain");
+        assertThat(AutomationA2AServerFacade.toOutputText(Map.of("message", "hello"))).isEqualTo("hello");
+        assertThat(AutomationA2AServerFacade.toOutputText(Map.of("count", 3))).isEqualTo("{\"count\":3}");
+        assertThat(AutomationA2AServerFacade.toOutputText(List.of("a", "b"))).isEqualTo("[\"a\",\"b\"]");
     }
 
     @Test
@@ -467,7 +497,7 @@ class AutomationA2AServerFacadeTest {
 
         assertThat(agentRun.result()
             .join()).isInstanceOfSatisfying(
-                Completed.class, completed -> assertThat(completed.text()).isEqualTo("{answer=42}"));
+                Completed.class, completed -> assertThat(completed.text()).isEqualTo("{\"answer\":42}"));
         assertThat(readingTenantId.get()).isEqualTo("tenant-1");
         assertThat(readingThreadName.get()).isEqualTo("a2a-run-completion-test");
     }
@@ -559,6 +589,46 @@ class AutomationA2AServerFacadeTest {
 
         assertThat(agentDescriptor.skills()).extracting(A2ASkill::id)
             .containsExactly("wf1");
+    }
+
+    @Test
+    void testDisabledA2aProjectWorkflowIsNotExposedOrRunnable() {
+        stubServer();
+        stubExposedWorkflow("wf1", 20L, Map.of());
+
+        A2aProjectWorkflow disabledA2aProjectWorkflow = stubExposedWorkflow("wf2", 21L, Map.of());
+
+        disabledA2aProjectWorkflow.setEnabled(false);
+
+        A2AAgentDescriptor agentDescriptor = facade.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
+
+        assertThat(agentDescriptor.skills()).extracting(A2ASkill::id)
+            .containsExactly("wf1");
+
+        assertThatExceptionOfType(A2AInvalidParamsException.class)
+            .isThrownBy(() -> start(CompletableFuture.completedFuture(completedJob(100L)), "wf2"))
+            .withMessageContaining("wf2");
+        verify(principalJobFacade, never()).createJob(any(), anyLong(), any());
+    }
+
+    @Test
+    void testEnabledA2aProjectWorkflowIsRunnableWhenAnotherIsDisabled() {
+        stubServer();
+        stubExposedWorkflow("wf1", 20L, Map.of());
+
+        A2aProjectWorkflow disabledA2aProjectWorkflow = stubExposedWorkflow("wf2", 21L, Map.of());
+
+        disabledA2aProjectWorkflow.setEnabled(false);
+
+        start(CompletableFuture.completedFuture(completedJob(100L)), null);
+
+        ArgumentCaptor<JobParametersDTO> jobParametersDTOArgumentCaptor =
+            ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        verify(principalJobFacade).createJob(jobParametersDTOArgumentCaptor.capture(), anyLong(), any());
+
+        assertThat(jobParametersDTOArgumentCaptor.getValue()
+            .getWorkflowId()).isEqualTo("wf1");
     }
 
     @Test

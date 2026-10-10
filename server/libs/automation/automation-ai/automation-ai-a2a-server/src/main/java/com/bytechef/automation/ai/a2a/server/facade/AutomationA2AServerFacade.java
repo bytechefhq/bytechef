@@ -33,6 +33,7 @@ import com.bytechef.automation.ai.a2a.util.A2aWorkflowTriggerUtils;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.a2a.A2AAgentDescriptor;
@@ -56,6 +57,7 @@ import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -317,6 +319,10 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
             for (A2aProjectWorkflow a2aProjectWorkflow : a2aProjectWorkflowService
                 .getA2aProjectA2aProjectWorkflows(a2aProject.getId())) {
 
+                if (!a2aProjectWorkflow.isEnabled()) {
+                    continue;
+                }
+
                 ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
                     .getProjectDeploymentWorkflow(a2aProjectWorkflow.getProjectDeploymentWorkflowId());
 
@@ -389,7 +395,33 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
         Object output = getCallableResponseOutput(job)
             .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
 
-        return output == null ? "" : String.valueOf(output);
+        return toOutputText(output);
+    }
+
+    /**
+     * Returns the workflow output as the text of the A2A reply: a text output as is, the text of a single-entry map
+     * such as the {@code message} of a workflow call response, and anything else as JSON.
+     */
+    static String toOutputText(@Nullable Object output) {
+        if (output == null) {
+            return "";
+        }
+
+        if (output instanceof String text) {
+            return text;
+        }
+
+        if (output instanceof Map<?, ?> outputMap && outputMap.size() == 1) {
+            Collection<?> values = outputMap.values();
+
+            if (values.iterator()
+                .next() instanceof String text) {
+
+                return text;
+            }
+        }
+
+        return JsonUtils.write(output);
     }
 
     private Optional<Object> getCallableResponseOutput(Job job) {
