@@ -120,6 +120,13 @@ class McpProjectDeploymentDeleteEventListenerIntTest {
             project.getId(), """
                 {"label": "MCP tool", "triggers": [], "tasks": []}""");
 
+        Project publishedProject = projectRepository.findById(project.getId())
+            .orElseThrow();
+
+        publishedProject.publish("v1");
+
+        projectRepository.save(publishedProject);
+
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
             mcpServer.getId(), project.getId(), 1, List.of(projectWorkflow.getWorkflowId()));
 
