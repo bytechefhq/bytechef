@@ -156,7 +156,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
                         />
 
                         <DialogBody>
-                            <div className="max-h-dialog-height overflow-y-auto px-6">
+                            <div className="max-h-dialog-height overflow-y-auto">
                                 <ProjectDeploymentDialogWorkflowsStepItem
                                     connections={connections}
                                     connectionsGrouped={connectionsGrouped}
@@ -171,7 +171,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
                             </div>
                         </DialogBody>
 
-                        <DialogFooter className="flex items-center px-6 pt-4 pb-6">
+                        <DialogFooter>
                             {componentConnections.length > 1 && (
                                 <div className="mr-auto flex items-center gap-2">
                                     <Switch
