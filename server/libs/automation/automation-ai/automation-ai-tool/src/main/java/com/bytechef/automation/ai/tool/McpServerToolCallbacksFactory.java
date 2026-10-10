@@ -16,12 +16,9 @@
 
 package com.bytechef.automation.ai.tool;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
-import com.bytechef.automation.ai.mcp.service.McpProjectService;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
-import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,24 +30,16 @@ import org.springframework.ai.tool.ToolCallback;
 public class McpServerToolCallbacksFactory {
 
     private final McpProjectFacade mcpProjectFacade;
-    private final McpProjectService mcpProjectService;
-    private final McpProjectWorkflowService mcpProjectWorkflowService;
-    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
-    private final WorkflowService workflowService;
+    private final McpProjectWorkflowFacade mcpProjectWorkflowFacade;
     private final WorkspaceMcpServerFacade workspaceMcpServerFacade;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public McpServerToolCallbacksFactory(
-        McpProjectFacade mcpProjectFacade, McpProjectService mcpProjectService,
-        McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService,
+        McpProjectFacade mcpProjectFacade, McpProjectWorkflowFacade mcpProjectWorkflowFacade,
         WorkspaceMcpServerFacade workspaceMcpServerFacade) {
 
         this.mcpProjectFacade = mcpProjectFacade;
-        this.mcpProjectService = mcpProjectService;
-        this.mcpProjectWorkflowService = mcpProjectWorkflowService;
-        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
-        this.workflowService = workflowService;
+        this.mcpProjectWorkflowFacade = mcpProjectWorkflowFacade;
         this.workspaceMcpServerFacade = workspaceMcpServerFacade;
     }
 
@@ -58,9 +47,7 @@ public class McpServerToolCallbacksFactory {
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         toolCallbacks.add(new ListMcpServersToolCallback(workspaceMcpServerFacade));
-        toolCallbacks.add(new ListMcpProjectWorkflowsToolCallback(
-            mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService, workflowService,
-            workspaceMcpServerFacade));
+        toolCallbacks.add(new ListMcpProjectWorkflowsToolCallback(mcpProjectWorkflowFacade));
 
         return toolCallbacks;
     }
@@ -72,7 +59,7 @@ public class McpServerToolCallbacksFactory {
         toolCallbacks.add(new UpdateMcpServerToolCallback(workspaceMcpServerFacade));
         toolCallbacks.add(new CreateMcpProjectToolCallback(mcpProjectFacade));
         toolCallbacks.add(new CloneMcpProjectToolCallback(mcpProjectFacade));
-        toolCallbacks.add(new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowService));
+        toolCallbacks.add(new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowFacade));
 
         return toolCallbacks;
     }

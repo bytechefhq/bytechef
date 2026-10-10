@@ -158,6 +158,13 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public KnowledgeBaseDocument getKnowledgeBaseDocument(long id) {
+        return knowledgeBaseDocumentService.getKnowledgeBaseDocument(id);
+    }
+
+    @Override
     public KnowledgeBaseDocument saveKnowledgeBaseDocument(KnowledgeBaseDocument knowledgeBaseDocument) {
         Long documentSize = knowledgeBaseDocument.getDocumentSize();
 
