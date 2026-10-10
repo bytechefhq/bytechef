@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261010000002" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="a2a_server_tag"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="a2a_server_tag">
+            <column name="a2a_server_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="a2a_server_tag" columnNames="a2a_server_id,tag_id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="a2a_server_tag"
+            baseColumnNames="a2a_server_id"
+            constraintName="fk_a2a_server_tag_a2a_server"
+            referencedTableName="a2a_server"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="a2a_server_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_a2a_server_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
