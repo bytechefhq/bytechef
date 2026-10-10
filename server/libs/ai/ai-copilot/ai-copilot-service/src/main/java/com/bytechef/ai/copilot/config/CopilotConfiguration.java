@@ -32,12 +32,12 @@ import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
-import com.bytechef.ai.copilot.util.Mode;
-import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.tool.ConfigureMcpServerToolCallback;
+import com.bytechef.automation.ai.mcp.tool.McpServerAgentType;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.tool.AutomationConfigurationAgentType;
 import com.bytechef.automation.configuration.tool.ClusterElementTools;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ReadProjectTools;
@@ -46,6 +46,7 @@ import com.bytechef.automation.configuration.tool.ScriptTools;
 import com.bytechef.automation.connection.tool.WorkspaceCopilotConnectionLister;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
 import com.bytechef.platform.ai.skill.tool.ReadSkillsTools;
+import com.bytechef.platform.ai.skill.tool.SkillAgentType;
 import com.bytechef.platform.ai.skill.tool.SkillsTools;
 import com.bytechef.platform.ai.tool.BraveWebSearchTools;
 import com.bytechef.platform.ai.tool.FirecrawlTools;
@@ -63,6 +64,7 @@ import com.bytechef.platform.component.tool.ListConnectionsForComponentToolCallb
 import com.bytechef.platform.component.tool.LookupActionPropertyOptionsToolCallback;
 import com.bytechef.platform.component.tool.LookupComponentPropertyOptionsToolCallback;
 import com.bytechef.platform.component.tool.LookupTriggerPropertyOptionsToolCallback;
+import com.bytechef.platform.component.tool.PlatformComponentAgentType;
 import com.bytechef.platform.component.tool.PropertyOptionsResolver;
 import com.bytechef.platform.component.tool.ScopedConnectionGuard;
 import com.bytechef.platform.component.tool.SelectConnectionToolCallback;
@@ -71,6 +73,7 @@ import com.bytechef.platform.component.tool.SelectTriggerPropertyOptionToolCallb
 import com.bytechef.platform.component.tool.TaskTools;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.workflow.tool.PlatformWorkflowAgentType;
 import com.bytechef.platform.workflow.tool.WorkflowInstructionTools;
 import com.bytechef.platform.workflow.tool.WorkflowValidatorTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -94,7 +97,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Marko Kriskovic
@@ -111,7 +113,8 @@ public class CopilotConfiguration {
         `projectId` (the workflow does not exist yet). Build the COMPLETE definition first, exactly as step 7
         requires, then persist it with ONE call:
 
-        - Given a `workflowId` — `updateWorkflow(workflowId, workflow)`.
+        - Given a `workflowId` — `getWorkflow(workflowId)` for its current `version`, then
+          `updateWorkflow(workflowId, workflow, version)`.
         - Given only a `projectId` — `createProjectWorkflow(projectId, workflow)` carrying the COMPLETE definition.
           Never create an empty or default "Manual" placeholder workflow and fill it in afterwards; the single
           create call must carry the whole workflow.
@@ -163,7 +166,6 @@ public class CopilotConfiguration {
     private final PropertyOptionsResolver propertyOptionsResolver;
     private final ObjectProvider<CopilotConnectionLister> connectionListerProvider;
     private final ScopedConnectionGuard scopedConnectionGuard;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings({
         "EI", "CT_CONSTRUCTOR_THROW"
@@ -229,8 +231,6 @@ public class CopilotConfiguration {
         ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools,
         Optional<BraveWebSearchTools> braveWebSearchTools, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
-        String name = Source.CODE_EDITOR.name() + "_" + Mode.ASK.name();
-
         List<Object> tools = new ArrayList<>(
             List.of(readProjectWorkflowTools, componentTools, workflowValidatorTools, workflowInstructionTools));
 
@@ -238,7 +238,7 @@ public class CopilotConfiguration {
         braveWebSearchTools.ifPresent(tools::add);
 
         return CodeEditorSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(PlatformWorkflowAgentType.CODE_EDITOR_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorAskResource))
@@ -256,10 +256,8 @@ public class CopilotConfiguration {
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
-        String name = Source.CODE_EDITOR.name() + "_" + Mode.BUILD.name();
-
         return CodeEditorSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(PlatformWorkflowAgentType.CODE_EDITOR_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorBuildResource))
@@ -281,8 +279,6 @@ public class CopilotConfiguration {
         Optional<BraveWebSearchTools> braveWebSearchTools, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
 
-        String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.ASK.name();
-
         List<Object> tools = new ArrayList<>(
             List.of(
                 readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
@@ -292,7 +288,7 @@ public class CopilotConfiguration {
         braveWebSearchTools.ifPresent(tools::add);
 
         return ClusterElementSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(PlatformComponentAgentType.CLUSTER_ELEMENT_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementAskResource))
@@ -310,10 +306,8 @@ public class CopilotConfiguration {
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
-        String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.BUILD.name();
-
         return ClusterElementSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(PlatformComponentAgentType.CLUSTER_ELEMENT_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementBuildResource))
@@ -395,8 +389,6 @@ public class CopilotConfiguration {
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
-        String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.ASK.name();
-
         List<Object> tools = new ArrayList<>(
             List.of(
                 readProjectTools, readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
@@ -408,7 +400,7 @@ public class CopilotConfiguration {
         tools.addAll(interactivePickerToolCallbacks());
 
         return WorkflowEditorSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(AutomationConfigurationAgentType.WORKFLOW_EDITOR_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptWorkflowEditorAskResource))
@@ -432,8 +424,6 @@ public class CopilotConfiguration {
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
-        String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name();
-
         List<Object> tools = new ArrayList<>(
             List.of(
                 projectWorkflowTools, componentTools, taskTools, scriptTools, workflowValidatorTools,
@@ -442,7 +432,7 @@ public class CopilotConfiguration {
         tools.addAll(interactivePickerToolCallbacks());
 
         return WorkflowEditorSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(AutomationConfigurationAgentType.WORKFLOW_EDITOR_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
@@ -463,10 +453,8 @@ public class CopilotConfiguration {
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
-        String name = Source.CONVERTER.name() + "_" + Mode.BUILD.name();
-
         return ConverterSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(AutomationConfigurationAgentType.CONVERTER_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptConverterBuildResource))
@@ -490,8 +478,6 @@ public class CopilotConfiguration {
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
-        String name = Source.SKILLS.name() + "_" + Mode.ASK.name();
-
         List<Object> tools = new ArrayList<>(
             List.of(
                 readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
@@ -501,7 +487,7 @@ public class CopilotConfiguration {
         braveWebSearchTools.ifPresent(tools::add);
 
         return SkillsSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(SkillAgentType.SKILLS_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptSkillsAskResource))
@@ -519,10 +505,8 @@ public class CopilotConfiguration {
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
-        String name = Source.SKILLS.name() + "_" + Mode.BUILD.name();
-
         return SkillsSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(SkillAgentType.SKILLS_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptSkillsBuildResource))
@@ -547,14 +531,12 @@ public class CopilotConfiguration {
         ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider)
         throws AGUIException {
 
-        String name = Source.MCP_SERVER.name() + "_" + Mode.BUILD.name();
-
         IntelligentToolChatClientFactory mcpServerChatClientFactory =
             candidateChatModel -> mcpServerBuildSubAgentChatClientFactoryProvider.getObject()
                 .get(candidateChatModel);
 
         return McpServerSpringAIAgent.builder()
-            .agentId(name.toLowerCase())
+            .agentId(McpServerAgentType.MCP_SERVER_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptMcpServerBuildResource))

@@ -20,6 +20,7 @@ import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -29,7 +30,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -55,7 +55,6 @@ public class ListProjectDeploymentsToolCallback implements ToolCallback {
         }""";
 
     private final ProjectDeploymentFacade projectDeploymentFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ListProjectDeploymentsToolCallback(ProjectDeploymentFacade projectDeploymentFacade) {
@@ -79,7 +78,7 @@ public class ListProjectDeploymentsToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            ListProjectDeploymentsInput input = jsonMapper.readValue(toolInput, ListProjectDeploymentsInput.class);
+            ListProjectDeploymentsInput input = JsonUtils.read(toolInput, ListProjectDeploymentsInput.class);
 
             AutomationToolInvocationContext invocationContext =
                 AutomationToolInvocationContext.fromToolContext(toolContext);
@@ -109,12 +108,11 @@ public class ListProjectDeploymentsToolCallback implements ToolCallback {
                 .map(ListProjectDeploymentsToolCallback::toSummary)
                 .toList();
 
-            return jsonMapper.writeValueAsString(summaries);
+            return JsonUtils.write(summaries);
         } catch (JacksonException exception) {
             return toolError("Serialization error: " + exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, ListProjectDeploymentsToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(ListProjectDeploymentsToolCallback.class, TOOL_NAME, exception);
         }
     }
 
@@ -134,7 +132,7 @@ public class ListProjectDeploymentsToolCallback implements ToolCallback {
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record ListProjectDeploymentsInput(@Nullable String projectId) {

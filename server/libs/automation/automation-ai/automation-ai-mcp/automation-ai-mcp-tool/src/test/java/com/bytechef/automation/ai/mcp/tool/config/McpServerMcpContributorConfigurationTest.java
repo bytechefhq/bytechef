@@ -17,7 +17,6 @@
 package com.bytechef.automation.ai.mcp.tool.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,20 +28,23 @@ import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class McpServerMcpContributorConfigurationTest {
 
     private final McpServerMcpContributorConfiguration configuration =
         new McpServerMcpContributorConfiguration();
-    private final WorkspaceFacade workspaceFacade = memberWorkspaceFacade();
+    private final WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
 
     @Nested
     class McpServerCrudContributorTest {
@@ -59,6 +61,7 @@ class McpServerMcpContributorConfigurationTest {
 
         @Test
         void testListMcpProjectWorkflowsListsThroughTheFacadeWithTheGivenWorkspace() {
+            when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(7L, "Workspace")));
             when(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(5L)).thenReturn(List.of());
 
             String result = getListMcpProjectWorkflowsToolCallback().call("{\"mcpServerId\": 5, \"workspaceId\": 7}");
@@ -87,17 +90,5 @@ class McpServerMcpContributorConfigurationTest {
                 .findFirst()
                 .orElseThrow();
         }
-    }
-
-    private static WorkspaceFacade memberWorkspaceFacade() {
-        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
-
-        lenient().when(workspaceFacade.getMyWorkspaces())
-            .thenReturn(
-                List.of(
-                    new Workspace(1L, "Workspace 1"), new Workspace(7L, "Workspace 7"),
-                    new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
-
-        return workspaceFacade;
     }
 }
