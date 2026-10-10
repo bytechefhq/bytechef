@@ -74,7 +74,7 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
         String workflowId, long projectId, long environmentId, String prompt, @Nullable String systemPrompt,
         Set<String> allowedComponentNames) {
 
-        String agentId = (Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name()).toLowerCase();
+        String agentId = Source.WORKFLOW_EDITOR.agentId(Mode.BUILD);
 
         LocalAgent localAgent = localAgentMap.get(agentId);
 
@@ -130,18 +130,20 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
         localAgent.runAgent(parameters, new AgentSubscriber() {
 
             @Override
+            public void onRunErrorEvent(RunErrorEvent runErrorEvent) {
+                errorRef.compareAndSet(null, new IllegalStateException(runErrorEvent.getError()));
+
+                latch.countDown();
+            }
+
+            @Override
             public void onRunFinalized(AgentSubscriberParams params) {
                 latch.countDown();
             }
 
             @Override
-            public void onRunErrorEvent(RunErrorEvent runErrorEvent) {
-                errorRef.compareAndSet(null, new IllegalStateException(runErrorEvent.getError()));
-            }
-
-            @Override
             public void onRunFailed(AgentSubscriberParams params, Throwable throwable) {
-                errorRef.set(throwable);
+                errorRef.compareAndSet(null, throwable);
 
                 latch.countDown();
             }
