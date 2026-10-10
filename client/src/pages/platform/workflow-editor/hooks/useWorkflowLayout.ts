@@ -16,6 +16,7 @@ import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo} from 'react';
+import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 export const useWorkflowLayout = (includeComponents?: string[]) => {
@@ -86,6 +87,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     }, [workflow]);
 
     const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
+    const {integrationId} = useParams();
 
     const componentDefinitionsQueryParameters: object = {
         actionDefinitions: true,
@@ -162,8 +164,8 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         setContext({
             ...currentContext,
             mode: MODE.ASK,
-            parameters: {},
-            source: Source.WORKFLOW_EDITOR,
+            parameters: integrationId ? {integrationId} : {},
+            source: integrationId ? Source.WORKFLOW_EDITOR_EMBEDDED : Source.WORKFLOW_EDITOR,
         });
 
         if (!copilotPanelOpen) {
