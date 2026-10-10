@@ -19,13 +19,17 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
@@ -70,6 +74,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -96,11 +101,18 @@ class WorkspaceFacadeIntTest {
 
     private static final long USER_ID = 31L;
 
+    private static final Workspace WORKSPACE_1 = new Workspace(1L, "Workspace 1");
+    private static final Workspace WORKSPACE_2 = new Workspace(2L, "Workspace 2");
+    private static final Workspace WORKSPACE_3 = new Workspace(3L, "Workspace 3");
+
     @Autowired
     private PermissionService permissionService;
 
     @Autowired
     private WorkspaceFacadeImpl workspaceFacade;
+
+    @Autowired
+    private WorkspaceService workspaceService;
 
     @BeforeEach
     void beforeEach() {
@@ -127,6 +139,61 @@ class WorkspaceFacadeIntTest {
         when(permissionService.isTenantAdmin()).thenReturn(true);
 
         assertNotDenied(() -> workspaceFacade.getUserWorkspaces(USER_ID));
+    }
+
+    @Test
+    void testGetMyWorkspacesIsGatedOnAuthentication() {
+        assertNotDenied(() -> workspaceFacade.getMyWorkspaces());
+
+        SecurityContextHolder.clearContext();
+
+        assertThatThrownBy(() -> workspaceFacade.getMyWorkspaces())
+            .isInstanceOfAny(AccessDeniedException.class, AuthenticationCredentialsNotFoundException.class);
+    }
+
+    @Test
+    void testGetMyWorkspacesFiltersToMembershipForNonAdmin() {
+        givenThreeWorkspaces();
+
+        when(permissionService.getMyWorkspaceRole(1L)).thenReturn("VIEWER");
+        when(permissionService.getMyWorkspaceRole(3L)).thenReturn("EDITOR");
+
+        assertThat(workspaceFacade.getMyWorkspaces()).containsExactly(WORKSPACE_1, WORKSPACE_3);
+    }
+
+    @Test
+    void testGetUserWorkspacesReturnsAllForTenantAdmin() {
+        givenThreeWorkspaces();
+
+        when(permissionService.isTenantAdmin()).thenReturn(true);
+
+        assertThat(workspaceFacade.getUserWorkspaces(USER_ID)).containsExactly(WORKSPACE_1, WORKSPACE_2, WORKSPACE_3);
+
+        verify(permissionService, never()).getMyWorkspaceRole(anyLong());
+    }
+
+    @Test
+    void testGetUserWorkspacesFiltersToMembershipForNonAdmin() {
+        givenThreeWorkspaces();
+
+        when(permissionService.isCurrentUser(USER_ID)).thenReturn(true);
+        when(permissionService.getMyWorkspaceRole(1L)).thenReturn("VIEWER");
+        when(permissionService.getMyWorkspaceRole(3L)).thenReturn("EDITOR");
+
+        assertThat(workspaceFacade.getUserWorkspaces(USER_ID)).containsExactly(WORKSPACE_1, WORKSPACE_3);
+    }
+
+    @Test
+    void testGetUserWorkspacesEmptyWhenNonAdminHasNoMemberships() {
+        givenThreeWorkspaces();
+
+        when(permissionService.isCurrentUser(USER_ID)).thenReturn(true);
+
+        assertThat(workspaceFacade.getUserWorkspaces(USER_ID)).isEmpty();
+    }
+
+    private void givenThreeWorkspaces() {
+        when(workspaceService.getWorkspaces()).thenReturn(List.of(WORKSPACE_1, WORKSPACE_2, WORKSPACE_3));
     }
 
     private static void assertDenied(ThrowingCallable call) {

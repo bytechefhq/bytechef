@@ -55,7 +55,12 @@ public interface ProjectWorkflowFacade {
 
     SharedWorkflowDTO getSharedWorkflow(String workflowUuid);
 
+    long getWorkflowProjectId(String workflowId);
+
     WorkflowTemplateDTO getWorkflowTemplate(String id, boolean sharedWorkflow);
+
+    void saveWorkflowTestConnection(
+        String workflowId, String workflowNodeName, String connectionKey, long connectionId, long environmentId);
 
     long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow);
 

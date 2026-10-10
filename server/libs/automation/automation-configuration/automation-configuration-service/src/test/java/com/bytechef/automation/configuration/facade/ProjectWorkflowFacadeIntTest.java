@@ -188,6 +188,22 @@ class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
+    void testGetWorkflowProjectId() {
+        Project project = new Project();
+
+        project.setName("Test Project Id Project");
+        project.setWorkspaceId(workspace.getId());
+
+        project = projectRepository.save(project);
+
+        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
+            project.getId(), "{\"label\":\"Test Workflow\",\"tasks\":[]}");
+
+        assertThat(projectWorkflowFacade.getWorkflowProjectId(projectWorkflow.getWorkflowId()))
+            .isEqualTo(project.getId());
+    }
+
+    @Test
     void testExportSharedWorkflow() {
         Project project = new Project();
 
@@ -785,6 +801,9 @@ class ProjectWorkflowFacadeIntTest {
             assertRequiresScope(
                 PROJECT_ID, "Project", "WORKFLOW_EDIT",
                 () -> projectWorkflowFacade.restoreProjectVersionWorkflow(PROJECT_ID, 1, UUID_STRING));
+            assertRequiresScope(
+                WORKFLOW_ID, "Workflow", "WORKFLOW_EDIT",
+                () -> projectWorkflowFacade.saveWorkflowTestConnection(WORKFLOW_ID, "slack_1", "slack", 1L, 0L));
         }
 
         @Test
@@ -792,6 +811,13 @@ class ProjectWorkflowFacadeIntTest {
             assertRequiresScope(
                 PROJECT_ID, "Project", "WORKFLOW_VIEW",
                 () -> projectWorkflowFacade.getProjectWorkflowVersions(PROJECT_ID, UUID_STRING));
+        }
+
+        @Test
+        void testWorkflowReadMethodsAreProtected() {
+            assertRequiresScope(
+                WORKFLOW_ID, "Workflow", "WORKFLOW_VIEW",
+                () -> projectWorkflowFacade.getWorkflowProjectId(WORKFLOW_ID));
         }
 
         private void
