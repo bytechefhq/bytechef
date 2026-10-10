@@ -33,6 +33,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.expression.AccessException;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.MethodExecutor;
@@ -297,6 +298,12 @@ public class SpelEvaluator implements Evaluator {
                             return value;
                         }
 
+                        if (spelEvaluationException.getCause() instanceof AccessException accessException &&
+                            accessException.getCause() instanceof IllegalArgumentException illegalArgumentException) {
+
+                            throw illegalArgumentException;
+                        }
+
                         throw new IllegalArgumentException(
                             "Unevaluatable expression: " + value + " - " + spelEvaluationException.getMessage(),
                             spelEvaluationException);
@@ -333,14 +340,23 @@ public class SpelEvaluator implements Evaluator {
     }
 
     private MethodResolver methodResolver() {
-        return (ctx, target, name, args) -> {
+        return (resolverContext, resolverTarget, name, argumentTypes) -> {
             MethodExecutor executor = methodExecutorMap.get(name);
 
             if (executor == null) {
                 throw new UnsupportedOperationException("Method invocation is not allowed: " + name);
             }
 
-            return executor;
+            return (context, target, arguments) -> {
+                try {
+                    return executor.execute(context, target, arguments);
+                } catch (SpelEvaluationException spelEvaluationException) {
+                    throw spelEvaluationException;
+                } catch (RuntimeException runtimeException) {
+                    throw new AccessException(
+                        "Invalid arguments for " + name + ": " + runtimeException.getMessage(), runtimeException);
+                }
+            };
         };
     }
 

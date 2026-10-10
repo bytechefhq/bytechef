@@ -538,6 +538,26 @@ public class SpelEvaluatorTest {
         assertEquals("=n1+", MapUtils.get(map, "value"));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "=split()", "=split('a,b')", "=substring()", "=join(',')", "=split(1, ',')"
+    })
+    public void testFunctionWithInvalidArgumentsReturnsOriginalValueInLenientMode(String formula) {
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("value", formula), Collections.emptyMap(), true);
+
+        assertEquals(formula, MapUtils.get(map, "value"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "=split()", "=split('a,b')", "=substring()", "=join(',')", "=split(1, ',')"
+    })
+    public void testFunctionWithInvalidArgumentsThrowsInStrictMode(String formula) {
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", formula), Collections.emptyMap()));
+    }
+
     @Test
     public void testFormulaWithTrailingOperatorReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
