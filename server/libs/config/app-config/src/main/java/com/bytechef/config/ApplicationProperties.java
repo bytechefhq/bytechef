@@ -917,19 +917,88 @@ public class ApplicationProperties {
             }
 
             /**
-             * Shell Tools configuration. Shell commands run in the server process and cannot be confined to a
-             * workspace, so the tool is only offered when explicitly enabled.
+             * Shell Tools configuration. The tool is only offered when explicitly enabled; its commands run in a Docker
+             * container unless running them on the server is allowed.
              */
             public static class Shell {
 
+                /**
+                 * Whether a Shell Tools element may run commands directly on the server instead of in a Docker
+                 * container
+                 */
+                private boolean allowLocal;
+
+                private Docker docker = new Docker();
                 private boolean enabled;
+
+                public Docker getDocker() {
+                    return docker;
+                }
+
+                public boolean isAllowLocal() {
+                    return allowLocal;
+                }
 
                 public boolean isEnabled() {
                     return enabled;
                 }
 
+                public void setAllowLocal(boolean allowLocal) {
+                    this.allowLocal = allowLocal;
+                }
+
+                public void setDocker(Docker docker) {
+                    this.docker = docker;
+                }
+
                 public void setEnabled(boolean enabled) {
                     this.enabled = enabled;
+                }
+
+                /**
+                 * Docker sandbox for shell commands. Each agent workspace gets its own container with the workspace
+                 * bind-mounted at the same path.
+                 */
+                public static class Docker {
+
+                    /**
+                     * Docker-compatible CLI used to manage the containers, e.g. docker or podman
+                     */
+                    private String command;
+
+                    /**
+                     * How long a container may stay unused before it is removed
+                     */
+                    private Duration idleTimeout;
+
+                    /**
+                     * Container image; it must provide /bin/bash and sleep
+                     */
+                    private String image;
+
+                    public String getCommand() {
+                        return command;
+                    }
+
+                    public Duration getIdleTimeout() {
+                        return idleTimeout;
+                    }
+
+                    public String getImage() {
+                        return image;
+                    }
+
+                    public void setCommand(String command) {
+                        this.command = command;
+                    }
+
+                    public void setIdleTimeout(Duration idleTimeout) {
+                        this.idleTimeout = idleTimeout;
+                    }
+
+                    public void setImage(String image) {
+                        this.image = image;
+                    }
                 }
             }
 

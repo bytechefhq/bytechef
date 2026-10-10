@@ -76,6 +76,7 @@ org-springaicommunity-agents-agent-client-core = { module = "io.github.markpolla
 org-springaicommunity-mcp-authorization-server = { module = "org.springaicommunity:mcp-authorization-server", version.ref = "springaicommunity-mcp-security" }
 org-springaicommunity-mcp-server-security = { module = "org.springaicommunity:mcp-server-security", version.ref = "springaicommunity-mcp-security" }
 org-springaicommunity-spring-ai-agent-utils = { module = "org.springaicommunity:spring-ai-agent-utils", version.ref = "springaicommunity-agent-utils" }
+org-springaicommunity-spring-ai-agent-utils-docker-cli = { module = "org.springaicommunity:spring-ai-agent-utils-docker-cli", version.ref = "springaicommunity-agent-utils" }
 org-springaicommunity-spring-ai-session = { module = "org.springaicommunity:spring-ai-session", version.ref = "springaicommunity-spring-ai-session" }
 org-springaicommunity-spring-ai-session-jdbc = { module = "org.springaicommunity:spring-ai-session-jdbc", version.ref = "springaicommunity-spring-ai-session" }
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
