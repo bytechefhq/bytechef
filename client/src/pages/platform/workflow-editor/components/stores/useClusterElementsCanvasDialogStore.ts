@@ -2,8 +2,9 @@ import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
 interface ClusterElementsCanvasDialogStateI {
+    aiAgentSimpleEditorPreferred: boolean;
     copilotPanelOpen: boolean;
-    editorPreferences: Record<string, boolean>;
+    dataStreamSimpleEditorPreferred: boolean;
     showAiAgentEditor: boolean;
     showDataStreamEditor: boolean;
     testingPanelOpen: boolean;
@@ -11,8 +12,9 @@ interface ClusterElementsCanvasDialogStateI {
 
 interface ClusterElementsCanvasDialogActionsI {
     reset: () => void;
+    setAiAgentSimpleEditorPreferred: (preferred: boolean) => void;
     setCopilotPanelOpen: (open: boolean) => void;
-    setEditorPreference: (agentNodeName: string, showAiAgent: boolean) => void;
+    setDataStreamSimpleEditorPreferred: (preferred: boolean) => void;
     setShowAiAgentEditor: (show: boolean) => void;
     setShowDataStreamEditor: (show: boolean) => void;
     setTestingPanelOpen: (open: boolean) => void;
@@ -21,8 +23,9 @@ interface ClusterElementsCanvasDialogActionsI {
 type ClusterElementsCanvasDialogStoreType = ClusterElementsCanvasDialogActionsI & ClusterElementsCanvasDialogStateI;
 
 const initialState: ClusterElementsCanvasDialogStateI = {
+    aiAgentSimpleEditorPreferred: true,
     copilotPanelOpen: false,
-    editorPreferences: {},
+    dataStreamSimpleEditorPreferred: true,
     showAiAgentEditor: false,
     showDataStreamEditor: false,
     testingPanelOpen: false,
@@ -37,7 +40,13 @@ export const useClusterElementsCanvasDialogStore = create<ClusterElementsCanvasD
                 reset: () =>
                     set(() => ({
                         ...initialState,
-                        editorPreferences: get().editorPreferences,
+                        aiAgentSimpleEditorPreferred: get().aiAgentSimpleEditorPreferred,
+                        dataStreamSimpleEditorPreferred: get().dataStreamSimpleEditorPreferred,
+                    })),
+
+                setAiAgentSimpleEditorPreferred: (preferred) =>
+                    set(() => ({
+                        aiAgentSimpleEditorPreferred: preferred,
                     })),
 
                 setCopilotPanelOpen: (open) =>
@@ -45,9 +54,9 @@ export const useClusterElementsCanvasDialogStore = create<ClusterElementsCanvasD
                         copilotPanelOpen: open,
                     })),
 
-                setEditorPreference: (agentNodeName, showAiAgent) =>
+                setDataStreamSimpleEditorPreferred: (preferred) =>
                     set(() => ({
-                        editorPreferences: {...get().editorPreferences, [agentNodeName]: showAiAgent},
+                        dataStreamSimpleEditorPreferred: preferred,
                     })),
 
                 setShowAiAgentEditor: (show) =>
@@ -67,7 +76,10 @@ export const useClusterElementsCanvasDialogStore = create<ClusterElementsCanvasD
             }),
             {
                 name: 'bytechef.cluster-elements-canvas-dialog-store',
-                partialize: (state) => ({editorPreferences: state.editorPreferences}),
+                partialize: (state) => ({
+                    aiAgentSimpleEditorPreferred: state.aiAgentSimpleEditorPreferred,
+                    dataStreamSimpleEditorPreferred: state.dataStreamSimpleEditorPreferred,
+                }),
             }
         )
     )

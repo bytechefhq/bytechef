@@ -37,7 +37,6 @@ interface ClusterElementsCanvasDialogProps {
     previousComponentDefinitions: ComponentDefinitionBasic[];
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
-    workflowReferenceId?: number | string;
 }
 
 const ClusterElementsCanvasDialog = ({
@@ -46,7 +45,6 @@ const ClusterElementsCanvasDialog = ({
     previousComponentDefinitions,
     updateWorkflowMutation,
     workflowNodeOutputs,
-    workflowReferenceId,
 }: ClusterElementsCanvasDialogProps) => {
     const [shouldRenderDataPillPanel, setShouldRenderDataPillPanel] = useState(false);
     const [isDataPillPanelVisible, setIsDataPillPanelVisible] = useState(false);
@@ -84,7 +82,6 @@ const ClusterElementsCanvasDialog = ({
         isDataStreamSimpleModeAvailable,
     } = useClusterElementsCanvasDialog({
         onOpenChange,
-        workflowReferenceId,
     });
 
     const queryClient = useQueryClient();
