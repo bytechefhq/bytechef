@@ -57,12 +57,12 @@ final class McpServerSubAgentConfigurationTest {
         IntelligentToolChatClientFactory factory = configuration.mcpServerBuildSubAgentChatClientFactory(
             fixedChatClient);
 
-        assertThat(factory.get()).isSameAs(fixedChatClient);
+        assertThat(factory.get(null)).isSameAs(fixedChatClient);
     }
 
     @Test
     void testConfigureMcpServerToolCallbackDescriptionMentionsFromAi() {
-        ToolCallback toolCallback = new ConfigureMcpServerToolCallback(() -> mock(ChatClient.class));
+        ToolCallback toolCallback = new ConfigureMcpServerToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String description = toolCallback.getToolDefinition()
             .description();

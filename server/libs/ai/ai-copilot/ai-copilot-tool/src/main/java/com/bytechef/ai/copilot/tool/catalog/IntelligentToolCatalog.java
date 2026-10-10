@@ -68,7 +68,7 @@ public class IntelligentToolCatalog {
         }
 
         IntelligentToolChatClientFactory decoratedChatClientFactory =
-            () -> chatClientDecorator.apply(rawChatClientFactory.get(), definition);
+            chatModel -> chatClientDecorator.apply(rawChatClientFactory.get(chatModel), definition);
 
         ToolCallback toolCallback = definition.create(decoratedChatClientFactory);
 
