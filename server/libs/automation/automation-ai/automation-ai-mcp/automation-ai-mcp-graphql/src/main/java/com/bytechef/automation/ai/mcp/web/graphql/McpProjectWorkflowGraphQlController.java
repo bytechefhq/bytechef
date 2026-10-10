@@ -199,6 +199,10 @@ public class McpProjectWorkflowGraphQlController {
             mcpProjectWorkflow = mcpProjectWorkflowService.updateParameters(id, parameters);
         }
 
+        if (input.get("enabled") instanceof Boolean enabled) {
+            mcpProjectWorkflow = mcpProjectWorkflowService.updateEnabled(id, enabled);
+        }
+
         return mcpProjectWorkflow;
     }
 
