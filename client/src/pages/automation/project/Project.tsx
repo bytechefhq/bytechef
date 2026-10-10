@@ -118,7 +118,6 @@ const Project = () => {
                                         onEditSubflowClick={handleEditSubflowClick}
                                         runDisabled={runDisabled}
                                         showWorkflowInputs={true}
-                                        workflowReferenceId={projectWorkflowId}
                                     />
                                 )}
                             </WorkflowEditorProvider>
