@@ -75,21 +75,8 @@ public class McpServerGraphQlController {
     public McpServer updateMcpServer(@Argument long id, @Argument McpServerUpdateInput input) {
         getNonEmbeddedMcpServer(id);
 
-        McpServer mcpServer = mcpServerService.update(id, input.name(), input.enabled());
-
-        if (input.enforceToolAuthorization() != null || input.authenticationRequired() != null) {
-            if (input.enforceToolAuthorization() != null) {
-                mcpServer.setEnforceToolAuthorization(input.enforceToolAuthorization());
-            }
-
-            if (input.authenticationRequired() != null) {
-                mcpServer.setAuthenticationRequired(input.authenticationRequired());
-            }
-
-            mcpServer = mcpServerService.update(mcpServer);
-        }
-
-        return mcpServer;
+        return mcpServerService.update(
+            id, input.name(), input.enabled(), input.enforceToolAuthorization(), input.authenticationRequired());
     }
 
     @MutationMapping
