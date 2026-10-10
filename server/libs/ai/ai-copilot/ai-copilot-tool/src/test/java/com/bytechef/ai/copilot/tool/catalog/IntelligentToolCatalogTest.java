@@ -20,16 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
 
@@ -39,25 +42,40 @@ import org.springframework.beans.factory.ObjectProvider;
 class IntelligentToolCatalogTest {
 
     @Test
-    void testGetByNamesSkipsDefinitionWithNoFactoryForVariant() {
-        FakeIntelligentToolDefinition projectWorkflowAgent = buildDefinition("buildWorkflow", mock(ChatClient.class));
-        FakeIntelligentToolDefinition mcpAgent = buildDefinition("mcp_agent", mock(ChatClient.class));
-        FakeIntelligentToolDefinition unavailableAgent = new FakeIntelligentToolDefinition("importWorkflow", Map.of());
+    void testGetByNamesSkipsDefinitionWithNoSupplierForAskVariant() {
+        FakeIntelligentToolDefinition projectWorkflowAgent = projectScopedDefinition();
+        FakeIntelligentToolDefinition mcpAgent = unscopedDefinition();
+        FakeIntelligentToolDefinition converterAgent = buildOnlyDefinition();
 
-        IntelligentToolCatalog catalog = catalogOf(projectWorkflowAgent, mcpAgent, unavailableAgent);
+        IntelligentToolCatalog catalog = catalogOf(projectWorkflowAgent, mcpAgent, converterAgent);
 
         List<ToolCallback> toolCallbacks = catalog.getByNames(
-            Set.of(projectWorkflowAgent.name, mcpAgent.name, unavailableAgent.name), IntelligentToolVariant.BUILD,
+            Set.of(projectWorkflowAgent.name, mcpAgent.name, converterAgent.name), IntelligentToolVariant.ASK,
             identityChatClientDecorator(), identityToolCallbackDecorator());
 
         assertThat(toolCallbacks).containsExactly(projectWorkflowAgent.toolCallback, mcpAgent.toolCallback);
     }
 
     @Test
+    void testGetForPanelReturnsOnlyDefinitionsScopedToTheGivenPanel() {
+        FakeIntelligentToolDefinition projectWorkflowAgent = projectScopedDefinition();
+        FakeIntelligentToolDefinition mcpAgent = unscopedDefinition();
+        FakeIntelligentToolDefinition converterAgent = buildOnlyDefinition();
+
+        IntelligentToolCatalog catalog = catalogOf(projectWorkflowAgent, mcpAgent, converterAgent);
+
+        List<ToolCallback> toolCallbacks = catalog.getForPanel(
+            IntelligentToolScope.PROJECT, IntelligentToolVariant.BUILD,
+            identityChatClientDecorator(), identityToolCallbackDecorator());
+
+        assertThat(toolCallbacks).containsExactly(projectWorkflowAgent.toolCallback);
+    }
+
+    @Test
     void testGetByNamesReturnsOnlyTheMatchingDefinition() {
-        FakeIntelligentToolDefinition projectWorkflowAgent = buildDefinition("buildWorkflow", mock(ChatClient.class));
-        FakeIntelligentToolDefinition mcpAgent = buildDefinition("mcp_agent", mock(ChatClient.class));
-        FakeIntelligentToolDefinition converterAgent = buildDefinition("importWorkflow", mock(ChatClient.class));
+        FakeIntelligentToolDefinition projectWorkflowAgent = projectScopedDefinition();
+        FakeIntelligentToolDefinition mcpAgent = unscopedDefinition();
+        FakeIntelligentToolDefinition converterAgent = buildOnlyDefinition();
 
         IntelligentToolCatalog catalog = catalogOf(projectWorkflowAgent, mcpAgent, converterAgent);
 
@@ -70,7 +88,7 @@ class IntelligentToolCatalogTest {
 
     @Test
     void testDecoratorsAreInvokedWithTheMatchingDefinition() {
-        FakeIntelligentToolDefinition projectWorkflowAgent = buildDefinition("buildWorkflow", mock(ChatClient.class));
+        FakeIntelligentToolDefinition projectWorkflowAgent = projectScopedDefinition();
 
         IntelligentToolCatalog catalog = catalogOf(projectWorkflowAgent);
 
@@ -91,9 +109,8 @@ class IntelligentToolCatalogTest {
                 return toolCallback;
             };
 
-        catalog.getByNames(
-            Set.of(projectWorkflowAgent.name), IntelligentToolVariant.BUILD, chatClientDecorator,
-            toolCallbackDecorator);
+        catalog.getForPanel(
+            IntelligentToolScope.PROJECT, IntelligentToolVariant.BUILD, chatClientDecorator, toolCallbackDecorator);
 
         assertThat(chatClientDecoratorCalls).containsExactly(projectWorkflowAgent);
         assertThat(toolCallbackDecoratorCalls).containsExactly(projectWorkflowAgent);
@@ -104,22 +121,22 @@ class IntelligentToolCatalogTest {
         ChatClient rawChatClient = mock(ChatClient.class);
         ChatClient decoratedChatClient = mock(ChatClient.class);
 
-        FakeIntelligentToolDefinition projectWorkflowAgent = buildDefinition("buildWorkflow", rawChatClient);
+        FakeIntelligentToolDefinition projectWorkflowAgent = projectScopedDefinition(rawChatClient);
 
         IntelligentToolCatalog catalog = catalogOf(projectWorkflowAgent);
 
         BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator =
             (chatClient, definition) -> decoratedChatClient;
 
-        catalog.getByNames(
-            Set.of(projectWorkflowAgent.name), IntelligentToolVariant.BUILD, chatClientDecorator,
+        catalog.getForPanel(
+            IntelligentToolScope.PROJECT, IntelligentToolVariant.BUILD, chatClientDecorator,
             identityToolCallbackDecorator());
 
         assertThat(projectWorkflowAgent.capturedChatClient).isSameAs(decoratedChatClient);
     }
 
     @Test
-    void testBuildToolCallbackDoesNotResolveTheRawChatClientFactoryEagerly() {
+    void testBuildToolCallbackDoesNotResolveTheRawChatClientSupplierEagerly() {
         AtomicInteger rawFactoryResolutionCount = new AtomicInteger();
         IntelligentToolChatClientFactory rawChatClientFactory = chatModel -> {
             rawFactoryResolutionCount.incrementAndGet();
@@ -144,9 +161,65 @@ class IntelligentToolCatalogTest {
             .hasValue(0);
     }
 
-    private static FakeIntelligentToolDefinition buildDefinition(String name, ChatClient chatClient) {
+    @Test
+    void testTheChatModelReachesTheDefinitionFactory() {
+        AtomicReference<ChatModel> received = new AtomicReference<>();
+
+        IntelligentToolDefinition definition = definitionWithFactory(
+            candidate -> {
+                received.set(candidate);
+
+                return mock(ChatClient.class);
+            });
+
+        List<ToolCallback> toolCallbacks = catalogOf(definition)
+            .getByNames(
+                Set.of("test_tool"), IntelligentToolVariant.BUILD, (chatClient, current) -> chatClient,
+                (toolCallback, current) -> toolCallback);
+
+        assertThat(toolCallbacks).hasSize(1);
+
+        // the factory is handed to create(...); the callback decides when to invoke it
+        assertThat(received.get()).isNull();
+    }
+
+    private static FakeIntelligentToolDefinition projectScopedDefinition() {
+        return projectScopedDefinition(mock(ChatClient.class));
+    }
+
+    private static FakeIntelligentToolDefinition projectScopedDefinition(ChatClient chatClient) {
         return new FakeIntelligentToolDefinition(
-            name, Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient));
+            "buildWorkflow", "buildWorkflow", Set.of(IntelligentToolScope.PROJECT),
+            Map.of(
+                IntelligentToolVariant.ASK, (IntelligentToolChatClientFactory) chatModel -> chatClient,
+                IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient));
+    }
+
+    private static FakeIntelligentToolDefinition unscopedDefinition() {
+        ChatClient chatClient = mock(ChatClient.class);
+
+        return new FakeIntelligentToolDefinition(
+            "mcp_agent", "mcp_agent", Set.of(),
+            Map.of(
+                IntelligentToolVariant.ASK, (IntelligentToolChatClientFactory) chatModel -> chatClient,
+                IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient));
+    }
+
+    private static FakeIntelligentToolDefinition buildOnlyDefinition() {
+        ChatClient chatClient = mock(ChatClient.class);
+
+        return new FakeIntelligentToolDefinition(
+            "importWorkflow", "importWorkflow", Set.of(),
+            Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient));
+    }
+
+    /**
+     * Builds a definition over the given raw factory whose {@code create} does NOT invoke it — mirroring the real
+     * catalog contract, where {@code create} receives the factory and decides for itself when (or whether) to call it,
+     * rather than the catalog resolving it up front.
+     */
+    private static IntelligentToolDefinition definitionWithFactory(IntelligentToolChatClientFactory chatClientFactory) {
+        return new LazyIntelligentToolDefinition("test_tool", chatClientFactory, mock(ToolCallback.class));
     }
 
     private static BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> identityChatClientDecorator() {
@@ -157,20 +230,28 @@ class IntelligentToolCatalogTest {
         return (toolCallback, definition) -> toolCallback;
     }
 
-    @SuppressWarnings("unchecked")
     private static IntelligentToolCatalog catalogOf(IntelligentToolDefinition... definitions) {
         IntelligentToolContributor contributor = () -> List.of(definitions);
+
+        return new IntelligentToolCatalog(fixedObjectProvider(contributor));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<IntelligentToolContributor> fixedObjectProvider(
+        IntelligentToolContributor contributor) {
 
         ObjectProvider<IntelligentToolContributor> objectProvider = mock(ObjectProvider.class);
 
         when(objectProvider.orderedStream()).thenReturn(Stream.of(contributor));
 
-        return new IntelligentToolCatalog(objectProvider);
+        return objectProvider;
     }
 
     private static final class FakeIntelligentToolDefinition implements IntelligentToolDefinition {
 
         private final String name;
+        private final String agentTypeKey;
+        private final Set<IntelligentToolScope> panelScopes;
         private final Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant;
         private final ToolCallback toolCallback = mock(ToolCallback.class);
 
@@ -178,15 +259,29 @@ class IntelligentToolCatalogTest {
         private ChatClient capturedChatClient;
 
         private FakeIntelligentToolDefinition(
-            String name, Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant) {
+            String name, String agentTypeKey, Set<IntelligentToolScope> panelScopes,
+            Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant) {
 
             this.name = name;
+            this.agentTypeKey = agentTypeKey;
+            this.panelScopes = panelScopes;
             this.chatClientFactoriesByVariant = chatClientFactoriesByVariant;
         }
 
         @Override
         public String name() {
             return name;
+        }
+
+        @Override
+        public String agentTypeKey() {
+            return agentTypeKey;
+        }
+
+        @Override
+        @SuppressFBWarnings("EI_EXPOSE_REP")
+        public Set<IntelligentToolScope> panelScopes() {
+            return panelScopes;
         }
 
         @Override
@@ -203,6 +298,10 @@ class IntelligentToolCatalogTest {
         }
     }
 
+    /**
+     * Mirrors {@code importWorkflow}'s real shape: {@code create} stores the given factory for later, deferred use
+     * instead of resolving it — the property that keeps {@code importWorkflow} lazy.
+     */
     private static final class LazyIntelligentToolDefinition implements IntelligentToolDefinition {
 
         private final String name;
@@ -220,6 +319,16 @@ class IntelligentToolCatalogTest {
         @Override
         public String name() {
             return name;
+        }
+
+        @Override
+        public String agentTypeKey() {
+            return name;
+        }
+
+        @Override
+        public Set<IntelligentToolScope> panelScopes() {
+            return Set.of();
         }
 
         @Override
