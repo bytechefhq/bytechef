@@ -36,7 +36,7 @@ vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
 
 const ORIGINAL_DEFINITION = '{"tasks": []}';
 
-const UPDATED_DEFINITION = '{"tasks": [{"name": "delay_1"}]}';
+const UPDATED_DEFINITION = '{"tasks": [{"name": "delay_1", "type": "delay/v1/delay"}]}';
 
 const originalContext = {mode: MODE.BUILD, parameters: {workflowId: 'w1'}, source: Source.WORKFLOW_EDITOR};
 
@@ -210,6 +210,26 @@ describe('useWorkflowCodeEditorSheet', () => {
             expect(result.current.definition).toBe(ORIGINAL_DEFINITION);
             expect(result.current.dirty).toBe(false);
             expect(useCopilotStore.getState().messages[1]?.content).toBe('It runs the tasks in order.');
+        });
+
+        it('leaves the editor untouched when a BUILD-mode reply carries a non-workflow JSON object', () => {
+            const {result} = renderWorkflowCodeEditorSheet();
+
+            const notesReply = '```json\n{"notes": "Add a delay step"}\n```';
+
+            useCopilotStore.setState({
+                context: {mode: MODE.BUILD, parameters: {format: 'json'}, source: Source.WORKFLOW_CODE_EDITOR},
+                messages: [
+                    {content: 'add a delay', role: 'user'},
+                    {content: notesReply, role: 'assistant'},
+                ],
+            });
+
+            act(() => useCopilotPostTurnRegistry.getState().runFor(Source.WORKFLOW_CODE_EDITOR));
+
+            expect(result.current.definition).toBe(ORIGINAL_DEFINITION);
+            expect(result.current.dirty).toBe(false);
+            expect(useCopilotStore.getState().messages[1]?.content).toBe(notesReply);
         });
 
         it('stops auto-applying once unmounted', () => {
