@@ -33,6 +33,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.connection.aiprovider.AiProviderConnectionSource;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,9 @@ class AiProviderFacadeAuditIntTest {
 
     @Autowired
     private AiProviderFacade aiProviderFacade;
+
+    @MockitoBean
+    private AiProviderConnectionSource aiProviderConnectionSource;
 
     @MockitoBean
     private ComponentDefinitionService componentDefinitionService;
