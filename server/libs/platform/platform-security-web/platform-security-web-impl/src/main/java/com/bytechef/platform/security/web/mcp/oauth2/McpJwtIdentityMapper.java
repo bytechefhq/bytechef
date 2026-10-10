@@ -40,12 +40,11 @@ public class McpJwtIdentityMapper {
         Jwt jwt, Issuer issuer, Collection<GrantedAuthority> scopeAuthorities, String urlTenantId) {
 
         String tenantClaim = issuer.getTenantClaim();
-        String claimTenantId = StringUtils.isNotBlank(tenantClaim) ? jwt.getClaimAsString(tenantClaim) : null;
 
-        if (StringUtils.isNotBlank(claimTenantId) && !claimTenantId.equals(urlTenantId)) {
+        if (StringUtils.isNotBlank(tenantClaim) && !isMatchingTenant(jwt.getClaimAsString(tenantClaim), urlTenantId)) {
             throw new OAuth2AuthenticationException(
                 new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN),
-                "Token tenant claim does not match the endpoint tenant");
+                "Token tenant claim is missing or does not match the endpoint tenant");
         }
 
         List<GrantedAuthority> authorities = new ArrayList<>(scopeAuthorities);
@@ -69,6 +68,10 @@ public class McpJwtIdentityMapper {
             .forEach(authorities::add);
 
         return new McpJwtIdentity(urlTenantId, getSubject(jwt), authorities);
+    }
+
+    private static boolean isMatchingTenant(String claimTenantId, String urlTenantId) {
+        return StringUtils.isNotBlank(claimTenantId) && claimTenantId.equals(urlTenantId);
     }
 
     private static boolean isGrantableClaimValue(String claimValue) {

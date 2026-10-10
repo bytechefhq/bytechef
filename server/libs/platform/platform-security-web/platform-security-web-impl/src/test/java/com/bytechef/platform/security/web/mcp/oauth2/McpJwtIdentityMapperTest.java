@@ -38,7 +38,7 @@ class McpJwtIdentityMapperTest {
 
     @Test
     void testUsesUrlTenantAndMapsAuthorities() {
-        Issuer issuer = issuer("tenant_id", "authorities", List.of());
+        Issuer issuer = issuer(null, "authorities", List.of());
 
         Jwt jwt = jwtBuilder()
             .subject("admin@localhost.com")
@@ -55,7 +55,7 @@ class McpJwtIdentityMapperTest {
 
     @Test
     void testDoesNotGrantReservedAuthoritiesFromClaim() {
-        Issuer issuer = issuer("tenant_id", "authorities", List.of("ROLE_USER"));
+        Issuer issuer = issuer(null, "authorities", List.of("ROLE_USER"));
 
         Jwt jwt = jwtBuilder()
             .subject("attacker@customer.com")
@@ -73,7 +73,7 @@ class McpJwtIdentityMapperTest {
 
     @Test
     void testMapsAuthoritiesFromClaimPlusStatic() {
-        Issuer issuer = issuer("org", "groups", List.of("ROLE_USER"));
+        Issuer issuer = issuer(null, "groups", List.of("ROLE_USER"));
 
         Jwt jwt = jwtBuilder()
             .subject("jane@customer.com")
@@ -90,7 +90,7 @@ class McpJwtIdentityMapperTest {
 
     @Test
     void testNoAuthoritiesClaimYieldsOnlyStaticAndScopeAuthorities() {
-        Issuer issuer = issuer("tenant_id", null, List.of());
+        Issuer issuer = issuer(null, null, List.of());
 
         Jwt jwt = jwtBuilder()
             .subject("admin@localhost.com")
@@ -125,6 +125,20 @@ class McpJwtIdentityMapperTest {
         Jwt jwt = jwtBuilder()
             .subject("attacker@customer.com")
             .claim("tenant_id", "victim")
+            .build();
+
+        assertThatExceptionOfType(OAuth2AuthenticationException.class)
+            .isThrownBy(
+                () -> mcpJwtIdentityMapper.map(
+                    jwt, issuer, Set.of(new SimpleGrantedAuthority("SCOPE_mcp:automation")), "acme"));
+    }
+
+    @Test
+    void testRejectsTokenMissingTheConfiguredTenantClaim() {
+        Issuer issuer = issuer("tenant_id", null, List.of());
+
+        Jwt jwt = jwtBuilder()
+            .subject("attacker@customer.com")
             .build();
 
         assertThatExceptionOfType(OAuth2AuthenticationException.class)
