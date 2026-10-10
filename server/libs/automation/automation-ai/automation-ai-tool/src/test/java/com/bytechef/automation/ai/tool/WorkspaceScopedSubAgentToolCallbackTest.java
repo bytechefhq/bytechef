@@ -17,8 +17,8 @@
 package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.agent.tool.CoreAgentType;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
@@ -39,12 +39,16 @@ class WorkspaceScopedSubAgentToolCallbackTest {
 
     private ContextCapturingDelegate delegate;
     private WorkspaceScopedSubAgentToolCallback toolCallback;
+    private final WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
 
     @BeforeEach
     void beforeEach() {
+        when(workspaceFacade.getMyWorkspaces()).thenReturn(
+            List.of(new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
+
         delegate = new ContextCapturingDelegate();
 
-        toolCallback = new WorkspaceScopedSubAgentToolCallback(delegate, memberWorkspaceFacade());
+        toolCallback = new WorkspaceScopedSubAgentToolCallback(delegate, workspaceFacade);
     }
 
     @Test
@@ -140,6 +144,40 @@ class WorkspaceScopedSubAgentToolCallbackTest {
     }
 
     @Test
+    void testExplicitWorkspaceIdOtherThanTheChatWorkspaceIsRejected() {
+        String result = toolCallback.call(
+            "{\"request\": \"list servers\", \"workspaceId\": 42}",
+            new ToolContext(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L)));
+
+        assertThat(result).contains("error")
+            .contains("Workspace 42 is not the workspace 7 this conversation is scoped to.");
+        assertThat(delegate.capturedContext).isNull();
+    }
+
+    @Test
+    void testMalformedChatEnvironmentReturnsErrorInsteadOfDefaulting() {
+        String result = toolCallback.call(
+            "{\"request\": \"list servers\"}",
+            new ToolContext(
+                Map.of(
+                    AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L,
+                    AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, "not-a-number")));
+
+        assertThat(result).contains("error")
+            .contains("environment of this conversation could not be determined");
+        assertThat(delegate.capturedContext).isNull();
+    }
+
+    @Test
+    void testExplicitWorkspaceIdTheCallerIsNotAMemberOfIsRejected() {
+        String result = toolCallback.call("{\"request\": \"list servers\", \"workspaceId\": 99}");
+
+        assertThat(result).contains("error")
+            .contains("Workspace 99 is not accessible to the caller.");
+        assertThat(delegate.capturedContext).isNull();
+    }
+
+    @Test
     void testMissingWorkspacePointsToListWorkspaces() {
         String result = toolCallback.call("{\"request\": \"list servers\"}");
 
@@ -153,7 +191,7 @@ class WorkspaceScopedSubAgentToolCallbackTest {
         PlainCopilotDelegate copilotDelegate = new PlainCopilotDelegate();
 
         WorkspaceScopedSubAgentToolCallback copilotToolCallback =
-            new WorkspaceScopedSubAgentToolCallback(copilotDelegate, memberWorkspaceFacade());
+            new WorkspaceScopedSubAgentToolCallback(copilotDelegate, workspaceFacade);
 
         String result = copilotToolCallback.call("{\"request\": \"list tables\", \"workspaceId\": 43}");
 
@@ -220,17 +258,5 @@ class WorkspaceScopedSubAgentToolCallbackTest {
 
             return "delegated";
         }
-    }
-
-    private static WorkspaceFacade memberWorkspaceFacade() {
-        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
-
-        lenient().when(workspaceFacade.getMyWorkspaces())
-            .thenReturn(
-                List.of(
-                    new Workspace(1L, "Workspace 1"), new Workspace(7L, "Workspace 7"),
-                    new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
-
-        return workspaceFacade;
     }
 }

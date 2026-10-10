@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.NoSuchElementException;
 import org.jspecify.annotations.Nullable;
@@ -26,7 +27,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -54,7 +54,6 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
         }""";
 
     private final ProjectDeploymentFacade projectDeploymentFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public RollbackProjectDeploymentToolCallback(ProjectDeploymentFacade projectDeploymentFacade) {
@@ -78,7 +77,7 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            RollbackProjectDeploymentInput input = jsonMapper.readValue(
+            RollbackProjectDeploymentInput input = JsonUtils.read(
                 toolInput, RollbackProjectDeploymentInput.class);
 
             if (input.projectDeploymentId() == null || input.projectDeploymentId()
@@ -146,7 +145,7 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
                         + " could not be rolled back — one of its workflows no longer exists");
             }
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new RollbackProjectDeploymentOutput(
                     projectDeploymentId, input.projectVersion(), previousProjectVersion));
         } catch (JacksonException exception) {
@@ -154,13 +153,12 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, RollbackProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(RollbackProjectDeploymentToolCallback.class, TOOL_NAME, exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record RollbackProjectDeploymentInput(String projectDeploymentId, Integer projectVersion) {

@@ -20,9 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.agui.core.exception.AGUIException;
+import com.agui.server.LocalAgent;
 import com.bytechef.ai.copilot.agent.McpServerSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
@@ -37,11 +39,21 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
@@ -73,6 +85,56 @@ class CopilotConfigurationTest {
             CopilotConfigurationTest.<SubAgentChatModelResolver>emptyProvider());
 
         assertThat(mcpServerSpringAIAgent.getAgentId()).isEqualTo("mcp_server_build");
+    }
+
+    @Test
+    void testEveryRegisteredChatAgentIdIsAUniqueCopilotAgentTypeKey() throws ReflectiveOperationException {
+        Set<String> copilotAgentTypeKeys = Arrays.stream(CopilotAgentType.values())
+            .map(CopilotAgentType::key)
+            .collect(Collectors.toSet());
+
+        List<String> agentIds = new ArrayList<>();
+
+        for (Method method : CopilotConfiguration.class.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(Bean.class) && LocalAgent.class.isAssignableFrom(method.getReturnType())) {
+                LocalAgent localAgent = (LocalAgent) invokeWithStubs(method);
+
+                agentIds.add(localAgent.getAgentId());
+            }
+        }
+
+        assertThat(agentIds)
+            .hasSize(16)
+            .doesNotHaveDuplicates()
+            .allSatisfy(agentId -> assertThat(copilotAgentTypeKeys).contains(agentId))
+            .contains("workflow_code_editor_ask", "workflow_code_editor_build", "converter_build", "mcp_server_build");
+    }
+
+    private Object invokeWithStubs(Method method) throws ReflectiveOperationException {
+        Parameter[] parameters = method.getParameters();
+        Object[] arguments = new Object[parameters.length];
+
+        for (int index = 0; index < parameters.length; index++) {
+            Class<?> parameterType = parameters[index].getType();
+
+            if (parameterType == Resource.class) {
+                arguments[index] = PROMPT_RESOURCE;
+            } else if (parameterType == Optional.class) {
+                arguments[index] = Optional.empty();
+            } else if (parameterType == ObjectProvider.class) {
+                arguments[index] = emptyProvider();
+            } else {
+                arguments[index] = mock(parameterType);
+            }
+        }
+
+        method.setAccessible(true);
+
+        try {
+            return method.invoke(copilotConfiguration, arguments);
+        } catch (InvocationTargetException exception) {
+            throw new IllegalStateException("Failed to build agent via " + method.getName(), exception.getCause());
+        }
     }
 
     @SuppressWarnings("unchecked")

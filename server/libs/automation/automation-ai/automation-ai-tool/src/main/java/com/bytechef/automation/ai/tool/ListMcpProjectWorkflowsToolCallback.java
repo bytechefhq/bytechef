@@ -18,13 +18,13 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -53,7 +53,6 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
         }""";
 
     private final McpProjectWorkflowFacade mcpProjectWorkflowFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ListMcpProjectWorkflowsToolCallback(McpProjectWorkflowFacade mcpProjectWorkflowFacade) {
@@ -77,22 +76,21 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            ListMcpProjectWorkflowsInput input = jsonMapper.readValue(toolInput, ListMcpProjectWorkflowsInput.class);
+            ListMcpProjectWorkflowsInput input = JsonUtils.read(toolInput, ListMcpProjectWorkflowsInput.class);
 
             Long mcpServerId = input.mcpServerId();
 
             if (mcpServerId == null) {
-                return ToolErrors.toolError(jsonMapper, "mcpServerId is required");
+                return ToolErrors.toolError("mcpServerId is required");
             }
 
-            return jsonMapper.writeValueAsString(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(mcpServerId));
+            return JsonUtils.write(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(mcpServerId));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError(jsonMapper, "Invalid tool input: " + exception.getMessage());
+            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
         } catch (IllegalArgumentException exception) {
-            return ToolErrors.toolError(jsonMapper, exception.getMessage());
+            return ToolErrors.toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, ListMcpProjectWorkflowsToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(ListMcpProjectWorkflowsToolCallback.class, TOOL_NAME, exception);
         }
     }
 
