@@ -123,6 +123,9 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
 
         jobMetadata.put(MetadataConstants.JOB_RESUME_ID, jobResumeIdString);
         jobMetadata.put(
+            MetadataConstants.APPROVAL_RESUME,
+            MapUtils.getBoolean(suspend.continueParameters(), MetadataConstants.APPROVAL_RESUME, false));
+        jobMetadata.put(
             MetadataConstants.STREAMING_RESUME,
             MapUtils.getBoolean(suspend.continueParameters(), MetadataConstants.STREAMING_RESUME, false));
         jobMetadata.put(MetadataConstants.TASK_EXECUTION_RESUME_ID, taskExecution.getId());
