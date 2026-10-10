@@ -17,37 +17,31 @@
 package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(ObjectMapperSetupExtension.class)
 class UpdateMcpProjectWorkflowParametersToolCallbackTest {
 
-    private McpProjectWorkflowService mcpProjectWorkflowService;
+    private McpProjectWorkflowFacade mcpProjectWorkflowFacade;
     private UpdateMcpProjectWorkflowParametersToolCallback toolCallback;
 
     @BeforeEach
     void beforeEach() {
-        mcpProjectWorkflowService = mock(McpProjectWorkflowService.class);
-        toolCallback = new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowService);
+        mcpProjectWorkflowFacade = mock(McpProjectWorkflowFacade.class);
+        toolCallback = new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowFacade);
     }
 
     @Test
@@ -64,7 +58,7 @@ class UpdateMcpProjectWorkflowParametersToolCallbackTest {
             .contains("error")
             .contains("mcpProjectWorkflowId is required");
 
-        verify(mcpProjectWorkflowService, never()).updateParameters(anyLong(), anyMap());
+        verify(mcpProjectWorkflowFacade, never()).updateMcpProjectWorkflowParameters(anyLong(), any(), any(), any());
     }
 
     @Test
@@ -75,88 +69,37 @@ class UpdateMcpProjectWorkflowParametersToolCallbackTest {
             .contains("error")
             .contains("toolName must not be blank");
 
-        verify(mcpProjectWorkflowService, never()).updateParameters(anyLong(), anyMap());
+        verify(mcpProjectWorkflowFacade, never()).updateMcpProjectWorkflowParameters(anyLong(), any(), any(), any());
     }
 
     @Test
     void testUnknownIdReturnsError() {
-        when(mcpProjectWorkflowService.fetchMcpProjectWorkflow(99L)).thenReturn(Optional.empty());
+        when(mcpProjectWorkflowFacade.updateMcpProjectWorkflowParameters(99L, "get_weather", null, null))
+            .thenThrow(new IllegalArgumentException("McpProjectWorkflow not found: 99"));
 
         String result = toolCallback.call("{\"mcpProjectWorkflowId\": 99, \"toolName\": \"get_weather\"}");
 
         assertThat(result)
             .contains("error")
             .contains("McpProjectWorkflow not found");
-
-        verify(mcpProjectWorkflowService, never()).updateParameters(anyLong(), anyMap());
     }
 
     @Test
-    void testMergePreservesExistingParameters() {
-        McpProjectWorkflow existingMcpProjectWorkflow = new McpProjectWorkflow();
-
-        existingMcpProjectWorkflow.setParameters(
-            Map.of("toolName", "old_name", "city", "fromAi('city', 'STRING', {required: true})"));
-
+    void testPassesTheSuppliedFieldsToTheFacade() {
         McpProjectWorkflow updatedMcpProjectWorkflow = new McpProjectWorkflow();
 
-        when(mcpProjectWorkflowService.fetchMcpProjectWorkflow(7L))
-            .thenReturn(Optional.of(existingMcpProjectWorkflow));
-        when(mcpProjectWorkflowService.updateParameters(eq(7L), anyMap())).thenAnswer(invocation -> {
-            updatedMcpProjectWorkflow.setParameters(invocation.getArgument(1));
+        updatedMcpProjectWorkflow.setParameters(Map.of("toolName", "get_weather", "city", "Berlin"));
 
-            return updatedMcpProjectWorkflow;
-        });
+        when(mcpProjectWorkflowFacade.updateMcpProjectWorkflowParameters(
+            7L, "get_weather", "Fetch weather", Map.of("city", "Berlin")))
+                .thenReturn(updatedMcpProjectWorkflow);
 
         String result = toolCallback.call(
-            "{\"mcpProjectWorkflowId\": 7, \"toolName\": \"get_weather\", \"toolDescription\": \"Fetch weather\"}");
+            "{\"mcpProjectWorkflowId\": 7, \"toolName\": \"get_weather\", \"toolDescription\": \"Fetch weather\", "
+                + "\"parameters\": {\"city\": \"Berlin\"}}");
 
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Map<String, Object>> parametersCaptor = ArgumentCaptor.forClass(Map.class);
-
-        verify(mcpProjectWorkflowService).updateParameters(eq(7L), parametersCaptor.capture());
-
-        Map<String, Object> mergedParameters = parametersCaptor.getValue();
-
-        assertThat(mergedParameters)
-            .containsEntry("toolName", "get_weather")
-            .containsEntry("toolDescription", "Fetch weather")
-            .containsEntry("city", "fromAi('city', 'STRING', {required: true})");
-
-        assertThat(result).contains("get_weather");
-    }
-
-    @Test
-    void testParametersOverlayReplacesOnlySuppliedKeys() {
-        McpProjectWorkflow existingMcpProjectWorkflow = new McpProjectWorkflow();
-
-        existingMcpProjectWorkflow.setParameters(Map.of("toolName", "get_weather", "city", "Berlin", "unit", "C"));
-
-        when(mcpProjectWorkflowService.fetchMcpProjectWorkflow(7L))
-            .thenReturn(Optional.of(existingMcpProjectWorkflow));
-        when(mcpProjectWorkflowService.updateParameters(eq(7L), anyMap()))
-            .thenAnswer(invocation -> {
-                McpProjectWorkflow updatedMcpProjectWorkflow = new McpProjectWorkflow();
-
-                updatedMcpProjectWorkflow.setParameters(invocation.getArgument(1));
-
-                return updatedMcpProjectWorkflow;
-            });
-
-        toolCallback.call(
-            "{\"mcpProjectWorkflowId\": 7, \"parameters\": {\"city\": " +
-                "\"fromAi('city', 'STRING', {description: 'City name', required: true})\"}}");
-
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Map<String, Object>> parametersCaptor = ArgumentCaptor.forClass(Map.class);
-
-        verify(mcpProjectWorkflowService).updateParameters(eq(7L), parametersCaptor.capture());
-
-        Map<String, Object> mergedParameters = parametersCaptor.getValue();
-
-        assertThat(mergedParameters)
-            .containsEntry("city", "fromAi('city', 'STRING', {description: 'City name', required: true})")
-            .containsEntry("unit", "C")
-            .containsEntry("toolName", "get_weather");
+        assertThat(result)
+            .contains("get_weather")
+            .contains("Berlin");
     }
 }
