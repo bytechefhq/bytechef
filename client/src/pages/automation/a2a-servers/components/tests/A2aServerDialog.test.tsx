@@ -73,7 +73,6 @@ describe('A2aServerDialog', () => {
             input: {
                 authenticationRequired: true,
                 description: 'Answers sales questions',
-                enabled: true,
                 name: 'Support agent',
             },
         });

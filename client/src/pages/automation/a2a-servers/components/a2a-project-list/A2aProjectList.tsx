@@ -19,11 +19,7 @@ const A2aProjectList = ({a2aServer}: A2aProjectListProps) => {
     }
 
     if (!a2aProjects.length) {
-        return (
-            <p className="text-xs text-muted-foreground">
-                No projects yet. Use Add Project to expose agent-backed workflows as skills.
-            </p>
-        );
+        return null;
     }
 
     return (

@@ -23,7 +23,6 @@ import {z} from 'zod';
 const formSchema = z.object({
     authenticationRequired: z.boolean(),
     description: z.string(),
-    enabled: z.boolean(),
     name: z.string().min(1, {message: 'Name is required'}),
 });
 
@@ -50,7 +49,6 @@ const A2aServerDialog = ({
         defaultValues: {
             authenticationRequired: a2aServer?.authenticationRequired ?? true,
             description: a2aServer?.description ?? '',
-            enabled: a2aServer?.enabled ?? true,
             name: a2aServer?.name ?? '',
         },
         resolver: zodResolver(formSchema),
@@ -72,7 +70,6 @@ const A2aServerDialog = ({
                     input: {
                         authenticationRequired: values.authenticationRequired,
                         description: values.description,
-                        enabled: values.enabled,
                         name: values.name,
                     },
                 },
@@ -179,29 +176,6 @@ const A2aServerDialog = ({
                                         </FormItem>
                                     )}
                                 />
-
-                                {a2aServer && (
-                                    <FormField
-                                        control={form.control}
-                                        name="enabled"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <div className="flex items-center space-x-2">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={field.value}
-                                                            onCheckedChange={field.onChange}
-                                                        />
-                                                    </FormControl>
-
-                                                    <FormLabel className="font-normal">Enabled</FormLabel>
-                                                </div>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
                             </DialogBody>
 
                             <DialogFooter>
