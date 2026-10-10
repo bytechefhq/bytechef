@@ -19,10 +19,9 @@ package com.bytechef.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.tool.model.ProjectDetailInfo;
@@ -70,13 +69,29 @@ class ProjectToolsTest {
     @Mock
     private ProjectTagFacade projectTagFacade;
 
-    private final WorkspaceFacade workspaceFacade = memberWorkspaceFacade();
-
     @Mock
     private ToolContext toolContext;
 
+    @Mock
+    private WorkspaceFacade workspaceFacade;
+
+    @Test
+    void testListProjectsRejectsAWorkspaceTheCallerIsNotAMemberOf() {
+        when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(2L, "Other")));
+
+        ProjectTools projectTools = newTools();
+
+        assertThatCode(() -> projectTools.listProjects(WORKSPACE_ID, toolContext))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("Workspace 1 is not accessible to the caller.");
+
+        verifyNoInteractions(projectFacade);
+    }
+
     @Test
     void testListProjectsListsTheExplicitWorkspace() {
+        givenTheCallerIsAWorkspaceMember();
+
         mockWorkspaceProjects(projectDTO(7L, "Alpha"));
 
         List<ProjectInfo> projectInfos = newTools().listProjects(WORKSPACE_ID, toolContext);
@@ -108,6 +123,8 @@ class ProjectToolsTest {
 
     @Test
     void testSearchProjectsMatchesNameAndDescription() {
+        givenTheCallerIsAWorkspaceMember();
+
         mockWorkspaceProjects(projectDTO(7L, "Alpha"), projectDTO(8L, "Beta"));
 
         List<ProjectInfo> projectInfos = newTools().searchProjects("alp", WORKSPACE_ID, toolContext);
@@ -174,6 +191,8 @@ class ProjectToolsTest {
 
     @Test
     void testCreateProjectPassesTheResolvedCategoryAndTags() {
+        givenTheCallerIsAWorkspaceMember();
+
         Category category = new Category(3L, "Sales");
         Tag tag = new Tag(5L, "crm");
 
@@ -197,7 +216,36 @@ class ProjectToolsTest {
     }
 
     @Test
+    void testCreateProjectRejectsAWorkspaceTheCallerCannotAccess() {
+        when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(2L, "Other")));
+
+        ProjectTools projectTools = newTools();
+
+        assertThatCode(() -> projectTools.createProject("Alpha", null, null, WORKSPACE_ID, null, toolContext))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("Workspace 1 is not accessible to the caller.");
+
+        verifyNoInteractions(projectFacade);
+    }
+
+    @Test
+    void testCreateProjectRejectsAWorkspaceOtherThanTheChatWorkspace() {
+        when(toolContext.getContext())
+            .thenReturn(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 2L));
+
+        ProjectTools projectTools = newTools();
+
+        assertThatCode(() -> projectTools.createProject("Alpha", null, null, WORKSPACE_ID, null, toolContext))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("this conversation is scoped to");
+
+        verifyNoInteractions(projectFacade);
+    }
+
+    @Test
     void testCreateProjectRejectsAnUnknownCategory() {
+        givenTheCallerIsAWorkspaceMember();
+
         when(projectCategoryFacade.getProjectCategories(WORKSPACE_ID)).thenReturn(List.of());
 
         ProjectTools projectTools = newTools();
@@ -257,6 +305,10 @@ class ProjectToolsTest {
             .publishedVersion()).isEqualTo(2);
     }
 
+    private void givenTheCallerIsAWorkspaceMember() {
+        when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(WORKSPACE_ID, "Workspace")));
+    }
+
     private void mockWorkspaceProjects(ProjectDTO... projectDTOs) {
         when(projectFacade.getWorkspaceProjects(null, null, false, null, null, null, WORKSPACE_ID))
             .thenReturn(List.of(projectDTOs));
@@ -273,17 +325,5 @@ class ProjectToolsTest {
             .name(name)
             .workspaceId(WORKSPACE_ID)
             .build();
-    }
-
-    private static WorkspaceFacade memberWorkspaceFacade() {
-        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
-
-        lenient().when(workspaceFacade.getMyWorkspaces())
-            .thenReturn(
-                List.of(
-                    new Workspace(1L, "Workspace 1"), new Workspace(7L, "Workspace 7"),
-                    new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
-
-        return workspaceFacade;
     }
 }

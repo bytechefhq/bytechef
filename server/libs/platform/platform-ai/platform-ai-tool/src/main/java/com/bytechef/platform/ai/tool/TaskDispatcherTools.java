@@ -17,12 +17,12 @@
 package com.bytechef.platform.ai.tool;
 
 import com.bytechef.exception.ExecutionException;
-import com.bytechef.platform.ai.tool.exception.TaskDispatcherToolErrorType;
 import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.exception.TaskDispatcherDefinitionErrorType;
 import com.bytechef.platform.workflow.task.dispatcher.facade.TaskDispatcherDefinitionFacade;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -89,7 +89,7 @@ public class TaskDispatcherTools {
             log.error("listTaskDispatchers(): " + FAILED_TO_LIST_TASK_DISPATCHERS, e);
 
             throw new ExecutionException(
-                FAILED_TO_LIST_TASK_DISPATCHERS, e, TaskDispatcherToolErrorType.LIST_TASK_DISPATCHERS);
+                FAILED_TO_LIST_TASK_DISPATCHERS, e, TaskDispatcherDefinitionErrorType.LIST_TASK_DISPATCHERS);
         }
     }
 
@@ -129,7 +129,7 @@ public class TaskDispatcherTools {
             log.error("getTaskDispatcher({}, {}): Failed to get task dispatcher {}", name, version, name, e);
 
             throw new ExecutionException(
-                FAILED_TO_GET_TASK_DISPATCHER, e, TaskDispatcherToolErrorType.GET_TASK_DISPATCHER);
+                FAILED_TO_GET_TASK_DISPATCHER, e, TaskDispatcherDefinitionErrorType.GET_TASK_DISPATCHER);
         }
     }
 
@@ -174,7 +174,7 @@ public class TaskDispatcherTools {
                 version, name, e);
 
             throw new ExecutionException("Failed to get output properties", e,
-                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_OUTPUT);
+                TaskDispatcherDefinitionErrorType.GET_TASK_DISPATCHER_OUTPUT);
         }
     }
 
@@ -208,7 +208,7 @@ public class TaskDispatcherTools {
                 name, e);
 
             throw new ExecutionException("Failed to get properties", e,
-                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_PROPERTIES);
+                TaskDispatcherDefinitionErrorType.GET_TASK_DISPATCHER_PROPERTIES);
         }
     }
 
@@ -249,7 +249,7 @@ public class TaskDispatcherTools {
                 "searchTaskDispatchers({}): Failed to search task dispatchers with query '{}'", query, query, e);
 
             throw new ExecutionException(
-                FAILED_TO_SEARCH_TASK_DISPATCHERS, e, TaskDispatcherToolErrorType.SEARCH_TASK_DISPATCHERS);
+                FAILED_TO_SEARCH_TASK_DISPATCHERS, e, TaskDispatcherDefinitionErrorType.SEARCH_TASK_DISPATCHERS);
         }
     }
 
@@ -290,7 +290,7 @@ public class TaskDispatcherTools {
 
             throw new ExecutionException(
                 "Failed to generate task dispatcher definition", e,
-                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_DEFINITION);
+                TaskDispatcherDefinitionErrorType.GET_TASK_DISPATCHER_DEFINITION);
         }
     }
 

@@ -18,13 +18,13 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.automation.ai.tool.exception.WorkflowExecutionToolErrorType;
 import com.bytechef.automation.ai.tool.model.TaskExecutionInfo;
 import com.bytechef.automation.ai.tool.model.TriggerExecutionInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowExecutionDetailInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowExecutionSummary;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.exception.ProjectWorkflowExecutionErrorType;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.exception.ExecutionException;
@@ -77,7 +77,7 @@ public class WorkflowExecutionTools {
                     "Workspace context unavailable in this tool invocation, so workflow execution " +
                         workflowExecutionId + " could not be read. This is not a statement that the execution " +
                         "does not exist.",
-                    WorkflowExecutionToolErrorType.GET_WORKFLOW_EXECUTION);
+                    ProjectWorkflowExecutionErrorType.GET_WORKFLOW_EXECUTION);
             }
 
             WorkflowExecutionDTO execution = projectWorkflowExecutionFacade.getWorkflowExecution(workflowExecutionId);
@@ -88,7 +88,7 @@ public class WorkflowExecutionTools {
             if (executionWorkspaceId == null || !workspaceId.equals(executionWorkspaceId)) {
                 throw new ExecutionException(
                     "Workflow execution " + workflowExecutionId + " not found",
-                    WorkflowExecutionToolErrorType.GET_WORKFLOW_EXECUTION);
+                    ProjectWorkflowExecutionErrorType.GET_WORKFLOW_EXECUTION);
             }
 
             return toDetailInfo(execution);
@@ -99,7 +99,7 @@ public class WorkflowExecutionTools {
 
             throw new ExecutionException(
                 "Failed to get workflow execution: " + exception.getMessage(), exception,
-                WorkflowExecutionToolErrorType.GET_WORKFLOW_EXECUTION);
+                ProjectWorkflowExecutionErrorType.GET_WORKFLOW_EXECUTION);
         }
     }
 
@@ -129,7 +129,7 @@ public class WorkflowExecutionTools {
                 throw new ExecutionException(
                     "Workspace context unavailable in this tool invocation, so no workflow executions were listed. " +
                         "This is not a statement that there are no executions.",
-                    WorkflowExecutionToolErrorType.LIST_WORKFLOW_EXECUTIONS);
+                    ProjectWorkflowExecutionErrorType.LIST_WORKFLOW_EXECUTIONS);
             }
 
             Long environmentId = asLong(toolContext, WorkflowExecutionToolContextKeys.ENVIRONMENT_ID);
@@ -149,7 +149,7 @@ public class WorkflowExecutionTools {
 
             throw new ExecutionException(
                 "Failed to list workflow executions: " + exception.getMessage(), exception,
-                WorkflowExecutionToolErrorType.LIST_WORKFLOW_EXECUTIONS);
+                ProjectWorkflowExecutionErrorType.LIST_WORKFLOW_EXECUTIONS);
         }
     }
 
@@ -253,7 +253,7 @@ public class WorkflowExecutionTools {
                 "Unknown jobStatus '" + value + "'. Valid values: " + Arrays.stream(Status.values())
                     .map(Status::name)
                     .collect(Collectors.joining(", ")),
-                WorkflowExecutionToolErrorType.LIST_WORKFLOW_EXECUTIONS);
+                ProjectWorkflowExecutionErrorType.LIST_WORKFLOW_EXECUTIONS);
         }
     }
 }

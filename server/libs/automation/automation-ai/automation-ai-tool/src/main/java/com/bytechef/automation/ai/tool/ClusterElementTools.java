@@ -16,9 +16,9 @@
 
 package com.bytechef.automation.ai.tool;
 
-import com.bytechef.automation.ai.tool.exception.ScriptToolErrorType;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.exception.ProjectWorkflowErrorType;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ErrorType;
@@ -101,7 +101,7 @@ public class ClusterElementTools {
 
             throw new ExecutionException(
                 "Failed to update workflow root properties: " + e.getMessage(), e,
-                ScriptToolErrorType.UPDATE_WORKFLOW_ROOT);
+                ProjectWorkflowErrorType.UPDATE_WORKFLOW_ROOT);
         }
     }
 
@@ -171,7 +171,7 @@ public class ClusterElementTools {
                 workflowId, taskName, taskName, workflowId, e);
 
             throw new ExecutionException(
-                "Failed to update workflow: " + e.getMessage(), e, ScriptToolErrorType.UPDATE_SCRIPT);
+                "Failed to update workflow: " + e.getMessage(), e, ProjectWorkflowErrorType.UPDATE_SCRIPT);
         }
     }
 
