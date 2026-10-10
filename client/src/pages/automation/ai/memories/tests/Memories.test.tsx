@@ -271,6 +271,45 @@ describe('Memories page', () => {
         expect(screen.getByRole('heading', {level: 2, name: /alice profile/i})).toBeInTheDocument();
     });
 
+    it('opens the detail dialog when the row is clicked', async () => {
+        const memories = [makeMemory({id: 1, title: 'Alice profile'})];
+
+        mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: memories}));
+
+        wrap(<Memories />);
+
+        await userEvent.click(screen.getByRole('row', {name: /alice profile/i}));
+
+        expect(screen.getByRole('heading', {level: 2, name: /alice profile/i})).toBeInTheDocument();
+    });
+
+    it('opens the detail dialog when the focused row is activated with the keyboard', async () => {
+        const memories = [makeMemory({id: 1, title: 'Alice profile'})];
+
+        mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: memories}));
+
+        wrap(<Memories />);
+
+        screen.getByRole('row', {name: /alice profile/i}).focus();
+
+        await userEvent.keyboard('{Enter}');
+
+        expect(screen.getByRole('heading', {level: 2, name: /alice profile/i})).toBeInTheDocument();
+    });
+
+    it('opens the row actions menu without the detail dialog', async () => {
+        const memories = [makeMemory({id: 1, title: 'Alice profile'})];
+
+        mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: memories}));
+
+        wrap(<Memories />);
+
+        await openRowMenu('Alice profile');
+
+        expect(await screen.findByRole('menuitem', {name: /view/i})).toBeInTheDocument();
+        expect(screen.queryByRole('heading', {level: 2, name: /alice profile/i})).toBeNull();
+    });
+
     it('opens the edit dialog when Edit is clicked', async () => {
         const memories = [makeMemory({id: 1, title: 'Alice profile'})];
 

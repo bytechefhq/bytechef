@@ -92,7 +92,18 @@ const MemoriesTableRow = ({memory, mutable, onDelete, onEdit, onView}: MemoriesT
     const relativeTime = useMemo(() => formatRelative(memory.updatedAt), [memory.updatedAt]);
 
     return (
-        <tr className="border-b last:border-0 hover:bg-muted/40">
+        <tr
+            className="cursor-pointer border-b last:border-0 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none"
+            onClick={() => onView(memory)}
+            onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+
+                    onView(memory);
+                }
+            }}
+            tabIndex={0}
+        >
             <td className="px-4 py-2">
                 <div className="flex flex-col">
                     <span className="text-sm font-medium">{memory.title}</span>
@@ -122,7 +133,7 @@ const MemoriesTableRow = ({memory, mutable, onDelete, onEdit, onView}: MemoriesT
                         />
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="p-0">
+                    <DropdownMenuContent align="end" className="p-0" onClick={(event) => event.stopPropagation()}>
                         <DropdownMenuItem className="dropdown-menu-item" onClick={() => onView(memory)}>
                             <EyeIcon /> View
                         </DropdownMenuItem>
