@@ -19,6 +19,7 @@ package com.bytechef.component.ai.agent.action;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -91,6 +92,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
+import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -262,7 +265,9 @@ class AiAgentChatActionIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(Objects.requireNonNull(completedJob.getOutputs()));
 
-        assertThat(outputs.get("answer")).isEqualTo(FINAL_ANSWER);
+        assertThat(outputs)
+            .extractingByKey("answer")
+            .isEqualTo(FINAL_ANSWER);
 
         List<Prompt> prompts = scriptedChatModel.getPrompts();
 
@@ -282,8 +287,10 @@ class AiAgentChatActionIntTest {
 
         Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(getJobResumeId(suspendedJob));
 
-        assertThat(approvalForm.get("formTitle")).isEqualTo("Approve the refund of order 42");
-        assertThat(approvalForm).doesNotContainKey("userPrompt");
+        assertThat(approvalForm)
+            .doesNotContainKey("userPrompt")
+            .extractingByKey("formTitle")
+            .isEqualTo("Approve the refund of order 42");
     }
 
     @Test
@@ -300,7 +307,9 @@ class AiAgentChatActionIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(Objects.requireNonNull(completedJob.getOutputs()));
 
-        assertThat(outputs.get("answer")).isEqualTo(FINAL_ANSWER);
+        assertThat(outputs)
+            .extractingByKey("answer")
+            .isEqualTo(FINAL_ANSWER);
 
         List<Prompt> prompts = scriptedChatModel.getPrompts();
 
@@ -322,7 +331,9 @@ class AiAgentChatActionIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(Objects.requireNonNull(completedJob.getOutputs()));
 
-        assertThat(outputs.get("answer")).isEqualTo(FINAL_ANSWER);
+        assertThat(outputs)
+            .extractingByKey("answer")
+            .isEqualTo(FINAL_ANSWER);
         assertThat(getApprovalToolResponse(scriptedChatModel.getPrompts()
             .get(1))).contains("NO_RESPONSE");
         assertThat(taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(suspendedJob.getId())))
@@ -384,7 +395,7 @@ class AiAgentChatActionIntTest {
         Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(QUESTION_WORKFLOW_ID, Map.of()), false);
 
         assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
-        assertThat(suspendedJob.getMetadata(MetadataConstants.STREAMING_RESUME)).isEqualTo(true);
+        assertThat((Boolean) suspendedJob.getMetadata(MetadataConstants.STREAMING_RESUME)).isTrue();
 
         String jobResumeId = getJobResumeId(suspendedJob);
         List<Long> registeredJobIds = new CopyOnWriteArrayList<>();
@@ -399,7 +410,9 @@ class AiAgentChatActionIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(Objects.requireNonNull(completedJob.getOutputs()));
 
-        assertThat(outputs.get("answer")).isEqualTo(FINAL_ANSWER);
+        assertThat(outputs)
+            .extractingByKey("answer")
+            .isEqualTo(FINAL_ANSWER);
         assertThat(getApprovalToolResponse(scriptedChatModel.getPrompts()
             .get(1))).contains("Blue");
 
@@ -433,42 +446,38 @@ class AiAgentChatActionIntTest {
     }
 
     private Job awaitJobStatus(long jobId, Job.Status status) {
-        Instant deadline = Instant.now()
-            .plus(Duration.ofSeconds(20));
+        AtomicReference<Job> jobReference = new AtomicReference<>();
 
-        while (Instant.now()
-            .isBefore(deadline)) {
+        try {
+            await()
+                .atMost(Duration.ofSeconds(20))
+                .pollInterval(Duration.ofMillis(50))
+                .pollInSameThread()
+                .until(() -> {
+                    Job job = jobService.getJob(jobId);
 
+                    assertThat(job.getStatus()).isNotEqualTo(Job.Status.FAILED);
+
+                    jobReference.set(job);
+
+                    return job.getStatus() == status && (status != Job.Status.COMPLETED || job.getOutputs() != null);
+                });
+
+            return jobReference.get();
+        } catch (ConditionTimeoutException conditionTimeoutException) {
             Job job = jobService.getJob(jobId);
 
-            if (job.getStatus() == status && (status != Job.Status.COMPLETED || job.getOutputs() != null)) {
-                return job;
-            }
-
-            assertThat(job.getStatus()).isNotEqualTo(Job.Status.FAILED);
-
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException interruptedException) {
-                Thread currentThread = Thread.currentThread();
-
-                currentThread.interrupt();
-
-                throw new IllegalStateException(interruptedException);
-            }
+            throw new AssertionError(
+                "Job " + jobId + " did not reach status " + status + "; status=" + job.getStatus() + ", metadata=" +
+                    job.getMetadata() + ", taskExecutions=" + taskExecutionService.getJobTaskExecutions(jobId)
+                        .stream()
+                        .map(taskExecution -> taskExecution.getStatus() + "/" + taskExecution.getMetadata())
+                        .toList()
+                    +
+                    ", modelCalls=" + scriptedChatModel.getPrompts()
+                        .size(),
+                conditionTimeoutException);
         }
-
-        Job job = jobService.getJob(jobId);
-
-        throw new AssertionError(
-            "Job " + jobId + " did not reach status " + status + "; status=" + job.getStatus() + ", metadata=" +
-                job.getMetadata() + ", taskExecutions=" + taskExecutionService.getJobTaskExecutions(jobId)
-                    .stream()
-                    .map(taskExecution -> taskExecution.getStatus() + "/" + taskExecution.getMetadata())
-                    .toList()
-                +
-                ", modelCalls=" + scriptedChatModel.getPrompts()
-                    .size());
     }
 
     private void clearTransientStateLikeADatabaseReload(long taskExecutionId) {
