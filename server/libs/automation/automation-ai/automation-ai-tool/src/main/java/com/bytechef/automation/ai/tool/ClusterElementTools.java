@@ -47,16 +47,13 @@ public class ClusterElementTools {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
-    private final ScopedProjectGuard scopedProjectGuard;
 
     @SuppressFBWarnings("EI")
     public ClusterElementTools(
-        ComponentDefinitionService componentDefinitionService, ProjectWorkflowFacade projectWorkflowFacade,
-        ScopedProjectGuard scopedProjectGuard) {
+        ComponentDefinitionService componentDefinitionService, ProjectWorkflowFacade projectWorkflowFacade) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.projectWorkflowFacade = projectWorkflowFacade;
-        this.scopedProjectGuard = scopedProjectGuard;
     }
 
     @Tool(
@@ -68,11 +65,7 @@ public class ClusterElementTools {
         @ToolParam(
             description = "A JSON object containing the root-level properties to set, e.g. " +
                 "{\"label\": \"My Workflow\", \"description\": \"Does X\"}") String rootPropertiesDefinition,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
-
-        scopedProjectGuard.checkWorkflow(workflowId, workspaceId, toolContext,
-            ScriptToolErrorType.UPDATE_WORKFLOW_ROOT);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
@@ -118,10 +111,7 @@ public class ClusterElementTools {
         @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(description = "The name of the task whose clusterElements should be updated") String taskName,
         @ToolParam(description = "The cluster elements definition as a JSON string") String clusterElementsDefinition,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
-
-        scopedProjectGuard.checkWorkflow(workflowId, workspaceId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);

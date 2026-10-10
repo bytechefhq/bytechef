@@ -22,10 +22,10 @@ import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.SkillsTools;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
 import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -54,8 +54,8 @@ public class ToolCallbackContributorConfiguration {
 
     @Bean
     McpServerToolCallbackContributor copilotAgentToolCallbackContributor(
-        ObjectProvider<SkillsTools> skillsToolsProvider,
-        IntelligentToolCatalog intelligentToolCatalog, WorkspaceScopeResolver workspaceScopeResolver) {
+        ObjectProvider<SkillsTools> skillsToolsProvider, IntelligentToolCatalog intelligentToolCatalog,
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
@@ -66,8 +66,8 @@ public class ToolCallbackContributorConfiguration {
             toolCallbacks.addAll(
                 intelligentToolCatalog.getByNames(
                     INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, (chatClient, definition) -> chatClient,
-                    (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
-                        toolCallback, workspaceScopeResolver)));
+                    (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(toolCallback,
+                        workspaceFacade)));
 
             return toolCallbacks;
         };
@@ -76,7 +76,7 @@ public class ToolCallbackContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor mcpServerCrudMcpContributor(
         ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             McpServerToolCallbacksFactory mcpServerToolCallbacksFactory = mcpServerToolCallbacksFactoryProvider
@@ -98,7 +98,7 @@ public class ToolCallbackContributorConfiguration {
 
                 toolCallbacks.add(
                     WORKSPACE_SCOPED_MCP_TOOL_NAMES.contains(name)
-                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceScopeResolver)
+                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade)
                         : toolCallback);
             }
 
@@ -109,7 +109,7 @@ public class ToolCallbackContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor deploymentFlatCrudMcpContributor(
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             DeploymentToolCallbacksFactory deploymentToolCallbacksFactory = deploymentToolCallbacksFactoryProvider
@@ -127,7 +127,7 @@ public class ToolCallbackContributorConfiguration {
 
                 toolCallbacks.add(
                     WORKSPACE_SCOPED_DEPLOYMENT_TOOL_NAMES.contains(name)
-                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceScopeResolver)
+                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade)
                         : toolCallback);
             }
 
@@ -138,7 +138,7 @@ public class ToolCallbackContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor knowledgeBaseFlatCrudMcpContributor(
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory =
@@ -152,7 +152,7 @@ public class ToolCallbackContributorConfiguration {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
 
             for (ToolCallback toolCallback : knowledgeBaseToolCallbacksFactory.writeToolCallbacks()) {
-                toolCallbacks.add(new WorkspaceScopedFlatToolCallback(toolCallback, workspaceScopeResolver));
+                toolCallbacks.add(new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade));
             }
 
             return toolCallbacks;

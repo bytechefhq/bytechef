@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -42,24 +43,24 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
                     },
                     "workspaceId": {
                         "type": "integer",
-                        "description": "Target workspace id. Optional when the account has exactly one workspace; otherwise required — an error response lists the candidates."
+                        "description": "Target workspace id. Optional inside a Copilot chat, which defaults to the chat's workspace; otherwise required - call listWorkspaces to find it."
                     },
                     "environment": {
                         "type": "string",
-                        "description": "Target environment: DEVELOPMENT, STAGING, or PRODUCTION. Optional — defaults to DEVELOPMENT when omitted."
+                        "description": "Target environment: DEVELOPMENT, STAGING, or PRODUCTION. Optional - defaults to the chat's environment, or DEVELOPMENT."
                     }
                 },
                 "required": ["request"]
             }""";
 
     private final ToolCallback delegate;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
+    private final WorkspaceFacade workspaceFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkspaceScopedSubAgentToolCallback(ToolCallback delegate, WorkspaceScopeResolver workspaceScopeResolver) {
+    public WorkspaceScopedSubAgentToolCallback(ToolCallback delegate, WorkspaceFacade workspaceFacade) {
         this.delegate = delegate;
-        this.workspaceScopeResolver = workspaceScopeResolver;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Override
@@ -70,8 +71,8 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
             .name(delegateToolDefinition.name())
             .description(
                 delegateToolDefinition.description() +
-                    " Supply workspaceId when the account has more than one workspace. Supply environment" +
-                    " (DEVELOPMENT, STAGING, or PRODUCTION) to target something other than DEVELOPMENT.")
+                    " Supply workspaceId outside a Copilot chat (call listWorkspaces to find it). Supply environment" +
+                    " (DEVELOPMENT, STAGING, or PRODUCTION) to target another environment.")
             .inputSchema(INPUT_SCHEMA)
             .build();
     }
@@ -92,16 +93,33 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
                 return ToolErrors.toolError(jsonMapper, "request is required and must not be blank");
             }
 
-            WorkspaceScopeResolver.WorkspaceScope workspaceScope =
-                workspaceScopeResolver.resolve(input.workspaceId(), input.environment());
+            Long workspaceId;
 
-            if (workspaceScope instanceof WorkspaceScopeResolver.Rejected rejected) {
-                return rejected.response();
+            try {
+                workspaceId = AutomationToolInvocationContext.resolveWorkspaceId(
+                    input.workspaceId(), toolContext, workspaceFacade);
+            } catch (WorkspaceNotAccessibleException exception) {
+                return ToolErrors.toolError(jsonMapper, exception.getMessage());
             }
 
-            WorkspaceScopeResolver.Resolved resolved = (WorkspaceScopeResolver.Resolved) workspaceScope;
+            if (workspaceId == null) {
+                return ToolErrors.toolError(
+                    jsonMapper, "workspaceId is required - call listWorkspaces to find the workspace id.");
+            }
 
-            Map<String, Object> forwardedContext = resolved.toForwardedContext(toolContext);
+            long environmentId;
+
+            try {
+                environmentId = AutomationToolInvocationContext.resolveEnvironmentId(
+                    input.environment(), toolContext);
+            } catch (UnknownEnvironmentException exception) {
+                return ToolErrors.toolError(
+                    jsonMapper,
+                    "Unknown environment '" + input.environment() + "'. Supported: DEVELOPMENT, STAGING, PRODUCTION");
+            }
+
+            Map<String, Object> forwardedContext = AutomationToolInvocationContext.toForwardedContext(
+                toolContext, workspaceId, environmentId);
 
             String delegateInput = jsonMapper.writeValueAsString(Map.of("request", request));
 
