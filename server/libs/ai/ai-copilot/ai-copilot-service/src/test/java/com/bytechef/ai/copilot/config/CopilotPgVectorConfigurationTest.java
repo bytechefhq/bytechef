@@ -82,7 +82,7 @@ class CopilotPgVectorConfigurationTest {
     void testOllamaDocsEmbeddingModelUsesConfiguredUrl() {
         ApplicationProperties applicationProperties = mockOllamaApplicationProperties();
 
-        EmbeddingModel embeddingModel = CopilotPgVectorConfiguration.copilotDocsEmbeddingModel(applicationProperties);
+        EmbeddingModel embeddingModel = new CopilotPgVectorConfiguration().copilotEmbeddingModel(applicationProperties);
 
         float[] embedding = embeddingModel.embed("ByteChef");
 
@@ -100,7 +100,7 @@ class CopilotPgVectorConfigurationTest {
             .getOllama()
             .getApiKey()).thenReturn("secret-token");
 
-        EmbeddingModel embeddingModel = CopilotPgVectorConfiguration.copilotDocsEmbeddingModel(applicationProperties);
+        EmbeddingModel embeddingModel = new CopilotPgVectorConfiguration().copilotEmbeddingModel(applicationProperties);
 
         embeddingModel.embed("ByteChef");
 
