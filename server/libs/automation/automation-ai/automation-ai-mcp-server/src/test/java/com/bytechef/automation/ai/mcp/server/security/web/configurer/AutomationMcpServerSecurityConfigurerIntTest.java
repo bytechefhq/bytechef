@@ -77,11 +77,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.NestedTestConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -112,6 +117,7 @@ class AutomationMcpServerSecurityConfigurerIntTest {
 
         private static final String API_SECRET_KEY = String.valueOf(TenantKey.of());
         private static final String MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of());
+        private static final String NON_TENANT_BEARER_TOKEN = "not-a-tenant-key";
         private static final String OTHER_TENANT_ID = "tenantb";
         private static final String OTHER_TENANT_MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of(OTHER_TENANT_ID));
 
@@ -307,6 +313,87 @@ class AutomationMcpServerSecurityConfigurerIntTest {
                     .isUnauthorized());
 
             verifyNoInteractions(mcpServerService);
+        }
+
+        @Test
+        void testUiSessionWithNonTenantBearerTokenIsRejectedWhenAuthenticationIsRequired() throws Exception {
+            mockMcpServer(Environment.PRODUCTION);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession())
+                        .header("Authorization", "Bearer " + NON_TENANT_BEARER_TOKEN))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        @Test
+        void testUiSessionWithoutBearerTokenIsRejectedWhenAuthenticationIsRequired() throws Exception {
+            mockMcpServer(Environment.PRODUCTION);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession()))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        @Test
+        void testUiSessionWithValidApiKeySucceeds() throws Exception {
+            mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+            mockMcpServer(Environment.PRODUCTION);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession())
+                        .header("Authorization", "Bearer " + API_SECRET_KEY))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isOk());
+        }
+
+        @Test
+        void testUiSessionWithoutBearerTokenSucceedsWhenAuthenticationIsNotRequired() throws Exception {
+            mockMcpServer(Environment.PRODUCTION, PlatformType.AUTOMATION, false);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession()))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isOk());
+        }
+
+        @Test
+        void testNonTenantBearerTokenIsRejectedWhenAuthenticationIsNotRequired() throws Exception {
+            mockMcpServer(Environment.PRODUCTION, PlatformType.AUTOMATION, false);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession())
+                        .header("Authorization", "Bearer " + NON_TENANT_BEARER_TOKEN))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        private static MockHttpSession createUiSession() {
+            MockHttpSession mockHttpSession = new MockHttpSession();
+
+            mockHttpSession.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                new SecurityContextImpl(
+                    UsernamePasswordAuthenticationToken.authenticated(
+                        "admin@localhost.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))));
+
+            return mockHttpSession;
         }
 
         private void mockApiKey(PlatformType type, Environment environment) {

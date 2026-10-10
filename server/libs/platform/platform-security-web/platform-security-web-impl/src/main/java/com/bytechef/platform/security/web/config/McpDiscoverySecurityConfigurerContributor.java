@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.config;
 
+import com.bytechef.platform.security.web.mcp.McpAuthenticationEntryPoint;
 import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
 import com.bytechef.platform.security.web.mcp.oauth2.McpAuthenticationRequiredPredicate;
 import com.bytechef.platform.security.web.mcp.oauth2.McpDiscoveryAuthenticationFilter;
@@ -25,7 +26,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 /**
@@ -57,7 +57,7 @@ public class McpDiscoverySecurityConfigurerContributor implements SecurityConfig
             return (T) new DisabledMcpOAuth2ResourceServerConfigurer();
         }
 
-        AuthenticationEntryPoint authenticationEntryPoint =
+        McpAuthenticationEntryPoint mcpAuthenticationEntryPoint =
             new McpTenantProtectedResourceMetadataAuthenticationEntryPoint();
 
         McpAuthenticationRequiredPredicate mcpAuthenticationRequiredPredicate = new McpAuthenticationRequiredPredicate(
@@ -65,9 +65,9 @@ public class McpDiscoverySecurityConfigurerContributor implements SecurityConfig
                 .toList());
 
         McpDiscoveryAuthenticationFilter mcpDiscoveryAuthenticationFilter = new McpDiscoveryAuthenticationFilter(
-            RegexRequestMatcher.regexMatcher(MCP_PATH_REGEX), authenticationEntryPoint,
+            RegexRequestMatcher.regexMatcher(MCP_PATH_REGEX), mcpAuthenticationEntryPoint,
             mcpAuthenticationRequiredPredicate);
 
-        return (T) new McpDiscoverySecurityConfigurer(mcpDiscoveryAuthenticationFilter);
+        return (T) new McpDiscoverySecurityConfigurer(mcpDiscoveryAuthenticationFilter, mcpAuthenticationEntryPoint);
     }
 }

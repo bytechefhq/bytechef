@@ -13,6 +13,7 @@ dependencies {
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server")
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))

@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.config;
 
+import com.bytechef.platform.security.web.mcp.McpAuthenticationEntryPoint;
 import com.bytechef.platform.security.web.mcp.oauth2.McpDiscoveryAuthenticationFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,11 +29,21 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
 public class McpDiscoverySecurityConfigurer
     extends AbstractHttpConfigurer<McpDiscoverySecurityConfigurer, HttpSecurity> {
 
+    private final McpAuthenticationEntryPoint mcpAuthenticationEntryPoint;
     private final McpDiscoveryAuthenticationFilter mcpDiscoveryAuthenticationFilter;
 
     @SuppressFBWarnings("EI2")
-    public McpDiscoverySecurityConfigurer(McpDiscoveryAuthenticationFilter mcpDiscoveryAuthenticationFilter) {
+    public McpDiscoverySecurityConfigurer(
+        McpDiscoveryAuthenticationFilter mcpDiscoveryAuthenticationFilter,
+        McpAuthenticationEntryPoint mcpAuthenticationEntryPoint) {
+
+        this.mcpAuthenticationEntryPoint = mcpAuthenticationEntryPoint;
         this.mcpDiscoveryAuthenticationFilter = mcpDiscoveryAuthenticationFilter;
+    }
+
+    @Override
+    public void init(HttpSecurity http) {
+        http.setSharedObject(McpAuthenticationEntryPoint.class, mcpAuthenticationEntryPoint);
     }
 
     @Override
