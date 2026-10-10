@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.automation.ai.mcp.config.McpIntTestWorkflows;
 import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
@@ -75,6 +76,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -307,12 +309,21 @@ class McpProjectFacadeIntTest {
 
         assertThat(mcpProjectWorkflowsBefore).hasSize(2);
 
+        when(
+            principalJobService.getJobIds(
+                eq(Job.Status.STARTED), any(), any(), any(), eq(PlatformType.AUTOMATION), any(), eq(false), eq(0)))
+                    .thenReturn(Page.empty());
+
         mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of(workflowId1));
 
         List<McpProjectWorkflow> mcpProjectWorkflowsAfter =
             mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
 
         assertThat(mcpProjectWorkflowsAfter).hasSize(1);
+
+        verify(principalJobService).getJobIds(
+            eq(Job.Status.STARTED), any(), any(), eq(List.of(mcpProject.getProjectDeploymentId())),
+            eq(PlatformType.AUTOMATION), eq(List.of(workflowId2)), eq(false), eq(0));
     }
 
     @Test
