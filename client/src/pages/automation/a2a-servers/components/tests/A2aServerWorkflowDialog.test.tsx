@@ -223,7 +223,14 @@ describe('A2aServerWorkflowDialog', () => {
     it('pre-fills the selection in edit mode and updates the existing A2A project', async () => {
         const user = userEvent.setup();
 
-        renderDialog({id: '11', projectId: '5', projectVersion: 2, workflowIds: ['workflow-a']});
+        renderDialog({
+            id: '11',
+            lastModifiedDate: null,
+            projectDeploymentId: '31',
+            projectId: '5',
+            projectVersion: 2,
+            workflowIds: ['workflow-a'],
+        });
 
         expect(screen.getByDisplayValue('Sales project')).toBeDisabled();
         expect(screen.getByDisplayValue('v2')).toBeDisabled();
