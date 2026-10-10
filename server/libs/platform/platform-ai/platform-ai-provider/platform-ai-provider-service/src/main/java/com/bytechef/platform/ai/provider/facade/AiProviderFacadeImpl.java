@@ -30,6 +30,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.connection.aiprovider.AiProviderConnectionSource;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -39,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +53,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AiProviderFacadeImpl implements AiProviderFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(AiProviderFacadeImpl.class);
+
+    private final AiProviderConnectionSource aiProviderConnectionSource;
     private final ComponentDefinitionService componentDefinitionService;
     private final OllamaModelClient ollamaModelClient;
     private final PropertyService propertyService;
@@ -57,9 +63,11 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
     @SuppressFBWarnings("EI")
     public AiProviderFacadeImpl(
+        AiProviderConnectionSource aiProviderConnectionSource,
         ComponentDefinitionService componentDefinitionService, OllamaModelClient ollamaModelClient,
         PropertyService propertyService, ApplicationProperties applicationProperties) {
 
+        this.aiProviderConnectionSource = aiProviderConnectionSource;
         this.componentDefinitionService = componentDefinitionService;
         this.ollamaModelClient = ollamaModelClient;
         this.propertyService = propertyService;
@@ -108,16 +116,20 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                     .findFirst()
                     .orElse(null);
 
-                boolean enabled =
-                    property != null ? property.isEnabled() : isConfiguredInApplicationProperties(provider);
+                boolean enabled = aiProviderConnectionSource.getSupportedProviders()
+                    .contains(provider)
+                        ? aiProviderConnectionSource.isEnabled(provider, environment)
+                        : ((property != null && property.isEnabled()) || isConfiguredInApplicationProperties(provider));
+
+                ComponentDefinition fullComponentDefinition = resolveFullComponentDefinition(componentDefinition);
 
                 List<AiProviderCatalogItemDTO.Model> models = enabled && provider == Provider.OLLAMA
-                    ? readOllamaChatModels(componentDefinition, environment)
-                    : readChatModels(componentDefinition);
+                    ? readOllamaChatModels(fullComponentDefinition, environment)
+                    : labelModels(readChatModels(fullComponentDefinition));
 
                 return new AiProviderCatalogItemDTO(
-                    provider.getKey(), provider.getLabel(), componentDefinition.getIcon(), enabled,
-                    models.isEmpty(), models);
+                    provider.getKey(), provider.getLabel(), componentDefinition.getIcon(),
+                    enabled && fullComponentDefinition != null, models.isEmpty(), models);
             })
             .filter(Objects::nonNull)
             .toList();
@@ -331,13 +343,44 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .equalsIgnoreCase(docsProvider.name());
     }
 
-    private static List<AiProviderCatalogItemDTO.Model> readChatModels(ComponentDefinition componentDefinition) {
+    private @Nullable ComponentDefinition resolveFullComponentDefinition(ComponentDefinition componentDefinition) {
+        try {
+            return componentDefinitionService.getComponentDefinition(
+                componentDefinition.getName(), componentDefinition.getVersion());
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to load the full component definition for '{}' v{}; serving the provider as not enabled",
+                componentDefinition.getName(), componentDefinition.getVersion(), exception);
+
+            return null;
+        }
+    }
+
+    private static List<AiProviderCatalogItemDTO.Model> readChatModels(
+        @Nullable ComponentDefinition componentDefinition) {
+
+        if (componentDefinition == null) {
+            return List.of();
+        }
+
         return componentDefinition.getActions()
             .stream()
             .filter(actionDefinition -> "ask".equals(actionDefinition.getName()))
             .findFirst()
             .map(AiProviderFacadeImpl::extractModelOptions)
             .orElse(List.of());
+    }
+
+    private static List<AiProviderCatalogItemDTO.Model> labelModels(List<AiProviderCatalogItemDTO.Model> models) {
+        return models.stream()
+            .map(model -> new AiProviderCatalogItemDTO.Model(model.name(), resolveLabel(model)))
+            .toList();
+    }
+
+    private static String resolveLabel(AiProviderCatalogItemDTO.Model model) {
+        String label = model.label();
+
+        return label != null && !label.isBlank() ? label : model.name();
     }
 
     private List<AiProviderCatalogItemDTO.Model> readOllamaChatModels(
@@ -347,7 +390,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             resolveUrl(Provider.OLLAMA, environment), resolveApiKey(Provider.OLLAMA, environment));
 
         if (installedModels.isEmpty()) {
-            return readChatModels(componentDefinition);
+            return labelModels(readChatModels(componentDefinition));
         }
 
         return installedModels.stream()
