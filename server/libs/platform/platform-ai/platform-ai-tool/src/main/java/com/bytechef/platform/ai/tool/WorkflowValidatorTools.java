@@ -17,10 +17,10 @@
 package com.bytechef.platform.ai.tool;
 
 import com.bytechef.exception.ExecutionException;
-import com.bytechef.platform.ai.tool.exception.WorkflowValidatorToolErrorType;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
+import com.bytechef.platform.workflow.validator.exception.WorkflowValidatorErrorType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -93,7 +93,7 @@ public class WorkflowValidatorTools {
             log.error("validateWorkflow(): Failed to validate workflow", e);
 
             throw new ExecutionException(
-                "Failed to validate workflow", e, WorkflowValidatorToolErrorType.VALIDATE_WORKFLOW);
+                "Failed to validate workflow", e, WorkflowValidatorErrorType.VALIDATE_WORKFLOW);
         }
     }
 
