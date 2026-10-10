@@ -243,6 +243,26 @@ public class WorkspaceMcpServerFacadeIntTest {
         assertEquals(1, mcpServerRepository.count()); // Only the second server still exists
     }
 
+    @Test
+    void testUpdateWorkspaceMcpServer() {
+        McpServer createdServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
+            "Old name", PlatformType.AUTOMATION, Environment.DEVELOPMENT, false, null, testWorkspaceId);
+
+        McpServer updatedServer = workspaceMcpServerFacade.updateWorkspaceMcpServer(
+            createdServer.getId(), "New name", true);
+
+        assertEquals(createdServer.getId(), updatedServer.getId());
+        assertEquals("New name", updatedServer.getName());
+        assertTrue(updatedServer.isEnabled());
+
+        McpServer persistedServer = mcpServerRepository.findById(createdServer.getId())
+            .orElseThrow();
+
+        assertEquals("New name", persistedServer.getName());
+        assertTrue(persistedServer.isEnabled());
+        assertEquals(Environment.DEVELOPMENT, persistedServer.getEnvironment());
+    }
+
     @Nested
     @Import({
         McpMethodSecurityTestConfiguration.class, PostgreSQLContainerConfiguration.class

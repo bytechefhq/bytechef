@@ -103,6 +103,35 @@ class ReactorContextPropagationConfigurationTest {
     }
 
     @Test
+    void testSecurityContextDoesNotPropagateWhenAutomaticPropagationDisabled() {
+        Hooks.disableAutomaticContextPropagation();
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(new TestingAuthenticationToken("admin", "n/a", "ROLE_ADMIN"));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        AtomicReference<String> threadName = new AtomicReference<>();
+        AtomicReference<Authentication> onScheduler = new AtomicReference<>();
+
+        Mono.fromCallable(() -> {
+            SecurityContext schedulerSecurityContext = SecurityContextHolder.getContext();
+
+            threadName.set(Thread.currentThread()
+                .getName());
+            onScheduler.set(schedulerSecurityContext.getAuthentication());
+
+            return true;
+        })
+            .subscribeOn(Schedulers.boundedElastic())
+            .block();
+
+        assertThat(threadName.get()).contains("boundedElastic");
+        assertThat(onScheduler.get()).isNull();
+    }
+
+    @Test
     void testTenantPropagatesAcrossBoundedElasticHop() {
         TenantContext.setCurrentTenantId("acme");
 

@@ -20,8 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -32,6 +34,7 @@ import com.bytechef.platform.mcp.config.PlatformMcpMethodSecurityTestConfigurati
 import com.bytechef.platform.mcp.config.PlatformMcpMethodSecurityTestConfiguration.TenantAdminCheck;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
@@ -56,6 +59,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = PlatformMcpIntTestConfiguration.class)
+@SuppressFBWarnings("HARD_CODE_PASSWORD")
 class McpServerServiceIntTest {
 
     @Autowired
@@ -250,7 +254,9 @@ class McpServerServiceIntTest {
         McpServer mcpServer = mcpServerService.create(
             "flags-invariant", PlatformType.AUTOMATION, Environment.PRODUCTION, true);
 
-        assertThatThrownBy(() -> mcpServerService.update(mcpServer.getId(), "flags-renamed", false, true, false))
+        long mcpServerId = mcpServer.getId();
+
+        assertThatThrownBy(() -> mcpServerService.update(mcpServerId, "flags-renamed", false, true, false))
             .isInstanceOf(IllegalArgumentException.class);
 
         McpServer loaded = mcpServerService.getMcpServer(mcpServer.getSecretKey());
@@ -279,8 +285,120 @@ class McpServerServiceIntTest {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    void testUpdateDoesNotChangeEnvironment() {
+        McpServer currentMcpServer = mcpServerRepository.save(getMcpServer());
+
+        McpServer incomingMcpServer = new McpServer("renamed", PlatformType.AUTOMATION, Environment.PRODUCTION);
+
+        incomingMcpServer.setId(currentMcpServer.getId());
+        incomingMcpServer.setVersion(currentMcpServer.getVersion());
+
+        McpServer updatedMcpServer = mcpServerService.update(incomingMcpServer);
+
+        assertThat(updatedMcpServer.getEnvironment()).isEqualTo(Environment.DEVELOPMENT);
+        assertThat(updatedMcpServer.getName()).isEqualTo("renamed");
+
+        McpServer loadedMcpServer = mcpServerRepository.findById(currentMcpServer.getId())
+            .orElseThrow();
+
+        assertThat(loadedMcpServer.getEnvironment()).isEqualTo(Environment.DEVELOPMENT);
+        assertThat(loadedMcpServer.getName()).isEqualTo("renamed");
+    }
+
+    @Test
+    void testUpdateDoesNotChangeSecretKey() {
+        McpServer currentMcpServer = mcpServerRepository.save(getMcpServer());
+
+        String currentSecretKey = currentMcpServer.getSecretKey();
+
+        McpServer incomingMcpServer = getMcpServer();
+
+        incomingMcpServer.setId(currentMcpServer.getId());
+        incomingMcpServer.setVersion(currentMcpServer.getVersion());
+        incomingMcpServer.setSecretKey("attacker-chosen-secret");
+
+        McpServer updatedMcpServer = mcpServerService.update(incomingMcpServer);
+
+        assertThat(updatedMcpServer.getSecretKey()).isEqualTo(currentSecretKey);
+        assertThat(mcpServerService.getMcpServer(currentSecretKey)
+            .getId()).isEqualTo(currentMcpServer.getId());
+        assertThatThrownBy(() -> mcpServerService.getMcpServer("attacker-chosen-secret"))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testRotateSecretKeyRejectsUnknownServer() {
+        assertThatThrownBy(() -> mcpServerService.rotateSecretKey(Long.MAX_VALUE))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(mcpServerRepository.count()).isZero();
+    }
+
     private McpServer getMcpServer() {
         return new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
+    }
+
+    @Nested
+    class Enablement {
+
+        @MockitoBean
+        private McpServerEnablementValidator mcpServerEnablementValidator;
+
+        @Test
+        void testUpdateEnabledTrueRejectsWhenValidatorThrows() {
+            McpServer mcpServer = mcpServerRepository.save(
+                new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, false));
+
+            long mcpServerId = mcpServer.getId();
+
+            RuntimeException validationFailure = new IllegalStateException(
+                "workflow 'Unmapped Workflow' has no toolName");
+
+            doThrow(validationFailure).when(mcpServerEnablementValidator)
+                .validateEnablement(mcpServerId);
+
+            assertThatThrownBy(() -> mcpServerService.update(mcpServerId, null, true))
+                .isSameAs(validationFailure)
+                .hasMessageContaining("Unmapped Workflow");
+
+            verify(mcpServerEnablementValidator).validateEnablement(mcpServerId);
+
+            McpServer loadedMcpServer = mcpServerRepository.findById(mcpServerId)
+                .orElseThrow();
+
+            assertThat(loadedMcpServer.isEnabled()).isFalse();
+            assertThat(loadedMcpServer.getVersion()).isEqualTo(mcpServer.getVersion());
+        }
+
+        @Test
+        void testUpdateEnabledTrueSucceedsWhenValidatorPasses() {
+            McpServer mcpServer = mcpServerRepository.save(
+                new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, false));
+
+            McpServer updatedMcpServer = mcpServerService.update(mcpServer.getId(), null, true);
+
+            assertThat(updatedMcpServer.isEnabled()).isTrue();
+
+            verify(mcpServerEnablementValidator).validateEnablement(mcpServer.getId());
+
+            McpServer loadedMcpServer = mcpServerRepository.findById(mcpServer.getId())
+                .orElseThrow();
+
+            assertThat(loadedMcpServer.isEnabled()).isTrue();
+        }
+
+        @Test
+        void testUpdateEnabledFalseNeverValidates() {
+            McpServer mcpServer = mcpServerRepository.save(
+                new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true));
+
+            McpServer updatedMcpServer = mcpServerService.update(mcpServer.getId(), null, false);
+
+            assertThat(updatedMcpServer.isEnabled()).isFalse();
+
+            verifyNoInteractions(mcpServerEnablementValidator);
+        }
     }
 
     @Nested
