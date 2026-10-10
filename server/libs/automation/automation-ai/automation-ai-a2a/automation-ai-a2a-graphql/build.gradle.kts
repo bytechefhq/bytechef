@@ -19,4 +19,5 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:core:graphql:graphql-impl"))
+    testImplementation(project(":server:libs:test:test-int-support"))
 }

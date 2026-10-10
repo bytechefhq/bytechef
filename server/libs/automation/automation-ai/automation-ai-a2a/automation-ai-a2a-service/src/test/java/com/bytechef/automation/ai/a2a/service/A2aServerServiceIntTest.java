@@ -35,6 +35,8 @@ import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.repository.A2aServerRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Optional;
@@ -171,9 +173,54 @@ class A2aServerServiceIntTest {
         @Autowired
         private A2aServerService a2aServerService;
 
+        @Autowired
+        private TagRepository tagRepository;
+
         @AfterEach
         void afterEach() {
             a2aServerRepository.deleteAll();
+            tagRepository.deleteAll();
+        }
+
+        @Test
+        void testUpdateTagsReplacesTheTagsOfTheServer() {
+            A2aServer a2aServer = a2aServerService.create(new A2aServer("agent", null, Environment.DEVELOPMENT));
+
+            Tag salesTag = tagRepository.save(new Tag("sales"));
+            Tag supportTag = tagRepository.save(new Tag("support"));
+
+            a2aServerService.updateTags(a2aServer.getId(), List.of(salesTag.getId(), supportTag.getId()));
+
+            assertThat(a2aServerRepository.findById(a2aServer.getId())
+                .orElseThrow()
+                .getTagIds()).containsExactlyInAnyOrder(salesTag.getId(), supportTag.getId());
+
+            a2aServerService.updateTags(a2aServer.getId(), List.of(supportTag.getId()));
+
+            assertThat(a2aServerRepository.findById(a2aServer.getId())
+                .orElseThrow()
+                .getTagIds()).containsExactly(supportTag.getId());
+        }
+
+        @Test
+        void testUpdateKeepsTheTags() {
+            A2aServer currentA2aServer = a2aServerService.create(
+                new A2aServer("agent", null, Environment.DEVELOPMENT));
+
+            Tag salesTag = tagRepository.save(new Tag("sales"));
+
+            currentA2aServer = a2aServerService.updateTags(currentA2aServer.getId(), List.of(salesTag.getId()));
+
+            A2aServer incomingA2aServer = new A2aServer("agent2", null, Environment.DEVELOPMENT);
+
+            incomingA2aServer.setId(currentA2aServer.getId());
+            incomingA2aServer.setVersion(currentA2aServer.getVersion());
+
+            a2aServerService.update(incomingA2aServer);
+
+            assertThat(a2aServerRepository.findById(currentA2aServer.getId())
+                .orElseThrow()
+                .getTagIds()).containsExactly(salesTag.getId());
         }
 
         @Test

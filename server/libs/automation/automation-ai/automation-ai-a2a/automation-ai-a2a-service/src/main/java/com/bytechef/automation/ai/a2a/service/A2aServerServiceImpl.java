@@ -109,4 +109,15 @@ public class A2aServerServiceImpl implements A2aServerService {
 
         return a2aServerRepository.save(currentA2aServer);
     }
+
+    @Override
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public A2aServer updateTags(long id, List<Long> tagIds) {
+        A2aServer a2aServer = a2aServerRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("A2A server with id " + id + " not found"));
+
+        a2aServer.setTagIds(tagIds);
+
+        return a2aServerRepository.save(a2aServer);
+    }
 }

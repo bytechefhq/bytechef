@@ -33,5 +33,7 @@ public interface A2aProjectWorkflowService {
 
     List<A2aProjectWorkflow> getProjectDeploymentWorkflowA2aProjectWorkflows(Long projectDeploymentWorkflowId);
 
+    A2aProjectWorkflow updateEnabled(long id, boolean enabled);
+
     A2aProjectWorkflow updateSkill(long id, @Nullable String skillName, @Nullable String skillDescription);
 }

@@ -63,6 +63,17 @@ public class A2aProjectWorkflowServiceImpl implements A2aProjectWorkflowService 
 
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public A2aProjectWorkflow updateEnabled(long id, boolean enabled) {
+        A2aProjectWorkflow existingA2aProjectWorkflow = a2aProjectWorkflowRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("A2aProjectWorkflow not found with id: " + id));
+
+        existingA2aProjectWorkflow.setEnabled(enabled);
+
+        return a2aProjectWorkflowRepository.save(existingA2aProjectWorkflow);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public A2aProjectWorkflow updateSkill(long id, @Nullable String skillName, @Nullable String skillDescription) {
 
         A2aProjectWorkflow existingA2aProjectWorkflow = a2aProjectWorkflowRepository.findById(id)

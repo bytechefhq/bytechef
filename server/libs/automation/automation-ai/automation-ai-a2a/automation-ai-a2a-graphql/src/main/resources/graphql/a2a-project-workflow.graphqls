@@ -3,11 +3,13 @@ extend type Query {
 }
 
 extend type Mutation {
+    updateA2aProjectWorkflowEnabled(id: ID!, enabled: Boolean!): A2aProjectWorkflow
     updateA2aProjectWorkflowParameters(id: ID!, input: A2aProjectWorkflowParametersInput!): A2aProjectWorkflow
 }
 
 type A2aProjectWorkflow {
     id: ID!
+    enabled: Boolean!
     workflowId: String
     workflowLabel: String
     skillName: String

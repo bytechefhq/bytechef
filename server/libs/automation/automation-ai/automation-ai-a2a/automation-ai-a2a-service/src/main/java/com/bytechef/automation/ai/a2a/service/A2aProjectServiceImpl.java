@@ -66,6 +66,12 @@ public class A2aProjectServiceImpl implements A2aProjectService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<A2aProject> getA2aProjects() {
+        return a2aProjectRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<A2aProject> getA2aServerA2aProjects(long a2aServerId) {
         return a2aProjectRepository.findAllByA2aServerId(a2aServerId);
     }
