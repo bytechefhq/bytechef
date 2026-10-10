@@ -44,6 +44,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -63,9 +64,10 @@ import tools.jackson.databind.json.JsonMapper;
     "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationAutoConfiguration",
     "org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration"
 })
-@EnableConfigurationProperties(ApplicationProperties.class)
-@Import(LiquibaseConfiguration.class)
 @Configuration
+@EnableConfigurationProperties(ApplicationProperties.class)
+@EnableMethodSecurity
+@Import(LiquibaseConfiguration.class)
 public class KnowledgeBaseIntTestConfiguration {
 
     @Bean

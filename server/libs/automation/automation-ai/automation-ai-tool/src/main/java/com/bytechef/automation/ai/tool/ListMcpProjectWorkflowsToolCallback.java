@@ -17,26 +17,8 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.ai.mcp.domain.McpProject;
-import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
-import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
-import com.bytechef.automation.ai.mcp.service.McpProjectService;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
-import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
-import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.ai.tool.constant.ToolConstants;
-import com.bytechef.platform.component.constant.WorkflowConstants;
-import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
@@ -70,24 +52,12 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
             "required": ["mcpServerId"]
         }""";
 
-    private final McpProjectService mcpProjectService;
-    private final McpProjectWorkflowService mcpProjectWorkflowService;
-    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
-    private final WorkflowService workflowService;
-    private final WorkspaceMcpServerFacade workspaceMcpServerFacade;
+    private final McpProjectWorkflowFacade mcpProjectWorkflowFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ListMcpProjectWorkflowsToolCallback(
-        McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService,
-        WorkspaceMcpServerFacade workspaceMcpServerFacade) {
-
-        this.mcpProjectService = mcpProjectService;
-        this.mcpProjectWorkflowService = mcpProjectWorkflowService;
-        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
-        this.workflowService = workflowService;
-        this.workspaceMcpServerFacade = workspaceMcpServerFacade;
+    public ListMcpProjectWorkflowsToolCallback(McpProjectWorkflowFacade mcpProjectWorkflowFacade) {
+        this.mcpProjectWorkflowFacade = mcpProjectWorkflowFacade;
     }
 
     @Override
@@ -115,31 +85,7 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
                 return ToolErrors.toolError(jsonMapper, "mcpServerId is required");
             }
 
-            AutomationToolInvocationContext context = AutomationToolInvocationContext.fromToolContext(toolContext);
-
-            Long workspaceId = context == null ? null : context.workspaceId();
-
-            if (workspaceId == null) {
-                return ToolErrors.toolError(
-                    jsonMapper, "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
-            }
-
-            if (!isWorkspaceMcpServer(workspaceId, mcpServerId)) {
-                return ToolErrors.toolError(
-                    jsonMapper, "MCP server " + mcpServerId + " not found in the current workspace");
-            }
-
-            List<McpProjectWorkflowSummary> summaries = new ArrayList<>();
-
-            for (McpProject mcpProject : mcpProjectService.getMcpServerMcpProjects(mcpServerId)) {
-                for (McpProjectWorkflow mcpProjectWorkflow : mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(
-                    mcpProject.getId())) {
-
-                    summaries.add(toSummary(mcpProject, mcpProjectWorkflow));
-                }
-            }
-
-            return jsonMapper.writeValueAsString(summaries);
+            return jsonMapper.writeValueAsString(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(mcpServerId));
         } catch (JacksonException exception) {
             return ToolErrors.toolError(jsonMapper, "Invalid tool input: " + exception.getMessage());
         } catch (IllegalArgumentException exception) {
@@ -150,56 +96,6 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
         }
     }
 
-    private boolean isWorkspaceMcpServer(long workspaceId, long mcpServerId) {
-        List<McpServer> workspaceMcpServers = workspaceMcpServerFacade.getWorkspaceMcpServers(workspaceId);
-
-        return workspaceMcpServers.stream()
-            .anyMatch(mcpServer -> Objects.equals(mcpServer.getId(), mcpServerId));
-    }
-
-    private McpProjectWorkflowSummary toSummary(McpProject mcpProject, McpProjectWorkflow mcpProjectWorkflow) {
-        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
-            .getProjectDeploymentWorkflow(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
-
-        Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
-
-        WorkflowTrigger callableTrigger = getMcpToolCallableTrigger(workflow);
-
-        String inputSchema = callableTrigger == null
-            ? null
-            : MapUtils.getString(callableTrigger.getParameters(), WorkflowConstants.INPUT_SCHEMA);
-
-        Map<String, ?> parameters = mcpProjectWorkflow.getParameters();
-
-        return new McpProjectWorkflowSummary(
-            mcpProject.getId(), mcpProjectWorkflow.getId(), workflow.getId(), workflow.getLabel(),
-            callableTrigger != null, MapUtils.getString(parameters, ToolConstants.TOOL_NAME),
-            MapUtils.getString(parameters, ToolConstants.TOOL_DESCRIPTION), parameters, inputSchema);
-    }
-
-    private static @Nullable WorkflowTrigger getMcpToolCallableTrigger(Workflow workflow) {
-        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-            if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), WorkflowConstants.NEW_WORKFLOW_CALL)) {
-
-                return workflowTrigger;
-            }
-        }
-
-        return null;
-    }
-
     public record ListMcpProjectWorkflowsInput(@Nullable Long mcpServerId) {
-    }
-
-    @SuppressFBWarnings({
-        "EI_EXPOSE_REP", "EI_EXPOSE_REP2"
-    })
-    public record McpProjectWorkflowSummary(
-        Long mcpProjectId, Long mcpProjectWorkflowId, String workflowId, @Nullable String workflowLabel,
-        boolean toolCallable, @Nullable String toolName, @Nullable String toolDescription,
-        Map<String, ?> parameters, @Nullable String inputSchema) {
     }
 }
