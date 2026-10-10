@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +29,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvent;
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditPublisher;
 import com.bytechef.automation.ai.mcp.config.McpIntTestWorkflows;
 import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
@@ -44,11 +47,13 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -74,6 +79,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -81,6 +87,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @author Ivica Cardic
@@ -103,6 +110,9 @@ class McpProjectFacadeIntTest {
     @Autowired
     private JobFacade jobFacade;
 
+    @MockitoSpyBean
+    private McpProjectAuditPublisher mcpProjectAuditPublisher;
+
     @Autowired
     private McpProjectFacade mcpProjectFacade;
 
@@ -121,11 +131,17 @@ class McpProjectFacadeIntTest {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @MockitoSpyBean
+    private ProjectDeploymentFacade projectDeploymentFacade;
+
     @Autowired
     private ProjectDeploymentRepository projectDeploymentRepository;
 
     @Autowired
     private ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository;
+
+    @MockitoSpyBean
+    private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
@@ -368,6 +384,35 @@ class McpProjectFacadeIntTest {
     }
 
     @Test
+    void testUpdateMcpProjectDisablesARemovedWorkflowBeforeDeletingIt() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+        long projectDeploymentId = mcpProject.getProjectDeploymentId();
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        when(
+            principalJobService.getJobIds(
+                eq(Job.Status.STARTED), any(), any(), any(), eq(PlatformType.AUTOMATION), any(), eq(false), eq(0)))
+                    .thenReturn(Page.empty());
+
+        mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of());
+
+        InOrder inOrder = inOrder(projectDeploymentFacade, projectDeploymentWorkflowService);
+
+        inOrder.verify(projectDeploymentFacade)
+            .enableProjectDeploymentWorkflow(projectDeploymentId, workflowId1, false);
+        inOrder.verify(projectDeploymentWorkflowService)
+            .delete(projectDeploymentWorkflow.getId());
+
+        assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId)).isEmpty();
+        assertThat(mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId())).isEmpty();
+    }
+
+    @Test
     void testUpdateMcpProjectUnchangedWorkflows() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
             mcpServer.getId(), project.getId(), 1, List.of(workflowId1, workflowId2));
@@ -499,6 +544,20 @@ class McpProjectFacadeIntTest {
         }
 
         @Test
+        void testCreateMcpProjectRejectsAProjectVersionThatDoesNotExist() {
+            long projectDeploymentCount = projectDeploymentRepository.count();
+            long mcpServerId = mcpServer.getId();
+            long projectId = project.getId();
+
+            assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 9, List.of()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Version 9 of project " + projectId + " is not published");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
+        }
+
+        @Test
         void testCreateMcpProjectAcceptsAPublishedProjectVersion() {
             McpProject mcpProject = mcpProjectFacade.createMcpProject(
                 mcpServer.getId(), project.getId(), 2, List.of(workflowId3));
@@ -580,6 +639,63 @@ class McpProjectFacadeIntTest {
         }
 
         @Test
+        void testCreateMcpProjectCopiesTheTestConfigurationConnectionOfTheServerEnvironment() {
+            String draftWorkflowId = McpIntTestWorkflows.createNewWorkflowCallWorkflow(workflowService);
+
+            try {
+                projectWorkflowRepository.save(new ProjectWorkflow(project.getId(), 3, draftWorkflowId, workflowUuid1));
+
+                McpServer productionMcpServer = saveMcpServer(
+                    "production-server", Environment.PRODUCTION, project.getWorkspaceId());
+
+                stubRequiredSlackConnection();
+                stubWorkflowTestConfiguration(draftWorkflowId, Environment.PRODUCTION, 77L);
+                stubConnection(77L, "slack", Environment.PRODUCTION);
+
+                McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                    productionMcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+                assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                    mcpProject.getProjectDeploymentId()))
+                        .singleElement()
+                        .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.getConnections())
+                            .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                            .containsExactly(77L));
+            } finally {
+                McpIntTestWorkflows.deleteWorkflows(workflowService, List.of(draftWorkflowId));
+            }
+        }
+
+        @Test
+        void testUpdateMcpProjectCopiesTheTestConfigurationConnectionOfTheDeploymentEnvironment() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            ProjectDeployment mcpProjectDeployment = projectDeploymentRepository
+                .findById(mcpProject.getProjectDeploymentId())
+                .orElseThrow();
+
+            mcpProjectDeployment.setEnvironment(Environment.STAGING);
+
+            projectDeploymentRepository.save(mcpProjectDeployment);
+
+            stubRequiredSlackConnection();
+            stubWorkflowTestConfiguration(workflowId2, Environment.STAGING, 78L);
+            stubConnection(78L, "slack", Environment.STAGING);
+
+            mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of(workflowId1, workflowId2));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                mcpProject.getProjectDeploymentId()))
+                    .filteredOn(projectDeploymentWorkflow -> workflowId2.equals(
+                        projectDeploymentWorkflow.getWorkflowId()))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.getConnections())
+                        .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                        .containsExactly(78L));
+        }
+
+        @Test
         void testCreateMcpProjectRejectsAWorkflowWithoutItsRequiredConnection() {
             stubRequiredSlackConnection();
 
@@ -591,7 +707,9 @@ class McpProjectFacadeIntTest {
             assertThatThrownBy(
                 () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("requires a slack connection");
+                    .hasMessageContaining("requires a slack connection")
+                    .hasMessageContaining(workflowId1)
+                    .hasMessageContaining(Environment.DEVELOPMENT.name());
 
             assertThat(mcpProjectRepository.count()).isZero();
             assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
@@ -739,13 +857,19 @@ class McpProjectFacadeIntTest {
         }
 
         private void stubWorkflowTestConfiguration(String testConfigurationWorkflowId, long connectionId) {
+            stubWorkflowTestConfiguration(testConfigurationWorkflowId, Environment.DEVELOPMENT, connectionId);
+        }
+
+        private void stubWorkflowTestConfiguration(
+            String testConfigurationWorkflowId, Environment environment, long connectionId) {
+
             WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration();
 
             workflowTestConfiguration.setConnections(
                 List.of(new WorkflowTestConfigurationConnection(connectionId, "slack", "newWorkflowCall_1")));
 
             when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(
-                testConfigurationWorkflowId, Environment.DEVELOPMENT.ordinal()))
+                testConfigurationWorkflowId, environment.ordinal()))
                     .thenReturn(Optional.of(workflowTestConfiguration));
         }
     }
@@ -906,6 +1030,22 @@ class McpProjectFacadeIntTest {
 
             verifySystemDeploymentCleanedUp(projectDeploymentId);
 
+            assertThat(mcpProjectRepository.findById(mcpProject.getId())).isEmpty();
+        }
+
+        @Test
+        void testDeleteMcpProjectDeletesItsSystemDeploymentThroughTheDeploymentFacade() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            long projectDeploymentId = mcpProject.getProjectDeploymentId();
+
+            mcpProjectFacade.deleteMcpProject(mcpProject.getId());
+
+            verify(projectDeploymentFacade).deleteProjectDeployment(projectDeploymentId);
+            verify(mcpProjectAuditPublisher).publish(McpProjectAuditEvent.MCP_PROJECT_DELETED, mcpProject.getId());
+
+            assertThat(projectDeploymentRepository.findById(projectDeploymentId)).isEmpty();
             assertThat(mcpProjectRepository.findById(mcpProject.getId())).isEmpty();
         }
 

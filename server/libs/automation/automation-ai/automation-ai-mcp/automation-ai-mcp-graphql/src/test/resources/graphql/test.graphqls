@@ -1,5 +1,5 @@
 # Test-only GraphQL schema for automation-mcp GraphQL slice tests.
-# Contains all types, queries, and mutations needed by the integration tests.
+# Contains the root types and the types the production schema references from other modules.
 
 # Custom scalars
 scalar Any
@@ -12,71 +12,10 @@ enum PlatformType {
     EMBEDDED
 }
 
-# Base Query type with all query fields
-type Query {
-    # WorkspaceMcpServer queries
-    workspaceMcpServers(workspaceId: ID!): [McpServer]
+# Root types extended by the production schema files in src/main/resources/graphql
+type Query
 
-    # McpProject queries
-    mcpProject(id: ID): McpProject
-    mcpProjects(workspaceId: ID!): [McpProject]
-    mcpProjectsByServerId(mcpServerId: ID): [McpProject]
-
-    # McpProjectWorkflow queries
-    mcpProjectWorkflow(id: ID): McpProjectWorkflow
-    mcpProjectWorkflowsByMcpProjectId(mcpProjectId: ID): [McpProjectWorkflow]
-    toolEligibleProjectVersionWorkflows(projectId: ID!, projectVersion: Int!): [ProjectWorkflow!]!
-    mcpProjectWorkflowProperties(mcpProjectWorkflowId: ID!): [Property]
-}
-
-# Base Mutation type with all mutation fields
-type Mutation {
-    # WorkspaceMcpServer mutations
-    createWorkspaceMcpServer(input: CreateWorkspaceMcpServerInput!): McpServer
-    deleteWorkspaceMcpServer(mcpServerId: ID!): Boolean
-    updateWorkspaceMcpToolEnabled(id: ID!, enabled: Boolean!): McpTool
-
-    # McpProject mutations
-    createMcpProject(input: CreateMcpProjectInput!): McpProject
-    deleteMcpProject(id: ID!): Boolean
-    updateMcpProject(id: ID!, input: UpdateMcpProjectInput!): McpProject
-
-    # McpProjectWorkflow mutations
-    createMcpProjectWorkflow(input: McpProjectWorkflowInput!): McpProjectWorkflow
-    updateMcpProjectWorkflow(id: ID!, input: McpProjectWorkflowUpdateInput!): McpProjectWorkflow
-    deleteMcpProjectWorkflow(id: ID!): Boolean
-}
-
-# Input types
-input CreateWorkspaceMcpServerInput {
-    name: String!
-    type: PlatformType!
-    environmentId: ID!
-    enabled: Boolean
-    workspaceId: ID!
-}
-
-input CreateMcpProjectInput {
-    mcpServerId: ID!
-    projectId: ID!
-    projectVersion: Int!
-    selectedWorkflowIds: [String!]!
-}
-
-input UpdateMcpProjectInput {
-    selectedWorkflowIds: [String!]!
-}
-
-input McpProjectWorkflowInput {
-    mcpProjectId: Long!
-    projectDeploymentWorkflowId: Long!
-}
-
-input McpProjectWorkflowUpdateInput {
-    mcpProjectId: Long
-    projectDeploymentWorkflowId: Long
-    parameters: Map
-}
+type Mutation
 
 # Main types
 type McpServer {
@@ -100,35 +39,12 @@ type McpTool {
     mcpComponentId: ID!
 }
 
-type McpProject {
-    id: ID!
-    projectDeploymentId: ID!
-    mcpServerId: ID!
-    mcpProjectWorkflows: [McpProjectWorkflow]
-    project: Project
-    projectVersion: Int
-    createdBy: String
-    createdDate: Long
-    lastModifiedBy: String
-    lastModifiedDate: Long
-    version: Int
-}
-
-type McpProjectWorkflow {
-    id: ID!
-    mcpProjectId: Long!
-    projectDeploymentWorkflowId: Long!
-    parameters: Map
-    projectDeploymentWorkflow: ProjectDeploymentWorkflow
-    workflow: Workflow
-    createdBy: String
-    createdDate: Long
-    lastModifiedBy: String
-    lastModifiedDate: Long
-    version: Int
-}
-
 # Referenced type stubs
+type Tag {
+    id: ID
+    name: String
+}
+
 type Project {
     id: ID
     name: String

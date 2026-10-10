@@ -51,7 +51,7 @@ import org.springframework.test.context.ContextConfiguration;
     controllers = McpProjectGraphQlController.class,
     properties = {
         "bytechef.coordinator.enabled=true",
-        "spring.graphql.schema.locations=classpath:graphql/"
+        "spring.graphql.schema.locations=classpath*:graphql/"
     })
 @AutomationMcpGraphQlConfigurationSharedMocks
 class McpProjectGraphQlControllerIntTest {

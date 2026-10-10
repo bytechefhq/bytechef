@@ -59,7 +59,7 @@ import org.springframework.beans.factory.ObjectProvider;
 /**
  * @author Ivica Cardic
  */
-class McpServerToolCallbackContributorConfigurationTest {
+class ToolCallbackContributorConfigurationTest {
 
     private final ToolCallbackContributorConfiguration configuration =
         new ToolCallbackContributorConfiguration();

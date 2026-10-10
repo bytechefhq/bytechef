@@ -59,10 +59,15 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 
     testRuntimeOnly("org.postgresql:postgresql")
+    testRuntimeOnly(project(":server:libs:platform:platform-category:platform-category-service"))
+    testRuntimeOnly(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testRuntimeOnly(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    testRuntimeOnly(project(":server:libs:platform:platform-user:platform-user-service"))
 }

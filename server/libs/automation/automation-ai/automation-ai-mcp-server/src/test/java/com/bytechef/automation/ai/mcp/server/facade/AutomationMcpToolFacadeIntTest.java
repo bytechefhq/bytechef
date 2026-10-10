@@ -28,6 +28,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,6 +41,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.ai.mcp.server.config.AutomationMcpServerMethodSecurityIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
@@ -80,6 +82,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -89,19 +93,24 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.execution.ToolExecutionException;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.AopTestUtils;
 
 /**
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
+@SpringBootTest(classes = AutomationMcpServerMethodSecurityIntTestConfiguration.class)
 @SuppressWarnings("unchecked")
-class AutomationMcpToolFacadeTest {
+class AutomationMcpToolFacadeIntTest {
 
     private static final String NEW_WORKFLOW_CALL_TYPE = "workflow/v1/newWorkflowCall";
 
-    private final ObjectProvider<ApprovalTokens> approvalTokensObjectProvider =
-        (ObjectProvider<ApprovalTokens>) mock(ObjectProvider.class);
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade =
         mock(ClusterElementDefinitionFacade.class);
     private final ClusterElementDefinitionService clusterElementDefinitionService =
@@ -110,10 +119,7 @@ class AutomationMcpToolFacadeTest {
     private final JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
     private final JobService jobService = mock(JobService.class);
     private final McpComponentService mcpComponentService = mock(McpComponentService.class);
-    private final McpProjectService mcpProjectService = mock(McpProjectService.class);
     private final McpProjectWorkflowService mcpProjectWorkflowService = mock(McpProjectWorkflowService.class);
-    private final McpServerService mcpServerService = mock(McpServerService.class);
-    private final McpToolService mcpToolService = mock(McpToolService.class);
     private final PrincipalJobFacade principalJobFacade = mock(PrincipalJobFacade.class);
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
         mock(ProjectDeploymentWorkflowService.class);
@@ -123,12 +129,100 @@ class AutomationMcpToolFacadeTest {
     private final WorkflowService workflowService = mock(WorkflowService.class);
     private final WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
 
-    private final AutomationMcpToolFacade facade = new AutomationMcpToolFacade(
-        approvalTokensObjectProvider, clusterElementDefinitionFacade, clusterElementDefinitionService,
-        mock(Evaluator.class), jobCompletionAwaiter, jobResumeFacade, jobService, mcpComponentService,
-        mcpProjectService, mcpProjectWorkflowService, mcpServerService, mcpToolService, principalJobFacade,
-        projectDeploymentWorkflowService, "https://example.com", taskExecutionService, taskFileStorage,
-        toolExecutionRecorder, workflowService, workspaceMcpServerService);
+    @Autowired
+    private McpProjectService mcpProjectService;
+
+    @Autowired
+    private McpServerService mcpServerService;
+
+    @Autowired
+    private McpToolService mcpToolService;
+
+    private AutomationMcpToolFacade facade;
+    private McpProjectService mcpProjectServiceTarget;
+    private McpServerService mcpServerServiceTarget;
+    private McpToolService mcpToolServiceTarget;
+
+    @BeforeEach
+    void beforeEach() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        mcpProjectServiceTarget = AopTestUtils.getUltimateTargetObject(mcpProjectService);
+        mcpServerServiceTarget = AopTestUtils.getUltimateTargetObject(mcpServerService);
+        mcpToolServiceTarget = AopTestUtils.getUltimateTargetObject(mcpToolService);
+
+        reset(mcpProjectServiceTarget, mcpServerServiceTarget, mcpToolServiceTarget);
+
+        facade = new AutomationMcpToolFacade(
+            (ObjectProvider<ApprovalTokens>) mock(ObjectProvider.class), clusterElementDefinitionFacade,
+            clusterElementDefinitionService, mock(Evaluator.class), jobCompletionAwaiter, jobResumeFacade,
+            jobService, mcpComponentService, mcpProjectService, mcpProjectWorkflowService, mcpServerService,
+            mcpToolService, principalJobFacade, projectDeploymentWorkflowService, "https://example.com",
+            taskExecutionService, taskFileStorage, toolExecutionRecorder, workflowService,
+            workspaceMcpServerService);
+    }
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testMcpServerConfigurationReadsAreDeniedOutsideTheFacade() {
+        assertThatThrownBy(() -> mcpProjectService.getMcpServerMcpProjects(30L))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> mcpServerService.getMcpServer(30L))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> mcpToolService.fetchMcpTool(3L))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testJobWorkflowExposureReadsMcpServerProjectsWithoutWorkspacePermissionChecks() {
+        Job job = mock(Job.class);
+        McpProject mcpProject = mock(McpProject.class);
+        McpProjectWorkflow mcpProjectWorkflow = mock(McpProjectWorkflow.class);
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = mock(ProjectDeploymentWorkflow.class);
+
+        when(job.getWorkflowId()).thenReturn("wf1");
+        when(jobService.fetchJob(7L)).thenReturn(Optional.of(job));
+        when(mcpProject.getId()).thenReturn(10L);
+        when(mcpProjectServiceTarget.getMcpServerMcpProjects(30L)).thenReturn(List.of(mcpProject));
+        when(mcpProjectWorkflow.getProjectDeploymentWorkflowId()).thenReturn(21L);
+        when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L)).thenReturn(List.of(mcpProjectWorkflow));
+        when(projectDeploymentWorkflow.getWorkflowId()).thenReturn("wf1");
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(21L)).thenReturn(projectDeploymentWorkflow);
+
+        assertThat(facade.isJobWorkflowExposedByMcpServer(7L, 30L)).isTrue();
+        assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
+    }
+
+    @Test
+    void testJobWorkflowExposureSkipsStaleRowAndMatchesLaterRow() {
+        Job job = mock(Job.class);
+        McpProject mcpProject = mock(McpProject.class);
+        McpProjectWorkflow staleMcpProjectWorkflow = mock(McpProjectWorkflow.class);
+        McpProjectWorkflow mcpProjectWorkflow = mock(McpProjectWorkflow.class);
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = mock(ProjectDeploymentWorkflow.class);
+
+        when(job.getWorkflowId()).thenReturn("wf1");
+        when(jobService.fetchJob(11L)).thenReturn(Optional.of(job));
+        when(mcpProject.getId()).thenReturn(10L);
+        when(mcpProjectServiceTarget.getMcpServerMcpProjects(30L)).thenReturn(List.of(mcpProject));
+        when(staleMcpProjectWorkflow.getProjectDeploymentWorkflowId()).thenReturn(20L);
+        when(mcpProjectWorkflow.getProjectDeploymentWorkflowId()).thenReturn(21L);
+        when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
+            .thenReturn(List.of(staleMcpProjectWorkflow, mcpProjectWorkflow));
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(20L))
+            .thenThrow(new NoSuchElementException("No value present"));
+        when(projectDeploymentWorkflow.getWorkflowId()).thenReturn("wf1");
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(21L)).thenReturn(projectDeploymentWorkflow);
+
+        assertThat(facade.isJobWorkflowExposedByMcpServer(11L, 30L)).isTrue();
+    }
 
     @Test
     void testAwaitApprovedWorkflowRunReturnsOutputsWhenRunCompletes() {
@@ -140,6 +234,7 @@ class AutomationMcpToolFacadeTest {
         when(job.getOutputs()).thenReturn(outputs);
         when(jobService.getJob(1L)).thenReturn(job);
         when(jobCompletionAwaiter.await(anyLong(), any())).thenReturn(CompletableFuture.completedFuture(job));
+
         Map<String, ?> jobOutputs = Map.of("result", "ok");
 
         when(taskExecutionService.fetchLastJobTaskExecution(1L)).thenReturn(Optional.empty());
@@ -240,6 +335,7 @@ class AutomationMcpToolFacadeTest {
         when(job.getStatus()).thenReturn(Job.Status.COMPLETED);
         when(job.getOutputs()).thenReturn(outputs);
         when(jobResumeFacade.resumeJob("token", Map.of())).thenReturn(JobResumeOutcome.OK);
+
         Map<String, ?> jobOutputs = Map.of("done", true);
 
         when(jobService.getJob(6L)).thenReturn(job);
@@ -254,118 +350,14 @@ class AutomationMcpToolFacadeTest {
     }
 
     @Test
-    void testJobWorkflowExposureReadsMcpServerProjectsWithoutWorkspacePermissionChecks() {
-        Job job = mock(Job.class);
-        McpProject mcpProject = mock(McpProject.class);
-        McpProjectWorkflow mcpProjectWorkflow = mock(McpProjectWorkflow.class);
-        ProjectDeploymentWorkflow projectDeploymentWorkflow = mock(ProjectDeploymentWorkflow.class);
-
-        when(job.getWorkflowId()).thenReturn("wf1");
-        when(jobService.fetchJob(7L)).thenReturn(Optional.of(job));
-        when(mcpProject.getId()).thenReturn(10L);
-        when(mcpProjectService.getMcpServerMcpProjects(30L)).thenAnswer(invocation -> {
-            if (!AutomationAuthorizationContext.isSkipChecks()) {
-                throw new AccessDeniedException("Access Denied");
-            }
-
-            return List.of(mcpProject);
-        });
-        when(mcpProjectWorkflow.getProjectDeploymentWorkflowId()).thenReturn(21L);
-        when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L)).thenReturn(List.of(mcpProjectWorkflow));
-        when(projectDeploymentWorkflow.getWorkflowId()).thenReturn("wf1");
-        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(21L)).thenReturn(projectDeploymentWorkflow);
-
-        assertThat(facade.isJobWorkflowExposedByMcpServer(7L, 30L)).isTrue();
-        assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
-    }
-
-    @Test
-    void testJobWorkflowExposureSkipsStaleRowAndMatchesLaterRow() {
-        Job job = mock(Job.class);
-        McpProject mcpProject = mock(McpProject.class);
-        McpProjectWorkflow staleMcpProjectWorkflow = mock(McpProjectWorkflow.class);
-        McpProjectWorkflow mcpProjectWorkflow = mock(McpProjectWorkflow.class);
-        ProjectDeploymentWorkflow projectDeploymentWorkflow = mock(ProjectDeploymentWorkflow.class);
-
-        when(job.getWorkflowId()).thenReturn("wf1");
-        when(jobService.fetchJob(11L)).thenReturn(Optional.of(job));
-        when(mcpProject.getId()).thenReturn(10L);
-        when(mcpProjectService.getMcpServerMcpProjects(30L)).thenReturn(List.of(mcpProject));
-        when(staleMcpProjectWorkflow.getProjectDeploymentWorkflowId()).thenReturn(20L);
-        when(mcpProjectWorkflow.getProjectDeploymentWorkflowId()).thenReturn(21L);
-        when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
-            .thenReturn(List.of(staleMcpProjectWorkflow, mcpProjectWorkflow));
-        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(20L))
-            .thenThrow(new NoSuchElementException("No value present"));
-        when(projectDeploymentWorkflow.getWorkflowId()).thenReturn("wf1");
-        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(21L)).thenReturn(projectDeploymentWorkflow);
-
-        assertThat(facade.isJobWorkflowExposedByMcpServer(11L, 30L)).isTrue();
-    }
-
-    @Test
-    void testCallOfToolDisabledAfterListingIsRejected() {
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = givenListedTool();
-
-        givenEnabledMcpServer();
-
-        when(mcpToolService.fetchMcpTool(3L)).thenReturn(Optional.of(mcpTool(false)));
-
-        assertThatThrownBy(() -> functionToolCallback.call("{}"))
-            .isInstanceOf(ToolExecutionException.class)
-            .hasMessageContaining("disabled")
-            .hasCauseInstanceOf(ConfigurationException.class);
-
-        verify(clusterElementDefinitionFacade, never())
-            .executeTool(anyString(), anyInt(), anyString(), any(), any());
-    }
-
-    @Test
-    void testCallOfToolDeletedAfterListingIsRejected() {
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = givenListedTool();
-
-        givenEnabledMcpServer();
-
-        when(mcpToolService.fetchMcpTool(3L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> functionToolCallback.call("{}"))
-            .isInstanceOf(ToolExecutionException.class)
-            .hasCauseInstanceOf(ConfigurationException.class);
-
-        verify(clusterElementDefinitionFacade, never())
-            .executeTool(anyString(), anyInt(), anyString(), any(), any());
-    }
-
-    @Test
-    void testCallOfEnabledToolExecutes() {
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = givenListedTool();
-
-        givenEnabledMcpServer();
-
-        when(mcpToolService.fetchMcpTool(3L)).thenReturn(Optional.of(mcpTool(true)));
-        when(toolExecutionRecorder.record(any(), any(Supplier.class)))
-            .thenAnswer(invocation -> {
-                Supplier<Object> execution = invocation.getArgument(1);
-
-                return execution.get();
-            });
-        when(clusterElementDefinitionFacade.executeTool(eq("slack"), eq(1), eq("sendMessage"), any(), isNull()))
-            .thenReturn(Map.of("ok", true));
-
-        functionToolCallback.call("{}");
-
-        verify(clusterElementDefinitionFacade).executeTool(eq("slack"), eq(1), eq("sendMessage"), any(), isNull());
-    }
-
-    @Test
     void testCallReadsMcpServerConfigurationWithoutWorkspacePermissionChecks() {
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = givenListedTool();
 
-        McpServer mcpServer = new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
         AtomicBoolean executedSkippingChecks = new AtomicBoolean(true);
 
-        when(mcpServerService.getMcpServer(30L)).thenAnswer(invocation -> requireSkipChecks(mcpServer));
-        when(mcpToolService.fetchMcpTool(3L)).thenAnswer(invocation -> requireSkipChecks(Optional.of(mcpTool(true))));
+        givenEnabledMcpServer();
+
+        when(mcpToolServiceTarget.fetchMcpTool(3L)).thenReturn(Optional.of(mcpTool(true)));
         when(toolExecutionRecorder.record(any(), any(Supplier.class)))
             .thenAnswer(invocation -> {
                 Supplier<Object> execution = invocation.getArgument(1);
@@ -384,6 +376,39 @@ class AutomationMcpToolFacadeTest {
         verify(clusterElementDefinitionFacade).executeTool(eq("slack"), eq(1), eq("sendMessage"), any(), isNull());
         assertThat(executedSkippingChecks).isFalse();
         assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
+    }
+
+    @Test
+    void testCallOfToolDisabledAfterListingIsRejected() {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = givenListedTool();
+
+        givenEnabledMcpServer();
+
+        when(mcpToolServiceTarget.fetchMcpTool(3L)).thenReturn(Optional.of(mcpTool(false)));
+
+        assertThatThrownBy(() -> functionToolCallback.call("{}"))
+            .isInstanceOf(ToolExecutionException.class)
+            .hasMessageContaining("disabled")
+            .hasCauseInstanceOf(ConfigurationException.class);
+
+        verify(clusterElementDefinitionFacade, never())
+            .executeTool(anyString(), anyInt(), anyString(), any(), any());
+    }
+
+    @Test
+    void testCallOfToolDeletedAfterListingIsRejected() {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = givenListedTool();
+
+        givenEnabledMcpServer();
+
+        when(mcpToolServiceTarget.fetchMcpTool(3L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> functionToolCallback.call("{}"))
+            .isInstanceOf(ToolExecutionException.class)
+            .hasCauseInstanceOf(ConfigurationException.class);
+
+        verify(clusterElementDefinitionFacade, never())
+            .executeTool(anyString(), anyInt(), anyString(), any(), any());
     }
 
     // The tool name is optional, so a tool configured without one still has to reach the model under a callable
@@ -425,79 +450,6 @@ class AutomationMcpToolFacadeTest {
 
         assertThat(toolDefinition.description())
             .isEqualTo("The POST method submits an entity to the specified resource.");
-    }
-
-    private ToolDefinition getToolDefinition(Map<String, Object> parameters) {
-        McpTool mcpTool = new McpTool("post", parameters, 1L);
-
-        mcpTool.setId(4L);
-
-        McpComponent mcpComponent = new McpComponent("httpClient", 1, 1L, null);
-
-        when(mcpComponentService.getMcpComponent(1L)).thenReturn(mcpComponent);
-
-        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
-
-        when(clusterElementDefinition.getComponentName()).thenReturn("httpClient");
-        when(clusterElementDefinition.getComponentVersion()).thenReturn(1);
-        when(clusterElementDefinition.getName()).thenReturn("post");
-        when(clusterElementDefinition.getDescription())
-            .thenReturn("The POST method submits an entity to the specified resource.");
-        when(clusterElementDefinitionService.getClusterElementDefinition("httpClient", 1, "post"))
-            .thenReturn(clusterElementDefinition);
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.empty());
-
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
-            facade.getFunctionToolCallback(mcpTool);
-
-        return functionToolCallback.getToolDefinition();
-    }
-
-    private FunctionToolCallback<Map<String, Object>, Object> givenListedTool() {
-        McpTool mcpTool = mcpTool(true);
-
-        McpComponent mcpComponent = mock(McpComponent.class);
-
-        when(mcpComponent.getComponentName()).thenReturn("slack");
-        when(mcpComponent.getComponentVersion()).thenReturn(1);
-        when(mcpComponent.getMcpServerId()).thenReturn(30L);
-        when(mcpComponent.getConnectionId()).thenReturn(null);
-
-        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
-
-        when(clusterElementDefinition.getComponentName()).thenReturn("slack");
-        when(clusterElementDefinition.getComponentVersion()).thenReturn(1);
-        when(clusterElementDefinition.getName()).thenReturn("sendMessage");
-        when(clusterElementDefinition.getDescription()).thenReturn("Send a message");
-
-        when(mcpComponentService.getMcpComponent(2L)).thenReturn(mcpComponent);
-        when(clusterElementDefinitionService.getClusterElementDefinition("slack", 1, "sendMessage"))
-            .thenReturn(clusterElementDefinition);
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(30L)).thenReturn(Optional.empty());
-
-        return facade.getFunctionToolCallback(mcpTool);
-    }
-
-    private void givenEnabledMcpServer() {
-        when(mcpServerService.getMcpServer(30L)).thenReturn(
-            new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true));
-    }
-
-    private static <T> T requireSkipChecks(T value) {
-        if (!AutomationAuthorizationContext.isSkipChecks()) {
-            throw new AccessDeniedException("Access Denied");
-        }
-
-        return value;
-    }
-
-    private static McpTool mcpTool(boolean enabled) {
-        McpTool mcpTool = new McpTool("sendMessage", Map.of(), 2L);
-
-        mcpTool.setId(3L);
-        mcpTool.setEnabled(enabled);
-
-        return mcpTool;
     }
 
     @Test
@@ -551,7 +503,7 @@ class AutomationMcpToolFacadeTest {
     }
 
     @Test
-    void testCallOfWorkflowToolDisabledAfterListingIsRejected() {
+    void testCallOfWorkflowToolReadsMcpServerWithoutWorkspacePermissionChecks() {
         McpProject mcpProject = mcpProject();
 
         McpProjectWorkflow mappedMcpProjectWorkflow = mcpProjectWorkflow(
@@ -559,10 +511,48 @@ class AutomationMcpToolFacadeTest {
 
         stubCallableWorkflow(21L, "wf2");
 
+        AtomicBoolean jobCreatedSkippingChecks = new AtomicBoolean(true);
+
+        givenEnabledMcpServer();
+
         when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
             .thenReturn(List.of(mappedMcpProjectWorkflow));
-        when(mcpServerService.getMcpServer(30L)).thenReturn(
-            new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true));
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenAnswer(invocation -> {
+            jobCreatedSkippingChecks.set(AutomationAuthorizationContext.isSkipChecks());
+
+            return 5L;
+        });
+        when(toolExecutionRecorder.record(any(), any(Supplier.class))).thenReturn(Map.of("ok", true));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerMockedStatic = mockStatic(WorkflowTrigger.class);
+            MockedStatic<WorkflowNodeType> workflowNodeTypeMockedStatic = mockStatic(WorkflowNodeType.class)) {
+
+            stubNewWorkflowCallTrigger(workflowTriggerMockedStatic, workflowNodeTypeMockedStatic);
+
+            List<ToolCallback> toolCallbacks = facade.getFunctionToolCallbacks(mcpProject);
+
+            ToolCallback toolCallback = toolCallbacks.getFirst();
+
+            toolCallback.call("{}");
+
+            verify(principalJobFacade).createJob(any(), anyLong(), any());
+            assertThat(jobCreatedSkippingChecks).isFalse();
+            assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
+        }
+    }
+
+    @Test
+    void testCallOfWorkflowToolDisabledAfterListingIsRejected() {
+        McpProject mcpProject = mcpProject();
+
+        McpProjectWorkflow mappedMcpProjectWorkflow = mcpProjectWorkflow(
+            21L, Map.of("toolName", "mappedTool", "toolDescription", "A mapped tool"));
+
+        stubCallableWorkflow(21L, "wf2");
+        givenEnabledMcpServer();
+
+        when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
+            .thenReturn(List.of(mappedMcpProjectWorkflow));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerMockedStatic = mockStatic(WorkflowTrigger.class);
             MockedStatic<WorkflowNodeType> workflowNodeTypeMockedStatic = mockStatic(WorkflowNodeType.class)) {
@@ -596,11 +586,10 @@ class AutomationMcpToolFacadeTest {
             21L, Map.of("toolName", "mappedTool", "toolDescription", "A mapped tool"));
 
         stubCallableWorkflow(21L, "wf2");
+        givenEnabledMcpServer();
 
         when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
             .thenReturn(List.of(mappedMcpProjectWorkflow));
-        when(mcpServerService.getMcpServer(30L)).thenReturn(
-            new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true));
         when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
         when(toolExecutionRecorder.record(any(), any(Supplier.class))).thenReturn(Map.of("ok", true));
 
@@ -625,51 +614,6 @@ class AutomationMcpToolFacadeTest {
             assertThat(jobParametersDTO.getInputs())
                 .containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, "newWorkflowCall_1")
                 .containsKey("newWorkflowCall_1");
-        }
-    }
-
-    @Test
-    void testCallOfWorkflowToolReadsMcpServerWithoutWorkspacePermissionChecks() {
-        McpProject mcpProject = mcpProject();
-
-        McpProjectWorkflow mappedMcpProjectWorkflow = mcpProjectWorkflow(
-            21L, Map.of("toolName", "mappedTool", "toolDescription", "A mapped tool"));
-
-        stubCallableWorkflow(21L, "wf2");
-
-        McpServer mcpServer = new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
-        AtomicBoolean jobCreatedSkippingChecks = new AtomicBoolean(true);
-
-        when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
-            .thenReturn(List.of(mappedMcpProjectWorkflow));
-        when(mcpServerService.getMcpServer(30L)).thenAnswer(invocation -> {
-            if (!AutomationAuthorizationContext.isSkipChecks()) {
-                throw new AccessDeniedException("Access Denied");
-            }
-
-            return mcpServer;
-        });
-        when(principalJobFacade.createJob(any(), anyLong(), any())).thenAnswer(invocation -> {
-            jobCreatedSkippingChecks.set(AutomationAuthorizationContext.isSkipChecks());
-
-            return 5L;
-        });
-        when(toolExecutionRecorder.record(any(), any(Supplier.class))).thenReturn(Map.of("ok", true));
-
-        try (MockedStatic<WorkflowTrigger> workflowTriggerMockedStatic = mockStatic(WorkflowTrigger.class);
-            MockedStatic<WorkflowNodeType> workflowNodeTypeMockedStatic = mockStatic(WorkflowNodeType.class)) {
-
-            stubNewWorkflowCallTrigger(workflowTriggerMockedStatic, workflowNodeTypeMockedStatic);
-
-            List<ToolCallback> toolCallbacks = facade.getFunctionToolCallbacks(mcpProject);
-
-            ToolCallback toolCallback = toolCallbacks.getFirst();
-
-            toolCallback.call("{}");
-
-            verify(principalJobFacade).createJob(any(), anyLong(), any());
-            assertThat(jobCreatedSkippingChecks).isFalse();
-            assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
         }
     }
 
@@ -701,6 +645,32 @@ class AutomationMcpToolFacadeTest {
             .hasCauseInstanceOf(ExecutionException.class);
     }
 
+    private ToolDefinition getToolDefinition(Map<String, Object> parameters) {
+        McpTool mcpTool = new McpTool("post", parameters, 1L);
+
+        mcpTool.setId(4L);
+
+        McpComponent mcpComponent = new McpComponent("httpClient", 1, 1L, null);
+
+        when(mcpComponentService.getMcpComponent(1L)).thenReturn(mcpComponent);
+
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        when(clusterElementDefinition.getComponentName()).thenReturn("httpClient");
+        when(clusterElementDefinition.getComponentVersion()).thenReturn(1);
+        when(clusterElementDefinition.getName()).thenReturn("post");
+        when(clusterElementDefinition.getDescription())
+            .thenReturn("The POST method submits an entity to the specified resource.");
+        when(clusterElementDefinitionService.getClusterElementDefinition("httpClient", 1, "post"))
+            .thenReturn(clusterElementDefinition);
+        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.empty());
+
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+            facade.getFunctionToolCallback(mcpTool);
+
+        return functionToolCallback.getToolDefinition();
+    }
+
     private ToolCallback getWorkflowToolCallbackAwaiting(Job job) {
         McpProject mcpProject = mcpProject();
 
@@ -708,11 +678,10 @@ class AutomationMcpToolFacadeTest {
             21L, Map.of("toolName", "mappedTool", "toolDescription", "A mapped tool"));
 
         stubCallableWorkflow(21L, "wf2");
+        givenEnabledMcpServer();
 
         when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
             .thenReturn(List.of(mappedMcpProjectWorkflow));
-        when(mcpServerService.getMcpServer(30L)).thenReturn(
-            new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true));
         when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
         when(jobCompletionAwaiter.await(anyLong(), any())).thenReturn(CompletableFuture.completedFuture(job));
         when(taskExecutionService.fetchLastJobTaskExecution(5L)).thenReturn(Optional.empty());
@@ -729,6 +698,43 @@ class AutomationMcpToolFacadeTest {
 
             return toolCallbacks.getFirst();
         }
+    }
+
+    private FunctionToolCallback<Map<String, Object>, Object> givenListedTool() {
+        McpComponent mcpComponent = mock(McpComponent.class);
+
+        when(mcpComponent.getComponentName()).thenReturn("slack");
+        when(mcpComponent.getComponentVersion()).thenReturn(1);
+        when(mcpComponent.getMcpServerId()).thenReturn(30L);
+        when(mcpComponent.getConnectionId()).thenReturn(null);
+
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        when(clusterElementDefinition.getComponentName()).thenReturn("slack");
+        when(clusterElementDefinition.getComponentVersion()).thenReturn(1);
+        when(clusterElementDefinition.getName()).thenReturn("sendMessage");
+        when(clusterElementDefinition.getDescription()).thenReturn("Send a message");
+
+        when(mcpComponentService.getMcpComponent(2L)).thenReturn(mcpComponent);
+        when(clusterElementDefinitionService.getClusterElementDefinition("slack", 1, "sendMessage"))
+            .thenReturn(clusterElementDefinition);
+        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(30L)).thenReturn(Optional.empty());
+
+        return facade.getFunctionToolCallback(mcpTool(true));
+    }
+
+    private void givenEnabledMcpServer() {
+        when(mcpServerServiceTarget.getMcpServer(30L)).thenReturn(
+            new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true));
+    }
+
+    private static McpTool mcpTool(boolean enabled) {
+        McpTool mcpTool = new McpTool("sendMessage", Map.of(), 2L);
+
+        mcpTool.setId(3L);
+        mcpTool.setEnabled(enabled);
+
+        return mcpTool;
     }
 
     private static McpProject mcpProject() {

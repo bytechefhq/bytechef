@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.ai.mcp.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -31,6 +32,7 @@ import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.web.graphql.config.AutomationMcpGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.web.graphql.config.AutomationMcpGraphQlTestConfiguration;
+import graphql.ErrorType;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -40,6 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.graphql.ResponseError;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
@@ -64,7 +67,7 @@ import org.springframework.test.context.ContextConfiguration;
     controllers = McpProjectWorkflowGraphQlController.class,
     properties = {
         "bytechef.coordinator.enabled=true",
-        "spring.graphql.schema.locations=classpath:graphql/"
+        "spring.graphql.schema.locations=classpath*:graphql/"
     })
 @AutomationMcpGraphQlConfigurationSharedMocks
 class McpProjectWorkflowGraphQlControllerIntTest {
@@ -164,6 +167,40 @@ class McpProjectWorkflowGraphQlControllerIntTest {
     }
 
     @Test
+    void testMcpProjectWorkflowsQueryIsNotExposed() {
+        this.graphQlTester
+            .document("""
+                query {
+                    mcpProjectWorkflows {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .satisfy(errors -> assertFieldUndefined(errors, "mcpProjectWorkflows"));
+
+        verifyNoInteractions(mcpProjectWorkflowService);
+    }
+
+    @Test
+    void testMcpProjectWorkflowsByProjectDeploymentWorkflowIdQueryIsNotExposed() {
+        this.graphQlTester
+            .document("""
+                query {
+                    mcpProjectWorkflowsByProjectDeploymentWorkflowId(projectDeploymentWorkflowId: "1") {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .satisfy(errors -> assertFieldUndefined(errors, "mcpProjectWorkflowsByProjectDeploymentWorkflowId"));
+
+        verifyNoInteractions(mcpProjectWorkflowService);
+    }
+
+    @Test
     void testCreateMcpProjectWorkflow() {
         // Given
         McpProjectWorkflow mockWorkflow = createMockMcpProjectWorkflow(1L, 1L, 123L);
@@ -246,6 +283,15 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(mcpProjectWorkflowFacade).deleteMcpProjectWorkflow(workflowId);
+    }
+
+    private static void assertFieldUndefined(List<ResponseError> errors, String fieldName) {
+        assertThat(errors)
+            .singleElement()
+            .satisfies(error -> {
+                assertThat(error.getErrorType()).isEqualTo(ErrorType.ValidationError);
+                assertThat(error.getMessage()).contains("FieldUndefined", fieldName);
+            });
     }
 
     private McpProjectWorkflow createMockMcpProjectWorkflow(
