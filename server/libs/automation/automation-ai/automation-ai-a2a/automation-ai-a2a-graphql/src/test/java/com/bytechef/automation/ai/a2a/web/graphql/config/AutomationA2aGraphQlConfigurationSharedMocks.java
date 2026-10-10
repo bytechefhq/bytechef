@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.a2a.web.graphql.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.a2a.facade.A2aProjectFacade;
+import com.bytechef.automation.ai.a2a.facade.A2aServerFacade;
 import com.bytechef.automation.ai.a2a.service.A2aProjectService;
 import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
@@ -35,7 +36,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    A2aProjectFacade.class, A2aProjectService.class, A2aProjectWorkflowService.class, A2aServerService.class,
+    A2aProjectFacade.class, A2aProjectService.class, A2aServerFacade.class, A2aProjectWorkflowService.class,
+    A2aServerService.class,
     ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class, WorkflowService.class
 })
 public @interface AutomationA2aGraphQlConfigurationSharedMocks {

@@ -1,3 +1,15 @@
+scalar Long
+
 type Query
 
 type Mutation
+
+type Tag {
+    id: ID!
+    name: String!
+}
+
+input TagInput {
+    id: ID
+    name: String!
+}

@@ -31,6 +31,8 @@ public interface A2aProjectService {
 
     Optional<A2aProject> fetchA2aProject(long a2aProjectId);
 
+    List<A2aProject> getA2aProjects();
+
     List<A2aProject> getA2aServerA2aProjects(long a2aServerId);
 
     List<A2aProject> getProjectDeploymentA2aProjects(long projectDeploymentId);

@@ -1,4 +1,5 @@
 extend type Query {
+    a2aProjects: [A2aProject]
     a2aProjectsByServerId(a2aServerId: ID!): [A2aProject]
 }
 
@@ -10,6 +11,9 @@ extend type Mutation {
 
 type A2aProject {
     id: ID!
+    a2aServerId: ID!
+    lastModifiedDate: Long
+    projectDeploymentId: ID
     projectId: ID
     projectVersion: Int
     workflowIds: [String!]!
