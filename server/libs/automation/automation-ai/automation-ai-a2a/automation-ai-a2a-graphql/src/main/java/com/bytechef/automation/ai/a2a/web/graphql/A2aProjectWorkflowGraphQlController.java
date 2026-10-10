@@ -61,6 +61,11 @@ public class A2aProjectWorkflowGraphQlController {
     }
 
     @MutationMapping
+    public A2aProjectWorkflow updateA2aProjectWorkflowEnabled(@Argument long id, @Argument boolean enabled) {
+        return a2aProjectWorkflowService.updateEnabled(id, enabled);
+    }
+
+    @MutationMapping
     public A2aProjectWorkflow updateA2aProjectWorkflowParameters(
         @Argument long id, @Argument A2aProjectWorkflowParametersInput input) {
 

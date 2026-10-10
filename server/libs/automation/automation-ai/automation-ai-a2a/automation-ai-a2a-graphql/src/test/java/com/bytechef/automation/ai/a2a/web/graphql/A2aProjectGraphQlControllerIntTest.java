@@ -78,6 +78,39 @@ class A2aProjectGraphQlControllerIntTest {
 
     @Test
     @WithMockUser
+    void testA2aProjectsReturnsTheProjectsOfEveryServer() {
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setProjectId(42L);
+
+        when(a2aProjectService.getA2aProjects()).thenReturn(
+            List.of(createA2aProject(11L, 100L, 7L), createA2aProject(12L, 100L, 8L)));
+        when(projectDeploymentService.getProjectDeployment(100L)).thenReturn(projectDeployment);
+
+        graphQlTester
+            .document("""
+                query {
+                    a2aProjects {
+                        a2aServerId
+                        id
+                        projectId
+                    }
+                }
+                """)
+            .execute()
+            .path("a2aProjects[0].a2aServerId")
+            .entity(String.class)
+            .isEqualTo("7")
+            .path("a2aProjects[1].a2aServerId")
+            .entity(String.class)
+            .isEqualTo("8")
+            .path("a2aProjects[1].projectId")
+            .entity(String.class)
+            .isEqualTo("42");
+    }
+
+    @Test
+    @WithMockUser
     void testA2aProjectsByServerIdResolvesProjectFieldsThroughTheDeployment() {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 

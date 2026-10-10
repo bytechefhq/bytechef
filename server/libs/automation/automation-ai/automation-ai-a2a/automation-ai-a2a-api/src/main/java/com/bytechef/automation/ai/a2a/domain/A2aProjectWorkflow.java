@@ -50,6 +50,9 @@ public final class A2aProjectWorkflow {
     private Long projectDeploymentWorkflowId;
 
     @Column
+    private boolean enabled = true;
+
+    @Column
     private MapWrapper parameters = new MapWrapper();
 
     @CreatedBy
@@ -143,8 +146,16 @@ public final class A2aProjectWorkflow {
         return version;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     public void setA2aProjectId(Long a2aProjectId) {
         this.a2aProjectId = a2aProjectId;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public void setId(Long id) {
@@ -200,6 +211,7 @@ public final class A2aProjectWorkflow {
             "id=" + id +
             ", a2aProjectId=" + a2aProjectId +
             ", projectDeploymentWorkflowId=" + projectDeploymentWorkflowId +
+            ", enabled=" + enabled +
             ", parameters=" + parameters +
             ", version=" + version +
             '}';

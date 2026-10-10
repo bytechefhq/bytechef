@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.a2a.service;
+package com.bytechef.automation.ai.a2a.facade;
 
-import com.bytechef.automation.ai.a2a.domain.A2aProject;
+import com.bytechef.automation.ai.a2a.domain.A2aServer;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface A2aProjectService {
+public interface A2aServerFacade {
 
-    A2aProject create(long projectDeploymentId, long a2aServerId, long projectId);
+    /**
+     * Returns the tags assigned to any A2A server.
+     */
+    List<Tag> getA2aServerTags();
 
-    void delete(long a2aProjectId);
+    /**
+     * Returns the tags of each of the given A2A servers.
+     */
+    Map<A2aServer, List<Tag>> getA2aServerTags(List<A2aServer> a2aServers);
 
-    Optional<A2aProject> fetchA2aProject(long a2aProjectId);
-
-    List<A2aProject> getA2aProjects();
-
-    List<A2aProject> getA2aServerA2aProjects(long a2aServerId);
-
-    List<A2aProject> getProjectDeploymentA2aProjects(long projectDeploymentId);
+    /**
+     * Replaces the tags of an A2A server, creating tags that do not exist yet.
+     */
+    List<Tag> updateA2aServerTags(long id, List<Tag> tags);
 }

@@ -65,6 +65,12 @@ public class A2aProjectGraphQlController {
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
+    public List<A2aProject> a2aProjects() {
+        return a2aProjectService.getA2aProjects();
+    }
+
+    @QueryMapping
+    @PreAuthorize("isAuthenticated()")
     public List<A2aProject> a2aProjectsByServerId(@Argument long a2aServerId) {
         return a2aProjectService.getA2aServerA2aProjects(a2aServerId);
     }
