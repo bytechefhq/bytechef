@@ -16,15 +16,13 @@
 
 package com.bytechef.automation.ai.mcp.web.graphql;
 
-import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
-import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLOW;
-
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.ai.mcp.util.McpWorkflowUtils;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -37,13 +35,11 @@ import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
-import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -100,7 +96,7 @@ public class McpProjectWorkflowGraphQlController {
             .filter(projectWorkflow -> {
                 Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
-                return getToolCallableTrigger(workflow) != null;
+                return McpWorkflowUtils.getCallableTrigger(workflow) != null;
             })
             .toList();
     }
@@ -121,7 +117,7 @@ public class McpProjectWorkflowGraphQlController {
 
         Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
-        WorkflowTrigger trigger = getToolCallableTrigger(workflow);
+        WorkflowTrigger trigger = McpWorkflowUtils.getCallableTrigger(workflow);
 
         if (trigger == null) {
             return List.of();
@@ -229,19 +225,4 @@ public class McpProjectWorkflowGraphQlController {
 
         return new WorkflowDTO(workflow, List.of(), List.of());
     }
-
-    private static WorkflowTrigger getToolCallableTrigger(Workflow workflow) {
-        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-            if (Objects.equals(workflowNodeType.name(), WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), NEW_WORKFLOW_CALL)) {
-
-                return workflowTrigger;
-            }
-        }
-
-        return null;
-    }
-
 }
