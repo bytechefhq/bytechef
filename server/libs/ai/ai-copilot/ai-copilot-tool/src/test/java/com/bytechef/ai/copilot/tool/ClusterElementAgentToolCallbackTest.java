@@ -62,7 +62,7 @@ class ClusterElementAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(synthesised);
 
-        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(() -> chatClient);
+        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"describe the cluster\"}");
 
@@ -72,7 +72,7 @@ class ClusterElementAgentToolCallbackTest {
     @Test
     void testCallReturnsErrorWhenRequestIsBlank() {
         ClusterElementAgentToolCallback callback =
-            new ClusterElementAgentToolCallback(() -> mock(ChatClient.class));
+            new ClusterElementAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("{\"request\":\"   \"}");
 
@@ -84,7 +84,7 @@ class ClusterElementAgentToolCallbackTest {
     @Test
     void testCallReturnsErrorOnInvalidJson() {
         ClusterElementAgentToolCallback callback =
-            new ClusterElementAgentToolCallback(() -> mock(ChatClient.class));
+            new ClusterElementAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         String result = callback.call("not-json");
 
@@ -104,7 +104,7 @@ class ClusterElementAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(null);
 
-        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(() -> chatClient);
+        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -126,7 +126,7 @@ class ClusterElementAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(new RuntimeException("component lookup unavailable"));
 
-        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(() -> chatClient);
+        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -155,7 +155,7 @@ class ClusterElementAgentToolCallbackTest {
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
-        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(() -> chatClient);
+        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -173,7 +173,7 @@ class ClusterElementAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(() -> chatClient);
+        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(chatModel -> chatClient, null);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -183,7 +183,7 @@ class ClusterElementAgentToolCallbackTest {
     @Test
     void testToolDefinitionExposesClusterElementAgentNameAndRequestSchema() {
         ClusterElementAgentToolCallback callback =
-            new ClusterElementAgentToolCallback(() -> mock(ChatClient.class));
+            new ClusterElementAgentToolCallback(chatModel -> mock(ChatClient.class), null);
 
         assertThat(callback.getToolDefinition()
             .name()).isEqualTo("configureClusterElement");
@@ -212,7 +212,7 @@ class ClusterElementAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(upstreamException);
 
-        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(() -> chatClient);
+        ClusterElementAgentToolCallback callback = new ClusterElementAgentToolCallback(chatModel -> chatClient, null);
 
         String result = callback.call("{\"request\":\"any\"}");
 
