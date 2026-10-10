@@ -50,7 +50,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(classes = McpProjectIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
-public class McpProjectServiceIntTest {
+class McpProjectServiceIntTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -81,7 +81,7 @@ public class McpProjectServiceIntTest {
     private Long mcpServerId2;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         McpServer mcpServer1 = new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
 
         mcpServer1 = mcpServerRepository.save(mcpServer1);
@@ -117,7 +117,7 @@ public class McpProjectServiceIntTest {
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         mcpProjectRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
         projectRepository.deleteAll();
@@ -127,7 +127,7 @@ public class McpProjectServiceIntTest {
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         McpProject mcpProject = getMcpProject();
 
         mcpProject = mcpProjectService.create(mcpProject);
@@ -139,7 +139,7 @@ public class McpProjectServiceIntTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         McpProject mcpProject = mcpProjectRepository.save(getMcpProject());
 
         mcpProject.setMcpServerId(mcpServerId2);
@@ -152,7 +152,7 @@ public class McpProjectServiceIntTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         McpProject mcpProject = mcpProjectRepository.save(getMcpProject());
 
         mcpProjectService.delete(Validate.notNull(mcpProject.getId(), "id"));
@@ -162,7 +162,7 @@ public class McpProjectServiceIntTest {
     }
 
     @Test
-    public void testFetchMcpProject() {
+    void testFetchMcpProject() {
         McpProject mcpProject = mcpProjectRepository.save(getMcpProject());
 
         Optional<McpProject> fetchedMcpProject =
@@ -173,7 +173,7 @@ public class McpProjectServiceIntTest {
     }
 
     @Test
-    public void testGetMcpServerMcpProjects() {
+    void testGetMcpServerMcpProjects() {
         McpProject mcpProject = mcpProjectRepository.save(getMcpProject());
 
         assertThat(mcpProjectService.getMcpServerMcpProjects(mcpServerId)).hasSize(1);
@@ -181,7 +181,7 @@ public class McpProjectServiceIntTest {
             .getFirst()).isEqualTo(mcpProject);
 
         // Test with non-existing server
-        assertThat(mcpProjectService.getMcpServerMcpProjects(Long.MAX_VALUE)).hasSize(0);
+        assertThat(mcpProjectService.getMcpServerMcpProjects(Long.MAX_VALUE)).isEmpty();
     }
 
     private McpProject getMcpProject() {

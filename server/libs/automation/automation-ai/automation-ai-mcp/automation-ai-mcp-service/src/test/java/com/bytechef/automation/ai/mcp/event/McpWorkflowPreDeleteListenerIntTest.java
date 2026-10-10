@@ -55,7 +55,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(classes = McpProjectIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
-public class McpWorkflowPreDeleteListenerIntTest {
+class McpWorkflowPreDeleteListenerIntTest {
 
     private static final String OTHER_WORKFLOW_ID = "workflow3";
     private static final String SYSTEM_PROJECT_WORKFLOW_ID = "workflow2";
@@ -96,7 +96,7 @@ public class McpWorkflowPreDeleteListenerIntTest {
     private Workspace workspace;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
@@ -113,7 +113,7 @@ public class McpWorkflowPreDeleteListenerIntTest {
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         mcpProjectWorkflowRepository.deleteAll();
         mcpProjectRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
@@ -125,7 +125,7 @@ public class McpWorkflowPreDeleteListenerIntTest {
     }
 
     @Test
-    public void testDeleteWorkflowDeletesMcpProjectWorkflow() {
+    void testDeleteWorkflowDeletesMcpProjectWorkflow() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
             mcpServer.getId(), project.getId(), 1, List.of(WORKFLOW_ID));
 
@@ -139,7 +139,7 @@ public class McpWorkflowPreDeleteListenerIntTest {
     }
 
     @Test
-    public void testDeleteWorkflowDeletesRegularAndMcpProjectDeploymentWorkflows() {
+    void testDeleteWorkflowDeletesRegularAndMcpProjectDeploymentWorkflows() {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
@@ -167,7 +167,7 @@ public class McpWorkflowPreDeleteListenerIntTest {
     }
 
     @Test
-    public void testDeleteWorkflowSweepsProjectDeploymentWorkflowsOfASystemNamedProject() {
+    void testDeleteWorkflowSweepsProjectDeploymentWorkflowsOfASystemNamedProject() {
         Project systemProject = projectRepository.save(
             Project.builder()
                 .description("test-system-project")
@@ -208,7 +208,7 @@ public class McpWorkflowPreDeleteListenerIntTest {
     }
 
     @Test
-    public void testDeleteWorkflowLeavesOtherWorkflowsProjectDeploymentWorkflowsAlone() {
+    void testDeleteWorkflowLeavesOtherWorkflowsProjectDeploymentWorkflowsAlone() {
         projectWorkflowRepository.save(
             new ProjectWorkflow(project.getId(), 1, OTHER_WORKFLOW_ID, UUID.randomUUID()));
 

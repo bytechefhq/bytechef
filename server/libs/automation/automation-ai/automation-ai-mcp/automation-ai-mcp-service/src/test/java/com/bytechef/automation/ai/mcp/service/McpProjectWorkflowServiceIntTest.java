@@ -65,7 +65,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 @SpringBootTest(classes = McpProjectIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
-public class McpProjectWorkflowServiceIntTest {
+class McpProjectWorkflowServiceIntTest {
 
     private static final String INVALID_PROJECT_DEPLOYMENT_WORKFLOW =
         "Invalid projectDeploymentWorkflowId for the given MCP project";
@@ -103,7 +103,7 @@ public class McpProjectWorkflowServiceIntTest {
     private ProjectDeploymentWorkflow projectDeploymentWorkflow;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         McpServer mcpServer1 = new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
 
         mcpServer1 = mcpServerRepository.save(mcpServer1);
@@ -170,7 +170,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         mcpProjectWorkflowRepository.deleteAll();
         mcpProjectRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
@@ -182,7 +182,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         McpProjectWorkflow mcpProjectWorkflow = getMcpProjectWorkflow();
 
         mcpProjectWorkflow = mcpProjectWorkflowService.create(mcpProjectWorkflow);
@@ -194,7 +194,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testCreateWithParameters() {
+    void testCreateWithParameters() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.create(
             mcpProject.getId(), projectDeploymentWorkflow.getId());
 
@@ -205,7 +205,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
         Long newMcpProjectId = mcpProject2.getId();
@@ -219,7 +219,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testUpdateWithParameters() {
+    void testUpdateWithParameters() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
         Long newMcpProjectId = mcpProject2.getId();
@@ -232,7 +232,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
         mcpProjectWorkflowService.delete(Validate.notNull(mcpProjectWorkflow.getId(), "id"));
@@ -242,7 +242,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testFetchMcpProjectWorkflow() {
+    void testFetchMcpProjectWorkflow() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
         Optional<McpProjectWorkflow> fetchedWorkflow = mcpProjectWorkflowService.fetchMcpProjectWorkflow(
@@ -253,7 +253,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testGetMcpProjectMcpProjectWorkflows() {
+    void testGetMcpProjectMcpProjectWorkflows() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
         assertThat(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProject.getId())).hasSize(1);
@@ -262,11 +262,11 @@ public class McpProjectWorkflowServiceIntTest {
                 .isEqualTo(mcpProjectWorkflow);
 
         // Test with non-existing project
-        assertThat(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(Long.MAX_VALUE)).hasSize(0);
+        assertThat(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(Long.MAX_VALUE)).isEmpty();
     }
 
     @Test
-    public void testGetProjectDeploymentWorkflowMcpProjectWorkflows() {
+    void testGetProjectDeploymentWorkflowMcpProjectWorkflows() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
         assertThat(mcpProjectWorkflowService.getProjectDeploymentWorkflowMcpProjectWorkflows(
@@ -277,11 +277,11 @@ public class McpProjectWorkflowServiceIntTest {
 
         // Test with non-existing workflow
         assertThat(mcpProjectWorkflowService.getProjectDeploymentWorkflowMcpProjectWorkflows(Long.MAX_VALUE))
-            .hasSize(0);
+            .isEmpty();
     }
 
     @Test
-    public void testCreateRejectsProjectDeploymentWorkflowOfAnotherDeployment() {
+    void testCreateRejectsProjectDeploymentWorkflowOfAnotherDeployment() {
         Long mcpProjectId = mcpProject.getId();
         Long foreignProjectDeploymentWorkflowId = foreignProjectDeploymentWorkflow.getId();
 
@@ -293,7 +293,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testCreateRejectsUnknownProjectDeploymentWorkflowIndistinguishably() {
+    void testCreateRejectsUnknownProjectDeploymentWorkflowIndistinguishably() {
         Long mcpProjectId = mcpProject.getId();
 
         assertThatThrownBy(() -> mcpProjectWorkflowService.create(mcpProjectId, Long.MAX_VALUE))
@@ -304,7 +304,7 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testUpdateRejectsProjectDeploymentWorkflowOfAnotherDeployment() {
+    void testUpdateRejectsProjectDeploymentWorkflowOfAnotherDeployment() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
         long mcpProjectWorkflowId = Validate.notNull(mcpProjectWorkflow.getId(), "id");
