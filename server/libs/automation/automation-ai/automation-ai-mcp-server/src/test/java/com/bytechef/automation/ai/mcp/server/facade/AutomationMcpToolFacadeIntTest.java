@@ -253,6 +253,7 @@ class AutomationMcpToolFacadeIntTest {
         when(job.getId()).thenReturn(2L);
         when(job.getStatus()).thenReturn(Job.Status.STOPPED);
         when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn("resume-2");
+        when(job.getMetadata(MetadataConstants.APPROVAL_RESUME)).thenReturn(true);
         when(jobService.getJob(2L)).thenReturn(job);
 
         Thread currentThread = Thread.currentThread();
@@ -281,6 +282,7 @@ class AutomationMcpToolFacadeIntTest {
         when(job.getId()).thenReturn(3L);
         when(job.getStatus()).thenReturn(Job.Status.STARTED, Job.Status.STARTED, Job.Status.STOPPED);
         when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn("resume-3");
+        when(job.getMetadata(MetadataConstants.APPROVAL_RESUME)).thenReturn(true);
         when(jobService.getJob(3L)).thenReturn(job);
         when(jobCompletionAwaiter.await(anyLong(), any())).thenReturn(CompletableFuture.completedFuture(job));
 
@@ -624,10 +626,58 @@ class AutomationMcpToolFacadeIntTest {
         when(job.getId()).thenReturn(5L);
         when(job.getStatus()).thenReturn(Job.Status.STOPPED);
         when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn("resume-5");
+        when(job.getMetadata(MetadataConstants.APPROVAL_RESUME)).thenReturn(true);
 
         ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(job);
 
         assertThat(toolCallback.call("{}")).contains("approval_required");
+    }
+
+    @Test
+    void testCallOfWorkflowToolReportsWaitingWhenRunIsPausedOnWaitStep() {
+        Job job = mock(Job.class);
+
+        when(job.getId()).thenReturn(5L);
+        when(job.getStatus()).thenReturn(Job.Status.STOPPED);
+        when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn("resume-5");
+
+        ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(job);
+
+        assertThat(toolCallback.call("{}"))
+            .contains("waiting")
+            .doesNotContain("approval_required")
+            .doesNotContain("resumeToken")
+            .doesNotContain("formUrl");
+    }
+
+    @Test
+    void testResolvePendingApprovalResumeTokenIsEmptyWhenRunIsPausedOnWaitStep() {
+        Job job = mock(Job.class);
+
+        when(job.getStatus()).thenReturn(Job.Status.STOPPED);
+        when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn("resume-6");
+        when(jobService.fetchJob(6L)).thenReturn(Optional.of(job));
+
+        assertThat(facade.resolvePendingApprovalResumeToken(6L)).isEmpty();
+        assertThat(facade.resolvePendingApprovalFormUrl(6L)).isEmpty();
+    }
+
+    @Test
+    void testAwaitApprovedWorkflowRunReturnsWaitingWhenResumedRunPausesOnWaitStep() {
+        Job job = mock(Job.class);
+
+        when(job.getId()).thenReturn(9L);
+        when(job.getStatus()).thenReturn(Job.Status.STARTED, Job.Status.STOPPED);
+        when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn("resume-9");
+        when(jobService.getJob(9L)).thenReturn(job);
+        when(jobCompletionAwaiter.await(anyLong(), any())).thenReturn(CompletableFuture.completedFuture(job));
+
+        Object result = facade.awaitApprovedWorkflowRun(9L);
+
+        assertThat((Map<String, Object>) result)
+            .containsEntry("status", "waiting")
+            .containsEntry("jobId", 9L)
+            .doesNotContainKey("resumeToken");
     }
 
     @Test

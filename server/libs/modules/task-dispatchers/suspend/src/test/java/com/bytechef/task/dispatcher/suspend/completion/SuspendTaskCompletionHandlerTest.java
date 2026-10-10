@@ -190,6 +190,21 @@ class SuspendTaskCompletionHandlerTest {
     }
 
     @Test
+    void testHandleMarksJobAsApprovalResumeWhenSuspendRequestsApproval() {
+        Map<String, ?> jobMetadata = handleSuspendAndGetJobMetadata(
+            Map.of(MetadataConstants.APPROVAL_RESUME, true, "formUrl", "https://example.com/approval/abc"));
+
+        assertEquals(true, jobMetadata.get(MetadataConstants.APPROVAL_RESUME));
+    }
+
+    @Test
+    void testHandleMarksJobAsNotApprovalResumeWhenSuspendIsAWait() {
+        Map<String, ?> jobMetadata = handleSuspendAndGetJobMetadata(Map.of("expiresAt", 1_000L));
+
+        assertEquals(false, jobMetadata.get(MetadataConstants.APPROVAL_RESUME));
+    }
+
+    @Test
     void testHandleThrowsWhenJobNotFound() {
         String jobResumeIdString = createJobResumeIdString(100L);
         Suspend suspend = new Suspend(Map.of(), null);

@@ -16,6 +16,7 @@
 
 package com.bytechef.component.approval.action;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -23,10 +24,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -36,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Ivica Cardic
@@ -80,5 +84,33 @@ class ApprovalRequestApprovalActionTest {
         verify(clusterElementDefinitionService, times(1)).executeApprovalChannel(
             eq("googleMail"), eq(1), eq("googleMail"), any(), eq("https://example.com/api/resume/abc"),
             eq(componentConnection), eq(context));
+    }
+
+    @Test
+    void testPerformMarksTheSuspendAsAnApproval() throws Exception {
+        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(
+            mock(ClusterElementDefinitionService.class));
+
+        MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
+            .getPerform()
+            .orElseThrow();
+
+        ActionContextAware context = mock(ActionContextAware.class);
+
+        when(context.isEditorEnvironment()).thenReturn(false);
+        when(context.getResumeUrl()).thenReturn("https://example.com/api/job/resume/abc");
+
+        performFunction.apply(
+            ParametersFactory.create(Map.of()), Map.of(), ParametersFactory.create(Map.of()), context);
+
+        ArgumentCaptor<Suspend> suspendArgumentCaptor = ArgumentCaptor.forClass(Suspend.class);
+
+        verify(context).suspend(suspendArgumentCaptor.capture());
+
+        Suspend suspend = suspendArgumentCaptor.getValue();
+
+        Map<String, ?> continueParameters = suspend.continueParameters();
+
+        assertThat(continueParameters.get(MetadataConstants.APPROVAL_RESUME)).isEqualTo(true);
     }
 }
