@@ -44,6 +44,7 @@ import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSmartWebFetchTo
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSubagentTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTaskTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTodoWriteTool;
+import com.bytechef.component.ai.agent.utils.cluster.exec.DockerExecBackendRegistry;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
@@ -125,7 +126,10 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
         ApplicationProperties.Ai.AgentUtils.Shell shell = agentUtils.getShell();
 
         if (shell.isEnabled()) {
-            clusterElements.add(new AiAgentUtilsShellTools(agentWorkspaceResolver).clusterElementDefinition);
+            clusterElements.add(
+                new AiAgentUtilsShellTools(
+                    agentWorkspaceResolver, createDockerExecBackendRegistry(shell.getDocker()),
+                    shell.isAllowLocal()).clusterElementDefinition);
         }
 
         for (AiAgentUtilsClusterElementContributor clusterElementContributor : clusterElementContributors) {
@@ -165,6 +169,12 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
         }
 
         return new AgentWorkspaceResolver(Path.of(basedir));
+    }
+
+    private static DockerExecBackendRegistry createDockerExecBackendRegistry(
+        ApplicationProperties.Ai.AgentUtils.Shell.Docker docker) {
+
+        return new DockerExecBackendRegistry(docker.getCommand(), docker.getImage(), docker.getIdleTimeout());
     }
 
     private static Set<String> getAllowedPrivateHosts(ApplicationProperties.Ai.AgentUtils agentUtils) {
