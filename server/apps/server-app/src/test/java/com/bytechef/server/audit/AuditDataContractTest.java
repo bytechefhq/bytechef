@@ -82,6 +82,7 @@ class AuditDataContractTest {
     private static final String CHUNK_DATA = "knowledge base chunks are document data and are not recorded";
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
+    private static final String SUGGESTION = "generates a suggestion without saving it";
     private static final String TAGS = "tag assignment";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String ROW_DATA = "data table rows are data and are not recorded";
@@ -160,6 +161,7 @@ class AuditDataContractTest {
         Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
         Map.entry("ProjectCodeWorkflowFacadeImpl.updateCodeWorkflowSource", DEFINITION_EDIT),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
+        Map.entry("PropertyCopilotFacadeImpl.generatePropertyValue", SUGGESTION),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceDataTableFacadeImpl.addColumn", DELEGATES),
