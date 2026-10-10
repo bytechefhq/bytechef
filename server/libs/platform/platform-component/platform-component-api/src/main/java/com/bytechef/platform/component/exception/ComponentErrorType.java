@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.exception;
 
 import com.bytechef.exception.AbstractErrorType;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 
 /**
  * @author Ivica Cardic
@@ -31,8 +32,22 @@ public class ComponentErrorType extends AbstractErrorType {
     public static final ComponentErrorType INVALID_DATE_STRING = new ComponentErrorType(105);
     public static final ComponentErrorType INVALID_ORDER_DIRECTION = new ComponentErrorType(106);
     public static final ComponentErrorType UNSUPPORTED_PROPERTY_TYPE = new ComponentErrorType(107);
+    public static final ComponentErrorType GENERATE_ACTION_DEFINITION = new ComponentErrorType(108);
+    public static final ComponentErrorType GENERATE_TRIGGER_DEFINITION = new ComponentErrorType(109);
+    public static final ComponentErrorType GET_ACTION = new ComponentErrorType(110);
+    public static final ComponentErrorType GET_COMPONENT = new ComponentErrorType(111);
+    public static final ComponentErrorType GET_OUTPUT_PROPERTIES = new ComponentErrorType(112);
+    public static final ComponentErrorType GET_PROPERTIES = new ComponentErrorType(113);
+    public static final ComponentErrorType GET_TRIGGER = new ComponentErrorType(114);
+    public static final ComponentErrorType LIST_ACTIONS = new ComponentErrorType(115);
+    public static final ComponentErrorType LIST_COMPONENTS = new ComponentErrorType(116);
+    public static final ComponentErrorType LIST_TRIGGERS = new ComponentErrorType(117);
+    public static final ComponentErrorType OPERATION_NOT_FOUND = new ComponentErrorType(118);
+    public static final ComponentErrorType SEARCH_ACTIONS = new ComponentErrorType(119);
+    public static final ComponentErrorType SEARCH_COMPONENTS = new ComponentErrorType(120);
+    public static final ComponentErrorType SEARCH_TRIGGERS = new ComponentErrorType(121);
 
     private ComponentErrorType(int errorKey) {
-        super(ComponentErrorType.class, errorKey);
+        super(ComponentDefinition.class, errorKey);
     }
 }

@@ -18,9 +18,11 @@ package com.bytechef.platform.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -45,9 +47,6 @@ import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.List;
@@ -72,8 +71,6 @@ class ComponentToolsTest {
     private TriggerDefinitionFacade triggerDefinitionFacade;
 
     private ComponentTools componentTools;
-    @Mock
-    private ConnectionFacade connectionFacade;
 
     @Mock
     private VectorStore vectorStore;
@@ -82,7 +79,7 @@ class ComponentToolsTest {
     void beforeEach() {
         MockitoAnnotations.openMocks(this);
         componentTools = new ComponentTools(
-            actionDefinitionFacade, componentDefinitionFacade, connectionFacade, triggerDefinitionFacade, vectorStore);
+            actionDefinitionFacade, componentDefinitionFacade, triggerDefinitionFacade, vectorStore);
     }
 
     @Test
@@ -229,7 +226,7 @@ class ComponentToolsTest {
     }
 
     @Test
-    void testGetOutputPropertyForActionWithExecutePerformFallback() {
+    void testGetOutputPropertyForActionWithFailingOutputFunctionNeverExecutesPerform() {
         String componentName = "testComponent";
         String actionName = "testAction";
         Integer version = 1;
@@ -245,74 +242,28 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
+        when(componentDefinition.isConnectionRequired()).thenReturn(false);
         when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
             eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
-                .thenThrow(new RuntimeException("Output function failed"));
+                .thenThrow(new IllegalStateException("Output function failed"));
 
-        ConnectionDTO connectionDTO = ConnectionDTO.builder()
-            .id(123L)
-            .build();
-
-        when(connectionFacade.getConnections(componentName, version, null, null, null, PlatformType.AUTOMATION))
-            .thenReturn(List.of(connectionDTO));
-
-        Map<String, Object> performResult = Map.of("data", "test");
-        when(
-            actionDefinitionFacade
-                .executePerform(
-                    eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(),
-                    anyMap(), anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull(), isNull()))
-                        .thenReturn(performResult);
-
-        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
-
-        assertNotNull(result);
-        verify(actionDefinitionFacade).executeOutput(eq(componentName), eq(version), eq(actionName), anyMap(),
-            anyMap());
-        verify(actionDefinitionFacade).executePerform(
-            eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(),
-            anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull(), isNull());
-    }
-
-    @Test
-    void testGetOutputPropertyForActionWithExecutePerformThrowsException() {
-        String componentName = "testComponent";
-        String actionName = "testAction";
-        Integer version = 1;
-
-        ActionDefinition action = mock(ActionDefinition.class);
-        when(action.getName()).thenReturn(actionName);
-        when(action.isOutputDefined()).thenReturn(true);
-        when(action.isOutputSchemaDefined()).thenReturn(false);
-        when(action.isOutputFunctionDefined()).thenReturn(true);
-
-        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
-        when(componentDefinition.getName()).thenReturn(componentName);
-        when(componentDefinition.getVersion()).thenReturn(version);
-        when(componentDefinition.getTriggers()).thenReturn(List.of());
-        when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
-            .thenReturn(componentDefinition);
-
-        when(actionDefinitionFacade.executeOutput(
-            eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
-                .thenThrow(new RuntimeException("Output function failed"));
-
-        when(connectionFacade.getConnections(componentName, version, null, null, null, PlatformType.AUTOMATION))
-            .thenThrow(new RuntimeException("Connection required"));
-
-        RuntimeException exception = assertThrows(RuntimeException.class,
+        ExecutionException exception = assertThrows(ExecutionException.class,
             () -> componentTools.getOutputProperty(componentName, actionName, version, null));
 
-        assertEquals("Failed to get output properties: Please make a " + componentName + " connection",
+        assertEquals(
+            "The output function of action '" + actionName + "' failed: Output function failed",
             exception.getMessage());
+        assertInstanceOf(IllegalStateException.class, exception.getCause());
+        verify(actionDefinitionFacade, never()).executePerform(
+            any(), anyInt(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), anyBoolean(),
+            any(), any(), any());
     }
 
     @Test
-    void testGetOutputPropertySkipsTheConnectionFallbackWhenTheToolContextDisablesIt() {
+    void testGetOutputPropertyForActionRequiringConnectionReportsCause() {
         String componentName = "testComponent";
         String actionName = "testAction";
         Integer version = 1;
@@ -328,28 +279,24 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinition.isConnectionRequired()).thenReturn(true);
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
             eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
-                .thenThrow(new RuntimeException("Output function failed"));
+                .thenThrow(new NullPointerException());
 
-        ToolContext toolContext = new ToolContext(
-            Map.of(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, true));
+        ExecutionException exception = assertThrows(ExecutionException.class,
+            () -> componentTools.getOutputProperty(componentName, actionName, version, null));
 
-        RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> componentTools.getOutputProperty(componentName, actionName, version, toolContext));
+        String message = exception.getMessage();
 
-        assertEquals(
-            "Failed to get output properties: The output of " + componentName + " " + actionName +
-                " is only known after a test run",
-            exception.getMessage());
-
-        verify(connectionService, never()).getConnections(anyString(), anyInt(), any());
+        assertTrue(message.contains("needs a " + componentName + " connection"), message);
+        assertTrue(message.contains("cause: NullPointerException"), message);
         verify(actionDefinitionFacade, never()).executePerform(
-            anyString(), anyInt(), anyString(), any(), any(), any(), any(), any(), anyMap(), anyMap(), any(), any(),
-            any(), anyBoolean(), any(), any(), any());
+            any(), anyInt(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), anyBoolean(),
+            any(), any(), any());
     }
 
     @Test
@@ -543,7 +490,7 @@ class ComponentToolsTest {
         assertEquals(
             "This chat can't use salesforce: it isn't one of the integrations available to this user.",
             executionException.getMessage());
-        verify(componentDefinitionService, never()).getComponentDefinition(anyString(), any());
+        verify(componentDefinitionFacade, never()).getComponentDefinition(anyString(), any());
     }
 
     @Test
@@ -552,14 +499,14 @@ class ComponentToolsTest {
             ExecutionException.class,
             () -> componentTools.getAction("salesforce", "createRecord", null, allowListToolContext("slack")));
 
-        verify(componentDefinitionService, never()).getComponentDefinition(anyString(), any());
+        verify(componentDefinitionFacade, never()).getComponentDefinition(anyString(), any());
     }
 
     @Test
     void testGetComponentReturnsAnAllowedComponentAndIgnoresAMissingAllowList() {
         ComponentDefinition slackComponentDefinition = mockComponentDefinition("slack", "sendMessage");
 
-        when(componentDefinitionService.getComponentDefinition("slack", null)).thenReturn(slackComponentDefinition);
+        when(componentDefinitionFacade.getComponentDefinition("slack", null)).thenReturn(slackComponentDefinition);
 
         ComponentInfo allowedComponentInfo = componentTools.getComponent("slack", null, allowListToolContext("slack"));
         ComponentInfo unrestrictedComponentInfo = componentTools.getComponent("slack", null, null);
@@ -577,7 +524,7 @@ class ComponentToolsTest {
         ComponentDefinition slackComponentDefinition = mockComponentDefinition("slack", "sendMessage");
         ComponentDefinition salesforceComponentDefinition = mockComponentDefinition("salesforce", "sendEmail");
 
-        when(componentDefinitionService.getComponentDefinitions())
+        when(componentDefinitionFacade.getComponentDefinitions())
             .thenReturn(List.of(slackComponentDefinition, salesforceComponentDefinition));
     }
 

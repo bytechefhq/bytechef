@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.ai.tool;
 
-import com.bytechef.automation.ai.tool.exception.ProjectToolErrorType;
 import com.bytechef.automation.ai.tool.model.ProjectDeploymentStatusInfo;
 import com.bytechef.automation.ai.tool.model.ProjectDetailInfo;
 import com.bytechef.automation.ai.tool.model.ProjectInfo;
@@ -26,6 +25,7 @@ import com.bytechef.automation.ai.tool.model.ProjectVersionInfo;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -84,7 +84,7 @@ public class ProjectTools {
             required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectToolErrorType.LIST_PROJECTS);
+        long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.LIST_PROJECTS);
 
         try {
             List<ProjectInfo> projectInfos = getWorkspaceProjects(resolvedWorkspaceId).stream()
@@ -100,7 +100,7 @@ public class ProjectTools {
             log.error("listProjects(): Failed to list projects", e);
 
             throw new ExecutionException(
-                "Failed to list projects: " + e.getMessage(), e, ProjectToolErrorType.LIST_PROJECTS);
+                "Failed to list projects: " + e.getMessage(), e, ProjectErrorType.LIST_PROJECTS);
         }
     }
 
@@ -140,7 +140,7 @@ public class ProjectTools {
             log.error("getProject({}): Failed to get project {}", projectId, projectId, e);
 
             throw new ExecutionException(
-                "Failed to get project: " + e.getMessage(), e, ProjectToolErrorType.GET_PROJECT);
+                "Failed to get project: " + e.getMessage(), e, ProjectErrorType.GET_PROJECT);
         }
     }
 
@@ -152,7 +152,7 @@ public class ProjectTools {
             required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectToolErrorType.SEARCH_PROJECTS);
+        long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.SEARCH_PROJECTS);
 
         try {
             String lowerQuery = query.toLowerCase()
@@ -174,7 +174,7 @@ public class ProjectTools {
             log.error("searchProjects({}): Failed to search projects with query '{}'", query, query, e);
 
             throw new ExecutionException(
-                "Failed to search projects: " + e.getMessage(), e, ProjectToolErrorType.SEARCH_PROJECTS);
+                "Failed to search projects: " + e.getMessage(), e, ProjectErrorType.SEARCH_PROJECTS);
         }
     }
 
@@ -207,7 +207,7 @@ public class ProjectTools {
             log.error("getProjectStatus({}): Failed to get status for project {}", projectId, projectId, e);
 
             throw new ExecutionException(
-                "Failed to get project status: " + e.getMessage(), e, ProjectToolErrorType.GET_PROJECT_STATUS);
+                "Failed to get project status: " + e.getMessage(), e, ProjectErrorType.GET_PROJECT_STATUS);
         }
     }
 
@@ -222,7 +222,7 @@ public class ProjectTools {
         @ToolParam(required = false, description = "The tag IDs to associate with the project") List<Long> tagIds,
         ToolContext toolContext) {
 
-        long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectToolErrorType.CREATE_PROJECT);
+        long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.CREATE_PROJECT);
 
         try {
             String trimmedDescription = description == null ? null : description.trim();
@@ -252,7 +252,7 @@ public class ProjectTools {
                 categoryId, resolvedWorkspaceId, tagIds, name, e);
 
             throw new ExecutionException(
-                "Failed to create project: " + e.getMessage(), e, ProjectToolErrorType.CREATE_PROJECT);
+                "Failed to create project: " + e.getMessage(), e, ProjectErrorType.CREATE_PROJECT);
         }
     }
 
@@ -299,7 +299,7 @@ public class ProjectTools {
                 categoryId, tagIds, projectId, e);
 
             throw new ExecutionException(
-                "Failed to update project: " + e.getMessage(), e, ProjectToolErrorType.UPDATE_PROJECT);
+                "Failed to update project: " + e.getMessage(), e, ProjectErrorType.UPDATE_PROJECT);
         }
     }
 
@@ -325,7 +325,7 @@ public class ProjectTools {
             log.error("deleteProject({}): Failed to delete project {}", projectId, projectId, e);
 
             throw new ExecutionException(
-                "Failed to delete project: " + e.getMessage(), e, ProjectToolErrorType.DELETE_PROJECT);
+                "Failed to delete project: " + e.getMessage(), e, ProjectErrorType.DELETE_PROJECT);
         }
     }
 
@@ -353,12 +353,12 @@ public class ProjectTools {
             log.error("publishProject({}, {}): Failed to publish project {}", projectId, description, projectId, e);
 
             throw new ExecutionException(
-                "Failed to publish project: " + e.getMessage(), e, ProjectToolErrorType.PUBLISH_PROJECT);
+                "Failed to publish project: " + e.getMessage(), e, ProjectErrorType.PUBLISH_PROJECT);
         }
     }
 
     private long requireWorkspaceId(
-        @Nullable Long workspaceId, @Nullable ToolContext toolContext, ProjectToolErrorType projectToolErrorType) {
+        @Nullable Long workspaceId, @Nullable ToolContext toolContext, ProjectErrorType projectErrorType) {
 
         Long resolvedWorkspaceId;
 
@@ -366,12 +366,12 @@ public class ProjectTools {
             resolvedWorkspaceId = AutomationToolInvocationContext.resolveWorkspaceId(
                 workspaceId, toolContext, workspaceFacade);
         } catch (WorkspaceNotAccessibleException exception) {
-            throw new ExecutionException(exception.getMessage(), exception, projectToolErrorType);
+            throw new ExecutionException(exception.getMessage(), exception, projectErrorType);
         }
 
         if (resolvedWorkspaceId == null) {
             throw new ExecutionException(
-                "workspaceId is required - call listWorkspaces to find the workspace id.", projectToolErrorType);
+                "workspaceId is required - call listWorkspaces to find the workspace id.", projectErrorType);
         }
 
         return resolvedWorkspaceId;

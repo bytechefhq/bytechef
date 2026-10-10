@@ -19,22 +19,17 @@ package com.bytechef.platform.ai.tool;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.exception.ExecutionException;
-import com.bytechef.platform.ai.tool.exception.ComponentToolErrorType;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.ai.tool.util.ToolUtils;
-import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
-import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -64,8 +59,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ComponentTools {
 
-    public static final String TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY = "connectionFallbackDisabled";
-
     private static final Logger log = LoggerFactory.getLogger(ComponentTools.class);
 
     private static final String TRIGGER_NOT_FOUND = "Trigger '%s' not found in component '%s'";
@@ -87,7 +80,6 @@ public class ComponentTools {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ComponentDefinitionFacade componentDefinitionFacade;
-    private final ConnectionFacade connectionFacade;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final VectorStore vectorStore;
 
@@ -112,12 +104,11 @@ public class ComponentTools {
     @SuppressFBWarnings("EI")
     public ComponentTools(
         ActionDefinitionFacade actionDefinitionFacade, ComponentDefinitionFacade componentDefinitionFacade,
-        ConnectionFacade connectionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
+        TriggerDefinitionFacade triggerDefinitionFacade,
         @Autowired(required = false) @Qualifier("copilotPgVectorStore") VectorStore vectorStore) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.componentDefinitionFacade = componentDefinitionFacade;
-        this.connectionFacade = connectionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.vectorStore = vectorStore;
     }
@@ -129,7 +120,7 @@ public class ComponentTools {
         @ToolParam(required = false, description = "The version of the component") Integer version,
         @Nullable ToolContext toolContext) {
 
-        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_COMPONENT);
+        checkAllowedComponent(componentName, toolContext, ComponentErrorType.GET_COMPONENT);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -182,7 +173,7 @@ public class ComponentTools {
         } catch (Exception e) {
             log.error("getComponent({}, {}): Failed to get component {}", componentName, version, componentName, e);
 
-            throw new ExecutionException(FAILED_TO_GET_COMPONENT, e, ComponentToolErrorType.GET_COMPONENT);
+            throw new ExecutionException(FAILED_TO_GET_COMPONENT, e, ComponentErrorType.GET_COMPONENT);
         }
     }
 
@@ -195,7 +186,7 @@ public class ComponentTools {
         @ToolParam(required = false, description = "The version of the component") Integer version,
         @Nullable ToolContext toolContext) {
 
-        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_TRIGGER);
+        checkAllowedComponent(componentName, toolContext, ComponentErrorType.GET_TRIGGER);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -220,7 +211,7 @@ public class ComponentTools {
                         type.name(), ToolUtils.generateParametersJson(trigger.getProperties()), outputPropertiesJson);
                 })
                 .orElseThrow(() -> new ExecutionException(
-                    String.format(TRIGGER_NOT_FOUND, triggerName, componentName), ComponentToolErrorType.GET_TRIGGER));
+                    String.format(TRIGGER_NOT_FOUND, triggerName, componentName), ComponentErrorType.GET_TRIGGER));
 
         } catch (ExecutionException e) {
             throw e;
@@ -229,7 +220,7 @@ public class ComponentTools {
                 "getTrigger({}, {}, {}): Failed to get trigger '{}' from component '{}'", componentName, triggerName,
                 version, triggerName, componentName, e);
 
-            throw new ExecutionException(FAILED_TO_GET_TRIGGER, e, ComponentToolErrorType.GET_TRIGGER);
+            throw new ExecutionException(FAILED_TO_GET_TRIGGER, e, ComponentErrorType.GET_TRIGGER);
         }
     }
 
@@ -242,7 +233,7 @@ public class ComponentTools {
         @ToolParam(required = false, description = "The version of the component") Integer version,
         @Nullable ToolContext toolContext) {
 
-        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GENERATE_TRIGGER_DEFINITION);
+        checkAllowedComponent(componentName, toolContext, ComponentErrorType.GENERATE_TRIGGER_DEFINITION);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -258,7 +249,7 @@ public class ComponentTools {
                 .findFirst()
                 .orElseThrow(() -> new ExecutionException(
                     String.format(TRIGGER_NOT_FOUND, triggerName, componentName),
-                    ComponentToolErrorType.GENERATE_TRIGGER_DEFINITION));
+                    ComponentErrorType.GENERATE_TRIGGER_DEFINITION));
             String parametersJson = ToolUtils.generateParametersJson(trigger.getProperties());
 
             // Generate the trigger definition using the template with actual parameters
@@ -283,7 +274,7 @@ public class ComponentTools {
                 componentName, triggerName, version, componentName, triggerName, e);
 
             throw new ExecutionException(
-                FAILED_TO_GENERATE_TRIGGER_DEFINITION, e, ComponentToolErrorType.GENERATE_TRIGGER_DEFINITION);
+                FAILED_TO_GENERATE_TRIGGER_DEFINITION, e, ComponentErrorType.GENERATE_TRIGGER_DEFINITION);
         }
     }
 
@@ -308,7 +299,7 @@ public class ComponentTools {
         } catch (Exception e) {
             log.error("listActions(): " + FAILED_TO_LIST_ACTIONS, e);
 
-            throw new ExecutionException(FAILED_TO_LIST_ACTIONS, e, ComponentToolErrorType.LIST_ACTIONS);
+            throw new ExecutionException(FAILED_TO_LIST_ACTIONS, e, ComponentErrorType.LIST_ACTIONS);
         }
     }
 
@@ -329,7 +320,7 @@ public class ComponentTools {
         } catch (Exception e) {
             log.error("listComponents(): " + FAILED_TO_LIST_COMPONENTS, e);
 
-            throw new ExecutionException(FAILED_TO_LIST_COMPONENTS, e, ComponentToolErrorType.LIST_COMPONENTS);
+            throw new ExecutionException(FAILED_TO_LIST_COMPONENTS, e, ComponentErrorType.LIST_COMPONENTS);
         }
     }
 
@@ -354,7 +345,7 @@ public class ComponentTools {
         } catch (Exception e) {
             log.error("listTriggers(): " + FAILED_TO_LIST_TRIGGERS, e);
 
-            throw new ExecutionException(FAILED_TO_LIST_TRIGGERS, e, ComponentToolErrorType.LIST_TRIGGERS);
+            throw new ExecutionException(FAILED_TO_LIST_TRIGGERS, e, ComponentErrorType.LIST_TRIGGERS);
         }
     }
 
@@ -389,7 +380,7 @@ public class ComponentTools {
         } catch (Exception e) {
             log.error("searchComponents({}): Failed to search components with query '{}'", query, query, e);
 
-            throw new ExecutionException(FAILED_TO_SEARCH_COMPONENTS, e, ComponentToolErrorType.SEARCH_COMPONENTS);
+            throw new ExecutionException(FAILED_TO_SEARCH_COMPONENTS, e, ComponentErrorType.SEARCH_COMPONENTS);
         }
     }
 
@@ -427,7 +418,7 @@ public class ComponentTools {
         } catch (Exception e) {
             log.error("searchTriggers({}): Failed to search triggers with query '{}'", query, query, e);
 
-            throw new ExecutionException(FAILED_TO_SEARCH_TRIGGERS, e, ComponentToolErrorType.SEARCH_TRIGGERS);
+            throw new ExecutionException(FAILED_TO_SEARCH_TRIGGERS, e, ComponentErrorType.SEARCH_TRIGGERS);
         }
     }
 
@@ -440,7 +431,7 @@ public class ComponentTools {
         @ToolParam(required = false, description = "The version of the component") Integer version,
         @Nullable ToolContext toolContext) {
 
-        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_ACTION);
+        checkAllowedComponent(componentName, toolContext, ComponentErrorType.GET_ACTION);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -472,7 +463,7 @@ public class ComponentTools {
                         outputPropertiesJson);
                 })
                 .orElseThrow(() -> new ExecutionException(
-                    String.format(ACTION_NOT_FOUND, actionName, componentName), ComponentToolErrorType.GET_ACTION));
+                    String.format(ACTION_NOT_FOUND, actionName, componentName), ComponentErrorType.GET_ACTION));
 
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -488,7 +479,7 @@ public class ComponentTools {
                 "getAction({}, {}, {}): Failed to get action '{}' from component '{}'", componentName, actionName,
                 version, actionName, componentName, e);
 
-            throw new ExecutionException(FAILED_TO_GET_ACTION, e, ComponentToolErrorType.GET_ACTION);
+            throw new ExecutionException(FAILED_TO_GET_ACTION, e, ComponentErrorType.GET_ACTION);
         }
     }
 
@@ -550,7 +541,7 @@ public class ComponentTools {
             log.error("searchClusterElements({}, {}): Failed to search cluster elements with type '{}'",
                 clusterElementType, componentName, clusterElementType, e);
 
-            throw new ExecutionException(FAILED_TO_SEARCH_ACTIONS, e, ComponentToolErrorType.SEARCH_ACTIONS);
+            throw new ExecutionException(FAILED_TO_SEARCH_ACTIONS, e, ComponentErrorType.SEARCH_ACTIONS);
         }
     }
 
@@ -563,7 +554,7 @@ public class ComponentTools {
         @ToolParam(required = false, description = "The version of the component") Integer version,
         @Nullable ToolContext toolContext) {
 
-        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_ACTION);
+        checkAllowedComponent(componentName, toolContext, ComponentErrorType.GET_ACTION);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -597,7 +588,7 @@ public class ComponentTools {
                 })
                 .orElseThrow(() -> new ExecutionException(
                     String.format(ACTION_NOT_FOUND, clusterElementName, componentName),
-                    ComponentToolErrorType.GET_ACTION));
+                    ComponentErrorType.GET_ACTION));
 
             if (log.isDebugEnabled()) {
                 log.debug("getClusterElement({}, {}, {}): Found cluster element '{}' from component '{}'",
@@ -613,7 +604,7 @@ public class ComponentTools {
                 "getClusterElement({}, {}, {}): Failed to get cluster element '{}' from component '{}'", componentName,
                 clusterElementName, version, clusterElementName, componentName, e);
 
-            throw new ExecutionException(FAILED_TO_GET_ACTION, e, ComponentToolErrorType.GET_ACTION);
+            throw new ExecutionException(FAILED_TO_GET_ACTION, e, ComponentErrorType.GET_ACTION);
         }
     }
 
@@ -650,7 +641,7 @@ public class ComponentTools {
         } catch (Exception e) {
             log.error("searchActions({}): Failed to search actions with query '{}'", query, query, e);
 
-            throw new ExecutionException(FAILED_TO_SEARCH_ACTIONS, e, ComponentToolErrorType.SEARCH_ACTIONS);
+            throw new ExecutionException(FAILED_TO_SEARCH_ACTIONS, e, ComponentErrorType.SEARCH_ACTIONS);
         }
     }
 
@@ -663,7 +654,7 @@ public class ComponentTools {
         @ToolParam(required = false, description = "The version of the component") Integer version,
         @Nullable ToolContext toolContext) {
 
-        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GENERATE_ACTION_DEFINITION);
+        checkAllowedComponent(componentName, toolContext, ComponentErrorType.GENERATE_ACTION_DEFINITION);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -675,7 +666,7 @@ public class ComponentTools {
                 .findFirst()
                 .orElseThrow(() -> new ExecutionException(
                     String.format(ACTION_NOT_FOUND, actionName, componentName),
-                    ComponentToolErrorType.GENERATE_ACTION_DEFINITION));
+                    ComponentErrorType.GENERATE_ACTION_DEFINITION));
             String parametersJson = ToolUtils.generateParametersJson(action.getProperties());
 
             // Generate the action definition using the template with actual parameters
@@ -700,7 +691,7 @@ public class ComponentTools {
                 actionName, version, componentName, actionName, e);
 
             throw new ExecutionException(
-                FAILED_TO_GENERATE_ACTION_DEFINITION, e, ComponentToolErrorType.GENERATE_ACTION_DEFINITION);
+                FAILED_TO_GENERATE_ACTION_DEFINITION, e, ComponentErrorType.GENERATE_ACTION_DEFINITION);
         }
     }
 
@@ -714,7 +705,7 @@ public class ComponentTools {
         @ToolParam(required = false, description = "The version of the component") Integer version,
         @Nullable ToolContext toolContext) {
 
-        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_OUTPUT_PROPERTIES);
+        checkAllowedComponent(componentName, toolContext, ComponentErrorType.GET_OUTPUT_PROPERTIES);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -757,40 +748,7 @@ public class ComponentTools {
                         if (actionDefinition.isOutputSchemaDefined()) {
                             outputResponse = actionDefinition.getOutputResponse();
                         } else if (actionDefinition.isOutputFunctionDefined()) {
-                            try {
-                                outputResponse = actionDefinitionFacade.executeOutput(
-                                    componentDefinition.getName(), componentDefinition.getVersion(),
-                                    actionDefinition.getName(), Map.of(), Map.of());
-                            } catch (Exception e) {
-                                if (isConnectionFallbackDisabled(toolContext)) {
-                                    throw new Exception(
-                                        "The output of " + componentDefinition.getName() + " " +
-                                            actionDefinition.getName() + " is only known after a test run",
-                                        e);
-                                }
-
-                                try {
-                                    List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
-                                        componentName, version, null, null, null, PlatformType.AUTOMATION);
-
-                                    ConnectionDTO connectionDTO = connectionDTOs.getFirst();
-
-                                    Map<String, Long> connectionIds = Map.of(operationName, connectionDTO.id());
-
-                                    var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
-                                        componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
-                                        null, null, Map.of(), connectionIds, null, null, null, true, null, null, null);
-
-                                    if (output != null) {
-                                        outputResponse = SchemaUtils.toOutput(
-                                            output, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
-                                            PropertyFactory.PROPERTY_FACTORY);
-                                    }
-                                } catch (Exception e2) {
-                                    throw new Exception(
-                                        "Please make a " + componentDefinition.getName() + " connection");
-                                }
-                            }
+                            outputResponse = executeActionOutput(componentDefinition, actionDefinition);
                         }
                     }
                 } else {
@@ -809,7 +767,7 @@ public class ComponentTools {
                     } else {
                         throw new ExecutionException(
                             String.format(OPERATION_NOT_FOUND, operationName, componentName),
-                            ComponentToolErrorType.OPERATION_NOT_FOUND);
+                            ComponentErrorType.OPERATION_NOT_FOUND);
                     }
                 }
             }
@@ -836,7 +794,7 @@ public class ComponentTools {
 
             throw new ExecutionException(
                 FAILED_TO_GET_OUTPUT_PROPERTIES + ": " + e.getMessage(), e,
-                ComponentToolErrorType.GET_OUTPUT_PROPERTIES);
+                ComponentErrorType.GET_OUTPUT_PROPERTIES);
         }
     }
 
@@ -850,7 +808,7 @@ public class ComponentTools {
         @ToolParam(required = false, description = "The version of the component") Integer version,
         @Nullable ToolContext toolContext) {
 
-        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_PROPERTIES);
+        checkAllowedComponent(componentName, toolContext, ComponentErrorType.GET_PROPERTIES);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -899,7 +857,7 @@ public class ComponentTools {
                     } else {
                         throw new ExecutionException(
                             String.format(OPERATION_NOT_FOUND, operationName, componentName),
-                            ComponentToolErrorType.OPERATION_NOT_FOUND);
+                            ComponentErrorType.OPERATION_NOT_FOUND);
                     }
                 }
             }
@@ -917,16 +875,16 @@ public class ComponentTools {
                 "getProperties({}, {}, {}): Failed to get properties for '{}:{}'", componentName, operationName,
                 version, componentName, operationName, e);
 
-            throw new ExecutionException(FAILED_TO_GET_PROPERTIES, e, ComponentToolErrorType.GET_PROPERTIES);
+            throw new ExecutionException(FAILED_TO_GET_PROPERTIES, e, ComponentErrorType.GET_PROPERTIES);
         }
     }
 
     private static void checkAllowedComponent(
-        String componentName, @Nullable ToolContext toolContext, ComponentToolErrorType componentToolErrorType) {
+        String componentName, @Nullable ToolContext toolContext, ComponentErrorType componentErrorType) {
 
         if (!AllowedComponentNamesUtils.isAllowed(componentName, toolContext)) {
             throw new ExecutionException(
-                AllowedComponentNamesUtils.getNotAllowedMessage(List.of(componentName)), componentToolErrorType);
+                AllowedComponentNamesUtils.getNotAllowedMessage(List.of(componentName)), componentErrorType);
         }
     }
 
@@ -938,6 +896,40 @@ public class ComponentTools {
     /**
      * Minimal component information record for the response.
      */
+    private OutputResponse executeActionOutput(
+        ComponentDefinition componentDefinition, ActionDefinition actionDefinition) {
+
+        String componentName = componentDefinition.getName();
+        String actionName = actionDefinition.getName();
+
+        try {
+            return actionDefinitionFacade.executeOutput(
+                componentName, componentDefinition.getVersion(), actionName, Map.of(), Map.of());
+        } catch (RuntimeException exception) {
+            log.warn(
+                "getOutputProperty: output function of '{}:{}' failed: {}", componentName, actionName,
+                exception.toString(), exception);
+
+            Class<? extends RuntimeException> exceptionClass = exception.getClass();
+
+            String cause = exception.getMessage() == null ? exceptionClass.getSimpleName() : exception.getMessage();
+
+            if (componentDefinition.isConnectionRequired()) {
+                throw new ExecutionException(
+                    String.format(
+                        "The output of action '%s' is computed by an output function that needs a %s connection " +
+                            "and could not be computed without one (cause: %s). The output becomes available " +
+                            "once the task runs with a %s connection.",
+                        actionName, componentName, cause, componentName),
+                    exception, ComponentErrorType.GET_OUTPUT_PROPERTIES);
+            }
+
+            throw new ExecutionException(
+                String.format("The output function of action '%s' failed: %s", actionName, cause), exception,
+                ComponentErrorType.GET_OUTPUT_PROPERTIES);
+        }
+    }
+
     private ComponentDefinition getComponentDefinition(String componentName, Integer version) {
         return version != null
             ? componentDefinitionFacade.getComponentDefinition(componentName, version)
@@ -1011,15 +1003,5 @@ public class ComponentTools {
         @JsonProperty("name") @JsonPropertyDescription("The name of the trigger") String name,
         @JsonProperty("description") @JsonPropertyDescription("The description of the trigger") String description,
         @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this trigger") String componentName) {
-    }
-
-    private static boolean isConnectionFallbackDisabled(@Nullable ToolContext toolContext) {
-        if (toolContext == null) {
-            return false;
-        }
-
-        Map<String, Object> context = toolContext.getContext();
-
-        return context != null && Boolean.TRUE.equals(context.get(TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY));
     }
 }

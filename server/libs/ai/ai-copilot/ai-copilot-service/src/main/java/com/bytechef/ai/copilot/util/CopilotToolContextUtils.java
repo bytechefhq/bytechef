@@ -99,10 +99,6 @@ public final class CopilotToolContextUtils {
             toolContext, ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY,
             NumberUtils.asLong(state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID)));
 
-        if (ScopedProjectToolContext.isConfined(new ToolContext(toolContext))) {
-            toolContext.put(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, Boolean.TRUE);
-        }
-
         if (!toolContext.isEmpty()) {
             LookupPropertyTracker.install(toolContext);
         }

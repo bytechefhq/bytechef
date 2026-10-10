@@ -16,9 +16,9 @@
 
 package com.bytechef.automation.ai.tool;
 
-import com.bytechef.automation.ai.tool.exception.SkillToolErrorType;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
+import com.bytechef.platform.ai.skill.exception.AiSkillErrorType;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -78,7 +78,7 @@ public class SkillsTools {
             log.error("createAiSkill({}): Failed to create skill", name, e);
 
             throw new ExecutionException(
-                "Failed to create skill: " + e.getMessage(), e, SkillToolErrorType.CREATE_SKILL);
+                "Failed to create skill: " + e.getMessage(), e, AiSkillErrorType.CREATE_SKILL);
         }
     }
 
@@ -106,7 +106,7 @@ public class SkillsTools {
             log.error("createAdditionalFilesInSkill({}): Failed to add files to skill", id, e);
 
             throw new ExecutionException(
-                "Failed to add files to skill: " + e.getMessage(), e, SkillToolErrorType.CREATE_SKILL);
+                "Failed to add files to skill: " + e.getMessage(), e, AiSkillErrorType.CREATE_SKILL);
         }
     }
 
@@ -126,7 +126,7 @@ public class SkillsTools {
             log.error("getAiSkill({}): Failed to get skill", id, e);
 
             throw new ExecutionException(
-                "Failed to get skill: " + e.getMessage(), e, SkillToolErrorType.GET_SKILL);
+                "Failed to get skill: " + e.getMessage(), e, AiSkillErrorType.GET_SKILL);
         }
     }
 
@@ -147,7 +147,7 @@ public class SkillsTools {
             log.error("getAiSkillFileContent({}, {}): Failed to read skill file content", id, path, e);
 
             throw new ExecutionException(
-                "Failed to get skill file content: " + e.getMessage(), e, SkillToolErrorType.GET_SKILL_FILE_CONTENT);
+                "Failed to get skill file content: " + e.getMessage(), e, AiSkillErrorType.GET_SKILL_FILE_CONTENT);
         }
     }
 
@@ -167,7 +167,7 @@ public class SkillsTools {
             log.error("getAiSkillFilePaths({}): Failed to list skill file paths", id, e);
 
             throw new ExecutionException(
-                "Failed to get skill file paths: " + e.getMessage(), e, SkillToolErrorType.GET_SKILL_FILE_PATHS);
+                "Failed to get skill file paths: " + e.getMessage(), e, AiSkillErrorType.GET_SKILL_FILE_PATHS);
         }
     }
 
@@ -185,7 +185,7 @@ public class SkillsTools {
             log.error("getAiSkills(): Failed to list skills", e);
 
             throw new ExecutionException(
-                "Failed to list skills: " + e.getMessage(), e, SkillToolErrorType.LIST_SKILLS);
+                "Failed to list skills: " + e.getMessage(), e, AiSkillErrorType.LIST_SKILLS);
         }
     }
 
@@ -208,7 +208,7 @@ public class SkillsTools {
             log.error("removeFileInSkill({}, {}): Failed to remove file from skill", id, path, e);
 
             throw new ExecutionException(
-                "Failed to remove file from skill: " + e.getMessage(), e, SkillToolErrorType.REMOVE_SKILL_FILE);
+                "Failed to remove file from skill: " + e.getMessage(), e, AiSkillErrorType.REMOVE_SKILL_FILE);
         }
     }
 
@@ -232,7 +232,7 @@ public class SkillsTools {
             log.error("updateAiSkillContent({}): Failed to update skill content", id, e);
 
             throw new ExecutionException(
-                "Failed to update skill content: " + e.getMessage(), e, SkillToolErrorType.UPDATE_SKILL_CONTENT);
+                "Failed to update skill content: " + e.getMessage(), e, AiSkillErrorType.UPDATE_SKILL_CONTENT);
         }
     }
 
@@ -259,7 +259,7 @@ public class SkillsTools {
             log.error("updateAiSkill({}): Failed to update skill", id, e);
 
             throw new ExecutionException(
-                "Failed to update skill: " + e.getMessage(), e, SkillToolErrorType.UPDATE_SKILL);
+                "Failed to update skill: " + e.getMessage(), e, AiSkillErrorType.UPDATE_SKILL);
         }
     }
 }
