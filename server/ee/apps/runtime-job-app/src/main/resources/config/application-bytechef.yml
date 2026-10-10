@@ -1,4 +1,14 @@
 bytechef:
+  ai:
+    agent-utils:
+      # Hosts the web fetch tool may reach although they resolve to a private or loopback address
+      allowed-private-hosts: []
+      shell:
+        # Shell commands run in the server process and cannot be confined to the agent workspace; enable only on
+        # trusted single-tenant installations
+        enabled: false
+      workspace:
+        basedir: ${user.home}/bytechef/data/ai-agent-workspaces
   approval:
     signed-token:
       # Tolerance applied to signed approval link expiry checks default: PT60S
