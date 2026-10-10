@@ -17,6 +17,7 @@
 package com.bytechef.platform.knowledgebase.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -43,6 +44,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Integration tests for {@link KnowledgeBaseDocumentFacade}.
@@ -113,6 +117,33 @@ class KnowledgeBaseDocumentFacadeIntTest {
         assertThat(document.getDocument()).isEqualTo(mockFileEntry);
 
         verify(knowledgeBaseFileStorage).storeDocument(eq(filename), any(InputStream.class));
+    }
+
+    @Test
+    void testGetKnowledgeBaseDocumentDeniesUnauthenticatedCaller() {
+        KnowledgeBaseDocument document = saveKnowledgeBaseDocument();
+
+        SecurityContextHolder.clearContext();
+
+        assertThatThrownBy(() -> knowledgeBaseDocumentFacade.getKnowledgeBaseDocument(document.getId()))
+            .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+    }
+
+    @Test
+    void testGetKnowledgeBaseDocumentAllowsAuthenticatedCaller() {
+        KnowledgeBaseDocument document = saveKnowledgeBaseDocument();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(UsernamePasswordAuthenticationToken.authenticated("user", null, List.of()));
+
+        try {
+            KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentFacade.getKnowledgeBaseDocument(
+                document.getId());
+
+            assertThat(knowledgeBaseDocument.getId()).isEqualTo(document.getId());
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
     }
 
     @Test
@@ -244,5 +275,16 @@ class KnowledgeBaseDocumentFacadeIntTest {
             knowledgeBaseDocumentRepository.findAllByKnowledgeBaseId(knowledgeBase.getId());
 
         assertThat(documents).hasSize(2);
+    }
+
+    private KnowledgeBaseDocument saveKnowledgeBaseDocument() {
+        KnowledgeBaseDocument document = new KnowledgeBaseDocument();
+
+        document.setKnowledgeBaseId(knowledgeBase.getId());
+        document.setName("Guarded Document");
+        document.setDocument(new FileEntry("guarded.txt", "file://test/guarded.txt"));
+        document.setStatus(KnowledgeBaseDocument.STATUS_READY);
+
+        return knowledgeBaseDocumentRepository.save(document);
     }
 }
