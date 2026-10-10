@@ -77,6 +77,9 @@ const getWorkflowDefinition = (chatMemoryType: string, chatMemoryName: string) =
 
 const getNodeIds = () => useClusterElementsDataStore.getState().nodes.map((node) => node.id);
 
+const getRootX = () =>
+    useClusterElementsDataStore.getState().nodes.find((node) => node.id === 'aiAgent_1')?.position.x ?? Number.NaN;
+
 describe('useClusterElementsLayout', () => {
     let pendingAnimationFrameCallbacks: Array<FrameRequestCallback> = [];
 
@@ -132,24 +135,25 @@ describe('useClusterElementsLayout', () => {
         vi.restoreAllMocks();
     });
 
-    it('keeps the nested root placeholders laid out while the panel-close animation is running', async () => {
+    const renderLayout = async () => {
         const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
 
         const wrapper = ({children}: {children: ReactNode}) =>
             createElement(QueryClientProvider, {client: queryClient}, children);
 
-        renderHook(() => useClusterElementsLayout(), {wrapper});
+        const renderedHook = renderHook(() => useClusterElementsLayout(), {wrapper});
 
         await waitFor(() => expect(getNodeIds()).toContain('awsChatMemory_1-model-placeholder-0'));
 
-        // Replacing the selected memory closes the details panel, which starts the canvas-width animation...
+        return renderedHook;
+    };
+
+    const setDetailsPanelOpen = (workflowNodeDetailsPanelOpen: boolean) =>
         act(() => {
-            useWorkflowNodeDetailsPanelStore.setState({workflowNodeDetailsPanelOpen: false} as never);
+            useWorkflowNodeDetailsPanelStore.setState({workflowNodeDetailsPanelOpen} as never);
         });
 
-        expect(pendingAnimationFrameCallbacks.length).toBeGreaterThan(0);
-
-        // ...and the saved workflow then swaps the memory component while the animation is still in flight.
+    const replaceAwsMemoryWithJdbcMemory = async () => {
         act(() => {
             useWorkflowDataStore.setState({
                 workflow: {
@@ -166,6 +170,18 @@ describe('useClusterElementsLayout', () => {
         );
 
         await waitFor(() => expect(getNodeIds()).toContain('jdbcChatMemory_1-dataSource-placeholder-0'));
+    };
+
+    it('keeps the nested root placeholders laid out while the panel-close animation is running', async () => {
+        await renderLayout();
+
+        // Replacing the selected memory closes the details panel, which starts the canvas-width animation...
+        setDetailsPanelOpen(false);
+
+        expect(pendingAnimationFrameCallbacks.length).toBeGreaterThan(0);
+
+        // ...and the saved workflow then swaps the memory component while the animation is still in flight.
+        await replaceAwsMemoryWithJdbcMemory();
 
         act(() => {
             flushAnimationFrames(0);
@@ -180,5 +196,68 @@ describe('useClusterElementsLayout', () => {
             ])
         );
         expect(getNodeIds()).not.toContain('awsChatMemory_1');
+    });
+
+    it('slides the canvas to its new width when the panel closes', async () => {
+        await renderLayout();
+
+        const initialRootX = getRootX();
+
+        setDetailsPanelOpen(false);
+
+        act(() => {
+            flushAnimationFrames(0);
+            flushAnimationFrames(100);
+        });
+
+        const midSlideRootX = getRootX();
+
+        act(() => {
+            flushAnimationFrames(10_000);
+        });
+
+        const slidRootX = getRootX();
+
+        expect(midSlideRootX).toBeGreaterThan(initialRootX);
+        expect(slidRootX).toBeGreaterThan(midSlideRootX);
+        expect(pendingAnimationFrameCallbacks).toHaveLength(0);
+    });
+
+    it('replaces the running slide when the panel reopens mid-animation', async () => {
+        await renderLayout();
+
+        setDetailsPanelOpen(false);
+
+        act(() => {
+            flushAnimationFrames(0);
+            flushAnimationFrames(100);
+        });
+
+        const midSlideRootX = getRootX();
+
+        setDetailsPanelOpen(true);
+
+        expect(window.cancelAnimationFrame).toHaveBeenCalled();
+
+        act(() => {
+            flushAnimationFrames(0);
+            flushAnimationFrames(10_000);
+        });
+
+        expect(getRootX()).toBeLessThan(midSlideRootX);
+    });
+
+    it('stops the slide when the canvas unmounts', async () => {
+        const {unmount} = await renderLayout();
+
+        setDetailsPanelOpen(false);
+
+        const nodesBeforeUnmount = useClusterElementsDataStore.getState().nodes;
+
+        unmount();
+
+        expect(window.cancelAnimationFrame).toHaveBeenCalled();
+        expect(pendingAnimationFrameCallbacks).toHaveLength(0);
+        expect(useClusterElementsDataStore.getState().nodes).toBe(nodesBeforeUnmount);
     });
 });
