@@ -24,5 +24,7 @@ import java.util.List;
  */
 public interface WorkspaceFacade {
 
+    List<Workspace> getMyWorkspaces();
+
     List<Workspace> getUserWorkspaces(long id);
 }
