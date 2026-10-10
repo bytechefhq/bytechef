@@ -8,11 +8,19 @@
 package com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer;
 
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerApiKeyAuthenticationProvider;
+import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerApiKeyAuthenticationToken;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
+import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
+import com.bytechef.platform.security.web.mcp.McpAuthenticationGuardFilter;
+import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 /**
@@ -32,6 +40,18 @@ public class EmbeddedMcpServerSecurityConfigurer extends AbstractApiKeyHttpConfi
             PATH_PATTERN,
             new EmbeddedMcpServerApiKeyAuthenticationConverter(signingKeyService),
             new EmbeddedMcpServerApiKeyAuthenticationProvider(connectedUserService, mcpServerService));
+    }
+
+    @Override
+    public void configure(HttpSecurity http) {
+        super.configure(http);
+
+        McpAuthenticationGuardFilter mcpAuthenticationGuardFilter = new McpAuthenticationGuardFilter(
+            RegexRequestMatcher.regexMatcher(PATH_PATTERN),
+            List.of(EmbeddedMcpServerApiKeyAuthenticationToken.class, McpAnonymousAuthenticationToken.class),
+            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+
+        http.addFilterBefore(mcpAuthenticationGuardFilter, AuthorizationFilter.class);
     }
 
     @Override
