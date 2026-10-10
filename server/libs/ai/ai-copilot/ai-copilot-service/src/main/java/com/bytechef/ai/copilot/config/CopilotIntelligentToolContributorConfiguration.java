@@ -26,6 +26,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SimpleIntelligentToolDefinition;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,27 +46,36 @@ class CopilotIntelligentToolContributorConfiguration {
         @Qualifier("clusterElementBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> clusterElementBuildFactoryProvider,
         @Qualifier("codeEditorBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> codeEditorBuildFactoryProvider,
         @Qualifier("skillsBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> skillsBuildFactoryProvider,
-        @Qualifier("workflowExecutionBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider) {
+        @Qualifier("workflowExecutionBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
+        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider) {
+
+        SubAgentChatModelResolver chatModelResolver = chatModelResolverProvider.getIfAvailable();
 
         List<IntelligentToolDefinition> definitions = List.of(
             new SimpleIntelligentToolDefinition(
-                "buildWorkflow", variant -> workflowEditorBuildFactoryProvider.getIfAvailable(),
-                ProjectWorkflowAgentToolCallback::new),
+                "buildWorkflow",
+                variant -> workflowEditorBuildFactoryProvider.getIfAvailable(),
+                chatClientFactory -> new ProjectWorkflowAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "importWorkflow", variant -> converterBuildFactoryProvider.getIfAvailable(),
-                ConverterAgentToolCallback::new),
+                "importWorkflow",
+                variant -> converterBuildFactoryProvider.getIfAvailable(),
+                chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "configureClusterElement", variant -> clusterElementBuildFactoryProvider.getIfAvailable(),
-                ClusterElementAgentToolCallback::new),
+                "configureClusterElement",
+                variant -> clusterElementBuildFactoryProvider.getIfAvailable(),
+                chatClientFactory -> new ClusterElementAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "writeScript", variant -> codeEditorBuildFactoryProvider.getIfAvailable(),
-                CodeEditorAgentToolCallback::new),
+                "writeScript",
+                variant -> codeEditorBuildFactoryProvider.getIfAvailable(),
+                chatClientFactory -> new CodeEditorAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "authorSkill", variant -> skillsBuildFactoryProvider.getIfAvailable(),
-                SkillsAgentToolCallback::new),
+                "authorSkill",
+                variant -> skillsBuildFactoryProvider.getIfAvailable(),
+                chatClientFactory -> new SkillsAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "debugWorkflowExecution", variant -> workflowExecutionBuildFactoryProvider.getIfAvailable(),
-                WorkflowExecutionAgentToolCallback::new));
+                "debugWorkflowExecution",
+                variant -> workflowExecutionBuildFactoryProvider.getIfAvailable(),
+                chatClientFactory -> new WorkflowExecutionAgentToolCallback(chatClientFactory, chatModelResolver)));
 
         return () -> definitions;
     }

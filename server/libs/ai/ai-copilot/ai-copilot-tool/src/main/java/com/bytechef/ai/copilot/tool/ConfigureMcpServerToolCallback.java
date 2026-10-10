@@ -21,6 +21,8 @@ import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -69,10 +71,14 @@ public class ConfigureMcpServerToolCallback implements ToolCallback {
             }""";
 
     private final IntelligentToolChatClientFactory chatClientFactory;
+    private final @Nullable SubAgentChatModelResolver chatModelResolver;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ConfigureMcpServerToolCallback(IntelligentToolChatClientFactory chatClientFactory) {
+    public ConfigureMcpServerToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
         this.chatClientFactory = chatClientFactory;
+        this.chatModelResolver = chatModelResolver;
     }
 
     @Override
@@ -107,7 +113,8 @@ public class ConfigureMcpServerToolCallback implements ToolCallback {
 
             Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            ChatClient mcpServerChatClient = chatClientFactory.get();
+            ChatClient mcpServerChatClient =
+                chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
             String result = CurrentAgentContext.callWith(
                 CopilotAgentType.CONFIGURE_MCP_SERVER, parentAgent,
