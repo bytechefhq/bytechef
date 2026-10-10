@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool.knowledgebase;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.exception.KnowledgeBaseDocumentNotFoundException;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
@@ -29,7 +30,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -59,7 +59,6 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
 
     private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public DeleteKnowledgeBaseDocumentToolCallback(
@@ -88,7 +87,7 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
             DeleteKnowledgeBaseDocumentInput input =
-                jsonMapper.readValue(toolInput, DeleteKnowledgeBaseDocumentInput.class);
+                JsonUtils.read(toolInput, DeleteKnowledgeBaseDocumentInput.class);
 
             if (input.knowledgeBaseId() == null || input.knowledgeBaseId()
                 .isBlank()) {
@@ -137,17 +136,16 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
             }
 
             if (!isDocumentInKnowledgeBase(documentId, knowledgeBaseId)) {
-                return jsonMapper.writeValueAsString(new DeleteKnowledgeBaseDocumentOutput(false, input.documentId()));
+                return JsonUtils.write(new DeleteKnowledgeBaseDocumentOutput(false, input.documentId()));
             }
 
             knowledgeBaseDocumentFacade.deleteKnowledgeBaseDocument(documentId);
 
-            return jsonMapper.writeValueAsString(new DeleteKnowledgeBaseDocumentOutput(true, input.documentId()));
+            return JsonUtils.write(new DeleteKnowledgeBaseDocumentOutput(true, input.documentId()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, DeleteKnowledgeBaseDocumentToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(DeleteKnowledgeBaseDocumentToolCallback.class, TOOL_NAME, exception);
         }
     }
 
@@ -178,7 +176,7 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record DeleteKnowledgeBaseDocumentInput(String knowledgeBaseId, String documentId) {
