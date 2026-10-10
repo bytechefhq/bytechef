@@ -9,7 +9,7 @@ For example: the action getMail will probably have the mail parameters as an out
 You can reference the output property in a format similar to:
 ${taskName.property}
 ${taskName.arrayProperty[1]}
-${taskName.objectProperty.property}}
+${taskName.objectProperty.property}
 
 Task parameters:
 - Fill in every required task parameter whose value is already known from the request instead of leaving it empty.
