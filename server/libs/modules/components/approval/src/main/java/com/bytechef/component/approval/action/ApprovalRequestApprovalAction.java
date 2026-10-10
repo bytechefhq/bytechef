@@ -69,6 +69,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -298,7 +299,7 @@ public class ApprovalRequestApprovalAction {
         Instant expiresAt = Instant.now()
             .plus(60, ChronoUnit.DAYS);
 
-        context.suspend(new Suspend(Map.of(FORM_URL, formUrl), expiresAt));
+        context.suspend(new Suspend(Map.of(FORM_URL, formUrl, MetadataConstants.APPROVAL_RESUME, true), expiresAt));
 
         return null;
     }

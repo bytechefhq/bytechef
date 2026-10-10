@@ -345,6 +345,10 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
             return describePendingApproval(job);
         }
 
+        if (isPausedOnWait(job)) {
+            return describePendingWait(job);
+        }
+
         JobExecutionErrors.checkForError(job, taskExecutionService);
         JobExecutionErrors.checkCompleted(job);
 
@@ -357,7 +361,31 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
     }
 
     private static boolean isPausedOnApproval(Job job) {
+        return isSuspended(job) && Boolean.TRUE.equals(job.getMetadata(MetadataConstants.APPROVAL_RESUME));
+    }
+
+    private static boolean isPausedOnWait(Job job) {
+        return isSuspended(job) && !Boolean.TRUE.equals(job.getMetadata(MetadataConstants.APPROVAL_RESUME));
+    }
+
+    private static boolean isSuspended(Job job) {
         return job.getStatus() == Job.Status.STOPPED && job.getMetadata(MetadataConstants.JOB_RESUME_ID) != null;
+    }
+
+    private static Map<String, Object> describePendingWait(Job job) {
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("status", "waiting");
+        result.put(
+            "message",
+            "The workflow run is paused at a wait step and continues on its own when the wait ends; no action " +
+                "is required.");
+
+        if (job.getId() != null) {
+            result.put("jobId", job.getId());
+        }
+
+        return result;
     }
 
     private Map<String, Object> describePendingApproval(Job job) {
@@ -398,15 +426,11 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         Job job = jobService.fetchJob(jobId)
             .orElse(null);
 
-        if (job == null || job.getStatus() != Job.Status.STOPPED) {
+        if (job == null || !isPausedOnApproval(job)) {
             return Optional.empty();
         }
 
-        Object jobResumeId = job.getMetadata(MetadataConstants.JOB_RESUME_ID);
-
-        if (jobResumeId == null) {
-            return Optional.empty();
-        }
+        Object jobResumeId = Objects.requireNonNull(job.getMetadata(MetadataConstants.JOB_RESUME_ID));
 
         return ApprovalFormUrls.buildResumeToken(
             jobResumeId.toString(), approvalTokensObjectProvider.getIfAvailable());
@@ -458,15 +482,11 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         Job job = jobService.fetchJob(jobId)
             .orElse(null);
 
-        if (job == null || job.getStatus() != Job.Status.STOPPED) {
+        if (job == null || !isPausedOnApproval(job)) {
             return Optional.empty();
         }
 
-        Object jobResumeId = job.getMetadata(MetadataConstants.JOB_RESUME_ID);
-
-        if (jobResumeId == null) {
-            return Optional.empty();
-        }
+        Object jobResumeId = Objects.requireNonNull(job.getMetadata(MetadataConstants.JOB_RESUME_ID));
 
         return ApprovalFormUrls.buildFormUrl(
             publicUrl, jobResumeId.toString(), approvalTokensObjectProvider.getIfAvailable());

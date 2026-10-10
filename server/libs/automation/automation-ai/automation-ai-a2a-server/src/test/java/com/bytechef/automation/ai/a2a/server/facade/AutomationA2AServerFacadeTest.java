@@ -187,6 +187,7 @@ class AutomationA2AServerFacadeTest {
         when(job.getId()).thenReturn(100L);
         when(job.getStatus()).thenReturn(Job.Status.STOPPED);
         when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn(jobResumeId);
+        when(job.getMetadata(MetadataConstants.APPROVAL_RESUME)).thenReturn(true);
 
         A2AAgentRun agentRun = start(CompletableFuture.completedFuture(job), null);
 
@@ -226,6 +227,27 @@ class AutomationA2AServerFacadeTest {
                 .doesNotContain("internal-host");
             assertThat(failed.taskReference()).isNotNull();
         });
+    }
+
+    @Test
+    void testRunPausedOnWaitStepIsWorkingNotInputRequired() {
+        stubServer();
+        stubExposedWorkflow("wf1", 20L, Map.of());
+
+        Job job = mock(Job.class);
+
+        when(job.getId()).thenReturn(100L);
+        when(job.getStatus()).thenReturn(Job.Status.STOPPED);
+        when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn(
+            JobResumeId.of(100L)
+                .toString());
+
+        A2AAgentRun agentRun = start(CompletableFuture.completedFuture(job), null);
+
+        assertThat(agentRun.result()
+            .join()).isInstanceOfSatisfying(
+                Working.class,
+                working -> assertThat(working.taskReference()).isEqualTo(agentRun.taskReference()));
     }
 
     @Test
