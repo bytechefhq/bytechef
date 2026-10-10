@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
-import com.bytechef.platform.ai.provider.facade.AiProviderCatalogFacade;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
 import com.bytechef.platform.configuration.web.graphql.config.PlatformConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.platform.configuration.web.graphql.config.PlatformConfigurationGraphQlTestConfiguration;
 import java.util.List;
@@ -47,7 +47,7 @@ import org.springframework.test.context.ContextConfiguration;
 class AiProviderCatalogGraphQlControllerIntTest {
 
     @Autowired
-    private AiProviderCatalogFacade aiProviderCatalogFacade;
+    private AiProviderFacade aiProviderFacade;
 
     @Autowired
     private GraphQlTester graphQlTester;
@@ -58,7 +58,7 @@ class AiProviderCatalogGraphQlControllerIntTest {
             "ai.provider.openAi", "Open AI", "<svg/>", true, false,
             List.of(new AiProviderCatalogItemDTO.Model("gpt-5", "GPT-5")));
 
-        when(aiProviderCatalogFacade.getAiProviderCatalog(2)).thenReturn(List.of(aiProviderCatalogItemDTO));
+        when(aiProviderFacade.getAiChatProviderCatalog(2)).thenReturn(List.of(aiProviderCatalogItemDTO));
 
         graphQlTester
             .document("""
@@ -102,7 +102,7 @@ class AiProviderCatalogGraphQlControllerIntTest {
 
     @Test
     void testAiDefaultModelDelegatesToFacade() {
-        when(aiProviderCatalogFacade.getAiDefaultModel(2))
+        when(aiProviderFacade.getAiDefaultChatModel(2))
             .thenReturn(new AiDefaultModelDTO("ai.provider.anthropic", "claude-sonnet-4-6"));
 
         graphQlTester
