@@ -114,6 +114,8 @@ public class CopilotApiController {
             }
         } else if (agentId.equals("converter")) {
             agentId = "converter_build";
+        } else if (agentId.equals("mcp_server")) {
+            agentId = "mcp_server_build";
         } else if (agentId.equals("skills")) {
             if (Mode.valueOf((String) mode) == Mode.BUILD) {
                 agentId = "skills_build";

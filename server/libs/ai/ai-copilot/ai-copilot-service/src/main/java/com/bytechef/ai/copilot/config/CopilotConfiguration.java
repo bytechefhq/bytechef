@@ -22,12 +22,14 @@ import com.bytechef.ai.copilot.advisor.EnvironmentAwareQuestionAnswerAdvisor;
 import com.bytechef.ai.copilot.agent.ClusterElementSpringAIAgent;
 import com.bytechef.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ai.copilot.agent.ConverterSpringAIAgent;
+import com.bytechef.ai.copilot.agent.McpServerSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.SkillsSpringAIAgent;
 import com.bytechef.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
+import com.bytechef.ai.copilot.tool.ConfigureMcpServerToolCallback;
 import com.bytechef.ai.copilot.tool.CreateConnectionToolCallback;
 import com.bytechef.ai.copilot.tool.ListConnectionsForComponentToolCallback;
 import com.bytechef.ai.copilot.tool.LookupActionPropertyOptionsToolCallback;
@@ -470,6 +472,35 @@ public class CopilotConfiguration {
                     List.of(
                         skillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
                         workflowInstructionTools)))
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+    }
+
+    @Bean
+    McpServerSpringAIAgent mcpServerBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel,
+        @Qualifier("mcpServerBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> mcpServerBuildSubAgentChatClientFactoryProvider,
+        @Value("classpath:prompt_mcp_server_build.txt") Resource promptMcpServerBuildResource,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        throws AGUIException {
+
+        String name = Source.MCP_SERVER.name() + "_" + Mode.BUILD.name();
+
+        IntelligentToolChatClientFactory mcpServerChatClientFactory =
+            () -> mcpServerBuildSubAgentChatClientFactoryProvider.getObject()
+                .get();
+
+        return McpServerSpringAIAgent.builder()
+            .agentId(name.toLowerCase())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptMcpServerBuildResource))
+            .state(state)
+            .toolCallbacks(
+                wrapTools(
+                    securityContextRehydrator,
+                    List.of(new ConfigureMcpServerToolCallback(mcpServerChatClientFactory))))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
