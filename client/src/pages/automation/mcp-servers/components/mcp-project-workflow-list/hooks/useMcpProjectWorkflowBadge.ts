@@ -1,4 +1,4 @@
-import {useDeleteMcpProjectWorkflowMutation} from '@/shared/middleware/graphql';
+import {useDeleteMcpProjectWorkflowMutation, useUpdateMcpProjectWorkflowMutation} from '@/shared/middleware/graphql';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -41,11 +41,26 @@ export default function useMcpProjectWorkflowBadge(mcpProjectWorkflow: McpProjec
         },
     });
 
+    const updateMcpProjectWorkflowMutation = useUpdateMcpProjectWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['mcpProjectsByServerId'],
+            });
+        },
+    });
+
     const handleCloseEditDialog = () => {
         setShowEditWorkflowDialog(false);
 
         queryClient.invalidateQueries({
             queryKey: ['mcpProjectsByServerId'],
+        });
+    };
+
+    const handleEnabledChange = (enabled: boolean) => {
+        updateMcpProjectWorkflowMutation.mutate({
+            id: mcpProjectWorkflow.id,
+            input: {enabled},
         });
     };
 
@@ -58,7 +73,9 @@ export default function useMcpProjectWorkflowBadge(mcpProjectWorkflow: McpProjec
     return {
         handleCloseEditDialog,
         handleConfirmDelete,
+        handleEnabledChange,
         isDeletePending: deleteMcpProjectWorkflowMutation.isPending,
+        isEnablePending: updateMcpProjectWorkflowMutation.isPending,
         projectDeploymentWorkflow,
         setShowDeleteDialog,
         setShowEditWorkflowDialog,

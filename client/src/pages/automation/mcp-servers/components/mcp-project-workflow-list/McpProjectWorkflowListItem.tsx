@@ -1,5 +1,6 @@
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
+import Switch from '@/components/Switch/Switch';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
@@ -17,7 +18,9 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
     const {
         handleCloseEditDialog,
         handleConfirmDelete,
+        handleEnabledChange,
         isDeletePending,
+        isEnablePending,
         projectDeploymentWorkflow,
         setShowDeleteDialog,
         setShowEditWorkflowDialog,
@@ -40,7 +43,15 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                 <div className="flex items-center gap-2 py-0.5">
                     <span className="min-w-0 flex-1 truncate text-sm font-medium">{workflowLabel}</span>
 
-                    <div className="flex shrink-0 items-center gap-0.5">
+                    <div className="flex shrink-0 items-center gap-2">
+                        <Switch
+                            aria-label={`Enable ${workflowLabel}`}
+                            checked={mcpProjectWorkflow.enabled}
+                            className="mr-2"
+                            disabled={isEnablePending}
+                            onCheckedChange={handleEnabledChange}
+                        />
+
                         {/* Anchor the popover to the Configure button so it opens right-aligned to that button. */}
 
                         <PopoverAnchor asChild>
