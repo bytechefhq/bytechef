@@ -26,10 +26,10 @@ import org.springframework.security.core.Authentication;
 
 /**
  * Surface-neutral invocation context for shared component-interaction tool callbacks (connection / property options).
- * Carries the workspace, user, and environment a tool needs, plus an optional conversation id (used by AI Hub's
- * artifact recorder; null for the Copilot surface) and an optional captured {@link Authentication} the tool wrapper
- * restores on the worker thread. Both AI Hub and the Copilot panel populate it into their agent {@code ToolContext};
- * the shared tools read only this type, so they don't depend on any one surface.
+ * Carries the workspace, user, and environment a tool needs, plus an optional conversation id and an optional captured
+ * {@link Authentication} the tool wrapper restores on the worker thread. The Copilot panel and the management MCP
+ * surface populate it into their agent {@code ToolContext}; the shared tools read only this type, so they don't depend
+ * on any one surface.
  *
  * <p>
  * New callers should prefer {@link #builder()} over the positional constructors: with three adjacent {@code Long} ids
@@ -52,8 +52,7 @@ import org.springframework.security.core.Authentication;
 })
 public record AgentToolInvocationContext(
     @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
-    @Nullable String conversationId, @Nullable String tenantId, @Nullable Authentication authentication,
-    boolean skipAutomationAuthorization) {
+    @Nullable String conversationId, @Nullable String tenantId, @Nullable Authentication authentication) {
 
     public static final String TOOL_CONTEXT_WORKSPACE_ID_KEY = "bytechef.agentTool.workspaceId";
     public static final String TOOL_CONTEXT_USER_ID_KEY = "bytechef.agentTool.userId";
@@ -61,28 +60,16 @@ public record AgentToolInvocationContext(
     public static final String TOOL_CONTEXT_CONVERSATION_ID_KEY = "bytechef.agentTool.conversationId";
     public static final String TOOL_CONTEXT_TENANT_ID_KEY = "bytechef.agentTool.tenantId";
     public static final String TOOL_CONTEXT_AUTHENTICATION_KEY = "bytechef.agentTool.authentication";
-    public static final String TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY = "bytechef.agentTool.skipAutomationAuthorization";
 
     /**
-     * Convenience constructor for callers that carry a captured authentication but do not request the embedded
-     * automation-authorization bypass.
-     */
-    public AgentToolInvocationContext(
-        @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
-        @Nullable String conversationId, @Nullable String tenantId, @Nullable Authentication authentication) {
-
-        this(workspaceId, userId, environmentId, conversationId, tenantId, authentication, false);
-    }
-
-    /**
-     * Convenience constructor for the common case of no captured authentication (e.g. AI Hub and the userId-based
-     * in-editor Copilot path, where security context is rehydrated from the user id instead).
+     * Convenience constructor for the common case of no captured authentication (e.g. the userId-based in-editor
+     * Copilot path, where security context is rehydrated from the user id instead).
      */
     public AgentToolInvocationContext(
         @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
         @Nullable String conversationId, @Nullable String tenantId) {
 
-        this(workspaceId, userId, environmentId, conversationId, tenantId, null, false);
+        this(workspaceId, userId, environmentId, conversationId, tenantId, null);
     }
 
     public static Builder builder() {
@@ -107,15 +94,15 @@ public record AgentToolInvocationContext(
         String tenantId = asString(map.get(TOOL_CONTEXT_TENANT_ID_KEY));
         Authentication authentication = map.get(TOOL_CONTEXT_AUTHENTICATION_KEY) instanceof Authentication value
             ? value : null;
-        boolean skipAutomationAuthorization = Boolean.TRUE.equals(map.get(TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY));
 
         if (workspaceId == null && userId == null && environmentId == null && conversationId == null
-            && tenantId == null && authentication == null && !skipAutomationAuthorization) {
+            && tenantId == null && authentication == null) {
+
             return null;
         }
 
         return new AgentToolInvocationContext(
-            workspaceId, userId, environmentId, conversationId, tenantId, authentication, skipAutomationAuthorization);
+            workspaceId, userId, environmentId, conversationId, tenantId, authentication);
     }
 
     public int resolveEnvironmentOrDefault() {
@@ -157,10 +144,6 @@ public record AgentToolInvocationContext(
             map.put(TOOL_CONTEXT_AUTHENTICATION_KEY, authentication);
         }
 
-        if (skipAutomationAuthorization) {
-            map.put(TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY, Boolean.TRUE);
-        }
-
         return map;
     }
 
@@ -197,7 +180,6 @@ public record AgentToolInvocationContext(
         private @Nullable String conversationId;
         private @Nullable String tenantId;
         private @Nullable Authentication authentication;
-        private boolean skipAutomationAuthorization;
 
         private Builder() {
         }
@@ -238,16 +220,9 @@ public record AgentToolInvocationContext(
             return this;
         }
 
-        public Builder skipAutomationAuthorization(boolean skipAutomationAuthorization) {
-            this.skipAutomationAuthorization = skipAutomationAuthorization;
-
-            return this;
-        }
-
         public AgentToolInvocationContext build() {
             return new AgentToolInvocationContext(
-                workspaceId, userId, environmentId, conversationId, tenantId, authentication,
-                skipAutomationAuthorization);
+                workspaceId, userId, environmentId, conversationId, tenantId, authentication);
         }
     }
 }
