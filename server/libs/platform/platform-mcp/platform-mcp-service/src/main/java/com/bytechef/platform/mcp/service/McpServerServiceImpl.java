@@ -154,6 +154,14 @@ public class McpServerServiceImpl implements McpServerService {
     @Override
     @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
     public McpServer update(long id, String name, Boolean enabled) {
+        return update(id, name, enabled, null, null);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
+    public McpServer update(
+        long id, String name, Boolean enabled, Boolean enforceToolAuthorization, Boolean authenticationRequired) {
+
         McpServer existingMcpServer = getMcpServer(id);
 
         if (name != null) {
@@ -167,6 +175,16 @@ public class McpServerServiceImpl implements McpServerService {
         if (enabled != null) {
             existingMcpServer.setEnabled(enabled);
         }
+
+        if (enforceToolAuthorization != null) {
+            existingMcpServer.setEnforceToolAuthorization(enforceToolAuthorization);
+        }
+
+        if (authenticationRequired != null) {
+            existingMcpServer.setAuthenticationRequired(authenticationRequired);
+        }
+
+        checkAuthenticationRequiredForEnforcement(existingMcpServer);
 
         return mcpServerRepository.save(existingMcpServer);
     }
