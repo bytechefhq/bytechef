@@ -117,6 +117,9 @@ class McpProjectFacadeIntTest {
             .workspaceId(workspace.getId())
             .build();
 
+        project.publish("v1");
+        project.publish("v2");
+
         project = projectRepository.save(project);
 
         projectWorkflowRepository.saveAll(
@@ -333,6 +336,104 @@ class McpProjectFacadeIntTest {
 
             assertThat(projectDeploymentWorkflowRepository.count()).isEqualTo(projectDeploymentWorkflowCount);
             assertThat(mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId())).hasSize(1);
+        }
+    }
+
+    @Nested
+    class ProjectVersionPublication {
+
+        @Test
+        void testCreateMcpProjectRejectsAnUnpublishedProject() {
+            Project unpublishedProject = projectRepository.save(
+                Project.builder()
+                    .categoryId(project.getCategoryId())
+                    .name("unpublished-project")
+                    .workspaceId(project.getWorkspaceId())
+                    .build());
+
+            projectWorkflowRepository.save(
+                new ProjectWorkflow(unpublishedProject.getId(), 1, "unpublished", UUID.randomUUID()));
+
+            long projectDeploymentCount = projectDeploymentRepository.count();
+            long mcpServerId = mcpServer.getId();
+            long projectId = unpublishedProject.getId();
+            List<String> selectedWorkflowIds = List.of("unpublished");
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Project " + projectId + " is not published");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
+            assertThat(projectDeploymentWorkflowRepository.count()).isZero();
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsTheDraftProjectVersion() {
+            projectWorkflowRepository.save(new ProjectWorkflow(project.getId(), 3, "draft", UUID.randomUUID()));
+
+            long projectDeploymentCount = projectDeploymentRepository.count();
+            long mcpServerId = mcpServer.getId();
+            long projectId = project.getId();
+            List<String> selectedWorkflowIds = List.of("draft");
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 3, selectedWorkflowIds))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Version 3 of project " + projectId + " is not published");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
+            assertThat(projectDeploymentWorkflowRepository.count()).isZero();
+        }
+
+        @Test
+        void testCreateMcpProjectAcceptsAPublishedProjectVersion() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 2, List.of("workflow3"));
+
+            assertThat(mcpProjectRepository.findById(mcpProject.getId())).isPresent();
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                mcpProject.getProjectDeploymentId()))
+                    .extracting(ProjectDeploymentWorkflow::getWorkflowId)
+                    .containsExactly("workflow3");
+        }
+
+        @Test
+        void testCloneMcpProjectRejectsAnUnpublishedProject() {
+            Project unpublishedProject = projectRepository.save(
+                Project.builder()
+                    .categoryId(project.getCategoryId())
+                    .name("unpublished-project")
+                    .workspaceId(project.getWorkspaceId())
+                    .build());
+
+            ProjectDeployment unpublishedProjectDeployment = new ProjectDeployment();
+
+            unpublishedProjectDeployment.setEnvironment(Environment.DEVELOPMENT);
+            unpublishedProjectDeployment.setName("unpublished-deployment");
+            unpublishedProjectDeployment.setProjectId(unpublishedProject.getId());
+            unpublishedProjectDeployment.setProjectVersion(1);
+
+            unpublishedProjectDeployment = projectDeploymentRepository.save(unpublishedProjectDeployment);
+
+            McpProject sourceMcpProject = mcpProjectRepository.save(
+                new McpProject(unpublishedProjectDeployment.getId(), mcpServer.getId()));
+
+            McpServer targetMcpServer = mcpServerRepository.save(
+                new McpServer("target-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
+
+            long projectDeploymentCount = projectDeploymentRepository.count();
+            long sourceMcpProjectId = sourceMcpProject.getId();
+            long targetMcpServerId = targetMcpServer.getId();
+
+            assertThatThrownBy(() -> mcpProjectFacade.cloneMcpProject(sourceMcpProjectId, targetMcpServerId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("is not published");
+
+            assertThat(mcpProjectRepository.count()).isEqualTo(1);
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
         }
     }
 

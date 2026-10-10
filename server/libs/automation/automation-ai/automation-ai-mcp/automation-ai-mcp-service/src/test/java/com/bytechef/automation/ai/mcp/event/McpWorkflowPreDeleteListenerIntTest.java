@@ -102,12 +102,15 @@ class McpWorkflowPreDeleteListenerIntTest {
 
         workspace = workspaceRepository.save(new Workspace("test-workspace"));
 
-        project = projectRepository.save(
-            Project.builder()
-                .description("test-project")
-                .name("test-project")
-                .workspaceId(workspace.getId())
-                .build());
+        Project newProject = Project.builder()
+            .description("test-project")
+            .name("test-project")
+            .workspaceId(workspace.getId())
+            .build();
+
+        newProject.publish("v1");
+
+        project = projectRepository.save(newProject);
 
         projectWorkflowRepository.save(new ProjectWorkflow(project.getId(), 1, WORKFLOW_ID, UUID.randomUUID()));
     }
@@ -168,12 +171,15 @@ class McpWorkflowPreDeleteListenerIntTest {
 
     @Test
     void testDeleteWorkflowSweepsProjectDeploymentWorkflowsOfASystemNamedProject() {
-        Project systemProject = projectRepository.save(
-            Project.builder()
-                .description("test-system-project")
-                .name("__EMBEDDED__test-project")
-                .workspaceId(workspace.getId())
-                .build());
+        Project newSystemProject = Project.builder()
+            .description("test-system-project")
+            .name("__EMBEDDED__test-project")
+            .workspaceId(workspace.getId())
+            .build();
+
+        newSystemProject.publish("v1");
+
+        Project systemProject = projectRepository.save(newSystemProject);
 
         projectWorkflowRepository.save(
             new ProjectWorkflow(systemProject.getId(), 1, SYSTEM_PROJECT_WORKFLOW_ID, UUID.randomUUID()));

@@ -22,10 +22,13 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -54,6 +57,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     private final McpServerService mcpServerService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
@@ -61,7 +65,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         McpProjectAuditPublisher mcpProjectAuditPublisher, McpProjectService mcpProjectService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         ProjectDeploymentService projectDeploymentService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService) {
 
         this.mcpProjectAuditPublisher = mcpProjectAuditPublisher;
@@ -70,6 +74,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         this.mcpServerService = mcpServerService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
     }
 
@@ -78,6 +83,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
+
+        validateProjectVersionPublished(projectId, projectVersion);
 
         validateProjectVersionWorkflowIds(projectId, projectVersion, selectedWorkflowIds);
 
@@ -259,6 +266,24 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         return createMcpProject(
             targetMcpServerId, sourceDeployment.getProjectId(), sourceDeployment.getProjectVersion(),
             selectedWorkflowIds);
+    }
+
+    private void validateProjectVersionPublished(long projectId, int projectVersion) {
+        Project project = projectService.getProject(projectId);
+
+        if (!project.isPublished()) {
+            throw new IllegalArgumentException("Project " + projectId + " is not published");
+        }
+
+        boolean projectVersionPublished = project.getProjectVersions()
+            .stream()
+            .anyMatch(curProjectVersion -> curProjectVersion.getVersion() == projectVersion &&
+                curProjectVersion.getStatus() == ProjectVersion.Status.PUBLISHED);
+
+        if (!projectVersionPublished) {
+            throw new IllegalArgumentException(
+                "Version " + projectVersion + " of project " + projectId + " is not published");
+        }
     }
 
     private void validateProjectVersionWorkflowIds(long projectId, int projectVersion, List<String> workflowIds) {

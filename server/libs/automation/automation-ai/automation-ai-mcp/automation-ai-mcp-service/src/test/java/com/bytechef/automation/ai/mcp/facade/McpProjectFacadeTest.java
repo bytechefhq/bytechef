@@ -17,8 +17,10 @@
 package com.bytechef.automation.ai.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,15 +28,20 @@ import com.bytechef.automation.ai.mcp.audit.McpProjectAuditPublisher;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -50,16 +57,18 @@ class McpProjectFacadeTest {
     private final ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
         mock(ProjectDeploymentWorkflowService.class);
+    private final ProjectService projectService = mock(ProjectService.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
 
     private final McpProjectFacade mcpProjectFacade = new McpProjectFacadeImpl(
         mcpProjectAuditPublisher, mcpProjectService, mcpProjectWorkflowService, mcpServerService,
-        projectDeploymentService, projectDeploymentWorkflowService, projectWorkflowService);
+        projectDeploymentService, projectDeploymentWorkflowService, projectService, projectWorkflowService);
 
-    @Test
-    void testCreateMcpProjectUsesMcpServerEnvironment() {
+    @BeforeEach
+    void beforeEach() {
         when(mcpServerService.getMcpServer(1L)).thenReturn(
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.PRODUCTION));
+        when(projectService.getProject(100L)).thenReturn(project(3));
         when(projectDeploymentService.create(any(ProjectDeployment.class)))
             .thenAnswer(invocation -> {
                 ProjectDeployment projectDeployment = invocation.getArgument(0);
@@ -76,7 +85,18 @@ class McpProjectFacadeTest {
 
                 return mcpProject;
             });
+        when(projectDeploymentWorkflowService.create(any(ProjectDeploymentWorkflow.class)))
+            .thenAnswer(invocation -> {
+                ProjectDeploymentWorkflow projectDeploymentWorkflow = invocation.getArgument(0);
 
+                projectDeploymentWorkflow.setId(30L);
+
+                return projectDeploymentWorkflow;
+            });
+    }
+
+    @Test
+    void testCreateMcpProjectUsesMcpServerEnvironment() {
         mcpProjectFacade.createMcpProject(1L, 100L, 1, List.of());
 
         ArgumentCaptor<ProjectDeployment> projectDeploymentArgumentCaptor =
@@ -87,5 +107,64 @@ class McpProjectFacadeTest {
         ProjectDeployment projectDeployment = projectDeploymentArgumentCaptor.getValue();
 
         assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
+    }
+
+    @Nested
+    class CreateMcpProjectProjectVersionPublication {
+
+        @Test
+        void testCreateMcpProjectRejectsAnUnpublishedProject() {
+            when(projectService.getProject(100L)).thenReturn(project(0));
+            when(projectWorkflowService.getProjectWorkflowIds(100L, 1)).thenReturn(List.of("wf-1"));
+
+            assertThatIllegalArgumentException()
+                .isThrownBy(() -> mcpProjectFacade.createMcpProject(1L, 100L, 1, List.of("wf-1")))
+                .withMessageContaining("Project 100 is not published");
+
+            verify(projectDeploymentService, never()).create(any());
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsTheDraftProjectVersion() {
+            when(projectWorkflowService.getProjectWorkflowIds(100L, 4)).thenReturn(List.of("wf-1"));
+
+            assertThatIllegalArgumentException()
+                .isThrownBy(() -> mcpProjectFacade.createMcpProject(1L, 100L, 4, List.of("wf-1")))
+                .withMessageContaining("Version 4 of project 100 is not published");
+
+            verify(projectDeploymentService, never()).create(any());
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsAProjectVersionThatDoesNotExist() {
+            assertThatIllegalArgumentException()
+                .isThrownBy(() -> mcpProjectFacade.createMcpProject(1L, 100L, 9, List.of()))
+                .withMessageContaining("Version 9 of project 100 is not published");
+
+            verify(projectDeploymentService, never()).create(any());
+        }
+
+        @Test
+        void testCreateMcpProjectAcceptsAPublishedProjectVersion() {
+            when(projectWorkflowService.getProjectWorkflowIds(100L, 2)).thenReturn(List.of("wf-1"));
+
+            mcpProjectFacade.createMcpProject(1L, 100L, 2, List.of("wf-1"));
+
+            verify(projectDeploymentService).create(any());
+            verify(mcpProjectWorkflowService).create(20L, 30L);
+        }
+    }
+
+    private static Project project(int publishedProjectVersionCount) {
+        Project project = Project.builder()
+            .id(100L)
+            .name("project")
+            .build();
+
+        for (int index = 0; index < publishedProjectVersionCount; index++) {
+            project.publish("v" + (index + 1));
+        }
+
+        return project;
     }
 }
