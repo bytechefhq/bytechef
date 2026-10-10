@@ -1,6 +1,5 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import JsonView from '@/shared/components/JsonView';
 import {
     type EditorJobFileLogsQuery,
@@ -147,7 +146,7 @@ const LogEntryMessage = ({collapsed, message}: {collapsed?: boolean; message: st
 
     if (parsedJson) {
         return (
-            <div className="flex-1 overflow-x-auto text-nowrap">
+            <div className="min-w-0 flex-1 wrap-anywhere">
                 <JsonView
                     collapsed={false}
                     fallback={
@@ -167,7 +166,7 @@ const LogEntryMessage = ({collapsed, message}: {collapsed?: boolean; message: st
         );
     }
 
-    return <span className="min-w-0 flex-1 text-sm break-words">{message}</span>;
+    return <span className="min-w-0 flex-1 text-sm wrap-anywhere">{message}</span>;
 };
 
 interface LogEntryRowProps {
@@ -220,7 +219,7 @@ const LogEntryRow = ({collapsed, entry, showComponentName}: LogEntryRowProps) =>
                         <div>
                             <span className="text-xs font-semibold text-muted-foreground">Message: </span>
 
-                            <span className="text-xs break-words">{entry.exceptionMessage}</span>
+                            <span className="text-xs wrap-anywhere">{entry.exceptionMessage}</span>
                         </div>
                     )}
 
@@ -228,7 +227,7 @@ const LogEntryRow = ({collapsed, entry, showComponentName}: LogEntryRowProps) =>
                         <div>
                             <span className="text-xs font-semibold text-muted-foreground">Stack Trace:</span>
 
-                            <pre className="mt-1 overflow-x-auto text-xs whitespace-pre-wrap text-muted-foreground">
+                            <pre className="mt-1 text-xs wrap-anywhere whitespace-pre-wrap text-muted-foreground">
                                 {entry.stackTrace}
                             </pre>
                         </div>
@@ -397,22 +396,16 @@ const WorkflowExecutionLogsContent = ({
         <div className="flex h-full min-h-0 flex-col">
             {toolbarContainer ? createPortal(toolbar, toolbarContainer) : toolbar}
 
-            <ScrollArea className="min-h-0 flex-1">
-                <div className="divide-y divide-stroke-neutral-secondary">
-                    {visibleLogs.map((logEntry, index) => (
-                        <LogEntryRow
-                            collapsed={collapsed}
-                            entry={logEntry}
-                            key={`${logEntry.timestamp}-${index}-${expansionVersion}`}
-                            showComponentName={!taskExecutionId && !isTriggerLogs}
-                        />
-                    ))}
-                </div>
-
-                <ScrollBar orientation="horizontal" />
-
-                <ScrollBar orientation="vertical" />
-            </ScrollArea>
+            <div className="divide-y divide-stroke-neutral-secondary">
+                {visibleLogs.map((logEntry, index) => (
+                    <LogEntryRow
+                        collapsed={collapsed}
+                        entry={logEntry}
+                        key={`${logEntry.timestamp}-${index}-${expansionVersion}`}
+                        showComponentName={!taskExecutionId && !isTriggerLogs}
+                    />
+                ))}
+            </div>
         </div>
     );
 };
