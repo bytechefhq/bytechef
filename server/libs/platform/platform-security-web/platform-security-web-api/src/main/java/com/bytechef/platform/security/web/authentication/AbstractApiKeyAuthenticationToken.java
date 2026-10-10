@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.authentication;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
@@ -30,6 +31,7 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
 
     private @Nullable Long apiKeyId;
     private long environmentId;
+    private boolean environmentIdPresent;
     private @Nullable String tenantId;
     private @Nullable User user;
 
@@ -41,7 +43,18 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
         super(List.of());
 
         this.environmentId = environmentId;
+        this.environmentIdPresent = true;
         this.tenantId = tenantId;
+    }
+
+    @SuppressFBWarnings("EI")
+    public AbstractApiKeyAuthenticationToken(User user) {
+        super(user.getAuthorities());
+
+        this.user = user;
+
+        setAuthenticated(true);
+        setDetails(user);
     }
 
     public AbstractApiKeyAuthenticationToken(long environmentId, User user) {
@@ -54,6 +67,7 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
 
         this.apiKeyId = apiKeyId;
         this.environmentId = environmentId;
+        this.environmentIdPresent = true;
         this.user = user;
 
         setAuthenticated(true);
@@ -98,5 +112,9 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
 
     public long getEnvironmentId() {
         return environmentId;
+    }
+
+    public Optional<Long> fetchEnvironmentId() {
+        return environmentIdPresent ? Optional.of(environmentId) : Optional.empty();
     }
 }
