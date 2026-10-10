@@ -14,7 +14,10 @@ export type Scalars = {
 
 export type A2aProject = {
   __typename?: 'A2aProject';
+  a2aServerId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  projectDeploymentId?: Maybe<Scalars['ID']['output']>;
   projectId?: Maybe<Scalars['ID']['output']>;
   projectVersion?: Maybe<Scalars['Int']['output']>;
   workflowIds: Array<Scalars['String']['output']>;
@@ -22,6 +25,7 @@ export type A2aProject = {
 
 export type A2aProjectWorkflow = {
   __typename?: 'A2aProjectWorkflow';
+  enabled: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   skillDescription?: Maybe<Scalars['String']['output']>;
   skillName?: Maybe<Scalars['String']['output']>;
@@ -41,8 +45,10 @@ export type A2aServer = {
   enabled: Scalars['Boolean']['output'];
   environmentId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
   secretKey?: Maybe<Scalars['String']['output']>;
+  tags?: Maybe<Array<Maybe<Tag>>>;
 };
 
 export type ActionDefinition = {
@@ -1525,6 +1531,7 @@ export type McpProjectWorkflow = {
   __typename?: 'McpProjectWorkflow';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
+  enabled: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
@@ -1542,6 +1549,7 @@ export type McpProjectWorkflowInput = {
 };
 
 export type McpProjectWorkflowUpdateInput = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
   mcpProjectId?: InputMaybe<Scalars['Long']['input']>;
   parameters?: InputMaybe<Scalars['Map']['input']>;
   projectDeploymentWorkflowId?: InputMaybe<Scalars['Long']['input']>;
@@ -1715,8 +1723,10 @@ export type Mutation = {
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
   updateA2aProject?: Maybe<A2aProject>;
+  updateA2aProjectWorkflowEnabled?: Maybe<A2aProjectWorkflow>;
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
   updateA2aServer?: Maybe<A2aServer>;
+  updateA2aServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateAiAgentEvalScenario: AiAgentEvalScenario;
   updateAiAgentEvalTest: AiAgentEvalTest;
   updateAiAgentJudge: AiAgentJudge;
@@ -2383,6 +2393,12 @@ export type MutationUpdateA2aProjectArgs = {
 };
 
 
+export type MutationUpdateA2aProjectWorkflowEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateA2aProjectWorkflowParametersArgs = {
   id: Scalars['ID']['input'];
   input: A2aProjectWorkflowParametersInput;
@@ -2392,6 +2408,12 @@ export type MutationUpdateA2aProjectWorkflowParametersArgs = {
 export type MutationUpdateA2aServerArgs = {
   id: Scalars['ID']['input'];
   input: UpdateA2aServerInput;
+};
+
+
+export type MutationUpdateA2aServerTagsArgs = {
+  id: Scalars['ID']['input'];
+  tags: Array<TagInput>;
 };
 
 
@@ -2913,7 +2935,9 @@ export type Query = {
   __typename?: 'Query';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   a2aProjectWorkflowsByA2aProjectId?: Maybe<Array<Maybe<A2aProjectWorkflow>>>;
+  a2aProjects?: Maybe<Array<Maybe<A2aProject>>>;
   a2aProjectsByServerId?: Maybe<Array<Maybe<A2aProject>>>;
+  a2aServerTags?: Maybe<Array<Maybe<Tag>>>;
   a2aServers?: Maybe<Array<Maybe<A2aServer>>>;
   actionDefinition: ActionDefinition;
   actionDefinitions: Array<ActionDefinition>;
