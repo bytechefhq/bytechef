@@ -77,7 +77,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testManagementResolvesTenantFromUrlAndEnrichesPrincipal() throws Exception {
         String path = managementPath("acme");
 
-        authenticate(jwtNoTenant("mcp:management", endpointUrl(path)), "SCOPE_mcp:management");
+        authenticate(jwtWithTenant("acme", "mcp:management", endpointUrl(path)), "SCOPE_mcp:management");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -104,7 +104,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testAutomationResolvesTenantFromUrl() throws Exception {
         String path = automationPath("acme");
 
-        authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -122,7 +122,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testRejectsTokenMissingRequiredScope() throws Exception {
         String path = managementPath("acme");
 
-        authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -139,7 +139,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testRejectsRequestWhoseEndpointHasNoRequiredScope() throws Exception {
         String path = automationPath("acme") + "/unmatched";
 
-        authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -154,7 +154,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
     @Test
     void testRejectsTokenMissingAudience() throws Exception {
-        authenticate(jwtNoTenant("mcp:automation", null), "SCOPE_mcp:automation");
+        authenticate(jwtWithTenant("acme", "mcp:automation", null), "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -170,7 +170,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     @Test
     void testRejectsTokenWhoseAudienceIsAnotherEndpoint() throws Exception {
         authenticate(
-            jwtNoTenant("mcp:automation", "http://localhost/api/automation/other-secret/mcp"),
+            jwtWithTenant("acme", "mcp:automation", "http://localhost/api/automation/other-secret/mcp"),
             "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -202,6 +202,23 @@ class TenantAwareJwtAuthenticationFilterTest {
     }
 
     @Test
+    void testRejectsTokenMissingTheConfiguredTenantClaim() throws Exception {
+        String path = automationPath("acme");
+
+        authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicBoolean chainInvoked = new AtomicBoolean();
+
+        tenantAwareJwtAuthenticationFilter.doFilter(
+            request(path), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(chainInvoked).isFalse();
+    }
+
+    @Test
     void testRejectsSelfIssuerTokenWhenByteChefUserIsNotActive() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
@@ -211,7 +228,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         String path = automationPath("acme");
 
-        authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -236,7 +253,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         String path = automationPath("acme");
 
-        authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -316,7 +333,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testVerifiesMcpServerSecretInsideUrlTenant() throws Exception {
         String path = automationPath("acme");
 
-        authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -338,7 +355,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         String path = managementPath("victim");
 
-        authenticate(jwtNoTenant("mcp:management", endpointUrl(path)), "SCOPE_mcp:management");
+        authenticate(jwtWithTenant("victim", "mcp:management", endpointUrl(path)), "SCOPE_mcp:management");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -358,7 +375,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         String path = automationPath("acme");
 
-        authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -380,7 +397,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         String path = automationPath("acme");
 
-        authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -411,10 +428,13 @@ class TenantAwareJwtAuthenticationFilterTest {
     }
 
     private static Jwt jwtWithTenant(String tenantId, String scope, String audience) {
-        return jwtBuilder(scope)
-            .claim("tenant_id", tenantId)
-            .audience(List.of(audience))
-            .build();
+        Jwt.Builder builder = jwtBuilder(scope).claim("tenant_id", tenantId);
+
+        if (audience != null) {
+            builder.audience(List.of(audience));
+        }
+
+        return builder.build();
     }
 
     private static Jwt jwtNonStaticIssuer() {
