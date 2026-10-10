@@ -1,0 +1,6 @@
+query a2aServerTags {
+    a2aServerTags {
+        id
+        name
+    }
+}

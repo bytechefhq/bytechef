@@ -5,7 +5,12 @@ query a2aServers {
         enabled
         environmentId
         id
+        lastModifiedDate
         name
         secretKey
+        tags {
+            id
+            name
+        }
     }
 }
