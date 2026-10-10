@@ -21,6 +21,8 @@ import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.ai.copilot.tool.util.WorkflowPersistCaptureUtils;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,8 +37,8 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
 
 /**
- * Hand-rolled Spring AI {@link ToolCallback} that exposes the Converter Copilot subagent to the parent ai_hub BUILD
- * agent. BUILD-only — there is no ASK variant of the Converter Copilot specialist.
+ * Hand-rolled Spring AI {@link ToolCallback} that exposes the Converter Copilot subagent to a parent BUILD agent.
+ * BUILD-only — there is no ASK variant of the Converter Copilot specialist.
  *
  * @author Ivica Cardic
  */
@@ -67,10 +69,14 @@ public class ConverterAgentToolCallback implements ToolCallback {
             }""";
 
     private final IntelligentToolChatClientFactory chatClientFactory;
+    private final @Nullable SubAgentChatModelResolver chatModelResolver;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ConverterAgentToolCallback(IntelligentToolChatClientFactory chatClientFactory) {
+    public ConverterAgentToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
         this.chatClientFactory = chatClientFactory;
+        this.chatModelResolver = chatModelResolver;
     }
 
     @Override
@@ -105,7 +111,8 @@ public class ConverterAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = WorkflowPersistCaptureUtils.withCaptureHolder(parentContext);
 
-            ChatClient converterChatClient = chatClientFactory.get();
+            ChatClient converterChatClient =
+                chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
             String result = CurrentAgentContext.callWith(
                 CopilotAgentType.IMPORT_WORKFLOW, parentAgent,
