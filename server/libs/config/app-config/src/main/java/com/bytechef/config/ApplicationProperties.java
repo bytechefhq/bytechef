@@ -788,6 +788,7 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
+        private AgentUtils agentUtils = new AgentUtils();
         private AutoMemory autoMemory = new AutoMemory();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
@@ -797,6 +798,10 @@ public class ApplicationProperties {
         private Memory memory = new Memory();
         private Provider provider = new Provider();
         private Vectorstore vectorstore = new Vectorstore();
+
+        public AgentUtils getAgentUtils() {
+            return agentUtils;
+        }
 
         public AutoMemory getAutoMemory() {
             return autoMemory;
@@ -834,6 +839,10 @@ public class ApplicationProperties {
             return vectorstore;
         }
 
+        public void setAgentUtils(AgentUtils agentUtils) {
+            this.agentUtils = agentUtils;
+        }
+
         public void setAutoMemory(AutoMemory autoMemory) {
             this.autoMemory = autoMemory;
         }
@@ -868,6 +877,80 @@ public class ApplicationProperties {
 
         public void setVectorstore(Vectorstore vectorstore) {
             this.vectorstore = vectorstore;
+        }
+
+        /**
+         * AI Agent Utils tools configuration. Isolates the file and shell tools of each agent in its own workspace.
+         */
+        public static class AgentUtils {
+
+            /**
+             * Hosts the web fetch tool may reach even though they resolve to a private or loopback address.
+             */
+            private List<String> allowedPrivateHosts;
+
+            private Shell shell = new Shell();
+            private Workspace workspace = new Workspace();
+
+            public List<String> getAllowedPrivateHosts() {
+                return allowedPrivateHosts;
+            }
+
+            public Shell getShell() {
+                return shell;
+            }
+
+            public Workspace getWorkspace() {
+                return workspace;
+            }
+
+            public void setAllowedPrivateHosts(List<String> allowedPrivateHosts) {
+                this.allowedPrivateHosts = allowedPrivateHosts;
+            }
+
+            public void setShell(Shell shell) {
+                this.shell = shell;
+            }
+
+            public void setWorkspace(Workspace workspace) {
+                this.workspace = workspace;
+            }
+
+            /**
+             * Shell Tools configuration. Shell commands run in the server process and cannot be confined to a
+             * workspace, so the tool is only offered when explicitly enabled.
+             */
+            public static class Shell {
+
+                private boolean enabled;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+            }
+
+            /**
+             * Agent workspace configuration.
+             */
+            public static class Workspace {
+
+                /**
+                 * Base directory under which each tenant's agents get their own workspace directory
+                 */
+                private String basedir;
+
+                public String getBasedir() {
+                    return basedir;
+                }
+
+                public void setBasedir(String basedir) {
+                    this.basedir = basedir;
+                }
+            }
         }
 
         public static class AutoMemory {
