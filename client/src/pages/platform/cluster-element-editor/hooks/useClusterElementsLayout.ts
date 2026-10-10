@@ -127,6 +127,7 @@ const useClusterElementsLayout = () => {
 
     const previousCanvasWidthRef = useRef(canvasWidth);
     const cancelAnimationRef = useRef<(() => void) | null>(null);
+    const animationTargetNodesRef = useRef<Node[] | null>(null);
 
     const workflowDefinitionTasks = useMemo(() => {
         if (!workflow.definition) {
@@ -355,7 +356,18 @@ const useClusterElementsLayout = () => {
             return;
         }
 
-        const currentNodes = useClusterElementsDataStore.getState().nodes;
+        // A panel-toggle animation still in flight would keep writing its pre-layout snapshot over these nodes,
+        // so stop it and lay out from the position it was heading to.
+        const currentNodes = animationTargetNodesRef.current || useClusterElementsDataStore.getState().nodes;
+
+        if (cancelAnimationRef.current) {
+            cancelAnimationRef.current();
+
+            cancelAnimationRef.current = null;
+        }
+
+        animationTargetNodesRef.current = null;
+
         const currentRootNode = currentNodes.find((node) => node.id === rootClusterElementNodeData?.workflowNodeName);
 
         const elements = getClusterElementsLayoutElements({
@@ -406,13 +418,23 @@ const useClusterElementsLayout = () => {
             cancelAnimationRef.current();
         }
 
-        cancelAnimationRef.current = animateNodePositions(currentNodes, targetNodes, setNodes);
+        animationTargetNodesRef.current = targetNodes;
+
+        cancelAnimationRef.current = animateNodePositions(currentNodes, targetNodes, (nodes) => {
+            if (nodes === targetNodes) {
+                animationTargetNodesRef.current = null;
+            }
+
+            setNodes(nodes);
+        });
 
         return () => {
             if (cancelAnimationRef.current) {
                 cancelAnimationRef.current();
                 cancelAnimationRef.current = null;
             }
+
+            animationTargetNodesRef.current = null;
         };
     }, [canvasWidth, setNodes]);
 };
