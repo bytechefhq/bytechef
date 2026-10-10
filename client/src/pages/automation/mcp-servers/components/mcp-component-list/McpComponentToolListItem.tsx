@@ -91,11 +91,12 @@ const McpComponentToolListItem = ({
                         {description && <span className="truncate text-xs text-muted-foreground">{description}</span>}
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-0.5">
+                    <div className="flex shrink-0 items-center gap-2">
                         {(embedded || enabledSwitchVisible) && (
                             <Switch
                                 aria-label={`Enable ${toolLabel}`}
                                 checked={mcpTool.enabled}
+                                className="mr-2"
                                 disabled={isEnablePending}
                                 onCheckedChange={handleEnabledChange}
                             />
