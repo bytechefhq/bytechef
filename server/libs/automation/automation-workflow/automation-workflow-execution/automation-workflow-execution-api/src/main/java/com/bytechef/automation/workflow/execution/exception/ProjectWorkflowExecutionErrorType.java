@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.tool.exception;
+package com.bytechef.automation.workflow.execution.exception;
 
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public class ScriptToolErrorType extends AbstractErrorType {
+public class ProjectWorkflowExecutionErrorType extends AbstractErrorType {
 
-    public static final ScriptToolErrorType UPDATE_SCRIPT = new ScriptToolErrorType(100);
-    public static final ScriptToolErrorType UPDATE_WORKFLOW_ROOT = new ScriptToolErrorType(101);
+    public static final ProjectWorkflowExecutionErrorType GET_WORKFLOW_EXECUTION =
+        new ProjectWorkflowExecutionErrorType(100);
+    public static final ProjectWorkflowExecutionErrorType LIST_WORKFLOW_EXECUTIONS =
+        new ProjectWorkflowExecutionErrorType(101);
 
-    private ScriptToolErrorType(int errorKey) {
-        super(ScriptToolErrorType.class, errorKey);
+    private ProjectWorkflowExecutionErrorType(int errorKey) {
+        super(WorkflowExecutionDTO.class, errorKey);
     }
 }
