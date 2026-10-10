@@ -78,6 +78,7 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -881,6 +882,7 @@ class A2aProjectFacadeIntTest {
                     .thenReturn(Optional.of(workflowTestConfiguration));
         }
 
+        @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
         private static String workflowDefinition(String triggerType) {
             return """
                 {
