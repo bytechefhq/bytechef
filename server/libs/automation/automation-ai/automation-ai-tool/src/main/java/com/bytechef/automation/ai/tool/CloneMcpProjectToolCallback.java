@@ -19,13 +19,13 @@ package com.bytechef.automation.ai.tool;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -54,7 +54,6 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
             }""";
 
     private final McpProjectFacade mcpProjectFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CloneMcpProjectToolCallback(McpProjectFacade mcpProjectFacade) {
@@ -78,7 +77,7 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            CloneMcpProjectInput input = jsonMapper.readValue(toolInput, CloneMcpProjectInput.class);
+            CloneMcpProjectInput input = JsonUtils.read(toolInput, CloneMcpProjectInput.class);
 
             Long mcpProjectId = input.mcpProjectId();
 
@@ -102,7 +101,7 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
 
             McpProject clone = mcpProjectFacade.cloneMcpProject(mcpProjectId, targetMcpServerId);
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new CloneMcpProjectOutput(
                     clone.getId(), clone.getProjectDeploymentId(), clone.getMcpServerId()));
         } catch (JacksonException exception) {
@@ -111,12 +110,12 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
             | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(jsonMapper, CloneMcpProjectToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(CloneMcpProjectToolCallback.class, TOOL_NAME, exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record CloneMcpProjectInput(@Nullable Long mcpProjectId, @Nullable String targetMcpServerId) {

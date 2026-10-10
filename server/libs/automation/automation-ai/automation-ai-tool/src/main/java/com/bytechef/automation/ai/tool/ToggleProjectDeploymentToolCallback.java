@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.NoSuchElementException;
 import org.jspecify.annotations.Nullable;
@@ -25,7 +26,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -50,7 +50,6 @@ public class ToggleProjectDeploymentToolCallback implements ToolCallback {
         }""";
 
     private final ProjectDeploymentFacade projectDeploymentFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ToggleProjectDeploymentToolCallback(ProjectDeploymentFacade projectDeploymentFacade) {
@@ -74,7 +73,7 @@ public class ToggleProjectDeploymentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            ToggleProjectDeploymentInput input = jsonMapper.readValue(toolInput, ToggleProjectDeploymentInput.class);
+            ToggleProjectDeploymentInput input = JsonUtils.read(toolInput, ToggleProjectDeploymentInput.class);
 
             if (input.projectDeploymentId() == null || input.projectDeploymentId()
                 .isBlank()) {
@@ -106,20 +105,19 @@ public class ToggleProjectDeploymentToolCallback implements ToolCallback {
                 return toolError("Project deployment " + projectDeploymentId + " not found");
             }
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new ToggleProjectDeploymentOutput(projectDeploymentId, input.enabled()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, ToggleProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(ToggleProjectDeploymentToolCallback.class, TOOL_NAME, exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record ToggleProjectDeploymentInput(String projectDeploymentId, Boolean enabled) {

@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool.knowledgebase;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
@@ -32,7 +33,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -66,7 +66,6 @@ public class AddKnowledgeBaseDocumentToolCallback implements ToolCallback {
 
     private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AddKnowledgeBaseDocumentToolCallback(
@@ -95,7 +94,7 @@ public class AddKnowledgeBaseDocumentToolCallback implements ToolCallback {
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
             AddKnowledgeBaseDocumentInput input =
-                jsonMapper.readValue(toolInput, AddKnowledgeBaseDocumentInput.class);
+                JsonUtils.read(toolInput, AddKnowledgeBaseDocumentInput.class);
 
             if (input.knowledgeBaseId() == null || input.knowledgeBaseId()
                 .isBlank()) {
@@ -157,14 +156,13 @@ public class AddKnowledgeBaseDocumentToolCallback implements ToolCallback {
             KnowledgeBaseDocument document = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
                 knowledgeBaseId, input.name(), input.mimeType(), new ByteArrayInputStream(contentBytes));
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new AddKnowledgeBaseDocumentOutput(true, document.getId()
                     .toString(), document.getName()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, AddKnowledgeBaseDocumentToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(AddKnowledgeBaseDocumentToolCallback.class, TOOL_NAME, exception);
         }
     }
 
@@ -185,7 +183,7 @@ public class AddKnowledgeBaseDocumentToolCallback implements ToolCallback {
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record AddKnowledgeBaseDocumentInput(
