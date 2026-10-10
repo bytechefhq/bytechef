@@ -166,7 +166,9 @@ class McpServerServiceTest {
     void testRotateSecretKeyRejectsUnknownServer() {
         when(mcpServerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> mcpServerService().rotateSecretKey(1L))
+        McpServerServiceImpl mcpServerService = mcpServerService();
+
+        assertThatThrownBy(() -> mcpServerService.rotateSecretKey(1L))
             .isInstanceOf(IllegalArgumentException.class);
 
         verify(mcpServerRepository, never()).save(any());
