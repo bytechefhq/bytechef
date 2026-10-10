@@ -59,7 +59,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = PlatformMcpIntTestConfiguration.class)
-public class McpComponentServiceIntTest {
+class McpComponentServiceIntTest {
 
     @Autowired
     private ConnectionRepository connectionRepository;
@@ -82,20 +82,20 @@ public class McpComponentServiceIntTest {
     private McpServer mcpServer;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         mcpComponentRepository.deleteAll();
         mcpServerRepository.deleteAll();
         connectionRepository.deleteAll();
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         McpComponent mcpComponent = getMcpComponent();
 
         mcpComponent = mcpComponentService.create(mcpComponent);
@@ -109,7 +109,7 @@ public class McpComponentServiceIntTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
 
         Connection connection = new Connection();
@@ -132,7 +132,7 @@ public class McpComponentServiceIntTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
 
         mcpComponentService.delete(Validate.notNull(mcpComponent.getId(), "id"));
@@ -142,7 +142,7 @@ public class McpComponentServiceIntTest {
     }
 
     @Test
-    public void testGetMcpComponent() {
+    void testGetMcpComponent() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
 
         McpComponent retrievedComponent = mcpComponentService.getMcpComponent(
@@ -152,7 +152,7 @@ public class McpComponentServiceIntTest {
     }
 
     @Test
-    public void testGetMcpComponents() {
+    void testGetMcpComponents() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
 
         List<McpComponent> components = mcpComponentService.getMcpComponents();
@@ -162,7 +162,7 @@ public class McpComponentServiceIntTest {
     }
 
     @Test
-    public void testGetMcpServerMcpComponents() {
+    void testGetMcpServerMcpComponents() {
         McpComponent component1 = mcpComponentRepository.save(getMcpComponent());
         McpComponent component2 = new McpComponent("test-component-2", 1, mcpServer.getId(), null);
 
@@ -188,7 +188,7 @@ public class McpComponentServiceIntTest {
 
         assertThat(first.getComponentName()).isEqualTo("another-component");
 
-        assertThat(mcpComponentService.getMcpServerMcpComponents(Long.MAX_VALUE)).hasSize(0);
+        assertThat(mcpComponentService.getMcpServerMcpComponents(Long.MAX_VALUE)).isEmpty();
     }
 
     private McpComponent getMcpComponent() {

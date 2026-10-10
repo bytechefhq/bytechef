@@ -56,7 +56,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = PlatformMcpIntTestConfiguration.class)
-public class McpServerServiceIntTest {
+class McpServerServiceIntTest {
 
     @Autowired
     private DataSource dataSource;
@@ -74,12 +74,12 @@ public class McpServerServiceIntTest {
     private WorkflowService workflowService;
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         mcpServerRepository.deleteAll();
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         McpServer mcpServer = getMcpServer();
 
         mcpServer = mcpServerService.create(mcpServer);
@@ -93,7 +93,7 @@ public class McpServerServiceIntTest {
     }
 
     @Test
-    public void testCreateWithParameters() {
+    void testCreateWithParameters() {
         McpServer mcpServer = mcpServerService.create(
             "test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, false);
 
@@ -106,7 +106,7 @@ public class McpServerServiceIntTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         McpServer mcpServer = mcpServerRepository.save(getMcpServer());
 
         mcpServer.setName("updated-server");
@@ -120,7 +120,7 @@ public class McpServerServiceIntTest {
     }
 
     @Test
-    public void testUpdateWithParameters() {
+    void testUpdateWithParameters() {
         McpServer mcpServer = mcpServerRepository.save(getMcpServer());
 
         mcpServer = mcpServerService.update(mcpServer.getId(), "updated-server", false);
@@ -131,7 +131,7 @@ public class McpServerServiceIntTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         McpServer mcpServer = mcpServerRepository.save(getMcpServer());
 
         mcpServerService.delete(Validate.notNull(mcpServer.getId(), "id"));
@@ -141,7 +141,7 @@ public class McpServerServiceIntTest {
     }
 
     @Test
-    public void testGetMcpServer() {
+    void testGetMcpServer() {
         McpServer mcpServer = mcpServerRepository.save(getMcpServer());
 
         McpServer retrievedMcpServer = mcpServerService.getMcpServer(Validate.notNull(mcpServer.getId(), "id"));
@@ -150,7 +150,7 @@ public class McpServerServiceIntTest {
     }
 
     @Test
-    public void testGetMcpServersByType() {
+    void testGetMcpServersByType() {
         McpServer automationServer = mcpServerRepository.save(getMcpServer());
         McpServer embeddedServer =
             mcpServerRepository.save(new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.DEVELOPMENT));

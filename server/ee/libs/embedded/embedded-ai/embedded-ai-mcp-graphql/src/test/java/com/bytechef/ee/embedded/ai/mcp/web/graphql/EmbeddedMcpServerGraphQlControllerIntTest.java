@@ -427,9 +427,9 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
 
             assertThat(mcpTool.getId()).isEqualTo(3L);
             assertThat(mcpTool.getMcpComponentId()).isEqualTo(2L);
-            Map<String, ?> parameters = mcpTool.getParameters();
-
-            assertThat(parameters.get("to")).isEqualTo("y");
+            assertThat(mcpTool.getParameters())
+                .extractingByKey("to")
+                .isEqualTo("y");
             assertThat(mcpTool.getVersion()).isEqualTo(4);
         }
 

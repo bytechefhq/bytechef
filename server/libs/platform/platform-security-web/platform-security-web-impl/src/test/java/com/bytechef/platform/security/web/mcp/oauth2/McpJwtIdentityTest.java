@@ -56,9 +56,11 @@ class McpJwtIdentityTest {
 
         authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
-        assertThat(mcpJwtIdentity.authorities()).containsExactly(new SimpleGrantedAuthority("ROLE_USER"));
+        List<GrantedAuthority> identityAuthorities = mcpJwtIdentity.authorities();
+        SimpleGrantedAuthority adminAuthority = new SimpleGrantedAuthority("ROLE_ADMIN");
+
+        assertThat(identityAuthorities).containsExactly(new SimpleGrantedAuthority("ROLE_USER"));
         assertThatExceptionOfType(UnsupportedOperationException.class)
-            .isThrownBy(() -> mcpJwtIdentity.authorities()
-                .add(new SimpleGrantedAuthority("ROLE_ADMIN")));
+            .isThrownBy(() -> identityAuthorities.add(adminAuthority));
     }
 }

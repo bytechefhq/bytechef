@@ -43,6 +43,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -332,9 +334,9 @@ public class McpComponentGraphQlControllerIntTest {
             verify(mcpComponentService, never()).create(any(McpComponent.class));
         }
 
-        @Test
-        void testCreateMcpComponentWithToolsRejectsEmbeddedMcpServer() {
-            assertRejected("""
+        @ParameterizedTest
+        @ValueSource(strings = {
+            """
                 mutation {
                     createMcpComponentWithTools(input: {
                         componentName: "component", componentVersion: 1, mcpServerId: "2", tools: []
@@ -342,14 +344,8 @@ public class McpComponentGraphQlControllerIntTest {
                         id
                     }
                 }
-                """);
-
-            verifyNoInteractions(mcpServerFacade);
-        }
-
-        @Test
-        void testUpdateMcpComponentWithToolsRejectsEmbeddedMcpComponent() {
-            assertRejected("""
+                """,
+            """
                 mutation {
                     updateMcpComponentWithTools(id: "2", input: {
                         componentName: "component", componentVersion: 1, mcpServerId: "2", tools: [], version: 1
@@ -357,14 +353,8 @@ public class McpComponentGraphQlControllerIntTest {
                         id
                     }
                 }
-                """);
-
-            verifyNoInteractions(mcpServerFacade);
-        }
-
-        @Test
-        void testUpdateMcpComponentWithToolsRejectsMoveIntoEmbeddedMcpServer() {
-            assertRejected("""
+                """,
+            """
                 mutation {
                     updateMcpComponentWithTools(id: "1", input: {
                         componentName: "component", componentVersion: 1, mcpServerId: "2", tools: [], version: 1
@@ -372,18 +362,15 @@ public class McpComponentGraphQlControllerIntTest {
                         id
                     }
                 }
-                """);
-
-            verifyNoInteractions(mcpServerFacade);
-        }
-
-        @Test
-        void testDeleteMcpComponentRejectsEmbeddedMcpComponent() {
-            assertRejected("""
+                """,
+            """
                 mutation {
                     deleteMcpComponent(id: "2")
                 }
-                """);
+                """
+        })
+        void testMcpServerFacadeMutationRejectsEmbeddedMcpServer(String document) {
+            assertRejected(document);
 
             verifyNoInteractions(mcpServerFacade);
         }

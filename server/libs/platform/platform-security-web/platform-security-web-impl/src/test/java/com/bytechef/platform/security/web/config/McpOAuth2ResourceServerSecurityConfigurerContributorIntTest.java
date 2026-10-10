@@ -184,8 +184,9 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
             .firstValue("WWW-Authenticate")
             .orElse("");
 
-        assertThat(wwwAuthenticate).contains("Bearer");
-        assertThat(wwwAuthenticate).contains("resource_metadata");
+        assertThat(wwwAuthenticate)
+            .contains("Bearer")
+            .contains("resource_metadata");
     }
 
     @Test

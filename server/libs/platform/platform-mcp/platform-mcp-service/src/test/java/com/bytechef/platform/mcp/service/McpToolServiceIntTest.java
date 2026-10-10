@@ -177,7 +177,7 @@ class McpToolServiceIntTest {
         assertThat(mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
             .getFirst()).isEqualTo(mcpTool);
 
-        assertThat(mcpToolService.getMcpComponentMcpTools(Long.MAX_VALUE)).hasSize(0);
+        assertThat(mcpToolService.getMcpComponentMcpTools(Long.MAX_VALUE)).isEmpty();
     }
 
     private McpTool getMcpTool() {
