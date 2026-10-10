@@ -31,7 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -138,8 +140,10 @@ public class McpServerFacadeImpl implements McpServerFacade {
 
     @Override
     @PreAuthorize("hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')")
-    public McpComponent update(McpComponent mcpComponent, List<McpTool> mcpTools) {
-        McpComponent updatedComponent = mcpComponentService.update(mcpComponent);
+    public McpComponent update(
+        McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools) {
+
+        McpComponent updatedComponent = mcpComponentService.update(mcpComponent, requiredAuthorities);
 
         List<McpTool> currentMcpTools = mcpToolService.getMcpComponentMcpTools(updatedComponent.getId());
 

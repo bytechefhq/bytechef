@@ -30,6 +30,7 @@ import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -177,11 +178,13 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
-    public McpComponent updateEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools) {
+    public McpComponent updateEmbeddedMcpComponent(
+        McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools) {
+
         checkEmbeddedMcpComponent(mcpComponent.getId());
         getEmbeddedMcpServer(mcpComponent.getMcpServerId());
 
-        return mcpServerFacade.update(mcpComponent, mcpTools);
+        return mcpServerFacade.update(mcpComponent, requiredAuthorities, mcpTools);
     }
 
     @Override

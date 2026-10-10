@@ -20,6 +20,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import java.util.List;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,12 +49,15 @@ public class McpComponentServiceImpl implements McpComponentService {
 
     @Override
     @PreAuthorize("hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')")
-    public McpComponent update(McpComponent mcpComponent) {
+    public McpComponent update(McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities) {
         McpComponent currentMcpComponent = OptionalUtils.get(mcpComponentRepository.findById(mcpComponent.getId()));
 
         currentMcpComponent.setConnectionId(mcpComponent.getConnectionId());
-        currentMcpComponent.setRequiredAuthorities(mcpComponent.getRequiredAuthorities());
         currentMcpComponent.setVersion(mcpComponent.getVersion());
+
+        if (requiredAuthorities != null) {
+            currentMcpComponent.setRequiredAuthorities(requiredAuthorities);
+        }
 
         return mcpComponentRepository.save(currentMcpComponent);
     }

@@ -162,7 +162,7 @@ class McpServerFacadeIntTest {
 
         mcpComponent.setComponentName("updated-component");
 
-        McpComponent updatedComponent = mcpServerFacade.update(mcpComponent, newTools);
+        McpComponent updatedComponent = mcpServerFacade.update(mcpComponent, null, newTools);
 
         assertThat(updatedComponent).isNotNull();
         assertThat(updatedComponent.getComponentName()).isEqualTo("test-component");
@@ -187,7 +187,7 @@ class McpServerFacadeIntTest {
         List<McpTool> newTools = List.of(
             getMcpTool("kept-tool", mcpComponent.getId()), getMcpTool("added-tool", mcpComponent.getId()));
 
-        McpComponent updatedComponent = mcpServerFacade.update(mcpComponent, newTools);
+        McpComponent updatedComponent = mcpServerFacade.update(mcpComponent, null, newTools);
 
         List<McpTool> savedTools = mcpToolRepository.findAllByMcpComponentId(updatedComponent.getId());
 
@@ -346,7 +346,7 @@ class McpServerFacadeIntTest {
 
             mcpComponent.setId(4L);
 
-            assertThatThrownBy(() -> securedMcpServerFacade.update(mcpComponent, List.of()))
+            assertThatThrownBy(() -> securedMcpServerFacade.update(mcpComponent, null, List.of()))
                 .isInstanceOf(AccessDeniedException.class);
 
             verify(permissionEvaluator).hasPermission(any(), eq(4L), eq("McpComponent"), eq("MCP_EDIT"));

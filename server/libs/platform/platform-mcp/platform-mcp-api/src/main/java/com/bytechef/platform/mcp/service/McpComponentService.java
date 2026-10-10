@@ -18,6 +18,8 @@ package com.bytechef.platform.mcp.service;
 
 import com.bytechef.platform.mcp.domain.McpComponent;
 import java.util.List;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Service interface for managing {@link McpComponent} entities.
@@ -37,10 +39,11 @@ public interface McpComponentService {
     /**
      * Updates an existing MCP component.
      *
-     * @param mcpComponent the MCP component to update
+     * @param mcpComponent        the MCP component to update
+     * @param requiredAuthorities the authorities to require, or {@code null} to keep the current ones
      * @return the updated MCP component
      */
-    McpComponent update(McpComponent mcpComponent);
+    McpComponent update(McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities);
 
     /**
      * Deletes an MCP component by ID.

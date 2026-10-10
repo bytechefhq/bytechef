@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -39,6 +40,7 @@ import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationShare
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlMethodSecurityTestConfiguration;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -229,7 +231,7 @@ public class McpComponentGraphQlControllerIntTest {
     void testUpdateMcpComponentWithTools() {
         McpComponent mcpComponent = createMockMcpComponent(1L, "component", 1);
 
-        when(mcpServerFacade.update(any(McpComponent.class), any())).thenReturn(mcpComponent);
+        when(mcpServerFacade.update(any(McpComponent.class), any(), any())).thenReturn(mcpComponent);
 
         this.graphQlTester
             .document("""
@@ -246,7 +248,57 @@ public class McpComponentGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("1");
 
-        verify(mcpServerFacade).update(any(McpComponent.class), any());
+        verify(mcpServerFacade).update(any(McpComponent.class), isNull(), any());
+    }
+
+    @Test
+    void testUpdateMcpComponentWithToolsWithEmptyRequiredAuthorities() {
+        McpComponent mcpComponent = createMockMcpComponent(1L, "component", 1);
+
+        when(mcpServerFacade.update(any(McpComponent.class), any(), any())).thenReturn(mcpComponent);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpComponentWithTools(id: "1", input: {
+                        componentName: "component", componentVersion: 1, mcpServerId: "1", requiredAuthorities: [],
+                        tools: [], version: 1
+                    }) {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpComponentWithTools.id")
+            .entity(String.class)
+            .isEqualTo("1");
+
+        verify(mcpServerFacade).update(any(McpComponent.class), eq(Set.of()), any());
+    }
+
+    @Test
+    void testUpdateMcpComponentWithToolsWithRequiredAuthorities() {
+        McpComponent mcpComponent = createMockMcpComponent(1L, "component", 1);
+
+        when(mcpServerFacade.update(any(McpComponent.class), any(), any())).thenReturn(mcpComponent);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpComponentWithTools(id: "1", input: {
+                        componentName: "component", componentVersion: 1, mcpServerId: "1",
+                        requiredAuthorities: ["ROLE_ADMIN"], tools: [], version: 1
+                    }) {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpComponentWithTools.id")
+            .entity(String.class)
+            .isEqualTo("1");
+
+        verify(mcpServerFacade).update(any(McpComponent.class), eq(Set.of("ROLE_ADMIN")), any());
     }
 
     @Nested

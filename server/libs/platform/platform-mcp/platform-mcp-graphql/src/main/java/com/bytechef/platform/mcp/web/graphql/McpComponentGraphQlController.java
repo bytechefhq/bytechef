@@ -137,16 +137,15 @@ public class McpComponentGraphQlController {
             input.version());
         mcpComponent.setId(id);
 
-        if (input.requiredAuthorities() != null) {
-            mcpComponent.setRequiredAuthorities(new HashSet<>(input.requiredAuthorities()));
-        }
+        Set<String> requiredAuthorities =
+            input.requiredAuthorities() == null ? null : new HashSet<>(input.requiredAuthorities());
 
         List<McpTool> mcpTools = input.tools()
             .stream()
             .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters(), id))
             .toList();
 
-        return mcpServerFacade.update(mcpComponent, mcpTools);
+        return mcpServerFacade.update(mcpComponent, requiredAuthorities, mcpTools);
     }
 
     @MutationMapping
