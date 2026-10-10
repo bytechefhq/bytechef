@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.facade;
 
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import java.util.List;
 import java.util.Map;
@@ -30,4 +31,8 @@ public interface ComponentDefinitionFacade {
         String componentName, int componentVersion, String groupName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         @Nullable Long connectionId);
+
+    ComponentDefinition getComponentDefinition(String name, @Nullable Integer version);
+
+    List<ComponentDefinition> getComponentDefinitions();
 }

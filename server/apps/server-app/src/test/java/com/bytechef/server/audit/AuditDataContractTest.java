@@ -82,6 +82,7 @@ class AuditDataContractTest {
     private static final String CHUNK_DATA = "knowledge base chunks are document data and are not recorded";
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
+    private static final String OUTPUT_PREVIEW = "computes a task output without saving it";
     private static final String TAGS = "tag assignment";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String ROW_DATA = "data table rows are data and are not recorded";
@@ -138,6 +139,7 @@ class AuditDataContractTest {
             TOOL_SETTING),
         Map.entry("McpIntegrationInstanceWorkflowFacadeImpl.updateMcpIntegrationInstanceWorkflow", TOOL_SETTING),
         Map.entry("McpProjectWorkflowFacadeImpl.updateMcpProjectWorkflow", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowFacadeImpl.updateMcpProjectWorkflowParameters", TOOL_SETTING),
         Map.entry("McpProjectWorkflowServiceImpl.create", RECORDED_BY_CALLER),
         Map.entry("McpProjectWorkflowServiceImpl.delete", RECORDED_BY_CALLER),
         Map.entry("McpProjectWorkflowServiceImpl.update", TOOL_SETTING),
@@ -161,6 +163,7 @@ class AuditDataContractTest {
         Map.entry("ProjectCodeWorkflowFacadeImpl.updateCodeWorkflowSource", DEFINITION_EDIT),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
         Map.entry("ProjectWorkflowFacadeImpl.saveWorkflowTestConnection", WORKFLOW_INPUTS),
+        Map.entry("TaskDispatcherDefinitionFacadeImpl.executeOutput", OUTPUT_PREVIEW),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceDataTableFacadeImpl.addColumn", DELEGATES),

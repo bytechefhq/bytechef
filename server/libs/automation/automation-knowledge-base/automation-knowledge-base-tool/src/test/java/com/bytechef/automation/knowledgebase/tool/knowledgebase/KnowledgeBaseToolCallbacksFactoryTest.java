@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -36,8 +35,7 @@ class KnowledgeBaseToolCallbacksFactoryTest {
     private final KnowledgeBaseToolCallbacksFactory factory = new KnowledgeBaseToolCallbacksFactory(
         Mockito.mock(WorkspaceKnowledgeBaseFacade.class),
         Mockito.mock(KnowledgeBaseFacade.class),
-        Mockito.mock(KnowledgeBaseDocumentFacade.class),
-        Mockito.mock(KnowledgeBaseDocumentService.class));
+        Mockito.mock(KnowledgeBaseDocumentFacade.class));
 
     @Test
     void readListExcludesMutations() {

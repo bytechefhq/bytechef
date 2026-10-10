@@ -28,7 +28,6 @@ import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade
 import com.bytechef.automation.knowledgebase.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -46,8 +45,7 @@ class KnowledgeBaseMcpContributorConfigurationTest {
     void contributesTheSevenFlatKnowledgeBaseToolsWhenFactoryPresent() {
         KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = new KnowledgeBaseToolCallbacksFactory(
             mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
-            mock(KnowledgeBaseDocumentFacade.class),
-            mock(KnowledgeBaseDocumentService.class));
+            mock(KnowledgeBaseDocumentFacade.class));
 
         McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
             presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), workspaceFacade);
@@ -72,8 +70,7 @@ class KnowledgeBaseMcpContributorConfigurationTest {
     void everyKnowledgeBaseToolAcceptsWorkspaceId() {
         KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = new KnowledgeBaseToolCallbacksFactory(
             mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
-            mock(KnowledgeBaseDocumentFacade.class),
-            mock(KnowledgeBaseDocumentService.class));
+            mock(KnowledgeBaseDocumentFacade.class));
 
         McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
             presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), workspaceFacade);

@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.component.remote.client.facade;
 
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import java.util.List;
@@ -39,6 +40,16 @@ public class RemoteComponentDefinitionFacadeClient extends AbstractWorkerClient
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         @Nullable Long connectionId) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ComponentDefinition getComponentDefinition(String name, @Nullable Integer version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ComponentDefinition> getComponentDefinitions() {
         throw new UnsupportedOperationException();
     }
 }
