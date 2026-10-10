@@ -124,7 +124,7 @@ class McpComponentServiceIntTest {
 
         mcpComponent.setConnectionId(2L);
 
-        mcpComponent = mcpComponentService.update(mcpComponent);
+        mcpComponent = mcpComponentService.update(mcpComponent, null);
 
         assertThat(mcpComponent)
             .hasFieldOrPropertyWithValue("connectionId", 2L)
@@ -196,6 +196,68 @@ class McpComponentServiceIntTest {
     }
 
     @Nested
+    class UpdateRequiredAuthorities {
+
+        @Test
+        void testUpdateKeepsRequiredAuthoritiesWhenOmitted() {
+            McpComponent existingMcpComponent = saveMcpComponentWithRequiredAuthorities(Set.of("ROLE_ADMIN"));
+
+            McpComponent updatedMcpComponent = mcpComponentService.update(
+                getMcpComponentUpdate(existingMcpComponent), null);
+
+            assertThat(updatedMcpComponent.getRequiredAuthorities()).containsExactly("ROLE_ADMIN");
+            assertThat(getStoredRequiredAuthorities(existingMcpComponent)).containsExactly("ROLE_ADMIN");
+        }
+
+        @Test
+        void testUpdateClearsRequiredAuthoritiesWhenEmpty() {
+            McpComponent existingMcpComponent = saveMcpComponentWithRequiredAuthorities(Set.of("ROLE_ADMIN"));
+
+            McpComponent updatedMcpComponent = mcpComponentService.update(
+                getMcpComponentUpdate(existingMcpComponent), Set.of());
+
+            assertThat(updatedMcpComponent.getRequiredAuthorities()).isEmpty();
+            assertThat(getStoredRequiredAuthorities(existingMcpComponent)).isEmpty();
+        }
+
+        @Test
+        void testUpdateReplacesRequiredAuthorities() {
+            McpComponent existingMcpComponent = saveMcpComponentWithRequiredAuthorities(Set.of("ROLE_ADMIN"));
+
+            McpComponent updatedMcpComponent = mcpComponentService.update(
+                getMcpComponentUpdate(existingMcpComponent), Set.of("ROLE_REVIEWER"));
+
+            assertThat(updatedMcpComponent.getRequiredAuthorities()).containsExactly("ROLE_REVIEWER");
+            assertThat(getStoredRequiredAuthorities(existingMcpComponent)).containsExactly("ROLE_REVIEWER");
+        }
+
+        private McpComponent getMcpComponentUpdate(McpComponent existingMcpComponent) {
+            McpComponent mcpComponent = new McpComponent(
+                existingMcpComponent.getComponentName(), existingMcpComponent.getComponentVersion(),
+                existingMcpComponent.getMcpServerId(), null, existingMcpComponent.getVersion());
+
+            mcpComponent.setId(existingMcpComponent.getId());
+
+            return mcpComponent;
+        }
+
+        private Set<String> getStoredRequiredAuthorities(McpComponent mcpComponent) {
+            McpComponent storedMcpComponent = mcpComponentRepository.findById(mcpComponent.getId())
+                .orElseThrow();
+
+            return storedMcpComponent.getRequiredAuthorities();
+        }
+
+        private McpComponent saveMcpComponentWithRequiredAuthorities(Set<String> requiredAuthorities) {
+            McpComponent mcpComponent = getMcpComponent();
+
+            mcpComponent.setRequiredAuthorities(requiredAuthorities);
+
+            return mcpComponentRepository.save(mcpComponent);
+        }
+    }
+
+    @Nested
     @Import(PlatformMcpMethodSecurityTestConfiguration.class)
     class MethodSecurity {
 
@@ -245,9 +307,8 @@ class McpComponentServiceIntTest {
             McpComponent mcpComponent = new McpComponent("test-component", 1, otherMcpServerId, null);
 
             mcpComponent.setId(existingMcpComponent.getId());
-            mcpComponent.setRequiredAuthorities(Set.of("ROLE_TAMPERED"));
 
-            assertThatThrownBy(() -> mcpComponentService.update(mcpComponent))
+            assertThatThrownBy(() -> mcpComponentService.update(mcpComponent, Set.of("ROLE_TAMPERED")))
                 .isInstanceOf(AccessDeniedException.class);
 
             McpComponent storedMcpComponent = mcpComponentRepository.findById(existingMcpComponent.getId())
@@ -265,9 +326,8 @@ class McpComponentServiceIntTest {
             when(permissionEvaluator.hasPermission(any(), eq(mcpComponentId), eq("McpComponent"), eq("MCP_EDIT")))
                 .thenReturn(true);
 
-            existingMcpComponent.setRequiredAuthorities(Set.of("ROLE_REVIEWER"));
-
-            McpComponent updatedMcpComponent = mcpComponentService.update(existingMcpComponent);
+            McpComponent updatedMcpComponent = mcpComponentService.update(
+                existingMcpComponent, Set.of("ROLE_REVIEWER"));
 
             assertThat(updatedMcpComponent.getRequiredAuthorities()).containsExactly("ROLE_REVIEWER");
         }

@@ -287,9 +287,9 @@ class EmbeddedMcpServerFacadeIntTest {
             McpComponent mcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID);
             List<McpTool> mcpTools = List.of(new McpTool("tool", Map.of()));
 
-            when(mcpServerFacade.update(mcpComponent, mcpTools)).thenReturn(mcpComponent);
+            when(mcpServerFacade.update(mcpComponent, null, mcpTools)).thenReturn(mcpComponent);
 
-            assertThat(embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, mcpTools))
+            assertThat(embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, mcpTools))
                 .isSameAs(mcpComponent);
         }
 
@@ -424,10 +424,11 @@ class EmbeddedMcpServerFacadeIntTest {
         void testUpdateEmbeddedMcpComponentRejectsMoveToAutomationMcpServer() {
             McpComponent mcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, AUTOMATION_MCP_SERVER_ID);
 
-            assertThatThrownBy(() -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, List.of()))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(
+                () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, List.of()))
+                    .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).update(any(), any());
+            verify(mcpServerFacade, never()).update(any(), any(), any());
         }
 
         @Test
@@ -503,7 +504,7 @@ class EmbeddedMcpServerFacadeIntTest {
             operation(
                 "updateEmbeddedMcpComponent",
                 facade -> facade.updateEmbeddedMcpComponent(
-                    createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID), List.of())),
+                    createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID), null, List.of())),
             operation(
                 "updateEmbeddedMcpServer",
                 facade -> facade.updateEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID, "Renamed", false, null, null)),

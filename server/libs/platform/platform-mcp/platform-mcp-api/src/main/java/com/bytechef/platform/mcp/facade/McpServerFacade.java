@@ -22,6 +22,8 @@ import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for managing MCP Server operations that involve multiple services.
@@ -72,11 +74,13 @@ public interface McpServerFacade {
     /**
      * Updates an existing MCP component with associated tools.
      *
-     * @param mcpComponent the MCP component to update (must have ID set)
-     * @param mcpTools     the list of MCP tools to replace existing tools
+     * @param mcpComponent        the MCP component to update (must have ID set)
+     * @param requiredAuthorities the authorities to require, or {@code null} to keep the current ones
+     * @param mcpTools            the list of MCP tools to replace existing tools
      * @return the updated MCP component
      */
-    McpComponent update(McpComponent mcpComponent, List<McpTool> mcpTools);
+    McpComponent update(
+        McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools);
 
     /**
      * Updates MCP server tags, handling tag validation and persistence.
