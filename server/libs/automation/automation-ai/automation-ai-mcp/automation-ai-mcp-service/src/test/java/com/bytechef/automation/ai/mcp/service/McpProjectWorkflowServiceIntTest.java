@@ -232,6 +232,45 @@ class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
+    void testCreateDefaultsToEnabled() {
+        McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.create(
+            mcpProject.getId(), projectDeploymentWorkflow.getId());
+
+        long mcpProjectWorkflowId = Validate.notNull(mcpProjectWorkflow.getId(), "id");
+
+        assertThat(mcpProjectWorkflow.isEnabled()).isTrue();
+        assertThat(mcpProjectWorkflowRepository.findById(mcpProjectWorkflowId))
+            .get()
+            .extracting(McpProjectWorkflow::isEnabled)
+            .isEqualTo(true);
+    }
+
+    @Test
+    void testUpdateEnabledPersistsTheFlag() {
+        McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
+
+        long mcpProjectWorkflowId = Validate.notNull(mcpProjectWorkflow.getId(), "id");
+
+        McpProjectWorkflow disabledMcpProjectWorkflow = mcpProjectWorkflowService.updateEnabled(
+            mcpProjectWorkflowId, false);
+
+        assertThat(disabledMcpProjectWorkflow.isEnabled()).isFalse();
+        assertThat(mcpProjectWorkflowRepository.findById(mcpProjectWorkflowId))
+            .get()
+            .extracting(McpProjectWorkflow::isEnabled)
+            .isEqualTo(false);
+
+        McpProjectWorkflow enabledMcpProjectWorkflow = mcpProjectWorkflowService.updateEnabled(
+            mcpProjectWorkflowId, true);
+
+        assertThat(enabledMcpProjectWorkflow.isEnabled()).isTrue();
+        assertThat(mcpProjectWorkflowRepository.findById(mcpProjectWorkflowId))
+            .get()
+            .extracting(McpProjectWorkflow::isEnabled)
+            .isEqualTo(true);
+    }
+
+    @Test
     void testDelete() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
@@ -418,6 +457,15 @@ class McpProjectWorkflowServiceIntTest {
                 .thenReturn(false);
 
             assertThatThrownBy(() -> mcpProjectWorkflowService.updateParameters(8L, Map.of()))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateEnabledRequiresEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(8L), eq("McpProjectWorkflow"), eq("MCP_EDIT")))
+                .thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectWorkflowService.updateEnabled(8L, false))
                 .isInstanceOf(AccessDeniedException.class);
         }
     }
