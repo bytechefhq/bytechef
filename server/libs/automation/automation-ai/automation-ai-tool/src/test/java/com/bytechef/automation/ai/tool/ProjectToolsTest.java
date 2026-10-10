@@ -19,37 +19,36 @@ package com.bytechef.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
-import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
-import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.model.ProjectDetailInfo;
 import com.bytechef.automation.ai.tool.model.ProjectInfo;
-import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.ai.tool.model.ProjectStatusInfo;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
+import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.dto.ProjectDTO;
+import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
+import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
-import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.facade.ProjectTagFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.exception.ExecutionException;
-import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.category.domain.Category;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 /**
  * @author Ivica Cardic
@@ -57,275 +56,234 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 @ExtendWith(MockitoExtension.class)
 class ProjectToolsTest {
 
-    private static final long FOREIGN_WORKSPACE_ID = 2L;
     private static final long WORKSPACE_ID = 1L;
 
     @Mock
-    private CategoryService categoryService;
+    private ProjectCategoryFacade projectCategoryFacade;
 
     @Mock
-    private ProjectDeploymentService projectDeploymentService;
+    private ProjectDeploymentFacade projectDeploymentFacade;
 
     @Mock
     private ProjectFacade projectFacade;
 
     @Mock
-    private ProjectService projectService;
+    private ProjectTagFacade projectTagFacade;
 
-    @Mock
-    private TagService tagService;
+    private final WorkspaceFacade workspaceFacade = memberWorkspaceFacade();
 
     @Mock
     private ToolContext toolContext;
 
-    @Mock
-    private WorkspaceScopeResolver workspaceScopeResolver;
+    @Test
+    void testListProjectsListsTheExplicitWorkspace() {
+        mockWorkspaceProjects(projectDTO(7L, "Alpha"));
 
-    @Nested
-    class ScopedProjectTest {
+        List<ProjectInfo> projectInfos = newTools().listProjects(WORKSPACE_ID, toolContext);
 
-        private static final long OWN_PROJECT_ID = 1114L;
-
-        @Test
-        void testScopedRunListsOnlyItsOwnProject() {
-            Project project = project(OWN_PROJECT_ID, WORKSPACE_ID);
-
-            when(projectService.getProject(OWN_PROJECT_ID)).thenReturn(project);
-
-            List<ProjectInfo> projectInfos = newTools().listProjects(null, scopedToolContext());
-
-            assertThat(projectInfos).extracting(ProjectInfo::id)
-                .containsExactly(OWN_PROJECT_ID);
-            verify(projectService, never()).getWorkspaceProjectIds(anyLong());
-            verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
-        }
-
-        @Test
-        void testScopedRunCannotReadAnotherProject() {
-            ProjectTools projectTools = newTools();
-
-            assertThatCode(() -> projectTools.getProject(7L, null, scopedToolContext()))
-                .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
-
-            verify(projectService, never()).getProjectVersions(anyLong());
-        }
-
-        @Test
-        void testScopedRunCannotCreateChangeDeleteOrPublishProjects() {
-            ProjectTools projectTools = newTools();
-
-            assertThatCode(() -> projectTools.createProject("name", null, null, null, null, scopedToolContext()))
-                .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
-            assertThatCode(
-                () -> projectTools.updateProject(OWN_PROJECT_ID, "name", null, null, null, null, scopedToolContext()))
-                    .isInstanceOf(ExecutionException.class)
-                    .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
-            assertThatCode(() -> projectTools.deleteProject(OWN_PROJECT_ID, null, scopedToolContext()))
-                .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
-            assertThatCode(() -> projectTools.publishProject(OWN_PROJECT_ID, null, null, scopedToolContext()))
-                .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
-
-            verify(projectService, never()).create(any());
-            verify(projectFacade, never()).updateProject(any());
-            verify(projectFacade, never()).deleteProject(anyLong());
-            verify(projectFacade, never()).publishProject(anyLong(), any(), anyBoolean());
-        }
-
-        @Test
-        void testRunThatSkipsAuthorizationWithoutAScopedProjectCannotListProjects() {
-            ToolContext toolContext = new ToolContext(
-                AgentToolInvocationContext.builder()
-                    .authentication(new UsernamePasswordAuthenticationToken("1234567890", null, List.of()))
-                    .skipAutomationAuthorization(true)
-                    .build()
-                    .toToolContext());
-
-            ProjectTools projectTools = newTools();
-
-            assertThatCode(() -> projectTools.listProjects(null, toolContext))
-                .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.UNSCOPED_MESSAGE);
-
-            verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
-        }
-
-        private ToolContext scopedToolContext() {
-            return new ToolContext(
-                Map.of(ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID));
-        }
+        assertThat(projectInfos).extracting(ProjectInfo::id)
+            .containsExactly(7L);
     }
 
-    @Nested
-    class WorkspaceScopeTest {
+    @Test
+    void testListProjectsFallsBackToTheChatWorkspace() {
+        when(toolContext.getContext())
+            .thenReturn(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, WORKSPACE_ID));
 
-        @Test
-        void testListProjectsListsOnlyTheResolvedWorkspaceProjects() {
-            resolveWorkspace(WORKSPACE_ID);
+        mockWorkspaceProjects(projectDTO(7L, "Alpha"));
 
-            Project project = project(7L, WORKSPACE_ID);
-
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID)).thenReturn(List.of(7L));
-            when(projectService.getProjects(List.of(7L))).thenReturn(List.of(project));
-
-            List<ProjectInfo> projectInfos = newTools().listProjects(null, toolContext);
-
-            assertThat(projectInfos).extracting(ProjectInfo::id)
-                .containsExactly(7L);
-            verify(projectService, never()).getProjects();
-        }
-
-        @Test
-        void testListProjectsFailsClosedWhenTheWorkspaceIsRejected() {
-            when(workspaceScopeResolver.resolveWorkspace(null, toolContext))
-                .thenReturn(new WorkspaceScopeResolver.Rejected("{\"error\":\"workspace_required\"}"));
-
-            ProjectTools projectTools = newTools();
-
-            assertThatCode(() -> projectTools.listProjects(null, toolContext))
-                .isInstanceOf(ExecutionException.class)
-                .hasMessageContaining("workspace_required");
-
-            verify(projectService, never()).getWorkspaceProjectIds(anyLong());
-            verify(projectService, never()).getProjects();
-        }
-
-        @Test
-        void testSearchProjectsSearchesOnlyTheResolvedWorkspaceProjects() {
-            resolveWorkspace(WORKSPACE_ID);
-
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID)).thenReturn(List.of(7L));
-            when(projectService.getProjects(List.of(7L))).thenReturn(List.of(project(7L, WORKSPACE_ID)));
-
-            List<ProjectInfo> projectInfos = newTools().searchProjects("project", null, toolContext);
-
-            assertThat(projectInfos).hasSize(1);
-            verify(projectService, never()).getProjects();
-        }
-
-        @Test
-        void testGetProjectReadsAProjectOfTheWorkspace() {
-            resolveWorkspace(WORKSPACE_ID);
-
-            when(projectService.fetchProject(7L)).thenReturn(Optional.of(project(7L, WORKSPACE_ID)));
-            when(projectService.getProjectVersions(7L)).thenReturn(List.of());
-
-            ProjectDetailInfo projectDetailInfo = newTools().getProject(7L, null, toolContext);
-
-            assertThat(projectDetailInfo.id()).isEqualTo(7L);
-        }
-
-        @Test
-        void testGetProjectRejectsAProjectOfAnotherWorkspace() {
-            resolveWorkspace(WORKSPACE_ID);
-
-            when(projectService.fetchProject(7L)).thenReturn(Optional.of(project(7L, FOREIGN_WORKSPACE_ID)));
-
-            ProjectTools projectTools = newTools();
-
-            assertThatCode(() -> projectTools.getProject(7L, null, toolContext))
-                .isInstanceOf(ExecutionException.class)
-                .hasMessageContaining("Project 7 not found in workspace " + WORKSPACE_ID);
-
-            verify(projectService, never()).getProjectVersions(anyLong());
-        }
-
-        @Test
-        void testGetProjectStatusRejectsAProjectOfAnotherWorkspace() {
-            resolveWorkspace(WORKSPACE_ID);
-
-            when(projectService.fetchProject(7L)).thenReturn(Optional.of(project(7L, FOREIGN_WORKSPACE_ID)));
-
-            ProjectTools projectTools = newTools();
-
-            assertThatCode(() -> projectTools.getProjectStatus(7L, null, toolContext))
-                .isInstanceOf(ExecutionException.class);
-
-            verify(projectDeploymentService, never()).getProjectDeployments(anyLong());
-        }
-
-        @Test
-        void testCreateProjectCreatesTheProjectInTheResolvedWorkspace() {
-            resolveWorkspace(WORKSPACE_ID);
-
-            when(projectService.create(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-            newTools().createProject("project", null, null, null, null, toolContext);
-
-            ArgumentCaptor<Project> projectArgumentCaptor = ArgumentCaptor.forClass(Project.class);
-
-            verify(projectService).create(projectArgumentCaptor.capture());
-
-            Project project = projectArgumentCaptor.getValue();
-
-            assertThat(project.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
-        }
-
-        @Test
-        void testUpdateProjectRejectsAProjectOfAnotherWorkspace() {
-            resolveWorkspace(WORKSPACE_ID);
-
-            when(projectService.fetchProject(7L)).thenReturn(Optional.of(project(7L, FOREIGN_WORKSPACE_ID)));
-
-            ProjectTools projectTools = newTools();
-
-            assertThatCode(() -> projectTools.updateProject(7L, "renamed", null, null, null, null, toolContext))
-                .isInstanceOf(ExecutionException.class);
-
-            verify(projectFacade, never()).updateProject(any());
-        }
-
-        @Test
-        void testDeleteProjectRejectsAProjectOfAnotherWorkspace() {
-            resolveWorkspace(WORKSPACE_ID);
-
-            when(projectService.fetchProject(7L)).thenReturn(Optional.of(project(7L, FOREIGN_WORKSPACE_ID)));
-
-            ProjectTools projectTools = newTools();
-
-            assertThatCode(() -> projectTools.deleteProject(7L, null, toolContext))
-                .isInstanceOf(ExecutionException.class);
-
-            verify(projectFacade, never()).deleteProject(anyLong());
-        }
-
-        @Test
-        void testPublishProjectRejectsAProjectOfAnotherWorkspace() {
-            resolveWorkspace(WORKSPACE_ID);
-
-            when(projectService.fetchProject(7L)).thenReturn(Optional.of(project(7L, FOREIGN_WORKSPACE_ID)));
-
-            ProjectTools projectTools = newTools();
-
-            assertThatCode(() -> projectTools.publishProject(7L, null, null, toolContext))
-                .isInstanceOf(ExecutionException.class);
-
-            verify(projectFacade, never()).publishProject(anyLong(), any(), anyBoolean());
-        }
+        assertThat(newTools().listProjects(null, toolContext)).hasSize(1);
     }
 
-    private void resolveWorkspace(long workspaceId) {
-        when(workspaceScopeResolver.resolveWorkspace(null, toolContext))
-            .thenReturn(new WorkspaceScopeResolver.Resolved(workspaceId, 0L));
+    @Test
+    void testListProjectsRequiresAWorkspace() {
+        when(toolContext.getContext()).thenReturn(Map.of());
+
+        ProjectTools projectTools = newTools();
+
+        assertThatCode(() -> projectTools.listProjects(null, toolContext))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("listWorkspaces");
+    }
+
+    @Test
+    void testSearchProjectsMatchesNameAndDescription() {
+        mockWorkspaceProjects(projectDTO(7L, "Alpha"), projectDTO(8L, "Beta"));
+
+        List<ProjectInfo> projectInfos = newTools().searchProjects("alp", WORKSPACE_ID, toolContext);
+
+        assertThat(projectInfos).extracting(ProjectInfo::id)
+            .containsExactly(7L);
+    }
+
+    @Test
+    void testGetProjectMapsTheFacadeProject() {
+        ProjectVersion projectVersion = new ProjectVersion(1);
+
+        when(projectFacade.getProject(7L)).thenReturn(
+            ProjectDTO.builder()
+                .category(new Category(3L, "Sales"))
+                .id(7L)
+                .name("Alpha")
+                .projectVersions(List.of(projectVersion))
+                .tags(List.of(new Tag(5L, "crm")))
+                .workspaceId(WORKSPACE_ID)
+                .build());
+
+        ProjectDetailInfo projectDetailInfo = newTools().getProject(7L);
+
+        assertThat(projectDetailInfo.id()).isEqualTo(7L);
+        assertThat(projectDetailInfo.categoryId()).isEqualTo(3L);
+        assertThat(projectDetailInfo.tagIds()).containsExactly(5L);
+        assertThat(projectDetailInfo.versions()).hasSize(1);
+    }
+
+    @Test
+    void testGetProjectSurfacesAFacadeFailureAsToolError() {
+        when(projectFacade.getProject(7L)).thenThrow(new IllegalStateException("denied"));
+
+        ProjectTools projectTools = newTools();
+
+        assertThatCode(() -> projectTools.getProject(7L))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("denied");
+    }
+
+    @Test
+    void testGetProjectStatusReadsTheProjectDeploymentsOfItsWorkspace() {
+        when(projectFacade.getProject(7L)).thenReturn(projectDTO(7L, "Alpha"));
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .enabled(true)
+            .environment(Environment.DEVELOPMENT)
+            .id(9L)
+            .projectId(7L)
+            .projectVersion(1)
+            .build();
+
+        when(projectDeploymentFacade.getWorkspaceProjectDeployments(WORKSPACE_ID, null, 7L, null, false))
+            .thenReturn(List.of(projectDeploymentDTO));
+
+        ProjectStatusInfo projectStatusInfo = newTools().getProjectStatus(7L);
+
+        assertThat(projectStatusInfo.deployments()).hasSize(1);
+        assertThat(projectStatusInfo.deployments()
+            .getFirst()
+            .enabled()).isTrue();
+    }
+
+    @Test
+    void testCreateProjectPassesTheResolvedCategoryAndTags() {
+        Category category = new Category(3L, "Sales");
+        Tag tag = new Tag(5L, "crm");
+
+        when(projectCategoryFacade.getProjectCategories(WORKSPACE_ID)).thenReturn(List.of(category));
+        when(projectTagFacade.getProjectTags()).thenReturn(List.of(tag, new Tag(6L, "other")));
+        when(projectFacade.createProject(any())).thenReturn(7L);
+        when(projectFacade.getProject(7L)).thenReturn(projectDTO(7L, "Alpha"));
+
+        newTools().createProject("Alpha", " notes ", 3L, WORKSPACE_ID, List.of(5L), toolContext);
+
+        ArgumentCaptor<ProjectDTO> projectDTOArgumentCaptor = ArgumentCaptor.forClass(ProjectDTO.class);
+
+        verify(projectFacade).createProject(projectDTOArgumentCaptor.capture());
+
+        ProjectDTO projectDTO = projectDTOArgumentCaptor.getValue();
+
+        assertThat(projectDTO.category()).isSameAs(category);
+        assertThat(projectDTO.description()).isEqualTo("notes");
+        assertThat(projectDTO.tags()).containsExactly(tag);
+        assertThat(projectDTO.workspaceId()).isEqualTo(WORKSPACE_ID);
+    }
+
+    @Test
+    void testCreateProjectRejectsAnUnknownCategory() {
+        when(projectCategoryFacade.getProjectCategories(WORKSPACE_ID)).thenReturn(List.of());
+
+        ProjectTools projectTools = newTools();
+
+        assertThatCode(() -> projectTools.createProject("Alpha", null, 3L, WORKSPACE_ID, null, toolContext))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("Category 3 not found");
+
+        verify(projectFacade, never()).createProject(any());
+    }
+
+    @Test
+    void testUpdateProjectKeepsUnchangedFieldsAndTheVersion() {
+        Category category = new Category(3L, "Sales");
+
+        when(projectFacade.getProject(7L)).thenReturn(
+            ProjectDTO.builder()
+                .category(category)
+                .description("old")
+                .id(7L)
+                .name("Alpha")
+                .version(4)
+                .workspaceId(WORKSPACE_ID)
+                .build());
+
+        newTools().updateProject(7L, "Renamed", null, null, null);
+
+        ArgumentCaptor<ProjectDTO> projectDTOArgumentCaptor = ArgumentCaptor.forClass(ProjectDTO.class);
+
+        verify(projectFacade).updateProject(projectDTOArgumentCaptor.capture());
+
+        ProjectDTO projectDTO = projectDTOArgumentCaptor.getValue();
+
+        assertThat(projectDTO.name()).isEqualTo("Renamed");
+        assertThat(projectDTO.description()).isEqualTo("old");
+        assertThat(projectDTO.category()).isSameAs(category);
+        assertThat(projectDTO.version()).isEqualTo(4);
+    }
+
+    @Test
+    void testDeleteProjectDeletesThroughTheFacade() {
+        when(projectFacade.getProject(7L)).thenReturn(projectDTO(7L, "Alpha"));
+
+        String result = newTools().deleteProject(7L);
+
+        verify(projectFacade).deleteProject(7L);
+
+        assertThat(result).contains("Alpha");
+    }
+
+    @Test
+    void testPublishProjectPublishesThroughTheFacade() {
+        when(projectFacade.publishProject(7L, "v1", false)).thenReturn(2);
+        when(projectFacade.getProject(7L)).thenReturn(projectDTO(7L, "Alpha"));
+
+        assertThat(newTools().publishProject(7L, "v1")
+            .publishedVersion()).isEqualTo(2);
+    }
+
+    private void mockWorkspaceProjects(ProjectDTO... projectDTOs) {
+        when(projectFacade.getWorkspaceProjects(null, null, false, null, null, null, WORKSPACE_ID))
+            .thenReturn(List.of(projectDTOs));
     }
 
     private ProjectTools newTools() {
         return new ProjectTools(
-            categoryService, projectDeploymentService, projectFacade, projectService,
-            new ScopedProjectGuard(
-                projectService, mock(ProjectWorkflowService.class), mock(ScopedConnectionGuard.class),
-                workspaceScopeResolver),
-            tagService);
+            projectCategoryFacade, projectDeploymentFacade, projectFacade, projectTagFacade, workspaceFacade);
     }
 
-    private static Project project(long projectId, long workspaceId) {
-        return Project.builder()
+    private static ProjectDTO projectDTO(long projectId, String name) {
+        return ProjectDTO.builder()
             .id(projectId)
-            .name("project-" + projectId)
-            .workspaceId(workspaceId)
+            .name(name)
+            .workspaceId(WORKSPACE_ID)
             .build();
+    }
+
+    private static WorkspaceFacade memberWorkspaceFacade() {
+        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        lenient().when(workspaceFacade.getMyWorkspaces())
+            .thenReturn(
+                List.of(
+                    new Workspace(1L, "Workspace 1"), new Workspace(7L, "Workspace 7"),
+                    new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
+
+        return workspaceFacade;
     }
 }

@@ -18,15 +18,16 @@ package com.bytechef.automation.ai.tool;
 
 import static com.bytechef.automation.ai.tool.exception.ProjectWorkflowToolErrorType.GET_WORKFLOW;
 
-import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.exception.ProjectWorkflowToolErrorType;
 import com.bytechef.automation.ai.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
-import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
@@ -38,7 +39,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -82,35 +82,31 @@ public class ProjectWorkflowTools {
     private static final String DEFAULT_WORKFLOW_NAME = "Workflow";
 
     private final ComponentDefinitionService componentDefinitionService;
+    private final ProjectFacade projectFacade;
     private final ProjectWorkflowFacade projectWorkflowFacade;
-    private final ProjectWorkflowService projectWorkflowService;
-    private final ScopedProjectGuard scopedProjectGuard;
     private final WorkspaceConnectionFacade workspaceConnectionFacade;
     private final ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider;
+    private final WorkspaceFacade workspaceFacade;
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowTools(
-        ComponentDefinitionService componentDefinitionService, ProjectWorkflowFacade projectWorkflowFacade,
-        ProjectWorkflowService projectWorkflowService, ScopedProjectGuard scopedProjectGuard,
-        WorkspaceConnectionFacade workspaceConnectionFacade,
-        ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider) {
+        ComponentDefinitionService componentDefinitionService, ProjectFacade projectFacade,
+        ProjectWorkflowFacade projectWorkflowFacade, WorkspaceConnectionFacade workspaceConnectionFacade,
+        ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider,
+        WorkspaceFacade workspaceFacade) {
 
         this.componentDefinitionService = componentDefinitionService;
+        this.projectFacade = projectFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
-        this.projectWorkflowService = projectWorkflowService;
-        this.scopedProjectGuard = scopedProjectGuard;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
         this.workflowTestConfigurationFacadeProvider = workflowTestConfigurationFacadeProvider;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Tool(
         description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
     public WorkflowInfo getWorkflow(
-        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
-
-        checkWorkspaceWorkflow(workflowId, workspaceId, toolContext, GET_WORKFLOW);
+        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId) {
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
@@ -136,11 +132,7 @@ public class ProjectWorkflowTools {
     @Tool(
         description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
     public List<WorkflowInfo> listWorkflows(
-        @ToolParam(description = "The ID of the project") long projectId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
-
-        checkWorkspaceProject(projectId, workspaceId, toolContext, ProjectWorkflowToolErrorType.LIST_WORKFLOWS);
+        @ToolParam(description = "The ID of the project") long projectId) {
 
         try {
             List<ProjectWorkflowDTO> workflows = projectWorkflowFacade.getProjectWorkflows(projectId);
@@ -172,30 +164,30 @@ public class ProjectWorkflowTools {
     public List<WorkflowInfo> searchWorkflows(
         @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
         @ToolParam(required = false, description = "The ID of the project") Long projectId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        @ToolParam(
+            required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        Set<Long> accessibleProjectIds = scopedProjectGuard.getAccessibleProjectIds(
-            workspaceId, toolContext, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
+        Long resolvedWorkspaceId;
 
         try {
-            List<ProjectWorkflowDTO> allWorkflows;
+            resolvedWorkspaceId = AutomationToolInvocationContext.resolveWorkspaceId(
+                workspaceId, toolContext, workspaceFacade);
+        } catch (WorkspaceNotAccessibleException exception) {
+            throw new ExecutionException(
+                exception.getMessage(), exception, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
+        }
 
-            if (projectId != null) {
-                if (!accessibleProjectIds.contains(projectId)) {
-                    throw new ExecutionException(
-                        "Project " + projectId + " is not accessible to this conversation, so it was not searched. "
-                            + "This is not a statement that the project has no workflows.",
-                        ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
-                }
+        if (projectId == null && resolvedWorkspaceId == null) {
+            throw new ExecutionException(
+                "Either projectId or workspaceId is required - call listWorkspaces to find the workspace id.",
+                ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
+        }
 
-                allWorkflows = projectWorkflowFacade.getProjectWorkflows(projectId);
-            } else {
-                allWorkflows = accessibleProjectIds.stream()
-                    .flatMap(accessibleProjectId -> projectWorkflowFacade.getProjectWorkflows(accessibleProjectId)
-                        .stream())
-                    .toList();
-            }
+        try {
+            List<ProjectWorkflowDTO> allWorkflows = projectId == null
+                ? projectFacade.getWorkspaceProjectWorkflows(resolvedWorkspaceId)
+                : projectWorkflowFacade.getProjectWorkflows(projectId);
 
             String lowerQuery = StringUtils.trim(query.toLowerCase());
 
@@ -242,10 +234,8 @@ public class ProjectWorkflowTools {
         @ToolParam(
             description = "The definition for the workflow. Needs to be in JSON format similar to " +
                 DEFAULT_DEFINITION) String definition,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        checkWorkspaceProject(projectId, workspaceId, toolContext, ProjectWorkflowToolErrorType.CREATE_WORKFLOW);
         checkAllowedComponents(definition, toolContext, ProjectWorkflowToolErrorType.CREATE_WORKFLOW);
 
         try {
@@ -276,11 +266,7 @@ public class ProjectWorkflowTools {
 
     @Tool(description = "Delete a workflow. Returns a confirmation message.")
     public String deleteWorkflow(
-        @ToolParam(description = "The ID of the workflow to delete") String workflowId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
-
-        checkWorkspaceWorkflow(workflowId, workspaceId, toolContext, ProjectWorkflowToolErrorType.DELETE_WORKFLOW);
+        @ToolParam(description = "The ID of the workflow to delete") String workflowId) {
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
@@ -310,10 +296,8 @@ public class ProjectWorkflowTools {
         @ToolParam(
             description = "The new definition of the workflow. Needs to be in JSON format similar to " +
                 DEFAULT_DEFINITION) String definition,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        checkWorkspaceWorkflow(workflowId, workspaceId, toolContext, ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);
         checkAllowedComponents(definition, toolContext, ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);
 
         try {
@@ -360,14 +344,7 @@ public class ProjectWorkflowTools {
         @ToolParam(
             description = "The connection key declared in the node's 'connections' block — usually the component name, e.g. 'slack'") String connectionKey,
         @ToolParam(description = "The id of the connection the user picked") long connectionId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
-
-        checkWorkspaceWorkflow(
-            workflowId, workspaceId, toolContext, ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION);
-
-        scopedProjectGuard.checkConnection(connectionId, toolContext,
-            ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION);
 
         try {
             WorkflowTestConfigurationFacade workflowTestConfigurationFacade =
@@ -394,13 +371,7 @@ public class ProjectWorkflowTools {
                     ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION);
             }
 
-            if (!ScopedProjectToolContext.isConfined(toolContext)) {
-                checkConnectionAccessible(
-                    connectionId,
-                    scopedProjectGuard.resolveWorkspaceId(
-                        workspaceId, toolContext, ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION),
-                    environmentId);
-            }
+            checkConnectionAccessible(connectionId, getWorkflowWorkspaceId(workflowId), environmentId);
 
             workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
                 workflowId, workflowNodeName, connectionKey, connectionId, environmentId);
@@ -443,6 +414,12 @@ public class ProjectWorkflowTools {
         }
     }
 
+    private long getWorkflowWorkspaceId(String workflowId) {
+        ProjectDTO projectDTO = projectFacade.getProject(projectWorkflowFacade.getWorkflowProjectId(workflowId));
+
+        return Objects.requireNonNull(projectDTO.workspaceId());
+    }
+
     private void checkConnectionAccessible(long connectionId, long workspaceId, long environmentId) {
         List<ConnectionDTO> connections = workspaceConnectionFacade.getConnections(
             workspaceId, null, null, environmentId, null);
@@ -454,20 +431,6 @@ public class ProjectWorkflowTools {
             throw new IllegalArgumentException(
                 "Connection " + connectionId + " not found in the workflow's workspace and current environment");
         }
-    }
-
-    private void checkWorkspaceProject(
-        long projectId, @Nullable Long workspaceId, @Nullable ToolContext toolContext,
-        ProjectWorkflowToolErrorType projectWorkflowToolErrorType) {
-
-        scopedProjectGuard.getProject(projectId, workspaceId, toolContext, projectWorkflowToolErrorType);
-    }
-
-    private void checkWorkspaceWorkflow(
-        String workflowId, @Nullable Long workspaceId, @Nullable ToolContext toolContext,
-        ProjectWorkflowToolErrorType projectWorkflowToolErrorType) {
-
-        scopedProjectGuard.checkWorkflow(workflowId, workspaceId, toolContext, projectWorkflowToolErrorType);
     }
 
     private static @Nullable Long resolveEnvironmentId(@Nullable ToolContext toolContext) {
@@ -507,8 +470,7 @@ public class ProjectWorkflowTools {
         String definition) {
 
         try {
-            long projectId = projectWorkflowService.getProjectWorkflow(projectWorkflowDTO.getProjectWorkflowId())
-                .getProjectId();
+            long projectId = projectWorkflowFacade.getWorkflowProjectId(workflowId);
             String workflowName = extractWorkflowName(definition);
 
             capturePersistedWorkflow(
