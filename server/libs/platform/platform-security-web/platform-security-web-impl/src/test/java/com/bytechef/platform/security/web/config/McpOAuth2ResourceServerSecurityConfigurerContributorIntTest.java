@@ -57,6 +57,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Ivica Cardic
@@ -67,7 +81,11 @@ import org.springframework.context.annotation.Import;
 @Import(PostgreSQLContainerConfiguration.class)
 class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
+    private static final String INITIALIZE_REQUEST = """
+        {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05",\
+        "capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}}}""";
     private static final String MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of("public"));
+    private static final String MANAGEMENT_ENDPOINT_PATH = "/api/management/" + MCP_SERVER_SECRET_KEY + "/mcp";
 
     @Autowired
     private KeyPair mcpTestSigningKeyPair;
@@ -77,6 +95,9 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @LocalServerPort
     private int port;
@@ -204,6 +225,81 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         }
     }
 
+    @Test
+    void testUiSessionWithNonTenantBearerTokenReturnsDiscoveryChallenge() throws Exception {
+        String expectedWwwAuthenticate = postInitialize(null).headers()
+            .firstValue("WWW-Authenticate")
+            .orElseThrow();
+
+        MvcResult mvcResult = createMockMvc()
+            .perform(
+                MockMvcRequestBuilders.post(MANAGEMENT_ENDPOINT_PATH)
+                    .servletPath(MANAGEMENT_ENDPOINT_PATH)
+                    .session(createUiSession())
+                    .header("Authorization", "Bearer not-a-tenant-key"))
+            .andExpect(MockMvcResultMatchers.status()
+                .isUnauthorized())
+            .andReturn();
+
+        MockHttpServletResponse mockHttpServletResponse = mvcResult.getResponse();
+
+        assertThat(mockHttpServletResponse.getHeader("WWW-Authenticate"))
+            .isEqualTo(expectedWwwAuthenticate.replace("localhost:" + port, "localhost"));
+    }
+
+    @Test
+    void testUiSessionWithoutBearerTokenReturnsDiscoveryChallenge() throws Exception {
+        MvcResult mvcResult = createMockMvc()
+            .perform(
+                MockMvcRequestBuilders.post(MANAGEMENT_ENDPOINT_PATH)
+                    .servletPath(MANAGEMENT_ENDPOINT_PATH)
+                    .session(createUiSession()))
+            .andExpect(MockMvcResultMatchers.status()
+                .isUnauthorized())
+            .andReturn();
+
+        MockHttpServletResponse mockHttpServletResponse = mvcResult.getResponse();
+
+        assertThat(mockHttpServletResponse.getHeader("WWW-Authenticate"))
+            .contains("Bearer")
+            .contains("resource_metadata");
+    }
+
+    @Test
+    void testUiSessionWithValidSelfIssuerJwtIsAccepted() throws Exception {
+        String token = signManagementJwt("http://localhost" + MANAGEMENT_ENDPOINT_PATH);
+
+        createMockMvc()
+            .perform(
+                MockMvcRequestBuilders.post(MANAGEMENT_ENDPOINT_PATH)
+                    .servletPath(MANAGEMENT_ENDPOINT_PATH)
+                    .session(createUiSession())
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_EVENT_STREAM)
+                    .content(INITIALIZE_REQUEST))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk());
+    }
+
+    private MockMvc createMockMvc() {
+        return MockMvcBuilders.webAppContextSetup(webApplicationContext)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
+    }
+
+    private static MockHttpSession createUiSession() {
+        MockHttpSession mockHttpSession = new MockHttpSession();
+
+        mockHttpSession.setAttribute(
+            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+            new SecurityContextImpl(
+                UsernamePasswordAuthenticationToken.authenticated(
+                    "admin@localhost.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))));
+
+        return mockHttpSession;
+    }
+
     private String signManagementJwt(String audience) {
         return sign(
             baseClaims(ISSUER_URI)
@@ -259,15 +355,11 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     }
 
     private HttpResponse<String> postInitialize(String bearerToken, String mcpServerSecretKey) throws Exception {
-        String initializeRequest = """
-            {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05",\
-            "capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}}}""";
-
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:" + port + "/api/management/" + mcpServerSecretKey + "/mcp"))
             .header("Content-Type", "application/json")
             .header("Accept", "application/json, text/event-stream")
-            .POST(HttpRequest.BodyPublishers.ofString(initializeRequest));
+            .POST(HttpRequest.BodyPublishers.ofString(INITIALIZE_REQUEST));
 
         if (bearerToken != null) {
             requestBuilder.header("Authorization", "Bearer " + bearerToken);
