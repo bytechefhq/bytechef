@@ -10,3 +10,8 @@ You can reference the output property in a format similar to:
 ${taskName.property}
 ${taskName.arrayProperty[1]}
 ${taskName.objectProperty.property}}
+
+Task parameters:
+- Fill in every required task parameter whose value is already known from the request instead of leaving it empty.
+- In particular, when the request names a specific data table, set the dataTable component's "table" parameter to that table's base name (e.g. "table": "invoices").
+- Only leave a parameter unset when its value genuinely cannot be derived from the request (e.g. it must be picked from the user's account, like a folder or channel id).
