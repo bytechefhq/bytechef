@@ -30,8 +30,10 @@ import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.ai.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
+import com.bytechef.automation.ai.mcp.repository.WorkspaceMcpServerRepository;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -115,6 +117,9 @@ class McpProjectFacadeIntTest {
     private ProjectWorkflowRepository projectWorkflowRepository;
 
     @Autowired
+    private WorkspaceMcpServerRepository workspaceMcpServerRepository;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     @Autowired
@@ -133,11 +138,10 @@ class McpProjectFacadeIntTest {
 
     @BeforeEach
     void beforeEach() {
-        mcpServer = mcpServerRepository.save(
-            new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
-
         Category category = categoryRepository.save(new Category("test-category"));
         Workspace workspace = workspaceRepository.save(new Workspace("test-workspace"));
+
+        mcpServer = saveMcpServer("test-server", Environment.DEVELOPMENT, workspace.getId());
 
         project = Project.builder()
             .categoryId(category.getId())
@@ -177,6 +181,7 @@ class McpProjectFacadeIntTest {
     void afterEach() {
         mcpProjectWorkflowRepository.deleteAll();
         mcpProjectRepository.deleteAll();
+        workspaceMcpServerRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
         projectWorkflowRepository.deleteAll();
@@ -204,8 +209,8 @@ class McpProjectFacadeIntTest {
 
     @Test
     void testCreateMcpProjectUsesMcpServerEnvironment() {
-        McpServer productionMcpServer = mcpServerRepository.save(
-            new McpServer("production-server", PlatformType.AUTOMATION, Environment.PRODUCTION));
+        McpServer productionMcpServer = saveMcpServer(
+            "production-server", Environment.PRODUCTION, project.getWorkspaceId());
 
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
             productionMcpServer.getId(), project.getId(), 1, List.of(workflowId1));
@@ -457,8 +462,8 @@ class McpProjectFacadeIntTest {
             McpProject sourceMcpProject = mcpProjectRepository.save(
                 new McpProject(unpublishedProjectDeployment.getId(), mcpServer.getId()));
 
-            McpServer targetMcpServer = mcpServerRepository.save(
-                new McpServer("target-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
+            McpServer targetMcpServer = saveMcpServer(
+                "target-server", Environment.DEVELOPMENT, project.getWorkspaceId());
 
             long projectDeploymentCount = projectDeploymentRepository.count();
             long sourceMcpProjectId = sourceMcpProject.getId();
@@ -622,8 +627,8 @@ class McpProjectFacadeIntTest {
             McpProject sourceMcpProject = mcpProjectFacade.createMcpProject(
                 mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
 
-            McpServer productionMcpServer = mcpServerRepository.save(
-                new McpServer("production-server", PlatformType.AUTOMATION, Environment.PRODUCTION));
+            McpServer productionMcpServer = saveMcpServer(
+                "production-server", Environment.PRODUCTION, project.getWorkspaceId());
 
             stubRequiredSlackConnection();
 
@@ -720,6 +725,102 @@ class McpProjectFacadeIntTest {
     }
 
     @Nested
+    class WorkspaceIsolation {
+
+        @Test
+        void testCreateMcpProjectRejectsAProjectOfAnotherWorkspace() {
+            Workspace otherWorkspace = workspaceRepository.save(new Workspace("other-workspace"));
+
+            McpServer otherWorkspaceMcpServer = saveMcpServer(
+                "other-workspace-server", Environment.DEVELOPMENT, otherWorkspace.getId());
+
+            long projectDeploymentCount = projectDeploymentRepository.count();
+            long mcpServerId = otherWorkspaceMcpServer.getId();
+            long projectId = project.getId();
+            List<String> selectedWorkflowIds = List.of(workflowId1);
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("not in the same workspace");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
+            assertThat(projectDeploymentWorkflowRepository.count()).isZero();
+            assertThat(mcpProjectWorkflowRepository.count()).isZero();
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsAnMcpServerWithoutWorkspace() {
+            McpServer unassignedMcpServer = mcpServerRepository.save(
+                new McpServer("unassigned-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
+
+            long projectDeploymentCount = projectDeploymentRepository.count();
+            long mcpServerId = unassignedMcpServer.getId();
+            long projectId = project.getId();
+            List<String> selectedWorkflowIds = List.of(workflowId1);
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("not in the same workspace");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
+        }
+
+        @Test
+        void testCreateMcpProjectAcceptsAnMcpServerOfTheProjectWorkspace() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            assertThat(mcpProjectRepository.findById(mcpProject.getId())).isPresent();
+        }
+
+        @Test
+        void testCloneMcpProjectRejectsATargetMcpServerOfAnotherWorkspace() {
+            McpProject sourceMcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            Workspace otherWorkspace = workspaceRepository.save(new Workspace("other-workspace"));
+
+            McpServer otherWorkspaceMcpServer = saveMcpServer(
+                "other-workspace-server", Environment.DEVELOPMENT, otherWorkspace.getId());
+
+            long projectDeploymentCount = projectDeploymentRepository.count();
+            long projectDeploymentWorkflowCount = projectDeploymentWorkflowRepository.count();
+            long sourceMcpProjectId = sourceMcpProject.getId();
+            long targetMcpServerId = otherWorkspaceMcpServer.getId();
+
+            assertThatThrownBy(() -> mcpProjectFacade.cloneMcpProject(sourceMcpProjectId, targetMcpServerId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("not in the same workspace");
+
+            assertThat(mcpProjectRepository.count()).isEqualTo(1);
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
+            assertThat(projectDeploymentWorkflowRepository.count()).isEqualTo(projectDeploymentWorkflowCount);
+        }
+
+        @Test
+        void testCloneMcpProjectAcceptsATargetMcpServerOfTheProjectWorkspace() {
+            McpProject sourceMcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            McpServer targetMcpServer = saveMcpServer(
+                "target-server", Environment.DEVELOPMENT, project.getWorkspaceId());
+
+            McpProject clonedMcpProject = mcpProjectFacade.cloneMcpProject(
+                sourceMcpProject.getId(), targetMcpServer.getId());
+
+            assertThat(clonedMcpProject.getMcpServerId()).isEqualTo(targetMcpServer.getId());
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                clonedMcpProject.getProjectDeploymentId()))
+                    .extracting(ProjectDeploymentWorkflow::getWorkflowId)
+                    .containsExactly(workflowId1);
+        }
+    }
+
+    @Nested
     @Import({
         McpMethodSecurityTestConfiguration.class, PostgreSQLContainerConfiguration.class
     })
@@ -772,5 +873,14 @@ class McpProjectFacadeIntTest {
             assertThatThrownBy(() -> mcpProjectFacade.cloneMcpProject(5L, 6L))
                 .isInstanceOf(AccessDeniedException.class);
         }
+    }
+
+    private McpServer saveMcpServer(String name, Environment environment, Long workspaceId) {
+        McpServer savedMcpServer = mcpServerRepository.save(
+            new McpServer(name, PlatformType.AUTOMATION, environment));
+
+        workspaceMcpServerRepository.save(new WorkspaceMcpServer(savedMcpServer.getId(), workspaceId));
+
+        return savedMcpServer;
     }
 }

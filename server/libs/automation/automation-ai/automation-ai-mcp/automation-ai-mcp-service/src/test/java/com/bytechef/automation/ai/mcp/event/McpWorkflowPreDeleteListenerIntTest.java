@@ -23,9 +23,11 @@ import com.bytechef.automation.ai.mcp.config.McpIntTestWorkflows;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
+import com.bytechef.automation.ai.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
+import com.bytechef.automation.ai.mcp.repository.WorkspaceMcpServerRepository;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -91,6 +93,9 @@ class McpWorkflowPreDeleteListenerIntTest {
     private WorkflowService workflowService;
 
     @Autowired
+    private WorkspaceMcpServerRepository workspaceMcpServerRepository;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     private McpServer mcpServer;
@@ -106,6 +111,8 @@ class McpWorkflowPreDeleteListenerIntTest {
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
         workspace = workspaceRepository.save(new Workspace("test-workspace"));
+
+        workspaceMcpServerRepository.save(new WorkspaceMcpServer(mcpServer.getId(), workspace.getId()));
 
         Project newProject = Project.builder()
             .description("test-project")
@@ -128,6 +135,7 @@ class McpWorkflowPreDeleteListenerIntTest {
     void afterEach() {
         mcpProjectWorkflowRepository.deleteAll();
         mcpProjectRepository.deleteAll();
+        workspaceMcpServerRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
         projectWorkflowRepository.deleteAll();
