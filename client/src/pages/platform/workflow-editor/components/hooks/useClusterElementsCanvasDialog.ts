@@ -13,17 +13,24 @@ import {useCallback, useEffect, useMemo} from 'react';
 
 interface UseClusterElementsCanvasDialogProps {
     onOpenChange: (open: boolean) => void;
-    workflowReferenceId?: number | string;
 }
 
-export default function useClusterElementsCanvasDialog({
-    onOpenChange,
-    workflowReferenceId,
-}: UseClusterElementsCanvasDialogProps) {
+export default function useClusterElementsCanvasDialog({onOpenChange}: UseClusterElementsCanvasDialogProps) {
+    const aiAgentSimpleEditorPreferred = useClusterElementsCanvasDialogStore(
+        (state) => state.aiAgentSimpleEditorPreferred
+    );
+    const dataStreamSimpleEditorPreferred = useClusterElementsCanvasDialogStore(
+        (state) => state.dataStreamSimpleEditorPreferred
+    );
+    const setAiAgentSimpleEditorPreferred = useClusterElementsCanvasDialogStore(
+        (state) => state.setAiAgentSimpleEditorPreferred
+    );
     const setCopilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setCopilotPanelOpen);
     const setShowAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.setShowAiAgentEditor);
     const setShowDataStreamEditor = useClusterElementsCanvasDialogStore((state) => state.setShowDataStreamEditor);
-    const setEditorPreference = useClusterElementsCanvasDialogStore((state) => state.setEditorPreference);
+    const setDataStreamSimpleEditorPreferred = useClusterElementsCanvasDialogStore(
+        (state) => state.setDataStreamSimpleEditorPreferred
+    );
     const setTestingPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setTestingPanelOpen);
 
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
@@ -80,42 +87,11 @@ export default function useClusterElementsCanvasDialog({
         return componentName === 'dataStreamProcessor' && operationName === 'fieldMapper';
     }, [isDataStreamClusterRoot, workflowNodeName, workflow.definition]);
 
-    const preferenceWorkflowReferenceId = workflowReferenceId ?? workflow.id;
-    const preferenceKey =
-        preferenceWorkflowReferenceId && workflowNodeName
-            ? `${preferenceWorkflowReferenceId}:${workflowNodeName}`
-            : undefined;
-
-    useEffect(() => {
-        if (isAiAgentClusterRoot && preferenceKey) {
-            const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[preferenceKey];
-
-            const showAiAgent = preference ?? true;
-
-            setShowAiAgentEditor(showAiAgent);
-        }
-    }, [isAiAgentClusterRoot, preferenceKey, setShowAiAgentEditor]);
-
-    useEffect(() => {
-        if (isDataStreamClusterRoot && preferenceKey) {
-            if (!isDataStreamSimpleModeAvailable) {
-                setShowDataStreamEditor(false);
-
-                return;
-            }
-
-            const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[preferenceKey];
-
-            const showDataStream = preference ?? true;
-
-            setShowDataStreamEditor(showDataStream);
-        }
-    }, [isDataStreamClusterRoot, isDataStreamSimpleModeAvailable, preferenceKey, setShowDataStreamEditor]);
-
     const handleToggleEditor = useCallback(
         (showSimpleEditor: boolean) => {
             if (isAiAgentClusterRoot) {
                 setShowAiAgentEditor(showSimpleEditor);
+                setAiAgentSimpleEditorPreferred(showSimpleEditor);
 
                 useTestingModeStore.getState().resetTestingMode();
 
@@ -124,6 +100,7 @@ export default function useClusterElementsCanvasDialog({
                 useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
             } else if (isDataStreamClusterRoot) {
                 setShowDataStreamEditor(showSimpleEditor);
+                setDataStreamSimpleEditorPreferred(showSimpleEditor);
 
                 if (showSimpleEditor) {
                     useWorkflowNodeDetailsPanelStore.getState().reset();
@@ -141,17 +118,13 @@ export default function useClusterElementsCanvasDialog({
                     }
                 }
             }
-
-            if (preferenceKey) {
-                setEditorPreference(preferenceKey, showSimpleEditor);
-            }
         },
         [
-            preferenceKey,
             isAiAgentClusterRoot,
             isDataStreamClusterRoot,
             rootClusterElementNodeData,
-            setEditorPreference,
+            setAiAgentSimpleEditorPreferred,
+            setDataStreamSimpleEditorPreferred,
             setShowAiAgentEditor,
             setShowDataStreamEditor,
             setTestingPanelOpen,
@@ -219,31 +192,19 @@ export default function useClusterElementsCanvasDialog({
     }, [handleOpenChange]);
 
     useEffect(() => {
-        if (isAiAgentClusterRoot && preferenceKey) {
-            const showAiAgent = useClusterElementsCanvasDialogStore.getState().editorPreferences[preferenceKey] ?? true;
-
-            setShowAiAgentEditor(showAiAgent);
-        } else {
-            setShowAiAgentEditor(false);
-        }
-    }, [preferenceKey, isAiAgentClusterRoot, setShowAiAgentEditor]);
+        setShowAiAgentEditor(isAiAgentClusterRoot && aiAgentSimpleEditorPreferred);
+    }, [aiAgentSimpleEditorPreferred, isAiAgentClusterRoot, setShowAiAgentEditor]);
 
     useEffect(() => {
-        if (isDataStreamClusterRoot && preferenceKey) {
-            if (!isDataStreamSimpleModeAvailable) {
-                setShowDataStreamEditor(false);
-
-                return;
-            }
-
-            const showDataStream =
-                useClusterElementsCanvasDialogStore.getState().editorPreferences[preferenceKey] ?? true;
-
-            setShowDataStreamEditor(showDataStream);
-        } else {
-            setShowDataStreamEditor(false);
-        }
-    }, [preferenceKey, isDataStreamClusterRoot, isDataStreamSimpleModeAvailable, setShowDataStreamEditor]);
+        setShowDataStreamEditor(
+            isDataStreamClusterRoot && isDataStreamSimpleModeAvailable && dataStreamSimpleEditorPreferred
+        );
+    }, [
+        dataStreamSimpleEditorPreferred,
+        isDataStreamClusterRoot,
+        isDataStreamSimpleModeAvailable,
+        setShowDataStreamEditor,
+    ]);
 
     const handlePointerDownOutside = useCallback((event: CustomEvent<{originalEvent: PointerEvent}>) => {
         const target = event.detail.originalEvent.target;

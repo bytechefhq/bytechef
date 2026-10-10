@@ -110,7 +110,6 @@ const renderDialog = () =>
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             updateWorkflowMutation={{} as any}
             workflowNodeOutputs={[]}
-            workflowReferenceId={1}
         />
     );
 
