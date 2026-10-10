@@ -633,6 +633,7 @@ include("server:ee:libs:core:tenant:tenant-remote-client")
 include("server:ee:libs:core:tenant:tenant-remote-rest")
 
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api")
+include("server:ee:libs:embedded:embedded-ai:embedded-ai-tool")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-graphql")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-remote-client")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-server")
