@@ -32,6 +32,18 @@ public class TaskDispatcherDefinitionErrorType extends AbstractErrorType {
         new TaskDispatcherDefinitionErrorType(102);
     public static final TaskDispatcherDefinitionErrorType EXECUTE_VARIABLE_PROPERTIES =
         new TaskDispatcherDefinitionErrorType(103);
+    public static final TaskDispatcherDefinitionErrorType GET_TASK_DISPATCHER =
+        new TaskDispatcherDefinitionErrorType(104);
+    public static final TaskDispatcherDefinitionErrorType GET_TASK_DISPATCHER_DEFINITION =
+        new TaskDispatcherDefinitionErrorType(105);
+    public static final TaskDispatcherDefinitionErrorType GET_TASK_DISPATCHER_OUTPUT =
+        new TaskDispatcherDefinitionErrorType(106);
+    public static final TaskDispatcherDefinitionErrorType GET_TASK_DISPATCHER_PROPERTIES =
+        new TaskDispatcherDefinitionErrorType(107);
+    public static final TaskDispatcherDefinitionErrorType LIST_TASK_DISPATCHERS =
+        new TaskDispatcherDefinitionErrorType(108);
+    public static final TaskDispatcherDefinitionErrorType SEARCH_TASK_DISPATCHERS =
+        new TaskDispatcherDefinitionErrorType(109);
 
     private TaskDispatcherDefinitionErrorType(int errorKey) {
         super(TaskDispatcherDefinition.class, errorKey);

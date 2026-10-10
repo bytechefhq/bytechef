@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
-import com.bytechef.automation.ai.tool.exception.ProjectWorkflowToolErrorType;
+import com.bytechef.automation.configuration.exception.ProjectWorkflowErrorType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.mcp.domain.McpServer;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class UpdateMcpServerToolCallbackTest {
             .thenThrow(
                 new ConfigurationException(
                     "MCP server has an incomplete tool mapping for: orders",
-                    ProjectWorkflowToolErrorType.UPDATE_WORKFLOW));
+                    ProjectWorkflowErrorType.UPDATE_WORKFLOW));
 
         UpdateMcpServerToolCallback callback = new UpdateMcpServerToolCallback(facade);
 
