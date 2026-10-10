@@ -59,11 +59,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.NestedTestConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -93,6 +98,7 @@ class ManagementMcpServerSecurityConfigurerIntTest {
 
         private static final String API_SECRET_KEY = String.valueOf(TenantKey.of());
         private static final String MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of());
+        private static final String NON_TENANT_BEARER_TOKEN = "not-a-tenant-key";
         private static final String WRONG_MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of());
 
         @Autowired
@@ -116,13 +122,7 @@ class ManagementMcpServerSecurityConfigurerIntTest {
         void beforeEach() {
             reset(apiKeyService, authorityService, propertyService, userService);
 
-            Property property = mock(Property.class);
-
-            when(property.get("secretKey")).thenReturn(MCP_SERVER_SECRET_KEY);
-            when(property.get("authenticationRequired")).thenReturn(true);
-            when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
-            when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
-                .thenReturn(Optional.of(property));
+            mockMcpServerProperty(true);
 
             mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -190,6 +190,92 @@ class ManagementMcpServerSecurityConfigurerIntTest {
                         .header("X-ENVIRONMENT", "STAGING"))
                 .andExpect(MockMvcResultMatchers.status()
                     .isUnauthorized());
+        }
+
+        @Test
+        void testUiSessionWithNonTenantBearerTokenIsRejectedWhenAuthenticationIsRequired() throws Exception {
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession())
+                        .header("Authorization", "Bearer " + NON_TENANT_BEARER_TOKEN))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        @Test
+        void testUiSessionWithoutBearerTokenIsRejectedWhenAuthenticationIsRequired() throws Exception {
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession()))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        @Test
+        void testUiSessionWithValidAdminApiKeySucceeds() throws Exception {
+            mockApiKey(null, Environment.PRODUCTION);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession())
+                        .header("Authorization", "Bearer " + API_SECRET_KEY))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isOk());
+        }
+
+        @Test
+        void testUiSessionWithoutBearerTokenSucceedsWhenAuthenticationIsNotRequired() throws Exception {
+            mockMcpServerProperty(false);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession()))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isOk());
+        }
+
+        @Test
+        void testNonTenantBearerTokenIsRejectedWhenAuthenticationIsNotRequired() throws Exception {
+            mockMcpServerProperty(false);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .session(createUiSession())
+                        .header("Authorization", "Bearer " + NON_TENANT_BEARER_TOKEN))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        private static MockHttpSession createUiSession() {
+            MockHttpSession mockHttpSession = new MockHttpSession();
+
+            mockHttpSession.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                new SecurityContextImpl(
+                    UsernamePasswordAuthenticationToken.authenticated(
+                        "admin@localhost.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))));
+
+            return mockHttpSession;
+        }
+
+        private void mockMcpServerProperty(boolean authenticationRequired) {
+            Property property = mock(Property.class);
+
+            when(property.get("secretKey")).thenReturn(MCP_SERVER_SECRET_KEY);
+            when(property.get("authenticationRequired")).thenReturn(authenticationRequired);
+            when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
+            when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
+                .thenReturn(Optional.of(property));
         }
 
         private void mockApiKey(PlatformType type, Environment environment) {
