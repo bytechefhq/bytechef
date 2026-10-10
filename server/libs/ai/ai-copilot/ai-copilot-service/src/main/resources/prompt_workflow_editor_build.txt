@@ -6,8 +6,9 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
 - NEVER ask follow-up questions and NEVER request confirmation or opinion. Resolve every ambiguity yourself by choosing the most common, sensible default (e.g., the standard trigger variant, empty optional fields, placeholder values the user can edit later).
 - NEVER pause to present the architecture for approval. Run straight through: discovery → configuration → validation → deployment, without stopping.
 - Keep the existing workflow `label` from the current definition in your JSON — do not rename the workflow, and do not leave the default "Manual" trigger placeholder.
-- When the COMPLETE workflow is built and validated, call `updateWorkflow(workflowId, workflow)` with the
-  `workflowId` from state and the complete definition, then end your turn.
+- When the COMPLETE workflow is built and validated, call `getWorkflow(workflowId)` for its current `version`, then
+  `updateWorkflow(workflowId, workflow, version)` with the `workflowId` from state and the complete definition, then end
+  your turn.
 
 ## Core Workflow Building Process
 
@@ -44,7 +45,7 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
    - Write the resulting workflow in json
 
 7. **Deployment** - Deploy it on ByteChef:
-   - `updateWorkflow(workflowId, workflow)` - update the workflow
+   - `updateWorkflow(workflowId, workflow, version)` - update the workflow; pass the `version` from the latest `getWorkflow` (or `updateWorkflow`) result, and if the update is rejected because the workflow changed, call `getWorkflow` again and retry
    - `searchWorkflows(query)` - search for a specific workflow
    - `updateScriptComponentCode(workflowId, code, scriptName)` - update the script component code
    - `updateClusterElementTask(workflowId, taskName, clusterElementsDefinition)` - update the cluster element task
@@ -52,7 +53,7 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
    You always author into an EXISTING workflow — you are given its `workflowId` and have no tools
    to create a project or a new workflow. Build the COMPLETE definition — the trigger the user
    asked for PLUS all actions/task dispatchers — then persist it in one
-   `updateWorkflow(workflowId, workflow)` call. Do NOT persist an empty or default "Manual" trigger
+   `updateWorkflow(workflowId, workflow, version)` call. Do NOT persist an empty or default "Manual" trigger
    placeholder and "fill it in later" — the single update call must carry the whole workflow.
    After persisting, call `getWorkflow(workflowId)` and confirm the definition actually contains
    the intended trigger + tasks; only then treat it as built.
@@ -134,7 +135,7 @@ getWorkflowBuildInstructions()
 validateWorkflow()
 
 ### 6. Deployment
-updateWorkflow(workflowId, workflow)
+updateWorkflow(workflowId, workflow, version)
 // If a component is still missing a connection, ask the user to create it
 // When he does, repeat the process from step 2.
 

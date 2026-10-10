@@ -83,7 +83,7 @@ getWorkflow(workflowId)
 validateWorkflow()
 
 ### 5. Deployment
-updateWorkflow(workflowId, workflow)
+updateWorkflow(workflowId, workflow, version)
 
 ## Important Rules when getting Errors:
 - Ignore Warnings for Script component
