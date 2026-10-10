@@ -11,8 +11,6 @@ import {render} from '@/shared/util/test-utils';
 import {act, fireEvent, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const HINT_TEXT = 'Drop or click a data pill, or type $';
-
 const countProperty = {
     controlType: 'INTEGER',
     expressionEnabled: true,
@@ -80,23 +78,23 @@ describe('keyboard handover from an empty container', () => {
         } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
     });
 
-    it('$ on the hint of an empty array swaps to the one-pill editor with $ typed', async () => {
+    it('the Dynamic switch of an empty array swaps to an empty one-pill editor', async () => {
         setParameters({counts: []});
 
         const {container} = renderProperty(arrayProperty);
 
         await settle();
 
-        pressKeyOn(screen.getByText(HINT_TEXT), '$');
+        fireEvent.click(screen.getByRole('switch', {name: 'Dynamic'}));
 
         await settle();
 
         const editorElement = container.querySelector('.ProseMirror');
 
         expect(editorElement).not.toBeNull();
-        expect(editorElement!.textContent).toBe('$');
+        expect(editorElement!.textContent).toBe('');
         expect(document.activeElement).toBe(editorElement);
-        expect(screen.queryByText(HINT_TEXT)).toBeNull();
+        expect(screen.getByRole('switch', {name: 'Dynamic'})).toBeChecked();
         expect(screen.queryByRole('button', {name: /add array item/i})).toBeNull();
     });
 
@@ -114,14 +112,14 @@ describe('keyboard handover from an empty container', () => {
         expect(container.querySelector('.ProseMirror')?.textContent).toBe('$');
     });
 
-    it('= on the hint of an empty array swaps to the formula editor', async () => {
+    it('= on the add item button of an empty array swaps to the formula editor', async () => {
         setParameters({counts: []});
 
         const {container} = renderProperty(arrayProperty);
 
         await settle();
 
-        pressKeyOn(screen.getByText(HINT_TEXT), '=');
+        pressKeyOn(screen.getByRole('button', {name: /add array item/i}), '=');
 
         await settle();
 
@@ -163,6 +161,6 @@ describe('keyboard handover from an empty container', () => {
         await settle();
 
         expect(container.querySelector('input[type=number]')).toBeNull();
-        expect(screen.getByText(HINT_TEXT)).toBeInTheDocument();
+        expect(screen.getByRole('switch', {name: 'Dynamic'})).not.toBeChecked();
     });
 });

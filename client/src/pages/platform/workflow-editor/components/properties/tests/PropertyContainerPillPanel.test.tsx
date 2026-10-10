@@ -63,18 +63,6 @@ describe('picking an empty container opens the data pill panel', () => {
         useDataPillPanelStore.setState({dataPillPanelHasContent: true, dataPillPanelOpen: false});
     });
 
-    it('opens the panel when the hint of an empty array is clicked', async () => {
-        setParameters({counts: []});
-
-        renderArray();
-
-        await settle();
-
-        fireEvent.mouseDown(screen.getByText('Drop or click a data pill, or type $'));
-
-        expect(useDataPillPanelStore.getState().dataPillPanelOpen).toBe(true);
-    });
-
     it('opens the panel when the label of an empty array is clicked', async () => {
         setParameters({counts: []});
 
@@ -109,15 +97,5 @@ describe('picking an empty container opens the data pill panel', () => {
         fireEvent.mouseDown(screen.getByRole('button', {name: /add array item/i}));
 
         expect(useDataPillPanelStore.getState().dataPillPanelOpen).toBe(false);
-    });
-
-    it('keeps the hint clear of the add item button', async () => {
-        setParameters({counts: []});
-
-        renderArray();
-
-        await settle();
-
-        expect(screen.getByText('Drop or click a data pill, or type $')).toHaveClass('mb-2');
     });
 });
