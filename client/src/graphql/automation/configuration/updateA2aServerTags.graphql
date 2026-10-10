@@ -1,0 +1,5 @@
+mutation updateA2aServerTags($id: ID!, $tags: [TagInput!]!) {
+    updateA2aServerTags(id: $id, tags: $tags) {
+        id
+    }
+}

@@ -1,0 +1,6 @@
+mutation updateA2aProjectWorkflowEnabled($id: ID!, $enabled: Boolean!) {
+    updateA2aProjectWorkflowEnabled(id: $id, enabled: $enabled) {
+        enabled
+        id
+    }
+}
