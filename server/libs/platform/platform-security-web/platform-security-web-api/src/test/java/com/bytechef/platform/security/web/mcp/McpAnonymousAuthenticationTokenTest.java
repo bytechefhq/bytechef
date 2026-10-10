@@ -36,16 +36,6 @@ class McpAnonymousAuthenticationTokenTest {
     }
 
     @Test
-    void testManagementTokenIsAuthenticatedWithoutAuthorities() {
-        McpAnonymousAuthenticationToken token = McpAnonymousAuthenticationToken.ofManagementMcpServer();
-
-        assertThat(token.isAuthenticated()).isTrue();
-        assertThat(token.getAuthorities()).isEmpty();
-        assertThat(token.getName()).isEqualTo("mcp-anonymous:management");
-        assertThat(token).isNotInstanceOf(AnonymousAuthenticationToken.class);
-    }
-
-    @Test
     void testPrincipalDoesNotDiscloseTheSecretKey() {
         McpAnonymousAuthenticationToken token = McpAnonymousAuthenticationToken.ofAutomationMcpServer(42);
 
@@ -56,20 +46,11 @@ class McpAnonymousAuthenticationTokenTest {
     }
 
     @Test
-    void testOnlyManagementTokenIsManagementMcpServer() {
-        assertThat(McpAnonymousAuthenticationToken.ofManagementMcpServer()
-            .isManagementMcpServer()).isTrue();
-        assertThat(McpAnonymousAuthenticationToken.ofAutomationMcpServer(42)
-            .isManagementMcpServer()).isFalse();
-    }
-
-    @Test
     void testA2aTokenIdentifiesTheServerWithoutAuthorities() {
         McpAnonymousAuthenticationToken token = McpAnonymousAuthenticationToken.ofAutomationA2aServer(42);
 
         assertThat(token.isAuthenticated()).isTrue();
         assertThat(token.getAuthorities()).isEmpty();
         assertThat(token.getPrincipal()).isEqualTo("a2a-anonymous:automation:42");
-        assertThat(token.isManagementMcpServer()).isFalse();
     }
 }

@@ -16,14 +16,12 @@
 
 package com.bytechef.ai.mcp.server.security.web.config;
 
-import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpAuthenticationRequiredResolver;
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpServerSecretVerifier;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
-import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
@@ -63,11 +61,6 @@ public class ManagementMcpServerApiKeySecurityConfigurerContributor implements S
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
         return (T) new ManagementMcpServerSecurityConfigurer(
             apiKeyService, authorityService, environmentService, propertyService, userService);
-    }
-
-    @Bean
-    McpAuthenticationRequiredResolver managementMcpAuthenticationRequiredResolver() {
-        return new ManagementMcpAuthenticationRequiredResolver(propertyService);
     }
 
     @Bean
