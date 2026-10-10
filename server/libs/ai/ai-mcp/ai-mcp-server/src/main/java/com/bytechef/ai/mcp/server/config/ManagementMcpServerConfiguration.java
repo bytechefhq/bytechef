@@ -22,7 +22,8 @@ import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.ai.tool.WorkspaceTools;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -84,19 +85,11 @@ public class ManagementMcpServerConfiguration {
             listMcpProjectWorkflows(mcpServerId) shows each attached workflow's current mapping state. \
             configureMcpServer never creates the server, attaches workflows to it, or enables it — those are \
             the flat tools above.
-            listMcpServers, createMcpServer and listMcpProjectWorkflows additionally accept an optional \
-            workspaceId (and environment) since MCP servers are workspace-scoped: omit it when the account \
-            has exactly one \
-            workspace, otherwise retry with an explicit workspaceId from the workspace_required error's \
-            'workspaces' field.
-            The project, workflow and script tools (listProjects, searchProjects, getProject, createProject, \
-            listWorkflows, searchWorkflows, getWorkflow, createProjectWorkflow, updateWorkflow, \
-            updateScriptComponentCode, updateWorkflowRootProperties, updateClusterElementTask and the rest) \
-            likewise act within a single workspace and accept an \
-            optional workspaceId: they only list projects and workflows of that workspace and reject a project \
-            or workflow id that belongs to another one.
-            Most tools require workspace context: if a tool returns a workspace_required error, retry with one \
-            of the workspaceId values listed in its 'workspaces' field.""";
+            Tools that work within a workspace (listProjects, searchProjects, createProject, \
+            searchWorkflows without a projectId, and the MCP server, deployment and knowledge-base tools) take \
+            a workspaceId, and several also take an environment (DEVELOPMENT, STAGING or PRODUCTION, default \
+            DEVELOPMENT). Call listWorkspaces first to find the workspace id. Tools that take a project or \
+            workflow id act on that object directly.""";
 
     private final ComponentTools componentTools;
     private final ProjectTools projectTools;
@@ -105,17 +98,18 @@ public class ManagementMcpServerConfiguration {
     private final TaskDispatcherTools taskDispatcherTools;
     private final ScriptTools scriptTools;
     private final ClusterElementTools clusterElementTools;
+    private final WorkspaceTools workspaceTools;
     private final List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors;
     private final ToolExecutionRecorder toolExecutionRecorder;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
+    private final WorkspaceFacade workspaceFacade;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
         ComponentTools componentTools, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools,
         TaskTools taskTools, TaskDispatcherTools taskDispatcherTools, ScriptTools scriptTools,
-        ClusterElementTools clusterElementTools,
+        ClusterElementTools clusterElementTools, WorkspaceTools workspaceTools,
         List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors,
-        ToolExecutionRecorder toolExecutionRecorder, WorkspaceScopeResolver workspaceScopeResolver) {
+        ToolExecutionRecorder toolExecutionRecorder, WorkspaceFacade workspaceFacade) {
 
         this.componentTools = componentTools;
         this.projectTools = projectTools;
@@ -124,9 +118,10 @@ public class ManagementMcpServerConfiguration {
         this.taskDispatcherTools = taskDispatcherTools;
         this.scriptTools = scriptTools;
         this.clusterElementTools = clusterElementTools;
+        this.workspaceTools = workspaceTools;
         this.mcpServerToolCallbackContributors = mcpServerToolCallbackContributors;
         this.toolExecutionRecorder = toolExecutionRecorder;
-        this.workspaceScopeResolver = workspaceScopeResolver;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Bean
@@ -166,7 +161,7 @@ public class ManagementMcpServerConfiguration {
     ToolCallbackProvider toolCallbackProvider() {
         List<Object> tools = List.of(
             projectTools, projectWorkflowTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
-            clusterElementTools);
+            clusterElementTools, workspaceTools);
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
@@ -185,7 +180,7 @@ public class ManagementMcpServerConfiguration {
 
     private ToolCallback recording(ToolCallback toolCallback, ToolExecutionKind kind) {
         return new ToolInvocationRecordingToolCallback(
-            toolCallback, kind, toolExecutionRecorder, workspaceScopeResolver);
+            toolCallback, kind, toolExecutionRecorder, workspaceFacade);
     }
 
     private McpAsyncServer createMcpAsyncServer(WebMvcStreamableServerTransportProvider transportProvider) {

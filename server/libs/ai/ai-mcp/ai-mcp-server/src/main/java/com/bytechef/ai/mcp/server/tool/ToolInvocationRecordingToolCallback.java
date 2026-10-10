@@ -16,7 +16,8 @@
 
 package com.bytechef.ai.mcp.server.tool;
 
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionEvent;
@@ -44,17 +45,17 @@ public class ToolInvocationRecordingToolCallback implements ToolCallback {
     private final ToolCallback delegate;
     private final ToolExecutionKind kind;
     private final ToolExecutionRecorder toolExecutionRecorder;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
+    private final WorkspaceFacade workspaceFacade;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ToolInvocationRecordingToolCallback(
         ToolCallback delegate, ToolExecutionKind kind, ToolExecutionRecorder toolExecutionRecorder,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        WorkspaceFacade workspaceFacade) {
 
         this.delegate = delegate;
         this.kind = kind;
         this.toolExecutionRecorder = toolExecutionRecorder;
-        this.workspaceScopeResolver = workspaceScopeResolver;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Override
@@ -79,26 +80,38 @@ public class ToolInvocationRecordingToolCallback implements ToolCallback {
         ToolExecutionEvent.Builder builder = ToolExecutionEvent.builder(
             PlatformType.AUTOMATION, ToolExecutionSurface.MCP_MANAGEMENT, kind, toolDefinition.name());
 
-        if (resolveWorkspaceScope(toolInput) instanceof WorkspaceScopeResolver.Resolved resolved) {
-            builder
-                .workspaceId(resolved.workspaceId())
-                .environment(Math.toIntExact(resolved.environmentId()));
-        }
+        applyWorkspaceScope(builder, toolInput, toolContext);
 
         return toolExecutionRecorder.record(
             builder, () -> delegate.call(toolInput, toolContext),
             ToolInvocationRecordingToolCallback::resolveOutcome);
     }
 
-    private WorkspaceScopeResolver.@Nullable WorkspaceScope resolveWorkspaceScope(@Nullable String toolInput) {
+    private void applyWorkspaceScope(
+        ToolExecutionEvent.Builder builder, @Nullable String toolInput, @Nullable ToolContext toolContext) {
+
+        Long workspaceId;
+        long environmentId;
+
         try {
             Map<String, ?> input = readObject(toolInput);
 
-            return workspaceScopeResolver.resolve(
-                toLong(input.get(WORKSPACE_ID_FIELD)), toEnvironment(input.get(ENVIRONMENT_FIELD)));
+            workspaceId = AutomationToolInvocationContext.resolveWorkspaceId(
+                toLong(input.get(WORKSPACE_ID_FIELD)), toolContext, workspaceFacade);
+
+            if (workspaceId == null) {
+                return;
+            }
+
+            environmentId = AutomationToolInvocationContext.resolveEnvironmentId(
+                toEnvironment(input.get(ENVIRONMENT_FIELD)), toolContext);
         } catch (RuntimeException exception) {
-            return null;
+            return;
         }
+
+        builder
+            .workspaceId(workspaceId)
+            .environment(Math.toIntExact(environmentId));
     }
 
     private static ToolExecutionOutcome resolveOutcome(@Nullable String result) {
