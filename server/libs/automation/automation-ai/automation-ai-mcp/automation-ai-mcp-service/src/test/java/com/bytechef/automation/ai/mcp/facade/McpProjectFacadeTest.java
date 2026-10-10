@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -66,6 +67,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 /**
  * @author Ivica Cardic
@@ -343,6 +345,20 @@ class McpProjectFacadeTest {
             verify(projectDeploymentWorkflowService, never()).delete(anyLong());
         }
 
+        @Test
+        void testUpdateMcpProjectDisablesARemovedWorkflowBeforeDeletingIt() {
+            stubExistingMcpProject();
+
+            mcpProjectFacade.updateMcpProject(20L, List.of());
+
+            InOrder inOrder = inOrder(projectDeploymentFacade, projectDeploymentWorkflowService);
+
+            inOrder.verify(projectDeploymentFacade)
+                .enableProjectDeploymentWorkflow(10L, "kept", false);
+            inOrder.verify(projectDeploymentWorkflowService)
+                .delete(201L);
+        }
+
         private ProjectDeploymentWorkflow capturedProjectDeploymentWorkflow() {
             ArgumentCaptor<ProjectDeploymentWorkflow> projectDeploymentWorkflowArgumentCaptor =
                 ArgumentCaptor.forClass(ProjectDeploymentWorkflow.class);
@@ -383,6 +399,7 @@ class McpProjectFacadeTest {
 
             ProjectDeploymentWorkflow keptProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
+            keptProjectDeploymentWorkflow.setEnabled(true);
             keptProjectDeploymentWorkflow.setId(201L);
             keptProjectDeploymentWorkflow.setProjectDeploymentId(10L);
             keptProjectDeploymentWorkflow.setWorkflowId("kept");

@@ -233,6 +233,14 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
             if (!selectedWorkflowIdSet.contains(entry.getKey())) {
                 McpProjectWorkflow mcpProjectWorkflow = entry.getValue();
 
+                ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowMap.get(
+                    mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+
+                if (projectDeploymentWorkflow.isEnabled()) {
+                    projectDeploymentFacade.enableProjectDeploymentWorkflow(
+                        Objects.requireNonNull(mcpProject.getProjectDeploymentId()), entry.getKey(), false);
+                }
+
                 mcpProjectWorkflowService.delete(mcpProjectWorkflow.getId());
 
                 projectDeploymentWorkflowService.delete(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
