@@ -8,17 +8,19 @@ import {findForcedFunctionSuggestionStart, isFormulaModeActive} from './function
 
 export const FunctionSuggestionPluginKey = new PluginKey('functionSuggestion');
 
+type FunctionSuggestionStorageType = {
+    forcedFrom: number | null;
+    functionDefinitions: EvaluatorFunctionDefinition[];
+};
+
 declare module '@tiptap/core' {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     interface Storage {
-        FunctionSuggestion: {
-            forcedFrom: number | null;
-            functionDefinitions: EvaluatorFunctionDefinition[];
-        };
+        FunctionSuggestion: FunctionSuggestionStorageType;
     }
 }
 
-export const FunctionSuggestion = Extension.create({
+export const FunctionSuggestion = Extension.create<object, FunctionSuggestionStorageType>({
     addKeyboardShortcuts() {
         return {
             'Ctrl-Space': ({editor}) => {
