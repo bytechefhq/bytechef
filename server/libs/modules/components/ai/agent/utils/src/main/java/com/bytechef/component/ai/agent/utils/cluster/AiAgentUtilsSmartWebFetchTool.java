@@ -16,9 +16,12 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 
+import com.bytechef.component.ai.agent.utils.cluster.network.PrivateAddressGuardedToolCallback;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
@@ -31,12 +34,16 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.springaicommunity.agent.tools.SmartWebFetchTool;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
@@ -44,12 +51,21 @@ import org.springframework.ai.tool.ToolCallbackProvider;
  */
 public class AiAgentUtilsSmartWebFetchTool {
 
+    public static final String DOMAIN_SAFETY_CHECK = "domainSafetyCheck";
+    public static final String MAX_CONTENT_LENGTH = "maxContentLength";
+
+    private static final String URL_ARGUMENT_NAME = "url";
+
+    private final Set<String> allowedPrivateHosts;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
 
     public final ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> clusterElementDefinition;
 
     @SuppressFBWarnings("EI")
-    public AiAgentUtilsSmartWebFetchTool(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public AiAgentUtilsSmartWebFetchTool(
+        ClusterElementDefinitionService clusterElementDefinitionService, Set<String> allowedPrivateHosts) {
+
+        this.allowedPrivateHosts = Set.copyOf(allowedPrivateHosts);
         this.clusterElementDefinitionService = clusterElementDefinitionService;
 
         this.clusterElementDefinition =
@@ -57,6 +73,21 @@ public class AiAgentUtilsSmartWebFetchTool {
                 .title("Smart Web Fetch Tool")
                 .description("AI-powered web content summarization with caching.")
                 .type(TOOLS)
+                .properties(
+                    bool(DOMAIN_SAFETY_CHECK)
+                        .label("Domain Safety Check")
+                        .description(
+                            "Check each domain against an external domain safety service before fetching it. The " +
+                                "domain name is sent to that service.")
+                        .defaultValue(true)
+                        .advancedOption(true),
+                    integer(MAX_CONTENT_LENGTH)
+                        .label("Max Content Length")
+                        .description(
+                            "Maximum number of characters of fetched content passed to the model. Leave empty for " +
+                                "the default of 100000.")
+                        .minValue(1)
+                        .advancedOption(true))
                 .object(() -> this::apply);
     }
 
@@ -70,10 +101,21 @@ public class AiAgentUtilsSmartWebFetchTool {
         ChatClient chatClient = ChatClient.builder(chatModel)
             .build();
 
-        SmartWebFetchTool smartWebFetchTool = SmartWebFetchTool.builder(chatClient)
-            .build();
+        SmartWebFetchTool.Builder builder = SmartWebFetchTool.builder(chatClient)
+            .domainSafetyCheck(inputParameters.getBoolean(DOMAIN_SAFETY_CHECK, true));
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(smartWebFetchTool));
+        Integer maxContentLength = inputParameters.getInteger(MAX_CONTENT_LENGTH);
+
+        if (maxContentLength != null) {
+            builder.maxContentLength(maxContentLength);
+        }
+
+        List<ToolCallback> toolCallbacks = Arrays.stream(ToolCallbacks.from(builder.build()))
+            .<ToolCallback>map(toolCallback -> new PrivateAddressGuardedToolCallback(
+                toolCallback, URL_ARGUMENT_NAME, allowedPrivateHosts))
+            .toList();
+
+        return ToolCallbackProvider.from(toolCallbacks);
     }
 
     private ChatModel resolveChatModel(

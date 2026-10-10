@@ -16,7 +16,12 @@
 
 package com.bytechef.component.ai.agent.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.List;
@@ -31,10 +36,39 @@ public class AiAgentUtilsComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/ai_agent-utils_v1.json",
-            new AiAgentUtilsComponentHandler(
-                Mockito.mock(AiAgentToolFacade.class), Mockito.mock(AiSkillFacade.class), List.of(), null, null, null,
-                null)
-                    .getDefinition());
+            "definition/ai_agent-utils_v1.json", createComponentHandler(true).getDefinition());
+    }
+
+    @Test
+    public void testGetComponentDefinitionLeavesOutShellToolsUnlessEnabled() {
+        assertThat(clusterElementNames(createComponentHandler(false))).doesNotContain("shellTools")
+            .contains("fileSystemTools");
+        assertThat(clusterElementNames(createComponentHandler(true))).contains("shellTools");
+    }
+
+    private static List<String> clusterElementNames(AiAgentUtilsComponentHandler componentHandler) {
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        List<ClusterElementDefinition<?>> clusterElements = componentDefinition.getClusterElements();
+
+        return clusterElements.stream()
+            .map(ClusterElementDefinition::getName)
+            .toList();
+    }
+
+    private static AiAgentUtilsComponentHandler createComponentHandler(boolean shellEnabled) {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.Ai.AgentUtils agentUtils = applicationProperties.getAi()
+            .getAgentUtils();
+
+        agentUtils.getShell()
+            .setEnabled(shellEnabled);
+        agentUtils.getWorkspace()
+            .setBasedir("build/ai-agent-workspaces");
+
+        return new AiAgentUtilsComponentHandler(
+            Mockito.mock(AiAgentToolFacade.class), Mockito.mock(AiSkillFacade.class), applicationProperties,
+            List.of(), null, null, null, null);
     }
 }

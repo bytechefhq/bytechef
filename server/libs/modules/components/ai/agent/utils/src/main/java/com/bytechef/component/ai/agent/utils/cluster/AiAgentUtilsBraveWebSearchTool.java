@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -29,19 +30,25 @@ import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides web search with domain filtering using the Brave Search API.
- *
  * @author Ivica Cardic
  */
 public class AiAgentUtilsBraveWebSearchTool {
 
     public static final String BRAVE_API_KEY = "braveApiKey";
+    public static final String RESULT_COUNT = "resultCount";
 
     public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ToolCallbackProviderFunction>clusterElement("braveWebSearchTool")
             .title("Brave Web Search Tool")
             .description("Web search with domain filtering using the Brave Search API.")
             .type(TOOLS)
+            .properties(
+                integer(RESULT_COUNT)
+                    .label("Result Count")
+                    .description("Number of search results returned per query. Leave empty for the default of 10.")
+                    .minValue(1)
+                    .maxValue(20)
+                    .advancedOption(true))
             .object(() -> AiAgentUtilsBraveWebSearchTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
@@ -54,9 +61,14 @@ public class AiAgentUtilsBraveWebSearchTool {
             return ToolCallbackProvider.from(List.of());
         }
 
-        BraveWebSearchTool braveWebSearchTool = BraveWebSearchTool.builder(apiKey)
-            .build();
+        BraveWebSearchTool.Builder builder = BraveWebSearchTool.builder(apiKey);
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(braveWebSearchTool));
+        Integer resultCount = inputParameters.getInteger(RESULT_COUNT);
+
+        if (resultCount != null) {
+            builder.resultCount(resultCount);
+        }
+
+        return ToolCallbackProvider.from(ToolCallbacks.from(builder.build()));
     }
 }
