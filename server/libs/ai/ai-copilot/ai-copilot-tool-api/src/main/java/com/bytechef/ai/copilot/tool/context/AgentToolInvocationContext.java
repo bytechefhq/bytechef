@@ -53,7 +53,7 @@ import org.springframework.security.core.Authentication;
 public record AgentToolInvocationContext(
     @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
     @Nullable String conversationId, @Nullable String tenantId, @Nullable Authentication authentication,
-    @Nullable String llmProvider, @Nullable String llmModel, boolean skipAutomationAuthorization) {
+    @Nullable String llmProvider, @Nullable String llmModel) {
 
     public static final String TOOL_CONTEXT_WORKSPACE_ID_KEY = "bytechef.agentTool.workspaceId";
     public static final String TOOL_CONTEXT_USER_ID_KEY = "bytechef.agentTool.userId";
@@ -63,27 +63,6 @@ public record AgentToolInvocationContext(
     public static final String TOOL_CONTEXT_AUTHENTICATION_KEY = "bytechef.agentTool.authentication";
     public static final String TOOL_CONTEXT_LLM_PROVIDER_KEY = "bytechef.agentTool.llmProvider";
     public static final String TOOL_CONTEXT_LLM_MODEL_KEY = "bytechef.agentTool.llmModel";
-    public static final String TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY = "bytechef.agentTool.skipAutomationAuthorization";
-
-    public AgentToolInvocationContext(
-        @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
-        @Nullable String conversationId, @Nullable String tenantId, @Nullable Authentication authentication,
-        @Nullable String llmProvider, @Nullable String llmModel) {
-
-        this(
-            workspaceId, userId, environmentId, conversationId, tenantId, authentication, llmProvider, llmModel,
-            false);
-    }
-
-    public AgentToolInvocationContext(
-        @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
-        @Nullable String conversationId, @Nullable String tenantId, @Nullable Authentication authentication,
-        boolean skipAutomationAuthorization) {
-
-        this(
-            workspaceId, userId, environmentId, conversationId, tenantId, authentication, null, null,
-            skipAutomationAuthorization);
-    }
 
     public AgentToolInvocationContext(
         @Nullable Long workspaceId, @Nullable Long userId, @Nullable Long environmentId,
@@ -123,18 +102,15 @@ public record AgentToolInvocationContext(
             ? value : null;
         String llmProvider = asString(map.get(TOOL_CONTEXT_LLM_PROVIDER_KEY));
         String llmModel = asString(map.get(TOOL_CONTEXT_LLM_MODEL_KEY));
-        boolean skipAutomationAuthorization = Boolean.TRUE.equals(map.get(TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY));
 
         if (workspaceId == null && userId == null && environmentId == null && conversationId == null
-            && tenantId == null && authentication == null && llmProvider == null && llmModel == null
-            && !skipAutomationAuthorization) {
+            && tenantId == null && authentication == null && llmProvider == null && llmModel == null) {
 
             return null;
         }
 
         return new AgentToolInvocationContext(
-            workspaceId, userId, environmentId, conversationId, tenantId, authentication, llmProvider, llmModel,
-            skipAutomationAuthorization);
+            workspaceId, userId, environmentId, conversationId, tenantId, authentication, llmProvider, llmModel);
     }
 
     public int resolveEnvironmentOrDefault() {
@@ -184,10 +160,6 @@ public record AgentToolInvocationContext(
             map.put(TOOL_CONTEXT_LLM_MODEL_KEY, llmModel);
         }
 
-        if (skipAutomationAuthorization) {
-            map.put(TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY, Boolean.TRUE);
-        }
-
         return map;
     }
 
@@ -226,7 +198,6 @@ public record AgentToolInvocationContext(
         private @Nullable Authentication authentication;
         private @Nullable String llmProvider;
         private @Nullable String llmModel;
-        private boolean skipAutomationAuthorization;
 
         private Builder() {
         }
@@ -279,16 +250,9 @@ public record AgentToolInvocationContext(
             return this;
         }
 
-        public Builder skipAutomationAuthorization(boolean skipAutomationAuthorization) {
-            this.skipAutomationAuthorization = skipAutomationAuthorization;
-
-            return this;
-        }
-
         public AgentToolInvocationContext build() {
             return new AgentToolInvocationContext(
-                workspaceId, userId, environmentId, conversationId, tenantId, authentication, llmProvider, llmModel,
-                skipAutomationAuthorization);
+                workspaceId, userId, environmentId, conversationId, tenantId, authentication, llmProvider, llmModel);
         }
     }
 }
