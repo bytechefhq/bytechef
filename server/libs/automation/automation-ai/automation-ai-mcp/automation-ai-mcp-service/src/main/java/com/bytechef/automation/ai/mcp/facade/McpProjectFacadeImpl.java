@@ -25,6 +25,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -79,6 +80,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
+    private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public McpProjectFacadeImpl(
@@ -88,7 +90,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowTestConfigurationService workflowTestConfigurationService,
+        WorkspaceMcpServerService workspaceMcpServerService) {
 
         this.componentConnectionFacade = componentConnectionFacade;
         this.connectionService = connectionService;
@@ -102,6 +105,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+        this.workspaceMcpServerService = workspaceMcpServerService;
     }
 
     @Override
@@ -110,7 +114,11 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
-        validateProjectVersionPublished(projectId, projectVersion);
+        Project project = projectService.getProject(projectId);
+
+        validateSameWorkspace(project, mcpServerId);
+
+        validateProjectVersionPublished(project, projectVersion);
 
         validateProjectVersionWorkflowIds(projectId, projectVersion, selectedWorkflowIds);
 
@@ -401,8 +409,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         return workflowConnectionsMap;
     }
 
-    private void validateProjectVersionPublished(long projectId, int projectVersion) {
-        Project project = projectService.getProject(projectId);
+    private void validateProjectVersionPublished(Project project, int projectVersion) {
+        long projectId = Objects.requireNonNull(project.getId());
 
         if (!project.isPublished()) {
             throw new IllegalArgumentException("Project " + projectId + " is not published");
@@ -416,6 +424,17 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         if (!projectVersionPublished) {
             throw new IllegalArgumentException(
                 "Version " + projectVersion + " of project " + projectId + " is not published");
+        }
+    }
+
+    private void validateSameWorkspace(Project project, long mcpServerId) {
+        Long projectWorkspaceId = project.getWorkspaceId();
+        Long mcpServerWorkspaceId = workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServerId)
+            .orElse(null);
+
+        if (projectWorkspaceId == null || !projectWorkspaceId.equals(mcpServerWorkspaceId)) {
+            throw new IllegalArgumentException(
+                "Project " + project.getId() + " and MCP server " + mcpServerId + " are not in the same workspace");
         }
     }
 
