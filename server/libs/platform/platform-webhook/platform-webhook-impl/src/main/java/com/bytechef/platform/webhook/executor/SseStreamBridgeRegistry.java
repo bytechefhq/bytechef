@@ -125,6 +125,8 @@ public class SseStreamBridgeRegistry {
 
         if (SseStreamEvent.EVENT_TYPE_TASK_STARTED.equals(eventType)) {
             activatePendingRegistrations(jobId);
+
+            return;
         }
 
         if (SseStreamEvent.EVENT_TYPE_JOB_STATUS.equals(eventType)) {
@@ -192,18 +194,6 @@ public class SseStreamBridgeRegistry {
                 for (SseStreamBridge sseStreamBridge : sseStreamBridges) {
                     try {
                         sseStreamBridge.onError(new RuntimeException(errorMessage));
-                    } catch (Exception exception) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            }
-
-            case SseStreamEvent.EVENT_TYPE_TASK_STARTED -> {
-                for (SseStreamBridge sseStreamBridge : sseStreamBridges) {
-                    try {
-                        sseStreamBridge.onEvent(sseStreamEvent.getPayload());
                     } catch (Exception exception) {
                         if (log.isTraceEnabled()) {
                             log.trace(exception.getMessage(), exception);
