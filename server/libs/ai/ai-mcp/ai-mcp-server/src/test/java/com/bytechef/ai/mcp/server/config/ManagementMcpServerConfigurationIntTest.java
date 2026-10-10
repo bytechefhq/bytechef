@@ -25,6 +25,7 @@ import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
+import com.bytechef.automation.ai.tool.WorkspaceTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -45,10 +46,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 class ManagementMcpServerConfigurationIntTest {
 
     private static final List<String> WORKSPACE_SCOPED_TOOL_NAMES = List.of(
-        "listProjects", "getProject", "searchProjects", "getProjectStatus", "createProject", "updateProject",
-        "deleteProject", "publishProject", "getWorkflow", "listWorkflows", "searchWorkflows",
-        "createProjectWorkflow", "deleteWorkflow", "updateWorkflow", "saveWorkflowTestConnection",
-        "updateScriptComponentCode", "updateWorkflowRootProperties", "updateClusterElementTask");
+        "listProjects", "searchProjects", "createProject", "searchWorkflows");
 
     private final ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
         .withBean(ComponentTools.class, () -> mock(ComponentTools.class))
@@ -58,6 +56,7 @@ class ManagementMcpServerConfigurationIntTest {
         .withBean(TaskDispatcherTools.class, () -> mock(TaskDispatcherTools.class))
         .withBean(ScriptTools.class, () -> mock(ScriptTools.class))
         .withBean(ClusterElementTools.class, () -> mock(ClusterElementTools.class))
+        .withBean(WorkspaceTools.class, () -> mock(WorkspaceTools.class))
         .withUserConfiguration(ManagementMcpServerConfiguration.class);
 
     @Test
@@ -131,7 +130,24 @@ class ManagementMcpServerConfigurationIntTest {
     class WorkspaceScopedToolsTest {
 
         @Test
-        void testProjectWorkflowAndScriptToolsAcceptWorkspaceId() {
+        void testListWorkspacesIsExposed() {
+            applicationContextRunner.run(context -> {
+                assertThat(context).hasNotFailed();
+
+                ManagementMcpServerConfiguration configuration =
+                    context.getBean(ManagementMcpServerConfiguration.class);
+
+                ToolCallbackProvider toolCallbackProvider = configuration.toolCallbackProvider();
+
+                assertThat(toolCallbackProvider.getToolCallbacks())
+                    .extracting(toolCallback -> toolCallback.getToolDefinition()
+                        .name())
+                    .contains("listWorkspaces");
+            });
+        }
+
+        @Test
+        void testToolsThatWorkWithinAWorkspaceAcceptWorkspaceId() {
             applicationContextRunner.run(context -> {
                 assertThat(context).hasNotFailed();
 
