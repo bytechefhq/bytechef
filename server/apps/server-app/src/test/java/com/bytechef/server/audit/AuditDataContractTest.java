@@ -140,6 +140,7 @@ class AuditDataContractTest {
         Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
         Map.entry("PropertyCopilotFacadeImpl.generatePropertyValue", SUGGESTION),
+        Map.entry("WorkflowDescriptionCopilotFacadeImpl.generateWorkflowDescription", SUGGESTION),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
