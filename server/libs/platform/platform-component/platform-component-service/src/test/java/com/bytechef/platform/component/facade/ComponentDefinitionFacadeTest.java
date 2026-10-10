@@ -16,17 +16,158 @@
 
 package com.bytechef.platform.component.facade;
 
-import org.junit.jupiter.api.Disabled;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
  */
-public class ComponentDefinitionFacadeTest {
+@ExtendWith(MockitoExtension.class)
+class ComponentDefinitionFacadeTest {
 
-    @Disabled
+    @Mock
+    private ComponentDefinitionService componentDefinitionService;
+
+    @Mock
+    private ConnectionService connectionService;
+
+    private ComponentDefinitionFacadeImpl facade;
+
+    @BeforeEach
+    void setUp() {
+        facade = new ComponentDefinitionFacadeImpl(componentDefinitionService, connectionService);
+    }
+
     @Test
-    public void testGetComponentDefinitions() {
-        // TODO
+    void testExecuteWorkflowInputOptionsResolvesActiveConnectionAndDelegates() {
+        Connection connection = Connection.builder()
+            .componentName("slack")
+            .connectionVersion(1)
+            .name("Slack Connection")
+            .parameters(Map.of())
+            .type(PlatformType.AUTOMATION)
+            .build();
+
+        connection.setCredentialStatus(CredentialStatus.VALID);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+        when(componentDefinitionService.executeWorkflowInputOptions(
+            eq("slack"), eq(1), eq("channel"), eq("channel"), anyMap(), anyList(), any(), any()))
+                .thenReturn(List.of(new Option(ComponentDsl.option("General", "C1"))));
+
+        List<Option> options = facade.executeWorkflowInputOptions(
+            "slack", 1, "channel", "channel", Map.of(), List.of(), null, 5L);
+
+        assertThat(options)
+            .extracting(Option::getValue)
+            .containsExactly("C1");
+    }
+
+    @Test
+    void testExecuteWorkflowInputOptionsNullConnectionPassesNull() {
+        when(componentDefinitionService.executeWorkflowInputOptions(
+            anyString(), anyInt(), anyString(), anyString(), anyMap(), anyList(), any(), isNull()))
+                .thenReturn(List.of());
+
+        List<Option> options = facade.executeWorkflowInputOptions(
+            "slack", 1, "channel", "channel", Map.of(), List.of(), null, null);
+
+        verify(connectionService, never()).getConnection(any(Long.class));
+
+        assertThat(options).isEmpty();
+    }
+
+    @Test
+    void testExecuteWorkflowInputOptionsInactiveConnectionThrows() {
+        Connection connection = Connection.builder()
+            .componentName("slack")
+            .connectionVersion(1)
+            .name("Slack Connection")
+            .parameters(Map.of())
+            .type(PlatformType.AUTOMATION)
+            .build();
+
+        connection.setCredentialStatus(CredentialStatus.INVALID);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        assertThatThrownBy(() -> facade.executeWorkflowInputOptions(
+            "slack", 1, "channel", "channel", Map.of(), List.of(), null, 5L))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("Slack Connection")
+                .hasMessageContaining("INVALID");
+    }
+
+    @Nested
+    class PreAuthorizeTest {
+
+        private ComponentDefinitionFacade securedFacade;
+
+        @BeforeEach
+        void beforeEach() {
+            ProxyFactory proxyFactory = new ProxyFactory(facade);
+
+            proxyFactory.addAdvice(AuthorizationManagerBeforeMethodInterceptor.preAuthorize());
+
+            securedFacade = (ComponentDefinitionFacade) proxyFactory.getProxy();
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testDefinitionReadsRequireAuthentication() {
+            assertThatThrownBy(() -> securedFacade.getComponentDefinitions())
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+            assertThatThrownBy(() -> securedFacade.getComponentDefinition("slack", 1))
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+
+            verify(componentDefinitionService, never()).getComponentDefinitions();
+        }
+
+        @Test
+        void testAuthenticatedCallerReachesTheService() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(new TestingAuthenticationToken("user", "n/a", "ROLE_USER"));
+
+            when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of());
+
+            assertThat(securedFacade.getComponentDefinitions()).isEmpty();
+        }
     }
 }

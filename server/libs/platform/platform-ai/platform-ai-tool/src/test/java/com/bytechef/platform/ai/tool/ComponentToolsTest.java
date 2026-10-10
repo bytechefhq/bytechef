@@ -43,10 +43,10 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
@@ -63,7 +63,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 class ComponentToolsTest {
 
     @Mock
-    private ComponentDefinitionService componentDefinitionService;
+    private ComponentDefinitionFacade componentDefinitionFacade;
 
     @Mock
     private ActionDefinitionFacade actionDefinitionFacade;
@@ -73,7 +73,7 @@ class ComponentToolsTest {
 
     private ComponentTools componentTools;
     @Mock
-    private ConnectionService connectionService;
+    private ConnectionFacade connectionFacade;
 
     @Mock
     private VectorStore vectorStore;
@@ -82,8 +82,7 @@ class ComponentToolsTest {
     void beforeEach() {
         MockitoAnnotations.openMocks(this);
         componentTools = new ComponentTools(
-            componentDefinitionService, actionDefinitionFacade, triggerDefinitionFacade, connectionService,
-            vectorStore);
+            actionDefinitionFacade, componentDefinitionFacade, connectionFacade, triggerDefinitionFacade, vectorStore);
     }
 
     @Test
@@ -108,14 +107,14 @@ class ComponentToolsTest {
         when(componentDefinition.getName()).thenReturn(componentName);
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of(trigger));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, triggerName, version, null);
 
         assertNotNull(result);
         assertEquals("result", result.name());
-        verify(componentDefinitionService).getComponentDefinition(componentName, version);
+        verify(componentDefinitionFacade).getComponentDefinition(componentName, version);
         verify(triggerDefinitionFacade, never()).executeTrigger(
             anyString(), anyInt(), anyString(), any(), any(), any(), anyMap(), any(), any(), any(), any(), any(),
             anyBoolean());
@@ -142,7 +141,7 @@ class ComponentToolsTest {
         when(componentDefinition.getName()).thenReturn(componentName);
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of(trigger));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(triggerDefinitionFacade.executeOutput(
@@ -179,14 +178,14 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
 
         assertNotNull(result);
         assertEquals("actionResult", result.name());
-        verify(componentDefinitionService).getComponentDefinition(componentName, version);
+        verify(componentDefinitionFacade).getComponentDefinition(componentName, version);
         verify(actionDefinitionFacade, never()).executePerform(
             anyString(), anyInt(), anyString(), any(), any(), any(), any(), anyString(), anyMap(), anyMap(), anyMap(),
             any(), any(), anyBoolean(), any(), any(), any());
@@ -214,7 +213,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
@@ -246,17 +245,19 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
             eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
                 .thenThrow(new RuntimeException("Output function failed"));
 
-        Connection connection = mock(Connection.class);
-        when(connection.getId()).thenReturn(123L);
-        when(connectionService.getConnections(componentName, version, PlatformType.AUTOMATION))
-            .thenReturn(List.of(connection));
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .id(123L)
+            .build();
+
+        when(connectionFacade.getConnections(componentName, version, null, null, null, PlatformType.AUTOMATION))
+            .thenReturn(List.of(connectionDTO));
 
         Map<String, Object> performResult = Map.of("data", "test");
         when(
@@ -293,14 +294,14 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
             eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
                 .thenThrow(new RuntimeException("Output function failed"));
 
-        when(connectionService.getConnections(componentName, version, PlatformType.AUTOMATION))
+        when(connectionFacade.getConnections(componentName, version, null, null, null, PlatformType.AUTOMATION))
             .thenThrow(new RuntimeException("Connection required"));
 
         RuntimeException exception = assertThrows(RuntimeException.class,
@@ -363,7 +364,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of());
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         RuntimeException exception = assertThrows(RuntimeException.class,
@@ -410,7 +411,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
@@ -434,7 +435,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
@@ -461,7 +462,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
@@ -489,14 +490,14 @@ class ComponentToolsTest {
         when(componentDefinition.getName()).thenReturn(componentName);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, null))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, null))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, null, null);
 
         assertNotNull(result);
         assertEquals("result", result.name());
-        verify(componentDefinitionService).getComponentDefinition(componentName, null);
+        verify(componentDefinitionFacade).getComponentDefinition(componentName, null);
     }
 
     @Test

@@ -27,10 +27,10 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
@@ -85,10 +85,10 @@ public class ComponentTools {
     private static final String FAILED_TO_GET_OUTPUT_PROPERTIES = "Failed to get output properties";
     private static final String FAILED_TO_GET_PROPERTIES = "Failed to get properties";
 
-    private final ComponentDefinitionService componentDefinitionService;
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ComponentDefinitionFacade componentDefinitionFacade;
+    private final ConnectionFacade connectionFacade;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
-    private final ConnectionService connectionService;
     private final VectorStore vectorStore;
 
     private static final String DEFAULT_TRIGGER_DEFINITION = """
@@ -110,14 +110,15 @@ public class ComponentTools {
         """;
 
     @SuppressFBWarnings("EI")
-    public ComponentTools(ComponentDefinitionService componentDefinitionService,
-        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        ConnectionService connectionService,
+    public ComponentTools(
+        ActionDefinitionFacade actionDefinitionFacade, ComponentDefinitionFacade componentDefinitionFacade,
+        ConnectionFacade connectionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
         @Autowired(required = false) @Qualifier("copilotPgVectorStore") VectorStore vectorStore) {
-        this.componentDefinitionService = componentDefinitionService;
+
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.componentDefinitionFacade = componentDefinitionFacade;
+        this.connectionFacade = connectionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
-        this.connectionService = connectionService;
         this.vectorStore = vectorStore;
     }
 
@@ -769,13 +770,12 @@ public class ComponentTools {
                                 }
 
                                 try {
-                                    List<Connection> connections =
-                                        connectionService.getConnections(componentName, version,
-                                            PlatformType.AUTOMATION);
+                                    List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
+                                        componentName, version, null, null, null, PlatformType.AUTOMATION);
 
-                                    Connection connection = connections.getFirst();
+                                    ConnectionDTO connectionDTO = connectionDTOs.getFirst();
 
-                                    Map<String, Long> connectionIds = Map.of(operationName, connection.getId());
+                                    Map<String, Long> connectionIds = Map.of(operationName, connectionDTO.id());
 
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
                                         componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
@@ -932,7 +932,7 @@ public class ComponentTools {
 
     private List<ComponentDefinition> getAllowedComponentDefinitions(@Nullable ToolContext toolContext) {
         return AllowedComponentNamesUtils.filter(
-            componentDefinitionService.getComponentDefinitions(), ComponentDefinition::getName, toolContext);
+            componentDefinitionFacade.getComponentDefinitions(), ComponentDefinition::getName, toolContext);
     }
 
     /**
@@ -940,8 +940,8 @@ public class ComponentTools {
      */
     private ComponentDefinition getComponentDefinition(String componentName, Integer version) {
         return version != null
-            ? componentDefinitionService.getComponentDefinition(componentName, version)
-            : componentDefinitionService.getComponentDefinition(componentName, null);
+            ? componentDefinitionFacade.getComponentDefinition(componentName, version)
+            : componentDefinitionFacade.getComponentDefinition(componentName, null);
     }
 
     /**
