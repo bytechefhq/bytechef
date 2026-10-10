@@ -17,7 +17,6 @@
 package com.bytechef.ai.copilot.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
@@ -29,7 +28,7 @@ import com.bytechef.tenant.TenantContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
@@ -176,44 +175,7 @@ class RehydrateContextToolCallbackTest {
     }
 
     @Test
-    void testArmsSkipChecksInsideCallOnAnotherThreadThenRestores() {
-        TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
-        SecurityContextHolder.clearContext();
-
-        ProbeToolCallback probe = new ProbeToolCallback();
-
-        ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken("connected-user", "");
-
-        Map<String, Object> map = AgentToolInvocationContext.builder()
-            .tenantId("acme")
-            .authentication(authentication)
-            .skipAutomationAuthorization(true)
-            .build()
-            .toToolContext();
-
-        AtomicBoolean skipChecksAfterCall = new AtomicBoolean(true);
-
-        Thread thread = new Thread(() -> {
-            wrapped.call("{}", new ToolContext(map));
-
-            skipChecksAfterCall.set(AutomationAuthorizationContext.isSkipChecks());
-        });
-
-        assertThatCode(() -> {
-            thread.start();
-            thread.join();
-        }).doesNotThrowAnyException();
-
-        assertThat(probe.authenticationSeenInside).isSameAs(authentication);
-        assertThat(probe.skipChecksSeenInside).isTrue();
-        assertThat(skipChecksAfterCall).isFalse();
-        assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
-    }
-
-    @Test
-    void testDoesNotSkipChecksOnAnotherThreadWhenFlagAbsent() {
+    void testNeverArmsSkipChecksForACarriedConnectedUserAuthentication() {
         TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
         SecurityContextHolder.clearContext();
 
@@ -226,13 +188,40 @@ class RehydrateContextToolCallbackTest {
         Map<String, Object> map =
             new AgentToolInvocationContext(null, null, null, null, "acme", authentication).toToolContext();
 
+        String result = wrapped.call("{}", new ToolContext(map));
+
+        assertThat(result).isEqualTo("ok");
+        assertThat(probe.authenticationSeenInside).isSameAs(authentication);
+        assertThat(probe.tenantSeenInside).isEqualTo("acme");
+
+        assertThat(probe.skipChecksSeenInside).isFalse();
+        assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
+    }
+
+    @Test
+    void testDoesNotInheritAnOuterSkipModeFromTheDispatchingThread() throws Throwable {
+        TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
+        SecurityContextHolder.clearContext();
+
+        ProbeToolCallback probe = new ProbeToolCallback();
+
+        ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken("connected-user", "");
+
+        Map<String, Object> map = AutomationAuthorizationContext.callSkippingChecks(
+            () -> new AgentToolInvocationContext(null, null, null, null, "acme", authentication).toToolContext());
+
+        AtomicReference<Throwable> workerFailure = new AtomicReference<>();
+
         Thread thread = new Thread(() -> wrapped.call("{}", new ToolContext(map)));
 
-        assertThatCode(() -> {
-            thread.start();
-            thread.join();
-        }).doesNotThrowAnyException();
+        thread.setUncaughtExceptionHandler((failedThread, throwable) -> workerFailure.set(throwable));
 
+        thread.start();
+        thread.join();
+
+        assertThat(workerFailure.get()).isNull();
         assertThat(probe.authenticationSeenInside).isSameAs(authentication);
         assertThat(probe.skipChecksSeenInside).isFalse();
     }
@@ -333,9 +322,7 @@ class RehydrateContextToolCallbackTest {
 
         Map<String, Object> map = new AgentToolInvocationContext(null, 1L, null, null, "acme").toToolContext();
 
-        ToolContext toolContext = new ToolContext(map);
-
-        assertThatThrownBy(() -> wrapped.call("{}", toolContext))
+        assertThatThrownBy(() -> wrapped.call("{}", new ToolContext(map)))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("boom");
 
