@@ -17,10 +17,12 @@
 package com.bytechef.ai.mcp.server.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,116 +53,42 @@ class ManagementMcpServerServiceTest {
     }
 
     @Test
-    void testIsAuthenticationRequiredReturnsTrueWhenKeyMissing() {
-        Property property = mock(Property.class);
-
-        when(property.get("secretKey")).thenReturn("abc");
-        when(property.get("authenticationRequired")).thenReturn(null);
-        when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.of(property));
-
-        assertThat(managementMcpServerService.isAuthenticationRequired()).isTrue();
-    }
-
-    @Test
-    void testIsAuthenticationRequiredReturnsFalseWhenKeyExplicitlyFalse() {
-        Property property = mock(Property.class);
-
-        when(property.get("secretKey")).thenReturn("abc");
-        when(property.get("authenticationRequired")).thenReturn(false);
-        when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.of(property));
-
-        assertThat(managementMcpServerService.isAuthenticationRequired()).isFalse();
-    }
-
-    @Test
-    void testIsAuthenticationRequiredReturnsTrueWhenSet() {
-        Property property = mock(Property.class);
-
-        when(property.get("secretKey")).thenReturn("abc");
-        when(property.get("authenticationRequired")).thenReturn(true);
-        when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.of(property));
-
-        assertThat(managementMcpServerService.isAuthenticationRequired()).isTrue();
-    }
-
-    @Test
-    void testIsAuthenticationRequiredReturnsTrueWhenPropertyAbsent() {
+    void testGetManagementMcpServerUrlFirstTimeSavesOnlyTheSecretKey() {
         when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
             .thenReturn(Optional.empty());
 
-        assertThat(managementMcpServerService.isAuthenticationRequired()).isTrue();
+        String url = managementMcpServerService.getManagementMcpServerUrl();
+
+        verify(propertyService)
+            .save(
+                eq(MCP_SERVER_PROPERTY_KEY),
+                argThat(map -> map.size() == 1 && url.contains("/api/management/" + map.get("secretKey") + "/mcp")),
+                eq(Property.Scope.PLATFORM), isNull());
     }
 
     @Test
-    void testUpdateAuthenticationRequiredPreservesSecretKey() {
+    void testGetManagementMcpServerUrlReusesTheStoredSecretKey() {
         Property property = mock(Property.class);
 
         when(property.get("secretKey")).thenReturn("abc");
         when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
             .thenReturn(Optional.of(property));
 
-        boolean result = managementMcpServerService.updateAuthenticationRequired(true);
+        assertThat(managementMcpServerService.getManagementMcpServerUrl())
+            .isEqualTo("http://localhost:8080/api/management/abc/mcp");
 
-        assertThat(result).isTrue();
-
-        verify(propertyService)
-            .save(
-                eq(MCP_SERVER_PROPERTY_KEY),
-                argThat(map -> "abc".equals(map.get("secretKey")) && Boolean.TRUE.equals(map.get(
-                    "authenticationRequired"))),
-                eq(Property.Scope.PLATFORM), isNull());
+        verify(propertyService, never()).save(any(), any(), any(), any());
     }
 
     @Test
-    void testGetManagementMcpServerUrlFirstTimeSavesAuthenticationRequiredTrue() {
-        when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.empty());
-
-        managementMcpServerService.getManagementMcpServerUrl();
+    void testUpdateManagementMcpServerUrlRotatesTheSecretKeyAndDropsTheLegacyAuthenticationFlag() {
+        String url = managementMcpServerService.updateManagementMcpServerUrl();
 
         verify(propertyService)
             .save(
                 eq(MCP_SERVER_PROPERTY_KEY),
-                argThat(map -> Boolean.TRUE.equals(map.get("authenticationRequired"))),
-                eq(Property.Scope.PLATFORM), isNull());
-    }
-
-    @Test
-    void testUpdateManagementMcpServerUrlPreservesExistingAuthenticationRequiredFalse() {
-        Property property = mock(Property.class);
-
-        when(property.get("secretKey")).thenReturn("abc");
-        when(property.get("authenticationRequired")).thenReturn(false);
-        when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.of(property));
-
-        managementMcpServerService.updateManagementMcpServerUrl();
-
-        verify(propertyService)
-            .save(
-                eq(MCP_SERVER_PROPERTY_KEY),
-                argThat(map -> Boolean.FALSE.equals(map.get("authenticationRequired"))),
-                eq(Property.Scope.PLATFORM), isNull());
-    }
-
-    @Test
-    void testUpdateManagementMcpServerUrlRequiresAuthenticationForLegacyProperty() {
-        Property property = mock(Property.class);
-
-        when(property.get("secretKey")).thenReturn("abc");
-        when(property.get("authenticationRequired")).thenReturn(null);
-        when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.of(property));
-
-        managementMcpServerService.updateManagementMcpServerUrl();
-
-        verify(propertyService)
-            .save(
-                eq(MCP_SERVER_PROPERTY_KEY),
-                argThat(map -> Boolean.TRUE.equals(map.get("authenticationRequired"))),
+                argThat(map -> map.size() == 1 && !"abc".equals(map.get("secretKey")) &&
+                    url.contains("/api/management/" + map.get("secretKey") + "/mcp")),
                 eq(Property.Scope.PLATFORM), isNull());
     }
 }

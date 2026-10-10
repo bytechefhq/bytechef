@@ -17,27 +17,20 @@
 package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.service.WorkspaceService;
-import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
@@ -48,9 +41,8 @@ class WorkspaceScopeResolverTest {
 
     private final UserService userService = mock(UserService.class);
     private final WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
-    private final WorkspaceService workspaceService = mock(WorkspaceService.class);
     private final WorkspaceScopeResolver workspaceScopeResolver =
-        new WorkspaceScopeResolver(userService, workspaceFacade, workspaceService);
+        new WorkspaceScopeResolver(userService, workspaceFacade);
 
     @BeforeEach
     void beforeEach() {
@@ -59,13 +51,6 @@ class WorkspaceScopeResolverTest {
         user.setId(USER_ID);
 
         when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
-        when(workspaceService.getWorkspaces()).thenReturn(
-            List.of(workspace(7L, "Mine"), workspace(8L, "Foreign"), workspace(9L, "Other foreign")));
-    }
-
-    @AfterEach
-    void afterEach() {
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -111,7 +96,6 @@ class WorkspaceScopeResolverTest {
         WorkspaceScopeResolver.WorkspaceScope workspaceScope = workspaceScopeResolver.resolve(null, null);
 
         assertThat(workspaceScope).isEqualTo(new WorkspaceScopeResolver.Resolved(7L, 0L));
-        verify(workspaceService, never()).getWorkspaces();
     }
 
     @Test
@@ -136,38 +120,6 @@ class WorkspaceScopeResolverTest {
         WorkspaceScopeResolver.WorkspaceScope workspaceScope = workspaceScopeResolver.resolve(7L, null);
 
         assertThat(workspaceScope).isInstanceOf(WorkspaceScopeResolver.Rejected.class);
-        verify(workspaceService, never()).getWorkspaces();
-    }
-
-    @Test
-    void testAnonymousManagementPrincipalKeepsTheTenantWideList() {
-        SecurityContextHolder.getContext()
-            .setAuthentication(McpAnonymousAuthenticationToken.ofManagementMcpServer());
-
-        WorkspaceScopeResolver.WorkspaceScope workspaceScope = workspaceScopeResolver.resolve(null, null);
-
-        assertThat(((WorkspaceScopeResolver.Rejected) workspaceScope).response())
-            .contains("workspace_required")
-            .contains("Mine")
-            .contains("Foreign")
-            .contains("Other foreign");
-        assertThat(workspaceScopeResolver.resolve(8L, null))
-            .isEqualTo(new WorkspaceScopeResolver.Resolved(8L, 0L));
-        verify(workspaceFacade, never()).getUserWorkspaces(anyLong());
-        verify(userService, never()).fetchCurrentUser();
-    }
-
-    @Test
-    void testAnonymousAutomationPrincipalDoesNotGetTheTenantWideList() {
-        SecurityContextHolder.getContext()
-            .setAuthentication(McpAnonymousAuthenticationToken.ofAutomationMcpServer(3L));
-
-        when(userService.fetchCurrentUser()).thenReturn(Optional.empty());
-
-        WorkspaceScopeResolver.WorkspaceScope workspaceScope = workspaceScopeResolver.resolve(null, null);
-
-        assertThat(((WorkspaceScopeResolver.Rejected) workspaceScope).response()).doesNotContain("Foreign");
-        verify(workspaceService, never()).getWorkspaces();
     }
 
     @Test

@@ -16,7 +16,6 @@
 
 package com.bytechef.ai.mcp.server.configuration.service;
 
-import com.bytechef.ai.mcp.server.configuration.ManagementMcpServerAuthentication;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
@@ -61,9 +60,7 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
             secretKey = String.valueOf(TenantKey.of());
 
             propertyService.save(
-                MCP_SERVER_PROPERTY_KEY,
-                Map.of("secretKey", secretKey, ManagementMcpServerAuthentication.AUTHENTICATION_REQUIRED, true),
-                Property.Scope.PLATFORM, null);
+                MCP_SERVER_PROPERTY_KEY, Map.of("secretKey", secretKey), Property.Scope.PLATFORM, null);
         }
 
         return toManagementMcpServerUrl(secretKey);
@@ -72,51 +69,11 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
     @Override
     @PreAuthorize("isTenantAdmin()")
     public String updateManagementMcpServerUrl() {
-        Optional<Property> propertyOptional = propertyService.fetchProperty(
-            MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null);
-
-        boolean authenticationRequired = ManagementMcpServerAuthentication.isAuthenticationRequired(
-            propertyOptional.orElse(null));
-
         String secretKey = String.valueOf(TenantKey.of());
 
-        propertyService.save(
-            MCP_SERVER_PROPERTY_KEY,
-            Map.of(
-                "secretKey", secretKey, ManagementMcpServerAuthentication.AUTHENTICATION_REQUIRED,
-                authenticationRequired),
-            Property.Scope.PLATFORM, null);
+        propertyService.save(MCP_SERVER_PROPERTY_KEY, Map.of("secretKey", secretKey), Property.Scope.PLATFORM, null);
 
         return toManagementMcpServerUrl(secretKey);
-    }
-
-    @Override
-    @PreAuthorize("isTenantAdmin()")
-    public boolean isAuthenticationRequired() {
-        Optional<Property> propertyOptional = propertyService.fetchProperty(
-            MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null);
-
-        return ManagementMcpServerAuthentication.isAuthenticationRequired(propertyOptional.orElse(null));
-    }
-
-    @Override
-    @PreAuthorize("isTenantAdmin()")
-    public boolean updateAuthenticationRequired(boolean authenticationRequired) {
-        Optional<Property> propertyOptional = propertyService.fetchProperty(
-            MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null);
-
-        String secretKey = propertyOptional
-            .map(property -> (String) property.get("secretKey"))
-            .orElseGet(() -> String.valueOf(TenantKey.of()));
-
-        propertyService.save(
-            MCP_SERVER_PROPERTY_KEY,
-            Map.of(
-                "secretKey", secretKey, ManagementMcpServerAuthentication.AUTHENTICATION_REQUIRED,
-                authenticationRequired),
-            Property.Scope.PLATFORM, null);
-
-        return authenticationRequired;
     }
 
     private String toManagementMcpServerUrl(String secretKey) {

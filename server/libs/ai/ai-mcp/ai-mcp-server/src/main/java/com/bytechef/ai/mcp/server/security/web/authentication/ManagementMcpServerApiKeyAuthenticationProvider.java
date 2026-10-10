@@ -16,11 +16,9 @@
 
 package com.bytechef.ai.mcp.server.security.web.authentication;
 
-import com.bytechef.ai.mcp.server.configuration.ManagementMcpServerAuthentication;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
-import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
@@ -68,10 +66,6 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
 
         if (!isMcpServerSecretKeyEqual(property.get("secretKey"), mcpApiKeyCredentials.getMcpServerSecretKey())) {
             throw new BadCredentialsException("Invalid MCP server secret key");
-        }
-
-        if (!ManagementMcpServerAuthentication.isAuthenticationRequired(property)) {
-            return McpAnonymousAuthenticationToken.ofManagementMcpServer();
         }
 
         String secretKey = mcpApiKeyCredentials.getSecret();
