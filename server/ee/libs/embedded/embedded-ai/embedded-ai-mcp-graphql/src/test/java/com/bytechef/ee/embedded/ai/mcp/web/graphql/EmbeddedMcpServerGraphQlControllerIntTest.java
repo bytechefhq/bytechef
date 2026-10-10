@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +26,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.test.config.graphql.GraphQLScalarTypes;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -315,7 +317,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
 
         @Test
         void testUpdateEmbeddedMcpComponent() {
-            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), anyList()))
+            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), anyList()))
                 .thenReturn(createMcpComponent());
 
             graphQlTester.document("""
@@ -335,13 +337,60 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
             ArgumentCaptor<McpComponent> mcpComponentArgumentCaptor = ArgumentCaptor.forClass(McpComponent.class);
 
             verify(embeddedMcpServerFacade).updateEmbeddedMcpComponent(
-                mcpComponentArgumentCaptor.capture(), eq(List.of()));
+                mcpComponentArgumentCaptor.capture(), isNull(), eq(List.of()));
 
             McpComponent mcpComponent = mcpComponentArgumentCaptor.getValue();
 
             assertThat(mcpComponent.getId()).isEqualTo(2L);
             assertThat(mcpComponent.getMcpServerId()).isEqualTo(1L);
             assertThat(mcpComponent.getVersion()).isEqualTo(3);
+        }
+
+        @Test
+        void testUpdateEmbeddedMcpComponentWithEmptyRequiredAuthorities() {
+            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), anyList()))
+                .thenReturn(createMcpComponent());
+
+            graphQlTester.document("""
+                mutation {
+                    updateEmbeddedMcpComponent(id: "2", input: {
+                        componentName: "gmail", componentVersion: 1, mcpServerId: "1", requiredAuthorities: [],
+                        tools: [], version: 3
+                    }) {
+                        id
+                    }
+                }
+                """)
+                .execute()
+                .path("updateEmbeddedMcpComponent.id")
+                .entity(String.class)
+                .isEqualTo("2");
+
+            verify(embeddedMcpServerFacade).updateEmbeddedMcpComponent(any(), eq(Set.of()), eq(List.of()));
+        }
+
+        @Test
+        void testUpdateEmbeddedMcpComponentWithRequiredAuthorities() {
+            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), anyList()))
+                .thenReturn(createMcpComponent());
+
+            graphQlTester.document("""
+                mutation {
+                    updateEmbeddedMcpComponent(id: "2", input: {
+                        componentName: "gmail", componentVersion: 1, mcpServerId: "1",
+                        requiredAuthorities: ["ROLE_ADMIN"], tools: [], version: 3
+                    }) {
+                        id
+                    }
+                }
+                """)
+                .execute()
+                .path("updateEmbeddedMcpComponent.id")
+                .entity(String.class)
+                .isEqualTo("2");
+
+            verify(embeddedMcpServerFacade).updateEmbeddedMcpComponent(
+                any(), eq(Set.of("ROLE_ADMIN")), eq(List.of()));
         }
 
         @Test
@@ -359,7 +408,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
                 .errors()
                 .satisfy(errors -> assertThat(errors).hasSize(1));
 
-            verify(embeddedMcpServerFacade, never()).updateEmbeddedMcpComponent(any(), anyList());
+            verify(embeddedMcpServerFacade, never()).updateEmbeddedMcpComponent(any(), any(), anyList());
         }
 
         @Test

@@ -14,6 +14,8 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -42,7 +44,8 @@ public interface EmbeddedMcpServerFacade {
 
     List<ComponentDefinition> getMcpComponentDefinitions();
 
-    McpComponent updateEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools);
+    McpComponent updateEmbeddedMcpComponent(
+        McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools);
 
     McpServer updateEmbeddedMcpServer(
         long mcpServerId, String name, Boolean enabled, Boolean enforceToolAuthorization,

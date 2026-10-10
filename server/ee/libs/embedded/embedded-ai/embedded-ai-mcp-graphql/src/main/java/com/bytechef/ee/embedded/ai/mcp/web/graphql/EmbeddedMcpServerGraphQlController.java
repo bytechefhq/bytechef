@@ -21,6 +21,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -128,11 +129,11 @@ class EmbeddedMcpServerGraphQlController {
 
         mcpComponent.setId(id);
 
-        if (input.requiredAuthorities() != null) {
-            mcpComponent.setRequiredAuthorities(new HashSet<>(input.requiredAuthorities()));
-        }
+        Set<String> requiredAuthorities =
+            input.requiredAuthorities() == null ? null : new HashSet<>(input.requiredAuthorities());
 
-        return embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, toMcpTools(input.tools()));
+        return embeddedMcpServerFacade.updateEmbeddedMcpComponent(
+            mcpComponent, requiredAuthorities, toMcpTools(input.tools()));
     }
 
     @MutationMapping
