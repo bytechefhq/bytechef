@@ -29,6 +29,7 @@ import com.bytechef.automation.ai.mcp.server.exception.McpServerErrorType;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.ai.mcp.util.McpWorkflowUtils;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -41,14 +42,12 @@ import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -202,7 +201,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
             Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
-            WorkflowTrigger trigger = getMcpToolCallableTrigger(workflow);
+            WorkflowTrigger trigger = McpWorkflowUtils.getCallableTrigger(workflow);
 
             if (trigger == null) {
                 continue;
@@ -552,20 +551,4 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         }
     }
 
-    private static @Nullable WorkflowTrigger getMcpToolCallableTrigger(Workflow workflow) {
-        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-            String name = workflowNodeType.name();
-            String operation = workflowNodeType.operation();
-
-            if (Objects.equals(name, WorkflowConstants.WORKFLOW) &&
-                Objects.equals(operation, WorkflowConstants.NEW_WORKFLOW_CALL)) {
-
-                return workflowTrigger;
-            }
-        }
-
-        return null;
-    }
 }

@@ -24,6 +24,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -224,6 +225,46 @@ class McpProjectFacadeIntTest {
         assertThat(mcpProject.getMcpServerId()).isEqualTo(mcpServer.getId());
         assertThat(mcpProject.getProjectDeploymentId()).isNotNull();
         assertThat(mcpProjectRepository.findById(mcpProject.getId())).isPresent();
+    }
+
+    @Test
+    void testCreateMcpProjectRejectsWorkflowWithoutCallableTrigger() {
+        String webhookWorkflowId = createProjectVersionWebhookWorkflow();
+        long mcpServerId = mcpServer.getId();
+        long projectId = project.getId();
+        List<String> selectedWorkflowIds = List.of(workflowId1, webhookWorkflowId);
+
+        try {
+            assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(webhookWorkflowId)
+                .hasMessageContaining("New Workflow Call");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+        } finally {
+            McpIntTestWorkflows.deleteWorkflows(workflowService, List.of(webhookWorkflowId));
+        }
+    }
+
+    @Test
+    void testUpdateMcpProjectRejectsAddedWorkflowWithoutCallableTrigger() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+        String webhookWorkflowId = createProjectVersionWebhookWorkflow();
+        long mcpProjectId = mcpProject.getId();
+        List<String> selectedWorkflowIds = List.of(workflowId1, webhookWorkflowId);
+
+        try {
+            assertThatThrownBy(() -> mcpProjectFacade.updateMcpProject(mcpProjectId, selectedWorkflowIds))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(webhookWorkflowId)
+                .hasMessageContaining("New Workflow Call");
+
+            assertThat(mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProjectId)).hasSize(1);
+        } finally {
+            McpIntTestWorkflows.deleteWorkflows(workflowService, List.of(webhookWorkflowId));
+        }
     }
 
     @Test
@@ -957,6 +998,22 @@ class McpProjectFacadeIntTest {
             assertThatThrownBy(() -> mcpProjectFacade.cloneMcpProject(5L, 6L))
                 .isInstanceOf(AccessDeniedException.class);
         }
+    }
+
+    private String createProjectVersionWebhookWorkflow() {
+        Workflow workflow = workflowService.create(
+            """
+                {
+                    "label": "Webhook",
+                    "triggers": [{"name": "trigger_1", "type": "webhook/v1/autoRespondWithHTTP200"}],
+                    "tasks": []
+                }
+                """,
+            Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        projectWorkflowRepository.save(new ProjectWorkflow(project.getId(), 1, workflow.getId(), UUID.randomUUID()));
+
+        return workflow.getId();
     }
 
     private McpServer saveMcpServer(String name, Environment environment, Long workspaceId) {
