@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -243,6 +244,18 @@ class McpToolServiceIntTest {
                 .isInstanceOf(AccessDeniedException.class);
 
             verify(permissionEvaluator).hasPermission(any(), eq(9L), eq("McpTool"), eq("MCP_EDIT"));
+        }
+
+        @Test
+        void testUpdateMcpToolRequiresEditorOfTheTargetComponent() {
+            McpTool mcpTool = new McpTool(9L, "tool", Map.of(), 6L);
+
+            when(permissionEvaluator.hasPermission(any(), eq(9L), eq("McpTool"), eq("MCP_EDIT"))).thenReturn(true);
+
+            assertThatThrownBy(() -> mcpToolService.update(mcpTool))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(6L), eq("McpComponent"), eq("MCP_EDIT"));
         }
 
         @Test
