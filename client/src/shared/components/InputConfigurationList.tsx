@@ -691,7 +691,7 @@ const InputConfigurationList = ({
 
     if (!referenceInputs.length && !regularInputs.length && !subflowInputTree.size && !topLevelStubs.length) {
         if (!onOpenInputs) {
-            return <p className="text-sm">No Inputs yet</p>;
+            return <p className="p-4 text-center text-sm text-content-neutral-secondary">No Inputs yet</p>;
         }
 
         return (
