@@ -44,6 +44,7 @@ import com.bytechef.ai.copilot.tool.SelectTriggerPropertyOptionToolCallback;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.ai.copilot.tool.WorkspaceCopilotConnectionLister;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -495,14 +496,15 @@ public class CopilotConfiguration {
         @Qualifier("mcpServerBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> mcpServerBuildSubAgentChatClientFactoryProvider,
         @Value("classpath:prompt_mcp_server_build.txt") Resource promptMcpServerBuildResource,
         SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider)
         throws AGUIException {
 
         String name = Source.MCP_SERVER.name() + "_" + Mode.BUILD.name();
 
         IntelligentToolChatClientFactory mcpServerChatClientFactory =
-            () -> mcpServerBuildSubAgentChatClientFactoryProvider.getObject()
-                .get();
+            candidateChatModel -> mcpServerBuildSubAgentChatClientFactoryProvider.getObject()
+                .get(candidateChatModel);
 
         return McpServerSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -513,7 +515,9 @@ public class CopilotConfiguration {
             .toolCallbacks(
                 wrapTools(
                     securityContextRehydrator,
-                    List.of(new ConfigureMcpServerToolCallback(mcpServerChatClientFactory))))
+                    List.of(
+                        new ConfigureMcpServerToolCallback(
+                            mcpServerChatClientFactory, chatModelResolverProvider.getIfAvailable()))))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
@@ -556,7 +560,7 @@ public class CopilotConfiguration {
     IntelligentToolChatClientFactory codeEditorBuildSubAgentChatClientFactory(
         @Qualifier("codeEditorBuildSubAgentChatClient") ChatClient codeEditorBuildSubAgentChatClient) {
 
-        return () -> codeEditorBuildSubAgentChatClient;
+        return chatModel -> codeEditorBuildSubAgentChatClient;
     }
 
     @Bean
@@ -603,7 +607,7 @@ public class CopilotConfiguration {
     IntelligentToolChatClientFactory workflowEditorBuildSubAgentChatClientFactory(
         @Qualifier("workflowEditorBuildSubAgentChatClient") ChatClient workflowEditorBuildSubAgentChatClient) {
 
-        return () -> workflowEditorBuildSubAgentChatClient;
+        return chatModel -> workflowEditorBuildSubAgentChatClient;
     }
 
     @Bean
@@ -623,7 +627,7 @@ public class CopilotConfiguration {
     IntelligentToolChatClientFactory converterBuildSubAgentChatClientFactory(
         @Qualifier("converterBuildSubAgentChatClient") ChatClient converterBuildSubAgentChatClient) {
 
-        return () -> converterBuildSubAgentChatClient;
+        return chatModel -> converterBuildSubAgentChatClient;
     }
 
     @Bean
@@ -664,7 +668,7 @@ public class CopilotConfiguration {
     IntelligentToolChatClientFactory clusterElementBuildSubAgentChatClientFactory(
         @Qualifier("clusterElementBuildSubAgentChatClient") ChatClient clusterElementBuildSubAgentChatClient) {
 
-        return () -> clusterElementBuildSubAgentChatClient;
+        return chatModel -> clusterElementBuildSubAgentChatClient;
     }
 
     @Bean
@@ -707,7 +711,7 @@ public class CopilotConfiguration {
     IntelligentToolChatClientFactory skillsBuildSubAgentChatClientFactory(
         @Qualifier("skillsBuildSubAgentChatClient") ChatClient skillsBuildSubAgentChatClient) {
 
-        return () -> skillsBuildSubAgentChatClient;
+        return chatModel -> skillsBuildSubAgentChatClient;
     }
 
     @Bean
@@ -727,7 +731,7 @@ public class CopilotConfiguration {
     IntelligentToolChatClientFactory workflowExecutionBuildSubAgentChatClientFactory(
         @Qualifier("workflowExecutionBuildSubAgentChatClient") ChatClient workflowExecutionBuildSubAgentChatClient) {
 
-        return () -> workflowExecutionBuildSubAgentChatClient;
+        return chatModel -> workflowExecutionBuildSubAgentChatClient;
     }
 
     private String getSystemPrompt(Resource systemPromptResource) {
