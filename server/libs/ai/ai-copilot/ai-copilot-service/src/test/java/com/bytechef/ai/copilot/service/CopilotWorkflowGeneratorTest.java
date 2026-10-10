@@ -26,8 +26,11 @@ import static org.mockito.Mockito.when;
 
 import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.AgentSubscriberParams;
+import com.agui.core.agent.RunAgentInput;
 import com.agui.core.agent.RunAgentParameters;
 import com.agui.core.event.RunErrorEvent;
+import com.agui.core.exception.AGUIException;
+import com.agui.server.EventFactory;
 import com.agui.server.LocalAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.tenant.TenantContext;
@@ -35,8 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -55,6 +60,19 @@ class CopilotWorkflowGeneratorTest {
         Map<String, Object> stateMap = captureState(localAgent);
 
         assertThat(stateMap).containsEntry(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, "Prefer Slack.");
+    }
+
+    @Test
+    void testSeedsEnvironmentIntoState() {
+        LocalAgent localAgent = newCompletingAgent();
+
+        CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(localAgent));
+
+        generator.generateWorkflow("wf-1", 7L, 1L, "Build it", null, Set.of());
+
+        Map<String, Object> stateMap = captureState(localAgent);
+
+        assertThat(stateMap).containsEntry(CopilotConstants.STATE_ENVIRONMENT_ID, 1L);
     }
 
     @Test
@@ -109,6 +127,18 @@ class CopilotWorkflowGeneratorTest {
         assertThatThrownBy(() -> generator.generateWorkflow("wf-1", 7L, 1L, "Build it", null, Set.of()))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("The copilot run failed. Reference: run-1");
+    }
+
+    @Test
+    @Timeout(value = 30, unit = TimeUnit.SECONDS)
+    void testGenerateWorkflowFailsFastWithMessageOnRunErrorEvent() throws AGUIException {
+        LocalAgent localAgent = new RunErrorLocalAgent("No AI provider is enabled in environment STAGING");
+
+        CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(localAgent));
+
+        assertThatThrownBy(() -> generator.generateWorkflow("wf-1", 7L, 1L, "Build it", null, Set.of()))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("No AI provider is enabled in environment STAGING");
     }
 
     private static LocalAgent newCompletingAgent() {
@@ -167,5 +197,21 @@ class CopilotWorkflowGeneratorTest {
         return parametersCaptor.getValue()
             .getState()
             .getState();
+    }
+
+    private static final class RunErrorLocalAgent extends LocalAgent {
+
+        private final String errorMessage;
+
+        private RunErrorLocalAgent(String errorMessage) throws AGUIException {
+            super("workflow_editor_build", null, null, "system", List.of());
+
+            this.errorMessage = errorMessage;
+        }
+
+        @Override
+        protected void run(RunAgentInput input, AgentSubscriber subscriber) {
+            emitEvent(EventFactory.runErrorEvent(errorMessage), subscriber);
+        }
     }
 }

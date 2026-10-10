@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -38,6 +40,8 @@ import org.springframework.security.core.Authentication;
  * @author Ivica Cardic
  */
 public final class CopilotToolContextUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(CopilotToolContextUtils.class);
 
     private CopilotToolContextUtils() {
     }
@@ -62,6 +66,21 @@ public final class CopilotToolContextUtils {
         Authentication authentication = state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication value
             ? value : null;
 
+        String llmProvider = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER));
+        String llmModel = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL));
+
+        if (llmProvider == null || llmModel == null) {
+            if ((llmProvider == null) != (llmModel == null)) {
+                log.warn(
+                    "Copilot user-selected LLM half-set (provider={}, model={}); not propagating a model override "
+                        + "into the tool context",
+                    llmProvider, llmModel);
+            }
+
+            llmProvider = null;
+            llmModel = null;
+        }
+
         toolContext.putAll(
             AgentToolInvocationContext.builder()
                 .workspaceId(workspaceId)
@@ -69,7 +88,8 @@ public final class CopilotToolContextUtils {
                 .environmentId(environmentId)
                 .tenantId(tenantId)
                 .authentication(authentication)
-                .skipAutomationAuthorization(authentication != null && userId == null)
+                .llmProvider(llmProvider)
+                .llmModel(llmModel)
                 .build()
                 .toToolContext());
 

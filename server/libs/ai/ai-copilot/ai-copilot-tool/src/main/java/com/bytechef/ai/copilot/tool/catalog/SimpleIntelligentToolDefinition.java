@@ -16,7 +16,8 @@
 
 package com.bytechef.ai.copilot.tool.catalog;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.ai.agent.tool.AgentType;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
@@ -28,22 +29,21 @@ import org.springframework.ai.tool.ToolCallback;
 public final class SimpleIntelligentToolDefinition implements IntelligentToolDefinition {
 
     private final String name;
-    private final String agentTypeKey;
+    private final AgentType agentType;
     private final Set<IntelligentToolScope> panelScopes;
     private final Function<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoryFunction;
     private final Function<IntelligentToolChatClientFactory, ToolCallback> toolCallbackFactory;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public SimpleIntelligentToolDefinition(
-        String name, String agentTypeKey, Set<IntelligentToolScope> panelScopes,
+        String name, AgentType agentType, Set<IntelligentToolScope> panelScopes,
         Function<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoryFunction,
         Function<IntelligentToolChatClientFactory, ToolCallback> toolCallbackFactory) {
 
-        this.name = name;
-        this.agentTypeKey = agentTypeKey;
-        this.panelScopes = panelScopes;
-        this.chatClientFactoryFunction = chatClientFactoryFunction;
-        this.toolCallbackFactory = toolCallbackFactory;
+        this.name = Objects.requireNonNull(name, "name");
+        this.agentType = Objects.requireNonNull(agentType, "agentType");
+        this.panelScopes = Set.copyOf(Objects.requireNonNull(panelScopes, "panelScopes"));
+        this.chatClientFactoryFunction = Objects.requireNonNull(chatClientFactoryFunction, "chatClientFactoryFunction");
+        this.toolCallbackFactory = Objects.requireNonNull(toolCallbackFactory, "toolCallbackFactory");
     }
 
     @Override
@@ -52,12 +52,11 @@ public final class SimpleIntelligentToolDefinition implements IntelligentToolDef
     }
 
     @Override
-    public String agentTypeKey() {
-        return agentTypeKey;
+    public AgentType agentType() {
+        return agentType;
     }
 
     @Override
-    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Set<IntelligentToolScope> panelScopes() {
         return panelScopes;
     }
