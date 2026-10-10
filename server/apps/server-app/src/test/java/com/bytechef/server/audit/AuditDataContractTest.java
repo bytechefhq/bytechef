@@ -82,6 +82,7 @@ class AuditDataContractTest {
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
     private static final String SUGGESTION = "generates a suggestion without saving it";
+    private static final String OUTPUT_PREVIEW = "computes a task output without saving it";
     private static final String TAGS = "tag assignment";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
@@ -142,6 +143,7 @@ class AuditDataContractTest {
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
         Map.entry("ProjectWorkflowFacadeImpl.saveWorkflowTestConnection", WORKFLOW_INPUTS),
         Map.entry("PropertyCopilotFacadeImpl.generatePropertyValue", SUGGESTION),
+        Map.entry("TaskDispatcherDefinitionFacadeImpl.executeOutput", OUTPUT_PREVIEW),
         Map.entry("WorkflowDescriptionCopilotFacadeImpl.generateWorkflowDescription", SUGGESTION),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
