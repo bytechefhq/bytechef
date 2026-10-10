@@ -19,6 +19,7 @@ package com.bytechef.ai.agent.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ai.agent.tool.TestAgentTypeProvider.TestAgentType;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,5 +46,13 @@ class AgentTypeRegistryTest {
     @Test
     void testFromKeyFallsBackToUnknownForUnrecognizedKey() {
         assertThat(AgentTypeRegistry.fromKey("no_such_agent")).isEqualTo(CoreAgentType.UNKNOWN);
+    }
+
+    @Test
+    void testKeysIncludeProviderContributedTypes() {
+        Set<String> keys = AgentTypeRegistry.keys();
+
+        assertThat(keys).contains(CoreAgentType.UNKNOWN.key(), TestAgentType.ALPHA.key(), TestAgentType.BETA.key());
+        assertThat(keys).allSatisfy(key -> assertThat(AgentTypeRegistry.fromKey(key)).isNotNull());
     }
 }
