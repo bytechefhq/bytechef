@@ -1,10 +1,10 @@
 {
   "actionClusterElementTypes": {
     "removeFileFromAiSkill": [ ],
-    "appendFilesToAiSkill": [ ],
-    "createAiSkill": [ ],
+    "updateAiSkill": [ ],
     "deleteAiSkill": [ ],
-    "updateAiSkill": [ ]
+    "createAiSkill": [ ],
+    "appendFilesToAiSkill": [ ]
   },
   "actions": [ {
     "batch": null,
@@ -1286,23 +1286,23 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "autoMemoryTool": [ ],
-    "deleteAiSkill": [ ],
-    "fileSystemTools": [ ],
-    "braveWebSearchTool": [ ],
-    "createAiSkill": [ ],
-    "grepTool": [ ],
-    "appendFilesToAiSkill": [ ],
     "updateAiSkill": [ ],
-    "todoWriteTool": [ ],
-    "globTool": [ ],
-    "smartWebFetchTool": [ "MODEL" ],
-    "taskTool": [ "MODEL", "SUBAGENT" ],
-    "shellTools": [ ],
-    "askUserQuestionTool": [ ],
-    "removeFileFromAiSkill": [ ],
+    "appendFilesToAiSkill": [ ],
+    "grepTool": [ ],
+    "createAiSkill": [ ],
+    "braveWebSearchTool": [ ],
+    "fileSystemTools": [ ],
+    "deleteAiSkill": [ ],
+    "autoMemoryTool": [ ],
+    "listDirectoryTool": [ ],
     "subagentTool": [ "MODEL", "TOOLS" ],
-    "listDirectoryTool": [ ]
+    "removeFileFromAiSkill": [ ],
+    "askUserQuestionTool": [ ],
+    "shellTools": [ ],
+    "taskTool": [ "MODEL", "SUBAGENT" ],
+    "smartWebFetchTool": [ "MODEL" ],
+    "globTool": [ ],
+    "todoWriteTool": [ ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",
@@ -3112,6 +3112,32 @@
       "minLength": null,
       "name": "workspaceName",
       "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": "DOCKER",
+      "description": "Where commands run. Docker runs them in a container that only sees the agent's workspace. Local runs them on the server and is only available when the server allows it.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Execution Backend",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "execBackend",
+      "options": [ {
+        "description": null,
+        "label": "Docker",
+        "value": "DOCKER"
+      } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
       "placeholder": null,
