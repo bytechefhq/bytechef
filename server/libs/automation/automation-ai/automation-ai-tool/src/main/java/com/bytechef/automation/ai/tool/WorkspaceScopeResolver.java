@@ -20,9 +20,7 @@ import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,9 +32,6 @@ import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -49,15 +44,11 @@ public class WorkspaceScopeResolver {
     private final JsonMapper jsonMapper = new JsonMapper();
     private final UserService userService;
     private final WorkspaceFacade workspaceFacade;
-    private final WorkspaceService workspaceService;
 
     @SuppressFBWarnings("EI")
-    public WorkspaceScopeResolver(
-        UserService userService, WorkspaceFacade workspaceFacade, WorkspaceService workspaceService) {
-
+    public WorkspaceScopeResolver(UserService userService, WorkspaceFacade workspaceFacade) {
         this.userService = userService;
         this.workspaceFacade = workspaceFacade;
-        this.workspaceService = workspaceService;
     }
 
     public WorkspaceScope resolve(@Nullable Long requestedWorkspaceId, @Nullable String requestedEnvironment) {
@@ -139,22 +130,9 @@ public class WorkspaceScopeResolver {
     }
 
     private Optional<List<Workspace>> getCandidateWorkspaces() {
-        if (isAnonymousManagementMcpPrincipal()) {
-            return Optional.of(workspaceService.getWorkspaces());
-        }
-
         Optional<User> currentUser = userService.fetchCurrentUser();
 
         return currentUser.map(user -> workspaceFacade.getUserWorkspaces(Objects.requireNonNull(user.getId())));
-    }
-
-    private static boolean isAnonymousManagementMcpPrincipal() {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-
-        Authentication authentication = securityContext.getAuthentication();
-
-        return authentication instanceof McpAnonymousAuthenticationToken mcpAnonymousAuthenticationToken &&
-            mcpAnonymousAuthenticationToken.isManagementMcpServer();
     }
 
     public sealed interface WorkspaceScope permits Resolved, Rejected {

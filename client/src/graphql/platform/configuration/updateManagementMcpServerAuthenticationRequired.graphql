@@ -1,3 +1,0 @@
-mutation updateManagementMcpServerAuthenticationRequired($authenticationRequired: Boolean!) {
-    updateManagementMcpServerAuthenticationRequired(authenticationRequired: $authenticationRequired)
-}

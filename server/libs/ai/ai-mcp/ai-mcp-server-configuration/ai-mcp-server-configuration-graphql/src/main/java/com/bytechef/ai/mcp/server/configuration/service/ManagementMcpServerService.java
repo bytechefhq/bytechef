@@ -24,8 +24,4 @@ public interface ManagementMcpServerService {
     String getManagementMcpServerUrl();
 
     String updateManagementMcpServerUrl();
-
-    boolean isAuthenticationRequired();
-
-    boolean updateAuthenticationRequired(boolean authenticationRequired);
 }
