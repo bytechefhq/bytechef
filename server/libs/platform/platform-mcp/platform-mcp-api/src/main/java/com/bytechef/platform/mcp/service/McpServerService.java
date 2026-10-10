@@ -101,6 +101,21 @@ public interface McpServerService {
     McpServer update(long id, String name, Boolean enabled);
 
     /**
+     * Updates an existing MCP server's name, enabled state and authorization flags in a single operation. A rejected
+     * combination leaves the server unchanged.
+     *
+     * @param id                       the ID of the MCP server to update
+     * @param name                     the name of the server (can be null if not updating)
+     * @param enabled                  whether the server is enabled (can be null if not updating)
+     * @param enforceToolAuthorization whether tool authorization is enforced (can be null if not updating)
+     * @param authenticationRequired   whether authentication is required (can be null if not updating)
+     * @return the updated MCP server
+     * @throws IllegalArgumentException if the MCP server is not found or the flag combination is invalid
+     */
+    McpServer update(
+        long id, String name, Boolean enabled, Boolean enforceToolAuthorization, Boolean authenticationRequired);
+
+    /**
      * Updates the tags of an MCP server.
      *
      * @param id     the ID of the MCP server to update

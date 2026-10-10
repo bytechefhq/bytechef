@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -165,7 +164,7 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mockServer = createMockMcpServer(
             1L, "Updated Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, false);
 
-        when(mcpServerService.update(1L, "Updated Server", false)).thenReturn(mockServer);
+        when(mcpServerService.update(1L, "Updated Server", false, null, null)).thenReturn(mockServer);
 
         // When & Then
         this.graphQlTester
@@ -198,15 +197,9 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mockServer = createMockMcpServer(
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        when(mcpServerService.update(1L, "Test Server", true)).thenReturn(mockServer);
+        mockServer.setAuthenticationRequired(false);
 
-        McpServer updatedMockServer = createMockMcpServer(
-            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
-
-        updatedMockServer.setAuthenticationRequired(false);
-
-        when(mcpServerService.update(argThat(server -> server != null && !server.isAuthenticationRequired())))
-            .thenReturn(updatedMockServer);
+        when(mcpServerService.update(1L, "Test Server", true, null, false)).thenReturn(mockServer);
 
         this.graphQlTester
             .document("""
@@ -229,20 +222,15 @@ public class McpServerGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(false);
 
-        verify(mcpServerService).update(argThat(server -> server != null && !server.isAuthenticationRequired()));
+        verify(mcpServerService).update(1L, "Test Server", true, null, false);
+        verify(mcpServerService, never()).update(any(McpServer.class));
     }
 
     @Test
     void testUpdateMcpServerRejectsInvariantViolation() {
-        McpServer mockServer = createMockMcpServer(
-            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
-
-        when(mcpServerService.update(1L, "Test Server", true)).thenReturn(mockServer);
-
-        when(mcpServerService.update(argThat(
-            server -> server != null && server.isEnforceToolAuthorization() && !server.isAuthenticationRequired())))
-                .thenThrow(new IllegalArgumentException(
-                    "enforceToolAuthorization requires authenticationRequired to be enabled"));
+        when(mcpServerService.update(1L, "Test Server", true, true, false))
+            .thenThrow(new IllegalArgumentException(
+                "enforceToolAuthorization requires authenticationRequired to be enabled"));
 
         this.graphQlTester
             .document("""
@@ -267,6 +255,9 @@ public class McpServerGraphQlControllerIntTest {
             })
             .path("updateMcpServer")
             .valueIsNull();
+
+        verify(mcpServerService, never()).update(1L, "Test Server", true);
+        verify(mcpServerService, never()).update(any(McpServer.class));
     }
 
     @Test
@@ -274,20 +265,10 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mockServer = createMockMcpServer(
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        mockServer.setAuthenticationRequired(false);
-        mockServer.setEnforceToolAuthorization(false);
+        mockServer.setAuthenticationRequired(true);
+        mockServer.setEnforceToolAuthorization(true);
 
-        when(mcpServerService.update(1L, "Test Server", true)).thenReturn(mockServer);
-
-        McpServer updatedMockServer = createMockMcpServer(
-            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
-
-        updatedMockServer.setAuthenticationRequired(true);
-        updatedMockServer.setEnforceToolAuthorization(true);
-
-        when(mcpServerService.update(argThat(
-            server -> server != null && server.isAuthenticationRequired() && server.isEnforceToolAuthorization())))
-                .thenReturn(updatedMockServer);
+        when(mcpServerService.update(1L, "Test Server", true, true, true)).thenReturn(mockServer);
 
         this.graphQlTester
             .document("""
@@ -317,9 +298,8 @@ public class McpServerGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(mcpServerService).update(
-            argThat(server -> server != null && server.isAuthenticationRequired()
-                && server.isEnforceToolAuthorization()));
+        verify(mcpServerService).update(1L, "Test Server", true, true, true);
+        verify(mcpServerService, never()).update(1L, "Test Server", true);
     }
 
     @Test

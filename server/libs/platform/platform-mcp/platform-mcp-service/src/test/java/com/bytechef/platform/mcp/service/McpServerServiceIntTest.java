@@ -231,6 +231,37 @@ class McpServerServiceIntTest {
     }
 
     @Test
+    void testUpdateWithFlagsAppliesAllFieldsTogether() {
+        McpServer mcpServer = mcpServerService.create(
+            "flags-update", PlatformType.AUTOMATION, Environment.PRODUCTION, true);
+
+        mcpServerService.update(mcpServer.getId(), "flags-renamed", false, true, true);
+
+        McpServer loaded = mcpServerService.getMcpServer(mcpServer.getSecretKey());
+
+        assertThat(loaded.getName()).isEqualTo("flags-renamed");
+        assertThat(loaded.isEnabled()).isFalse();
+        assertThat(loaded.isEnforceToolAuthorization()).isTrue();
+        assertThat(loaded.isAuthenticationRequired()).isTrue();
+    }
+
+    @Test
+    void testUpdateWithFlagsRejectsInvalidCombinationWithoutPersistingAnyField() {
+        McpServer mcpServer = mcpServerService.create(
+            "flags-invariant", PlatformType.AUTOMATION, Environment.PRODUCTION, true);
+
+        assertThatThrownBy(() -> mcpServerService.update(mcpServer.getId(), "flags-renamed", false, true, false))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        McpServer loaded = mcpServerService.getMcpServer(mcpServer.getSecretKey());
+
+        assertThat(loaded.getName()).isEqualTo("flags-invariant");
+        assertThat(loaded.isEnabled()).isTrue();
+        assertThat(loaded.isEnforceToolAuthorization()).isFalse();
+        assertThat(loaded.isAuthenticationRequired()).isTrue();
+    }
+
+    @Test
     void testRotateSecretKeyInvalidatesPreviousSecretKey() {
         McpServer mcpServer = mcpServerService.create(
             "rotate", PlatformType.AUTOMATION, Environment.PRODUCTION, true);
