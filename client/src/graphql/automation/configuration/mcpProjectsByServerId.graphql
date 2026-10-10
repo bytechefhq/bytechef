@@ -17,6 +17,7 @@ query mcpProjectsByServerId($mcpServerId: ID!) {
         }
         mcpProjectWorkflows {
             id
+            enabled
             mcpProjectId
             projectDeploymentWorkflowId
             parameters

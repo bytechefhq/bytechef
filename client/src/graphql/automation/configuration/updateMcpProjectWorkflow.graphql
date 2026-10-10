@@ -1,6 +1,7 @@
 mutation updateMcpProjectWorkflow($id: ID!, $input: McpProjectWorkflowUpdateInput!) {
     updateMcpProjectWorkflow(id: $id, input: $input) {
         id
+        enabled
         mcpProjectId
         projectDeploymentWorkflowId
         parameters
