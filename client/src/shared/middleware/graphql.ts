@@ -1851,11 +1851,6 @@ export type EvaluatorFunctionDefinitionsQueryVariables = Exact<{ [key: string]: 
 
 export type EvaluatorFunctionDefinitionsQuery = { evaluatorFunctionDefinitions: Array<{ name: string, title: string, description: string, category: Types.EvaluatorFunctionCategory, returnType: Types.EvaluatorFunctionType, example: string, parameters: Array<{ name: string, description: string, type: Types.EvaluatorFunctionType, required: boolean }> }> };
 
-export type ManagementMcpServerAuthenticationRequiredQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ManagementMcpServerAuthenticationRequiredQuery = { managementMcpServerAuthenticationRequired: boolean };
-
 export type ManagementMcpServerUrlQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1940,13 +1935,6 @@ export type UpdateApiKeyMutationVariables = Exact<{
 
 
 export type UpdateApiKeyMutation = { updateApiKey: boolean };
-
-export type UpdateManagementMcpServerAuthenticationRequiredMutationVariables = Exact<{
-  authenticationRequired: boolean;
-}>;
-
-
-export type UpdateManagementMcpServerAuthenticationRequiredMutation = { updateManagementMcpServerAuthenticationRequired: boolean };
 
 export type UpdateManagementMcpServerUrlMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -9086,28 +9074,6 @@ export const useEvaluatorFunctionDefinitionsQuery = <
   }
     )};
 
-export const ManagementMcpServerAuthenticationRequiredDocument = new TypedDocumentString(`
-    query managementMcpServerAuthenticationRequired {
-  managementMcpServerAuthenticationRequired
-}
-    `);
-
-export const useManagementMcpServerAuthenticationRequiredQuery = <
-      TData = ManagementMcpServerAuthenticationRequiredQuery,
-      TError = unknown
-    >(
-      variables?: ManagementMcpServerAuthenticationRequiredQueryVariables,
-      options?: Omit<UseQueryOptions<ManagementMcpServerAuthenticationRequiredQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ManagementMcpServerAuthenticationRequiredQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<ManagementMcpServerAuthenticationRequiredQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['managementMcpServerAuthenticationRequired'] : ['managementMcpServerAuthenticationRequired', variables],
-    queryFn: fetcher<ManagementMcpServerAuthenticationRequiredQuery, ManagementMcpServerAuthenticationRequiredQueryVariables>(ManagementMcpServerAuthenticationRequiredDocument, variables),
-    ...options
-  }
-    )};
-
 export const ManagementMcpServerUrlDocument = new TypedDocumentString(`
     query managementMcpServerUrl {
   managementMcpServerUrl
@@ -9360,27 +9326,6 @@ export const useUpdateApiKeyMutation = <
       {
     mutationKey: ['updateApiKey'],
     mutationFn: (variables?: UpdateApiKeyMutationVariables) => fetcher<UpdateApiKeyMutation, UpdateApiKeyMutationVariables>(UpdateApiKeyDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpdateManagementMcpServerAuthenticationRequiredDocument = new TypedDocumentString(`
-    mutation updateManagementMcpServerAuthenticationRequired($authenticationRequired: Boolean!) {
-  updateManagementMcpServerAuthenticationRequired(
-    authenticationRequired: $authenticationRequired
-  )
-}
-    `);
-
-export const useUpdateManagementMcpServerAuthenticationRequiredMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpdateManagementMcpServerAuthenticationRequiredMutation, TError, UpdateManagementMcpServerAuthenticationRequiredMutationVariables, TContext>) => {
-    
-    return useMutation<UpdateManagementMcpServerAuthenticationRequiredMutation, TError, UpdateManagementMcpServerAuthenticationRequiredMutationVariables, TContext>(
-      {
-    mutationKey: ['updateManagementMcpServerAuthenticationRequired'],
-    mutationFn: (variables?: UpdateManagementMcpServerAuthenticationRequiredMutationVariables) => fetcher<UpdateManagementMcpServerAuthenticationRequiredMutation, UpdateManagementMcpServerAuthenticationRequiredMutationVariables>(UpdateManagementMcpServerAuthenticationRequiredDocument, variables)(),
     ...options
   }
     )};

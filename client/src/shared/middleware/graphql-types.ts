@@ -1769,7 +1769,6 @@ export type Mutation = {
   updateKnowledgeBaseDocumentChunk?: Maybe<KnowledgeBaseDocumentChunk>;
   updateKnowledgeBaseDocumentTags: Scalars['Boolean']['output'];
   updateKnowledgeBaseTags: Scalars['Boolean']['output'];
-  updateManagementMcpServerAuthenticationRequired: Scalars['Boolean']['output'];
   updateManagementMcpServerUrl: Scalars['String']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
   updateMcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
@@ -2608,11 +2607,6 @@ export type MutationUpdateKnowledgeBaseTagsArgs = {
 };
 
 
-export type MutationUpdateManagementMcpServerAuthenticationRequiredArgs = {
-  authenticationRequired: Scalars['Boolean']['input'];
-};
-
-
 export type MutationUpdateMcpComponentWithToolsArgs = {
   id: Scalars['ID']['input'];
   input: McpComponentWithToolsInput;
@@ -3062,7 +3056,6 @@ export type Query = {
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
-  managementMcpServerAuthenticationRequired: Scalars['Boolean']['output'];
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponentDefinitions: Array<ComponentDefinition>;
