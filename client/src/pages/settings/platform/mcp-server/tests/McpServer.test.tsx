@@ -5,25 +5,12 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import McpServer from '../McpServer';
 
 const hoisted = vi.hoisted(() => ({
-    authenticationRequiredData: undefined as undefined | {managementMcpServerAuthenticationRequired: boolean},
-    invalidateQueries: vi.fn(),
-    updateAuthenticationRequiredMutate: vi.fn(),
-    updateAuthenticationRequiredOnSuccess: undefined as undefined | (() => void),
+    updateMcpServerUrlMutate: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useManagementMcpServerAuthenticationRequiredQuery: () => ({data: hoisted.authenticationRequiredData}),
     useManagementMcpServerUrlQuery: () => ({data: {managementMcpServerUrl: 'https://example.com/mcp/abc'}}),
-    useUpdateManagementMcpServerAuthenticationRequiredMutation: ({onSuccess}: {onSuccess: () => void}) => {
-        hoisted.updateAuthenticationRequiredOnSuccess = onSuccess;
-
-        return {mutate: hoisted.updateAuthenticationRequiredMutate};
-    },
-    useUpdateManagementMcpServerUrlMutation: () => ({mutate: vi.fn()}),
-}));
-
-vi.mock('@tanstack/react-query', () => ({
-    useQueryClient: () => ({invalidateQueries: hoisted.invalidateQueries}),
+    useUpdateManagementMcpServerUrlMutation: () => ({mutate: hoisted.updateMcpServerUrlMutate}),
 }));
 
 vi.mock('@/shared/layout/LayoutContainer', () => ({
@@ -35,53 +22,53 @@ vi.mock('@/shared/layout/Header', () => ({
 }));
 
 vi.mock('@/shared/components/mcp-server/McpServerConfiguration', () => ({
-    default: ({authenticationRequired, mcpServerUrl}: {authenticationRequired: boolean; mcpServerUrl: string}) => (
-        <div
+    default: ({
+        authenticationRequired,
+        mcpServerUrl,
+        onRefresh,
+    }: {
+        authenticationRequired?: boolean;
+        mcpServerUrl: string;
+        onRefresh: () => void;
+    }) => (
+        <button
             data-authentication-required={String(authenticationRequired)}
             data-mcp-server-url={mcpServerUrl}
             data-testid="mcp-server-configuration"
+            onClick={onRefresh}
         />
     ),
 }));
 
 describe('McpServer', () => {
     beforeEach(() => {
-        hoisted.authenticationRequiredData = undefined;
-        hoisted.invalidateQueries.mockClear();
-        hoisted.updateAuthenticationRequiredMutate.mockClear();
+        hoisted.updateMcpServerUrlMutate.mockClear();
     });
 
-    it('hides the toggle until the setting loads and defaults the snippet to authenticated', () => {
+    it('offers no switch to turn authentication off', () => {
         render(<McpServer />);
 
         expect(screen.queryByRole('switch')).not.toBeInTheDocument();
-        expect(screen.getByTestId('mcp-server-configuration')).toHaveAttribute('data-authentication-required', 'true');
+        expect(screen.getByTestId('mcp-server-configuration')).toHaveAttribute(
+            'data-authentication-required',
+            'undefined'
+        );
     });
 
-    it('reflects the stored setting in the toggle and the connection snippet', () => {
-        hoisted.authenticationRequiredData = {managementMcpServerAuthenticationRequired: false};
-
+    it('shows the stored server url', () => {
         render(<McpServer />);
 
-        expect(screen.getByRole('switch')).not.toBeChecked();
-        expect(screen.getByTestId('mcp-server-configuration')).toHaveAttribute('data-authentication-required', 'false');
+        expect(screen.getByTestId('mcp-server-configuration')).toHaveAttribute(
+            'data-mcp-server-url',
+            'https://example.com/mcp/abc'
+        );
     });
 
-    it('saves the toggled value and refreshes the setting afterwards', () => {
-        hoisted.authenticationRequiredData = {managementMcpServerAuthenticationRequired: true};
-
+    it('rotates the server url on refresh', () => {
         render(<McpServer />);
 
-        expect(screen.getByRole('switch')).toBeChecked();
+        fireEvent.click(screen.getByTestId('mcp-server-configuration'));
 
-        fireEvent.click(screen.getByRole('switch'));
-
-        expect(hoisted.updateAuthenticationRequiredMutate).toHaveBeenCalledWith({authenticationRequired: false});
-
-        hoisted.updateAuthenticationRequiredOnSuccess?.();
-
-        expect(hoisted.invalidateQueries).toHaveBeenCalledWith({
-            queryKey: ['managementMcpServerAuthenticationRequired'],
-        });
+        expect(hoisted.updateMcpServerUrlMutate).toHaveBeenCalledWith({});
     });
 });
