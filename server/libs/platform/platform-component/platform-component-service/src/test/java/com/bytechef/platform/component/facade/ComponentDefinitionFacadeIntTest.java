@@ -25,6 +25,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.config.ComponentRegistryConfiguration;
 import com.bytechef.platform.component.config.ComponentRegistryConfigurationSharedMocks;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
@@ -34,9 +35,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
@@ -91,6 +100,49 @@ class ComponentDefinitionFacadeIntTest {
                 .isInstanceOf(ConfigurationException.class)
                 .hasMessageContaining("Facade Test Connection")
                 .hasMessageContaining("INVALID");
+    }
+
+    @Nested
+    class PreAuthorizeEnforcement {
+
+        private ComponentDefinitionFacade securedFacade;
+
+        @BeforeEach
+        void beforeEach() {
+            ProxyFactory proxyFactory = new ProxyFactory(componentDefinitionFacade);
+
+            proxyFactory.addAdvice(AuthorizationManagerBeforeMethodInterceptor.preAuthorize());
+
+            securedFacade = (ComponentDefinitionFacade) proxyFactory.getProxy();
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testDefinitionReadsRequireAuthentication() {
+            assertThatThrownBy(() -> securedFacade.getComponentDefinitions())
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+            assertThatThrownBy(() -> securedFacade.getComponentDefinition(COMPONENT_NAME, 1))
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+        }
+
+        @Test
+        void testAuthenticatedCallerReachesTheService() {
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+
+            securityContext.setAuthentication(new TestingAuthenticationToken("user", "n/a", "ROLE_USER"));
+
+            assertThat(securedFacade.getComponentDefinitions())
+                .extracting(ComponentDefinition::getName)
+                .contains(COMPONENT_NAME);
+
+            ComponentDefinition componentDefinition = securedFacade.getComponentDefinition(COMPONENT_NAME, 1);
+
+            assertThat(componentDefinition.getName()).isEqualTo(COMPONENT_NAME);
+        }
     }
 
     private Connection saveConnection(String channelId, CredentialStatus credentialStatus) {

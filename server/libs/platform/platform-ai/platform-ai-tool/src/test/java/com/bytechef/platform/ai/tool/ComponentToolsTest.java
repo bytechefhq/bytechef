@@ -43,8 +43,8 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.List;
@@ -61,7 +61,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 class ComponentToolsTest {
 
     @Mock
-    private ComponentDefinitionService componentDefinitionService;
+    private ComponentDefinitionFacade componentDefinitionFacade;
 
     @Mock
     private ActionDefinitionFacade actionDefinitionFacade;
@@ -80,9 +80,8 @@ class ComponentToolsTest {
     void beforeEach() {
         MockitoAnnotations.openMocks(this);
         componentTools = new ComponentTools(
-            componentDefinitionService, actionDefinitionFacade, triggerDefinitionFacade,
-            componentToolsConnectionResolver,
-            vectorStore);
+            actionDefinitionFacade, componentDefinitionFacade, triggerDefinitionFacade,
+            componentToolsConnectionResolver, vectorStore);
     }
 
     @Test
@@ -107,14 +106,14 @@ class ComponentToolsTest {
         when(componentDefinition.getName()).thenReturn(componentName);
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of(trigger));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, triggerName, version, null);
 
         assertNotNull(result);
         assertEquals("result", result.name());
-        verify(componentDefinitionService).getComponentDefinition(componentName, version);
+        verify(componentDefinitionFacade).getComponentDefinition(componentName, version);
         verify(triggerDefinitionFacade, never()).executeTrigger(
             anyString(), anyInt(), anyString(), any(), any(), any(), anyMap(), any(), any(), any(), any(), any(),
             anyBoolean());
@@ -141,7 +140,7 @@ class ComponentToolsTest {
         when(componentDefinition.getName()).thenReturn(componentName);
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of(trigger));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(triggerDefinitionFacade.executeOutput(
@@ -178,14 +177,14 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
 
         assertNotNull(result);
         assertEquals("actionResult", result.name());
-        verify(componentDefinitionService).getComponentDefinition(componentName, version);
+        verify(componentDefinitionFacade).getComponentDefinition(componentName, version);
         verify(actionDefinitionFacade, never()).executePerform(
             anyString(), anyInt(), anyString(), any(), any(), any(), any(), anyString(), anyMap(), anyMap(), anyMap(),
             any(), any(), anyBoolean(), any(), any(), any());
@@ -213,7 +212,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
@@ -245,7 +244,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
@@ -290,7 +289,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
@@ -324,7 +323,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
@@ -360,7 +359,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of());
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         RuntimeException exception = assertThrows(RuntimeException.class,
@@ -407,7 +406,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
@@ -431,7 +430,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
@@ -458,7 +457,7 @@ class ComponentToolsTest {
         when(componentDefinition.getVersion()).thenReturn(version);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, version))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
@@ -486,14 +485,14 @@ class ComponentToolsTest {
         when(componentDefinition.getName()).thenReturn(componentName);
         when(componentDefinition.getTriggers()).thenReturn(List.of());
         when(componentDefinition.getActions()).thenReturn(List.of(action));
-        when(componentDefinitionService.getComponentDefinition(componentName, null))
+        when(componentDefinitionFacade.getComponentDefinition(componentName, null))
             .thenReturn(componentDefinition);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, null, null);
 
         assertNotNull(result);
         assertEquals("result", result.name());
-        verify(componentDefinitionService).getComponentDefinition(componentName, null);
+        verify(componentDefinitionFacade).getComponentDefinition(componentName, null);
     }
 
     @Test
@@ -539,7 +538,7 @@ class ComponentToolsTest {
         assertEquals(
             "This chat can't use salesforce: it isn't one of the integrations available to this user.",
             executionException.getMessage());
-        verify(componentDefinitionService, never()).getComponentDefinition(anyString(), any());
+        verify(componentDefinitionFacade, never()).getComponentDefinition(anyString(), any());
     }
 
     @Test
@@ -548,14 +547,14 @@ class ComponentToolsTest {
             ExecutionException.class,
             () -> componentTools.getAction("salesforce", "createRecord", null, allowListToolContext("slack")));
 
-        verify(componentDefinitionService, never()).getComponentDefinition(anyString(), any());
+        verify(componentDefinitionFacade, never()).getComponentDefinition(anyString(), any());
     }
 
     @Test
     void testGetComponentReturnsAnAllowedComponentAndIgnoresAMissingAllowList() {
         ComponentDefinition slackComponentDefinition = mockComponentDefinition("slack", "sendMessage");
 
-        when(componentDefinitionService.getComponentDefinition("slack", null)).thenReturn(slackComponentDefinition);
+        when(componentDefinitionFacade.getComponentDefinition("slack", null)).thenReturn(slackComponentDefinition);
 
         ComponentInfo allowedComponentInfo = componentTools.getComponent("slack", null, allowListToolContext("slack"));
         ComponentInfo unrestrictedComponentInfo = componentTools.getComponent("slack", null, null);
@@ -573,7 +572,7 @@ class ComponentToolsTest {
         ComponentDefinition slackComponentDefinition = mockComponentDefinition("slack", "sendMessage");
         ComponentDefinition salesforceComponentDefinition = mockComponentDefinition("salesforce", "sendEmail");
 
-        when(componentDefinitionService.getComponentDefinitions())
+        when(componentDefinitionFacade.getComponentDefinitions())
             .thenReturn(List.of(slackComponentDefinition, salesforceComponentDefinition));
     }
 
