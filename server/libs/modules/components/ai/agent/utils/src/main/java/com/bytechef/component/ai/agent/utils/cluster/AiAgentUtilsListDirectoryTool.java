@@ -16,14 +16,17 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
+import static com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver.WORKSPACE_NAME;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
+import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
-import java.nio.file.Path;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springaicommunity.agent.common.workspace.Workspace;
 import org.springaicommunity.agent.tools.ListDirectoryTool;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -33,19 +36,33 @@ import org.springframework.ai.tool.ToolCallbackProvider;
  */
 public class AiAgentUtilsListDirectoryTool {
 
-    public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ToolCallbackProviderFunction>clusterElement("listDirectoryTool")
+    private static final String CLUSTER_ELEMENT_NAME = "listDirectoryTool";
+
+    private final AgentWorkspaceResolver agentWorkspaceResolver;
+
+    public final ClusterElementDefinition<ToolCallbackProviderFunction> clusterElementDefinition;
+
+    @SuppressFBWarnings("EI")
+    public AiAgentUtilsListDirectoryTool(AgentWorkspaceResolver agentWorkspaceResolver) {
+        this.agentWorkspaceResolver = agentWorkspaceResolver;
+
+        this.clusterElementDefinition = ComponentDsl.<ToolCallbackProviderFunction>clusterElement(CLUSTER_ELEMENT_NAME)
             .title("List Directory Tool")
-            .description("List files and directories within a path.")
+            .description("List files and directories within the agent's own workspace.")
             .type(TOOLS)
-            .object(() -> AiAgentUtilsListDirectoryTool::apply);
+            .properties(AgentWorkspaceResolver.workspaceNameProperty())
+            .object(() -> this::apply);
+    }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static ToolCallbackProvider apply(
+    private ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
+        Workspace workspace = agentWorkspaceResolver.resolve(
+            context, CLUSTER_ELEMENT_NAME, inputParameters.getString(WORKSPACE_NAME));
+
         ListDirectoryTool listDirectoryTool = ListDirectoryTool.builder()
-            .workingDirectory(Path.of(System.getProperty("user.dir")))
+            .workspace(workspace)
             .build();
 
         return ToolCallbackProvider.from(ToolCallbacks.from(listDirectoryTool));
