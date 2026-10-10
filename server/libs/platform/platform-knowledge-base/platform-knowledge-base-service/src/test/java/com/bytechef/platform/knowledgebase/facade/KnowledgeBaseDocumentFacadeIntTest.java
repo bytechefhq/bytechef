@@ -57,6 +57,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
@@ -408,6 +409,26 @@ class KnowledgeBaseDocumentFacadeIntTest {
             assertThat(knowledgeBaseDocumentRepository.count()).isEqualTo(1);
         }
 
+        @Test
+        void testGetKnowledgeBaseDocumentDeniesUnauthenticatedCaller() {
+            KnowledgeBaseDocument document = saveKnowledgeBaseDocument();
+
+            SecurityContextHolder.clearContext();
+
+            assertThatThrownBy(() -> knowledgeBaseDocumentFacade.getKnowledgeBaseDocument(document.getId()))
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+        }
+
+        @Test
+        void testGetKnowledgeBaseDocumentAllowsAuthenticatedCaller() {
+            KnowledgeBaseDocument document = saveKnowledgeBaseDocument();
+
+            KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentFacade.getKnowledgeBaseDocument(
+                document.getId());
+
+            assertThat(knowledgeBaseDocument.getId()).isEqualTo(document.getId());
+        }
+
         private KnowledgeBaseDocument createKnowledgeBaseDocument(long knowledgeBaseId) {
             byte[] content = "Refunds take five days.".getBytes(StandardCharsets.UTF_8);
 
@@ -435,5 +456,16 @@ class KnowledgeBaseDocumentFacadeIntTest {
                 return mock(PermissionEvaluator.class);
             }
         }
+    }
+
+    private KnowledgeBaseDocument saveKnowledgeBaseDocument() {
+        KnowledgeBaseDocument document = new KnowledgeBaseDocument();
+
+        document.setKnowledgeBaseId(knowledgeBase.getId());
+        document.setName("Guarded Document");
+        document.setDocument(new FileEntry("guarded.txt", "file://test/guarded.txt"));
+        document.setStatus(KnowledgeBaseDocument.STATUS_READY);
+
+        return knowledgeBaseDocumentRepository.save(document);
     }
 }

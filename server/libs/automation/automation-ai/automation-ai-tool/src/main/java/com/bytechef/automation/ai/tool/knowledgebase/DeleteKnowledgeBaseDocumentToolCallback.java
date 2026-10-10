@@ -22,7 +22,6 @@ import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.exception.KnowledgeBaseDocumentNotFoundException;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
@@ -59,18 +58,15 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
             }""";
 
     private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
-    private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public DeleteKnowledgeBaseDocumentToolCallback(
         KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
 
         this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
-        this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.workspaceKnowledgeBaseFacade = workspaceKnowledgeBaseFacade;
     }
 
@@ -157,7 +153,7 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
 
     private boolean isDocumentInKnowledgeBase(long documentId, long knowledgeBaseId) {
         try {
-            return knowledgeBaseDocumentService.getKnowledgeBaseDocument(documentId)
+            return knowledgeBaseDocumentFacade.getKnowledgeBaseDocument(documentId)
                 .getKnowledgeBaseId()
                 .equals(knowledgeBaseId);
         } catch (KnowledgeBaseDocumentNotFoundException exception) {

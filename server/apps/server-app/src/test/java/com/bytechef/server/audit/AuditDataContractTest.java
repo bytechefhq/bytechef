@@ -138,6 +138,7 @@ class AuditDataContractTest {
             TOOL_SETTING),
         Map.entry("McpIntegrationInstanceWorkflowFacadeImpl.updateMcpIntegrationInstanceWorkflow", TOOL_SETTING),
         Map.entry("McpProjectWorkflowFacadeImpl.updateMcpProjectWorkflow", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowFacadeImpl.updateMcpProjectWorkflowParameters", TOOL_SETTING),
         Map.entry("McpProjectWorkflowServiceImpl.create", RECORDED_BY_CALLER),
         Map.entry("McpProjectWorkflowServiceImpl.delete", RECORDED_BY_CALLER),
         Map.entry("McpProjectWorkflowServiceImpl.update", TOOL_SETTING),
