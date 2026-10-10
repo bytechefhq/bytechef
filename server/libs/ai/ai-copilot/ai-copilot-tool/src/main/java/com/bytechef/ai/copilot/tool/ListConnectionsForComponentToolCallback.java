@@ -46,10 +46,10 @@ import tools.jackson.core.JacksonException;
 /**
  * Spring AI {@link ToolCallback} that lists existing connections for a given component. The tool builds a
  * {@link CopilotConnectionRequest} from its invocation context and dispatches to the first
- * {@link CopilotConnectionLister} that supports it: the workspace path (in-editor copilot / AI Hub) lists the
- * workspace's connections scoped to the current environment; the embedded workflow chat has no workspace and lists the
- * connected user's connections instead. Used by the LLM before {@code createConnection} so it can offer the user an
- * existing connection instead of forcing them through the create dialog when one is already there.
+ * {@link CopilotConnectionLister} that supports it: the workspace path (in-editor copilot) lists the workspace's
+ * connections scoped to the current environment; an optional connected-user lister, when one is present, serves
+ * requests that have no workspace. Used by the LLM before {@code createConnection} so it can offer the user an existing
+ * connection instead of forcing them through the create dialog when one is already there.
  *
  * @author Ivica Cardic
  */
@@ -144,6 +144,16 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
 
                 resolvedFromComponentName = componentName;
                 componentName = resolvedComponentName;
+            } else {
+                String canonicalComponentName = componentDefinitionOptional.get()
+                    .getName();
+
+                if (canonicalComponentName != null && !canonicalComponentName.isBlank()
+                    && !canonicalComponentName.equals(componentName)) {
+
+                    resolvedFromComponentName = componentName;
+                    componentName = canonicalComponentName;
+                }
             }
 
             if (!AllowedComponentNamesUtils.isAllowed(componentName, toolContext)) {
