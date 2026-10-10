@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.search;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.search.SearchAssetProvider;
@@ -67,7 +68,8 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
             .filter(deployment -> {
                 Project project = projectMap.get(deployment.getProjectId());
 
-                return project != null && containsIgnoreCase(project.getName(), queryLower);
+                return project != null && !SystemProjects.isSystemProject(project) &&
+                    containsIgnoreCase(project.getName(), queryLower);
             })
             .limit(limit)
             .map(deployment -> {

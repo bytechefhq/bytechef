@@ -11,4 +11,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
