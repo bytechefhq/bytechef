@@ -27,7 +27,6 @@ import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -81,8 +80,7 @@ class WorkspaceScopedFlatToolCallbackTest {
         when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(
             List.of(workspace(42L, "Primary"), workspace(43L, "Secondary")));
 
-        workspaceScopeResolver = new WorkspaceScopeResolver(
-            userService, workspaceFacade, mock(WorkspaceService.class));
+        workspaceScopeResolver = new WorkspaceScopeResolver(userService, workspaceFacade);
 
         toolCallback = new WorkspaceScopedFlatToolCallback(delegate, workspaceScopeResolver);
     }

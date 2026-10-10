@@ -29,7 +29,6 @@ public final class McpAnonymousAuthenticationToken extends AbstractAuthenticatio
     private static final String AUTOMATION_A2A_PRINCIPAL_PREFIX = "a2a-anonymous:automation:";
     private static final String AUTOMATION_PRINCIPAL_PREFIX = "mcp-anonymous:automation:";
     private static final String EMBEDDED_PRINCIPAL_PREFIX = "mcp-anonymous:embedded:";
-    private static final String MANAGEMENT_PRINCIPAL = "mcp-anonymous:management";
 
     private final String principal;
 
@@ -51,14 +50,6 @@ public final class McpAnonymousAuthenticationToken extends AbstractAuthenticatio
 
     public static McpAnonymousAuthenticationToken ofEmbeddedMcpServer(long mcpServerId) {
         return new McpAnonymousAuthenticationToken(EMBEDDED_PRINCIPAL_PREFIX + mcpServerId);
-    }
-
-    public static McpAnonymousAuthenticationToken ofManagementMcpServer() {
-        return new McpAnonymousAuthenticationToken(MANAGEMENT_PRINCIPAL);
-    }
-
-    public boolean isManagementMcpServer() {
-        return MANAGEMENT_PRINCIPAL.equals(principal);
     }
 
     @Override

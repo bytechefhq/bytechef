@@ -24,7 +24,6 @@ import com.bytechef.ai.agent.tool.CoreAgentType;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
@@ -62,8 +61,7 @@ class WorkspaceScopedSubAgentToolCallbackTest {
         when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(
             List.of(workspace(42L, "Primary"), workspace(43L, "Secondary")));
 
-        workspaceScopeResolver = new WorkspaceScopeResolver(
-            userService, workspaceFacade, mock(WorkspaceService.class));
+        workspaceScopeResolver = new WorkspaceScopeResolver(userService, workspaceFacade);
 
         toolCallback = new WorkspaceScopedSubAgentToolCallback(delegate, workspaceScopeResolver);
     }
