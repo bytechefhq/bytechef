@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
@@ -50,7 +49,6 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -242,7 +240,18 @@ class SseStreamBridgeRegistryTest {
     }
 
     @Test
-    void testRegisterForResumeActivatesOnTaskStartedAndDeliversIt() {
+    void testRegisterDoesNotDeliverTaskStartedEvents() {
+        sseStreamBridgeRegistry.register(JOB_ID, sseStreamBridge);
+
+        sendEvent(SseStreamEvent.EVENT_TYPE_TASK_STARTED, 7L);
+        sendData("Hello");
+
+        verify(sseStreamBridge, never()).onEvent(7L);
+        verify(sseStreamBridge).onEvent("Hello");
+    }
+
+    @Test
+    void testRegisterForResumeActivatesOnTaskStartedWithoutDeliveringIt() {
         Registration registration = sseStreamBridgeRegistry.registerForResume(JOB_ID, sseStreamBridge);
 
         sendData("stale delta");
@@ -250,14 +259,9 @@ class SseStreamBridgeRegistryTest {
         sendEvent(SseStreamEvent.EVENT_TYPE_TASK_STARTED, 7L);
         sendData("Hello");
 
-        InOrder inOrder = inOrder(sseStreamBridge);
-
-        inOrder.verify(sseStreamBridge)
-            .onEvent(7L);
-        inOrder.verify(sseStreamBridge)
-            .onEvent("Hello");
-
+        verify(sseStreamBridge, never()).onEvent(7L);
         verify(sseStreamBridge, never()).onEvent("stale delta");
+        verify(sseStreamBridge).onEvent("Hello");
 
         assertThat(registration.completion()).isNotDone();
     }
