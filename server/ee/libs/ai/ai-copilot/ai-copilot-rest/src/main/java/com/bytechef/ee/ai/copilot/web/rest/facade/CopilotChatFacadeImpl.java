@@ -13,9 +13,13 @@ import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.util.Mode;
+import com.bytechef.ai.copilot.util.Source;
+import com.bytechef.ai.copilot.util.Source.WorkflowOwner;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.User;
@@ -27,6 +31,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -44,8 +50,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 class CopilotChatFacadeImpl implements CopilotChatFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(CopilotChatFacadeImpl.class);
+
     private final Map<String, LocalAgent> localAgentMap;
     private final AgUiService agUiService;
+    private final IntegrationWorkflowFacade integrationWorkflowFacade;
     private final PermissionService permissionService;
     private final ProjectWorkflowService projectWorkflowService;
     private final UserService userService;
@@ -53,9 +62,11 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
     @SuppressFBWarnings("EI")
     CopilotChatFacadeImpl(
         AgUiService agUiService, List<LocalAgent> localAgents, Optional<PermissionService> permissionService,
-        Optional<ProjectWorkflowService> projectWorkflowService, Optional<UserService> userService) {
+        Optional<ProjectWorkflowService> projectWorkflowService, Optional<UserService> userService,
+        Optional<IntegrationWorkflowFacade> integrationWorkflowFacade) {
 
         this.agUiService = agUiService;
+        this.integrationWorkflowFacade = integrationWorkflowFacade.orElse(null);
         this.localAgentMap = localAgents.stream()
             .collect(Collectors.toMap(LocalAgent::getAgentId, localAgent -> localAgent));
         this.permissionService = permissionService.orElse(null);
@@ -67,28 +78,13 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
     public SseEmitter chat(String agentId, AgUiParameters agUiParameters) {
         State state = agUiParameters.getState();
         Map<String, Object> stateMap = state.getState();
-        Mode mode = parseMode(stateMap.get("mode"));
 
-        authorizeWorkflowAccess(stateMap, mode);
-        authorizeWorkspaceAccess(stateMap, mode);
+        Source source = Source.fromId(agentId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown agentId: " + agentId));
 
-        stateMap.remove(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
+        Mode mode = resolveMode(source, parseMode(stateMap.get("mode")));
 
-        injectAuthenticatedUserId(stateMap);
-        stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
-
-        String resolvedAgentId;
-
-        if (agentId.equals("converter")) {
-            resolvedAgentId = "converter_build";
-        } else if (agentId.equals("mcp_server")) {
-            resolvedAgentId = "mcp_server_build";
-        } else if (mode == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The run state has no mode");
-        } else {
-            resolvedAgentId = agentId + "_" + mode.name()
-                .toLowerCase();
-        }
+        String resolvedAgentId = source.agentId(mode);
 
         LocalAgent localAgent = localAgentMap.get(resolvedAgentId);
 
@@ -96,7 +92,30 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown agentId: " + resolvedAgentId);
         }
 
+        boolean build = mode == Mode.BUILD;
+
+        if (source.workflowOwner() == WorkflowOwner.INTEGRATION) {
+            authorizeIntegrationWorkflowAccess(stateMap);
+        } else {
+            authorizeWorkflowAccess(stateMap, build);
+        }
+
+        authorizeWorkspaceAccess(stateMap, build);
+
+        stateMap.remove(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
+
+        injectAuthenticatedUserId(stateMap);
+        stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+
         return agUiService.runAgent(localAgent, agUiParameters);
+    }
+
+    private static Mode resolveMode(Source source, @Nullable Mode mode) {
+        try {
+            return source.resolveMode(mode);
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The run state has no mode", exception);
+        }
     }
 
     private void injectAuthenticatedUserId(Map<String, Object> stateMap) {
@@ -104,13 +123,39 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
             return;
         }
 
-        SecurityUtils.fetchCurrentUserLogin()
-            .flatMap(userService::fetchUserByLogin)
-            .map(User::getId)
-            .ifPresent(userId -> stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, userId));
+        Optional<String> currentUserLogin = SecurityUtils.fetchCurrentUserLogin();
+
+        Optional<Long> userId = currentUserLogin.flatMap(userService::fetchUserByLogin)
+            .map(User::getId);
+
+        if (userId.isEmpty()) {
+            log.warn(
+                "No user resolved for login '{}'; the Copilot run state carries no authenticated user id",
+                currentUserLogin.orElse(null));
+
+            return;
+        }
+
+        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, userId.get());
     }
 
-    private void authorizeWorkflowAccess(Map<String, Object> stateMap, @Nullable Mode mode) {
+    private void authorizeIntegrationWorkflowAccess(Map<String, Object> stateMap) {
+        if (!(stateMap.get("workflowId") instanceof String workflowId) || workflowId.isBlank()) {
+            return;
+        }
+
+        if (integrationWorkflowFacade == null) {
+            throw new AccessDeniedException("Workflow authorization is not available");
+        }
+
+        try {
+            integrationWorkflowFacade.getIntegrationWorkflow(workflowId);
+        } catch (IllegalArgumentException exception) {
+            throw new AccessDeniedException("Access denied to workflow " + workflowId, exception);
+        }
+    }
+
+    private void authorizeWorkflowAccess(Map<String, Object> stateMap, boolean build) {
         if (!(stateMap.get("workflowId") instanceof String workflowId) || workflowId.isBlank()) {
             return;
         }
@@ -119,17 +164,22 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
             throw new AccessDeniedException("Workflow authorization is not available");
         }
 
-        long projectId = projectWorkflowService.getWorkflowProjectWorkflow(workflowId)
-            .getProjectId();
+        ProjectWorkflow projectWorkflow;
 
-        boolean build = mode == Mode.BUILD;
+        try {
+            projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+        } catch (IllegalArgumentException exception) {
+            throw new AccessDeniedException("Access denied to workflow " + workflowId, exception);
+        }
+
+        long projectId = projectWorkflow.getProjectId();
 
         if (!permissionService.hasWorkspaceScopeForProject(projectId, build ? "WORKFLOW_EDIT" : "WORKFLOW_VIEW")) {
             throw new AccessDeniedException("Access denied to workflow " + workflowId);
         }
     }
 
-    private void authorizeWorkspaceAccess(Map<String, Object> stateMap, @Nullable Mode mode) {
+    private void authorizeWorkspaceAccess(Map<String, Object> stateMap, boolean build) {
         Object workspaceIdValue = stateMap.get(CopilotConstants.STATE_WORKSPACE_ID);
 
         if (workspaceIdValue == null) {
@@ -141,8 +191,6 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
         if (permissionService == null) {
             throw new AccessDeniedException("Workspace authorization is not available");
         }
-
-        boolean build = mode == Mode.BUILD;
 
         if (!permissionService.hasWorkspaceRole(workspaceId, build ? "EDITOR" : "VIEWER")) {
             throw new AccessDeniedException("Access denied to workspace " + workspaceId);
@@ -157,7 +205,7 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
         try {
             return Long.parseLong(String.valueOf(workspaceIdValue));
         } catch (NumberFormatException exception) {
-            throw new AccessDeniedException("Invalid workspace id");
+            throw new AccessDeniedException("Invalid workspace id", exception);
         }
     }
 
