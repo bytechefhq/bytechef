@@ -72,10 +72,10 @@ export function AppSidebarWorkspaceSelect() {
 
     if (!pathname.startsWith('/automation') || application?.edition !== 'EE' || !workspaces?.length) {
         return (
-            <Link className="flex min-w-0 items-center gap-2 py-1" to="/">
+            <Link className="flex min-w-0 flex-1 items-center gap-1 group-data-[collapsible=icon]:flex-none" to="/">
                 <Logo />
 
-                <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">ByteChef</span>
+                <span className="px-2 text-base font-medium group-data-[collapsible=icon]:hidden">ByteChef</span>
             </Link>
         );
     }
