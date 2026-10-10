@@ -72,7 +72,7 @@ public class McpServerSubAgentConfiguration {
     IntelligentToolChatClientFactory mcpServerBuildSubAgentChatClientFactory(
         @Qualifier("mcpServerBuildSubAgentChatClient") ChatClient mcpServerBuildSubAgentChatClient) {
 
-        return () -> mcpServerBuildSubAgentChatClient;
+        return chatModel -> mcpServerBuildSubAgentChatClient;
     }
 
     private String readPrompt(Resource resource) {
