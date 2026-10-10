@@ -23,6 +23,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.ai.mcp.config.McpIntTestWorkflows;
 import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
@@ -33,6 +35,7 @@ import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
@@ -42,12 +45,21 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,13 +75,20 @@ import org.springframework.security.test.context.support.WithMockUser;
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = McpProjectIntTestConfiguration.class)
+@SpringBootTest(
+    classes = McpProjectIntTestConfiguration.class, properties = "bytechef.workflow.repository.jdbc.enabled=true")
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
 class McpProjectFacadeIntTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private McpProjectFacade mcpProjectFacade;
@@ -98,9 +117,19 @@ class McpProjectFacadeIntTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    @Autowired
+    private WorkflowService workflowService;
+
+    @Autowired
+    private WorkflowTestConfigurationService workflowTestConfigurationService;
+
     private Project project;
     private ProjectDeployment projectDeployment;
     private McpServer mcpServer;
+    private String workflowId1;
+    private String workflowId2;
+    private String workflowId3;
+    private UUID workflowUuid1;
 
     @BeforeEach
     void beforeEach() {
@@ -122,11 +151,16 @@ class McpProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
+        workflowId1 = McpIntTestWorkflows.createNewWorkflowCallWorkflow(workflowService);
+        workflowId2 = McpIntTestWorkflows.createNewWorkflowCallWorkflow(workflowService);
+        workflowId3 = McpIntTestWorkflows.createNewWorkflowCallWorkflow(workflowService);
+        workflowUuid1 = UUID.randomUUID();
+
         projectWorkflowRepository.saveAll(
             List.of(
-                new ProjectWorkflow(project.getId(), 1, "workflow1", UUID.randomUUID()),
-                new ProjectWorkflow(project.getId(), 1, "workflow2", UUID.randomUUID()),
-                new ProjectWorkflow(project.getId(), 2, "workflow3", UUID.randomUUID())));
+                new ProjectWorkflow(project.getId(), 1, workflowId1, workflowUuid1),
+                new ProjectWorkflow(project.getId(), 1, workflowId2, UUID.randomUUID()),
+                new ProjectWorkflow(project.getId(), 2, workflowId3, UUID.randomUUID())));
 
         projectDeployment = new ProjectDeployment();
         projectDeployment.setName("test-deployment");
@@ -150,11 +184,13 @@ class McpProjectFacadeIntTest {
         workspaceRepository.deleteAll();
         categoryRepository.deleteAll();
         mcpServerRepository.deleteAll();
+
+        McpIntTestWorkflows.deleteWorkflows(workflowService, List.of(workflowId1, workflowId2, workflowId3));
     }
 
     @Test
     void testCreateMcpProject() {
-        List<String> selectedWorkflowIds = List.of("workflow1", "workflow2");
+        List<String> selectedWorkflowIds = List.of(workflowId1, workflowId2);
 
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
             mcpServer.getId(), project.getId(), 1, selectedWorkflowIds);
@@ -172,7 +208,7 @@ class McpProjectFacadeIntTest {
             new McpServer("production-server", PlatformType.AUTOMATION, Environment.PRODUCTION));
 
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            productionMcpServer.getId(), project.getId(), 1, List.of("workflow1"));
+            productionMcpServer.getId(), project.getId(), 1, List.of(workflowId1));
 
         ProjectDeployment mcpProjectDeployment = projectDeploymentRepository
             .findById(mcpProject.getProjectDeploymentId())
@@ -184,7 +220,7 @@ class McpProjectFacadeIntTest {
     @Test
     void testCreateMcpProjectEnablesTheProjectDeployment() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
 
         ProjectDeployment mcpProjectDeployment = projectDeploymentRepository
             .findById(mcpProject.getProjectDeploymentId())
@@ -209,10 +245,10 @@ class McpProjectFacadeIntTest {
     @Test
     void testCreateMcpProjectMultipleVersions() {
         McpProject mcpProject1 = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
 
         McpProject mcpProject2 = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), project.getId(), 2, List.of("workflow3"));
+            mcpServer.getId(), project.getId(), 2, List.of(workflowId3));
 
         assertThat(mcpProject1).isNotNull();
         assertThat(mcpProject2).isNotNull();
@@ -225,10 +261,10 @@ class McpProjectFacadeIntTest {
     @Test
     void testUpdateMcpProjectAddWorkflow() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
 
         McpProject updatedMcpProject = mcpProjectFacade.updateMcpProject(
-            mcpProject.getId(), List.of("workflow1", "workflow2"));
+            mcpProject.getId(), List.of(workflowId1, workflowId2));
 
         assertThat(updatedMcpProject).isNotNull();
         assertThat(updatedMcpProject.getId()).isEqualTo(mcpProject.getId());
@@ -242,14 +278,14 @@ class McpProjectFacadeIntTest {
     @Test
     void testUpdateMcpProjectRemoveWorkflow() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), project.getId(), 1, List.of("workflow1", "workflow2"));
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1, workflowId2));
 
         List<McpProjectWorkflow> mcpProjectWorkflowsBefore =
             mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
 
         assertThat(mcpProjectWorkflowsBefore).hasSize(2);
 
-        mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of("workflow1"));
+        mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of(workflowId1));
 
         List<McpProjectWorkflow> mcpProjectWorkflowsAfter =
             mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
@@ -260,14 +296,14 @@ class McpProjectFacadeIntTest {
     @Test
     void testUpdateMcpProjectUnchangedWorkflows() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), project.getId(), 1, List.of("workflow1", "workflow2"));
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1, workflowId2));
 
         List<McpProjectWorkflow> mcpProjectWorkflowsBefore =
             mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
 
         assertThat(mcpProjectWorkflowsBefore).hasSize(2);
 
-        mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of("workflow1", "workflow2"));
+        mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of(workflowId1, workflowId2));
 
         List<McpProjectWorkflow> mcpProjectWorkflowsAfter =
             mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
@@ -293,7 +329,7 @@ class McpProjectFacadeIntTest {
             long projectDeploymentCount = projectDeploymentRepository.count();
             long mcpServerId = mcpServer.getId();
             long projectId = project.getId();
-            List<String> selectedWorkflowIds = List.of("workflow1", "foreign");
+            List<String> selectedWorkflowIds = List.of(workflowId1, "foreign");
 
             assertThatThrownBy(
                 () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
@@ -310,12 +346,12 @@ class McpProjectFacadeIntTest {
             long projectDeploymentCount = projectDeploymentRepository.count();
             long mcpServerId = mcpServer.getId();
             long projectId = project.getId();
-            List<String> selectedWorkflowIds = List.of("workflow1");
+            List<String> selectedWorkflowIds = List.of(workflowId1);
 
             assertThatThrownBy(
                 () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 2, selectedWorkflowIds))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("workflow1");
+                    .hasMessageContaining(workflowId1);
 
             assertThat(mcpProjectRepository.count()).isZero();
             assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
@@ -324,15 +360,15 @@ class McpProjectFacadeIntTest {
         @Test
         void testUpdateMcpProjectRejectsAWorkflowOfAnotherProjectVersion() {
             McpProject mcpProject = mcpProjectFacade.createMcpProject(
-                mcpServer.getId(), project.getId(), 2, List.of("workflow3"));
+                mcpServer.getId(), project.getId(), 2, List.of(workflowId3));
 
             long projectDeploymentWorkflowCount = projectDeploymentWorkflowRepository.count();
             long mcpProjectId = mcpProject.getId();
-            List<String> selectedWorkflowIds = List.of("workflow3", "workflow1");
+            List<String> selectedWorkflowIds = List.of(workflowId3, workflowId1);
 
             assertThatThrownBy(() -> mcpProjectFacade.updateMcpProject(mcpProjectId, selectedWorkflowIds))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("workflow1");
+                .hasMessageContaining(workflowId1);
 
             assertThat(projectDeploymentWorkflowRepository.count()).isEqualTo(projectDeploymentWorkflowCount);
             assertThat(mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId())).hasSize(1);
@@ -391,13 +427,13 @@ class McpProjectFacadeIntTest {
         @Test
         void testCreateMcpProjectAcceptsAPublishedProjectVersion() {
             McpProject mcpProject = mcpProjectFacade.createMcpProject(
-                mcpServer.getId(), project.getId(), 2, List.of("workflow3"));
+                mcpServer.getId(), project.getId(), 2, List.of(workflowId3));
 
             assertThat(mcpProjectRepository.findById(mcpProject.getId())).isPresent();
             assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
                 mcpProject.getProjectDeploymentId()))
                     .extracting(ProjectDeploymentWorkflow::getWorkflowId)
-                    .containsExactly("workflow3");
+                    .containsExactly(workflowId3);
         }
 
         @Test
@@ -437,6 +473,209 @@ class McpProjectFacadeIntTest {
         }
     }
 
+    @Nested
+    class ConnectionResolution {
+
+        @Test
+        void testCreateMcpProjectPersistsTheTestConfigurationConnectionOnTheSystemDeploymentWorkflow() {
+            String draftWorkflowId = McpIntTestWorkflows.createNewWorkflowCallWorkflow(workflowService);
+
+            try {
+                projectWorkflowRepository.save(new ProjectWorkflow(project.getId(), 3, draftWorkflowId, workflowUuid1));
+
+                stubRequiredSlackConnection();
+                stubWorkflowTestConfiguration(draftWorkflowId, 77L);
+                stubConnection(77L, "slack", Environment.DEVELOPMENT);
+
+                McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                    mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+                assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                    mcpProject.getProjectDeploymentId()))
+                        .singleElement()
+                        .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.getConnections())
+                            .singleElement()
+                            .satisfies(connection -> {
+                                assertThat(connection.getConnectionId()).isEqualTo(77L);
+                                assertThat(connection.getWorkflowConnectionKey()).isEqualTo("slack");
+                                assertThat(connection.getWorkflowNodeName()).isEqualTo("newWorkflowCall_1");
+                            }));
+            } finally {
+                McpIntTestWorkflows.deleteWorkflows(workflowService, List.of(draftWorkflowId));
+            }
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsAWorkflowWithoutItsRequiredConnection() {
+            stubRequiredSlackConnection();
+
+            long projectDeploymentCount = projectDeploymentRepository.count();
+            long mcpServerId = mcpServer.getId();
+            long projectId = project.getId();
+            List<String> selectedWorkflowIds = List.of(workflowId1);
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("requires a slack connection");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+            assertThat(projectDeploymentRepository.count()).isEqualTo(projectDeploymentCount);
+            assertThat(projectDeploymentWorkflowRepository.count()).isZero();
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsARequiredConnectionFromAnotherEnvironment() {
+            stubRequiredSlackConnection();
+            stubWorkflowTestConfiguration(workflowId1, 77L);
+            stubConnection(77L, "slack", Environment.PRODUCTION);
+
+            long mcpServerId = mcpServer.getId();
+            long projectId = project.getId();
+            List<String> selectedWorkflowIds = List.of(workflowId1);
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("requires a slack connection");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+            assertThat(projectDeploymentWorkflowRepository.count()).isZero();
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsARequiredConnectionOfAnotherComponent() {
+            stubRequiredSlackConnection();
+            stubWorkflowTestConfiguration(workflowId1, 77L);
+            stubConnection(77L, "github", Environment.DEVELOPMENT);
+
+            long mcpServerId = mcpServer.getId();
+            long projectId = project.getId();
+            List<String> selectedWorkflowIds = List.of(workflowId1);
+
+            assertThatThrownBy(
+                () -> mcpProjectFacade.createMcpProject(mcpServerId, projectId, 1, selectedWorkflowIds))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("requires a slack connection");
+
+            assertThat(mcpProjectRepository.count()).isZero();
+            assertThat(projectDeploymentWorkflowRepository.count()).isZero();
+        }
+
+        @Test
+        void testCreateMcpProjectAcceptsAWorkflowWithoutItsOptionalConnection() {
+            when(componentConnectionFacade.getComponentConnections(any(WorkflowTrigger.class)))
+                .thenReturn(List.of(new ComponentConnection("slack", 1, "newWorkflowCall_1", "slack", false)));
+
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                mcpProject.getProjectDeploymentId()))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.getConnections())
+                        .isEmpty());
+        }
+
+        @Test
+        void testUpdateMcpProjectPersistsTheTestConfigurationConnectionOfAnAddedWorkflow() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            stubRequiredSlackConnection();
+            stubWorkflowTestConfiguration(workflowId2, 78L);
+            stubConnection(78L, "slack", Environment.DEVELOPMENT);
+
+            mcpProjectFacade.updateMcpProject(mcpProject.getId(), List.of(workflowId1, workflowId2));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                mcpProject.getProjectDeploymentId()))
+                    .filteredOn(projectDeploymentWorkflow -> workflowId2.equals(
+                        projectDeploymentWorkflow.getWorkflowId()))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.getConnections())
+                        .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                        .containsExactly(78L));
+        }
+
+        @Test
+        void testUpdateMcpProjectRejectsAnAddedWorkflowWithoutItsRequiredConnection() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            stubRequiredSlackConnection();
+
+            long projectDeploymentWorkflowCount = projectDeploymentWorkflowRepository.count();
+            long mcpProjectId = mcpProject.getId();
+            List<String> selectedWorkflowIds = List.of(workflowId2);
+
+            assertThatThrownBy(() -> mcpProjectFacade.updateMcpProject(mcpProjectId, selectedWorkflowIds))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("requires a slack connection");
+
+            assertThat(projectDeploymentWorkflowRepository.count()).isEqualTo(projectDeploymentWorkflowCount);
+            assertThat(mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProjectId)).hasSize(1);
+        }
+
+        @Test
+        void testCloneMcpProjectResolvesTheConnectionsOfTheTargetServerEnvironment() {
+            McpProject sourceMcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            McpServer productionMcpServer = mcpServerRepository.save(
+                new McpServer("production-server", PlatformType.AUTOMATION, Environment.PRODUCTION));
+
+            stubRequiredSlackConnection();
+
+            WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration();
+
+            workflowTestConfiguration.setConnections(
+                List.of(new WorkflowTestConfigurationConnection(79L, "slack", "newWorkflowCall_1")));
+
+            when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(
+                workflowId1, Environment.PRODUCTION.ordinal()))
+                    .thenReturn(Optional.of(workflowTestConfiguration));
+
+            stubConnection(79L, "slack", Environment.PRODUCTION);
+
+            McpProject clonedMcpProject = mcpProjectFacade.cloneMcpProject(
+                sourceMcpProject.getId(), productionMcpServer.getId());
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                clonedMcpProject.getProjectDeploymentId()))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.getConnections())
+                        .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                        .containsExactly(79L));
+        }
+
+        private void stubConnection(long connectionId, String componentName, Environment environment) {
+            Connection connection = new Connection();
+
+            connection.setComponentName(componentName);
+            connection.setEnvironmentId(environment.ordinal());
+            connection.setId(connectionId);
+
+            when(connectionService.getConnection(connectionId)).thenReturn(connection);
+        }
+
+        private void stubRequiredSlackConnection() {
+            when(componentConnectionFacade.getComponentConnections(any(WorkflowTrigger.class)))
+                .thenReturn(List.of(new ComponentConnection("slack", 1, "newWorkflowCall_1", "slack", true)));
+        }
+
+        private void stubWorkflowTestConfiguration(String testConfigurationWorkflowId, long connectionId) {
+            WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration();
+
+            workflowTestConfiguration.setConnections(
+                List.of(new WorkflowTestConfigurationConnection(connectionId, "slack", "newWorkflowCall_1")));
+
+            when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(
+                testConfigurationWorkflowId, Environment.DEVELOPMENT.ordinal()))
+                    .thenReturn(Optional.of(workflowTestConfiguration));
+        }
+    }
+
     @Test
     void testDeleteMcpProject() {
         McpProject mcpProject = new McpProject(projectDeployment.getId(), mcpServer.getId());
@@ -446,7 +685,7 @@ class McpProjectFacadeIntTest {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
         projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
-        projectDeploymentWorkflow.setWorkflowId("workflow1");
+        projectDeploymentWorkflow.setWorkflowId(workflowId1);
 
         projectDeploymentWorkflow = projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
 
@@ -457,7 +696,7 @@ class McpProjectFacadeIntTest {
         projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
         projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
-        projectDeploymentWorkflow.setWorkflowId("workflow2");
+        projectDeploymentWorkflow.setWorkflowId(workflowId2);
 
         projectDeploymentWorkflow = projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
 

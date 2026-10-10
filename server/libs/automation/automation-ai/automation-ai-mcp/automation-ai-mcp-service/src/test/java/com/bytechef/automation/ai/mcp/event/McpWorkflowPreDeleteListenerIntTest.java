@@ -18,6 +18,8 @@ package com.bytechef.automation.ai.mcp.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.ai.mcp.config.McpIntTestWorkflows;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
@@ -52,14 +54,11 @@ import org.springframework.context.annotation.Import;
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = McpProjectIntTestConfiguration.class)
+@SpringBootTest(
+    classes = McpProjectIntTestConfiguration.class, properties = "bytechef.workflow.repository.jdbc.enabled=true")
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
 class McpWorkflowPreDeleteListenerIntTest {
-
-    private static final String OTHER_WORKFLOW_ID = "workflow3";
-    private static final String SYSTEM_PROJECT_WORKFLOW_ID = "workflow2";
-    private static final String WORKFLOW_ID = "workflow1";
 
     @Autowired
     private McpProjectFacade mcpProjectFacade;
@@ -89,10 +88,16 @@ class McpWorkflowPreDeleteListenerIntTest {
     private ProjectWorkflowRepository projectWorkflowRepository;
 
     @Autowired
+    private WorkflowService workflowService;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     private McpServer mcpServer;
+    private String otherWorkflowId;
     private Project project;
+    private String systemProjectWorkflowId;
+    private String workflowId;
     private Workspace workspace;
 
     @BeforeEach
@@ -112,7 +117,11 @@ class McpWorkflowPreDeleteListenerIntTest {
 
         project = projectRepository.save(newProject);
 
-        projectWorkflowRepository.save(new ProjectWorkflow(project.getId(), 1, WORKFLOW_ID, UUID.randomUUID()));
+        workflowId = McpIntTestWorkflows.createNewWorkflowCallWorkflow(workflowService);
+        systemProjectWorkflowId = McpIntTestWorkflows.createNewWorkflowCallWorkflow(workflowService);
+        otherWorkflowId = McpIntTestWorkflows.createNewWorkflowCallWorkflow(workflowService);
+
+        projectWorkflowRepository.save(new ProjectWorkflow(project.getId(), 1, workflowId, UUID.randomUUID()));
     }
 
     @AfterEach
@@ -125,17 +134,20 @@ class McpWorkflowPreDeleteListenerIntTest {
         projectRepository.deleteAll();
         workspaceRepository.deleteAll();
         mcpServerRepository.deleteAll();
+
+        McpIntTestWorkflows.deleteWorkflows(
+            workflowService, List.of(workflowId, systemProjectWorkflowId, otherWorkflowId));
     }
 
     @Test
     void testDeleteWorkflowDeletesMcpProjectWorkflow() {
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), project.getId(), 1, List.of(WORKFLOW_ID));
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId));
 
         assertThat(mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId())).hasSize(1);
         assertThat(projectDeploymentWorkflowRepository.findAll()).hasSize(1);
 
-        projectWorkflowFacade.deleteWorkflow(WORKFLOW_ID);
+        projectWorkflowFacade.deleteWorkflow(workflowId);
 
         assertThat(projectDeploymentWorkflowRepository.findAll()).isEmpty();
         assertThat(mcpProjectWorkflowRepository.findAll()).isEmpty();
@@ -155,15 +167,15 @@ class McpWorkflowPreDeleteListenerIntTest {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
         projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
-        projectDeploymentWorkflow.setWorkflowId(WORKFLOW_ID);
+        projectDeploymentWorkflow.setWorkflowId(workflowId);
 
         projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
 
-        mcpProjectFacade.createMcpProject(mcpServer.getId(), project.getId(), 1, List.of(WORKFLOW_ID));
+        mcpProjectFacade.createMcpProject(mcpServer.getId(), project.getId(), 1, List.of(workflowId));
 
-        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(WORKFLOW_ID)).hasSize(2);
+        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(workflowId)).hasSize(2);
 
-        projectWorkflowFacade.deleteWorkflow(WORKFLOW_ID);
+        projectWorkflowFacade.deleteWorkflow(workflowId);
 
         assertThat(projectDeploymentWorkflowRepository.findAll()).isEmpty();
         assertThat(mcpProjectWorkflowRepository.findAll()).isEmpty();
@@ -182,7 +194,7 @@ class McpWorkflowPreDeleteListenerIntTest {
         Project systemProject = projectRepository.save(newSystemProject);
 
         projectWorkflowRepository.save(
-            new ProjectWorkflow(systemProject.getId(), 1, SYSTEM_PROJECT_WORKFLOW_ID, UUID.randomUUID()));
+            new ProjectWorkflow(systemProject.getId(), 1, systemProjectWorkflowId, UUID.randomUUID()));
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
@@ -196,27 +208,27 @@ class McpWorkflowPreDeleteListenerIntTest {
         ProjectDeploymentWorkflow unownedProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
         unownedProjectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
-        unownedProjectDeploymentWorkflow.setWorkflowId(SYSTEM_PROJECT_WORKFLOW_ID);
+        unownedProjectDeploymentWorkflow.setWorkflowId(systemProjectWorkflowId);
 
         unownedProjectDeploymentWorkflow = projectDeploymentWorkflowRepository.save(unownedProjectDeploymentWorkflow);
 
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(), systemProject.getId(), 1, List.of(SYSTEM_PROJECT_WORKFLOW_ID));
+            mcpServer.getId(), systemProject.getId(), 1, List.of(systemProjectWorkflowId));
 
-        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(SYSTEM_PROJECT_WORKFLOW_ID)).hasSize(2);
+        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(systemProjectWorkflowId)).hasSize(2);
         assertThat(mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId())).hasSize(1);
 
-        projectWorkflowFacade.deleteWorkflow(SYSTEM_PROJECT_WORKFLOW_ID);
+        projectWorkflowFacade.deleteWorkflow(systemProjectWorkflowId);
 
         assertThat(mcpProjectWorkflowRepository.findAll()).isEmpty();
-        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(SYSTEM_PROJECT_WORKFLOW_ID)).isEmpty();
+        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(systemProjectWorkflowId)).isEmpty();
         assertThat(projectDeploymentWorkflowRepository.findById(unownedProjectDeploymentWorkflow.getId())).isEmpty();
     }
 
     @Test
     void testDeleteWorkflowLeavesOtherWorkflowsProjectDeploymentWorkflowsAlone() {
         projectWorkflowRepository.save(
-            new ProjectWorkflow(project.getId(), 1, OTHER_WORKFLOW_ID, UUID.randomUUID()));
+            new ProjectWorkflow(project.getId(), 1, otherWorkflowId, UUID.randomUUID()));
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
@@ -230,21 +242,21 @@ class McpWorkflowPreDeleteListenerIntTest {
         ProjectDeploymentWorkflow deletedWorkflowRow = new ProjectDeploymentWorkflow();
 
         deletedWorkflowRow.setProjectDeploymentId(projectDeployment.getId());
-        deletedWorkflowRow.setWorkflowId(WORKFLOW_ID);
+        deletedWorkflowRow.setWorkflowId(workflowId);
 
         projectDeploymentWorkflowRepository.save(deletedWorkflowRow);
 
         ProjectDeploymentWorkflow otherWorkflowRow = new ProjectDeploymentWorkflow();
 
         otherWorkflowRow.setProjectDeploymentId(projectDeployment.getId());
-        otherWorkflowRow.setWorkflowId(OTHER_WORKFLOW_ID);
+        otherWorkflowRow.setWorkflowId(otherWorkflowId);
 
         otherWorkflowRow = projectDeploymentWorkflowRepository.save(otherWorkflowRow);
 
-        projectWorkflowFacade.deleteWorkflow(WORKFLOW_ID);
+        projectWorkflowFacade.deleteWorkflow(workflowId);
 
-        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(WORKFLOW_ID)).isEmpty();
-        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(OTHER_WORKFLOW_ID))
+        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(workflowId)).isEmpty();
+        assertThat(projectDeploymentWorkflowRepository.findAllByWorkflowId(otherWorkflowId))
             .extracting(ProjectDeploymentWorkflow::getId)
             .containsExactly(otherWorkflowRow.getId());
     }
