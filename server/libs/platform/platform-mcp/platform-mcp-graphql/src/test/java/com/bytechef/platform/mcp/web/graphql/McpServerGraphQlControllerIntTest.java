@@ -165,7 +165,7 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mockServer = createMockMcpServer(
             1L, "Updated Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, false);
 
-        when(mcpServerService.update(eq(1L), eq("Updated Server"), eq(false))).thenReturn(mockServer);
+        when(mcpServerService.update(1L, "Updated Server", false)).thenReturn(mockServer);
 
         // When & Then
         this.graphQlTester
@@ -198,7 +198,7 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mockServer = createMockMcpServer(
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        when(mcpServerService.update(eq(1L), eq("Test Server"), eq(true))).thenReturn(mockServer);
+        when(mcpServerService.update(1L, "Test Server", true)).thenReturn(mockServer);
 
         McpServer updatedMockServer = createMockMcpServer(
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
@@ -237,7 +237,7 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mockServer = createMockMcpServer(
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        when(mcpServerService.update(eq(1L), eq("Test Server"), eq(true))).thenReturn(mockServer);
+        when(mcpServerService.update(1L, "Test Server", true)).thenReturn(mockServer);
 
         when(mcpServerService.update(argThat(
             server -> server != null && server.isEnforceToolAuthorization() && !server.isAuthenticationRequired())))
@@ -277,7 +277,7 @@ public class McpServerGraphQlControllerIntTest {
         mockServer.setAuthenticationRequired(false);
         mockServer.setEnforceToolAuthorization(false);
 
-        when(mcpServerService.update(eq(1L), eq("Test Server"), eq(true))).thenReturn(mockServer);
+        when(mcpServerService.update(1L, "Test Server", true)).thenReturn(mockServer);
 
         McpServer updatedMockServer = createMockMcpServer(
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
