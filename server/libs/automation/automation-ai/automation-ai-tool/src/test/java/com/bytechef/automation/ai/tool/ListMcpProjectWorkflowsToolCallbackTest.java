@@ -22,14 +22,17 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.dto.McpProjectWorkflowSummaryDTO;
 import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class ListMcpProjectWorkflowsToolCallbackTest {
 
     private McpProjectWorkflowFacade mcpProjectWorkflowFacade;

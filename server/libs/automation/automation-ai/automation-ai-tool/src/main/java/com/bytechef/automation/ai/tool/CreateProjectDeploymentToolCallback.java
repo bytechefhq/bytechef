@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -28,7 +29,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -66,7 +66,6 @@ public class CreateProjectDeploymentToolCallback implements ToolCallback {
             }""";
 
     private final ProjectDeploymentFacade projectDeploymentFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CreateProjectDeploymentToolCallback(ProjectDeploymentFacade projectDeploymentFacade) {
@@ -90,7 +89,7 @@ public class CreateProjectDeploymentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            CreateProjectDeploymentInput input = jsonMapper.readValue(toolInput, CreateProjectDeploymentInput.class);
+            CreateProjectDeploymentInput input = JsonUtils.read(toolInput, CreateProjectDeploymentInput.class);
 
             if (input.projectId() == null || input.projectId()
                 .isBlank()) {
@@ -135,7 +134,7 @@ public class CreateProjectDeploymentToolCallback implements ToolCallback {
 
             long projectDeploymentId = projectDeploymentFacade.createProjectDeployment(dto);
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new CreateProjectDeploymentOutput(
                     projectDeploymentId, projectId, input.projectVersion(), environment.name(), false));
         } catch (JacksonException exception) {
@@ -143,13 +142,12 @@ public class CreateProjectDeploymentToolCallback implements ToolCallback {
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, CreateProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(CreateProjectDeploymentToolCallback.class, TOOL_NAME, exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record CreateProjectDeploymentInput(

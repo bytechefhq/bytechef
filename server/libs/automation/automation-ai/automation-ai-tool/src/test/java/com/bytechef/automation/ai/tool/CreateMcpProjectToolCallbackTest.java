@@ -23,14 +23,17 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class CreateMcpProjectToolCallbackTest {
 
     private final JsonMapper jsonMapper = new JsonMapper();
