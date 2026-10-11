@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public class A2aConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .authorizationRequired(false)
         .authorizations(
             authorization(AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")
