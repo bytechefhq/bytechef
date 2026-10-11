@@ -77,4 +77,19 @@ describe('McpProjectWorkflowListItem', () => {
 
         expect(screen.getByRole('switch', {name: 'Enable Lead intake'})).not.toBeChecked();
     });
+
+    it('offers configure, edit and delete in the actions menu', async () => {
+        const user = userEvent.setup();
+
+        render(<McpProjectWorkflowListItem mcpProjectWorkflow={createMcpProjectWorkflow(true)} />);
+
+        await user.click(screen.getByRole('button', {name: 'Lead intake actions'}));
+
+        expect(await screen.findByRole('menuitem', {name: 'Configure'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+
+        await user.click(screen.getByRole('menuitem', {name: 'Delete'}));
+
+        expect(await screen.findByText('Are you absolutely sure?')).toBeInTheDocument();
+    });
 });

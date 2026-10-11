@@ -2,6 +2,7 @@ import {McpActivePopoverProvider, useMcpActivePopover} from '@/shared/contexts/M
 import {McpTool} from '@/shared/middleware/graphql';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {act, fireEvent, render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {useState} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -92,6 +93,13 @@ const renderEmbeddedToolListItem = (tool: McpTool = mcpTool) =>
         </QueryClientProvider>
     );
 
+const chooseToolAction = async (actionName: string, toolLabel = 'Create Opportunity') => {
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', {name: `${toolLabel} actions`}));
+    await user.click(await screen.findByRole('menuitem', {name: actionName}));
+};
+
 describe('McpComponentToolListItem', () => {
     beforeEach(() => {
         mutateMock.mockClear();
@@ -100,7 +108,7 @@ describe('McpComponentToolListItem', () => {
         deleteDialogState.showDeleteDialog = false;
     });
 
-    it('passes connectionRequired through to the tool properties popover', () => {
+    it('passes connectionRequired through to the tool properties popover', async () => {
         render(
             <QueryClientProvider client={new QueryClient()}>
                 <McpActivePopoverProvider>
@@ -115,16 +123,16 @@ describe('McpComponentToolListItem', () => {
             </QueryClientProvider>
         );
 
-        fireEvent.click(screen.getByTitle('Configure'));
+        await chooseToolAction('Configure');
 
         expect(screen.getByText('tool-properties-popover')).toHaveAttribute('data-connection-required', 'true');
     });
-    it('clears the active popover when the item unmounts (card collapse)', () => {
+    it('clears the active popover when the item unmounts (card collapse)', async () => {
         render(<Harness />);
 
         expect(screen.getByTestId('active-popover-id')).toHaveTextContent('NONE');
 
-        fireEvent.click(screen.getByTitle('Configure'));
+        await chooseToolAction('Configure');
 
         expect(screen.getByTestId('active-popover-id')).toHaveTextContent('component-tool-42');
         expect(screen.getByText('tool-properties-popover')).toBeInTheDocument();
@@ -259,7 +267,7 @@ describe('McpComponentToolListItem', () => {
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['mcpToolsByComponentId']});
     });
 
-    it('routes deletes and property updates through the embedded operations for an embedded tool', () => {
+    it('routes deletes and property updates through the embedded operations for an embedded tool', async () => {
         render(
             <QueryClientProvider client={new QueryClient()}>
                 <McpActivePopoverProvider>
@@ -276,7 +284,7 @@ describe('McpComponentToolListItem', () => {
 
         expect(dropdownMenuHookMock).toHaveBeenCalledWith({embedded: true, mcpTool});
 
-        fireEvent.click(screen.getByTitle('Configure'));
+        await chooseToolAction('Configure');
 
         expect(screen.getByText('tool-properties-popover')).toHaveAttribute('data-embedded', 'true');
     });
@@ -323,10 +331,10 @@ describe('McpComponentToolListItem', () => {
         expect(screen.getByRole('switch', {name: 'Enable Delete Opportunity'})).toBeInTheDocument();
     });
 
-    it('opens the delete confirmation from the delete button', () => {
+    it('opens the delete confirmation from the actions menu', async () => {
         renderEmbeddedToolListItem();
 
-        fireEvent.click(screen.getByTitle('Delete'));
+        await chooseToolAction('Delete');
 
         expect(setShowDeleteDialogMock).toHaveBeenCalledWith(true);
     });
