@@ -1,18 +1,9 @@
-import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
-import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {Popover, PopoverAnchor} from '@/components/ui/popover';
+import {Popover} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
+import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {BoltIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 import McpProjectWorkflowPropertiesPopover from './McpProjectWorkflowPropertiesPopover';
 import {McpProjectWorkflowItemType} from './hooks/useMcpProjectList';
@@ -60,44 +51,13 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                             onCheckedChange={handleEnabledChange}
                         />
 
-                        <DropdownMenu>
-                            <PopoverAnchor asChild>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        aria-label={`${workflowLabel} actions`}
-                                        icon={<EllipsisVerticalIcon />}
-                                        size="iconSm"
-                                        variant="ghost"
-                                    />
-                                </DropdownMenuTrigger>
-                            </PopoverAnchor>
-
-                            <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item"
-                                    onSelect={() => openPopover(popoverId)}
-                                >
-                                    <BoltIcon /> Configure
-                                </DropdownMenuItem>
-
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item"
-                                    onSelect={() => setShowEditWorkflowDialog(true)}
-                                >
-                                    <EditIcon /> Edit
-                                </DropdownMenuItem>
-
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item-destructive"
-                                    onSelect={() => setShowDeleteDialog(true)}
-                                    variant="destructive"
-                                >
-                                    <Trash2Icon /> Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <McpToolActionsMenu
+                            anchorsPopover
+                            label={workflowLabel}
+                            onConfigureClick={() => openPopover(popoverId)}
+                            onDeleteClick={() => setShowDeleteDialog(true)}
+                            onEditClick={() => setShowEditWorkflowDialog(true)}
+                        />
                     </div>
                 </div>
 
