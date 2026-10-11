@@ -111,6 +111,6 @@ class ApprovalRequestApprovalActionTest {
 
         Map<String, ?> continueParameters = suspend.continueParameters();
 
-        assertThat(continueParameters.get(MetadataConstants.APPROVAL_RESUME)).isEqualTo(true);
+        assertThat((Boolean) continueParameters.get(MetadataConstants.APPROVAL_RESUME)).isTrue();
     }
 }
