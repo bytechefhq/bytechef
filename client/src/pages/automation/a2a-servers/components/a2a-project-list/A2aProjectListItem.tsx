@@ -84,7 +84,7 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
     );
 
     const handleProjectDeploymentDialogClose = () => {
-        queryClient
+        void queryClient
             .invalidateQueries({queryKey: ['a2aProjectsByServerId']})
             .then(() => setShowChangeProjectVersionDialog(false));
     };

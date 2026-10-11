@@ -16,7 +16,7 @@ const A2aServerConnectUrl = ({description, label, url}: A2aServerConnectUrlProps
     const [, copyToClipboard] = useCopyToClipboard();
 
     const handleCopy = () => {
-        copyToClipboard(url);
+        void copyToClipboard(url);
 
         setCopied(true);
 
