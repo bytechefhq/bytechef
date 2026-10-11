@@ -48,12 +48,7 @@ public class McpServerSubAgentConfiguration {
     ChatClient mcpServerBuildSubAgentChatClient(
         ChatModel chatModel, McpProjectWorkflowFacade mcpProjectWorkflowFacade) {
 
-        return ChatClient.builder(chatModel)
-            .defaultSystem(readPrompt(promptResource))
-            .defaultTools(
-                new ListMcpProjectWorkflowsToolCallback(mcpProjectWorkflowFacade),
-                new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowFacade))
-            .build();
+        return buildMcpServerBuildSubAgentChatClient(chatModel, mcpProjectWorkflowFacade);
     }
 
     @Bean
@@ -61,9 +56,23 @@ public class McpServerSubAgentConfiguration {
         McpProjectWorkflowFacade.class
     })
     IntelligentToolChatClientFactory mcpServerBuildSubAgentChatClientFactory(
-        @Qualifier("mcpServerBuildSubAgentChatClient") ChatClient mcpServerBuildSubAgentChatClient) {
+        @Qualifier("mcpServerBuildSubAgentChatClient") ChatClient mcpServerBuildSubAgentChatClient,
+        McpProjectWorkflowFacade mcpProjectWorkflowFacade) {
 
-        return chatModel -> mcpServerBuildSubAgentChatClient;
+        return candidateChatModel -> candidateChatModel == null
+            ? mcpServerBuildSubAgentChatClient
+            : buildMcpServerBuildSubAgentChatClient(candidateChatModel, mcpProjectWorkflowFacade);
+    }
+
+    private ChatClient buildMcpServerBuildSubAgentChatClient(
+        ChatModel chatModel, McpProjectWorkflowFacade mcpProjectWorkflowFacade) {
+
+        return ChatClient.builder(chatModel)
+            .defaultSystem(readPrompt(promptResource))
+            .defaultTools(
+                new ListMcpProjectWorkflowsToolCallback(mcpProjectWorkflowFacade),
+                new UpdateMcpProjectWorkflowParametersToolCallback(mcpProjectWorkflowFacade))
+            .build();
     }
 
     private String readPrompt(Resource resource) {
