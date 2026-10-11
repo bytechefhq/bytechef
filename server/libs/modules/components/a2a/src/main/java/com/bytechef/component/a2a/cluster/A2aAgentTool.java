@@ -18,6 +18,7 @@ package com.bytechef.component.a2a.cluster;
 
 import static com.bytechef.component.a2a.constant.A2aConstants.AGENT_URL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -70,13 +71,21 @@ public class A2aAgentTool {
     public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ToolCallbackProviderFunction>clusterElement("agentTool")
             .title("A2A Agent Tool")
-            .description("Delegate a task to the remote A2A (Agent2Agent) agent of the connection.")
+            .description("Delegate a task to a remote A2A (Agent2Agent) agent.")
             .type(TOOLS)
+            .properties(
+                string(AGENT_URL)
+                    .label("Agent URL")
+                    .description(
+                        "The URL of the remote A2A agent - for a ByteChef A2A Server, the endpoint URL from the " +
+                            "server's Connect tab. The agent card is read from " +
+                            "<Agent URL>/.well-known/agent-card.json.")
+                    .required(true))
             .object(() -> A2aAgentTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     static ToolCallbackProvider apply(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String agentUrl = connectionParameters.getRequiredString(AGENT_URL);
+        String agentUrl = inputParameters.getRequiredString(AGENT_URL);
         Map<String, String> headers = getAuthorizationHeaders(connectionParameters);
 
         Function<RemoteAgentTask, String> sendTaskFunction =
