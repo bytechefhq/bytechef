@@ -73,7 +73,7 @@ const ActivationWizardContent = ({onClose, requiredComponents, template}: Activa
             <DialogFooter>
                 {state.step === 'done' ? (
                     <>
-                        {editWorkflowAllowed && (
+                        {editWorkflowAllowed && state.workflowUuid && (
                             <Button label="Open in builder" onClick={openInBuilder} variant="outline" />
                         )}
 

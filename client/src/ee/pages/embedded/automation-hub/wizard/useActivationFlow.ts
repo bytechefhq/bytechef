@@ -1,7 +1,8 @@
 import {
     WireNodeConnectionRequestI,
     useCopyTemplateMutation,
-    useDeleteAutomationMutation,
+    useDeprovisionReferenceMutation,
+    useProvisionReferenceMutation,
     usePublishAutomationMutation,
     useSetAutomationEnabledMutation,
     useUpdateAutomationInputsMutation,
@@ -186,7 +187,8 @@ export const useActivationFlow = (
     const fetchWorkflow = useFetchWorkflow();
 
     const {mutateAsync: copyTemplate} = useCopyTemplateMutation();
-    const {mutateAsync: deleteAutomation} = useDeleteAutomationMutation();
+    const {mutateAsync: deprovisionReference} = useDeprovisionReferenceMutation();
+    const {mutateAsync: provisionReference} = useProvisionReferenceMutation();
     const {mutateAsync: publishAutomation} = usePublishAutomationMutation();
     const {mutateAsync: updateAutomationInputs} = useUpdateAutomationInputsMutation();
     const {mutateAsync: setAutomationEnabled} = useSetAutomationEnabledMutation();
@@ -226,35 +228,8 @@ export const useActivationFlow = (
         [fetchWorkflow, state.selections, wireNodeConnection]
     );
 
-    const activate = useCallback(async () => {
-        setPending(true);
-
-        let createdWorkflowUuid: string | undefined;
-
-        const undoPartialActivation = async () => {
-            try {
-                if (createdWorkflowUuid) {
-                    await deleteAutomation(createdWorkflowUuid);
-
-                    copiedWorkflowUuidRef.current = undefined;
-                }
-            } catch {
-                return;
-            }
-        };
-
-        try {
-            let workflowUuid: string;
-
-            if (copiedWorkflowUuidRef.current) {
-                workflowUuid = copiedWorkflowUuidRef.current;
-            } else {
-                workflowUuid = await copyTemplate(templateUuid);
-
-                copiedWorkflowUuidRef.current = workflowUuid;
-                createdWorkflowUuid = workflowUuid;
-            }
-
+    const activateCopy = useCallback(
+        async (workflowUuid: string) => {
             await wireCopiedWorkflow(workflowUuid);
 
             await publishAutomation(workflowUuid);
@@ -264,12 +239,62 @@ export const useActivationFlow = (
             }
 
             await setAutomationEnabled({enabled: true, workflowUuid});
+        },
+        [
+            publishAutomation,
+            setAutomationEnabled,
+            state.inputValues,
+            state.inputs.length,
+            updateAutomationInputs,
+            wireCopiedWorkflow,
+        ]
+    );
 
-            dispatch({type: 'ACTIVATED', workflowUuid});
+    const activateReference = useCallback(async () => {
+        const connections = Object.fromEntries(
+            Object.entries(state.selections).filter((selection): selection is [string, number] => selection[1] != null)
+        );
+
+        try {
+            await provisionReference({
+                connections,
+                inputs: state.inputs.length > 0 ? state.inputValues : undefined,
+                workflowUuid: templateUuid,
+            });
+
+            await setAutomationEnabled({enabled: true, workflowUuid: templateUuid});
+        } catch (error) {
+            await deprovisionReference(templateUuid).catch(() => undefined);
+
+            throw error;
+        }
+    }, [
+        deprovisionReference,
+        provisionReference,
+        setAutomationEnabled,
+        state.inputValues,
+        state.inputs.length,
+        state.selections,
+        templateUuid,
+    ]);
+
+    const activate = useCallback(async () => {
+        setPending(true);
+
+        try {
+            const copiedWorkflowUuid = copiedWorkflowUuidRef.current;
+
+            if (copiedWorkflowUuid) {
+                await activateCopy(copiedWorkflowUuid);
+
+                dispatch({type: 'ACTIVATED', workflowUuid: copiedWorkflowUuid});
+            } else {
+                await activateReference();
+
+                dispatch({type: 'ACTIVATED'});
+            }
         } catch (error) {
             const missingConnectionComponentName = await readMissingConnectionComponentName(error);
-
-            await undoPartialActivation();
 
             if (missingConnectionComponentName) {
                 dispatch({componentName: missingConnectionComponentName, type: 'MISSING_CONNECTION'});
@@ -279,17 +304,7 @@ export const useActivationFlow = (
         } finally {
             setPending(false);
         }
-    }, [
-        copyTemplate,
-        deleteAutomation,
-        publishAutomation,
-        setAutomationEnabled,
-        state.inputValues,
-        state.inputs.length,
-        updateAutomationInputs,
-        templateUuid,
-        wireCopiedWorkflow,
-    ]);
+    }, [activateCopy, activateReference]);
 
     const openInBuilder = useCallback(() => {
         void navigate(`/embedded/hub/builder/${state.workflowUuid}`);
