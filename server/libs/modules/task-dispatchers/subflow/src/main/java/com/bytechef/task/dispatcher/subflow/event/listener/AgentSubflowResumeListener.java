@@ -26,14 +26,12 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition.CallableResponse;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.AgentSubflowLink;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -80,41 +78,44 @@ public class AgentSubflowResumeListener implements ApplicationEventListener {
 
         Job subflowJob = jobService.getJob(jobStatusApplicationEvent.getJobId());
 
-        Long agentJobId = MapUtils.getLong(subflowJob.getMetadata(), SubflowRequestConstants.AGENT_JOB_ID);
-        String agentJobResumeId = MapUtils.getString(
-            subflowJob.getMetadata(), SubflowRequestConstants.AGENT_JOB_RESUME_ID);
+        Optional<AgentSubflowLink> agentSubflowLinkOptional = AgentSubflowLink.fromMetadata(subflowJob.getMetadata());
 
-        if (agentJobId == null || agentJobResumeId == null) {
+        if (agentSubflowLinkOptional.isEmpty()) {
             return;
         }
 
-        Map<String, Object> resumeData = switch (status) {
-            case COMPLETED -> buildCompletedResumeData(subflowJob);
-            case FAILED -> AgentJobResumer.failed(
+        AgentSubflowLink agentSubflowLink = agentSubflowLinkOptional.get();
+
+        long agentJobId = agentSubflowLink.agentJobId();
+        String agentJobResumeId = agentSubflowLink.agentJobResumeId();
+
+        SubflowOutcome subflowOutcome = switch (status) {
+            case COMPLETED -> buildCompletedOutcome(subflowJob);
+            case FAILED -> new SubflowOutcome.Failed(
                 "Sub-workflow '%s' failed: %s".formatted(describeSubflow(subflowJob), getErrorMessage(subflowJob)));
-            default -> AgentJobResumer.failed(
+            default -> new SubflowOutcome.Failed(
                 "Sub-workflow '%s' was stopped before it finished".formatted(describeSubflow(subflowJob)));
         };
 
-        if (agentJobResumer.resume(agentJobId, agentJobResumeId, resumeData) && log.isDebugEnabled()) {
+        if (agentJobResumer.resume(agentJobId, agentJobResumeId, subflowOutcome) && log.isDebugEnabled()) {
             log.debug("Resumed agent job {} after sub-workflow job {} {}", agentJobId, subflowJob.getId(), status);
         }
     }
 
-    private Map<String, Object> buildCompletedResumeData(Job subflowJob) {
+    private SubflowOutcome buildCompletedOutcome(Job subflowJob) {
         try {
             Optional<Object> callableOutput = getCallableResponseOutput(subflowJob);
 
             if (callableOutput.isPresent()) {
-                return AgentJobResumer.completed(callableOutput.get());
+                return new SubflowOutcome.Completed(callableOutput.get());
             }
 
-            return AgentJobResumer.completed(
+            return new SubflowOutcome.Completed(
                 subflowJob.getOutputs() == null ? null : taskFileStorage.readJobOutputs(subflowJob.getOutputs()));
         } catch (RuntimeException exception) {
             log.error("Failed to read the outputs of sub-workflow job {}", subflowJob.getId(), exception);
 
-            return AgentJobResumer.failed(
+            return new SubflowOutcome.Failed(
                 "Sub-workflow '%s' completed but its result could not be read: %s".formatted(
                     describeSubflow(subflowJob), exception.getMessage()));
         }

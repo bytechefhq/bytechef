@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
@@ -159,6 +160,12 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
             if (rejectedOutcome != null) {
                 return rejectedOutcome;
+            }
+
+            if (JobSuspends.isSuspendedForSubflow(job)) {
+                log.warn("Job {} waits on a sub-workflow and resumes itself when it finishes", jobResumeId.getJobId());
+
+                return JobResumeOutcome.NOT_YET_SUSPENDED;
             }
 
             if (streaming && !MapUtils.getBoolean(job.getMetadata(), MetadataConstants.STREAMING_RESUME, false)) {

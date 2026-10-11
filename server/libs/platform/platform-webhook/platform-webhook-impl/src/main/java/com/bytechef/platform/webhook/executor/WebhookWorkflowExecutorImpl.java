@@ -71,7 +71,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
     private static final String TIMEOUT = "timeout";
 
-    public static final String SUSPENDING_TASK_MESSAGE =
+    private static final String SUSPENDING_TASK_MESSAGE =
         "Workflows that return a synchronous response can't contain steps that pause the run, such as approval " +
             "or wait steps. Step '%s' (%s) would pause it. Use a trigger that responds asynchronously, or remove " +
             "the step.";
@@ -151,6 +151,10 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         return closedCompletion.toCompletableFuture();
     }
 
+    public static String suspendingTaskMessage(String taskName, String taskType) {
+        return SUSPENDING_TASK_MESSAGE.formatted(taskName, taskType);
+    }
+
     @Override
     public @Nullable Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         Object outputs;
@@ -159,7 +163,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
         findSuspendingTask(workflowId).ifPresent(workflowTask -> {
             throw new ConfigurationException(
-                String.format(SUSPENDING_TASK_MESSAGE, workflowTask.getName(), workflowTask.getType()),
+                suspendingTaskMessage(workflowTask.getName(), workflowTask.getType()),
                 WebhookErrorType.SUSPENDING_TASK_IN_SYNC_EXECUTION);
         });
 

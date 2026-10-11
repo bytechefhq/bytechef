@@ -22,8 +22,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.AdditionalAnswers.delegatesTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -77,6 +79,8 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -87,6 +91,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.awaitility.core.ConditionFactory;
@@ -100,6 +105,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -585,9 +591,128 @@ class JobSyncExecutorIntTest {
 
         Job job = jobService.getJob(jobId);
 
-        assertThat(job.getMetadata())
+        Map<String, Object> metadata = new HashMap<>(job.getMetadata());
+
+        assertThat(metadata)
             .containsEntry(MetadataConstants.SYNC_EXECUTION, true)
             .containsEntry("existing", "value");
+    }
+
+    @Test
+    void testStartJobWithAJobFactoryMarksTheJobAsASyncExecution() {
+        AtomicReference<JobParametersDTO> jobParametersDTOReference = new AtomicReference<>();
+
+        assertThatThrownBy(
+            () -> jobSyncExecutor.startJob(
+                new JobParametersDTO(OUTPUT_WORKFLOW_ID, Map.of(), Map.of("existing", "value")),
+                jobParametersDTO -> {
+                    jobParametersDTOReference.set(jobParametersDTO);
+
+                    throw new IllegalStateException("job created");
+                }))
+                    .hasMessage("job created");
+
+        JobParametersDTO jobParametersDTO = jobParametersDTOReference.get();
+
+        Map<String, Object> metadata = new HashMap<>(jobParametersDTO.getMetadata());
+
+        assertThat(metadata)
+            .containsEntry(MetadataConstants.SYNC_EXECUTION, true)
+            .containsEntry("existing", "value");
+    }
+
+    @Test
+    void testExecuteWithAJobFactoryMarksTheJobAsASyncExecution() {
+        AtomicReference<JobParametersDTO> jobParametersDTOReference = new AtomicReference<>();
+
+        assertThatThrownBy(
+            () -> jobSyncExecutor.execute(
+                new JobParametersDTO(OUTPUT_WORKFLOW_ID, Map.of()),
+                jobParametersDTO -> {
+                    jobParametersDTOReference.set(jobParametersDTO);
+
+                    throw new IllegalStateException("job created");
+                },
+                false, taskExecutionCompleteEvent -> {}))
+                    .hasMessage("job created");
+
+        JobParametersDTO jobParametersDTO = jobParametersDTOReference.get();
+
+        Map<String, Object> metadata = new HashMap<>(jobParametersDTO.getMetadata());
+
+        assertThat(metadata).containsEntry(MetadataConstants.SYNC_EXECUTION, true);
+    }
+
+    @Test
+    void testTimedOutJobIsFailedEvenWhenTheFirstUpdateLosesToAConcurrentUpdate() {
+        long jobId = jobSyncExecutor.startJob(new JobParametersDTO(GATE_WORKFLOW_ID, Map.of()));
+
+        taskGates.awaitStarted(jobId);
+
+        doThrow(new OptimisticLockingFailureException("concurrent update"))
+            .doAnswer(invocation -> jobService.update(invocation.getArgument(0)))
+            .when(recordingJobService)
+            .update(any(Job.class));
+
+        assertThatThrownBy(
+            () -> jobSyncExecutor.awaitJob(jobId, true, taskExecutionCompleteEvent -> {}, Duration.ofMillis(100)))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage("Job " + jobId + " did not finish within 100 milliseconds");
+
+        assertThat(getJobStatus(jobId)).isEqualTo(Job.Status.FAILED);
+    }
+
+    @Test
+    void testJobThatFinishesAsTheWaitTimesOutIsNotFailed() {
+        long jobId = jobSyncExecutor.startJob(new JobParametersDTO(GATE_WORKFLOW_ID, Map.of()));
+
+        taskGates.awaitStarted(jobId);
+
+        Job startedJob = jobService.getJob(jobId);
+        Job completedJob = jobService.getJob(jobId);
+
+        completedJob.setStatus(Job.Status.COMPLETED);
+
+        doReturn(startedJob, completedJob).when(recordingJobService)
+            .getJob(jobId);
+
+        clearInvocations(recordingJobService);
+
+        Job job = jobSyncExecutor.awaitJob(jobId, false, taskExecutionCompleteEvent -> {}, Duration.ofMillis(100));
+
+        doAnswer(invocation -> jobService.getJob(jobId)).when(recordingJobService)
+            .getJob(jobId);
+
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+
+        verify(recordingJobService, never()).update(any(Job.class));
+    }
+
+    @Test
+    void testInterruptedWaitKeepsTheInterruptFlag() throws Exception {
+        long jobId = jobSyncExecutor.startJob(new JobParametersDTO(GATE_WORKFLOW_ID, Map.of()));
+
+        taskGates.awaitStarted(jobId);
+
+        AtomicBoolean interrupted = new AtomicBoolean();
+
+        Thread waitingThread = Thread.ofVirtual()
+            .start(() -> {
+                jobSyncExecutor.awaitJob(jobId, false, taskExecutionCompleteEvent -> {}, Duration.ofSeconds(30));
+
+                interrupted.set(Thread.currentThread()
+                    .isInterrupted());
+            });
+
+        awaitJobCompletionLatchRegistration(jobId);
+
+        awaitCondition()
+            .until(() -> isParkedOnALatch(waitingThread));
+
+        waitingThread.interrupt();
+
+        assertThat(waitingThread.join(EVENT_TIMEOUT)).isTrue();
+        assertThat(interrupted).isTrue();
     }
 
     @Test
@@ -801,6 +926,13 @@ class JobSyncExecutorIntTest {
 
         awaitCondition()
             .until(() -> jobCompletionLatches.containsKey(key));
+    }
+
+    private static boolean isParkedOnALatch(Thread thread) {
+        return Arrays.stream(thread.getStackTrace())
+            .anyMatch(stackTraceElement -> Objects.equals(
+                stackTraceElement.getClassName(), CountDownLatch.class.getName()) &&
+                Objects.equals(stackTraceElement.getMethodName(), "await"));
     }
 
     private static void awaitLatch(CountDownLatch countDownLatch) {
