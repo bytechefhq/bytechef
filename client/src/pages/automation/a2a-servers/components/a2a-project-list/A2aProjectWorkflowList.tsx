@@ -1,6 +1,14 @@
+import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
     useA2aProjectWorkflowsByA2aProjectIdQuery,
     useDeleteA2aProjectMutation,
@@ -8,7 +16,7 @@ import {
     useUpdateA2aProjectWorkflowEnabledMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {PencilIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 import {A2aProjectItemType} from './hooks/useA2aProjectList';
@@ -97,25 +105,34 @@ const A2aProjectWorkflowList = ({a2aProject, onEditClick}: A2aProjectWorkflowLis
                                     }
                                 />
 
-                                <Button
-                                    aria-label={`Edit ${workflowLabel}`}
-                                    className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                    icon={<PencilIcon className="size-4" />}
-                                    onClick={onEditClick}
-                                    size="iconSm"
-                                    title="Edit"
-                                    variant="ghost"
-                                />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            aria-label={`${workflowLabel} actions`}
+                                            icon={<EllipsisVerticalIcon />}
+                                            size="iconSm"
+                                            variant="ghost"
+                                        />
+                                    </DropdownMenuTrigger>
 
-                                <Button
-                                    aria-label={`Remove ${workflowLabel}`}
-                                    className="rounded p-1"
-                                    icon={<Trash2Icon className="size-4" />}
-                                    onClick={() => setWorkflowIdToRemove(a2aProjectWorkflow.workflowId ?? undefined)}
-                                    size="iconSm"
-                                    title="Remove"
-                                    variant="destructiveGhost"
-                                />
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
+                                            <EditIcon /> Edit
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuSeparator />
+
+                                        <DropdownMenuItem
+                                            className="dropdown-menu-item-destructive"
+                                            onClick={() =>
+                                                setWorkflowIdToRemove(a2aProjectWorkflow.workflowId ?? undefined)
+                                            }
+                                            variant="destructive"
+                                        >
+                                            <Trash2Icon /> Remove
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
                     );
