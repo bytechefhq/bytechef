@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -53,6 +54,7 @@ import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
@@ -99,6 +101,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -123,6 +126,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private final AutomationProjectConfigurationService automationProjectConfigurationService;
     private final AutomationProjectFacade automationProjectFacade;
     private final ComponentDefinitionService componentDefinitionService;
+    private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
     private final ConnectedUserProjectService connectUserProjectService;
     private final ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
@@ -160,6 +164,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         AutomationProjectConfigurationService automationProjectConfigurationService,
         AutomationProjectFacade automationProjectFacade,
         ComponentDefinitionService componentDefinitionService,
+        ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService,
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade,
@@ -185,6 +190,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         this.automationProjectConfigurationService = automationProjectConfigurationService;
         this.automationProjectFacade = automationProjectFacade;
         this.componentDefinitionService = componentDefinitionService;
+        this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserProjectConfigurationService = connectedUserProjectConfigurationService;
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserWorkflowReferenceFacade = connectedUserWorkflowReferenceFacade;
@@ -340,7 +346,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         for (ConnectedUserProjectWorkflow connectedUserProjectWorkflow : connectedUserProjectWorkflows) {
             if (connectedUserProjectWorkflowRepository.existsById(connectedUserProjectWorkflow.getId())) {
-                deleteProjectWorkflow(connectedUserProjectWorkflow.getId());
+                doDeleteProjectWorkflow(connectedUserProjectWorkflow.getId());
             }
         }
 
@@ -374,30 +380,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Audited(event = AutomationProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOW_DELETED, data = {
         @AuditData(key = "connectedUserProjectWorkflowId", value = "#connectedUserProjectWorkflowId")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', " +
+        "'CONNECTED_USER_DELETE')")
     public void deleteProjectWorkflow(long connectedUserProjectWorkflowId) {
-        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
-            .getConnectedUserProjectWorkflow(connectedUserProjectWorkflowId);
-
-        ConnectedUserProject connectedUserProject = connectUserProjectService.getConnectedUserProject(
-            connectedUserProjectWorkflow.getConnectedUserProjectId());
-
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserProject.getConnectedUserId());
-
-        String automationUuid = connectedUserProjectWorkflow.getAutomationUuid();
-
-        if (automationUuid != null) {
-            connectedUserWorkflowReferenceFacade.deleteReference(
-                connectedUser.getExternalId(), automationUuid, connectedUser.getEnvironment());
-
-            return;
-        }
-
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
-            connectedUserProjectWorkflow.getProjectWorkflowId());
-
-        deleteProjectWorkflow(
-            connectedUser.getExternalId(), projectWorkflow.getUuidAsString(), connectedUser.getEnvironment());
+        AutomationAuthorizationContext.runSkippingChecks(() -> doDeleteProjectWorkflow(connectedUserProjectWorkflowId));
     }
 
     @Override
@@ -467,35 +453,15 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         @AuditData(key = "connectedUserProjectWorkflowId", value = "#connectedUserProjectWorkflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', " +
+        "'CONNECTED_USER_MANAGE')")
     public void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable) {
-        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
-            .getConnectedUserProjectWorkflow(connectedUserProjectWorkflowId);
-
-        ConnectedUserProject connectedUserProject = connectUserProjectService.getConnectedUserProject(
-            connectedUserProjectWorkflow.getConnectedUserProjectId());
-
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserProject.getConnectedUserId());
-
-        String automationUuid = connectedUserProjectWorkflow.getAutomationUuid();
-
-        if (automationUuid != null) {
-            connectedUserWorkflowReferenceFacade.enableReference(
-                connectedUser.getExternalId(), automationUuid, enable, connectedUser.getEnvironment());
-
-            return;
-        }
-
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
-            connectedUserProjectWorkflow.getProjectWorkflowId());
-
-        enableProjectWorkflow(
-            connectedUser.getExternalId(), projectWorkflow.getUuidAsString(), enable,
-            connectedUser.getEnvironmentId());
+        AutomationAuthorizationContext.runSkippingChecks(
+            () -> doEnableProjectWorkflow(connectedUserProjectWorkflowId, enable));
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     @Transactional(propagation = Propagation.SUPPORTS)
     public List<ConnectedUserAutomationProjectConfigurationDTO> getConnectedUserProjectConfigurations(
         long connectedUserId) {
@@ -549,7 +515,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("#connectedUserId == null ? hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment) : " +
+        "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment) {
         return connectUserProjectService.getConnectedUserProjects(connectedUserId, environment)
             .stream()
@@ -582,7 +549,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', " +
+        "'CONNECTED_USER_VIEW')")
     @Transactional(propagation = Propagation.SUPPORTS)
     public ConnectedUserWorkflowReferenceValuesDTO getProjectWorkflowReferenceValues(
         long connectedUserProjectWorkflowId) {
@@ -591,7 +559,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     @Transactional(propagation = Propagation.SUPPORTS)
     public List<ProvisionableAutomationProjectDTO> getProvisionableProjects(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
@@ -642,7 +610,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         @AuditData(key = "configurationId", value = "#configurationId"),
         @AuditData(key = "workflowUuids", value = "#workflows.![workflowUuid]")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     @Transactional(propagation = Propagation.SUPPORTS)
     public void provisionProjectWorkflows(
         long connectedUserId, long configurationId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows) {
@@ -694,7 +662,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        Set<Long> entitledConnectionIds = connectedUserProjectWorkflowManager.getEntitledConnectionIds(
+        Set<Long> entitledConnectionIds = connectedUserConnectionMembership.getConnectionIds(
             connectedUserProject.getConnectedUserId(), environment);
 
         List<ProjectDeploymentWorkflowConnection> connections = workflowTestConfigurationService
@@ -832,8 +800,67 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 "Workflow with workflowUuid: %s not exist".formatted(workflowUuid),
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
 
+        Set<Long> connectionIds = connectedUserConnectionMembership.getConnectionIds(
+            connectedUserProject.getConnectedUserId(), environment);
+
+        if (!connectionIds.contains(connectionId)) {
+            throw new AccessDeniedException(
+                "Connection %s is neither owned by nor shared with the connected user".formatted(connectionId));
+        }
+
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey, connectionId, environment.ordinal());
+    }
+
+    private void doDeleteProjectWorkflow(long connectedUserProjectWorkflowId) {
+        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
+            .getConnectedUserProjectWorkflow(connectedUserProjectWorkflowId);
+
+        ConnectedUserProject connectedUserProject = connectUserProjectService.getConnectedUserProject(
+            connectedUserProjectWorkflow.getConnectedUserProjectId());
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserProject.getConnectedUserId());
+
+        String automationUuid = connectedUserProjectWorkflow.getAutomationUuid();
+
+        if (automationUuid != null) {
+            connectedUserWorkflowReferenceFacade.deleteReference(
+                connectedUser.getExternalId(), automationUuid, connectedUser.getEnvironment());
+
+            return;
+        }
+
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
+            connectedUserProjectWorkflow.getProjectWorkflowId());
+
+        deleteProjectWorkflow(
+            connectedUser.getExternalId(), projectWorkflow.getUuidAsString(), connectedUser.getEnvironment());
+    }
+
+    private void doEnableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable) {
+        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
+            .getConnectedUserProjectWorkflow(connectedUserProjectWorkflowId);
+
+        ConnectedUserProject connectedUserProject = connectUserProjectService.getConnectedUserProject(
+            connectedUserProjectWorkflow.getConnectedUserProjectId());
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserProject.getConnectedUserId());
+
+        String automationUuid = connectedUserProjectWorkflow.getAutomationUuid();
+
+        if (automationUuid != null) {
+            connectedUserWorkflowReferenceFacade.enableReference(
+                connectedUser.getExternalId(), automationUuid, enable, connectedUser.getEnvironment());
+
+            return;
+        }
+
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
+            connectedUserProjectWorkflow.getProjectWorkflowId());
+
+        enableProjectWorkflow(
+            connectedUser.getExternalId(), projectWorkflow.getUuidAsString(), enable,
+            connectedUser.getEnvironmentId());
     }
 
     private void assignConfiguration(
