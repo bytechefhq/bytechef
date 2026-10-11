@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils.cluster;
+package com.bytechef.component.a2a.cluster;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -39,7 +39,7 @@ import org.springframework.ai.tool.definition.ToolDefinition;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-class AiAgentUtilsAgentClientToolTest {
+class A2aAgentToolTest {
 
     private static final String AGENT_CARD_URL =
         "http://localhost:9555/api/automation/a2a/secret/.well-known/agent-card.json";
@@ -53,7 +53,7 @@ class AiAgentUtilsAgentClientToolTest {
             "http://localhost:9555/api/automation/a2a/secret/.well-known/agent-card.json"
         })
     void testGetAgentCardBaseUrlKeepsThePathTheAgentIsServedUnder(String baseUrl) {
-        String agentCardBaseUrl = AiAgentUtilsAgentClientTool.getAgentCardBaseUrl(baseUrl);
+        String agentCardBaseUrl = A2aAgentTool.getAgentCardBaseUrl(baseUrl);
 
         URI agentCardUri = URI.create(agentCardBaseUrl)
             .resolve(".well-known/agent-card.json");
@@ -63,7 +63,7 @@ class AiAgentUtilsAgentClientToolTest {
 
     @Test
     void testGetAgentCardBaseUrlForAnAgentServedAtTheRoot() {
-        String agentCardBaseUrl = AiAgentUtilsAgentClientTool.getAgentCardBaseUrl("https://agent.example.com");
+        String agentCardBaseUrl = A2aAgentTool.getAgentCardBaseUrl("https://agent.example.com");
 
         URI agentCardUri = URI.create(agentCardBaseUrl)
             .resolve(".well-known/agent-card.json");
@@ -79,7 +79,7 @@ class AiAgentUtilsAgentClientToolTest {
             "http://localhost:9555/api/automation/a2a/secret/.well-known/agent-card.json"
         })
     void testGetEndpointUrlDropsTheTrailingSlashAndAgentCardPath(String baseUrl) {
-        assertThat(AiAgentUtilsAgentClientTool.getEndpointUrl(baseUrl))
+        assertThat(A2aAgentTool.getEndpointUrl(baseUrl))
             .isEqualTo("http://localhost:9555/api/automation/a2a/secret");
     }
 
@@ -100,7 +100,7 @@ class AiAgentUtilsAgentClientToolTest {
             .version("1.0.0")
             .build();
 
-        AgentCard endpointAgentCard = AiAgentUtilsAgentClientTool.withEndpointUrl(agentCard, endpointUrl);
+        AgentCard endpointAgentCard = A2aAgentTool.withEndpointUrl(agentCard, endpointUrl);
 
         assertThat(endpointAgentCard.url()).isEqualTo(endpointUrl);
         assertThat(endpointAgentCard.additionalInterfaces())
@@ -112,7 +112,6 @@ class AiAgentUtilsAgentClientToolTest {
     void testApplyUsesTheToolNameAndDescriptionOfTheNode() {
         ToolDefinition toolDefinition = getToolDefinition(
             Map.of(
-                "baseUrl", "http://localhost:9555/api/automation/a2a/secret",
                 "toolDescription", "Ask the Java Release Expert about Java and Spring releases.",
                 "toolName", "askJavaReleaseExpert"));
 
@@ -123,18 +122,35 @@ class AiAgentUtilsAgentClientToolTest {
 
     @Test
     void testApplyFallsBackToTheDefaultToolNameAndDescription() {
-        ToolDefinition toolDefinition = getToolDefinition(
-            Map.of(
-                "baseUrl", "http://localhost:9555/api/automation/a2a/secret", "toolDescription", " ",
-                "toolName", ""));
+        ToolDefinition toolDefinition = getToolDefinition(Map.of("toolDescription", " ", "toolName", ""));
 
         assertThat(toolDefinition.name()).isEqualTo("sendTaskToRemoteAgent");
         assertThat(toolDefinition.description()).startsWith("Delegate a task to the configured remote A2A agent");
     }
 
+    @Test
+    void testGetAuthorizationHeadersSendsTheTokenAsABearerHeader() {
+        Map<String, String> headers = A2aAgentTool.getAuthorizationHeaders(
+            ParametersFactory.create(Map.of("agentUrl", "http://localhost:9555/api/automation/a2a/secret", "token",
+                "api-key")));
+
+        assertThat(headers).containsExactly(Map.entry("Authorization", "Bearer api-key"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "", " "
+    })
+    void testGetAuthorizationHeadersIsEmptyWithoutAToken(String token) {
+        assertThat(A2aAgentTool.getAuthorizationHeaders(ParametersFactory.create(Map.of("token", token)))).isEmpty();
+        assertThat(A2aAgentTool.getAuthorizationHeaders(ParametersFactory.create(Map.of()))).isEmpty();
+    }
+
     private static ToolDefinition getToolDefinition(Map<String, ?> inputParameters) {
-        ToolCallback[] toolCallbacks = AiAgentUtilsAgentClientTool.apply(
-            ParametersFactory.create(inputParameters), ParametersFactory.create(Map.of()), mock(Context.class))
+        ToolCallback[] toolCallbacks = A2aAgentTool.apply(
+            ParametersFactory.create(inputParameters),
+            ParametersFactory.create(Map.of("agentUrl", "http://localhost:9555/api/automation/a2a/secret")),
+            mock(Context.class))
             .getToolCallbacks();
 
         assertThat(toolCallbacks).hasSize(1);

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils.cluster;
+package com.bytechef.component.a2a.cluster;
 
-import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.a2a.constant.A2aConstants.AGENT_URL;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -34,6 +35,7 @@ import io.a2a.client.TaskUpdateEvent;
 import io.a2a.client.config.ClientConfig;
 import io.a2a.client.transport.jsonrpc.JSONRPCTransport;
 import io.a2a.client.transport.jsonrpc.JSONRPCTransportConfig;
+import io.a2a.client.transport.spi.interceptors.ClientCallContext;
 import io.a2a.spec.AgentCard;
 import io.a2a.spec.AgentInterface;
 import io.a2a.spec.Artifact;
@@ -43,6 +45,7 @@ import io.a2a.spec.Task;
 import io.a2a.spec.TaskStatus;
 import io.a2a.spec.TextPart;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -54,9 +57,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 /**
  * @author Ivica Cardic
  */
-public class AiAgentUtilsAgentClientTool {
-
-    public static final String BASE_URL = "baseUrl";
+public class A2aAgentTool {
 
     private static final String AGENT_CARD_PATH = ".well-known/agent-card.json";
 
@@ -67,25 +68,19 @@ public class AiAgentUtilsAgentClientTool {
     private static final String DEFAULT_TOOL_NAME = "sendTaskToRemoteAgent";
 
     public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ToolCallbackProviderFunction>clusterElement("agentClientTool")
+        ComponentDsl.<ToolCallbackProviderFunction>clusterElement("agentTool")
             .title("A2A Agent Tool")
-            .description("Delegate a task to a remote A2A (Agent2Agent) compliant agent.")
+            .description("Delegate a task to the remote A2A (Agent2Agent) agent of the connection.")
             .type(TOOLS)
-            .properties(
-                string(BASE_URL)
-                    .label("Base URL")
-                    .description(
-                        "Base URL of the remote A2A agent. Its agent card is resolved from " +
-                            "<baseUrl>/.well-known/agent-card.json.")
-                    .required(true))
-            .object(() -> AiAgentUtilsAgentClientTool::apply);
+            .object(() -> A2aAgentTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     static ToolCallbackProvider apply(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String baseUrl = inputParameters.getRequiredString(BASE_URL);
+        String agentUrl = connectionParameters.getRequiredString(AGENT_URL);
+        Map<String, String> headers = getAuthorizationHeaders(connectionParameters);
 
         Function<RemoteAgentTask, String> sendTaskFunction =
-            remoteAgentTask -> sendTask(baseUrl, remoteAgentTask.task());
+            remoteAgentTask -> sendTask(agentUrl, headers, remoteAgentTask.task());
 
         ToolCallback toolCallback = FunctionToolCallback.builder(
             getNonBlankString(inputParameters, ToolConstants.TOOL_NAME, DEFAULT_TOOL_NAME), sendTaskFunction)
@@ -96,14 +91,14 @@ public class AiAgentUtilsAgentClientTool {
         return ToolCallbackProvider.from(toolCallback);
     }
 
-    private static String sendTask(String baseUrl, String task) {
+    private static String sendTask(String baseUrl, Map<String, String> headers, String task) {
         StringBuilder responseBuilder = new StringBuilder();
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference<Throwable> errorReference = new AtomicReference<>();
 
         try {
             AgentCard agentCard = withEndpointUrl(
-                A2A.getAgentCard(getAgentCardBaseUrl(baseUrl), AGENT_CARD_PATH, null), getEndpointUrl(baseUrl));
+                A2A.getAgentCard(getAgentCardBaseUrl(baseUrl), AGENT_CARD_PATH, headers), getEndpointUrl(baseUrl));
 
             Client client = Client.builder(agentCard)
                 .clientConfig(new ClientConfig.Builder()
@@ -124,7 +119,7 @@ public class AiAgentUtilsAgentClientTool {
                 .build();
 
             try {
-                client.sendMessage(A2A.toUserMessage(task), null);
+                client.sendMessage(A2A.toUserMessage(task), new ClientCallContext(Map.of(), headers));
 
                 boolean completed = latch.await(RESPONSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
@@ -150,6 +145,16 @@ public class AiAgentUtilsAgentClientTool {
             throw new IllegalStateException(
                 "Failed to send task to the remote agent at " + baseUrl + ": " + exception.getMessage(), exception);
         }
+    }
+
+    static Map<String, String> getAuthorizationHeaders(Parameters connectionParameters) {
+        String token = connectionParameters.getString(TOKEN);
+
+        if (token == null || token.isBlank()) {
+            return Map.of();
+        }
+
+        return Map.of("Authorization", "Bearer " + token);
     }
 
     static String getAgentCardBaseUrl(String baseUrl) {
