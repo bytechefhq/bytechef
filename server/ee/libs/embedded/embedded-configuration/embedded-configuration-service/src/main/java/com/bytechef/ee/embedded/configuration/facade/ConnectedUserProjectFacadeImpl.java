@@ -38,6 +38,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
+import com.bytechef.ee.embedded.configuration.exception.WorkflowTemplateAlreadyCopiedException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
@@ -190,6 +191,18 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         if (!automationWorkflowTemplate) {
             throw new IllegalArgumentException("Not a published automation workflow template: " + workflowUuid);
         }
+
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
+            externalUserId, environment);
+
+        connectedUserProjectWorkflowService
+            .fetchCopiedConnectedUserProjectWorkflow(connectedUserProject.getId(), workflowUuid)
+            .ifPresent(connectedUserProjectWorkflow -> {
+                ProjectWorkflow copiedProjectWorkflow = projectWorkflowService.getProjectWorkflow(
+                    connectedUserProjectWorkflow.getProjectWorkflowId());
+
+                throw new WorkflowTemplateAlreadyCopiedException(workflowUuid, copiedProjectWorkflow.getUuidAsString());
+            });
 
         String publishedWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);
 

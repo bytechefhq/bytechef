@@ -38,6 +38,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
+import com.bytechef.ee.embedded.configuration.exception.WorkflowTemplateAlreadyCopiedException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -446,6 +447,25 @@ class ConnectedUserProjectFacadeIntTest {
                 .kind() == ConnectedUserProjectWorkflowDTO.Kind.REFERENCE)
             .singleElement()
             .satisfies(referenceDTO -> assertThat(referenceDTO.copiedFromWorkflowUuid()).isNull());
+    }
+
+    @Test
+    void testCopyWorkflowTemplateTwiceIsRefusedWithTheUuidOfTheExistingCopy() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Copy Twice");
+
+        String workflowTemplateUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        String copiedWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
+            externalUserId, workflowTemplateUuid, Environment.PRODUCTION);
+
+        assertThatThrownBy(() -> connectedUserProjectFacade.copyWorkflowTemplate(
+            externalUserId, workflowTemplateUuid, Environment.PRODUCTION))
+                .isInstanceOfSatisfying(
+                    WorkflowTemplateAlreadyCopiedException.class,
+                    workflowTemplateAlreadyCopiedException -> assertThat(
+                        workflowTemplateAlreadyCopiedException.getCopiedWorkflowUuid()).isEqualTo(copiedWorkflowUuid));
     }
 
     @Test
