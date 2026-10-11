@@ -99,6 +99,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -831,6 +832,14 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .orElseThrow(() -> new ConfigurationException(
                 "Workflow with workflowUuid: %s not exist".formatted(workflowUuid),
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
+
+        Set<Long> entitledConnectionIds = connectedUserProjectWorkflowManager.getEntitledConnectionIds(
+            connectedUserProject.getConnectedUserId(), environment);
+
+        if (!entitledConnectionIds.contains(connectionId)) {
+            throw new AccessDeniedException(
+                "Connection %s is neither owned by nor shared with the connected user".formatted(connectionId));
+        }
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey, connectionId, environment.ordinal());
