@@ -18,15 +18,24 @@ package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.ConfigureMcpServerToolCallback;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import java.lang.reflect.Field;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.core.io.ClassPathResource;
 
@@ -45,13 +54,39 @@ final class McpServerSubAgentConfigurationTest {
     }
 
     @Test
-    void testFactoryReturnsFixedClient() {
+    void testFactoryReturnsFixedClientWhenNoCandidateChatModel() {
         ChatClient fixedChatClient = mock(ChatClient.class);
 
         IntelligentToolChatClientFactory factory = configuration.mcpServerBuildSubAgentChatClientFactory(
-            fixedChatClient);
+            fixedChatClient, mock(McpProjectWorkflowFacade.class));
 
         assertThat(factory.get(null)).isSameAs(fixedChatClient);
+    }
+
+    @Test
+    void testFactoryBuildsClientOnCandidateChatModel() {
+        ChatClient fixedChatClient = mock(ChatClient.class);
+        ChatModel candidateChatModel = mock(ChatModel.class);
+
+        when(candidateChatModel.getOptions()).thenReturn(ChatOptions.builder()
+            .build());
+        when(candidateChatModel.call(any(Prompt.class)))
+            .thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage("configured")))));
+
+        IntelligentToolChatClientFactory factory = configuration.mcpServerBuildSubAgentChatClientFactory(
+            fixedChatClient, mock(McpProjectWorkflowFacade.class));
+
+        ChatClient chatClient = factory.get(candidateChatModel);
+
+        assertThat(chatClient).isNotSameAs(fixedChatClient);
+
+        String content = chatClient.prompt("configure the server")
+            .call()
+            .content();
+
+        assertThat(content).isEqualTo("configured");
+
+        verify(candidateChatModel).call(any(Prompt.class));
     }
 
     @Test
