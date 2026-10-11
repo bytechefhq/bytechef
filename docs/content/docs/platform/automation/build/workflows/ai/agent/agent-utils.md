@@ -30,12 +30,18 @@ Gives the agent an **external checklist** it maintains itself. Tasks move throug
 
 Lets the agent **delegate a complex sub-task to a specialized sub-agent** that runs in its own isolated context and reports back only its result - keeping the parent agent's context clean. Built-in sub-agent types cover common shapes (read-only exploration, general-purpose work, planning, and shell operations), and several can run in parallel. Attach a **Model** child to the Task tool to choose which model the sub-agents run on. This is the building block for the [orchestrator-workers agentic pattern](/platform/automation/build/workflows/ai/agentic-patterns).
 
-### Agent Client
+### A2A Agent Tool
 
-> **Coming soon.** The Agent Client tool is on the upcoming release track and is not yet available
+> **Coming soon.** The A2A Agent Tool is on the upcoming release track and is not yet available
 > in the latest released version of ByteChef.
 
-Delegates a task to a **remote, external agent** over the open [A2A (Agent2Agent) protocol](https://a2aproject.github.io/A2A/). The remote agent's capabilities are discovered from its agent card, and the task is sent as an A2A message - letting your agent collaborate with agents built on other frameworks.
+Delegates a task to a **remote, external agent** over the open [A2A (Agent2Agent) protocol](https://a2a-protocol.org) - letting your agent collaborate with agents built on other frameworks, or with workflows another ByteChef exposes through an [A2A Server](/platform/automation/deploy/a2a-servers).
+
+Set **Base URL** to the remote agent's address - for a ByteChef A2A Server, its endpoint URL from the server's **Connect** tab. The agent card is read from `<Base URL>/.well-known/agent-card.json`, and the task is sent as an A2A message to the Base URL; pasting the agent card URL itself also works. The tool returns the remote agent's text reply.
+
+The model sees the tool as `sendTaskToRemoteAgent` with a generic description. Give each A2A Agent Tool its own **Tool Name** and **Tool Description** - for example `askJavaReleaseExpert` - so the model knows what the remote agent is for, and can tell several remote agents apart.
+
+The tool sends no credentials, so it can call agents that accept unauthenticated requests only - for a ByteChef A2A Server, one with **Require authentication** off.
 
 ---
 
