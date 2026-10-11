@@ -95,7 +95,7 @@ public class WorkflowCallWorkflowTool {
             Map<String, ?> inputs = inputParameters.getMap(INPUTS, Collections.emptyMap());
 
             if (context.isEditorEnvironment()) {
-                return subflowSyncExecutor.execute(workflowUuid, NEW_WORKFLOW_CALL, inputs, true);
+                return SubflowToolSupport.executeSynchronously(subflowSyncExecutor, workflowUuid, inputs, true);
             }
 
             ActionContextAware actionContextAware;
@@ -104,6 +104,10 @@ public class WorkflowCallWorkflowTool {
                 actionContextAware = SubflowToolSupport.requireGuardsPassed(context, "callWorkflow", TOOL_LABEL);
             } catch (SubflowToolSupport.GuardFailure guardFailure) {
                 return guardFailure.getMessage();
+            }
+
+            if (SubflowToolSupport.isSyncJob(actionContextAware, subflowSyncExecutor)) {
+                return SubflowToolSupport.executeSynchronously(subflowSyncExecutor, workflowUuid, inputs, false);
             }
 
             Subflow subflow;

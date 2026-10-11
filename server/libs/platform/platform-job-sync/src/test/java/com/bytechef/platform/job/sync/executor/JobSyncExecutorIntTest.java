@@ -577,6 +577,20 @@ class JobSyncExecutorIntTest {
     }
 
     @Test
+    void testStartJobMarksTheJobAsASyncExecution() {
+        long jobId = jobSyncExecutor.startJob(
+            new JobParametersDTO(OUTPUT_WORKFLOW_ID, Map.of(), Map.of("existing", "value")));
+
+        jobSyncExecutor.awaitJob(jobId, true);
+
+        Job job = jobService.getJob(jobId);
+
+        assertThat(job.getMetadata())
+            .containsEntry(MetadataConstants.SYNC_EXECUTION, true)
+            .containsEntry("existing", "value");
+    }
+
+    @Test
     void testSseStreamRunsBeforeSuspend() throws Exception {
         RecordingSseStreamBridge recordingSseStreamBridge = new RecordingSseStreamBridge();
 
