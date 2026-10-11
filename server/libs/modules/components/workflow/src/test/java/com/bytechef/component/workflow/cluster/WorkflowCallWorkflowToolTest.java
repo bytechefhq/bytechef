@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -170,6 +171,57 @@ class WorkflowCallWorkflowToolTest {
 
         assertEquals(Map.of("total", 10), result);
         verify(context, never()).toActionContext(any(), anyInt(), any(), any());
+    }
+
+    @Test
+    void testToolRunsTheSubflowSynchronouslyInASyncJob() throws Exception {
+        SubflowDataSource subflowDataSource = mock(SubflowDataSource.class);
+        SubflowResolver subflowResolver = mock(SubflowResolver.class);
+        SubflowSyncExecutor subflowSyncExecutor = mock(SubflowSyncExecutor.class);
+
+        when(subflowSyncExecutor.isSyncJob(42L)).thenReturn(true);
+        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of("amount", 5), false))
+            .thenReturn(Map.of("total", 10));
+
+        TestAgentContext agentContext = mock(TestAgentContext.class);
+
+        when(agentContext.getJobId()).thenReturn(42L);
+
+        ClusterElementContextAware context = mock(
+            ClusterElementContextAware.class,
+            withSettings().extraInterfaces(ClusterElementContext.class));
+
+        when(context.toActionContext("workflow", 1, "callWorkflow", null)).thenReturn(agentContext);
+
+        Object result = getToolFunction(subflowDataSource, subflowResolver, subflowSyncExecutor).apply(
+            MockParametersFactory.create(Map.of("workflowUuid", "uuid-1", "inputs", Map.of("amount", 5))),
+            MockParametersFactory.create(Map.of()), (ClusterElementContext) context);
+
+        assertEquals(Map.of("total", 10), result);
+        verify(agentContext, never()).suspend(any());
+        verify(subflowResolver, never()).resolveSubflow(any(), any(), anyBoolean());
+    }
+
+    @Test
+    void testToolReturnsErrorWhenTheSynchronousSubflowFails() throws Exception {
+        SubflowSyncExecutor subflowSyncExecutor = mock(SubflowSyncExecutor.class);
+
+        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of(), true))
+            .thenThrow(new IllegalStateException("Step 'approve' (approval/v1/requestApproval) would pause it."));
+
+        ClusterElementContext context = mock(ClusterElementContext.class);
+
+        when(context.isEditorEnvironment()).thenReturn(true);
+
+        Object result = getToolFunction(
+            mock(SubflowDataSource.class), mock(SubflowResolver.class), subflowSyncExecutor).apply(
+                MockParametersFactory.create(Map.of("workflowUuid", "uuid-1")),
+                MockParametersFactory.create(Map.of()), context);
+
+        assertEquals(
+            SubflowToolSupport.ERROR_SYNC_EXECUTION_FAILED_PREFIX +
+                "Step 'approve' (approval/v1/requestApproval) would pause it.",
+            result);
     }
 
     @Test
