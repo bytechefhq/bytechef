@@ -13,7 +13,6 @@ import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowTempla
 import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
-import com.bytechef.ee.embedded.configuration.exception.WorkflowTemplateAlreadyCopiedException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
@@ -507,14 +506,6 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<Object> handleMissingInputException(MissingInputException missingInputException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(Map.of("missingInputName", missingInputException.getInputName()));
-    }
-
-    @ExceptionHandler(WorkflowTemplateAlreadyCopiedException.class)
-    public ResponseEntity<Object> handleWorkflowTemplateAlreadyCopiedException(
-        WorkflowTemplateAlreadyCopiedException workflowTemplateAlreadyCopiedException) {
-
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body(Map.of("copiedWorkflowUuid", workflowTemplateAlreadyCopiedException.getCopiedWorkflowUuid()));
     }
 
     @InitBinder

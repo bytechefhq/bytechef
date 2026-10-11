@@ -17,7 +17,6 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ProvisionWo
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendWorkflowConfigurationConnectionRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateWorkflowInputsRequestModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowTemplateAlreadyCopiedErrorModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -62,7 +61,6 @@ public interface ConnectedUserProjectWorkflowApi {
      * @param workflowUuid The workflow template uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return The new workflow uuid. (status code 200)
-     *         or The connected user has already copied this automation workflow template. (status code 409)
      */
     @Operation(
         operationId = "copyFrontendWorkflowTemplate",
@@ -72,9 +70,6 @@ public interface ConnectedUserProjectWorkflowApi {
         responses = {
             @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
-            }),
-            @ApiResponse(responseCode = "409", description = "The connected user has already copied this automation workflow template.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowTemplateAlreadyCopiedErrorModel.class))
             })
         },
         security = {
@@ -104,7 +99,6 @@ public interface ConnectedUserProjectWorkflowApi {
      * @param workflowUuid The workflow template uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return The new workflow uuid. (status code 200)
-     *         or The connected user has already copied this automation workflow template. (status code 409)
      */
     @Operation(
         operationId = "copyWorkflowTemplate",
@@ -114,9 +108,6 @@ public interface ConnectedUserProjectWorkflowApi {
         responses = {
             @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
-            }),
-            @ApiResponse(responseCode = "409", description = "The connected user has already copied this automation workflow template.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowTemplateAlreadyCopiedErrorModel.class))
             })
         },
         security = {

@@ -42,4 +42,3 @@ export * from './UpdateFrontendIntegrationInstanceWorkflowRequest';
 export * from './UpdateFrontendWorkflowConfigurationConnectionRequest';
 export * from './UpdateWorkflowInputsRequest';
 export * from './Workflow';
-export * from './WorkflowTemplateAlreadyCopiedError';
