@@ -57,6 +57,7 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
 
     private static final String API_PLATFORM_SCOPE_PREFIX = "API_PLATFORM_";
     private static final String CONNECTION = "Connection";
+    private static final String CONNECTION_VIEW = "CONNECTION_VIEW";
     private static final String DEPLOYMENT_SCOPE_PREFIX = "DEPLOYMENT_";
     private static final String WORKFLOW_VIEW = "WORKFLOW_VIEW";
 
@@ -199,7 +200,15 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
         }
 
         if (CONNECTION.equals(resourceType)) {
-            return ownsConnection(connectedUser, id) ? Decision.GRANT : Decision.DENY;
+            if (ownsConnection(connectedUser, id)) {
+                return Decision.GRANT;
+            }
+
+            if (CONNECTION_VIEW.equals(scope) && isSharedConnection(connectedUser, id)) {
+                return Decision.GRANT;
+            }
+
+            return Decision.DENY;
         }
 
         if (!PROJECT_BEARING_TYPES.contains(resourceType)) {
@@ -266,6 +275,20 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
                 publishedProject.lastPublishedVersion(), projectWorkflow.getProjectVersion()))
             .flatMap(publishedProject -> CollectionUtils.stream(publishedProject.workflowTemplates()))
             .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid));
+    }
+
+    private boolean isSharedConnection(ConnectedUserAuthentication connectedUser, Serializable id) {
+        if (!(id instanceof Number number)) {
+            return false;
+        }
+
+        Set<Long> sharedConnectionIds = connectedUserConnectionService.getSharedConnectionIds();
+
+        if (!sharedConnectionIds.contains(number.longValue())) {
+            return false;
+        }
+
+        return isInPrincipalEnvironment(connectedUser, id, CONNECTION);
     }
 
     private boolean ownsConnection(ConnectedUserAuthentication connectedUser, Serializable id) {
