@@ -159,17 +159,17 @@ const McpServerDialog = ({
                                     name="authenticationRequired"
                                     render={({field}) => (
                                         <FormItem>
-                                            <div className="flex items-center space-x-2">
+                                            <FormLabel>Require authentication</FormLabel>
+
+                                            <div className="flex items-center gap-2">
                                                 <FormControl>
                                                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                                 </FormControl>
 
-                                                <FormLabel className="font-normal">Require authentication</FormLabel>
+                                                <FormDescription>
+                                                    Require an API key or OAuth token in addition to the server URL.
+                                                </FormDescription>
                                             </div>
-
-                                            <FormDescription>
-                                                Require an API key or OAuth token in addition to the server URL.
-                                            </FormDescription>
 
                                             <FormMessage />
                                         </FormItem>
