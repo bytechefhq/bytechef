@@ -113,13 +113,13 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                                     id: id!,
                                     tags: tagList || [],
                                 })}
-                                id={parseInt(a2aServer.id)}
+                                id={Number.parseInt(a2aServer.id)}
                                 remainingTags={tags
                                     ?.filter((tag) => !a2aServerTagIds?.includes(tag.id))
-                                    .map((tag) => ({id: parseInt(tag.id), name: tag.name}))}
+                                    .map((tag) => ({id: Number.parseInt(tag.id), name: tag.name}))}
                                 tags={(a2aServer.tags ?? [])
                                     .filter((tag) => tag != null)
-                                    .map((tag) => ({id: parseInt(tag!.id), name: tag!.name}))}
+                                    .map((tag) => ({id: Number.parseInt(tag!.id), name: tag!.name}))}
                                 updateTagsMutation={updateA2aServerTagsMutation}
                             />
 
