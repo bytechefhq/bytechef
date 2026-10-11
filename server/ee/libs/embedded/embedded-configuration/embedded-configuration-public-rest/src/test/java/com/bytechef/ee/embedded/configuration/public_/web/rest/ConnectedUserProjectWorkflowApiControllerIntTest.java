@@ -32,7 +32,6 @@ import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowTempla
 import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
-import com.bytechef.ee.embedded.configuration.exception.WorkflowTemplateAlreadyCopiedException;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
@@ -193,27 +192,6 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
 
         expectCopyNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
         expectCopyNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
-    }
-
-    @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
-    void testCopyFrontendWorkflowTemplateAlreadyCopiedReturns409WithTheExistingCopyUuid() {
-        String copiedWorkflowUuid = "copied-workflow-uuid-1";
-
-        when(connectedUserProjectFacade.copyWorkflowTemplate(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class)))
-                .thenThrow(new WorkflowTemplateAlreadyCopiedException(WORKFLOW_UUID, copiedWorkflowUuid));
-
-        webTestClient
-            .post()
-            .uri("/v1/automation/workflow-templates/{workflowUuid}/copy", WORKFLOW_UUID)
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isEqualTo(409)
-            .expectBody()
-            .jsonPath("$.copiedWorkflowUuid")
-            .isEqualTo(copiedWorkflowUuid);
     }
 
     @Test
