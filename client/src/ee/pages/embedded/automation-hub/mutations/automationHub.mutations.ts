@@ -28,6 +28,27 @@ export const useDeprovisionReferenceMutation = () => {
     });
 };
 
+export interface ProvisionReferenceRequestI {
+    connections: Record<string, number>;
+    inputs?: Record<string, unknown>;
+    workflowUuid: string;
+}
+
+export const useProvisionReferenceMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<void, Error, ProvisionReferenceRequestI>({
+        mutationFn: ({connections, inputs, workflowUuid}) =>
+            new ConnectedUserProjectWorkflowApi().provisionFrontendWorkflowReference({
+                provisionWorkflowReferenceRequest: {connections, inputs},
+                workflowUuid,
+            }),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({queryKey: AutomationHubKeys.automations});
+        },
+    });
+};
+
 export interface SetAutomationEnabledRequestI {
     enabled: boolean;
     workflowUuid: string;

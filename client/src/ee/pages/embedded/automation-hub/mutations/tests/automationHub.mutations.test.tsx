@@ -5,6 +5,7 @@ import {
     useDeleteAutomationMutation,
     useDeleteHubConnectionMutation,
     useDeprovisionReferenceMutation,
+    useProvisionReferenceMutation,
     usePublishAutomationMutation,
     useSetAutomationEnabledMutation,
     useUpdateAutomationInputsMutation,
@@ -24,6 +25,7 @@ const {connectedUserProjectWorkflowApiMock, connectionApiMock} = vi.hoisted(() =
         deprovisionFrontendWorkflowReference: vi.fn(),
         disableFrontendProjectWorkflow: vi.fn(),
         enableFrontendProjectWorkflow: vi.fn(),
+        provisionFrontendWorkflowReference: vi.fn(),
         publishFrontendProjectWorkflow: vi.fn(),
         updateFrontendProjectWorkflowInputs: vi.fn(),
         updateFrontendWorkflowConfigurationConnection: vi.fn(),
@@ -96,6 +98,24 @@ describe('automationHub.mutations', () => {
 
         expect(connectedUserProjectWorkflowApiMock.deprovisionFrontendWorkflowReference).toHaveBeenCalledWith({
             workflowUuid: 'reference-uuid',
+        });
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: AutomationHubKeys.automations});
+    });
+
+    it('provisions a reference with the chosen connections and inputs and refreshes the automations', async () => {
+        const {invalidateQueriesSpy, result} = renderMutationHook(useProvisionReferenceMutation);
+
+        await act(async () => {
+            await result.current.mutateAsync({
+                connections: {slack: 7},
+                inputs: {sheetName: 'Leads'},
+                workflowUuid: 'template-uuid',
+            });
+        });
+
+        expect(connectedUserProjectWorkflowApiMock.provisionFrontendWorkflowReference).toHaveBeenCalledWith({
+            provisionWorkflowReferenceRequest: {connections: {slack: 7}, inputs: {sheetName: 'Leads'}},
+            workflowUuid: 'template-uuid',
         });
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: AutomationHubKeys.automations});
     });
