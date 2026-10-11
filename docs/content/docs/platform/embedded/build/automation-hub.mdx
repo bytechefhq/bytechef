@@ -51,7 +51,7 @@ The component renders `automation-hub.html` from your ByteChef host, waits for t
 | `className` | `string` | - | Class for the wrapping element. Give it a height; the iframe fills it. |
 | `tabs` | `{automations?, connections?, newWorkflow?}` | all `true` | Which parts of the hub are shown. See [Tabs](#tabs). |
 | `connectionDialogAllowed` | `boolean` | `true` | Whether users can create a new connection from the activation wizard and the builder. When `false`, they can only pick existing connections. |
-| `editWorkflowAllowed` | `boolean` | `true` | Whether the activation wizard offers **Edit workflow** and **Open in builder**. |
+| `editWorkflowAllowed` | `boolean` | `true` | Whether users can open copies of your templates in the builder: **Edit workflow** and **Open in builder** in the activation wizard, and **Customize** on a card. Blank automations stay editable while `tabs.newWorkflow` is on. |
 | `includeComponents` | `string[]` | - | Restricts the components offered in the builder to these names. |
 | `defaultLayout` | `'grid' \| 'list'` | `'grid'` | The initial catalog layout. |
 | `layoutSwitcherAllowed` | `boolean` | `true` | Whether users can switch between grid and list. When `false`, `defaultLayout` always applies. |
@@ -78,7 +78,7 @@ Each published template appears as a card with its label, description, and the i
 A template the user has not activated shows **Use**, which opens the activation wizard. Once activated, the card shows the automation's version, an **Enable** / **Disable** button, and a menu:
 
 - **Settings** - edit the workflow inputs. Shown only when the template has inputs.
-- **Customize** - open the user's copy in the builder.
+- **Customize** - open the user's copy in the builder. Shown only for a copy, never for a reference (see [Copies and references](#copies-and-references)).
 - **Remove** - delete the automation after a confirmation.
 
 **Enable** is unavailable for an automation that has not been published from the builder yet, and for one whose template is gone (see [Needs attention](#needs-attention)). If enabling fails because a connection or a required input is missing, the hub says which and, for an input, opens the settings dialog.
@@ -89,13 +89,15 @@ The wizard has up to three steps:
 
 1. **Connect** - one account picker per component that needs a connection. **Connect** next to a picker creates a new connection, unless `connectionDialogAllowed` is `false`. Skipped when the template needs no connections.
 2. **Configure** - one field per workflow input. Required inputs must be filled. Skipped when the template has no inputs.
-3. **Activate** - the hub copies the template for this user, wires the chosen connections into it, publishes and saves the inputs, and turns it on. If any step fails, the copy is removed so the user can try again.
+3. **Activate** - the hub gives the user a reference to the template with the chosen connections and inputs, and turns it on. If this fails, the reference is removed so the user can try again.
 
-When it finishes the user sees "Your automation is running". With `editWorkflowAllowed`, **Edit workflow** copies the template and opens it in the builder without activating it, and **Open in builder** opens the finished automation.
+When it finishes the user sees "Your automation is running". With `editWorkflowAllowed`, **Edit workflow** instead copies the template and opens the copy in the builder. Activating after that turns on the copy rather than adding a reference, and **Open in builder** then opens it.
 
 ### The builder
 
 **Customize**, **Edit workflow**, and **New Automation** open the embedded [workflow builder](/platform/embedded/build/automations/automation-workflows) inside the hub, with a back arrow to the catalog. The builder honors the hub's `connectionDialogAllowed` and `includeComponents`. Users publish from the builder header before they can enable the automation.
+
+The builder opens only what a user may edit: a copy of a template needs `editWorkflowAllowed`, a blank automation needs `editWorkflowAllowed` or `tabs.newWorkflow`, and a reference never opens. Otherwise the hub returns to the catalog.
 
 ### Connections
 
@@ -109,9 +111,9 @@ Automations created from a template that is no longer published, or that need ac
 
 ## Copies and references
 
-An automation a user activates in the hub is a **copy**: the user's own editable workflow, made from the last published version of your template. Publishing a new version of the catalog project does not change existing copies.
+An automation a user activates in the hub is a **reference**: it points at your catalog workflow rather than duplicating it, and holds only the user's connections and inputs. References follow your catalog: when you publish a new project version they move to it, and when you remove the workflow from the project or delete the project they are disabled and marked as needing attention. Outside the hub, create references with the provision operation in the [API reference](/openapi/frontend/embedded-configuration-connected-user-project-workflow).
 
-The embedded API can also give a user a **reference** instead - an automation that points at your catalog workflow rather than duplicating it. References follow your catalog: when you publish a new project version they move to it, and when you remove the workflow from the project or delete the project they are disabled and marked as needing attention. The hub shows and manages references, but creates only copies; create references with the provision operation in the [API reference](/openapi/frontend/embedded-configuration-connected-user-project-workflow).
+**Edit workflow** makes a **copy** instead: the user's own editable workflow, made from the last published version of your template. Publishing a new version of the catalog project does not change existing copies. Turn `editWorkflowAllowed` off to keep users on references only.
 
 ## Controlling what appears in the hub
 
