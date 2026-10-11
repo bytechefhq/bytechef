@@ -50,13 +50,15 @@ Expand the server row. It has **Component Tools**, **Workflow Tools** and **Conn
 - **Add Component** (on the **Component Tools** tab) -- opens a two-step dialog: **Select Component** (pick the third-party component) then **Select Tools from &lt;component&gt;** (choose which of its actions are exposed as tools, and configure each tool's parameters).
 - **Add Workflows** (on the **Workflow Tools** tab) -- pick an integration instance configuration, then the workflows within it to expose. Only workflows carrying a **New Workflow Call** trigger are eligible; a configuration with none shows "No tool-eligible workflows found".
 
+Each exposed workflow's ellipsis (⋮) menu has **Configure** (its tool mapping), **Edit** (its connections and inputs in the integration instance configuration) and **Delete**.
+
 For each exposed component action, you choose which parameters you fix yourself and which the connected agent fills at call time, using the `fromAi(...)` expression - the same mechanism as attaching tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
 
 <!-- TODO screenshot: Add Component dialog on the Select Tools step, showing the list of the component's actions with per-tool selection and the tool properties popover -->
 
 ### Enabling and disabling individual tools
 
-Expand a server row, then expand one of its components to see the tools it exposes. Each tool has a switch, a **Configure** button that opens the tool's parameters, and a **Delete** button.
+Expand a server row, then expand one of its components to see the tools it exposes. Each tool has a switch and an ellipsis (⋮) menu with **Configure**, which opens the tool's parameters, and **Delete**.
 
 - **Switch on** - the tool is offered to agents.
 - **Switch off** - the tool is not offered to any agent and cannot be called, whatever a connected user has enabled for themselves.
