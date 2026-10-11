@@ -26,6 +26,7 @@ import io.a2a.spec.AgentCapabilities;
 import io.a2a.spec.AgentCard;
 import io.a2a.spec.AgentInterface;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -131,8 +132,7 @@ class A2aAgentToolTest {
     @Test
     void testGetAuthorizationHeadersSendsTheTokenAsABearerHeader() {
         Map<String, String> headers = A2aAgentTool.getAuthorizationHeaders(
-            ParametersFactory.create(Map.of("agentUrl", "http://localhost:9555/api/automation/a2a/secret", "token",
-                "api-key")));
+            ParametersFactory.create(Map.of("token", "api-key")));
 
         assertThat(headers).containsExactly(Map.entry("Authorization", "Bearer api-key"));
     }
@@ -147,10 +147,12 @@ class A2aAgentToolTest {
     }
 
     private static ToolDefinition getToolDefinition(Map<String, ?> inputParameters) {
+        Map<String, Object> toolInputParameters = new HashMap<>(inputParameters);
+
+        toolInputParameters.put("agentUrl", "http://localhost:9555/api/automation/a2a/secret");
+
         ToolCallback[] toolCallbacks = A2aAgentTool.apply(
-            ParametersFactory.create(inputParameters),
-            ParametersFactory.create(Map.of("agentUrl", "http://localhost:9555/api/automation/a2a/secret")),
-            mock(Context.class))
+            ParametersFactory.create(toolInputParameters), ParametersFactory.create(Map.of()), mock(Context.class))
             .getToolCallbacks();
 
         assertThat(toolCallbacks).hasSize(1);

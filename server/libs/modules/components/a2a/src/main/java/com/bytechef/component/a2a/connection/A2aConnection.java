@@ -16,7 +16,6 @@
 
 package com.bytechef.component.a2a.connection;
 
-import static com.bytechef.component.a2a.constant.A2aConstants.AGENT_URL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
@@ -31,14 +30,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public class A2aConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .properties(
-            string(AGENT_URL)
-                .label("Agent URL")
-                .description(
-                    "The URL of the remote A2A agent - for a ByteChef A2A Server, the endpoint URL from the server's " +
-                        "Connect tab. The agent card is read from <Agent URL>/.well-known/agent-card.json.")
-                .required(true))
-        .authorizationRequired(false)
         .authorizations(
             authorization(AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")
