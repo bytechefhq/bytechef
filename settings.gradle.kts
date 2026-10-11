@@ -258,6 +258,7 @@ include("server:libs:platform:platform-workflow:platform-workflow-execution:plat
 include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service")
 include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service")
 
+include("server:libs:modules:components:a2a")
 include("server:libs:modules:components:accelo")
 include("server:libs:modules:components:active-campaign")
 include("server:libs:modules:components:acumbamail")
