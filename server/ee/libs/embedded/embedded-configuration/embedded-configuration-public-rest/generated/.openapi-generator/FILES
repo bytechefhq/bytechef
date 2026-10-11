@@ -50,5 +50,4 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Upda
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendWorkflowConfigurationConnectionRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateWorkflowInputsRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/WorkflowModel.java
-src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/WorkflowTemplateAlreadyCopiedErrorModel.java
 src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

@@ -56,7 +56,6 @@ docs/UpdateFrontendIntegrationInstanceWorkflowRequest.md
 docs/UpdateFrontendWorkflowConfigurationConnectionRequest.md
 docs/UpdateWorkflowInputsRequest.md
 docs/Workflow.md
-docs/WorkflowTemplateAlreadyCopiedError.md
 index.ts
 models/AuthorizationType.ts
 models/AutomationWorkflowProject.ts
@@ -100,6 +99,5 @@ models/UpdateFrontendIntegrationInstanceWorkflowRequest.ts
 models/UpdateFrontendWorkflowConfigurationConnectionRequest.ts
 models/UpdateWorkflowInputsRequest.ts
 models/Workflow.ts
-models/WorkflowTemplateAlreadyCopiedError.ts
 models/index.ts
 runtime.ts

@@ -38,7 +38,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
-import com.bytechef.ee.embedded.configuration.exception.WorkflowTemplateAlreadyCopiedException;
+import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -462,10 +462,12 @@ class ConnectedUserProjectFacadeIntTest {
 
         assertThatThrownBy(() -> connectedUserProjectFacade.copyWorkflowTemplate(
             externalUserId, workflowTemplateUuid, Environment.PRODUCTION))
-                .isInstanceOfSatisfying(
-                    WorkflowTemplateAlreadyCopiedException.class,
-                    workflowTemplateAlreadyCopiedException -> assertThat(
-                        workflowTemplateAlreadyCopiedException.getCopiedWorkflowUuid()).isEqualTo(copiedWorkflowUuid));
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> {
+                    assertThat(configurationException.getErrorKey()).isEqualTo(
+                        ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_ALREADY_COPIED.getErrorKey());
+                    assertThat(configurationException.getInputParameters()
+                        .get("copiedWorkflowUuid")).isEqualTo(copiedWorkflowUuid);
+                });
     }
 
     @Test
