@@ -40,6 +40,7 @@ import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentica
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,6 +82,7 @@ class ConnectedUserAccessDeciderTest {
     @Mock
     private ProjectWorkflowService projectWorkflowService;
 
+    private ResourceEnvironmentResolver connectionEnvironmentResolver;
     private ResourceEnvironmentResolver projectDeploymentEnvironmentResolver;
     private ResourceOwnershipResolver projectDeploymentResolver;
     private ResourceEnvironmentResolver projectDeploymentWorkflowEnvironmentResolver;
@@ -90,6 +92,7 @@ class ConnectedUserAccessDeciderTest {
 
     @BeforeEach
     void setUp() {
+        connectionEnvironmentResolver = environmentResolver("Connection");
         projectDeploymentEnvironmentResolver = environmentResolver("ProjectDeployment");
         projectDeploymentResolver = resolver("ProjectDeployment");
         projectDeploymentWorkflowEnvironmentResolver = environmentResolver("ProjectDeploymentWorkflow");
@@ -99,7 +102,9 @@ class ConnectedUserAccessDeciderTest {
         decider = new ConnectedUserAccessDeciderImpl(
             automationWorkflowProjectFacade, connectedUserConnectionService, connectedUserProjectService,
             integrationInstanceService, projectService, projectWorkflowService,
-            List.of(projectDeploymentEnvironmentResolver, projectDeploymentWorkflowEnvironmentResolver),
+            List.of(
+                connectionEnvironmentResolver, projectDeploymentEnvironmentResolver,
+                projectDeploymentWorkflowEnvironmentResolver),
             List.of(projectDeploymentResolver, projectDeploymentWorkflowResolver, projectResolver));
 
         SecurityContextHolder.getContext()
@@ -277,6 +282,26 @@ class ConnectedUserAccessDeciderTest {
 
         assertThat(decider.decide(8L, "Connection", "CONNECTION_VIEW")).isEqualTo(Decision.GRANT);
         assertThat(decider.decide(9L, "Connection", "CONNECTION_VIEW")).isEqualTo(Decision.DENY);
+    }
+
+    @Test
+    void testConnectionSharedWithEveryConnectedUserIsGrantedForViewInThePrincipalsEnvironment() {
+        when(connectedUserConnectionService.getConnectionIds(42L)).thenReturn(List.of());
+        when(connectedUserConnectionService.getSharedConnectionIds()).thenReturn(Set.of(13L, 14L));
+        when(connectionEnvironmentResolver.fetchEnvironment(13L)).thenReturn(Optional.of(Environment.PRODUCTION));
+        when(connectionEnvironmentResolver.fetchEnvironment(14L)).thenReturn(Optional.of(Environment.DEVELOPMENT));
+
+        assertThat(decider.decide(13L, "Connection", "CONNECTION_VIEW")).isEqualTo(Decision.GRANT);
+        assertThat(decider.decide(14L, "Connection", "CONNECTION_VIEW")).isEqualTo(Decision.DENY);
+        assertThat(decider.decide(15L, "Connection", "CONNECTION_VIEW")).isEqualTo(Decision.DENY);
+    }
+
+    @Test
+    void testConnectionSharedWithEveryConnectedUserIsDeniedForAnyScopeButView() {
+        when(connectedUserConnectionService.getConnectionIds(42L)).thenReturn(List.of());
+
+        assertThat(decider.decide(13L, "Connection", "CONNECTION_EDIT")).isEqualTo(Decision.DENY);
+        assertThat(decider.decide(13L, "Connection", "CONNECTION_DELETE")).isEqualTo(Decision.DENY);
     }
 
     @Test
