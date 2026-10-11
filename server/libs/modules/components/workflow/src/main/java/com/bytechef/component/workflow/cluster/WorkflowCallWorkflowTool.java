@@ -95,19 +95,24 @@ public class WorkflowCallWorkflowTool {
             Map<String, ?> inputs = inputParameters.getMap(INPUTS, Collections.emptyMap());
 
             if (context.isEditorEnvironment()) {
-                return SubflowToolSupport.executeSynchronously(subflowSyncExecutor, workflowUuid, inputs, true);
+                return SubflowToolSupport.executeSynchronously(
+                    subflowSyncExecutor, workflowUuid, inputs, true,
+                    SubflowToolSupport.findCallerJobId(context, "callWorkflow"));
             }
 
             ActionContextAware actionContextAware;
 
-            try {
-                actionContextAware = SubflowToolSupport.requireGuardsPassed(context, "callWorkflow", TOOL_LABEL);
-            } catch (SubflowToolSupport.GuardFailure guardFailure) {
-                return guardFailure.getMessage();
+            switch (SubflowToolSupport.checkAgentContext(context, "callWorkflow", TOOL_LABEL)) {
+                case SubflowToolSupport.AgentContextCheck.Rejected rejected -> {
+                    return rejected.error();
+                }
+                case SubflowToolSupport.AgentContextCheck.Passed passed -> actionContextAware =
+                    passed.actionContextAware();
             }
 
             if (SubflowToolSupport.isSyncJob(actionContextAware, subflowSyncExecutor)) {
-                return SubflowToolSupport.executeSynchronously(subflowSyncExecutor, workflowUuid, inputs, false);
+                return SubflowToolSupport.executeSynchronously(
+                    subflowSyncExecutor, workflowUuid, inputs, false, actionContextAware.getJobId());
             }
 
             Subflow subflow;
@@ -116,10 +121,10 @@ public class WorkflowCallWorkflowTool {
                 subflow = subflowResolver.resolveSubflow(workflowUuid, NEW_WORKFLOW_CALL, false);
             } catch (RuntimeException exception) {
                 log.warn(
-                    "Sub-workflow resolution failed for uuid={} (jobId={}): {}",
-                    workflowUuid, actionContextAware.getJobId(), exception.getMessage());
+                    "Sub-workflow resolution failed for uuid={} (jobId={})", workflowUuid,
+                    actionContextAware.getJobId(), exception);
 
-                return ERROR_RESOLVE_FAILED_PREFIX + exception.getMessage();
+                return ERROR_RESOLVE_FAILED_PREFIX + SubflowToolSupport.describe(exception);
             }
 
             return SubflowToolSupport.suspendForSubflow(actionContextAware, subflow, inputs);

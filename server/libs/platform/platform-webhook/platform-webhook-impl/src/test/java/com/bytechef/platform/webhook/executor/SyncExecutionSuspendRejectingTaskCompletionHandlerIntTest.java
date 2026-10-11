@@ -24,7 +24,9 @@ import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWor
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
@@ -43,6 +45,7 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext.Suspend;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -50,9 +53,12 @@ import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
+import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
+import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,13 +73,14 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Ivica Cardic
  */
-class SyncExecutionSuspendRejectingIntTest {
+class SyncExecutionSuspendRejectingTaskCompletionHandlerIntTest {
 
     private static final String TENANT = "public";
 
     private final AtomicBoolean nextStepRan = new AtomicBoolean();
 
     private JobService jobService;
+    private TaskExecutionService taskExecutionService;
     private JobSyncExecutor jobSyncExecutor;
     private WorkflowService workflowService;
 
@@ -91,7 +98,7 @@ class SyncExecutionSuspendRejectingIntTest {
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
-        TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
+        taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
 
         jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
@@ -119,13 +126,22 @@ class SyncExecutionSuspendRejectingIntTest {
             asyncMessageBroker.send(messageEvent.getRoute(), messageEvent);
         };
 
+        Evaluator evaluator = SpelEvaluator.create();
+
         List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories = List.of(
             (taskCompletionHandler, taskDispatcher) -> new SyncExecutionSuspendRejectingTaskCompletionHandler(
-                eventPublisher, jobService, taskExecutionService, WebhookWorkflowExecutorImpl.SUSPENDING_TASK_MESSAGE));
+                eventPublisher, jobService, taskExecutionService, WebhookWorkflowExecutorImpl::suspendingTaskMessage),
+            (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
+                contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage));
+
+        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories = List.of(
+            taskDispatcher -> new ConditionTaskDispatcher(
+                contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage));
 
         jobSyncExecutor = new JobSyncExecutor(
-            contextService, SpelEvaluator.create(), jobService, -1, asyncMessageBroker, List.of(),
-            taskCompletionHandlerFactories, List.of(), List.of(), List.of(), taskExecutionService,
+            contextService, evaluator, jobService, -1, asyncMessageBroker, List.of(), taskCompletionHandlerFactories,
+            List.of(), List.of(), taskDispatcherResolverFactories, taskExecutionService,
             new SyncTaskExecutor(), taskHandlerMap::get, taskFileStorage, 10, workflowService);
     }
 
@@ -139,9 +155,30 @@ class SyncExecutionSuspendRejectingIntTest {
             taskExecutionCompleteEvent -> {}))
                 .isInstanceOf(ExecutionException.class)
                 .hasMessage(
-                    String.format(WebhookWorkflowExecutorImpl.SUSPENDING_TASK_MESSAGE, "approve", "test/v1/suspend"));
+                    WebhookWorkflowExecutorImpl.suspendingTaskMessage("approve", "test/v1/suspend"));
 
         assertThat(nextStepRan).isFalse();
+    }
+
+    @Test
+    void testSuspendingStepInsideAConditionFailsTheRunAndItsParent() {
+        String workflowId = EncodingUtils.base64EncodeToString("syncSuspendNested");
+
+        Job job = jobSyncExecutor.execute(
+            new JobParametersDTO(workflowId, Map.of()),
+            jobParametersDTO -> jobService.create(jobParametersDTO, workflowService.getWorkflow(workflowId)), false,
+            taskExecutionCompleteEvent -> {});
+
+        assertThat(job.getStatus()).isEqualTo(Job.Status.FAILED);
+        assertThat(job.getError()
+            .getMessage()).isEqualTo(
+                WebhookWorkflowExecutorImpl.suspendingTaskMessage("approve", "test/v1/suspend"));
+        assertThat(nextStepRan).isFalse();
+        assertThat(taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(job.getId())))
+            .filteredOn(taskExecution -> "condition_1".equals(taskExecution.getName()))
+            .singleElement()
+            .extracting(TaskExecution::getStatus)
+            .isEqualTo(TaskExecution.Status.FAILED);
     }
 
     @Test
@@ -157,7 +194,7 @@ class SyncExecutionSuspendRejectingIntTest {
         assertThat(job.getError()).isNotNull();
         assertThat(job.getError()
             .getMessage()).isEqualTo(
-                String.format(WebhookWorkflowExecutorImpl.SUSPENDING_TASK_MESSAGE, "approve", "test/v1/suspend"));
+                WebhookWorkflowExecutorImpl.suspendingTaskMessage("approve", "test/v1/suspend"));
         assertThat(nextStepRan).isFalse();
     }
 }

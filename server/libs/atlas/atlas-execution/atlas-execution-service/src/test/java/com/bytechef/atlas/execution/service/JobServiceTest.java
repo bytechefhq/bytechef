@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 class JobServiceTest {
 
     private static final long JOB_ID = 7L;
+    private static final long PARENT_TASK_EXECUTION_ID = 11L;
     private static final Instant ORIGINAL_START_DATE = Instant.parse("2026-09-07T18:47:00Z");
 
     private final JobRepository jobRepository = mock(JobRepository.class);
@@ -71,6 +72,28 @@ class JobServiceTest {
     @Test
     void testResumeToStatusStartedRejectsCompletedJob() {
         stubJob(Job.Status.COMPLETED);
+
+        assertThatThrownBy(() -> jobService.resumeToStatusStarted(JOB_ID))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        verify(jobRepository, never()).save(any());
+    }
+
+    @Test
+    void testResumeToStatusStartedResumesSuspendedSubflowChild() {
+        Job job = stubJob(Job.Status.STOPPED);
+
+        job.setParentTaskExecutionId(PARENT_TASK_EXECUTION_ID);
+
+        assertThat(jobService.resumeToStatusStarted(JOB_ID)
+            .getStatus()).isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
+    void testResumeToStatusStartedRejectsFailedSubflowChild() {
+        Job job = stubJob(Job.Status.FAILED);
+
+        job.setParentTaskExecutionId(PARENT_TASK_EXECUTION_ID);
 
         assertThatThrownBy(() -> jobService.resumeToStatusStarted(JOB_ID))
             .isInstanceOf(IllegalArgumentException.class);

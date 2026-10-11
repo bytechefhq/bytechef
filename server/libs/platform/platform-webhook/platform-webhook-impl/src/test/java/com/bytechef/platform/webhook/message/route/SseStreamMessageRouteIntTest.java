@@ -121,7 +121,8 @@ class SseStreamMessageRouteIntTest {
         jobService.update(job);
 
         SseStreamApplicationEventListener sseStreamApplicationEventListener = new SseStreamApplicationEventListener(
-            coordinatorInstanceContext.getBean(MessageBroker.class), mock(TaskExecutionService.class));
+            mock(JobService.class), coordinatorInstanceContext.getBean(MessageBroker.class),
+            mock(TaskExecutionService.class));
 
         sseStreamApplicationEventListener.onApplicationEvent(
             new JobStatusApplicationEvent(jobId, Job.Status.COMPLETED));

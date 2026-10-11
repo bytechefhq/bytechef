@@ -82,7 +82,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
             Job job = jobService.getJob(jobStatusApplicationEvent.getJobId());
 
             if (job.getParentTaskExecutionId() == null) {
-                return; // not a subflow -- nothing to do
+                return;
             }
 
             switch (status) {

@@ -34,8 +34,9 @@ public class MetadataConstants {
     public static final String JOB_RESUME_ID = "jobResumeId";
     public static final String RESUME_DATA = "__resumeData";
     public static final String STREAMING_RESUME = "__bytechef_streaming_resume__";
+    public static final String SUBFLOW_RESUME = "__bytechef_subflow_resume__";
     public static final String SUSPEND = "suspend";
-    public static final String SYNC_EXECUTION = "syncExecution";
+    public static final String SYNC_EXECUTION = "__bytechef_sync_execution__";
     public static final String TASK_EXECUTION_RESUME_ID = "taskExecutionResumeId";
     public static final String TYPE = "type";
     public static final String WORKFLOW_ID = "workflowId";

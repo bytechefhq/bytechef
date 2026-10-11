@@ -1,3 +1,11 @@
+plugins {
+    `java-test-fixtures`
+}
+
+configurations.testFixturesImplementation {
+    extendsFrom(configurations.implementation.get())
+}
+
 dependencies {
     api("org.springframework.data:spring-data-commons")
     api(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))

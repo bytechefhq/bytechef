@@ -76,6 +76,7 @@ import com.bytechef.platform.workflow.execution.facade.ApprovalFormFacadeImpl;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacadeImpl;
+import com.bytechef.platform.workflow.execution.service.InMemoryTaskStateService;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcherPreSendProcessor;
@@ -89,8 +90,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import org.awaitility.core.ConditionTimeoutException;
@@ -542,27 +541,6 @@ class AiAgentChatActionIntTest {
         @Override
         public boolean canProcess(TaskExecution taskExecution) {
             return true;
-        }
-    }
-
-    private static class InMemoryTaskStateService implements TaskStateService {
-
-        private final Map<String, Object> values = new ConcurrentHashMap<>();
-
-        @Override
-        public void delete(JobResumeId jobResumeId) {
-            values.remove(jobResumeId.toString());
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T> Optional<T> fetchValue(JobResumeId jobResumeId) {
-            return Optional.ofNullable((T) values.get(jobResumeId.toString()));
-        }
-
-        @Override
-        public void save(JobResumeId jobResumeId, Object value) {
-            values.put(jobResumeId.toString(), value);
         }
     }
 

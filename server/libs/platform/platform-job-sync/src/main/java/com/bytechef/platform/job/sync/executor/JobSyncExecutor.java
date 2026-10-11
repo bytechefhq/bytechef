@@ -85,13 +85,11 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
@@ -100,6 +98,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
  * Runs jobs in-process and waits for them. Every job it creates is marked with
@@ -111,6 +110,7 @@ public class JobSyncExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(JobSyncExecutor.class);
 
+    private static final int MAX_FAIL_UNFINISHED_JOB_ATTEMPTS = 3;
     private static final int NO_TIMEOUT = -1;
     private static final int UNLIMITED_TASK_EXECUTIONS = -1;
 
@@ -877,43 +877,60 @@ public class JobSyncExecutor {
     private void waitForJobCompletion(long jobId, @Nullable Duration timeout) {
         CountDownLatch latch = jobCompletionLatches.computeIfAbsent(getKey(jobId), id -> new CountDownLatch(1));
 
-        Job job = jobService.getJob(jobId);
-
-        if (job.getStatus() == Job.Status.COMPLETED || job.getStatus() == Job.Status.FAILED ||
-            job.getStatus() == Job.Status.STOPPED) {
-
-            jobCompletionLatches.remove(getKey(jobId));
-
-            return;
-        }
-
         try {
+            if (isTerminal(jobService.getJob(jobId))) {
+                return;
+            }
+
             long timeoutMillis = getTimeoutMillis(timeout);
 
             if (timeoutMillis == NO_TIMEOUT) {
                 latch.await();
-            } else {
-                if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
-                    throw new TimeoutException(
-                        "Job %d did not finish within %d milliseconds".formatted(jobId, timeoutMillis));
-                }
+            } else if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                failUnfinishedJob(jobId,
+                    "Job %d did not finish within %d milliseconds".formatted(jobId, timeoutMillis));
             }
-        } catch (InterruptedException | TimeoutException exception) {
-            if (log.isTraceEnabled()) {
-                log.trace(exception.getMessage());
-            }
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
 
-            job.setError(
-                new ExecutionError(
-                    Objects.requireNonNullElse(
-                        exception.getMessage(), "Interrupted while waiting for job %d".formatted(jobId)),
-                    List.of()));
-            job.setStatus(Job.Status.FAILED);
-
-            jobService.update(job);
+            failUnfinishedJob(jobId, "Interrupted while waiting for job %d".formatted(jobId));
         } finally {
             jobCompletionLatches.remove(getKey(jobId));
         }
+    }
+
+    private void failUnfinishedJob(long jobId, String errorMessage) {
+        if (log.isTraceEnabled()) {
+            log.trace(errorMessage);
+        }
+
+        for (int attempt = 1;; attempt++) {
+            Job job = jobService.getJob(jobId);
+
+            if (isTerminal(job)) {
+                return;
+            }
+
+            job.setError(new ExecutionError(errorMessage, List.of()));
+            job.setStatus(Job.Status.FAILED);
+
+            try {
+                jobService.update(job);
+
+                return;
+            } catch (OptimisticLockingFailureException optimisticLockingFailureException) {
+                if (attempt == MAX_FAIL_UNFINISHED_JOB_ATTEMPTS) {
+                    throw optimisticLockingFailureException;
+                }
+            }
+        }
+    }
+
+    private static boolean isTerminal(Job job) {
+        Job.Status status = job.getStatus();
+
+        return status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED;
     }
 
     @FunctionalInterface

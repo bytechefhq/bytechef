@@ -41,7 +41,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
-class PrincipalJobFacadeImplTest {
+class PrincipalJobFacadeTest {
 
     @Mock
     private PrincipalJobService principalJobService;

@@ -26,9 +26,14 @@ import org.jspecify.annotations.Nullable;
  */
 public interface SubflowSyncExecutor {
 
+    /**
+     * Runs the sub-workflow one nesting level below the job identified by {@code callerJobId}, or at the first level
+     * when there is no calling job, and fails when that level exceeds the maximum sub-workflow depth.
+     */
     @Nullable
     Object execute(
-        String workflowUuid, String triggerName, Map<String, ?> inputs, boolean editorEnvironment);
+        String workflowUuid, String triggerName, Map<String, ?> inputs, boolean editorEnvironment,
+        @Nullable Long callerJobId);
 
     /**
      * Returns true when the job was started by a synchronous job executor, which awaits it in-process, so it must not
