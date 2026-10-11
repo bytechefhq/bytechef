@@ -269,7 +269,6 @@ class McpProjectWorkflowGraphQlControllerIntTest {
 
     @Test
     void testUpdateMcpProjectWorkflowDisablesTheWorkflow() {
-        // Given
         long workflowId = 1L;
         McpProjectWorkflow disabledWorkflow = createMockMcpProjectWorkflow(workflowId, 2L, 456L);
 
@@ -277,7 +276,6 @@ class McpProjectWorkflowGraphQlControllerIntTest {
 
         when(mcpProjectWorkflowService.updateEnabled(workflowId, false)).thenReturn(disabledWorkflow);
 
-        // When & Then
         this.graphQlTester
             .document("""
                 mutation {
@@ -302,13 +300,11 @@ class McpProjectWorkflowGraphQlControllerIntTest {
 
     @Test
     void testUpdateMcpProjectWorkflowWithoutEnabledLeavesTheFlagUntouched() {
-        // Given
         long workflowId = 1L;
         McpProjectWorkflow mockWorkflow = createMockMcpProjectWorkflow(workflowId, 2L, 456L);
 
         when(mcpProjectWorkflowService.update(anyLong(), anyLong(), anyLong())).thenReturn(mockWorkflow);
 
-        // When & Then
         this.graphQlTester
             .document("""
                 mutation {
