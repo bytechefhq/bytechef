@@ -253,7 +253,8 @@ describe('A2aProjectList', () => {
         render(<A2aProjectList a2aServer={a2aServer} />);
 
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
-        await user.click(screen.getByRole('button', {name: 'Remove Lead intake'}));
+        await user.click(screen.getByRole('button', {name: 'Lead intake actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Remove'}));
         await user.click(await screen.findByRole('button', {name: 'Delete'}));
 
         await waitFor(() =>
@@ -272,7 +273,8 @@ describe('A2aProjectList', () => {
         render(<A2aProjectList a2aServer={a2aServer} />);
 
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[1]);
-        await user.click(screen.getByRole('button', {name: 'Remove Triage'}));
+        await user.click(screen.getByRole('button', {name: 'Triage actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Remove'}));
         await user.click(await screen.findByRole('button', {name: 'Delete'}));
 
         await waitFor(() => expect(hoisted.deleteMutate).toHaveBeenCalledWith({id: '12'}));
@@ -304,5 +306,17 @@ describe('A2aProjectList', () => {
         await user.click(screen.getByRole('switch', {name: 'Enable Follow up'}));
 
         expect(hoisted.updateEnabledMutate).toHaveBeenCalledWith({enabled: true, id: '22'});
+    });
+
+    it('edits a workflow from its actions menu', async () => {
+        const user = userEvent.setup();
+
+        render(<A2aProjectList a2aServer={a2aServer} />);
+
+        await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
+        await user.click(screen.getByRole('button', {name: 'Lead intake actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Edit'}));
+
+        expect(await screen.findByText('Editing skills of A2A project 11')).toBeInTheDocument();
     });
 });
