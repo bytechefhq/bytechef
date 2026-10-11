@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import io.a2a.A2A;
 import io.a2a.client.Client;
@@ -64,7 +65,10 @@ public class AiAgentUtilsAgentClientTool {
     private static final String AGENT_CARD_PATH = ".well-known/agent-card.json";
 
     private static final long RESPONSE_TIMEOUT_SECONDS = 60;
-    private static final String TOOL_NAME = "sendTaskToRemoteAgent";
+    private static final String DEFAULT_TOOL_DESCRIPTION =
+        "Delegate a task to the configured remote A2A agent and return its response. Provide the task as a " +
+            "self-contained instruction.";
+    private static final String DEFAULT_TOOL_NAME = "sendTaskToRemoteAgent";
 
     public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ToolCallbackProviderFunction>clusterElement("agentClientTool")
@@ -81,19 +85,16 @@ public class AiAgentUtilsAgentClientTool {
             .object(() -> AiAgentUtilsAgentClientTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static ToolCallbackProvider apply(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    static ToolCallbackProvider apply(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String baseUrl = inputParameters.getRequiredString(BASE_URL);
 
         Function<RemoteAgentTask, String> sendTaskFunction =
             remoteAgentTask -> sendTask(baseUrl, remoteAgentTask.task());
 
-        ToolCallback toolCallback = FunctionToolCallback.builder(TOOL_NAME, sendTaskFunction)
+        ToolCallback toolCallback = FunctionToolCallback.builder(
+            getNonBlankString(inputParameters, ToolConstants.TOOL_NAME, DEFAULT_TOOL_NAME), sendTaskFunction)
             .inputType(RemoteAgentTask.class)
-            .description(
-                "Delegate a task to the configured remote A2A agent and return its response. Provide the task as a " +
-                    "self-contained instruction.")
+            .description(getNonBlankString(inputParameters, ToolConstants.TOOL_DESCRIPTION, DEFAULT_TOOL_DESCRIPTION))
             .build();
 
         return ToolCallbackProvider.from(toolCallback);
@@ -199,6 +200,12 @@ public class AiAgentUtilsAgentClientTool {
         }
 
         return agentCardBuilder.build();
+    }
+
+    private static String getNonBlankString(Parameters inputParameters, String key, String defaultValue) {
+        String value = inputParameters.getString(key);
+
+        return value == null || value.isBlank() ? defaultValue : value;
     }
 
     private static void appendEventText(StringBuilder responseBuilder, ClientEvent clientEvent) {
