@@ -18,8 +18,15 @@ package com.bytechef.encryption.filesystem;
 
 import com.bytechef.encryption.AbstractEncryptionKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.concurrent.Callable;
 
 /**
  * @author Ivica Cardic
@@ -33,20 +40,49 @@ public class FileSystemEncryptionKey extends AbstractEncryptionKey {
         Path userHome = Path.of(System.getProperty("user.home"));
 
         try {
-            Path bytechefPath = Files.createDirectories(userHome.resolve(".bytechef"));
-
-            Path keyPath = bytechefPath.resolve("key");
-
-            if (Files.exists(keyPath)) {
-                key = Files.readString(keyPath);
-            } else {
-                key = generateKey();
-
-                Files.writeString(Files.createFile(keyPath), key);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            key = readOrCreateKey(Files.createDirectories(userHome.resolve(".bytechef")), this::generateKey);
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
         }
+    }
+
+    static String readOrCreateKey(Path keyDirectoryPath, Callable<String> keyGenerator) throws Exception {
+        Path keyPath = keyDirectoryPath.resolve("key");
+
+        synchronized (FileSystemEncryptionKey.class) {
+            try (FileChannel fileChannel = FileChannel.open(
+                keyPath, StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.WRITE)) {
+
+                FileLock fileLock = fileChannel.lock();
+
+                try {
+                    if (fileChannel.size() > 0) {
+                        return readKey(fileChannel);
+                    }
+
+                    String newKey = keyGenerator.call();
+
+                    fileChannel.write(ByteBuffer.wrap(newKey.getBytes(StandardCharsets.UTF_8)));
+                    fileChannel.force(true);
+
+                    return newKey;
+                } finally {
+                    fileLock.release();
+                }
+            }
+        }
+    }
+
+    private static String readKey(FileChannel fileChannel) throws IOException {
+        ByteBuffer byteBuffer = ByteBuffer.allocate((int) fileChannel.size());
+
+        while (byteBuffer.hasRemaining()) {
+            if (fileChannel.read(byteBuffer, byteBuffer.position()) < 0) {
+                break;
+            }
+        }
+
+        return new String(byteBuffer.array(), 0, byteBuffer.position(), StandardCharsets.UTF_8);
     }
 
     @Override
