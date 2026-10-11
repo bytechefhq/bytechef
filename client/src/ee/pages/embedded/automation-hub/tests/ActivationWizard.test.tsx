@@ -9,8 +9,10 @@ import ActivationWizard from '../wizard/ActivationWizard';
 const {
     copyTemplateMutateAsyncMock,
     deleteAutomationMutateAsyncMock,
+    deprovisionReferenceMutateAsyncMock,
     fetchWorkflowMock,
     navigateMock,
+    provisionReferenceMutateAsyncMock,
     publishMutateAsyncMock,
     refetchComponentDefinitionsMock,
     setEnabledMutateAsyncMock,
@@ -21,8 +23,10 @@ const {
 } = vi.hoisted(() => ({
     copyTemplateMutateAsyncMock: vi.fn(),
     deleteAutomationMutateAsyncMock: vi.fn(),
+    deprovisionReferenceMutateAsyncMock: vi.fn(),
     fetchWorkflowMock: vi.fn(),
     navigateMock: vi.fn(),
+    provisionReferenceMutateAsyncMock: vi.fn(),
     publishMutateAsyncMock: vi.fn(),
     refetchComponentDefinitionsMock: vi.fn(),
     setEnabledMutateAsyncMock: vi.fn(),
@@ -46,6 +50,8 @@ vi.mock('@/ee/pages/embedded/automation-hub/queries/automationHub.queries', () =
 vi.mock('@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations', () => ({
     useCopyTemplateMutation: () => ({mutateAsync: copyTemplateMutateAsyncMock}),
     useDeleteAutomationMutation: () => ({mutateAsync: deleteAutomationMutateAsyncMock}),
+    useDeprovisionReferenceMutation: () => ({mutateAsync: deprovisionReferenceMutateAsyncMock}),
+    useProvisionReferenceMutation: () => ({mutateAsync: provisionReferenceMutateAsyncMock}),
     usePublishAutomationMutation: () => ({mutateAsync: publishMutateAsyncMock}),
     useSetAutomationEnabledMutation: () => ({mutateAsync: setEnabledMutateAsyncMock}),
     useUpdateAutomationInputsMutation: () => ({mutateAsync: updateInputsMutateAsyncMock}),
@@ -140,13 +146,21 @@ const walkToActivateStep = (connectionName = 'My Slack') => {
     clickButton('Next');
 };
 
+const copyThroughEditWorkflow = async () => {
+    clickButton('Edit workflow');
+
+    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/copy-1'));
+};
+
 describe('ActivationWizard', () => {
     beforeEach(() => {
         copyTemplateMutateAsyncMock.mockReset();
         deleteAutomationMutateAsyncMock.mockReset();
+        deprovisionReferenceMutateAsyncMock.mockReset();
         fetchWorkflowMock.mockReset();
         navigateMock.mockReset();
         onCloseMock.mockReset();
+        provisionReferenceMutateAsyncMock.mockReset();
         publishMutateAsyncMock.mockReset();
         updateInputsMutateAsyncMock.mockReset();
         refetchComponentDefinitionsMock.mockReset();
@@ -157,7 +171,9 @@ describe('ActivationWizard', () => {
 
         copyTemplateMutateAsyncMock.mockResolvedValue('copy-1');
         deleteAutomationMutateAsyncMock.mockResolvedValue(undefined);
+        deprovisionReferenceMutateAsyncMock.mockResolvedValue(undefined);
         fetchWorkflowMock.mockResolvedValue({definition: copiedWorkflowDefinition, workflowUuid: 'copy-1'});
+        provisionReferenceMutateAsyncMock.mockResolvedValue(undefined);
         publishMutateAsyncMock.mockResolvedValue(undefined);
         refetchComponentDefinitionsMock.mockResolvedValue({});
         setEnabledMutateAsyncMock.mockResolvedValue(undefined);
@@ -186,7 +202,7 @@ describe('ActivationWizard', () => {
         }));
     });
 
-    it('writes nothing before Activate, which then copies, wires, publishes and enables', async () => {
+    it('writes nothing before Activate, which then provisions a reference with the chosen connections', async () => {
         renderWizard();
 
         expect(screen.getByLabelText('Slack connection')).toBeInTheDocument();
@@ -196,50 +212,38 @@ describe('ActivationWizard', () => {
 
         walkToActivateStep();
 
-        expect(copyTemplateMutateAsyncMock).not.toHaveBeenCalled();
-        expect(wireNodeConnectionMutateAsyncMock).not.toHaveBeenCalled();
-        expect(publishMutateAsyncMock).not.toHaveBeenCalled();
+        expect(provisionReferenceMutateAsyncMock).not.toHaveBeenCalled();
         expect(setEnabledMutateAsyncMock).not.toHaveBeenCalled();
 
         clickButton('Activate');
 
-        await waitFor(() => expect(copyTemplateMutateAsyncMock).toHaveBeenCalledWith('tpl-1'));
-
         await waitFor(() =>
-            expect(wireNodeConnectionMutateAsyncMock).toHaveBeenCalledWith({
-                connectionId: 7,
-                workflowConnectionKey: 'slack',
-                workflowNodeName: 'sendMessage_1',
-                workflowUuid: 'copy-1',
+            expect(provisionReferenceMutateAsyncMock).toHaveBeenCalledWith({
+                connections: {slack: 7},
+                inputs: undefined,
+                workflowUuid: 'tpl-1',
             })
         );
 
-        expect(wireNodeConnectionMutateAsyncMock).toHaveBeenCalledTimes(1);
-
         await waitFor(() =>
-            expect(setEnabledMutateAsyncMock).toHaveBeenCalledWith({enabled: true, workflowUuid: 'copy-1'})
+            expect(setEnabledMutateAsyncMock).toHaveBeenCalledWith({enabled: true, workflowUuid: 'tpl-1'})
         );
 
-        expect(publishMutateAsyncMock).toHaveBeenCalledWith('copy-1');
-
-        expect(wireNodeConnectionMutateAsyncMock.mock.invocationCallOrder[0]).toBeLessThan(
-            publishMutateAsyncMock.mock.invocationCallOrder[0]
-        );
-        expect(publishMutateAsyncMock.mock.invocationCallOrder[0]).toBeLessThan(
+        expect(provisionReferenceMutateAsyncMock.mock.invocationCallOrder[0]).toBeLessThan(
             setEnabledMutateAsyncMock.mock.invocationCallOrder[0]
         );
 
-        expect(deleteAutomationMutateAsyncMock).not.toHaveBeenCalled();
+        expect(copyTemplateMutateAsyncMock).not.toHaveBeenCalled();
+        expect(wireNodeConnectionMutateAsyncMock).not.toHaveBeenCalled();
+        expect(publishMutateAsyncMock).not.toHaveBeenCalled();
+        expect(deprovisionReferenceMutateAsyncMock).not.toHaveBeenCalled();
 
         expect(await screen.findByText('Your automation is running')).toBeInTheDocument();
-
-        clickButton('Open in builder');
-
-        expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/copy-1');
+        expect(screen.queryByRole('button', {name: 'Open in builder'})).not.toBeInTheDocument();
     });
 
-    it('deletes the copy it made when the activation chain fails partway', async () => {
-        wireNodeConnectionMutateAsyncMock.mockRejectedValueOnce(new Error('wiring rejected'));
+    it('deprovisions the reference it made when enabling it fails', async () => {
+        setEnabledMutateAsyncMock.mockRejectedValueOnce(new Error('Enabling blew up'));
 
         renderWizard();
 
@@ -247,56 +251,33 @@ describe('ActivationWizard', () => {
 
         clickButton('Activate');
 
-        expect(await screen.findByText(WIRING_ERROR_MESSAGE)).toBeInTheDocument();
+        expect(await screen.findByText('Enabling blew up')).toBeInTheDocument();
 
-        await waitFor(() => expect(deleteAutomationMutateAsyncMock).toHaveBeenCalledWith('copy-1'));
-
-        expect(publishMutateAsyncMock).not.toHaveBeenCalled();
-        expect(setEnabledMutateAsyncMock).not.toHaveBeenCalled();
-    });
-
-    it('copies afresh on a retry rather than reusing the copy it just deleted', async () => {
-        wireNodeConnectionMutateAsyncMock.mockRejectedValueOnce(new Error('wiring rejected'));
-
-        renderWizard();
-
-        walkToActivateStep();
-
-        clickButton('Activate');
-
-        await waitFor(() => expect(deleteAutomationMutateAsyncMock).toHaveBeenCalledWith('copy-1'));
-
-        copyTemplateMutateAsyncMock.mockResolvedValue('copy-2');
-
-        clickButton('Activate');
-
-        await waitFor(() => expect(copyTemplateMutateAsyncMock).toHaveBeenCalledTimes(2));
-
-        await waitFor(() =>
-            expect(setEnabledMutateAsyncMock).toHaveBeenCalledWith({enabled: true, workflowUuid: 'copy-2'})
-        );
-    });
-
-    it('spares a copy the user opened in the builder when a later activation fails', async () => {
-        wireNodeConnectionMutateAsyncMock.mockRejectedValueOnce(new Error('wiring rejected'));
-
-        renderWizard();
-
-        clickButton('Edit workflow');
-
-        await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/copy-1'));
-
-        walkToActivateStep();
-
-        clickButton('Activate');
-
-        expect(await screen.findByText(WIRING_ERROR_MESSAGE)).toBeInTheDocument();
+        await waitFor(() => expect(deprovisionReferenceMutateAsyncMock).toHaveBeenCalledWith('tpl-1'));
 
         expect(deleteAutomationMutateAsyncMock).not.toHaveBeenCalled();
     });
 
-    it('drives the highlight loop when enabling reports a missing connection', async () => {
-        setEnabledMutateAsyncMock.mockRejectedValueOnce(missingConnectionResponseError('slack'));
+    it('provisions again on a retry after a failed activation', async () => {
+        setEnabledMutateAsyncMock.mockRejectedValueOnce(new Error('Enabling blew up'));
+
+        renderWizard();
+
+        walkToActivateStep();
+
+        clickButton('Activate');
+
+        await waitFor(() => expect(deprovisionReferenceMutateAsyncMock).toHaveBeenCalledWith('tpl-1'));
+
+        clickButton('Activate');
+
+        await waitFor(() => expect(provisionReferenceMutateAsyncMock).toHaveBeenCalledTimes(2));
+
+        expect(await screen.findByText('Your automation is running')).toBeInTheDocument();
+    });
+
+    it('drives the highlight loop when provisioning reports a missing connection', async () => {
+        provisionReferenceMutateAsyncMock.mockRejectedValueOnce(missingConnectionResponseError('slack'));
 
         renderWizard();
 
@@ -306,7 +287,7 @@ describe('ActivationWizard', () => {
 
         expect(await screen.findByText('Connect Slack to continue')).toBeInTheDocument();
 
-        await waitFor(() => expect(deleteAutomationMutateAsyncMock).toHaveBeenCalledWith('copy-1'));
+        await waitFor(() => expect(deprovisionReferenceMutateAsyncMock).toHaveBeenCalledWith('tpl-1'));
 
         selectConnection('Slack connection', 'My Other Slack');
 
@@ -314,22 +295,21 @@ describe('ActivationWizard', () => {
         clickButton('Activate');
 
         await waitFor(() =>
-            expect(wireNodeConnectionMutateAsyncMock).toHaveBeenCalledWith({
-                connectionId: 8,
-                workflowConnectionKey: 'slack',
-                workflowNodeName: 'sendMessage_1',
-                workflowUuid: 'copy-1',
+            expect(provisionReferenceMutateAsyncMock).toHaveBeenLastCalledWith({
+                connections: {slack: 8},
+                inputs: undefined,
+                workflowUuid: 'tpl-1',
             })
         );
     });
 
-    it('reports progress while the chain runs and refuses a second Activate click', async () => {
-        let resolveWiring: () => void = () => undefined;
+    it('reports progress while provisioning runs and refuses a second Activate click', async () => {
+        let resolveProvisioning: () => void = () => undefined;
 
-        wireNodeConnectionMutateAsyncMock.mockImplementationOnce(
+        provisionReferenceMutateAsyncMock.mockImplementationOnce(
             () =>
                 new Promise<void>((resolve) => {
-                    resolveWiring = resolve;
+                    resolveProvisioning = resolve;
                 })
         );
 
@@ -339,13 +319,13 @@ describe('ActivationWizard', () => {
 
         clickButton('Activate');
 
-        await waitFor(() => expect(wireNodeConnectionMutateAsyncMock).toHaveBeenCalledTimes(1));
+        await waitFor(() => expect(provisionReferenceMutateAsyncMock).toHaveBeenCalledTimes(1));
 
         expect(screen.getByText('Setting up your automation…')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Activate'})).toBeDisabled();
 
         await act(async () => {
-            resolveWiring();
+            resolveProvisioning();
         });
 
         expect(await screen.findByText('Your automation is running')).toBeInTheDocument();
@@ -354,19 +334,16 @@ describe('ActivationWizard', () => {
     it('copies the template and opens the builder when Edit workflow is used on the connect step', async () => {
         renderWizard();
 
-        clickButton('Edit workflow');
+        await copyThroughEditWorkflow();
 
-        await waitFor(() => expect(copyTemplateMutateAsyncMock).toHaveBeenCalledWith('tpl-1'));
-
-        await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/copy-1'));
+        expect(copyTemplateMutateAsyncMock).toHaveBeenCalledWith('tpl-1');
+        expect(provisionReferenceMutateAsyncMock).not.toHaveBeenCalled();
     });
 
-    it('activates the copy Edit workflow already made rather than copying a second time', async () => {
+    it('activates the copy Edit workflow made instead of provisioning a reference', async () => {
         renderWizard();
 
-        clickButton('Edit workflow');
-
-        await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/copy-1'));
+        await copyThroughEditWorkflow();
 
         walkToActivateStep();
 
@@ -376,7 +353,49 @@ describe('ActivationWizard', () => {
             expect(setEnabledMutateAsyncMock).toHaveBeenCalledWith({enabled: true, workflowUuid: 'copy-1'})
         );
 
+        expect(wireNodeConnectionMutateAsyncMock).toHaveBeenCalledWith({
+            connectionId: 7,
+            workflowConnectionKey: 'slack',
+            workflowNodeName: 'sendMessage_1',
+            workflowUuid: 'copy-1',
+        });
+
+        expect(wireNodeConnectionMutateAsyncMock).toHaveBeenCalledTimes(1);
+
+        expect(wireNodeConnectionMutateAsyncMock.mock.invocationCallOrder[0]).toBeLessThan(
+            publishMutateAsyncMock.mock.invocationCallOrder[0]
+        );
+        expect(publishMutateAsyncMock.mock.invocationCallOrder[0]).toBeLessThan(
+            setEnabledMutateAsyncMock.mock.invocationCallOrder[0]
+        );
+
         expect(copyTemplateMutateAsyncMock).toHaveBeenCalledTimes(1);
+        expect(provisionReferenceMutateAsyncMock).not.toHaveBeenCalled();
+
+        expect(await screen.findByText('Your automation is running')).toBeInTheDocument();
+
+        clickButton('Open in builder');
+
+        expect(navigateMock).toHaveBeenLastCalledWith('/embedded/hub/builder/copy-1');
+    });
+
+    it('spares a copy the user opened in the builder when a later activation fails', async () => {
+        wireNodeConnectionMutateAsyncMock.mockRejectedValueOnce(new Error('wiring rejected'));
+
+        renderWizard();
+
+        await copyThroughEditWorkflow();
+
+        walkToActivateStep();
+
+        clickButton('Activate');
+
+        expect(await screen.findByText(WIRING_ERROR_MESSAGE)).toBeInTheDocument();
+
+        expect(deleteAutomationMutateAsyncMock).not.toHaveBeenCalled();
+        expect(deprovisionReferenceMutateAsyncMock).not.toHaveBeenCalled();
+        expect(publishMutateAsyncMock).not.toHaveBeenCalled();
+        expect(setEnabledMutateAsyncMock).not.toHaveBeenCalled();
     });
 
     it('offers no Edit workflow when the vendor has withdrawn it', () => {
@@ -442,15 +461,19 @@ describe('ActivationWizard', () => {
         renderWizard();
 
         expect(screen.queryByLabelText('Slack connection')).not.toBeInTheDocument();
-        expect(copyTemplateMutateAsyncMock).not.toHaveBeenCalled();
+        expect(provisionReferenceMutateAsyncMock).not.toHaveBeenCalled();
 
         expect(screen.queryByRole('button', {name: 'Next'})).not.toBeInTheDocument();
 
         clickButton('Activate');
 
-        await waitFor(() => expect(copyTemplateMutateAsyncMock).toHaveBeenCalledWith('tpl-1'));
-
-        expect(wireNodeConnectionMutateAsyncMock).not.toHaveBeenCalled();
+        await waitFor(() =>
+            expect(provisionReferenceMutateAsyncMock).toHaveBeenCalledWith({
+                connections: {},
+                inputs: undefined,
+                workflowUuid: 'tpl-1',
+            })
+        );
     });
 
     it('wires a copied node that declares no connections under the component name as key', async () => {
@@ -460,6 +483,8 @@ describe('ActivationWizard', () => {
         });
 
         renderWizard();
+
+        await copyThroughEditWorkflow();
 
         walkToActivateStep();
 
@@ -475,10 +500,12 @@ describe('ActivationWizard', () => {
         );
     });
 
-    it('reports a failed read of the copy as a wiring failure and rolls the copy back', async () => {
+    it('reports a failed read of the copy as a wiring failure', async () => {
         fetchWorkflowMock.mockRejectedValue(new Error('workflow load failed'));
 
         renderWizard();
+
+        await copyThroughEditWorkflow();
 
         walkToActivateStep();
 
@@ -486,9 +513,8 @@ describe('ActivationWizard', () => {
 
         expect(await screen.findByText(WIRING_ERROR_MESSAGE)).toBeInTheDocument();
 
-        await waitFor(() => expect(deleteAutomationMutateAsyncMock).toHaveBeenCalledWith('copy-1'));
-
         expect(wireNodeConnectionMutateAsyncMock).not.toHaveBeenCalled();
+        expect(deleteAutomationMutateAsyncMock).not.toHaveBeenCalled();
     });
 
     it('reports an unreadable copied definition in its own words rather than as a wiring failure', async () => {
@@ -496,18 +522,18 @@ describe('ActivationWizard', () => {
 
         renderWizard();
 
+        await copyThroughEditWorkflow();
+
         walkToActivateStep();
 
         clickButton('Activate');
 
         expect(await screen.findByText('The copied automation could not be read.')).toBeInTheDocument();
-
-        await waitFor(() => expect(deleteAutomationMutateAsyncMock).toHaveBeenCalledWith('copy-1'));
     });
 
     it('still reports the activation failure when the rollback itself fails', async () => {
-        wireNodeConnectionMutateAsyncMock.mockRejectedValueOnce(new Error('wiring rejected'));
-        deleteAutomationMutateAsyncMock.mockRejectedValue(new Error('delete blew up'));
+        setEnabledMutateAsyncMock.mockRejectedValueOnce(new Error('Enabling blew up'));
+        deprovisionReferenceMutateAsyncMock.mockRejectedValue(new Error('deprovision blew up'));
 
         renderWizard();
 
@@ -515,8 +541,8 @@ describe('ActivationWizard', () => {
 
         clickButton('Activate');
 
-        expect(await screen.findByText(WIRING_ERROR_MESSAGE)).toBeInTheDocument();
-        expect(screen.queryByText('delete blew up')).not.toBeInTheDocument();
+        expect(await screen.findByText('Enabling blew up')).toBeInTheDocument();
+        expect(screen.queryByText('deprovision blew up')).not.toBeInTheDocument();
     });
 
     it('refuses to start activation when the component-definition lookup fails', () => {
@@ -621,8 +647,33 @@ describe('ActivationWizard', () => {
             expect(screen.getByRole('button', {name: 'Next'})).toBeEnabled();
         });
 
-        it('stores the values between publishing and enabling', async () => {
+        it('provisions the reference with the values', async () => {
             renderWizard(templateWithInputs);
+
+            selectConnection('Slack connection', 'My Slack');
+
+            clickButton('Next');
+
+            fireEvent.change(screen.getByLabelText(/Spreadsheet name/), {target: {value: 'Leads'}});
+
+            clickButton('Next');
+            clickButton('Activate');
+
+            await waitFor(() =>
+                expect(provisionReferenceMutateAsyncMock).toHaveBeenCalledWith({
+                    connections: {slack: 7},
+                    inputs: {sheetName: 'Leads'},
+                    workflowUuid: 'tpl-1',
+                })
+            );
+
+            expect(updateInputsMutateAsyncMock).not.toHaveBeenCalled();
+        });
+
+        it('stores the values on a copy between publishing and enabling', async () => {
+            renderWizard(templateWithInputs);
+
+            await copyThroughEditWorkflow();
 
             selectConnection('Slack connection', 'My Slack');
 
@@ -657,6 +708,9 @@ describe('ActivationWizard', () => {
 
             await waitFor(() => expect(setEnabledMutateAsyncMock).toHaveBeenCalled());
 
+            expect(provisionReferenceMutateAsyncMock).toHaveBeenCalledWith(
+                expect.objectContaining({inputs: undefined})
+            );
             expect(updateInputsMutateAsyncMock).not.toHaveBeenCalled();
         });
     });

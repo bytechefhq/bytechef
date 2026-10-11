@@ -27,7 +27,7 @@ export type ActivationActionType =
     | {type: 'BACK'}
     | {type: 'COPIED'; workflowUuid: string}
     | {componentName: string; type: 'MISSING_CONNECTION'}
-    | {type: 'ACTIVATED'; workflowUuid: string}
+    | {type: 'ACTIVATED'; workflowUuid?: string}
     | {error: string; type: 'FAILED'};
 
 export function initialActivationState(
