@@ -33,6 +33,7 @@ import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -47,6 +48,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.SyncMessageBroker;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
@@ -64,6 +66,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import tools.jackson.databind.ObjectMapper;
@@ -376,7 +379,7 @@ class JobSyncExecutorTest {
 
         when(jobService.getJob(jobId)).thenReturn(failedJob);
         when(taskExecutionService.fetchLastJobTaskExecution(jobId))
-            .thenReturn(java.util.Optional.of(completedTaskExecution));
+            .thenReturn(Optional.of(completedTaskExecution));
         when(taskExecutionService.getJobTaskExecutions(jobId))
             .thenReturn(List.of(failedTaskExecution, completedTaskExecution));
 
@@ -450,6 +453,25 @@ class JobSyncExecutorTest {
     }
 
     @Test
+    void testStartJobMarksTheJobAsASyncExecution() {
+        ArgumentCaptor<JobParametersDTO> jobParametersDTOArgumentCaptor =
+            ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        when(jobService.create(jobParametersDTOArgumentCaptor.capture(), any()))
+            .thenThrow(new IllegalStateException("job created"));
+
+        assertThatThrownBy(
+            () -> jobSyncExecutor.startJob(new JobParametersDTO("workflow-1", Map.of(), Map.of("existing", "value"))))
+                .hasMessage("job created");
+
+        JobParametersDTO jobParametersDTO = jobParametersDTOArgumentCaptor.getValue();
+
+        assertThat(jobParametersDTO.getMetadata())
+            .containsEntry(MetadataConstants.SYNC_EXECUTION, true)
+            .containsEntry("existing", "value");
+    }
+
+    @Test
     void testTimedOutJobFailsWithAnErrorThatNamesTheJob() {
         long jobId = 707L;
 
@@ -467,7 +489,7 @@ class JobSyncExecutorTest {
         startedJob.setStatus(Job.Status.STARTED);
 
         when(jobService.getJob(jobId)).thenReturn(startedJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
     }
 
     private static void waitForLatchRegistration(JobSyncExecutor jobSyncExecutor, String key, Duration timeout)
