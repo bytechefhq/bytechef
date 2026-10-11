@@ -136,13 +136,13 @@ A disabled server, or an unknown secret key, answers every request with `401`.
 The **A2A** component lets an [AI Agent](/platform/automation/build/workflows/ai/agent) delegate tasks to a remote A2A
 agent - an A2A Server of this or another ByteChef, or an agent built on another framework.
 
-1. Create an **A2A** connection. Set **Agent URL** to the remote agent's address - for a ByteChef A2A Server, the
-   endpoint URL from the server's **Connect** tab. Pasting the agent card URL also works.
-2. When the agent requires authentication, choose the **Bearer Token** authorization and enter the token - for a
-   ByteChef A2A Server with **Require authentication** on, a workspace API key. It is sent as an
-   `Authorization: Bearer` header on the agent card request and on every message. Leave the authorization out for an
-   agent that accepts unauthenticated requests.
-3. Attach the **A2A Agent Tool** to the AI Agent's **Tools** slot and pick the connection.
+1. Attach the **A2A Agent Tool** to the AI Agent's **Tools** slot.
+2. Set **Agent URL** to the remote agent's address - for a ByteChef A2A Server, the endpoint URL from the server's
+   **Connect** tab. Pasting the agent card URL also works.
+3. When the agent requires authentication, pick an **A2A** connection - create one with the agent's **Bearer Token**,
+   for a ByteChef A2A Server with **Require authentication** on a workspace API key. It is sent as an
+   `Authorization: Bearer` header on the agent card request and on every message. The connection is optional: leave it
+   out for an agent that accepts unauthenticated requests.
 
 The model sees the tool as `sendTaskToRemoteAgent` with a generic description. Give each A2A Agent Tool its own **Tool
 Name** and **Tool Description** - for example `askJavaReleaseExpert` - so the model knows what the remote agent is for
