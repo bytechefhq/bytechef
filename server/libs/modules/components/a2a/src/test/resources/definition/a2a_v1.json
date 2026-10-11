@@ -45,7 +45,7 @@
     "label": "Artificial Intelligence"
   } ],
   "connection": {
-    "authorizationRequired": null,
+    "authorizationRequired": false,
     "authorizations": [ {
       "acquire": null,
       "apply": null,
