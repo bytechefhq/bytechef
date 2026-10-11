@@ -16,8 +16,11 @@
 
 package com.bytechef.component.workflow.cluster;
 
+import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
+
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementContext;
+import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
@@ -41,6 +44,8 @@ final class SubflowToolSupport {
 
     static final String ERROR_RESOLVE_FAILED_PREFIX =
         "Error: could not resolve the requested sub-workflow: ";
+
+    static final String ERROR_SYNC_EXECUTION_FAILED_PREFIX = "Error: the sub-workflow failed: ";
 
     private SubflowToolSupport() {
     }
@@ -81,6 +86,25 @@ final class SubflowToolSupport {
         }
 
         return actionContextAware;
+    }
+
+    static boolean isSyncJob(ActionContextAware actionContextAware, SubflowSyncExecutor subflowSyncExecutor) {
+        Long jobId = actionContextAware.getJobId();
+
+        return jobId != null && subflowSyncExecutor.isSyncJob(jobId);
+    }
+
+    static @Nullable Object executeSynchronously(
+        SubflowSyncExecutor subflowSyncExecutor, String workflowUuid, Map<String, ?> inputs,
+        boolean editorEnvironment) {
+
+        try {
+            return subflowSyncExecutor.execute(workflowUuid, NEW_WORKFLOW_CALL, inputs, editorEnvironment);
+        } catch (RuntimeException exception) {
+            log.warn("Synchronous sub-workflow {} failed: {}", workflowUuid, exception.getMessage());
+
+            return ERROR_SYNC_EXECUTION_FAILED_PREFIX + exception.getMessage();
+        }
     }
 
     static Object suspendForSubflow(ActionContextAware actionContextAware, Subflow subflow, Map<String, ?> inputs) {
