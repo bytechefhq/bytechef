@@ -11,7 +11,7 @@ import {useCustomComponentsQuery} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, Link2Icon, PlusIcon, UploadIcon} from 'lucide-react';
 
 interface NewCustomComponentMenuProps {
-    align?: 'center' | 'end';
+    align?: 'end' | 'start';
 }
 
 const NewCustomComponentMenu = ({align = 'end'}: NewCustomComponentMenuProps) => (
@@ -74,7 +74,7 @@ const CustomComponents = () => {
                     <CustomComponentList customComponents={customComponents} />
                 ) : (
                     <EmptyList
-                        button={<NewCustomComponentMenu align="center" />}
+                        button={<NewCustomComponentMenu align="start" />}
                         icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
                         message="You do not have any Custom Components created yet."
                         title="No Custom Components"
