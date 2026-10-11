@@ -108,22 +108,20 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                                 <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                             </CollapsibleTrigger>
 
-                            <div onClick={(event) => event.preventDefault()}>
-                                <TagList
-                                    getRequest={(id, tagList) => ({
-                                        id: id!,
-                                        tags: tagList || [],
-                                    })}
-                                    id={parseInt(a2aServer.id)}
-                                    remainingTags={tags
-                                        ?.filter((tag) => !a2aServerTagIds?.includes(tag.id))
-                                        .map((tag) => ({id: parseInt(tag.id), name: tag.name}))}
-                                    tags={(a2aServer.tags ?? [])
-                                        .filter((tag) => tag != null)
-                                        .map((tag) => ({id: parseInt(tag!.id), name: tag!.name}))}
-                                    updateTagsMutation={updateA2aServerTagsMutation}
-                                />
-                            </div>
+                            <TagList
+                                getRequest={(id, tagList) => ({
+                                    id: id!,
+                                    tags: tagList || [],
+                                })}
+                                id={parseInt(a2aServer.id)}
+                                remainingTags={tags
+                                    ?.filter((tag) => !a2aServerTagIds?.includes(tag.id))
+                                    .map((tag) => ({id: parseInt(tag.id), name: tag.name}))}
+                                tags={(a2aServer.tags ?? [])
+                                    .filter((tag) => tag != null)
+                                    .map((tag) => ({id: parseInt(tag!.id), name: tag!.name}))}
+                                updateTagsMutation={updateA2aServerTagsMutation}
+                            />
 
                             {a2aServer.description && (
                                 <span className="text-xs text-muted-foreground">{a2aServer.description}</span>

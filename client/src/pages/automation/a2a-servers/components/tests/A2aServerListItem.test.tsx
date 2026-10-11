@@ -9,6 +9,7 @@ import A2aServerListItem from '../A2aServerListItem';
 
 const hoisted = vi.hoisted(() => ({
     deleteMutate: vi.fn(),
+    tagsMutationOptions: undefined as {onSuccess?: () => void} | undefined,
     updateMutate: vi.fn(),
 }));
 
@@ -25,10 +26,16 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     }),
     useDeleteA2aServerMutation: () => ({mutate: hoisted.deleteMutate}),
     useUpdateA2aServerMutation: () => ({isPending: false, mutate: hoisted.updateMutate}),
-    useUpdateA2aServerTagsMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useUpdateA2aServerTagsMutation: (options?: {onSuccess?: () => void}) => {
+        hoisted.tagsMutationOptions = options;
+
+        return {isPending: false, mutate: vi.fn()};
+    },
 }));
 
-vi.mock('../A2aServerDialog', () => ({default: () => null}));
+vi.mock('../A2aServerDialog', () => ({
+    default: ({open}: {open?: boolean}) => (open ? <div>Editing the A2A server</div> : null),
+}));
 
 vi.mock('../A2aServerWorkflowDialog', () => ({default: () => null}));
 
@@ -47,9 +54,9 @@ const a2aServer = {
 const expandListItem = (user: ReturnType<typeof userEvent.setup>) =>
     user.click(screen.getByRole('button', {name: /2 workflow skills/}));
 
-const renderListItem = (listedA2aServer: A2aServer = a2aServer) =>
+const renderListItem = (listedA2aServer: A2aServer = a2aServer, queryClient: QueryClient = new QueryClient()) =>
     render(
-        <QueryClientProvider client={new QueryClient()}>
+        <QueryClientProvider client={queryClient}>
             <TooltipProvider>
                 <A2aServerListItem a2aServer={listedA2aServer} />
             </TooltipProvider>
@@ -157,5 +164,60 @@ describe('A2aServerListItem', () => {
         renderListItem();
 
         expect(screen.getByText('sales')).toBeInTheDocument();
+    });
+
+    it('refreshes the servers after the enabled toggle is saved', async () => {
+        const user = userEvent.setup();
+        const queryClient = new QueryClient();
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        hoisted.updateMutate.mockImplementation((_variables, options) => options.onSuccess());
+
+        renderListItem(a2aServer, queryClient);
+
+        await user.click(screen.getByRole('switch', {name: 'Enabled'}));
+
+        await waitFor(() => expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['a2aServers']}));
+    });
+
+    it('refreshes the servers and closes the confirmation after the server is deleted', async () => {
+        const user = userEvent.setup();
+        const queryClient = new QueryClient();
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        hoisted.deleteMutate.mockImplementation((_variables, options) => options.onSuccess());
+
+        renderListItem(a2aServer, queryClient);
+
+        await user.click(screen.getByRole('button', {name: 'Server actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Delete'}));
+        await user.click(await screen.findByRole('button', {name: 'Delete'}));
+
+        await waitFor(() => expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['a2aServers']}));
+
+        await waitFor(() => expect(screen.queryByText('Are you absolutely sure?')).not.toBeInTheDocument());
+    });
+
+    it('refreshes the servers and their tags after the tags are saved', () => {
+        const queryClient = new QueryClient();
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        renderListItem(a2aServer, queryClient);
+
+        hoisted.tagsMutationOptions?.onSuccess?.();
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['a2aServers']});
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['a2aServerTags']});
+    });
+
+    it('opens the edit dialog from the server actions', async () => {
+        const user = userEvent.setup();
+
+        renderListItem();
+
+        await user.click(screen.getByRole('button', {name: 'Server actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Edit'}));
+
+        expect(await screen.findByText('Editing the A2A server')).toBeInTheDocument();
     });
 });
