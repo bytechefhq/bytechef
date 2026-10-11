@@ -180,6 +180,7 @@ describe('AutomationsView', () => {
         useAutomationHubStore.setState({
             connectionDialogAllowed: true,
             defaultLayout: 'grid',
+            editWorkflowAllowed: true,
             includeComponents: undefined,
             initialized: true,
             layoutSwitcherAllowed: true,
@@ -547,6 +548,34 @@ describe('AutomationsView', () => {
             await user.click(screen.getByRole('menuitem', {name: /customize/i}));
 
             expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/copy-uuid');
+        });
+
+        it('offers no Customize on an activated COPY template when the vendor withdrew editing', async () => {
+            const user = userEvent.setup();
+
+            useAutomationHubStore.setState({editWorkflowAllowed: false});
+
+            renderView();
+
+            await user.click(within(templateCard('Sync leads')).getByRole('button', {name: 'Sync leads actions'}));
+
+            expect(screen.queryByRole('menuitem', {name: /customize/i})).not.toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: /remove/i})).toBeInTheDocument();
+        });
+
+        it('keeps Customize on a from-scratch automation when editing is withdrawn but New workflow is on', async () => {
+            const user = userEvent.setup();
+
+            useAutomationHubStore.setState({editWorkflowAllowed: false});
+
+            renderView();
+
+            await user.click(
+                within(templateCard('Weekly digest')).getByRole('button', {name: 'Weekly digest actions'})
+            );
+            await user.click(screen.getByRole('menuitem', {name: /customize/i}));
+
+            expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/blank-uuid');
         });
 
         it('offers a toggle but no Customize on an activated REFERENCE template', async () => {

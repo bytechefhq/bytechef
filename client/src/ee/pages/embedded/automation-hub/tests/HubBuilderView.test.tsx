@@ -52,6 +52,7 @@ describe('HubBuilderView', () => {
 
         useAutomationHubStore.setState({
             connectionDialogAllowed: true,
+            editWorkflowAllowed: true,
             includeComponents: ['slack', 'gmail'],
             initialized: true,
             tabs: DEFAULT_TABS,
@@ -110,6 +111,64 @@ describe('HubBuilderView', () => {
         );
 
         await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/embedded/hub', {replace: true}));
+    });
+
+    describe('builder access', () => {
+        const renderBuilder = () =>
+            render(
+                <QueryClientProvider client={new QueryClient()}>
+                    <MemoryRouter initialEntries={['/embedded/hub/builder/wf-1']}>
+                        <Routes>
+                            <Route element={<HubBuilderView />} path="/embedded/hub/builder/:workflowUuid" />
+                        </Routes>
+                    </MemoryRouter>
+                </QueryClientProvider>
+            );
+
+        it('turns a template copy away when the vendor withdrew editing', async () => {
+            useAutomationHubStore.setState({editWorkflowAllowed: false});
+            useGetWorkflowQueryMock.mockReturnValue({
+                data: {copiedFromWorkflowUuid: 'tpl-1', kind: 'COPY', label: 'Sync leads'},
+            });
+
+            renderBuilder();
+
+            await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/embedded/hub', {replace: true}));
+
+            expect(screen.queryByTestId('workflow-builder-probe')).not.toBeInTheDocument();
+        });
+
+        it('turns a reference away even when editing is allowed', async () => {
+            useGetWorkflowQueryMock.mockReturnValue({
+                data: {automationWorkflowUuid: 'tpl-1', kind: 'REFERENCE', label: 'Triage ticket'},
+            });
+
+            renderBuilder();
+
+            await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/embedded/hub', {replace: true}));
+
+            expect(screen.queryByTestId('workflow-builder-probe')).not.toBeInTheDocument();
+        });
+
+        it('shows nothing while the workflow loads when editing is withdrawn', () => {
+            useAutomationHubStore.setState({editWorkflowAllowed: false});
+            useGetWorkflowQueryMock.mockReturnValue({data: undefined, isLoading: true});
+
+            renderBuilder();
+
+            expect(screen.queryByTestId('workflow-builder-probe')).not.toBeInTheDocument();
+            expect(navigateMock).not.toHaveBeenCalled();
+        });
+
+        it('opens a from-scratch automation when New workflow is on although editing is withdrawn', () => {
+            useAutomationHubStore.setState({editWorkflowAllowed: false});
+            useGetWorkflowQueryMock.mockReturnValue({data: {kind: 'COPY', label: 'Weekly digest'}});
+
+            renderBuilder();
+
+            expect(screen.getByTestId('workflow-builder-probe')).toBeInTheDocument();
+            expect(navigateMock).not.toHaveBeenCalled();
+        });
     });
 
     it('stays put while the workflow loads cleanly', () => {
