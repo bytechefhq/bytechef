@@ -29,4 +29,10 @@ public interface SubflowSyncExecutor {
     @Nullable
     Object execute(
         String workflowUuid, String triggerName, Map<String, ?> inputs, boolean editorEnvironment);
+
+    /**
+     * Returns true when the job was started by a synchronous job executor, which awaits it in-process, so it must not
+     * suspend.
+     */
+    boolean isSyncJob(long jobId);
 }

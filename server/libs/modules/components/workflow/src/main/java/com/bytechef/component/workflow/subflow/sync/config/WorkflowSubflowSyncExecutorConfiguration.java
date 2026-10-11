@@ -35,6 +35,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
@@ -45,6 +46,7 @@ import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
@@ -72,6 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -87,6 +90,11 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 public class WorkflowSubflowSyncExecutorConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowSubflowSyncExecutorConfiguration.class);
+
+    static final String SUSPENDING_TASK_MESSAGE =
+        "A sub-workflow called synchronously (in the editor, or from a workflow that returns a synchronous " +
+            "response) can't pause. Step '%s' (%s) would pause it. Run the calling workflow asynchronously, or " +
+            "remove the step.";
 
     @Bean
     SubflowSyncExecutor subflowSyncExecutor(
@@ -109,26 +117,40 @@ public class WorkflowSubflowSyncExecutorConfiguration {
             getAdditionalApplicationEventListeners(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
             getTaskCompletionHandlerFactories(
-                contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
+                contextService, coordinatorEventPublisher, counterService, evaluator, jobService, taskExecutionService,
+                taskFileStorage),
             getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
             getTaskDispatcherResolverFactories(
                 childJobPrincipalFactory, contextService, counterService, coordinatorEventPublisher, evaluator,
                 jobService, subflowResolver, taskExecutionService, taskFileStorage),
             taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService);
 
-        return (workflowUuid, triggerName, inputs, editorEnvironment) -> {
-            Subflow subflow = subflowResolver.resolveSubflow(workflowUuid, triggerName, editorEnvironment);
+        return new SubflowSyncExecutor() {
 
-            Map<String, Object> jobInputs = Map.of(subflow.inputsName(), inputs);
+            @Override
+            public @Nullable Object execute(
+                String workflowUuid, String triggerName, Map<String, ?> inputs, boolean editorEnvironment) {
 
-            Job job = jobSyncExecutor.execute(new JobParametersDTO(subflow.workflowId(), jobInputs), true);
+                Subflow subflow = subflowResolver.resolveSubflow(workflowUuid, triggerName, editorEnvironment);
 
-            if (job.getOutputs() == null) {
-                return null;
+                Map<String, Object> jobInputs = Map.of(subflow.inputsName(), inputs);
+
+                Job job = jobSyncExecutor.execute(new JobParametersDTO(subflow.workflowId(), jobInputs), true);
+
+                if (job.getOutputs() == null) {
+                    return null;
+                }
+
+                return getCallableResponseOutput(job, taskExecutionService, taskFileStorage)
+                    .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
             }
 
-            return getCallableResponseOutput(job, taskExecutionService, taskFileStorage)
-                .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
+            @Override
+            public boolean isSyncJob(long jobId) {
+                return jobService.fetchJob(jobId)
+                    .map(job -> MapUtils.getBoolean(job.getMetadata(), MetadataConstants.SYNC_EXECUTION, false))
+                    .orElse(false);
+            }
         };
     }
 
@@ -170,11 +192,14 @@ public class WorkflowSubflowSyncExecutorConfiguration {
             });
     }
 
-    private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        ContextService contextService, CounterService counterService, Evaluator evaluator,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
+    List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
+        ContextService contextService, ApplicationEventPublisher eventPublisher, CounterService counterService,
+        Evaluator evaluator, JobService jobService, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
 
         return List.of(
+            (taskCompletionHandler, taskDispatcher) -> new SyncExecutionSuspendRejectingTaskCompletionHandler(
+                eventPublisher, jobService, taskExecutionService, SUSPENDING_TASK_MESSAGE),
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
                 contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage),

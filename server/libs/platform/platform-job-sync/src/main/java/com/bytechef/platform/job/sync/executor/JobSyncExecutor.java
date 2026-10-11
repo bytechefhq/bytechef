@@ -71,6 +71,7 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.worker.task.CallableResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
@@ -81,6 +82,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -100,6 +102,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskExecutor;
 
 /**
+ * Runs jobs in-process and waits for them. Every job it creates is marked with
+ * {@link MetadataConstants#SYNC_EXECUTION}, which tells steps that the run can't suspend.
+ *
  * @author Ivica Cardic
  */
 public class JobSyncExecutor {
@@ -494,7 +499,7 @@ public class JobSyncExecutor {
             coordinatorEventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
             taskExecutionService, taskFileStorage, workflowService);
 
-        long jobId = jobFacade.createJob(jobParametersDTO);
+        long jobId = jobFacade.createJob(withSyncExecutionMetadata(jobParametersDTO));
 
         return awaitJob(jobId, checkForError, taskExecutionCompleteCallback, timeout);
     }
@@ -506,7 +511,7 @@ public class JobSyncExecutor {
      * @return the unique identifier of the created job
      */
     public long startJob(JobParametersDTO jobParametersDTO) {
-        return jobFacade.createJob(jobParametersDTO);
+        return jobFacade.createJob(withSyncExecutionMetadata(jobParametersDTO));
     }
 
     /**
@@ -521,7 +526,7 @@ public class JobSyncExecutor {
             coordinatorEventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
             taskExecutionService, taskFileStorage, workflowService);
 
-        return jobFacade.createJob(jobParametersDTO);
+        return jobFacade.createJob(withSyncExecutionMetadata(jobParametersDTO));
     }
 
     /**
@@ -532,6 +537,16 @@ public class JobSyncExecutor {
      */
     public void stopJob(long jobId) {
         coordinatorEventPublisher.publishEvent(new StopJobEvent(jobId));
+    }
+
+    private static JobParametersDTO withSyncExecutionMetadata(JobParametersDTO jobParametersDTO) {
+        Map<String, Object> metadata = new HashMap<>(jobParametersDTO.getMetadata());
+
+        metadata.put(MetadataConstants.SYNC_EXECUTION, true);
+
+        return new JobParametersDTO(
+            jobParametersDTO.getWorkflowId(), jobParametersDTO.getParentTaskExecutionId(), jobParametersDTO.getInputs(),
+            jobParametersDTO.getLabel(), jobParametersDTO.getPriority(), jobParametersDTO.getWebhooks(), metadata);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {
@@ -545,7 +560,7 @@ public class JobSyncExecutor {
     }
 
     private Job execute(JobParametersDTO jobParametersDTO, JobFacade jobFacade, boolean checkForError) {
-        long jobId = jobFacade.createJob(jobParametersDTO);
+        long jobId = jobFacade.createJob(withSyncExecutionMetadata(jobParametersDTO));
 
         waitForJobCompletion(jobId, null);
 
