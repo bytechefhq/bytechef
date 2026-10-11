@@ -33,12 +33,12 @@ The endpoint supports the `message/send`, `message/stream`, `tasks/get` and `tas
 3. Give it a **name** and a **description** - both appear on the agent card that external clients read.
 4. Choose whether to **Require authentication** (see [Authentication](#authentication) below). It is on by default.
 
-A new server is enabled straight away; the **Enabled** checkbox is in the edit dialog. The server belongs to the
+A new server is enabled straight away; switch it off or on with the toggle on its card. The server belongs to the
 environment selected in the application sidebar when you create it (Development, Staging, or Production), and keeps
 it - so you can expose a different agent per environment. The list shows the servers of the selected environment.
 
 Creating, editing and deleting servers, and changing their skills, requires the `ADMIN` role. The secret key - and so
-the agent-card URL shown on the server's row - is visible to tenant admins only.
+the URLs on the server's **Connect** tab - is visible to tenant admins only.
 
 A server exposes nothing until you add a project to it.
 
@@ -46,7 +46,7 @@ A server exposes nothing until you add a project to it.
 
 ## Expose workflows as skills
 
-1. From the server's menu, choose **Add Project**.
+1. Expand the server's card, open the **Workflows** tab and click **Add Workflows**.
 2. **Select a project** and a published **version**.
 3. **Select the workflows** to expose. Only workflows with a **New Workflow Call** trigger
    (`workflow/v1/newWorkflowCall`) are listed - that trigger is what lets the workflow be invoked as a skill.
@@ -56,12 +56,28 @@ of its own in the server's environment that does not appear in the Deployments l
 skill on the agent card; the skill id is the workflow id.
 
 A server can hold one version of a project: adding a project the server already has is rejected, whichever version
-you pick. To expose more of its workflows, edit the skills of the project already on the server; to switch to another
-version, remove the project from the server and add it again with that version.
+you pick. To expose more of its workflows, edit the workflows of the project already on the server; to switch to
+another version, choose **Change Project Version** from the project's menu.
 
-To change the selection or describe the skills, open the project's menu under the server and choose **Edit Skills**.
-Under **Skill details** you can give each workflow a **skill name** and a **skill description** and save each one
-with **Save skill**. Left blank, they fall back to the workflow's own label and description.
+Each project on the **Workflows** tab expands to list its exposed workflows. From the project's menu:
+
+- **Edit Workflows** changes the selection and describes the skills. Under **Skill details** you can give each workflow
+  a **skill name** and a **skill description** and save each one with **Save skill**. Left blank, they fall back to the
+  workflow's own label and description.
+- **Change Project Version** moves the server's deployment of the project to another published version.
+- **Delete** removes the project and its skills from the server.
+
+Each workflow row has its own toggle and menu:
+
+- The **toggle** switches the skill off without removing it. A disabled workflow is left out of the agent card and
+  cannot be run; switch it back on to expose it again.
+- **Edit** opens the same dialog as **Edit Workflows**; **Remove** takes the workflow off the server. Removing the last
+  workflow of a project removes the project.
+
+### Tags and filters
+
+Tag servers with the **Tags** control on each card. The sidebar filters the list by **Projects** - the projects exposed
+by any server in the selected environment - and by **Tags**; the active filter is shown above the list.
 
 ### How a task runs
 
@@ -75,6 +91,8 @@ When a client sends `message/send`:
 - ByteChef starts the workflow and waits up to 300 seconds for it to finish. A finished run returns its response
   output, or the run's outputs, as a `completed` task; a failed run returns a `failed` task. A run that is still going
   returns a `working` task to poll with `tasks/get`.
+- The reply text is the output itself when it is text, and the value when the output holds a single text value - such
+  as the `message` of a **Response to Workflow Call** step. Any other output is sent as JSON.
 - A run that pauses on an [approval](/platform/automation/build/workflows/human-in-the-loop) step returns an
   `input-required` task, with the approval form link when ByteChef's public URL is configured. Once the decision is
   made, poll `tasks/get` for the result.
@@ -89,6 +107,9 @@ The task id identifies the workflow run, so `tasks/get` works for any task of th
 </Callout>
 
 ### The agent card
+
+The server's **Connect** tab shows the agent card URL and the JSON-RPC endpoint, each with a copy button, and whether
+requests need an API key.
 
 The card carries the server's name and description, protocol version `0.3.0`, the JSON-RPC transport, text input and
 output, and one entry per skill. Its `url` is built from ByteChef's public URL when one is configured, and from the
