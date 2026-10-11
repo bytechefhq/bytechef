@@ -1,6 +1,14 @@
+import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import McpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
@@ -10,7 +18,7 @@ import {
     useUpdateWorkspaceMcpToolEnabledMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {BoltIcon, Trash2Icon} from 'lucide-react';
+import {BoltIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 import useMcpProjectComponentToolDropdownMenu from './hooks/useMcpProjectComponentToolDropdownMenu';
@@ -102,29 +110,39 @@ const McpComponentToolListItem = ({
                             />
                         )}
 
-                        {/* Anchor the popover to the Configure button so it opens right-aligned to that button. */}
+                        <DropdownMenu>
+                            {/* Anchor the popover to the actions button so it opens right-aligned to it. */}
 
-                        <PopoverAnchor asChild>
-                            <Button
-                                aria-label="Configure"
-                                className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                icon={<BoltIcon className="size-4" />}
-                                onClick={() => openPopover(popoverId)}
-                                size="iconSm"
-                                title="Configure"
-                                variant="ghost"
-                            />
-                        </PopoverAnchor>
+                            <PopoverAnchor asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        aria-label={`${toolLabel} actions`}
+                                        icon={<EllipsisVerticalIcon />}
+                                        size="iconSm"
+                                        variant="ghost"
+                                    />
+                                </DropdownMenuTrigger>
+                            </PopoverAnchor>
 
-                        <Button
-                            aria-label="Delete"
-                            className="rounded p-1"
-                            icon={<Trash2Icon className="size-4" />}
-                            onClick={() => setShowDeleteDialog(true)}
-                            size="iconSm"
-                            title="Delete"
-                            variant="destructiveGhost"
-                        />
+                            <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onSelect={() => openPopover(popoverId)}
+                                >
+                                    <BoltIcon /> Configure
+                                </DropdownMenuItem>
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item-destructive"
+                                    onSelect={() => setShowDeleteDialog(true)}
+                                    variant="destructive"
+                                >
+                                    <Trash2Icon /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
 

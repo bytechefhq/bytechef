@@ -1,10 +1,18 @@
+import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {BoltIcon, PencilIcon, Trash2Icon} from 'lucide-react';
+import {BoltIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 import McpProjectWorkflowPropertiesPopover from './McpProjectWorkflowPropertiesPopover';
 import {McpProjectWorkflowItemType} from './hooks/useMcpProjectList';
@@ -52,39 +60,46 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                             onCheckedChange={handleEnabledChange}
                         />
 
-                        {/* Anchor the popover to the Configure button so it opens right-aligned to that button. */}
+                        <DropdownMenu>
+                            {/* Anchor the popover to the actions button so it opens right-aligned to it. */}
 
-                        <PopoverAnchor asChild>
-                            <Button
-                                aria-label="Configure"
-                                className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                icon={<BoltIcon className="size-4" />}
-                                onClick={() => openPopover(popoverId)}
-                                size="iconSm"
-                                title="Configure"
-                                variant="ghost"
-                            />
-                        </PopoverAnchor>
+                            <PopoverAnchor asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        aria-label={`${workflowLabel} actions`}
+                                        icon={<EllipsisVerticalIcon />}
+                                        size="iconSm"
+                                        variant="ghost"
+                                    />
+                                </DropdownMenuTrigger>
+                            </PopoverAnchor>
 
-                        <Button
-                            aria-label="Edit"
-                            className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                            icon={<PencilIcon className="size-4" />}
-                            onClick={() => setShowEditWorkflowDialog(true)}
-                            size="iconSm"
-                            title="Edit"
-                            variant="ghost"
-                        />
+                            <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onSelect={() => openPopover(popoverId)}
+                                >
+                                    <BoltIcon /> Configure
+                                </DropdownMenuItem>
 
-                        <Button
-                            aria-label="Delete"
-                            className="rounded p-1"
-                            icon={<Trash2Icon className="size-4" />}
-                            onClick={() => setShowDeleteDialog(true)}
-                            size="iconSm"
-                            title="Delete"
-                            variant="destructiveGhost"
-                        />
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onSelect={() => setShowEditWorkflowDialog(true)}
+                                >
+                                    <EditIcon /> Edit
+                                </DropdownMenuItem>
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item-destructive"
+                                    onSelect={() => setShowDeleteDialog(true)}
+                                    variant="destructive"
+                                >
+                                    <Trash2Icon /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
 
