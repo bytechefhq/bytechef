@@ -20,6 +20,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -93,7 +94,11 @@ public class JobCompletionAwaiterImpl implements JobCompletionAwaiter {
 
         if ("COMPLETED".equals(status) || "FAILED".equals(status) || "STOPPED".equals(status)) {
             try {
-                future.complete(jobService.getJob(jobId));
+                Job job = jobService.getJob(jobId);
+
+                if (isTerminal(job)) {
+                    future.complete(job);
+                }
             } catch (Exception exception) {
                 future.completeExceptionally(exception);
             }
@@ -126,6 +131,7 @@ public class JobCompletionAwaiterImpl implements JobCompletionAwaiter {
     private static boolean isTerminal(Job job) {
         Job.Status status = job.getStatus();
 
-        return status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED;
+        return status == Job.Status.COMPLETED || status == Job.Status.FAILED ||
+            (status == Job.Status.STOPPED && !JobSuspends.isAwaitingSubflow(job));
     }
 }

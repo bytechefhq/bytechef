@@ -22,6 +22,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.platform.ai.tool.ToolSuspension;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
@@ -50,10 +51,12 @@ final class SubflowToolSupport {
     private SubflowToolSupport() {
     }
 
-    static final class GuardFailure extends RuntimeException {
+    sealed interface AgentContextCheck {
 
-        GuardFailure(String message) {
-            super(message);
+        record Passed(ActionContextAware actionContextAware) implements AgentContextCheck {
+        }
+
+        record Rejected(String error) implements AgentContextCheck {
         }
     }
 
@@ -66,7 +69,7 @@ final class SubflowToolSupport {
             + "(including " + toolLabel + ") is supported per turn.";
     }
 
-    static ActionContextAware requireGuardsPassed(
+    static AgentContextCheck checkAgentContext(
         ClusterElementContext context, String clusterElementName, String toolLabel) {
 
         ActionContext agentActionContext = resolveAgentActionContext(context, clusterElementName);
@@ -74,7 +77,7 @@ final class SubflowToolSupport {
         if (!(agentActionContext instanceof ActionContextAware actionContextAware)) {
             log.warn("{} tool invoked outside an AI agent context (contract violation)", toolLabel);
 
-            throw new GuardFailure(notAgentContextError(toolLabel));
+            return new AgentContextCheck.Rejected(notAgentContextError(toolLabel));
         }
 
         if (actionContextAware.getSuspend() != null) {
@@ -82,10 +85,10 @@ final class SubflowToolSupport {
                 "{} tool invoked after another tool already suspended the agent (jobId={})", toolLabel,
                 actionContextAware.getJobId());
 
-            throw new GuardFailure(alreadySuspendedError(toolLabel));
+            return new AgentContextCheck.Rejected(alreadySuspendedError(toolLabel));
         }
 
-        return actionContextAware;
+        return new AgentContextCheck.Passed(actionContextAware);
     }
 
     static boolean isSyncJob(ActionContextAware actionContextAware, SubflowSyncExecutor subflowSyncExecutor) {
@@ -94,17 +97,40 @@ final class SubflowToolSupport {
         return jobId != null && subflowSyncExecutor.isSyncJob(jobId);
     }
 
+    static @Nullable Long findCallerJobId(ClusterElementContext context, String clusterElementName) {
+        ActionContext agentActionContext = resolveAgentActionContext(context, clusterElementName);
+
+        if (agentActionContext instanceof ActionContextAware actionContextAware) {
+            return actionContextAware.getJobId();
+        }
+
+        return null;
+    }
+
     static @Nullable Object executeSynchronously(
         SubflowSyncExecutor subflowSyncExecutor, String workflowUuid, Map<String, ?> inputs,
-        boolean editorEnvironment) {
+        boolean editorEnvironment, @Nullable Long callerJobId) {
 
         try {
-            return subflowSyncExecutor.execute(workflowUuid, NEW_WORKFLOW_CALL, inputs, editorEnvironment);
+            return subflowSyncExecutor.execute(
+                workflowUuid, NEW_WORKFLOW_CALL, inputs, editorEnvironment, callerJobId);
         } catch (RuntimeException exception) {
-            log.warn("Synchronous sub-workflow {} failed: {}", workflowUuid, exception.getMessage());
+            log.warn("Synchronous sub-workflow {} failed", workflowUuid, exception);
 
-            return ERROR_SYNC_EXECUTION_FAILED_PREFIX + exception.getMessage();
+            return ERROR_SYNC_EXECUTION_FAILED_PREFIX + describe(exception);
         }
+    }
+
+    static String describe(RuntimeException exception) {
+        String message = exception.getMessage();
+
+        if (message != null) {
+            return message;
+        }
+
+        Class<? extends RuntimeException> exceptionClass = exception.getClass();
+
+        return exceptionClass.getSimpleName();
     }
 
     static Object suspendForSubflow(ActionContextAware actionContextAware, Subflow subflow, Map<String, ?> inputs) {
@@ -113,6 +139,7 @@ final class SubflowToolSupport {
         Map<String, Object> continueParameters = new HashMap<>();
 
         continueParameters.put(SubflowRequestConstants.PENDING_SUBFLOW, request);
+        continueParameters.put(MetadataConstants.SUBFLOW_RESUME, true);
 
         actionContextAware.suspend(new ActionContext.Suspend(continueParameters, null));
 

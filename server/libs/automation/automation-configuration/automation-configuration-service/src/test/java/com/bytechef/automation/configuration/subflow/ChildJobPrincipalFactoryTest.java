@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-class ChildJobPrincipalFactoryImplTest {
+class ChildJobPrincipalFactoryTest {
 
     @Test
     void testCreateChildJobDelegatesToPrincipalJobFacade() {

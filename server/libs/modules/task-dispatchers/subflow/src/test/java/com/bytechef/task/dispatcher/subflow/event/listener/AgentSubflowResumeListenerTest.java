@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -48,8 +49,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 /**
  * @author Ivica Cardic
@@ -57,7 +56,6 @@ import org.mockito.quality.Strictness;
 @ExtendWith({
     MockitoExtension.class, ObjectMapperSetupExtension.class
 })
-@MockitoSettings(strictness = Strictness.LENIENT)
 class AgentSubflowResumeListenerTest {
 
     private static final long AGENT_JOB_ID = 100L;
@@ -93,8 +91,10 @@ class AgentSubflowResumeListenerTest {
                 MetadataConstants.JOB_RESUME_ID, AGENT_JOB_RESUME_ID, MetadataConstants.TASK_EXECUTION_RESUME_ID,
                 TASK_EXECUTION_RESUME_ID));
 
-        when(jobService.getJob(AGENT_JOB_ID)).thenReturn(agentJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(SUBFLOW_JOB_ID)).thenReturn(Optional.empty());
+        lenient().when(jobService.getJob(AGENT_JOB_ID))
+            .thenReturn(agentJob);
+        lenient().when(taskExecutionService.fetchLastJobTaskExecution(SUBFLOW_JOB_ID))
+            .thenReturn(Optional.empty());
     }
 
     @Test
@@ -211,10 +211,9 @@ class AgentSubflowResumeListenerTest {
 
     @Test
     void testSuspendedSubflowKeepsTheAgentWaiting() {
-        stubSubflowJob(Job.Status.STOPPED);
-
         agentSubflowResumeListener.onApplicationEvent(JobStatusApplicationEvent.suspended(SUBFLOW_JOB_ID));
 
+        verify(jobService, never()).getJob(SUBFLOW_JOB_ID);
         verifyNoInteractions(jobFacade);
     }
 

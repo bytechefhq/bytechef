@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.subflow;
+package com.bytechef.task.dispatcher.subflow.event.listener;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -23,6 +23,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
+import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.StopJobEvent;
@@ -45,6 +46,7 @@ import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
+import com.bytechef.atlas.execution.repository.memory.NonPersistentHandledFlagTaskExecutionRepository;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.JobService;
@@ -69,12 +71,12 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
-import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.service.InMemoryTaskStateService;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
-import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
+import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcherPreSendProcessor;
 import com.bytechef.task.dispatcher.suspend.completion.SuspendTaskCompletionHandler;
 import com.bytechef.tenant.TenantContext;
@@ -82,7 +84,6 @@ import com.bytechef.tenant.constant.TenantConstants;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -100,7 +101,7 @@ import tools.jackson.databind.json.JsonMapper;
  * @author Ivica Cardic
  */
 @TaskDispatcherIntTest
-class SubflowResumeIntTest {
+class SubflowJobStatusEventListenerIntTest {
 
     private static final String APPROVAL_DECISION = "the human approved";
     private static final String CHILD_WORKFLOW = "subflow-resumable-child";
@@ -170,6 +171,20 @@ class SubflowResumeIntTest {
         assertEquals(APPROVAL_DECISION, parentOutputs.get("childResult"));
     }
 
+    @Test
+    void testSuspendedChildStoppedByHandStopsTheParent() throws InterruptedException {
+        Rig rig = new Rig();
+
+        long parentJobId = rig.startParent();
+        long childJobId = rig.awaitChildLaunched();
+
+        rig.awaitJobStatus(childJobId, Job.Status.STOPPED);
+
+        rig.taskCoordinator.onApplicationEvent(new JobStatusApplicationEvent(childJobId, Job.Status.STOPPED));
+
+        rig.awaitJobStatus(parentJobId, Job.Status.STOPPED);
+    }
+
     private final class Rig {
 
         private final AtomicReference<Long> childJobIdReference = new AtomicReference<>();
@@ -209,7 +224,7 @@ class SubflowResumeIntTest {
             Map<String, TaskHandler<?>> taskHandlerMap = Map.of(
                 "var/v1/set", taskExecution -> taskExecution.getParameters()
                     .get("value"),
-                "suspend/v1", SubflowResumeIntTest::suspendUntilResumed);
+                "suspend/v1", SubflowJobStatusEventListenerIntTest::suspendUntilResumed);
 
             TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
@@ -467,22 +482,6 @@ class SubflowResumeIntTest {
         return EncodingUtils.base64EncodeToString(workflowName.getBytes(StandardCharsets.UTF_8));
     }
 
-    private static final class NonPersistentHandledFlagTaskExecutionRepository extends InMemoryTaskExecutionRepository {
-
-        @Override
-        public TaskExecution save(TaskExecution taskExecution) {
-            boolean handled = taskExecution.isHandled();
-
-            taskExecution.setHandled(false);
-
-            try {
-                return super.save(taskExecution);
-            } finally {
-                taskExecution.setHandled(handled);
-            }
-        }
-    }
-
     private static final class StartingChildJobPrincipalFactory implements ChildJobPrincipalFactory {
 
         private final AtomicReference<Long> childJobIdReference;
@@ -505,27 +504,6 @@ class SubflowResumeIntTest {
         @Override
         public long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO) {
             throw new UnsupportedOperationException();
-        }
-    }
-
-    private static final class InMemoryTaskStateService implements TaskStateService {
-
-        private final Map<JobResumeId, Object> store = new HashMap<>();
-
-        @Override
-        public void delete(JobResumeId jobResumeId) {
-            store.remove(jobResumeId);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T> Optional<T> fetchValue(JobResumeId jobResumeId) {
-            return Optional.ofNullable((T) store.get(jobResumeId));
-        }
-
-        @Override
-        public void save(JobResumeId jobResumeId, Object value) {
-            store.put(jobResumeId, value);
         }
     }
 }

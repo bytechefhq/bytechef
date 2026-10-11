@@ -23,10 +23,11 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.workflow.execution.JobSuspends;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.BiFunction;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -38,30 +39,28 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class SyncExecutionSuspendRejectingTaskCompletionHandler implements TaskCompletionHandler {
 
+    private final BiFunction<String, String, String> errorMessageFunction;
     private final ApplicationEventPublisher eventPublisher;
     private final JobService jobService;
-    private final String messageFormat;
     private final TaskExecutionService taskExecutionService;
 
     /**
-     * @param messageFormat a {@link String#format} pattern for the failed step's error, given the step's name and then
-     *                      its type
+     * @param errorMessageFunction builds the failed step's error from the step's name and type
      */
     @SuppressFBWarnings("EI")
     public SyncExecutionSuspendRejectingTaskCompletionHandler(
         ApplicationEventPublisher eventPublisher, JobService jobService, TaskExecutionService taskExecutionService,
-        String messageFormat) {
+        BiFunction<String, String, String> errorMessageFunction) {
 
+        this.errorMessageFunction = errorMessageFunction;
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
-        this.messageFormat = messageFormat;
         this.taskExecutionService = taskExecutionService;
     }
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        return taskExecution.getMetadata()
-            .containsKey(MetadataConstants.JOB_RESUME_ID);
+        return JobSuspends.isSuspending(taskExecution);
     }
 
     @Override
@@ -71,7 +70,7 @@ public class SyncExecutionSuspendRejectingTaskCompletionHandler implements TaskC
         Instant endDate = Instant.now();
 
         ExecutionError executionError = new ExecutionError(
-            String.format(messageFormat, taskExecution.getName(), taskExecution.getType()), List.of());
+            errorMessageFunction.apply(taskExecution.getName(), taskExecution.getType()), List.of());
 
         taskExecution.setEndDate(endDate);
         taskExecution.setError(executionError);

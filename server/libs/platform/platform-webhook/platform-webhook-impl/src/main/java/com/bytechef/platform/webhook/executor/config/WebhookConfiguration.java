@@ -143,7 +143,7 @@ public class WebhookConfiguration {
 
         TaskCompletionHandlerFactory suspendRejectingTaskCompletionHandlerFactory =
             (taskCompletionHandler, taskDispatcher) -> new SyncExecutionSuspendRejectingTaskCompletionHandler(
-                eventPublisher, jobService, taskExecutionService, WebhookWorkflowExecutorImpl.SUSPENDING_TASK_MESSAGE);
+                eventPublisher, jobService, taskExecutionService, WebhookWorkflowExecutorImpl::suspendingTaskMessage);
 
         return CollectionUtils.concat(
             List.of(suspendRejectingTaskCompletionHandlerFactory),

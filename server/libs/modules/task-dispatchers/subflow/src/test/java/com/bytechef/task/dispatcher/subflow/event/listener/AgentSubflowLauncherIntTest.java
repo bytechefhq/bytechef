@@ -48,6 +48,7 @@ import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
+import com.bytechef.atlas.execution.repository.memory.NonPersistentHandledFlagTaskExecutionRepository;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.JobService;
@@ -72,7 +73,7 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
-import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.service.InMemoryTaskStateService;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
@@ -87,11 +88,10 @@ import com.bytechef.tenant.constant.TenantConstants;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
@@ -112,6 +112,7 @@ class AgentSubflowLauncherIntTest {
     private static final String AGENT_TWO_CALLS_WORKFLOW = "agent-subflow-bridge-agent-two-calls";
     private static final String FAILING_SUBFLOW = "agent-subflow-bridge-failing";
     private static final String FAST_SUBFLOW = "agent-subflow-bridge-fast";
+    private static final String LOST_REQUEST_SUBFLOW = "agent-subflow-bridge-lost-request";
     private static final Duration JOB_STATUS_TIMEOUT = Duration.ofSeconds(20);
     private static final int MAX_DEPTH = 3;
     private static final String MISSING_SUBFLOW = "agent-subflow-bridge-missing";
@@ -259,6 +260,50 @@ class AgentSubflowLauncherIntTest {
     }
 
     @Test
+    void testSuspendEventRedeliveredAfterTheResumeWasConsumedDoesNotLaunchTheSubflowAgain()
+        throws InterruptedException {
+
+        Rig rig = new Rig();
+
+        long agentJobId = rig.startAgent(AGENT_WORKFLOW, Map.of("subflow", SUSPENDING_SUBFLOW), Map.of());
+
+        long subflowJobId = rig.awaitLaunchedSubflowJob(0);
+
+        rig.awaitJobStatus(subflowJobId, Job.Status.STOPPED);
+
+        Job agentJob = rig.jobService.getJob(agentJobId);
+
+        Map<String, Object> agentJobMetadata = new HashMap<>(agentJob.getMetadata());
+
+        agentJobMetadata.put(
+            MetadataConstants.CONSUMED_JOB_RESUME_ID, agentJobMetadata.get(MetadataConstants.JOB_RESUME_ID));
+        agentJobMetadata.remove(SubflowRequestConstants.LAUNCHED_SUBFLOW_RESUME_ID);
+
+        agentJob.setMetadata(agentJobMetadata);
+
+        rig.jobService.update(agentJob);
+
+        rig.taskCoordinator.onApplicationEvent(JobStatusApplicationEvent.suspended(agentJobId));
+
+        assertEquals(List.of(subflowJobId), rig.launchedSubflowJobIds);
+    }
+
+    @Test
+    void testLostSubflowRequestResumesAgentWithAnError() throws InterruptedException {
+        Rig rig = new Rig();
+
+        long agentJobId = rig.startAgent(AGENT_WORKFLOW, Map.of("subflow", LOST_REQUEST_SUBFLOW), Map.of());
+
+        rig.awaitJobStatus(agentJobId, Job.Status.COMPLETED);
+
+        Map<String, ?> toolResult = MapUtils.getMap(rig.awaitJobOutputs(agentJobId), "toolResult");
+
+        assertEquals("failed", toolResult.get("status"));
+        assertEquals(AgentSubflowLauncher.LOST_REQUEST_ERROR, toolResult.get("error"));
+        assertTrue(rig.launchedSubflowJobIds.isEmpty());
+    }
+
+    @Test
     void testSubflowThatCannotBeStartedResumesAgentWithAnError() throws InterruptedException {
         Rig rig = new Rig();
 
@@ -309,9 +354,13 @@ class AgentSubflowLauncherIntTest {
 
         String subflowName = MapUtils.getRequiredString(taskExecution.getParameters(), "subflow");
 
+        if (LOST_REQUEST_SUBFLOW.equals(subflowName)) {
+            return new ActionContext.Suspend(Map.of(MetadataConstants.SUBFLOW_RESUME, true), null);
+        }
+
         return new ActionContext.Suspend(
             Map.of(
-                SubflowRequestConstants.PENDING_SUBFLOW,
+                MetadataConstants.SUBFLOW_RESUME, true, SubflowRequestConstants.PENDING_SUBFLOW,
                 new PendingSubflowRequest(encodeWorkflowId(subflowName), "newWorkflowCall", Map.of("amount", 5))),
             null);
     }
@@ -580,22 +629,6 @@ class AgentSubflowLauncherIntTest {
         }
     }
 
-    private static final class NonPersistentHandledFlagTaskExecutionRepository extends InMemoryTaskExecutionRepository {
-
-        @Override
-        public TaskExecution save(TaskExecution taskExecution) {
-            boolean handled = taskExecution.isHandled();
-
-            taskExecution.setHandled(false);
-
-            try {
-                return super.save(taskExecution);
-            } finally {
-                taskExecution.setHandled(handled);
-            }
-        }
-    }
-
     private static final class RecordingChildJobPrincipalFactory implements ChildJobPrincipalFactory {
 
         private final AtomicReference<Long> grandchildJobIdReference;
@@ -630,27 +663,6 @@ class AgentSubflowLauncherIntTest {
             launchedSubflowJobIds.add(subflowJobId);
 
             return subflowJobId;
-        }
-    }
-
-    private static final class InMemoryTaskStateService implements TaskStateService {
-
-        private final Map<JobResumeId, Object> store = new ConcurrentHashMap<>();
-
-        @Override
-        public void delete(JobResumeId jobResumeId) {
-            store.remove(jobResumeId);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T> Optional<T> fetchValue(JobResumeId jobResumeId) {
-            return Optional.ofNullable((T) store.get(jobResumeId));
-        }
-
-        @Override
-        public void save(JobResumeId jobResumeId, Object value) {
-            store.put(jobResumeId, value);
         }
     }
 }

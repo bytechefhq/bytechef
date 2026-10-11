@@ -1,3 +1,11 @@
+plugins {
+    `java-test-fixtures`
+}
+
+configurations.testFixturesImplementation {
+    extendsFrom(configurations.implementation.get())
+}
+
 dependencies {
     api("tools.jackson.core:jackson-databind")
     api(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-api"))

@@ -29,7 +29,9 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.AgentSubflowLink;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
@@ -45,6 +47,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
+ * Launches the sub-workflow an agent tool asked for when the agent job suspends, and claims the launch on the agent job
+ * first so a redelivered suspend event cannot start it twice. Known limit: a crash between the claim and the launch
+ * leaves the agent job stopped, because nothing re-launches a claimed request.
+ *
  * @author Ivica Cardic
  */
 public class AgentSubflowLauncher implements ApplicationEventListener {
@@ -75,7 +81,11 @@ public class AgentSubflowLauncher implements ApplicationEventListener {
     }
 
     public static String tooDeepError(int maxDepth) {
-        return "Error: the chain of agent-to-agent calls exceeded the maximum nesting depth of " + maxDepth
+        return "Error: " + tooDeepMessage(maxDepth);
+    }
+
+    public static String tooDeepMessage(int maxDepth) {
+        return "the chain of agent-to-agent calls exceeded the maximum nesting depth of " + maxDepth
             + "; the target agent may call back into an agent already running in this chain.";
     }
 
@@ -103,7 +113,9 @@ public class AgentSubflowLauncher implements ApplicationEventListener {
 
         if (agentJobResumeId == null ||
             Objects.equals(
-                agentJobResumeId, agentJob.getMetadata(SubflowRequestConstants.LAUNCHED_SUBFLOW_RESUME_ID))) {
+                agentJobResumeId, agentJob.getMetadata(SubflowRequestConstants.LAUNCHED_SUBFLOW_RESUME_ID))
+            ||
+            Objects.equals(agentJobResumeId, agentJob.getMetadata(MetadataConstants.CONSUMED_JOB_RESUME_ID))) {
 
             return;
         }
@@ -123,6 +135,14 @@ public class AgentSubflowLauncher implements ApplicationEventListener {
         }
 
         if (pendingSubflowRequest == null) {
+            if (JobSuspends.isSuspendedForSubflow(agentJob)) {
+                log.error(
+                    "Agent job {} suspended for a sub-workflow but no request was stored for suspend {}", agentJobId,
+                    agentJobResumeId);
+
+                resumeWithFailure(agentJobId, agentJobResumeId, LOST_REQUEST_ERROR);
+            }
+
             return;
         }
 
@@ -188,7 +208,7 @@ public class AgentSubflowLauncher implements ApplicationEventListener {
     }
 
     private void resumeWithFailure(long agentJobId, String agentJobResumeId, String error) {
-        if (!agentJobResumer.resume(agentJobId, agentJobResumeId, AgentJobResumer.failed(error))) {
+        if (!agentJobResumer.resume(agentJobId, agentJobResumeId, new SubflowOutcome.Failed(error))) {
             log.error(
                 "Could not hand the failure '{}' back to agent job {} for suspend {}", error, agentJobId,
                 agentJobResumeId);
@@ -203,11 +223,13 @@ public class AgentSubflowLauncher implements ApplicationEventListener {
         subflowInputs.put(pendingSubflowRequest.inputsName(), pendingSubflowRequest.inputs());
         subflowInputs.put(JobInputConstants.TRIGGER_NAME_INPUT, pendingSubflowRequest.inputsName());
 
-        return new JobParametersDTO(
-            pendingSubflowRequest.workflowId(), subflowInputs,
-            Map.of(
-                SubflowRequestConstants.AGENT_JOB_ID, agentJobId, SubflowRequestConstants.AGENT_JOB_RESUME_ID,
-                agentJobResumeId, SubflowRequestConstants.SUBFLOW_DEPTH, depth));
+        AgentSubflowLink agentSubflowLink = new AgentSubflowLink(agentJobId, agentJobResumeId);
+
+        Map<String, Object> subflowMetadata = new HashMap<>(agentSubflowLink.toMetadata());
+
+        subflowMetadata.put(SubflowRequestConstants.SUBFLOW_DEPTH, depth);
+
+        return new JobParametersDTO(pendingSubflowRequest.workflowId(), subflowInputs, subflowMetadata);
     }
 
     private @Nullable PendingSubflowRequest fetchPendingSubflowRequest(String agentJobResumeId) {

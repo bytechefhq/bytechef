@@ -273,6 +273,10 @@ public class SseStreamBridgeRegistry {
         boolean suspended = "STOPPED".equals(status) &&
             !Boolean.FALSE.equals(sseStreamEvent.getMetadata(SseStreamEvent.METADATA_SUSPENDED));
 
+        if (suspended && Boolean.TRUE.equals(sseStreamEvent.getMetadata(SseStreamEvent.METADATA_AWAITING_SUBFLOW))) {
+            return;
+        }
+
         if ("COMPLETED".equals(status) || "FAILED".equals(status) || ("STOPPED".equals(status) && !suspended)) {
             activatePendingRegistrations(jobId);
         }

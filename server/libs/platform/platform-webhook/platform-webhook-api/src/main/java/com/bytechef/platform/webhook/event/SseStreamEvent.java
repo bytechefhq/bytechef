@@ -35,6 +35,7 @@ public class SseStreamEvent implements MessageEvent<SseStreamMessageRoute> {
     public static final String EVENT_TYPE_JOB_STATUS = "job_status";
     public static final String EVENT_TYPE_TASK_STARTED = "task_started";
     public static final String METADATA_ERROR_MESSAGE = "errorMessage";
+    public static final String METADATA_AWAITING_SUBFLOW = "awaitingSubflow";
     public static final String METADATA_SUSPENDED = "suspended";
 
     private Instant createDate;

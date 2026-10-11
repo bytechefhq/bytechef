@@ -359,6 +359,29 @@ class JobResumeFacadeTest {
     }
 
     @Test
+    void testResumeJobRejectsAJobWaitingOnASubflowItLaunched() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        Job job = jobOf(Job.Status.STOPPED, jobResumeId.toString());
+
+        Map<String, Object> metadata = new HashMap<>(job.getMetadata());
+
+        metadata.put(MetadataConstants.SUBFLOW_RESUME, true);
+
+        job.setMetadata(metadata);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
+
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(
+            jobResumeId.toString(), Map.of("status", "completed", "result", "forged"));
+
+        assertThat(outcome).isEqualTo(JobResumeOutcome.NOT_YET_SUSPENDED);
+
+        verify(jobService, never()).update(any());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
+    }
+
+    @Test
     void testResumeJobReturnsGoneForAnAlreadyConsumedResumeIdWhileTheJobRuns() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 

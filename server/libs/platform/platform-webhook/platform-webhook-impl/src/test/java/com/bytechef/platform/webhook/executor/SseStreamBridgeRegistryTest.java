@@ -196,6 +196,31 @@ class SseStreamBridgeRegistryTest {
     }
 
     @Test
+    void testRegisterStaysOpenWhileTheJobWaitsOnASubflowAndCompletesAfterItResumes() {
+        Registration registration = sseStreamBridgeRegistry.register(JOB_ID, sseStreamBridge);
+
+        SseStreamEvent sseStreamEvent = new SseStreamEvent(JOB_ID, SseStreamEvent.EVENT_TYPE_JOB_STATUS, "STOPPED");
+
+        sseStreamEvent.putMetadata(SseStreamEvent.METADATA_SUSPENDED, true);
+        sseStreamEvent.putMetadata(SseStreamEvent.METADATA_AWAITING_SUBFLOW, true);
+
+        sseStreamBridgeRegistry.onSseStreamEvent(sseStreamEvent);
+
+        verify(sseStreamBridge, never()).onSuspend();
+        verify(sseStreamBridge, never()).onComplete();
+
+        assertThat(registration.completion()).isNotDone();
+
+        sendData("answer");
+        sendJobStatus("COMPLETED");
+
+        verify(sseStreamBridge).onEvent("answer");
+        verify(sseStreamBridge).onComplete();
+
+        assertThat(registration.completion()).isDone();
+    }
+
+    @Test
     void testRegisterCompletesOnStoppedStatusOfAJobThatWasNotSuspended() {
         Registration registration = sseStreamBridgeRegistry.register(JOB_ID, sseStreamBridge);
 

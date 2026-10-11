@@ -192,7 +192,7 @@ public class WebhookWorkflowExecutorTest {
             assertThatThrownBy(() -> webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest))
                 .isInstanceOf(ConfigurationException.class)
                 .hasMessage(
-                    String.format(WebhookWorkflowExecutorImpl.SUSPENDING_TASK_MESSAGE, "approve",
+                    WebhookWorkflowExecutorImpl.suspendingTaskMessage("approve",
                         "approval/v1/requestApproval"));
 
             verify(webhookWorkflowSyncExecutor, never()).execute(any(), any());
