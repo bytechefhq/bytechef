@@ -17,19 +17,28 @@
 package com.bytechef.component.ai.agent.utils.cluster;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.a2a.spec.AgentCapabilities;
 import io.a2a.spec.AgentCard;
 import io.a2a.spec.AgentInterface;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class AiAgentUtilsAgentClientToolTest {
 
     private static final String AGENT_CARD_URL =
@@ -97,5 +106,39 @@ class AiAgentUtilsAgentClientToolTest {
         assertThat(endpointAgentCard.additionalInterfaces())
             .containsExactly(new AgentInterface("JSONRPC", endpointUrl));
         assertThat(endpointAgentCard.name()).isEqualTo("Java Release Expert");
+    }
+
+    @Test
+    void testApplyUsesTheToolNameAndDescriptionOfTheNode() {
+        ToolDefinition toolDefinition = getToolDefinition(
+            Map.of(
+                "baseUrl", "http://localhost:9555/api/automation/a2a/secret",
+                "toolDescription", "Ask the Java Release Expert about Java and Spring releases.",
+                "toolName", "askJavaReleaseExpert"));
+
+        assertThat(toolDefinition.name()).isEqualTo("askJavaReleaseExpert");
+        assertThat(toolDefinition.description()).isEqualTo(
+            "Ask the Java Release Expert about Java and Spring releases.");
+    }
+
+    @Test
+    void testApplyFallsBackToTheDefaultToolNameAndDescription() {
+        ToolDefinition toolDefinition = getToolDefinition(
+            Map.of(
+                "baseUrl", "http://localhost:9555/api/automation/a2a/secret", "toolDescription", " ",
+                "toolName", ""));
+
+        assertThat(toolDefinition.name()).isEqualTo("sendTaskToRemoteAgent");
+        assertThat(toolDefinition.description()).startsWith("Delegate a task to the configured remote A2A agent");
+    }
+
+    private static ToolDefinition getToolDefinition(Map<String, ?> inputParameters) {
+        ToolCallback[] toolCallbacks = AiAgentUtilsAgentClientTool.apply(
+            ParametersFactory.create(inputParameters), ParametersFactory.create(Map.of()), mock(Context.class))
+            .getToolCallbacks();
+
+        assertThat(toolCallbacks).hasSize(1);
+
+        return toolCallbacks[0].getToolDefinition();
     }
 }
