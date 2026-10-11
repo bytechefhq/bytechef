@@ -28,16 +28,25 @@ public interface A2aServerFacade {
 
     /**
      * Returns the tags assigned to any A2A server.
+     *
+     * @return the tags used by the A2A servers
      */
     List<Tag> getA2aServerTags();
 
     /**
      * Returns the tags of each of the given A2A servers.
+     *
+     * @param a2aServers the A2A servers to return the tags of
+     * @return the tags of each A2A server
      */
     Map<A2aServer, List<Tag>> getA2aServerTags(List<A2aServer> a2aServers);
 
     /**
-     * Replaces the tags of an A2A server, creating tags that do not exist yet.
+     * Replaces the tags of an A2A server, creating the tags that do not exist yet.
+     *
+     * @param id   the ID of the A2A server
+     * @param tags the tags to assign, new ones without an ID
+     * @return the assigned tags
      */
     List<Tag> updateA2aServerTags(long id, List<Tag> tags);
 }
