@@ -327,6 +327,7 @@ class ConnectedUserFacadeIntTest {
         connection.setComponentName("slack");
         connection.setEnvironmentId(Environment.PRODUCTION.ordinal());
         connection.setId(OWN_CONNECTION_ID);
+        connection.setType(PlatformType.EMBEDDED);
 
         ComponentConnection slot = new ComponentConnection("slack", 1, "postMessage1", "slack", true);
 
@@ -344,6 +345,7 @@ class ConnectedUserFacadeIntTest {
                     .id(OWN_CONNECTION_ID)
                     .build()));
         when(connectionService.getConnection(OWN_CONNECTION_ID)).thenReturn(connection);
+        when(connectionService.getConnections(anyList())).thenReturn(List.of(connection));
         when(connectionService.getConnections(PlatformType.EMBEDDED)).thenReturn(List.of());
         when(embeddedPermissionEvaluator.evaluate(any(), any())).thenReturn(true);
         when(environmentService.getEnvironment(ENVIRONMENT_ID)).thenReturn(Environment.PRODUCTION);
