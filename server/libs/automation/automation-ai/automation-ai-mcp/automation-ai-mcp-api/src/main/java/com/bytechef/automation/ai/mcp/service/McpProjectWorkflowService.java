@@ -107,7 +107,7 @@ public interface McpProjectWorkflowService {
     McpProjectWorkflow updateParameters(long id, Map<String, ?> parameters);
 
     /**
-     * Enables or disables an MCP project workflow. A disabled workflow stays configured but is not exposed as a tool.
+     * Enables or disables an MCP project workflow tool.
      *
      * @param id      the ID of the MCP project workflow to update
      * @param enabled whether the workflow is exposed as a tool
