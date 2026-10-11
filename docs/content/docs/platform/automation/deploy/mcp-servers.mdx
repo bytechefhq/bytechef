@@ -42,7 +42,7 @@ A server exposes nothing until you add components or workflows to it.
 4. If the actions need authentication, attach one of your **connections** to the component. The assistant then runs those actions using that connection's credentials.
 5. Optionally pick the component's **Required Authorities** - the roles a caller must hold, one of them at least, to see this component's tools when the server has [Enforce tool authorization](#enforce-tool-authorization) on. The list of authorities is available on the Enterprise Edition.
 
-You can add multiple components to one server, and enable or disable individual tools at any time: each tool row has its own **Enabled** toggle, and a disabled tool disappears from the server's tool list - connected assistants no longer see or can call it, as if it did not exist. Existing and newly added tools default to enabled. Switching a tool is a change to the workspace's MCP server, so it needs permission to edit that workspace's MCP servers. This complements the server-level toggle, which turns the whole server on or off at once.
+You can add multiple components to one server, and enable or disable individual tools at any time: each tool row has its own **Enabled** toggle next to its actions menu (**⋮**), and a disabled tool disappears from the server's tool list - connected assistants no longer see or can call it, as if it did not exist. Existing and newly added tools default to enabled. Switching a tool is a change to the workspace's MCP server, so it needs permission to edit that workspace's MCP servers. This complements the server-level toggle, which turns the whole server on or off at once. A tool's actions menu holds **Configure**, which opens the properties panel below, and **Delete**.
 
 ![Tool properties panel for a component action, with Tool Name and Tool Description above the action's own parameters](mcp-servers/mcp-component-tool-properties.png)
 
@@ -61,9 +61,11 @@ Rename an action when its generated name would not tell the model what it does i
 1. Expand the server's row, open its **Workflow Tools** tab and click **Add Workflows**.
 2. **Select a project** and a **published version**.
 3. **Select the workflows** from that version you want to expose. Only workflows that start with the **Workflow → New Workflow Call** trigger are listed; a version without any says so.
-4. Complete each workflow's **tool mapping**, from the properties control on its row in the expanded server. The mapping offers a **Tool Name** and a **Tool Description** - both what the model sees - plus one field per input declared on the workflow's trigger schema. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type.
+4. Complete each workflow's **tool mapping**: choose **Configure** from the actions menu (**⋮**) on its row in the expanded server. The mapping offers a **Tool Name** and a **Tool Description** - both what the model sees - plus one field per input declared on the workflow's trigger schema. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type.
 
-Adding a project version does not touch your own deployments. The server deploys the selected workflows itself, in a deployment of its own in the server's environment that does not appear in the Deployments list. The attachment stays pinned to that version: to expose a newer version, remove the project from the server and add it again with the new version.
+Adding a project version does not touch your own deployments. The server deploys the selected workflows itself, in a deployment of its own in the server's environment that does not appear in the Deployments list. The attachment stays pinned to that version: to expose another version, choose **Change Project Version** from the project's menu.
+
+Each workflow row has its own **Enabled** toggle, like a component tool: a disabled workflow is left out of the server's tool list until you switch it back on, and new workflows start enabled. The row's actions menu holds **Configure** (the tool mapping), **Edit** (the workflow's connections and inputs in the server's deployment) and **Delete**.
 
 Each exposed workflow becomes one tool. Per-input values can be fixed constants or `fromAi(...)` expressions the assistant fills at call time. When the assistant calls the tool, ByteChef runs the workflow with those inputs and waits up to 300 seconds for it to finish. It returns the workflow's response if the workflow sends one, and otherwise the run's outputs. A run that pauses on an [approval](/platform/automation/build/workflows/human-in-the-loop) step returns `status: approval_required` together with the approval form link; MCP clients that support elicitation ask the user to approve or reject inline instead.
 
@@ -79,6 +81,7 @@ The mapping lives on the MCP server's attachment to the workflow, not in the wor
       letters, digits, `_` and `-` replaced by `_`.
     - The server has [Enforce tool authorization](#enforce-tool-authorization) on, which hides every
       workflow tool.
+    - Its **Enabled** toggle is off.
 </Callout>
 
 ### Choosing what to expose
