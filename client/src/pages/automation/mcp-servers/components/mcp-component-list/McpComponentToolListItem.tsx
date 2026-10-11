@@ -1,16 +1,8 @@
-import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
-import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {Popover, PopoverAnchor} from '@/components/ui/popover';
+import {Popover} from '@/components/ui/popover';
 import McpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover';
+import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
 import {
     McpTool,
@@ -18,7 +10,6 @@ import {
     useUpdateWorkspaceMcpToolEnabledMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {BoltIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 import useMcpProjectComponentToolDropdownMenu from './hooks/useMcpProjectComponentToolDropdownMenu';
@@ -110,37 +101,12 @@ const McpComponentToolListItem = ({
                             />
                         )}
 
-                        <DropdownMenu>
-                            <PopoverAnchor asChild>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        aria-label={`${toolLabel} actions`}
-                                        icon={<EllipsisVerticalIcon />}
-                                        size="iconSm"
-                                        variant="ghost"
-                                    />
-                                </DropdownMenuTrigger>
-                            </PopoverAnchor>
-
-                            <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item"
-                                    onSelect={() => openPopover(popoverId)}
-                                >
-                                    <BoltIcon /> Configure
-                                </DropdownMenuItem>
-
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item-destructive"
-                                    onSelect={() => setShowDeleteDialog(true)}
-                                    variant="destructive"
-                                >
-                                    <Trash2Icon /> Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <McpToolActionsMenu
+                            anchorsPopover
+                            label={toolLabel}
+                            onConfigureClick={() => openPopover(popoverId)}
+                            onDeleteClick={() => setShowDeleteDialog(true)}
+                        />
                     </div>
                 </div>
 
