@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -134,7 +133,7 @@ class SuspendTaskCompletionHandlerTest {
         FileEntry contextFileEntry = taskFileStorage.storeContextValue(
             100L, Context.Classname.JOB, Map.of());
 
-        when(contextService.peek(eq(100L), eq(Context.Classname.JOB)))
+        when(contextService.peek(100L, Context.Classname.JOB))
             .thenReturn(contextFileEntry);
 
         Job stoppedJob = new Job();
@@ -255,7 +254,7 @@ class SuspendTaskCompletionHandlerTest {
             .thenReturn(job);
         when(jobService.getJob(100L))
             .thenReturn(job);
-        when(contextService.peek(eq(100L), eq(Context.Classname.JOB)))
+        when(contextService.peek(100L, Context.Classname.JOB))
             .thenReturn(taskFileStorage.storeContextValue(100L, Context.Classname.JOB, Map.of()));
 
         Job stoppedJob = new Job();
