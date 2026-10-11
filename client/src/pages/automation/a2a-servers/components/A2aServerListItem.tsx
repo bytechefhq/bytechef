@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
@@ -21,7 +22,7 @@ import {
     useUpdateA2aServerTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, EllipsisVerticalIcon, NetworkIcon} from 'lucide-react';
+import {ChevronDownIcon, EditIcon, EllipsisVerticalIcon, NetworkIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 import A2aServerConnect from './A2aServerConnect';
@@ -160,12 +161,21 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>Edit</DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => setEditDialogOpen(true)}
+                                >
+                                    <EditIcon /> Edit
+                                </DropdownMenuItem>
 
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} variant="destructive">
-                                    Delete
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item-destructive"
+                                    onClick={() => setDeleteDialogOpen(true)}
+                                    variant="destructive"
+                                >
+                                    <Trash2Icon /> Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
