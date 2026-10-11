@@ -410,10 +410,6 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
         return toOutputText(output);
     }
 
-    /**
-     * Returns the workflow output as the text of the A2A reply: a text output as is, the text of a single-entry map
-     * such as the {@code message} of a workflow call response, and anything else as JSON.
-     */
     static String toOutputText(@Nullable Object output) {
         if (output == null) {
             return "";

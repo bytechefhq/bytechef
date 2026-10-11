@@ -21,8 +21,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Join entity between an {@link A2aServer} and a tag.
- *
  * @author Ivica Cardic
  */
 @Table("a2a_server_tag")

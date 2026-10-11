@@ -52,10 +52,6 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
 /**
- * Provides a tool that delegates a task to a remote A2A (Agent2Agent) compliant agent. The remote agent's card is
- * resolved from the configured base URL, the task is sent as an A2A message, and the remote agent's text response is
- * returned.
- *
  * @author Ivica Cardic
  */
 public class AiAgentUtilsAgentClientTool {
@@ -156,11 +152,6 @@ public class AiAgentUtilsAgentClientTool {
         }
     }
 
-    /**
-     * Returns the base URL with a trailing slash. The SDK resolves the card path against the base URL with
-     * {@link java.net.URI#resolve(String)}, so its default absolute path drops any path the agent is served under, and
-     * a base without a trailing slash loses its last segment.
-     */
     static String getAgentCardBaseUrl(String baseUrl) {
         String agentCardBaseUrl = baseUrl.strip();
 
@@ -171,21 +162,12 @@ public class AiAgentUtilsAgentClientTool {
         return agentCardBaseUrl.endsWith("/") ? agentCardBaseUrl : agentCardBaseUrl + "/";
     }
 
-    /**
-     * Returns the endpoint URL the tool sends messages to: the configured base URL without a trailing slash or agent
-     * card path.
-     */
     static String getEndpointUrl(String baseUrl) {
         String agentCardBaseUrl = getAgentCardBaseUrl(baseUrl);
 
         return agentCardBaseUrl.substring(0, agentCardBaseUrl.length() - 1);
     }
 
-    /**
-     * Points every interface of the card at the configured base URL. The card advertises the agent's public URL, which
-     * can differ from the URL the tool was configured with and need not be reachable from here, for example a
-     * development proxy.
-     */
     static AgentCard withEndpointUrl(AgentCard agentCard, String endpointUrl) {
         List<AgentInterface> additionalInterfaces = agentCard.additionalInterfaces();
 
