@@ -40,6 +40,7 @@ import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -77,6 +78,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,6 +97,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
     private final ComponentDefinitionService componentDefinitionService;
+    private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserProjectService connectUserProjectService;
     private final ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
     private final ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager;
@@ -127,6 +130,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public ConnectedUserProjectFacadeImpl(
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         ComponentDefinitionService componentDefinitionService,
+        ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade,
         ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager,
@@ -148,6 +152,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         WorkflowTestConfigurationService workflowTestConfigurationService) {
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
         this.componentDefinitionService = componentDefinitionService;
+        this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserWorkflowReferenceFacade = connectedUserWorkflowReferenceFacade;
         this.connectedUserProjectWorkflowManager = connectedUserProjectWorkflowManager;
@@ -508,11 +513,16 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
+        Set<Long> ownedConnectionIds = connectedUserConnectionMembership.getOwnedConnectionIds(
+            connectedUserProject.getConnectedUserId(), environment);
+
         List<ProjectDeploymentWorkflowConnection> connections = workflowTestConfigurationService
             .fetchWorkflowTestConfiguration(workflowId, environment.ordinal())
             .map(WorkflowTestConfiguration::getConnections)
             .orElse(List.of())
             .stream()
+            .filter(workflowTestConfigurationConnection -> ownedConnectionIds.contains(
+                workflowTestConfigurationConnection.getConnectionId()))
             .filter(workflowTestConfigurationConnection -> {
                 Connection connection = connectionService.getConnection(
                     workflowTestConfigurationConnection.getConnectionId());
@@ -642,6 +652,13 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .orElseThrow(() -> new ConfigurationException(
                 "Workflow with workflowUuid: %s not exist".formatted(workflowUuid),
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
+
+        Set<Long> ownedConnectionIds = connectedUserConnectionMembership.getOwnedConnectionIds(
+            connectedUserProject.getConnectedUserId(), environment);
+
+        if (!ownedConnectionIds.contains(connectionId)) {
+            throw new AccessDeniedException("Connection %s is not owned by the connected user".formatted(connectionId));
+        }
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey, connectionId, environment.ordinal());
