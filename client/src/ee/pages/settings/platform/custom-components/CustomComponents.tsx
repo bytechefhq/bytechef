@@ -12,7 +12,7 @@ import {useCustomComponentsQuery} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, Link2Icon, PlusIcon, UploadIcon} from 'lucide-react';
 
 interface NewCustomComponentMenuProps {
-    align?: 'center' | 'end';
+    align?: 'end' | 'start';
 }
 
 const NewCustomComponentMenu = ({align = 'end'}: NewCustomComponentMenuProps) => (
@@ -73,7 +73,7 @@ const CustomComponents = () => {
                     <CustomComponentList customComponents={customComponents} />
                 ) : (
                     <EmptyState
-                        actions={<NewCustomComponentMenu align="center" />}
+                        actions={<NewCustomComponentMenu align="start" />}
                         description="Upload a JavaScript or Python file, or a Java jar, to add your own component to the catalog."
                         docsLink={{href: CUSTOM_COMPONENTS_DOCUMENTATION_URL, label: 'How custom components work'}}
                         icon={<Link2Icon />}
