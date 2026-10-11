@@ -43,7 +43,7 @@ export default function useMcpProjectWorkflowBadge(mcpProjectWorkflow: McpProjec
 
     const updateMcpProjectWorkflowMutation = useUpdateMcpProjectWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['mcpProjectsByServerId'],
             });
         },
