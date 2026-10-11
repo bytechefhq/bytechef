@@ -245,6 +245,12 @@ paths:
             application/json:
               schema:
                 type: "string"
+        "409":
+          description: "The connected user has already copied this automation workflow template."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTemplateAlreadyCopiedError"
       security:
         - jwtBearerAuth: [ ]
   /automation/workflow-templates/{workflowUuid}/provision:
@@ -1186,6 +1192,12 @@ paths:
             application/json:
               schema:
                 type: "string"
+        "409":
+          description: "The connected user has already copied this automation workflow template."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTemplateAlreadyCopiedError"
       security:
         - bearerAuth: [ ]
   /{externalUserId}/automation/workflow-templates/{workflowUuid}/provision:
@@ -2552,6 +2564,13 @@ components:
       properties:
         missingInputName:
           description: "The name of the required input that has no value."
+          type: "string"
+    WorkflowTemplateAlreadyCopiedError:
+      type: "object"
+      description: "Returned when the connected user has already copied an automation workflow template."
+      properties:
+        copiedWorkflowUuid:
+          description: "The uuid of the connected user's existing copy of the template."
           type: "string"
     AutomationWorkflowProjectWorkflowTemplate:
       type: "object"
