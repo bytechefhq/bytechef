@@ -3,6 +3,7 @@ import {Badge} from '@/components/ui/badge';
 import {Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {SetAutomationEnabledRequestI} from '@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations';
 import {describeAttentionReason} from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
+import {canOpenInBuilder, useBuilderAccess} from '@/ee/pages/embedded/automation-hub/utils/builderAccess';
 import {removeAutomation} from '@/ee/pages/embedded/automation-hub/utils/removeAutomation';
 import {reportRemoveError, reportSetEnabledError} from '@/ee/pages/embedded/automation-hub/utils/reportAutomationError';
 import AutomationCardMenu from '@/ee/pages/embedded/automation-hub/views/components/AutomationCardMenu';
@@ -32,9 +33,11 @@ const AutomationCard = ({
     const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
     const [removing, setRemoving] = useState(false);
 
-    const inputs = automation.inputs ?? [];
+    const builderAccess = useBuilderAccess();
 
     const navigate = useNavigate();
+
+    const inputs = automation.inputs ?? [];
 
     const label = automation.label || 'Untitled automation';
 
@@ -97,7 +100,7 @@ const AutomationCard = ({
                     <AutomationCardMenu
                         label={label}
                         onCustomize={
-                            automation.kind === 'COPY' && !automation.dangling
+                            automation.kind === 'COPY' && canOpenInBuilder(automation, builderAccess)
                                 ? () => navigate(`/embedded/hub/builder/${automation.workflowUuid}`)
                                 : undefined
                         }
