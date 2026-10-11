@@ -1,6 +1,7 @@
 import {HubBuilderContext} from '@/ee/pages/embedded/automation-hub/hubBuilderContext';
 import {AutomationHubKeys, useGetWorkflowQuery} from '@/ee/pages/embedded/automation-hub/queries/automationHub.queries';
 import {useAutomationHubStore} from '@/ee/pages/embedded/automation-hub/stores/useAutomationHubStore';
+import {canOpenInBuilder, useBuilderAccess} from '@/ee/pages/embedded/automation-hub/utils/builderAccess';
 import WorkflowBuilder from '@/ee/pages/embedded/workflow-builder/WorkflowBuilder';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo} from 'react';
@@ -15,13 +16,18 @@ const HubBuilderView = () => {
         }))
     );
 
+    const builderAccess = useBuilderAccess();
+
     const {workflowUuid} = useParams();
 
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
-    const {error: workflowError} = useGetWorkflowQuery(workflowUuid);
+    const {data: workflow, error: workflowError} = useGetWorkflowQuery(workflowUuid);
+
+    const builderRefused = !!workflow && !canOpenInBuilder(workflow, builderAccess);
+    const builderHidden = builderRefused || (!workflow && !builderAccess.editWorkflowAllowed);
 
     const handleBackClick = useCallback(() => {
         void queryClient.invalidateQueries({queryKey: AutomationHubKeys.automations});
@@ -35,10 +41,14 @@ const HubBuilderView = () => {
     );
 
     useEffect(() => {
-        if (workflowError) {
+        if (workflowError || builderRefused) {
             void navigate('/embedded/hub', {replace: true});
         }
-    }, [navigate, workflowError]);
+    }, [builderRefused, navigate, workflowError]);
+
+    if (builderHidden) {
+        return null;
+    }
 
     return (
         <HubBuilderContext.Provider value={hubBuilderContextValue}>
