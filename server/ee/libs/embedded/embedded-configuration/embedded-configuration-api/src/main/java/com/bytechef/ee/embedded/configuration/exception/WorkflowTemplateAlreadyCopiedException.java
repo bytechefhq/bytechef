@@ -8,9 +8,6 @@
 package com.bytechef.ee.embedded.configuration.exception;
 
 /**
- * Thrown when a connected user copies an automation workflow template they have already copied. Carries the uuid of the
- * existing copy so a client can open it instead. Mapped to 409.
- *
  * @version ee
  *
  * @author Ivica Cardic
