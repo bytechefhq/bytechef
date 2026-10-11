@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -38,6 +37,7 @@ import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.platform.ai.tool.ToolSuspension;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
@@ -103,8 +103,14 @@ class WorkflowCallWorkflowToolTest {
         Object pending = suspend.continueParameters()
             .get(SubflowRequestConstants.PENDING_SUBFLOW);
 
-        assertInstanceOf(PendingSubflowRequest.class, pending);
-        assertEquals("wf-99", ((PendingSubflowRequest) pending).workflowId());
+        PendingSubflowRequest pendingSubflowRequest = assertInstanceOf(PendingSubflowRequest.class, pending);
+
+        assertEquals("wf-99", pendingSubflowRequest.workflowId());
+        assertEquals("newWorkflowCall", pendingSubflowRequest.inputsName());
+        assertEquals(Map.of("amount", 5), pendingSubflowRequest.inputs());
+        assertEquals(
+            true, suspend.continueParameters()
+                .get(MetadataConstants.SUBFLOW_RESUME));
     }
 
     @Test
@@ -156,13 +162,18 @@ class WorkflowCallWorkflowToolTest {
         SubflowResolver subflowResolver = mock(SubflowResolver.class);
         SubflowSyncExecutor subflowSyncExecutor = mock(SubflowSyncExecutor.class);
 
-        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of("amount", 5), true))
+        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of("amount", 5), true, 7L))
             .thenReturn(Map.of("total", 10));
+
+        TestAgentContext agentContext = mock(TestAgentContext.class);
+
+        when(agentContext.getJobId()).thenReturn(7L);
 
         ClusterElementContextAware context = mock(
             ClusterElementContextAware.class,
             withSettings().extraInterfaces(ClusterElementContext.class));
 
+        when(context.toActionContext("workflow", 1, "callWorkflow", null)).thenReturn(agentContext);
         when(((ClusterElementContext) context).isEditorEnvironment()).thenReturn(true);
 
         Object result = getToolFunction(subflowDataSource, subflowResolver, subflowSyncExecutor).apply(
@@ -170,7 +181,8 @@ class WorkflowCallWorkflowToolTest {
             MockParametersFactory.create(Map.of()), (ClusterElementContext) context);
 
         assertEquals(Map.of("total", 10), result);
-        verify(context, never()).toActionContext(any(), anyInt(), any(), any());
+        verify(agentContext, never()).suspend(any());
+        verify(subflowResolver, never()).resolveSubflow(any(), any(), anyBoolean());
     }
 
     @Test
@@ -180,7 +192,7 @@ class WorkflowCallWorkflowToolTest {
         SubflowSyncExecutor subflowSyncExecutor = mock(SubflowSyncExecutor.class);
 
         when(subflowSyncExecutor.isSyncJob(42L)).thenReturn(true);
-        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of("amount", 5), false))
+        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of("amount", 5), false, 42L))
             .thenReturn(Map.of("total", 10));
 
         TestAgentContext agentContext = mock(TestAgentContext.class);
@@ -206,7 +218,7 @@ class WorkflowCallWorkflowToolTest {
     void testToolReturnsErrorWhenTheSynchronousSubflowFails() throws Exception {
         SubflowSyncExecutor subflowSyncExecutor = mock(SubflowSyncExecutor.class);
 
-        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of(), true))
+        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of(), true, null))
             .thenThrow(new IllegalStateException("Step 'approve' (approval/v1/requestApproval) would pause it."));
 
         ClusterElementContext context = mock(ClusterElementContext.class);
@@ -222,6 +234,25 @@ class WorkflowCallWorkflowToolTest {
             SubflowToolSupport.ERROR_SYNC_EXECUTION_FAILED_PREFIX +
                 "Step 'approve' (approval/v1/requestApproval) would pause it.",
             result);
+    }
+
+    @Test
+    void testToolNamesTheExceptionWhenTheSynchronousSubflowFailsWithoutAMessage() throws Exception {
+        SubflowSyncExecutor subflowSyncExecutor = mock(SubflowSyncExecutor.class);
+
+        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of(), true, null))
+            .thenThrow(new NullPointerException());
+
+        ClusterElementContext context = mock(ClusterElementContext.class);
+
+        when(context.isEditorEnvironment()).thenReturn(true);
+
+        Object result = getToolFunction(
+            mock(SubflowDataSource.class), mock(SubflowResolver.class), subflowSyncExecutor).apply(
+                MockParametersFactory.create(Map.of("workflowUuid", "uuid-1")),
+                MockParametersFactory.create(Map.of()), context);
+
+        assertEquals(SubflowToolSupport.ERROR_SYNC_EXECUTION_FAILED_PREFIX + "NullPointerException", result);
     }
 
     @Test

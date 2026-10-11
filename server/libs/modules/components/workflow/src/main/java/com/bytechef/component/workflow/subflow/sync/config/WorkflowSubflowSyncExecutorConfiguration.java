@@ -40,6 +40,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
@@ -49,6 +50,7 @@ import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import com.bytechef.task.dispatcher.approval.WaitForApprovalTaskDispatcher;
@@ -68,6 +70,7 @@ import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
+import com.bytechef.task.dispatcher.subflow.event.listener.AgentSubflowLauncher;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
@@ -91,18 +94,20 @@ public class WorkflowSubflowSyncExecutorConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowSubflowSyncExecutorConfiguration.class);
 
-    static final String SUSPENDING_TASK_MESSAGE =
+    private static final String SUSPENDING_TASK_MESSAGE =
         "A sub-workflow called synchronously (in the editor, or from a workflow that returns a synchronous " +
             "response) can't pause. Step '%s' (%s) would pause it. Run the calling workflow asynchronously, or " +
             "remove the step.";
 
     @Bean
     SubflowSyncExecutor subflowSyncExecutor(
-        ChildJobPrincipalFactory childJobPrincipalFactory, ContextService contextService, CounterService counterService,
-        TaskFileStorage durableTaskFileStorage, Environment environment, Evaluator evaluator, JobService jobService,
-        SubflowResolver subflowResolver, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
-        WorkflowService workflowService) {
+        ApplicationProperties applicationProperties, ChildJobPrincipalFactory childJobPrincipalFactory,
+        ContextService contextService, CounterService counterService, TaskFileStorage durableTaskFileStorage,
+        Environment environment, Evaluator evaluator, JobService jobService, SubflowResolver subflowResolver,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
+        TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
+
+        int maxSubflowDepth = getMaxSubflowDepth(applicationProperties);
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
@@ -129,13 +134,23 @@ public class WorkflowSubflowSyncExecutorConfiguration {
 
             @Override
             public @Nullable Object execute(
-                String workflowUuid, String triggerName, Map<String, ?> inputs, boolean editorEnvironment) {
+                String workflowUuid, String triggerName, Map<String, ?> inputs, boolean editorEnvironment,
+                @Nullable Long callerJobId) {
+
+                int depth = getSubflowDepth(jobService, callerJobId) + 1;
+
+                if (depth > maxSubflowDepth) {
+                    throw new IllegalStateException(AgentSubflowLauncher.tooDeepMessage(maxSubflowDepth));
+                }
 
                 Subflow subflow = subflowResolver.resolveSubflow(workflowUuid, triggerName, editorEnvironment);
 
                 Map<String, Object> jobInputs = Map.of(subflow.inputsName(), inputs);
 
-                Job job = jobSyncExecutor.execute(new JobParametersDTO(subflow.workflowId(), jobInputs), true);
+                Job job = jobSyncExecutor.execute(
+                    new JobParametersDTO(
+                        subflow.workflowId(), jobInputs, Map.of(SubflowRequestConstants.SUBFLOW_DEPTH, depth)),
+                    true);
 
                 if (job.getOutputs() == null) {
                     return null;
@@ -152,6 +167,28 @@ public class WorkflowSubflowSyncExecutorConfiguration {
                     .orElse(false);
             }
         };
+    }
+
+    static String suspendingTaskMessage(String taskName, String taskType) {
+        return SUSPENDING_TASK_MESSAGE.formatted(taskName, taskType);
+    }
+
+    private static int getMaxSubflowDepth(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+        ApplicationProperties.Workflow.Execution execution = workflow.getExecution();
+        ApplicationProperties.Workflow.Execution.Agent agent = execution.getAgent();
+
+        return agent.getMaxSubflowDepth();
+    }
+
+    private static int getSubflowDepth(JobService jobService, @Nullable Long callerJobId) {
+        if (callerJobId == null) {
+            return 0;
+        }
+
+        return jobService.fetchJob(callerJobId)
+            .map(job -> MapUtils.getInteger(job.getMetadata(), SubflowRequestConstants.SUBFLOW_DEPTH, 0))
+            .orElse(0);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {
@@ -199,7 +236,8 @@ public class WorkflowSubflowSyncExecutorConfiguration {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new SyncExecutionSuspendRejectingTaskCompletionHandler(
-                eventPublisher, jobService, taskExecutionService, SUSPENDING_TASK_MESSAGE),
+                eventPublisher, jobService, taskExecutionService,
+                WorkflowSubflowSyncExecutorConfiguration::suspendingTaskMessage),
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
                 contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage),

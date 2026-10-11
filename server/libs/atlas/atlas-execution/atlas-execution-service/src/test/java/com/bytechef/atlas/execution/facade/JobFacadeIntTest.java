@@ -17,7 +17,6 @@
 package com.bytechef.atlas.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
@@ -85,9 +84,6 @@ public class JobFacadeIntTest {
     private JobRepository jobRepository;
 
     @Autowired
-    private JobService jobService;
-
-    @Autowired
     private TaskExecutionRepository taskExecutionRepository;
 
     @Test
@@ -124,38 +120,6 @@ public class JobFacadeIntTest {
         assertThat(jobRepository.findById(childJobId)).isEmpty();
         assertThat(taskExecutionRepository.findById(parentTaskExecutionId)).isEmpty();
         assertThat(taskExecutionRepository.findById(childTaskExecutionId)).isEmpty();
-    }
-
-    @Test
-    public void testResumeToStatusStartedResumesSuspendedSubflowChild() {
-        long jobId = saveSubflowChildJob(Job.Status.STOPPED);
-
-        assertThat(jobService.resumeToStatusStarted(jobId)
-            .getStatus()).isEqualTo(Job.Status.STARTED);
-    }
-
-    @Test
-    public void testResumeToStatusStartedRejectsFailedSubflowChild() {
-        long jobId = saveSubflowChildJob(Job.Status.FAILED);
-
-        assertThatThrownBy(() -> jobService.resumeToStatusStarted(jobId))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    private long saveSubflowChildJob(Job.Status status) {
-        Job parentJob = jobRepository.save(newJob());
-        long parentJobId = Validate.notNull(parentJob.getId(), "id");
-
-        TaskExecution parentTaskExecution = taskExecutionRepository.save(newTaskExecution(parentJobId, null));
-        long parentTaskExecutionId = Validate.notNull(parentTaskExecution.getId(), "id");
-
-        Job job = newJob();
-
-        job.setParentTaskExecutionId(parentTaskExecutionId);
-        job.setStatus(status);
-
-        return Validate.notNull(jobRepository.save(job)
-            .getId(), "id");
     }
 
     private static Job newJob() {

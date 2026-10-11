@@ -9,6 +9,7 @@ dependencies {
 
     testImplementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
+    testImplementation(testFixtures(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory")))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
@@ -17,5 +18,6 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-job-sync"))
     testImplementation(project(":server:libs:platform:platform-worker"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api")))
     testImplementation(project(":server:libs:test:test-support"))
 }

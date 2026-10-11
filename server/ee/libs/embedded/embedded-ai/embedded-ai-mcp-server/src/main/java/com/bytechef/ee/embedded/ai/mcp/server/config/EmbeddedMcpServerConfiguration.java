@@ -50,6 +50,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.server.FilterableMcpAsyncServer;
@@ -118,6 +119,11 @@ import org.springframework.web.servlet.function.ServerResponse;
 @ConditionalOnEEVersion
 public class EmbeddedMcpServerConfiguration {
 
+    private static final String SUSPENDING_TASK_MESSAGE =
+        "An MCP tool runs a workflow without approval or wait steps synchronously, so the run can't pause. Step " +
+            "'%s' (%s) tried to pause it. Remove that step, or add an approval or wait step so the tool runs the " +
+            "workflow asynchronously.";
+
     private static final String ENVIRONMENT = "environment";
     private static final String EXTERNAL_USER_ID = "externalUserId";
     private static final String SECRET_KEY = "secretKey";
@@ -172,8 +178,9 @@ public class EmbeddedMcpServerConfiguration {
             contextService, evaluator, jobService, -1, asyncMessageBroker,
             getAdditionalApplicationEventListeners(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
-            getTaskCompletionHandlerFactories(
-                contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
+            getSyncTaskCompletionHandlerFactories(
+                contextService, coordinatorEventPublisher, counterService, evaluator, jobService, taskExecutionService,
+                taskFileStorage),
             getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
             getTaskDispatcherResolverFactories(
                 childJobPrincipalFactory, contextService, counterService, coordinatorEventPublisher, evaluator,
@@ -315,6 +322,26 @@ public class EmbeddedMcpServerConfiguration {
         }
 
         return com.bytechef.platform.configuration.domain.Environment.PRODUCTION;
+    }
+
+    static String suspendingTaskMessage(String taskName, String taskType) {
+        return SUSPENDING_TASK_MESSAGE.formatted(taskName, taskType);
+    }
+
+    List<TaskCompletionHandlerFactory> getSyncTaskCompletionHandlerFactories(
+        ContextService contextService, ApplicationEventPublisher eventPublisher, CounterService counterService,
+        Evaluator evaluator, JobService jobService, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
+
+        TaskCompletionHandlerFactory suspendRejectingTaskCompletionHandlerFactory =
+            (taskCompletionHandler, taskDispatcher) -> new SyncExecutionSuspendRejectingTaskCompletionHandler(
+                eventPublisher, jobService, taskExecutionService,
+                EmbeddedMcpServerConfiguration::suspendingTaskMessage);
+
+        return CollectionUtils.concat(
+            List.of(suspendRejectingTaskCompletionHandlerFactory),
+            getTaskCompletionHandlerFactories(
+                contextService, counterService, evaluator, taskExecutionService, taskFileStorage));
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(

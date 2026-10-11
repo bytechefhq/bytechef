@@ -22,11 +22,13 @@ import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
+import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -41,13 +43,15 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
 
     private static final Logger log = LoggerFactory.getLogger(SseStreamApplicationEventListener.class);
 
+    private final JobService jobService;
     private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
     public SseStreamApplicationEventListener(
-        MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
+        this.jobService = jobService;
         this.messageBroker = messageBroker;
         this.taskExecutionService = taskExecutionService;
     }
@@ -80,11 +84,27 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
             } else if (status == Job.Status.STOPPED) {
                 sseStreamEvent.putMetadata(
                     SseStreamEvent.METADATA_SUSPENDED, jobStatusApplicationEvent.isSuspended());
+
+                if (jobStatusApplicationEvent.isSuspended() && isAwaitingSubflow(jobId)) {
+                    sseStreamEvent.putMetadata(SseStreamEvent.METADATA_AWAITING_SUBFLOW, true);
+                }
             }
 
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
             log.warn("Failed to publish the {} status SSE event of job {}", status, jobId, exception);
+        }
+    }
+
+    private boolean isAwaitingSubflow(long jobId) {
+        try {
+            return jobService.fetchJob(jobId)
+                .filter(JobSuspends::isSuspendedForSubflow)
+                .isPresent();
+        } catch (Exception exception) {
+            log.error("Failed to look up whether job {} is waiting on a sub-workflow", jobId, exception);
+
+            return false;
         }
     }
 

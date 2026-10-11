@@ -85,8 +85,8 @@ public class PlatformCoordinatorConfiguration {
 
     @Bean
     SseStreamApplicationEventListener sseStreamApplicationEventListener(
-        MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
-        return new SseStreamApplicationEventListener(messageBroker, taskExecutionService);
+        return new SseStreamApplicationEventListener(jobService, messageBroker, taskExecutionService);
     }
 }
