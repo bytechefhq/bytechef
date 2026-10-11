@@ -1,0 +1,27 @@
+{
+  "label": "Sync Suspend Nested",
+  "tasks": [ {
+    "name": "condition_1",
+    "type": "condition/v1",
+    "parameters": {
+      "rawExpression": true,
+      "expression": "=1 == 1",
+      "caseTrue": [ {
+        "name": "approve",
+        "label": "Pause like an approval",
+        "type": "test/v1/suspend",
+        "parameters": { }
+      }, {
+        "name": "afterApprovalInBranch",
+        "type": "test/v1/next",
+        "parameters": { }
+      } ],
+      "caseFalse": [ ]
+    }
+  }, {
+    "name": "afterCondition",
+    "label": "Runs only once approved",
+    "type": "test/v1/next",
+    "parameters": { }
+  } ]
+}

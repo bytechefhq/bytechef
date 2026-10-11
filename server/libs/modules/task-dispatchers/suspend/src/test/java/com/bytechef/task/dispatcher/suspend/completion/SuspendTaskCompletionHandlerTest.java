@@ -201,6 +201,15 @@ class SuspendTaskCompletionHandlerTest {
         Map<String, ?> jobMetadata = handleSuspendAndGetJobMetadata(Map.of("expiresAt", 1_000L));
 
         assertEquals(false, jobMetadata.get(MetadataConstants.APPROVAL_RESUME));
+        assertEquals(false, jobMetadata.get(MetadataConstants.SUBFLOW_RESUME));
+    }
+
+    @Test
+    void testHandleMarksJobAsSubflowResumeWhenSuspendWaitsOnASubflow() {
+        Map<String, ?> jobMetadata = handleSuspendAndGetJobMetadata(Map.of(MetadataConstants.SUBFLOW_RESUME, true));
+
+        assertEquals(true, jobMetadata.get(MetadataConstants.SUBFLOW_RESUME));
+        assertEquals(false, jobMetadata.get(MetadataConstants.APPROVAL_RESUME));
     }
 
     @Test

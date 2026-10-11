@@ -49,7 +49,7 @@ class AgentJobResumerTest {
 
     private static final long AGENT_JOB_ID = 100L;
     private static final String AGENT_JOB_RESUME_ID = "agent-resume-id";
-    private static final Map<String, Object> RESUME_DATA = AgentJobResumer.completed("done");
+    private static final SubflowOutcome SUBFLOW_OUTCOME = new SubflowOutcome.Completed("done");
     private static final long TASK_EXECUTION_RESUME_ID = 7L;
 
     @Mock
@@ -63,7 +63,7 @@ class AgentJobResumerTest {
         stubAgentJob(Job.Status.STOPPED, waitingMetadata());
 
         boolean resumed = new AgentJobResumer(jobFacade, jobService).resume(
-            AGENT_JOB_ID, AGENT_JOB_RESUME_ID, RESUME_DATA);
+            AGENT_JOB_ID, AGENT_JOB_RESUME_ID, SUBFLOW_OUTCOME);
 
         assertThat(resumed).isTrue();
 
@@ -78,7 +78,8 @@ class AgentJobResumerTest {
         assertThat(updatedMetadata).containsEntry(MetadataConstants.CONSUMED_JOB_RESUME_ID, AGENT_JOB_RESUME_ID)
             .doesNotContainKey(SubflowRequestConstants.LAUNCHED_SUBFLOW_RESUME_ID);
 
-        verify(jobFacade).resumeJob(AGENT_JOB_ID, TASK_EXECUTION_RESUME_ID, RESUME_DATA);
+        verify(jobFacade).resumeJob(
+            AGENT_JOB_ID, TASK_EXECUTION_RESUME_ID, Map.of("status", "completed", "result", "done"));
     }
 
     @Test
@@ -138,14 +139,14 @@ class AgentJobResumerTest {
             .resumeJob(anyLong(), anyLong(), any());
 
         boolean resumed = new AgentJobResumer(jobFacade, jobService).resume(
-            AGENT_JOB_ID, AGENT_JOB_RESUME_ID, RESUME_DATA);
+            AGENT_JOB_ID, AGENT_JOB_RESUME_ID, SUBFLOW_OUTCOME);
 
         assertThat(resumed).isFalse();
     }
 
     private void assertNotResumed() {
         boolean resumed = new AgentJobResumer(jobFacade, jobService).resume(
-            AGENT_JOB_ID, AGENT_JOB_RESUME_ID, RESUME_DATA);
+            AGENT_JOB_ID, AGENT_JOB_RESUME_ID, SUBFLOW_OUTCOME);
 
         assertThat(resumed).isFalse();
 

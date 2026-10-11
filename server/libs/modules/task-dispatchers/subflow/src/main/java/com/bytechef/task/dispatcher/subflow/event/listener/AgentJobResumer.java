@@ -24,10 +24,8 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -36,13 +34,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
  * @author Ivica Cardic
  */
 class AgentJobResumer {
-
-    static final String STATUS = "status";
-    static final String STATUS_COMPLETED = "completed";
-    static final String STATUS_FAILED = "failed";
-
-    private static final String ERROR = "error";
-    private static final String RESULT = "result";
 
     private static final Logger log = LoggerFactory.getLogger(AgentJobResumer.class);
 
@@ -55,28 +46,7 @@ class AgentJobResumer {
         this.jobService = jobService;
     }
 
-    static Map<String, Object> completed(@Nullable Object result) {
-        Map<String, Object> resumeData = new LinkedHashMap<>();
-
-        resumeData.put(STATUS, STATUS_COMPLETED);
-
-        if (result != null) {
-            resumeData.put(RESULT, result);
-        }
-
-        return resumeData;
-    }
-
-    static Map<String, Object> failed(String error) {
-        Map<String, Object> resumeData = new LinkedHashMap<>();
-
-        resumeData.put(STATUS, STATUS_FAILED);
-        resumeData.put(ERROR, error);
-
-        return resumeData;
-    }
-
-    boolean resume(long agentJobId, String agentJobResumeId, Map<String, ?> resumeData) {
+    boolean resume(long agentJobId, String agentJobResumeId, SubflowOutcome subflowOutcome) {
         Job agentJob = jobService.getJob(agentJobId);
 
         if (agentJob.getStatus() != Job.Status.STOPPED) {
@@ -131,7 +101,7 @@ class AgentJobResumer {
         }
 
         try {
-            jobFacade.resumeJob(agentJobId, taskExecutionResumeId, resumeData);
+            jobFacade.resumeJob(agentJobId, taskExecutionResumeId, subflowOutcome.toResumeData());
         } catch (RuntimeException exception) {
             log.error(
                 "Claimed the resume of agent job {} for suspend {} but failed to dispatch it; the job stays stopped",
