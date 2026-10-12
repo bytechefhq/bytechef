@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
@@ -27,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -110,6 +112,51 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testCreateIntegrationInstanceConfigurationRefusesASecondConfigurationOfTheSameVersion() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integration.getId());
+
+        bumpLockVersionPast(integrationInstanceConfigurationId, 1);
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), 1)))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(104));
+    }
+
+    @Test
+    void testCreateIntegrationInstanceConfigurationAllowsAnotherVersionWhateverTheExistingLockVersion() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integration.getId());
+
+        int lockVersion = bumpLockVersionPast(integrationInstanceConfigurationId, 1);
+
+        while (integration.getLastIntegrationVersion() <= lockVersion) {
+            integrationService.publishIntegration(integration.getId(), null);
+
+            integration = integrationService.getIntegration(integration.getId());
+        }
+
+        long secondIntegrationInstanceConfigurationId =
+            integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), lockVersion));
+
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                secondIntegrationInstanceConfigurationId)
+                .getIntegrationVersion())
+                    .isEqualTo(lockVersion);
+    }
+
+    @Test
     void testListReadIsDeliberatelyOnlyAuthenticated() {
         long integrationInstanceConfigurationId = createEnabledIntegrationInstanceConfiguration();
 
@@ -138,6 +185,11 @@ class IntegrationInstanceConfigurationFacadeIntTest {
                     .isInstanceOf(AccessDeniedException.class);
     }
 
+    private static Authentication admin() {
+        return new UsernamePasswordAuthenticationToken(
+            "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN)));
+    }
+
     private static Authentication anonymous() {
         return new AnonymousAuthenticationToken(
             "key", "anonymousUser", List.of(new SimpleGrantedAuthority("ROLE_ANONYMOUS")));
@@ -147,9 +199,40 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
     }
 
+    private int bumpLockVersionPast(long integrationInstanceConfigurationId, int integrationVersion) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstanceConfigurationId);
+
+        while (integrationInstanceConfiguration.getVersion() <= integrationVersion) {
+            integrationInstanceConfigurationService.updateEnabled(
+                integrationInstanceConfigurationId, !integrationInstanceConfiguration.isEnabled());
+
+            integrationInstanceConfiguration = integrationInstanceConfigurationService
+                .getIntegrationInstanceConfiguration(integrationInstanceConfigurationId);
+        }
+
+        return integrationInstanceConfiguration.getVersion();
+    }
+
     private static Authentication connectedUser() {
         return new EmbeddedApiKeyAuthenticationToken(
             Environment.PRODUCTION.ordinal(), 1L, new User("external-user-1", "", List.of()), false);
+    }
+
+    private long createIntegrationInstanceConfiguration(long integrationId) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setAuthorizationType(AuthorizationType.API_KEY);
+        integrationInstanceConfiguration.setConnectionParameters(Map.of("key", "admin-value"));
+        integrationInstanceConfiguration.setEnvironment(Environment.STAGING);
+        integrationInstanceConfiguration.setIntegrationId(integrationId);
+        integrationInstanceConfiguration.setIntegrationVersion(1);
+        integrationInstanceConfiguration.setName("instance-configuration-" + UUID.randomUUID());
+
+        integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
+            integrationInstanceConfiguration);
+
+        return integrationInstanceConfiguration.getId();
     }
 
     private long createEnabledIntegrationInstanceConfiguration() {
@@ -176,6 +259,34 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfigurationId, true);
 
         return integrationInstanceConfigurationId;
+    }
+
+    private Integration createPublishedIntegration() {
+        Integration integration = new Integration();
+
+        integration.setComponentName("componentName");
+        integration.setName("integration-" + UUID.randomUUID());
+
+        integration = integrationService.create(integration);
+
+        integrationService.publishIntegration(integration.getId(), null);
+
+        return integrationService.getIntegration(integration.getId());
+    }
+
+    private static IntegrationInstanceConfigurationDTO newIntegrationInstanceConfigurationDTO(
+        long integrationId, int integrationVersion) {
+
+        return IntegrationInstanceConfigurationDTO.builder()
+            .authorizationType(AuthorizationType.API_KEY)
+            .connectionParameters(Map.of("key", "admin-value"))
+            .environment(Environment.STAGING)
+            .integrationId(integrationId)
+            .integrationInstanceConfigurationWorkflows(List.of())
+            .integrationVersion(integrationVersion)
+            .name("instance-configuration-" + UUID.randomUUID())
+            .tags(List.of())
+            .build();
     }
 
     private static Authentication nonAdmin() {
