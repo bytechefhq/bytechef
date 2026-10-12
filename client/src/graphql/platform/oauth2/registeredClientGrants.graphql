@@ -1,0 +1,10 @@
+query registeredClientGrants($registeredClientId: ID!) {
+    registeredClientGrants(registeredClientId: $registeredClientId) {
+        authorizedAt
+        expiresAt
+        lastIssuedAt
+        mcpServers
+        principalName
+        scopes
+    }
+}

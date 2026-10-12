@@ -1,0 +1,3 @@
+mutation revokeRegisteredClientGrant($registeredClientId: ID!, $principalName: String!) {
+    revokeRegisteredClientGrant(registeredClientId: $registeredClientId, principalName: $principalName)
+}
