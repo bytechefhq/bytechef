@@ -177,8 +177,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfiguration.getEnvironment(), integrationId, null);
 
         if (integrationInstanceConfigurations.stream()
-            .anyMatch(curIntegrationInstanceConfigurations -> curIntegrationInstanceConfigurations
-                .getVersion() == integrationVersion)) {
+            .anyMatch(curIntegrationInstanceConfiguration -> Objects.equals(
+                curIntegrationInstanceConfiguration.getIntegrationVersion(), integrationVersion))) {
 
             throw new ConfigurationException(
                 "Instance Configuration already exists for environment=%s and integrationVersion=%s".formatted(
