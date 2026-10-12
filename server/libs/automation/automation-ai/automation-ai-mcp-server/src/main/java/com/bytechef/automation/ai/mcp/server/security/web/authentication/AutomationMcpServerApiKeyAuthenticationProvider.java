@@ -27,6 +27,7 @@ import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -100,7 +101,11 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
         return ApiKeyAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    private McpServer getMcpServer(String mcpServerSecretKey) {
+    private McpServer getMcpServer(@Nullable String mcpServerSecretKey) {
+        if (mcpServerSecretKey == null) {
+            throw new BadCredentialsException("Invalid MCP server secret key");
+        }
+
         McpServer mcpServer;
 
         try {

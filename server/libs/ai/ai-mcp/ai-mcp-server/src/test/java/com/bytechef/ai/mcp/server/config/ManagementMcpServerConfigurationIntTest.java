@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -68,10 +69,15 @@ class ManagementMcpServerConfigurationIntTest {
     }
 
     @Test
-    void testMcpAsyncServerIsRegisteredAsBean() {
+    void testMcpAsyncServersAreRegisteredForTenantAnchoredAndCanonicalEndpoints() {
         applicationContextRunner.run(context -> {
             assertThat(context).hasNotFailed();
-            assertThat(context).hasSingleBean(McpAsyncServer.class);
+            assertThat(context.getBeansOfType(McpAsyncServer.class))
+                .containsOnlyKeys("mcpAsyncServer", "canonicalMcpAsyncServer");
+            assertThat(context.getBeansOfType(WebMvcStreamableServerTransportProvider.class))
+                .containsOnlyKeys(
+                    "webMvcStreamableHttpServerTransportProvider",
+                    "canonicalWebMvcStreamableHttpServerTransportProvider");
         });
     }
 

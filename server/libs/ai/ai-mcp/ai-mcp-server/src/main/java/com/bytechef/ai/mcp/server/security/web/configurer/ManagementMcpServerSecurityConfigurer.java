@@ -31,8 +31,9 @@ import java.util.regex.Pattern;
  */
 public class ManagementMcpServerSecurityConfigurer extends McpApiKeyHttpConfigurer {
 
-    private static final Pattern MCP_SERVER_SECRET_PATTERN = Pattern.compile("/api/management/(.+)/mcp");
-    private static final String PATH_PATTERN = "^/api/management/.+/mcp";
+    private static final Pattern MCP_SERVER_SECRET_PATTERN = Pattern.compile("/api/management/([^/]+)/mcp");
+    private static final String PATH_PATTERN = "^/api/management(/[^/]+)?/mcp$";
+    private static final String TENANTLESS_PATH = "/api/management/mcp";
 
     public ManagementMcpServerSecurityConfigurer(
         ApiKeyService apiKeyService, AuthorityService authorityService, EnvironmentService environmentService,
@@ -40,9 +41,10 @@ public class ManagementMcpServerSecurityConfigurer extends McpApiKeyHttpConfigur
         UserService userService) {
 
         super(
-            PATH_PATTERN, MCP_SERVER_SECRET_PATTERN,
+            PATH_PATTERN, MCP_SERVER_SECRET_PATTERN, TENANTLESS_PATH,
             new McpApiKeyAuthenticationConverter(environmentService, "/api/management/"),
             new ManagementMcpServerApiKeyAuthenticationProvider(
-                apiKeyService, authorityService, propertyService, userService));
+                apiKeyService, authorityService, propertyService, userService),
+            AUTHENTICATED_TYPES);
     }
 }

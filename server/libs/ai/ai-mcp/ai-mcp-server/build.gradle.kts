@@ -32,8 +32,20 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-a2a:automation-ai-a2a-api")) {
+        isTransitive = false
+    }
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-a2a-server")) {
+        isTransitive = false
+    }
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp-server")) {
+        isTransitive = false
+    }
     testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api")) {
+        isTransitive = false
+    }
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))

@@ -39,7 +39,7 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 @EnableConfigurationProperties(McpResourceServerProperties.class)
 public class McpOAuth2ResourceServerSecurityConfigurerContributor implements SecurityConfigurerContributor {
 
-    private static final String MCP_PATH_REGEX = "^/api/(automation|management)/.+/mcp";
+    private static final String MCP_PATH_REGEX = "^/api/(automation/.+|management(/[^/]+)?)/mcp$";
     private static final String RESOURCE_PATH = "/api";
 
     private final McpJwtDecoderFactory mcpJwtDecoderFactory;
