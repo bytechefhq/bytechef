@@ -173,6 +173,8 @@ bytechef:
       # SQS: one shared queue, correct for a single node only. REDIS: pub/sub broadcast, required with more than one node.
       control-provider: SQS
   oauth2:
+    authorization-server:
+      enabled: false
 #    predefinedApps:
 #      mailchimp:
 #        clientId: 123456789

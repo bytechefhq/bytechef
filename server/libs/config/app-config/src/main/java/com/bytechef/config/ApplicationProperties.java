@@ -4035,6 +4035,11 @@ public class ApplicationProperties {
     public static class Oauth2 {
 
         /**
+         * Embedded OAuth2 authorization server configuration.
+         */
+        private AuthorizationServer authorizationServer = new AuthorizationServer();
+
+        /**
          * Predefined OAuth2 applications mapped by component name
          */
         private Map<String, OAuth2App> predefinedApps = new HashMap<>();
@@ -4045,6 +4050,10 @@ public class ApplicationProperties {
         private String redirectUri;
 
         private ResourceServer resourceServer = new ResourceServer();
+
+        public AuthorizationServer getAuthorizationServer() {
+            return authorizationServer;
+        }
 
         public Map<String, OAuth2App> getPredefinedApps() {
             return predefinedApps;
@@ -4058,6 +4067,10 @@ public class ApplicationProperties {
             return resourceServer;
         }
 
+        public void setAuthorizationServer(AuthorizationServer authorizationServer) {
+            this.authorizationServer = authorizationServer;
+        }
+
         public void setResourceServer(ResourceServer resourceServer) {
             this.resourceServer = resourceServer;
         }
@@ -4068,6 +4081,26 @@ public class ApplicationProperties {
 
         public void setRedirectUri(String redirectUri) {
             this.redirectUri = redirectUri;
+        }
+
+        /**
+         * Embedded OAuth2 authorization server configuration. When disabled (the default), the authorization server
+         * endpoints are not exposed.
+         */
+        public static class AuthorizationServer {
+
+            /**
+             * Whether the embedded OAuth2 authorization server is enabled.
+             */
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
         }
 
         public static class ResourceServer {
