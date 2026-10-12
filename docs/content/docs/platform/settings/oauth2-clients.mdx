@@ -1,28 +1,30 @@
 ---
 title: OAuth2 Clients
-description: Clients registered against the embedded OAuth2 authorization server (including dynamically registered MCP clients) - list and revoke them.
+description: Clients registered against the embedded OAuth2 authorization server (including dynamically registered MCP clients) - see who has access and revoke it.
 ee: true
 comingSoon: true
 ---
 
-When ByteChef runs its own OAuth2 authorization server, MCP clients and other OAuth2-capable integrations register themselves with it automatically through Dynamic Client Registration (DCR). **Settings → OAuth2 Clients** is the admin surface for that client store: it lists every registered client and lets an administrator revoke one by deleting it.
+When ByteChef runs its own OAuth2 authorization server, MCP clients and other OAuth2-capable integrations register themselves with it automatically through Dynamic Client Registration (DCR). **Settings → OAuth2 Clients** is the admin surface for that client store: it lists every registered client, shows which users have granted it access, and lets an administrator revoke that access for a single user or for the whole client.
 
 <Callout title="Availability">
-    This page is Enterprise Edition and restricted to the `ADMIN` authority - the check sits on `RegisteredClientFacade`, so it applies to every caller, not just the UI. The list only has content when the embedded authorization server is enabled with `bytechef.oauth2.authorization-server.enabled=true` (`BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED`), which is off by default.
+    This page is Enterprise Edition and restricted to administrators - the check applies to every caller, not just the UI. The list only has content when the embedded authorization server is enabled with `bytechef.oauth2.authorization-server.enabled=true` (`BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED`), which is off by default.
 </Callout>
 
 ---
 
 ## How clients get here
 
-You do not create clients on this page. Entries appear as a side effect of an OAuth2 client connecting to one of ByteChef's [MCP server](/platform/settings/mcp-server) endpoints:
+You do not create clients on this page. Entries appear as a side effect of an OAuth2 client connecting to one of ByteChef's MCP server endpoints. This covers both the [management MCP server](/platform/settings/mcp-server) and the [automation MCP servers](/platform/automation/deploy/mcp-servers):
 
 1. An OAuth2-capable MCP client - for example a claude.ai web integration, which cannot send custom headers - makes its first unauthenticated request to an MCP endpoint.
 2. The authorization server advertises its authorization metadata, and the client registers itself via Dynamic Client Registration.
-3. The user completes an authorization-code + PKCE flow using their existing ByteChef login, followed by a consent screen.
+3. The user completes an authorization-code + PKCE flow using their existing ByteChef login (a user who is not signed in is sent to the login page and returned to the flow afterwards), followed by a consent screen. The consent screen shows the name the client registered with - self-declared and unverified - and the hosts its redirect URIs point to, which is where approving sends the user back.
 4. The registered client is persisted and appears in this list.
 
-Because registration is dynamic, the list reflects clients that have actually connected - there is no manual "add client" step. See [MCP Server → Authentication](/platform/settings/mcp-server#authentication) for the connecting side of this flow.
+Because registration is dynamic, the list reflects clients that have actually connected - there is no manual "add client" step.
+
+A connected client holds an access token that lasts one hour and a refresh token that lasts 30 days and is replaced on every renewal. Revoking a grant or a client below ends both: the client's next request is rejected and it cannot renew. See [MCP Server → Authentication](/platform/settings/mcp-server#authentication) for the connecting side of this flow.
 
 {/* TODO screenshot: Settings → OAuth2 Clients - the registered clients table showing the Name, Client ID, Issued, and Scopes columns with a delete (trash) icon at the end of each row */}
 
@@ -36,23 +38,65 @@ Each registered client is one row:
 | **Client ID** | The OAuth2 client identifier issued to the client. |
 | **Issued** | Local date and time the client ID was issued (`clientIdIssuedAt`). |
 | **Scopes** | The scopes granted to the client, joined with commas. |
+| **Grants** | How many users currently have access through this client. |
 
 Rows are ordered newest-issued first (`ORDER BY client_id_issued_at DESC`). Each row ends with a **Delete client** trash icon.
 
 When no clients have registered yet, the table is replaced by an empty state titled **No OAuth2 Clients** with the message "Clients registered through Dynamic Client Registration will appear here."
 
+## Grants
+
+A **grant** is the access one user has given to one client. When a user approves a client on the consent screen, ByteChef records that approval as a grant, and the client then uses it to act on that user's behalf on the MCP servers it connected to.
+
+Click the arrow at the start of a row to expand a client and see its grants:
+
+| Column | Description |
+|---|---|
+| **User** | The ByteChef user who approved the client. |
+| **MCP servers** | The MCP servers the grant reaches - **Management** for the management MCP server, or the name of the automation MCP server. |
+| **Scopes** | The scopes the user approved. |
+| **Authorized** | When the user first approved the client. |
+| **Last used** | When the client last received a new token. |
+| **Expires** | When the grant stops working unless the client renews it. |
+
+A grant is listed only while it still has a valid token.
+
+{/* TODO screenshot: an expanded client row showing the grants table with the User, MCP servers, Scopes, Authorized, Last used, Expires columns and a Revoke button */}
+
+### Revoke a user's grant
+
+1. Expand the client and click the **Revoke** button at the end of the user's row.
+2. Confirm in the dialog.
+
+Revoking takes effect immediately: the user's next request through that client is rejected with `401`, with no waiting for a token to expire. The revocation covers every MCP server the client reached for that user. To get access back, the user must connect again and approve the consent screen once more. Other users of the same client are not affected. If the grant is already gone - for example another administrator revoked it first - the page reports an error instead of a success.
+
 ## Revoke a client
 
-Deleting a client both removes its registration and revokes the tokens it currently holds.
+Removing a client revokes everything it holds. What the button does depends on how ByteChef is deployed.
 
-1. Click the **Delete client** trash icon at the end of the row.
-2. Confirm in the **Are you absolutely sure?** dialog - "This action cannot be undone. This will permanently delete the OAuth2 client and revoke its authorizations."
+**Single-tenant installations.** Click the **Delete client** trash icon at the end of the row and confirm in the **Are you absolutely sure?** dialog - "This action cannot be undone. This will permanently delete the OAuth2 client and revoke its authorizations." ByteChef removes the client, all of its grants and the users' stored approvals. Any MCP assistant connected through that client must register again and the user must approve access again.
 
-On delete the server first removes the client's rows from `oauth2_authorization`, invalidating its access and refresh tokens, and then removes the record from `oauth2_registered_client`. Any MCP assistant connected through that client must re-register - its next request triggers a fresh Dynamic Client Registration and a new consent flow.
+**Multi-tenant installations.** A client can be shared by several tenants, so you cannot delete it. The page lists only clients that have grants in your tenant, and each row shows **Revoke all grants** instead of the trash icon. It revokes every grant for that client in your tenant and leaves other tenants' grants untouched. Confirm in the dialog - the users must approve access again to reconnect.
 
-{/* TODO screenshot: the "Are you absolutely sure?" delete confirmation dialog with its Cancel and Delete buttons */}
+{/* TODO screenshot: the revoke confirmation dialog with its Cancel and Revoke buttons */}
+
+## Turn the authorization server on
+
+The embedded authorization server is off by default. Two settings are needed. First, turn the server on with `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=true`. Second, tell ByteChef to trust its own tokens by adding an issuer entry for itself:
+
+```
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF=true
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI=<your public URL>
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM=tenant_id
+```
+
+The self issuer URI must be exactly the value of `bytechef.public-url` (`BYTECHEF_PUBLIC_URL`), without a trailing slash. The authorization server uses that URL as its issuer, so a different value means ByteChef rejects its own tokens.
+
+If an external issuer already uses index `0`, add the self issuer at the next free index instead (for example `_1_`). Discovery advertises the first issuer, so put the self issuer at index `0` only when it should be the advertised sign-in.
+
+See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration) for details.
 
 ## What this page does not show
 
-- **No client secret.** Secrets are never returned to the admin UI; there is no reveal, copy, or rotate action. To rotate a client's credentials, delete it and let it re-register.
+- **No client secret.** Secrets are never returned to the admin UI; there is no reveal, copy, or rotate action. To rotate a client's credentials, delete it and let it re-register (single-tenant installations).
 - **No edit.** Registered clients are read-only apart from deletion - you cannot rename a client or change its scopes, redirect URIs, or grant types here. Those values are fixed at registration time.
