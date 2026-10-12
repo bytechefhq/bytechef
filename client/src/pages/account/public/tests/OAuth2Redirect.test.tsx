@@ -92,3 +92,25 @@ it('should redirect to home immediately when already authenticated', async () =>
         expect(screen.getByText('Home Page')).toBeInTheDocument();
     });
 });
+
+it('should load the authorization endpoint from the server when it was the remembered destination', async () => {
+    const assignMock = vi.fn();
+
+    vi.stubGlobal('location', {...window.location, assign: assignMock});
+
+    window.sessionStorage.setItem('bytechef.loginRedirect', '/oauth2/authorize?response_type=code&client_id=client');
+
+    mockAuthenticationStore({
+        getAccount: vi.fn().mockResolvedValue({email: 'test@example.com', firstName: 'Test', lastName: 'User'}),
+    });
+
+    renderOAuth2Redirect();
+
+    await waitFor(() => {
+        expect(assignMock).toHaveBeenCalledWith('/oauth2/authorize?response_type=code&client_id=client');
+    });
+
+    expect(screen.queryByText('Home Page')).not.toBeInTheDocument();
+
+    vi.unstubAllGlobals();
+});

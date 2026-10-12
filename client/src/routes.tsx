@@ -3,6 +3,7 @@ import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
+import OAuth2Consent from '@/pages/account/public/OAuth2Consent';
 import OAuth2Redirect from '@/pages/account/public/OAuth2Redirect';
 import PasswordResetEmailSent from '@/pages/account/public/PasswordResetEmailSent';
 import PasswordResetFinish from '@/pages/account/public/PasswordResetFinish';
@@ -83,6 +84,7 @@ const Billing = lazy(() => import('@/ee/pages/settings/platform/billing/Billing'
 const IdentityProvidersPage = lazy(
     () => import('@/ee/pages/settings/platform/identity-providers/IdentityProvidersPage')
 );
+const RegisteredClients = lazy(() => import('@/ee/pages/settings/platform/registered-clients/RegisteredClients'));
 const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
 const AutomationWorkflow = lazy(() => import('@/ee/pages/embedded/automation-workflow/AutomationWorkflow'));
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
@@ -371,6 +373,18 @@ const platformSettingsRoutes = {
         },
         {
             element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <RegisteredClients />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'registered-clients',
+        },
+        {
+            element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <EEVersion>
                         <LazyLoadWrapper>
@@ -429,6 +443,10 @@ const platformSettingsRoutes = {
             title: 'Identity Providers',
         },
         {
+            href: 'registered-clients',
+            title: 'OAuth2 Clients',
+        },
+        {
             href: 'admin-api-keys',
             title: 'Admin API Keys',
         },
@@ -455,6 +473,10 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: <Register />,
             path: '/register',
+        },
+        {
+            element: <OAuth2Consent />,
+            path: '/oauth2/consent',
         },
         {
             element: <OAuth2Redirect />,

@@ -1,6 +1,12 @@
 import {beforeEach, describe, expect, it} from 'vitest';
 
-import {buildLoginPath, consumeLoginRedirect, getLoginRedirect, rememberLoginRedirect} from '../login-redirect-utils';
+import {
+    buildLoginPath,
+    consumeLoginRedirect,
+    getLoginRedirect,
+    rememberLoginRedirect,
+    requiresFullPageLoad,
+} from '../login-redirect-utils';
 
 describe('buildLoginPath', () => {
     it('records the requested location so it survives a full page load', () => {
@@ -63,6 +69,29 @@ describe('getLoginRedirect open-redirect rejection', () => {
 
     it('keeps an ordinary same-origin path', () => {
         expect(getLoginRedirect('?redirect=%2Fautomation%2Fprojects')).toBe('/automation/projects');
+    });
+});
+
+describe('getLoginRedirect for the authorization endpoint', () => {
+    it('keeps the query string of an authorization request recorded by the server', () => {
+        const authorizeRequest =
+            '/oauth2/authorize?response_type=code&client_id=client&redirect_uri=http%3A%2F%2F127.0.0.1%2Fcallback';
+
+        expect(getLoginRedirect(`?redirect=${encodeURIComponent(authorizeRequest)}`)).toBe(authorizeRequest);
+    });
+});
+
+describe('requiresFullPageLoad', () => {
+    it('requires a full page load for the authorization endpoint, which the server serves', () => {
+        expect(requiresFullPageLoad('/oauth2/authorize?response_type=code&client_id=client')).toBe(true);
+        expect(requiresFullPageLoad('/oauth2/authorize')).toBe(true);
+    });
+
+    it('keeps router navigation for pages of the single-page application', () => {
+        expect(requiresFullPageLoad('/oauth2/consent?client_id=client')).toBe(false);
+        expect(requiresFullPageLoad('/oauth2/redirect')).toBe(false);
+        expect(requiresFullPageLoad('/oauth2/authorization/google')).toBe(false);
+        expect(requiresFullPageLoad('/automation/projects')).toBe(false);
     });
 });
 

@@ -4,7 +4,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {getLoginRedirect, rememberLoginRedirect} from '@/shared/auth/login-redirect-utils';
+import {getLoginRedirect, rememberLoginRedirect, requiresFullPageLoad} from '@/shared/auth/login-redirect-utils';
 import useCeEdition from '@/shared/edition/useCeEdition';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
@@ -150,6 +150,8 @@ const Login = () => {
         from: getLoginRedirect(pageLocation.search) ?? {pathname: '/', search: pageLocation.search},
     };
 
+    const fullPageRedirect = authenticated && typeof from === 'string' && requiresFullPageLoad(from) ? from : undefined;
+
     useEffect(() => {
         const company = searchParams.get('company');
 
@@ -196,6 +198,20 @@ const Login = () => {
             reset();
         }
     }, [authenticated, loginError, navigate, reset]);
+
+    useEffect(() => {
+        if (fullPageRedirect) {
+            window.location.assign(fullPageRedirect);
+        }
+    }, [fullPageRedirect]);
+
+    if (fullPageRedirect) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <LoadingIcon />
+            </div>
+        );
+    }
 
     if (authenticated) {
         return <Navigate replace to={from} />;

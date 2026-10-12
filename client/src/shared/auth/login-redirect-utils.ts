@@ -1,3 +1,4 @@
+const AUTHORIZATION_ENDPOINT_PATH = '/oauth2/authorize';
 const LOGIN_PATH = '/login';
 const REDIRECT_PARAM = 'redirect';
 const REDIRECT_STORAGE_KEY = 'bytechef.loginRedirect';
@@ -48,6 +49,9 @@ export const getLoginRedirect = (search: string): string | undefined => {
 
     return target ? normalizeRedirect(target) : undefined;
 };
+
+export const requiresFullPageLoad = (target: string): boolean =>
+    new URL(target, SENTINEL_ORIGIN).pathname === AUTHORIZATION_ENDPOINT_PATH;
 
 export const rememberLoginRedirect = (target: string | undefined): void => {
     try {
