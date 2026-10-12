@@ -10,6 +10,7 @@
     "connections",
     "ai-providers",
     "mcp-server",
+    "oauth2-clients",
     "components",
     "admin-api-keys",
     "audit-events",
