@@ -27,12 +27,9 @@ vi.mock('@/ee/pages/embedded/integration/components/integrations-sidebar/compone
     ),
 }));
 
-vi.mock(
-    '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListFilter',
-    () => ({
-        default: ({sortBy}: {sortBy: string}) => <div data-testid="workflows-list-filter">Sort:{sortBy}</div>,
-    })
-);
+vi.mock('@/shared/components/workflow/WorkflowsListFilter', () => ({
+    default: ({sortBy}: {sortBy: string}) => <div data-testid="workflows-list-filter">Sort:{sortBy}</div>,
+}));
 
 vi.mock(
     '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListItem',
