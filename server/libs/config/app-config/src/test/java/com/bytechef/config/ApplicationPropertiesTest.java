@@ -96,6 +96,27 @@ class ApplicationPropertiesTest {
     }
 
     @Test
+    void testAuthorizationServerDisabledByDefault() {
+        Oauth2 oauth2 = new Oauth2();
+
+        assertThat(oauth2.getAuthorizationServer()
+            .isEnabled()).isFalse();
+    }
+
+    @Test
+    void testAuthorizationServerEnabledBinds() {
+        MapConfigurationPropertySource source = new MapConfigurationPropertySource(
+            Map.of("bytechef.oauth2.authorization-server.enabled", "true"));
+
+        Oauth2 oauth2 = new Binder(source)
+            .bind("bytechef.oauth2", Oauth2.class)
+            .get();
+
+        assertThat(oauth2.getAuthorizationServer()
+            .isEnabled()).isTrue();
+    }
+
+    @Test
     void testResourceServerEmptyByDefault() {
         Oauth2 oauth2 = new Oauth2();
 

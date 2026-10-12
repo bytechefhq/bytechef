@@ -120,6 +120,8 @@ bytechef:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | memory | redis) default: memory
     provider: memory
   oauth2:
+    authorization-server:
+      enabled: false
 #    predefinedApps:
 #      mailchimp:
 #        clientId: 123456789

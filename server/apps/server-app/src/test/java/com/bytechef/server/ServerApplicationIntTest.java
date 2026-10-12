@@ -18,6 +18,7 @@ package com.bytechef.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
 import com.bytechef.ai.copilot.config.CopilotConfiguration;
 import com.bytechef.ai.copilot.config.CopilotPgVectorConfiguration;
@@ -33,12 +34,14 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.oauth2.authorizationserver.config.Oauth2AuthorizationServerConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.Locale;
 import javax.sql.DataSource;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,6 +51,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.NestedTestConfiguration;
 
 /**
  * @author Ivica Cardic
@@ -102,6 +106,35 @@ class ServerApplicationIntTest {
             assertThat(tableExists(databaseMetaData, "batch_job_instance")).isTrue();
             assertThat(tableExists(databaseMetaData, "batch_job_execution")).isTrue();
             assertThat(tableExists(databaseMetaData, "batch_step_execution")).isTrue();
+        }
+    }
+
+    /**
+     * Verifies that when {@code bytechef.oauth2.authorization-server.enabled=true} the whole application context still
+     * loads: the embedded authorization server's highest-precedence, {@code securityMatcher}-scoped filter chain
+     * coexists with {@code SecurityConfiguration}'s actuator, API and catch-all chains. An unscoped
+     * authorization-server chain would make Spring Security fail context startup, so a successful load is the
+     * regression guard for the co-hosting scoping.
+     */
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+            "bytechef.oauth2.authorization-server.enabled=true", "bytechef.edition=ee"
+        })
+    @Import({
+        PostgreSQLContainerConfiguration.class, ServerApplicationIntTest.ServerApplicationIntTestConfiguration.class
+    })
+    class AuthorizationServerEnabled {
+
+        @Autowired
+        private ApplicationContext applicationContext;
+
+        @Test
+        void testContextLoadsWithAuthorizationServerEnabled() {
+            assertThat(applicationContext.getBeanNamesForType(Oauth2AuthorizationServerConfiguration.class))
+                .isNotEmpty();
         }
     }
 
