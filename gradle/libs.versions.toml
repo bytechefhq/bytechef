@@ -69,6 +69,7 @@ org-springaicommunity-agent-judge-core = { module = "io.github.markpollack:agent
 org-springaicommunity-agent-judge-llm = { module = "io.github.markpollack:agent-judge-llm", version.ref = "markpollack-agent-judge" }
 org-springaicommunity-agents-agent-claude = { module = "io.github.markpollack:agent-claude", version.ref = "markpollack-agent-claude" }
 org-springaicommunity-agents-agent-client-core = { module = "io.github.markpollack:agent-client-core", version.ref = "markpollack-agent-claude" }
+org-springaicommunity-mcp-authorization-server = { module = "org.springaicommunity:mcp-authorization-server", version.ref = "springaicommunity-mcp-security" }
 org-springaicommunity-mcp-server-security = { module = "org.springaicommunity:mcp-server-security", version.ref = "springaicommunity-mcp-security" }
 org-springaicommunity-spring-ai-agent-utils = { module = "org.springaicommunity:spring-ai-agent-utils", version.ref = "springaicommunity-agent-utils" }
 org-springaicommunity-spring-ai-session = { module = "org.springaicommunity:spring-ai-session", version.ref = "springaicommunity-spring-ai-session" }
