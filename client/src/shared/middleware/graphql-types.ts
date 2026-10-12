@@ -1688,6 +1688,7 @@ export type Mutation = {
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpTool?: Maybe<Scalars['Boolean']['output']>;
+  deleteRegisteredClient: Scalars['Boolean']['output'];
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
@@ -1718,6 +1719,8 @@ export type Mutation = {
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
+  revokeRegisteredClientGrant: Scalars['Boolean']['output'];
+  revokeRegisteredClientGrants: Scalars['Boolean']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
@@ -2154,6 +2157,11 @@ export type MutationDeleteMcpToolArgs = {
 };
 
 
+export type MutationDeleteRegisteredClientArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteSharedProjectArgs = {
   id: Scalars['ID']['input'];
 };
@@ -2317,6 +2325,17 @@ export type MutationRenameDataTableArgs = {
 
 export type MutationRenameDataTableColumnArgs = {
   input: RenameColumnInput;
+};
+
+
+export type MutationRevokeRegisteredClientGrantArgs = {
+  principalName: Scalars['String']['input'];
+  registeredClientId: Scalars['ID']['input'];
+};
+
+
+export type MutationRevokeRegisteredClientGrantsArgs = {
+  registeredClientId: Scalars['ID']['input'];
 };
 
 
@@ -2728,6 +2747,13 @@ export type NumberProperty = Property & {
   type: PropertyType;
 };
 
+export type OAuth2ConsentClient = {
+  __typename?: 'OAuth2ConsentClient';
+  clientId: Scalars['String']['output'];
+  clientName?: Maybe<Scalars['String']['output']>;
+  redirectHosts: Array<Scalars['String']['output']>;
+};
+
 export type ObjectProperty = Property & {
   __typename?: 'ObjectProperty';
   additionalProperties?: Maybe<Array<Property>>;
@@ -3056,7 +3082,7 @@ export type Query = {
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
-  managementMcpServerCanonicalUrl?: Maybe<Scalars['String']['output']>;
+  managementMcpServerCanonicalUrl: Scalars['String']['output'];
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponentDefinitions: Array<ComponentDefinition>;
@@ -3079,12 +3105,15 @@ export type Query = {
   mcpTool?: Maybe<McpTool>;
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
+  oauth2ConsentClient?: Maybe<OAuth2ConsentClient>;
   preBuiltProjectTemplates: Array<ProjectTemplate>;
   preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
   project?: Maybe<Project>;
   projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
   projectTemplate?: Maybe<ProjectTemplate>;
   projects?: Maybe<Array<Maybe<Project>>>;
+  registeredClientGrants?: Maybe<Array<Maybe<RegisteredClientGrant>>>;
+  registeredClients?: Maybe<Array<Maybe<RegisteredClient>>>;
   searchKnowledgeBase?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
   sharedProject?: Maybe<SharedProject>;
   sharedWorkflow?: Maybe<SharedWorkflow>;
@@ -3661,6 +3690,11 @@ export type QueryMcpToolsByComponentIdArgs = {
 };
 
 
+export type QueryOauth2ConsentClientArgs = {
+  clientId: Scalars['String']['input'];
+};
+
+
 export type QueryPreBuiltProjectTemplatesArgs = {
   category?: InputMaybe<Scalars['String']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
@@ -3686,6 +3720,11 @@ export type QueryProjectDeploymentWorkflowArgs = {
 export type QueryProjectTemplateArgs = {
   id: Scalars['String']['input'];
   sharedProject: Scalars['Boolean']['input'];
+};
+
+
+export type QueryRegisteredClientGrantsArgs = {
+  registeredClientId: Scalars['ID']['input'];
 };
 
 
@@ -3847,6 +3886,29 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
   projectId?: InputMaybe<Scalars['ID']['input']>;
   tagId?: InputMaybe<Scalars['ID']['input']>;
   workspaceId: Scalars['ID']['input'];
+};
+
+export type RegisteredClient = {
+  __typename?: 'RegisteredClient';
+  authorizationGrantTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  clientId?: Maybe<Scalars['String']['output']>;
+  clientIdIssuedAt?: Maybe<Scalars['Long']['output']>;
+  clientName?: Maybe<Scalars['String']['output']>;
+  deletable?: Maybe<Scalars['Boolean']['output']>;
+  grantCount?: Maybe<Scalars['Int']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  redirectUris?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  scopes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+};
+
+export type RegisteredClientGrant = {
+  __typename?: 'RegisteredClientGrant';
+  authorizedAt?: Maybe<Scalars['Long']['output']>;
+  expiresAt?: Maybe<Scalars['Long']['output']>;
+  lastIssuedAt?: Maybe<Scalars['Long']['output']>;
+  mcpServers?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  principalName?: Maybe<Scalars['String']['output']>;
+  scopes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
 
 export type RemoveColumnInput = {

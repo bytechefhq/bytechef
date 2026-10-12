@@ -1854,7 +1854,7 @@ export type EvaluatorFunctionDefinitionsQuery = { evaluatorFunctionDefinitions: 
 export type ManagementMcpServerCanonicalUrlQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ManagementMcpServerCanonicalUrlQuery = { managementMcpServerCanonicalUrl: string | null };
+export type ManagementMcpServerCanonicalUrlQuery = { managementMcpServerCanonicalUrl: string };
 
 export type ManagementMcpServerUrlQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2043,6 +2043,47 @@ export type EnableCustomComponentMutationVariables = Exact<{
 
 
 export type EnableCustomComponentMutation = { enableCustomComponent: boolean };
+
+export type DeleteRegisteredClientMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteRegisteredClientMutation = { deleteRegisteredClient: boolean };
+
+export type Oauth2ConsentClientQueryVariables = Exact<{
+  clientId: string;
+}>;
+
+
+export type Oauth2ConsentClientQuery = { oauth2ConsentClient: { clientId: string, clientName: string | null, redirectHosts: Array<string> } | null };
+
+export type RegisteredClientGrantsQueryVariables = Exact<{
+  registeredClientId: string | number;
+}>;
+
+
+export type RegisteredClientGrantsQuery = { registeredClientGrants: Array<{ authorizedAt: any, expiresAt: any, lastIssuedAt: any, mcpServers: Array<string | null> | null, principalName: string | null, scopes: Array<string | null> | null } | null> | null };
+
+export type RegisteredClientsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RegisteredClientsQuery = { registeredClients: Array<{ authorizationGrantTypes: Array<string | null> | null, clientId: string | null, clientIdIssuedAt: any, clientName: string | null, deletable: boolean | null, grantCount: number | null, id: string | null, redirectUris: Array<string | null> | null, scopes: Array<string | null> | null } | null> | null };
+
+export type RevokeRegisteredClientGrantMutationVariables = Exact<{
+  registeredClientId: string | number;
+  principalName: string;
+}>;
+
+
+export type RevokeRegisteredClientGrantMutation = { revokeRegisteredClientGrant: boolean };
+
+export type RevokeRegisteredClientGrantsMutationVariables = Exact<{
+  registeredClientId: string | number;
+}>;
+
+
+export type RevokeRegisteredClientGrantsMutation = { revokeRegisteredClientGrants: boolean };
 
 export type AuthoritiesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -9733,6 +9774,153 @@ export const useEnableCustomComponentMutation = <
       {
     mutationKey: ['enableCustomComponent'],
     mutationFn: (variables?: EnableCustomComponentMutationVariables) => fetcher<EnableCustomComponentMutation, EnableCustomComponentMutationVariables>(EnableCustomComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteRegisteredClientDocument = new TypedDocumentString(`
+    mutation deleteRegisteredClient($id: ID!) {
+  deleteRegisteredClient(id: $id)
+}
+    `);
+
+export const useDeleteRegisteredClientMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteRegisteredClientMutation, TError, DeleteRegisteredClientMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteRegisteredClientMutation, TError, DeleteRegisteredClientMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteRegisteredClient'],
+    mutationFn: (variables?: DeleteRegisteredClientMutationVariables) => fetcher<DeleteRegisteredClientMutation, DeleteRegisteredClientMutationVariables>(DeleteRegisteredClientDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const Oauth2ConsentClientDocument = new TypedDocumentString(`
+    query oauth2ConsentClient($clientId: String!) {
+  oauth2ConsentClient(clientId: $clientId) {
+    clientId
+    clientName
+    redirectHosts
+  }
+}
+    `);
+
+export const useOauth2ConsentClientQuery = <
+      TData = Oauth2ConsentClientQuery,
+      TError = unknown
+    >(
+      variables: Oauth2ConsentClientQueryVariables,
+      options?: Omit<UseQueryOptions<Oauth2ConsentClientQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<Oauth2ConsentClientQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<Oauth2ConsentClientQuery, TError, TData>(
+      {
+    queryKey: ['oauth2ConsentClient', variables],
+    queryFn: fetcher<Oauth2ConsentClientQuery, Oauth2ConsentClientQueryVariables>(Oauth2ConsentClientDocument, variables),
+    ...options
+  }
+    )};
+
+export const RegisteredClientGrantsDocument = new TypedDocumentString(`
+    query registeredClientGrants($registeredClientId: ID!) {
+  registeredClientGrants(registeredClientId: $registeredClientId) {
+    authorizedAt
+    expiresAt
+    lastIssuedAt
+    mcpServers
+    principalName
+    scopes
+  }
+}
+    `);
+
+export const useRegisteredClientGrantsQuery = <
+      TData = RegisteredClientGrantsQuery,
+      TError = unknown
+    >(
+      variables: RegisteredClientGrantsQueryVariables,
+      options?: Omit<UseQueryOptions<RegisteredClientGrantsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<RegisteredClientGrantsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<RegisteredClientGrantsQuery, TError, TData>(
+      {
+    queryKey: ['registeredClientGrants', variables],
+    queryFn: fetcher<RegisteredClientGrantsQuery, RegisteredClientGrantsQueryVariables>(RegisteredClientGrantsDocument, variables),
+    ...options
+  }
+    )};
+
+export const RegisteredClientsDocument = new TypedDocumentString(`
+    query registeredClients {
+  registeredClients {
+    authorizationGrantTypes
+    clientId
+    clientIdIssuedAt
+    clientName
+    deletable
+    grantCount
+    id
+    redirectUris
+    scopes
+  }
+}
+    `);
+
+export const useRegisteredClientsQuery = <
+      TData = RegisteredClientsQuery,
+      TError = unknown
+    >(
+      variables?: RegisteredClientsQueryVariables,
+      options?: Omit<UseQueryOptions<RegisteredClientsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<RegisteredClientsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<RegisteredClientsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['registeredClients'] : ['registeredClients', variables],
+    queryFn: fetcher<RegisteredClientsQuery, RegisteredClientsQueryVariables>(RegisteredClientsDocument, variables),
+    ...options
+  }
+    )};
+
+export const RevokeRegisteredClientGrantDocument = new TypedDocumentString(`
+    mutation revokeRegisteredClientGrant($registeredClientId: ID!, $principalName: String!) {
+  revokeRegisteredClientGrant(
+    registeredClientId: $registeredClientId
+    principalName: $principalName
+  )
+}
+    `);
+
+export const useRevokeRegisteredClientGrantMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RevokeRegisteredClientGrantMutation, TError, RevokeRegisteredClientGrantMutationVariables, TContext>) => {
+    
+    return useMutation<RevokeRegisteredClientGrantMutation, TError, RevokeRegisteredClientGrantMutationVariables, TContext>(
+      {
+    mutationKey: ['revokeRegisteredClientGrant'],
+    mutationFn: (variables?: RevokeRegisteredClientGrantMutationVariables) => fetcher<RevokeRegisteredClientGrantMutation, RevokeRegisteredClientGrantMutationVariables>(RevokeRegisteredClientGrantDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RevokeRegisteredClientGrantsDocument = new TypedDocumentString(`
+    mutation revokeRegisteredClientGrants($registeredClientId: ID!) {
+  revokeRegisteredClientGrants(registeredClientId: $registeredClientId)
+}
+    `);
+
+export const useRevokeRegisteredClientGrantsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RevokeRegisteredClientGrantsMutation, TError, RevokeRegisteredClientGrantsMutationVariables, TContext>) => {
+    
+    return useMutation<RevokeRegisteredClientGrantsMutation, TError, RevokeRegisteredClientGrantsMutationVariables, TContext>(
+      {
+    mutationKey: ['revokeRegisteredClientGrants'],
+    mutationFn: (variables?: RevokeRegisteredClientGrantsMutationVariables) => fetcher<RevokeRegisteredClientGrantsMutation, RevokeRegisteredClientGrantsMutationVariables>(RevokeRegisteredClientGrantsDocument, variables)(),
     ...options
   }
     )};
