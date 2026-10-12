@@ -1,5 +1,5 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import {consumeLoginRedirect} from '@/shared/auth/login-redirect-utils';
+import {consumeLoginRedirect, requiresFullPageLoad} from '@/shared/auth/login-redirect-utils';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEffect, useState} from 'react';
@@ -26,7 +26,11 @@ const OAuth2Redirect = () => {
                 if (account) {
                     analytics.identify(account);
 
-                    navigate(redirect, {replace: true});
+                    if (requiresFullPageLoad(redirect)) {
+                        window.location.assign(redirect);
+                    } else {
+                        navigate(redirect, {replace: true});
+                    }
                 } else {
                     navigate('/login?error=oauth2', {replace: true});
                 }
@@ -36,7 +40,7 @@ const OAuth2Redirect = () => {
             });
     }, [analytics, getAccount, navigate, redirect]);
 
-    if (authenticated) {
+    if (authenticated && !requiresFullPageLoad(redirect)) {
         return <Navigate replace to={redirect} />;
     }
 

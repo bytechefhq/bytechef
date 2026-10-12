@@ -284,6 +284,41 @@ it('should fall back to the landing page when no location was recorded', () => {
     expect(screen.getByText('Landing page')).toBeInTheDocument();
 });
 
+describe('authorization endpoint redirect', () => {
+    const authorizeRequest = '/oauth2/authorize?response_type=code&client_id=client&state=xyz';
+
+    let assignMock: Mock;
+
+    beforeEach(() => {
+        assignMock = vi.fn();
+
+        vi.stubGlobal('location', {...window.location, assign: assignMock});
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('should load the authorization endpoint from the server after signing in', async () => {
+        renderAuthenticatedLoginPage(`/login?redirect=${encodeURIComponent(authorizeRequest)}`);
+
+        await waitFor(() => {
+            expect(assignMock).toHaveBeenCalledWith(authorizeRequest);
+        });
+
+        expect(screen.queryByText('Landing page')).not.toBeInTheDocument();
+    });
+
+    it('should keep router navigation for a page of the application', () => {
+        renderAuthenticatedLoginPage(
+            '/login?redirect=%2Fautomation%2Fprojects%2F1052%2Ftemplates%2Fai-email-classifier'
+        );
+
+        expect(screen.getByText('Template page')).toBeInTheDocument();
+        expect(assignMock).not.toHaveBeenCalled();
+    });
+});
+
 it('should ignore an off-site location recorded in the query string', () => {
     renderAuthenticatedLoginPage(`/login?redirect=${encodeURIComponent('https://evil.example')}`);
 
