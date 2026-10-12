@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.configuration.domain.Environment;
@@ -96,6 +97,16 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
         assertThat(authentication.isAuthenticated()).isTrue();
         assertThat(authentication.getAuthorities()).isEmpty();
         verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithoutMcpServerSecretKeyFails() {
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> automationMcpServerApiKeyAuthenticationProvider.authenticate(
+                ApiKeyAuthenticationToken.unauthenticated(
+                    new McpApiKeyCredentials(Environment.PRODUCTION, null, "api-secret"))))
+            .withMessage("Invalid MCP server secret key");
+        verifyNoInteractions(mcpServerService);
     }
 
     @Test

@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
@@ -154,6 +155,16 @@ class AutomationA2AServerApiKeyAuthenticationProviderTest {
 
         assertThat(authentication.getPrincipal()).isEqualTo("a2a-anonymous:automation:5");
         assertThat(String.valueOf(authentication)).doesNotContain("server-secret");
+    }
+
+    @Test
+    void testAuthenticateWithoutA2aServerSecretKeyFails() {
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> provider.authenticate(
+                ApiKeyAuthenticationToken.unauthenticated(
+                    new McpApiKeyCredentials(Environment.PRODUCTION, null, "api-secret"))))
+            .withMessage("Invalid A2A server secret key");
+        verifyNoInteractions(a2aServerService);
     }
 
     @Test

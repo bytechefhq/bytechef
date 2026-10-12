@@ -62,9 +62,11 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
         }
 
         Property property = propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null)
-            .orElseThrow(() -> new BadCredentialsException("MCP server secret key is not configured"));
+            .orElseThrow(() -> new BadCredentialsException("MCP server is not configured"));
 
-        if (!isMcpServerSecretKeyEqual(property.get("secretKey"), mcpApiKeyCredentials.getMcpServerSecretKey())) {
+        String mcpServerSecretKey = mcpApiKeyCredentials.getMcpServerSecretKey();
+
+        if (mcpServerSecretKey != null && !isMcpServerSecretKeyEqual(property.get("secretKey"), mcpServerSecretKey)) {
             throw new BadCredentialsException("Invalid MCP server secret key");
         }
 
@@ -98,10 +100,8 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
         return ApiKeyAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    private static boolean isMcpServerSecretKeyEqual(
-        @Nullable Object configuredSecretKey, @Nullable String presentedSecretKey) {
-
-        if (!(configuredSecretKey instanceof String configuredSecretKeyString) || presentedSecretKey == null) {
+    private static boolean isMcpServerSecretKeyEqual(@Nullable Object configuredSecretKey, String presentedSecretKey) {
+        if (!(configuredSecretKey instanceof String configuredSecretKeyString)) {
             return false;
         }
 

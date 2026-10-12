@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.server.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -75,12 +76,21 @@ class ManagementMcpServerSecretVerifierTest {
     }
 
     @Test
-    void testUnreadablePropertyIsRejected() {
+    void testUnreadablePropertyPropagatesTheFailure() {
         when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
-            .thenThrow(new IllegalStateException());
+            .thenThrow(new IllegalStateException("tenant schema unavailable"));
 
-        assertThat(managementMcpServerSecretVerifier.verifyMcpServerSecret(managementRequest(MCP_SERVER_SECRET_KEY)))
-            .contains(false);
+        assertThatThrownBy(
+            () -> managementMcpServerSecretVerifier.verifyMcpServerSecret(managementRequest(MCP_SERVER_SECRET_KEY)))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("tenant schema unavailable");
+    }
+
+    @Test
+    void testCanonicalPathIsAcceptedWithoutTheManagementServerProperty() {
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(Optional.empty());
+
+        assertThat(managementMcpServerSecretVerifier.verifyMcpServerSecret(canonicalRequest())).contains(true);
     }
 
     @Test
@@ -101,6 +111,14 @@ class ManagementMcpServerSecretVerifierTest {
         when(property.get("secretKey")).thenReturn(secretKey);
         when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
             .thenReturn(Optional.of(property));
+    }
+
+    private static MockHttpServletRequest canonicalRequest() {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/management/mcp");
+
+        request.setServletPath("/api/management/mcp");
+
+        return request;
     }
 
     private static MockHttpServletRequest managementRequest(String mcpServerSecretKey) {

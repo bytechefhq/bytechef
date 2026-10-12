@@ -73,6 +73,7 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
     public static final String ISSUER_URI = "https://as.bytechef.test";
     public static final String TENANT_CLAIM = "tenant_id";
 
+    private static final String CANONICAL_MCP_ENDPOINT = "/api/management/mcp";
     private static final String MCP_ENDPOINT = "/api/management/{secretKey}/mcp";
 
     @Bean
@@ -149,6 +150,11 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
     }
 
     @Bean
+    SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker() {
+        return (tokenValue, tenantId) -> false;
+    }
+
+    @Bean
     McpServerSecretVerifier managementMcpServerSecretVerifier(PropertyService propertyService) {
         return new ManagementMcpServerSecretVerifier(propertyService);
     }
@@ -170,19 +176,30 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
     }
 
     @Bean
-    RouterFunction<ServerResponse> mcpRouterFunction(WebMvcStreamableServerTransportProvider transportProvider) {
-        return transportProvider.getRouterFunction();
+    WebMvcStreamableServerTransportProvider canonicalWebMvcStreamableHttpServerTransportProvider() {
+        return WebMvcStreamableServerTransportProvider.builder()
+            .mcpEndpoint(CANONICAL_MCP_ENDPOINT)
+            .build();
     }
 
     @Bean
-    McpAsyncServer mcpAsyncServer(WebMvcStreamableServerTransportProvider transportProvider) {
-        return McpServer.async(transportProvider)
-            .serverInfo("mcp-server", "1.0.0")
-            .capabilities(
-                McpSchema.ServerCapabilities.builder()
-                    .tools(true)
-                    .build())
-            .build();
+    RouterFunction<ServerResponse> mcpRouterFunction() {
+        return webMvcStreamableHttpServerTransportProvider().getRouterFunction();
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> canonicalMcpRouterFunction() {
+        return canonicalWebMvcStreamableHttpServerTransportProvider().getRouterFunction();
+    }
+
+    @Bean
+    McpAsyncServer mcpAsyncServer() {
+        return createMcpAsyncServer(webMvcStreamableHttpServerTransportProvider());
+    }
+
+    @Bean
+    McpAsyncServer canonicalMcpAsyncServer() {
+        return createMcpAsyncServer(canonicalWebMvcStreamableHttpServerTransportProvider());
     }
 
     @Bean
@@ -203,6 +220,16 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
             .with(resourceServerContributor.getSecurityConfigurerAdapter(), withDefaults())
             .with(jwtContributor.getSecurityConfigurerAdapter(), withDefaults())
             .with(discoveryContributor.getSecurityConfigurerAdapter(), withDefaults())
+            .build();
+    }
+
+    private static McpAsyncServer createMcpAsyncServer(WebMvcStreamableServerTransportProvider transportProvider) {
+        return McpServer.async(transportProvider)
+            .serverInfo("mcp-server", "1.0.0")
+            .capabilities(
+                McpSchema.ServerCapabilities.builder()
+                    .tools(true)
+                    .build())
             .build();
     }
 

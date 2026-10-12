@@ -59,6 +59,7 @@ public class ManagementMcpServerSecurityIntTestConfiguration {
 
     public static final String SEEDED_TOOL_NAME = "seededTool";
 
+    private static final String CANONICAL_MCP_ENDPOINT = "/api/management/mcp";
     private static final String MCP_ENDPOINT = "/api/management/{secretKey}/mcp";
 
     @Bean
@@ -84,20 +85,30 @@ public class ManagementMcpServerSecurityIntTestConfiguration {
     }
 
     @Bean
-    RouterFunction<ServerResponse> mcpRouterFunction(WebMvcStreamableServerTransportProvider transportProvider) {
-        return transportProvider.getRouterFunction();
+    WebMvcStreamableServerTransportProvider canonicalWebMvcStreamableHttpServerTransportProvider() {
+        return WebMvcStreamableServerTransportProvider.builder()
+            .mcpEndpoint(CANONICAL_MCP_ENDPOINT)
+            .build();
     }
 
     @Bean
-    McpAsyncServer mcpAsyncServer(WebMvcStreamableServerTransportProvider transportProvider) {
-        return McpServer.async(transportProvider)
-            .serverInfo("mcp-server", "1.0.0")
-            .capabilities(
-                McpSchema.ServerCapabilities.builder()
-                    .tools(true)
-                    .build())
-            .tools(seededToolSpecification())
-            .build();
+    RouterFunction<ServerResponse> mcpRouterFunction() {
+        return webMvcStreamableHttpServerTransportProvider().getRouterFunction();
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> canonicalMcpRouterFunction() {
+        return canonicalWebMvcStreamableHttpServerTransportProvider().getRouterFunction();
+    }
+
+    @Bean
+    McpAsyncServer mcpAsyncServer() {
+        return createMcpAsyncServer(webMvcStreamableHttpServerTransportProvider());
+    }
+
+    @Bean
+    McpAsyncServer canonicalMcpAsyncServer() {
+        return createMcpAsyncServer(canonicalWebMvcStreamableHttpServerTransportProvider());
     }
 
     @Bean
@@ -112,6 +123,17 @@ public class ManagementMcpServerSecurityIntTestConfiguration {
                 new ManagementMcpServerSecurityConfigurer(
                     apiKeyService, authorityService, () -> List.of(Environment.values()), propertyService, userService),
                 Customizer.withDefaults())
+            .build();
+    }
+
+    private static McpAsyncServer createMcpAsyncServer(WebMvcStreamableServerTransportProvider transportProvider) {
+        return McpServer.async(transportProvider)
+            .serverInfo("mcp-server", "1.0.0")
+            .capabilities(
+                McpSchema.ServerCapabilities.builder()
+                    .tools(true)
+                    .build())
+            .tools(seededToolSpecification())
             .build();
     }
 

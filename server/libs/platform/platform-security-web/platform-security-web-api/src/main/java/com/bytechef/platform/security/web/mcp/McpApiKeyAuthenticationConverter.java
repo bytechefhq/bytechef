@@ -32,6 +32,10 @@ public class McpApiKeyAuthenticationConverter extends AbstractMcpApiKeyAuthentic
     protected String extractServerSecretKey(HttpServletRequest request) {
         String servletPath = request.getServletPath();
 
+        if (servletPath.equals(pathPrefix + "mcp")) {
+            return null;
+        }
+
         return servletPath.replace(pathPrefix, "")
             .replace("/mcp", "");
     }
