@@ -1851,6 +1851,11 @@ export type EvaluatorFunctionDefinitionsQueryVariables = Exact<{ [key: string]: 
 
 export type EvaluatorFunctionDefinitionsQuery = { evaluatorFunctionDefinitions: Array<{ name: string, title: string, description: string, category: Types.EvaluatorFunctionCategory, returnType: Types.EvaluatorFunctionType, example: string, parameters: Array<{ name: string, description: string, type: Types.EvaluatorFunctionType, required: boolean }> }> };
 
+export type ManagementMcpServerCanonicalUrlQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ManagementMcpServerCanonicalUrlQuery = { managementMcpServerCanonicalUrl: string | null };
+
 export type ManagementMcpServerUrlQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -9070,6 +9075,28 @@ export const useEvaluatorFunctionDefinitionsQuery = <
       {
     queryKey: variables === undefined ? ['evaluatorFunctionDefinitions'] : ['evaluatorFunctionDefinitions', variables],
     queryFn: fetcher<EvaluatorFunctionDefinitionsQuery, EvaluatorFunctionDefinitionsQueryVariables>(EvaluatorFunctionDefinitionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const ManagementMcpServerCanonicalUrlDocument = new TypedDocumentString(`
+    query managementMcpServerCanonicalUrl {
+  managementMcpServerCanonicalUrl
+}
+    `);
+
+export const useManagementMcpServerCanonicalUrlQuery = <
+      TData = ManagementMcpServerCanonicalUrlQuery,
+      TError = unknown
+    >(
+      variables?: ManagementMcpServerCanonicalUrlQueryVariables,
+      options?: Omit<UseQueryOptions<ManagementMcpServerCanonicalUrlQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ManagementMcpServerCanonicalUrlQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ManagementMcpServerCanonicalUrlQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['managementMcpServerCanonicalUrl'] : ['managementMcpServerCanonicalUrl', variables],
+    queryFn: fetcher<ManagementMcpServerCanonicalUrlQuery, ManagementMcpServerCanonicalUrlQueryVariables>(ManagementMcpServerCanonicalUrlDocument, variables),
     ...options
   }
     )};
