@@ -73,6 +73,11 @@ export default ({mode}) => {
         server: {
             host: '127.0.0.1',
             proxy: {
+                '/.well-known': {
+                    changeOrigin: true,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                },
                 '/actuator': {
                     changeOrigin: true,
                     secure: false,
@@ -110,6 +115,36 @@ export default ({mode}) => {
                     // rewrite: (path) => path.replace(/^\/api/, ""),
                 },
                 '/job/resume': {
+                    changeOrigin: true,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                },
+                '/oauth2/authorize': {
+                    changeOrigin: false,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                },
+                '/oauth2/introspect': {
+                    changeOrigin: true,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                },
+                '/oauth2/jwks': {
+                    changeOrigin: true,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                },
+                '/oauth2/register': {
+                    changeOrigin: true,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                },
+                '/oauth2/revoke': {
+                    changeOrigin: true,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                },
+                '/oauth2/token': {
                     changeOrigin: true,
                     secure: false,
                     target: 'http://localhost:9555',
