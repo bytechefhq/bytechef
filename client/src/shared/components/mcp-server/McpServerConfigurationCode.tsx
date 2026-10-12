@@ -6,7 +6,7 @@ import {AlertTriangleIcon, CheckIcon, CopyIcon, RefreshCwIcon} from 'lucide-reac
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: string; onRefresh: () => void}) => {
+const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: string; onRefresh?: () => void}) => {
     const [copied, setCopied] = useState(false);
     const [refreshed, setRefreshed] = useState(false);
     const [showRefreshDialog, setShowRefreshDialog] = useState(false);
@@ -25,7 +25,7 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
 
         setTimeout(() => setRefreshed(false), 300);
 
-        onRefresh();
+        onRefresh?.();
     };
 
     return (
@@ -49,16 +49,18 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <button
-                        aria-label="Regenerate server URL"
-                        className="rounded p-1 hover:bg-muted"
-                        disabled={refreshed}
-                        onClick={() => setShowRefreshDialog(true)}
-                    >
-                        <RefreshCwIcon
-                            className={twMerge('size-4 text-muted-foreground', refreshed && 'animate-spin')}
-                        />
-                    </button>
+                    {onRefresh && (
+                        <button
+                            aria-label="Regenerate server URL"
+                            className="rounded p-1 hover:bg-muted"
+                            disabled={refreshed}
+                            onClick={() => setShowRefreshDialog(true)}
+                        >
+                            <RefreshCwIcon
+                                className={twMerge('size-4 text-muted-foreground', refreshed && 'animate-spin')}
+                            />
+                        </button>
+                    )}
 
                     <button
                         aria-label="Copy server URL"

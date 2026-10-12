@@ -26,6 +26,17 @@ afterEach(() => {
 });
 
 describe('McpServerConfigurationCode', () => {
+    it('hides the regenerate button when no refresh handler is given', () => {
+        render(
+            <TooltipProvider>
+                <McpServerConfigurationCode codeSnippet={SERVER_URL} />
+            </TooltipProvider>
+        );
+
+        expect(screen.queryByRole('button', {name: 'Regenerate server URL'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Copy server URL'})).toBeInTheDocument();
+    });
+
     it('asks for confirmation instead of regenerating the URL right away', async () => {
         const onRefresh = renderConfigurationCode();
 

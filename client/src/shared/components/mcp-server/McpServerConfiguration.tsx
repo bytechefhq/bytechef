@@ -7,13 +7,15 @@ import {InfoCircledIcon} from '@radix-ui/react-icons';
 interface McpServerConfigurationProps {
     authenticationRequired?: boolean;
     mcpServerUrl: string;
-    onRefresh: () => void;
+    onRefresh?: () => void;
+    signInWithByteChefAvailable?: boolean;
 }
 
 const McpServerConfiguration = ({
     authenticationRequired = true,
     mcpServerUrl,
     onRefresh,
+    signInWithByteChefAvailable = false,
 }: McpServerConfigurationProps) => {
     const codeSnippet1 = authenticationRequired
         ? `{
@@ -66,7 +68,9 @@ const McpServerConfiguration = ({
 
     const apiKeyInstruction = authenticationRequired ? (
         <p className="text-sm text-muted-foreground">
-            Replace YOUR_API_KEY with an API key created under Settings. Requests without a valid API key are rejected.
+            {signInWithByteChefAvailable
+                ? 'Replace YOUR_API_KEY with an admin API key created under Settings. When the embedded authorization server is enabled, clients that support OAuth can leave out the header and sign in with a ByteChef account instead.'
+                : 'Replace YOUR_API_KEY with an API key created under Settings. Requests without a valid API key are rejected.'}
         </p>
     ) : null;
 
@@ -269,12 +273,22 @@ const McpServerConfiguration = ({
                             <div className="flex-1 space-y-4">
                                 <h2 className="font-semibold text-foreground">Server URL</h2>
 
-                                {authenticationRequired ? (
+                                {authenticationRequired && signInWithByteChefAvailable && (
+                                    <p className="text-sm text-muted-foreground">
+                                        Send an admin API key created under Settings with every request as an
+                                        Authorization: Bearer header, or sign in with a ByteChef account when the
+                                        embedded authorization server is enabled and your client supports OAuth.
+                                    </p>
+                                )}
+
+                                {authenticationRequired && !signInWithByteChefAvailable && (
                                     <p className="text-sm text-muted-foreground">
                                         This URL requires an API key created under Settings, sent with every request as
                                         an Authorization: Bearer header.
                                     </p>
-                                ) : (
+                                )}
+
+                                {!authenticationRequired && (
                                     <p className="text-sm text-muted-foreground">
                                         This server does not require authentication, so the URL can be used as is.
                                     </p>

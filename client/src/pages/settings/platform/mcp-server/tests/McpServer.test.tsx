@@ -1,4 +1,4 @@
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, within} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -9,6 +9,9 @@ const hoisted = vi.hoisted(() => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useManagementMcpServerCanonicalUrlQuery: () => ({
+        data: {managementMcpServerCanonicalUrl: 'https://app.example.com/api/management/mcp'},
+    }),
     useManagementMcpServerUrlQuery: () => ({data: {managementMcpServerUrl: 'https://example.com/mcp/abc'}}),
     useUpdateManagementMcpServerUrlMutation: () => ({mutate: hoisted.updateMcpServerUrlMutate}),
 }));
@@ -26,17 +29,31 @@ vi.mock('@/shared/components/mcp-server/McpServerConfiguration', () => ({
         authenticationRequired,
         mcpServerUrl,
         onRefresh,
+        signInWithByteChefAvailable,
     }: {
         authenticationRequired?: boolean;
         mcpServerUrl: string;
-        onRefresh: () => void;
+        onRefresh?: () => void;
+        signInWithByteChefAvailable?: boolean;
     }) => (
-        <button
+        <div
             data-authentication-required={String(authenticationRequired)}
             data-mcp-server-url={mcpServerUrl}
+            data-sign-in-with-bytechef-available={String(signInWithByteChefAvailable)}
             data-testid="mcp-server-configuration"
-            onClick={onRefresh}
-        />
+        >
+            {onRefresh && <button onClick={onRefresh}>Regenerate canonical</button>}
+        </div>
+    ),
+}));
+
+vi.mock('@/shared/components/mcp-server/McpServerConfigurationCode', () => ({
+    default: ({codeSnippet, onRefresh}: {codeSnippet: string; onRefresh?: () => void}) => (
+        <div data-testid="mcp-server-configuration-code">
+            <span>{codeSnippet}</span>
+
+            {onRefresh && <button onClick={onRefresh}>Regenerate tenant</button>}
+        </div>
     ),
 }));
 
@@ -55,19 +72,47 @@ describe('McpServer', () => {
         );
     });
 
-    it('shows the stored server url', () => {
+    it('shows the canonical url under the MCP server URL heading', () => {
         render(<McpServer />);
 
+        expect(screen.getByRole('heading', {name: 'MCP server URL'})).toBeInTheDocument();
         expect(screen.getByTestId('mcp-server-configuration')).toHaveAttribute(
             'data-mcp-server-url',
-            'https://example.com/mcp/abc'
+            'https://app.example.com/api/management/mcp'
         );
     });
 
-    it('rotates the server url on refresh', () => {
+    it('tells the canonical url block that signing in with ByteChef is an alternative to the API key', () => {
         render(<McpServer />);
 
-        fireEvent.click(screen.getByTestId('mcp-server-configuration'));
+        expect(screen.getByTestId('mcp-server-configuration')).toHaveAttribute(
+            'data-sign-in-with-bytechef-available',
+            'true'
+        );
+    });
+
+    it('shows the tenant url under the external identity providers section', () => {
+        render(<McpServer />);
+
+        const section = screen.getByRole('group', {name: 'URL for external identity providers'});
+
+        expect(within(section).getByText('https://example.com/mcp/abc')).toBeInTheDocument();
+        expect(
+            within(section).getByText(/Use this URL when your MCP client signs in through your own identity provider/)
+        ).toBeInTheDocument();
+    });
+
+    it('offers regeneration only for the tenant url', () => {
+        render(<McpServer />);
+
+        expect(screen.queryByRole('button', {name: 'Regenerate canonical'})).not.toBeInTheDocument();
+        expect(screen.getAllByRole('button')).toHaveLength(1);
+    });
+
+    it('rotates the tenant url on refresh', () => {
+        render(<McpServer />);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Regenerate tenant'}));
 
         expect(hoisted.updateMcpServerUrlMutate).toHaveBeenCalledWith({});
     });
