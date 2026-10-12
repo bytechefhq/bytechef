@@ -32,6 +32,7 @@ import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
+import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
@@ -139,10 +140,12 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
     @Bean
     McpJwtSecurityConfigurerContributor mcpJwtSecurityConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
-        ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider) {
+        ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider,
+        ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider) {
 
         return new McpJwtSecurityConfigurerContributor(
-            mcpResourceServerProperties, userService, mcpServerSecretVerifierProvider);
+            mcpResourceServerProperties, userService, mcpServerSecretVerifierProvider,
+            selfIssuedTokenRevocationCheckerProvider);
     }
 
     @Bean

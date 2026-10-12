@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.mcp.oauth2;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
+import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
@@ -64,18 +65,21 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     private final McpJwtIdentityMapper mcpJwtIdentityMapper;
     private final McpResourceServerProperties mcpResourceServerProperties;
     private final List<McpServerSecretVerifier> mcpServerSecretVerifiers;
+    private final SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker;
     private final UserService userService;
 
     @SuppressFBWarnings("EI2")
     public TenantAwareJwtAuthenticationFilter(
         McpAudienceValidator mcpAudienceValidator, McpJwtIdentityMapper mcpJwtIdentityMapper,
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
-        List<McpServerSecretVerifier> mcpServerSecretVerifiers) {
+        List<McpServerSecretVerifier> mcpServerSecretVerifiers,
+        @Nullable SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker) {
 
         this.mcpAudienceValidator = mcpAudienceValidator;
         this.mcpJwtIdentityMapper = mcpJwtIdentityMapper;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
         this.mcpServerSecretVerifiers = List.copyOf(mcpServerSecretVerifiers);
+        this.selfIssuedTokenRevocationChecker = selfIssuedTokenRevocationChecker;
         this.userService = userService;
     }
 
@@ -163,6 +167,12 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return null;
         }
 
+        if (issuer.isSelf() && isRevoked(jwt, urlTenantId)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+
+            return null;
+        }
+
         try {
             return mcpJwtIdentityMapper.map(jwt, issuer, jwtAuthenticationToken.getAuthorities(), urlTenantId);
         } catch (OAuth2AuthenticationException oAuth2AuthenticationException) {
@@ -211,6 +221,14 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             () -> userService.fetchUserByLogin(login)
                 .map(User::isActivated)
                 .orElse(false));
+    }
+
+    private boolean isRevoked(Jwt jwt, String tenantId) {
+        if (selfIssuedTokenRevocationChecker == null) {
+            return false;
+        }
+
+        return selfIssuedTokenRevocationChecker.isRevoked(jwt.getTokenValue(), tenantId);
     }
 
     @Nullable

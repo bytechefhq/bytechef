@@ -74,12 +74,35 @@ class McpResourceServerPropertiesTest {
             .withMessageContaining("issuers[0]");
     }
 
+    @Test
+    void testRejectsSelfIssuerWithoutTenantClaim() {
+        McpResourceServerProperties mcpResourceServerProperties = properties(
+            issuer("https://as.bytechef.test", true, null, " "));
+
+        assertThatIllegalStateException()
+            .isThrownBy(mcpResourceServerProperties::afterPropertiesSet)
+            .withMessageContaining("issuers[0].tenant-claim");
+    }
+
+    @Test
+    void testAcceptsExternalIssuerWithoutTenantClaim() {
+        McpResourceServerProperties mcpResourceServerProperties = properties(
+            issuer("https://idp.customer.test", false, "bytechef-mcp", null));
+
+        assertThatCode(mcpResourceServerProperties::afterPropertiesSet).doesNotThrowAnyException();
+    }
+
     private static Issuer issuer(String uri, boolean self, String audience) {
+        return issuer(uri, self, audience, "tenant_id");
+    }
+
+    private static Issuer issuer(String uri, boolean self, String audience, String tenantClaim) {
         Issuer issuer = new Issuer();
 
         issuer.setUri(uri);
         issuer.setSelf(self);
         issuer.setAudience(audience);
+        issuer.setTenantClaim(tenantClaim);
 
         return issuer;
     }
