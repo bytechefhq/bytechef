@@ -201,6 +201,8 @@ Name: createNewTextFile
 | text | Text | STRING | The text content to add to file. | true |
 | mimeType | File Type | STRING <details> <summary> Options </summary> <span>plain/text</span>, <span>text/csv</span>, <span>text/xml</span> </details> | Select file type. | true |
 | folderId | Parent Folder ID | STRING | ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder. | false |
+| autoCreateFolder | Auto Create Folder | STRING <details> <summary> Options </summary> <span>yes</span>, <span>no</span> </details> | Automatically create the parent folder if it does not exist. | false |
+| folderName | Folder Name | STRING | Name of the folder to create when the parent folder does not exist. | true |
 
 #### Example JSON Structure
 ```json
@@ -211,7 +213,9 @@ Name: createNewTextFile
     "fileName" : "",
     "text" : "",
     "mimeType" : "",
-    "folderId" : ""
+    "folderId" : "",
+    "autoCreateFolder" : "",
+    "folderName" : ""
   },
   "type" : "googleDrive/v1/createNewTextFile"
 }

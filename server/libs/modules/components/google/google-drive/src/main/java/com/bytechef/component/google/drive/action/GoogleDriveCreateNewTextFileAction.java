@@ -22,6 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.AUTO_CREATE_FOLDER;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FOLDER_NAME;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
@@ -78,10 +80,25 @@ public class GoogleDriveCreateNewTextFileAction {
             string(FOLDER_ID)
                 .label("Parent Folder ID")
                 .description(
-                    "ID of the folder where the file should be created; if no folder is selected, the file will be " +
+                    "ID of the folder where the file should be created; if no folder is selected, the file will be "
+                        +
                         "created in the root folder.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
-                .required(false))
+                .required(false),
+            string(AUTO_CREATE_FOLDER)
+                .label("Auto Create Folder")
+                .description(
+                    "Automatically create the parent folder if it does not exist.")
+                .defaultValue("no")
+                .options(
+                    option("Yes", "yes"),
+                    option("No", "no"))
+                .required(false),
+            string(FOLDER_NAME)
+                .label("Folder Name")
+                .description("Name of the folder to create when the parent folder does not exist.")
+                .displayCondition("%s == '%s'".formatted(AUTO_CREATE_FOLDER, "yes"))
+                .required(true))
         .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY), sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT))
         .perform(GoogleDriveCreateNewTextFileAction::perform);
 
@@ -92,10 +109,28 @@ public class GoogleDriveCreateNewTextFileAction {
         throws IOException {
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
+        String folderId = inputParameters.getString(FOLDER_ID);
+        boolean autoCreateFolderEnabled = "yes".equals(inputParameters.getString(AUTO_CREATE_FOLDER));
+        boolean hasFolderId = folderId != null && !folderId.isEmpty();
+        boolean folderExists = false;
+
+        if (hasFolderId) {
+            folderExists = GoogleUtils.checkIfFolderExists(connectionParameters, folderId);
+        }
+
+        if (hasFolderId && !folderExists && !autoCreateFolderEnabled) {
+            throw new IllegalArgumentException("The specified folder " + folderId + " does not exist.");
+        }
+
+        if (autoCreateFolderEnabled && !folderExists) {
+            File newFolder = createFolder(drive, inputParameters);
+
+            folderId = newFolder.getId();
+        }
+
         File newFile = new File()
             .setName(inputParameters.getRequiredString(FILE_NAME))
-            .setParents(inputParameters.getString(FOLDER_ID) == null
-                ? null : List.of(inputParameters.getString(FOLDER_ID)));
+            .setParents(folderId == null ? null : List.of(folderId));
 
         String mimeType = inputParameters.getRequiredString(MIME_TYPE);
 
@@ -120,6 +155,21 @@ public class GoogleDriveCreateNewTextFileAction {
                 .execute();
         } catch (IOException e) {
             throw translateGoogleIOException(e);
+        }
+    }
+
+    private static File createFolder(Drive drive, Parameters inputParameters) {
+        File folderFile = new File()
+            .setName(inputParameters.getRequiredString(FOLDER_NAME))
+            .setMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER);
+
+        try {
+            return drive
+                .files()
+                .create(folderFile)
+                .execute();
+        } catch (IOException exception) {
+            throw translateGoogleIOException(exception);
         }
     }
 }

@@ -77,6 +77,35 @@ class GoogleUtilsTest {
         .setMimeType("application/pdf");
 
     @Test
+    void testCheckIfFolderExists() throws IOException {
+        when(mockedDrive.files())
+            .thenReturn(mockedFiles);
+        when(mockedFiles.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedGet);
+        when(mockedGet.setFields(stringArgumentCaptor.capture()))
+            .thenReturn(mockedGet);
+        when(mockedGet.execute())
+            .thenReturn(testFile);
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDrive(mockedParameters))
+                .thenReturn(mockedDrive);
+
+            boolean folderExists = GoogleUtils.checkIfFolderExists(mockedParameters, "folderId");
+
+            verify(mockedDrive.files()).get("folderId");
+            verify(mockedGet).setFields("id, mimeType, trashed");
+
+            assertEquals("folderId", stringArgumentCaptor.getAllValues()
+                .get(0));
+            assertEquals("id, mimeType, trashed", stringArgumentCaptor.getAllValues()
+                .get(1));
+            assertEquals(false, folderExists);
+        }
+    }
+
+    @Test
     void testCopyFileOnGoogleDrive() throws IOException {
         when(mockedDrive.files())
             .thenReturn(mockedFiles);

@@ -46,6 +46,28 @@ import java.util.stream.Collectors;
  */
 public class GoogleUtils {
 
+    public static boolean checkIfFolderExists(Parameters connectionParameters, String folderId) {
+        Drive drive = GoogleServices.getDrive(connectionParameters);
+
+        try {
+            File folder = drive.files()
+                .get(folderId)
+                .setFields("id, mimeType, trashed")
+                .execute();
+
+            String folderMimeType = "application/vnd.google-apps.folder";
+            return folderMimeType.equals(folder.getMimeType()) && !folder.getTrashed();
+        } catch (GoogleJsonResponseException e) {
+            if (e.getStatusCode() == 404) {
+                return false;
+            } else {
+                throw translateGoogleIOException(e);
+            }
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
+    }
+
     public static File copyFileOnGoogleDrive(Parameters connectionParameters, Parameters inputParameters) {
         Drive drive = GoogleServices.getDrive(connectionParameters);
         String fileId = inputParameters.getRequiredString(FILE_ID);

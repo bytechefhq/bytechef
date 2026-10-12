@@ -35,6 +35,7 @@ public final class GoogleDriveConstants {
     public static final String MIME_TYPE = "mimeType";
     public static final String NAME = "name";
     public static final String TEXT = "text";
+    public static final String AUTO_CREATE_FOLDER = "autoCreateFolder";
 
     public static final ModifiableObjectProperty GOOGLE_FILE_OUTPUT_PROPERTY = object()
         .properties(
