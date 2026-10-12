@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
  */
 public class ManagementMcpServerSecretVerifier implements McpServerSecretVerifier {
 
+    private static final String CANONICAL_PATH = "/api/management/mcp";
     private static final Pattern SECRET_KEY_PATH_PATTERN = Pattern.compile("/api/management/(.+)/mcp");
 
     private final PropertyService propertyService;
@@ -43,7 +44,13 @@ public class ManagementMcpServerSecretVerifier implements McpServerSecretVerifie
 
     @Override
     public Optional<Boolean> verifyMcpServerSecret(HttpServletRequest request) {
-        Matcher matcher = SECRET_KEY_PATH_PATTERN.matcher(request.getServletPath());
+        String servletPath = request.getServletPath();
+
+        if (CANONICAL_PATH.equals(servletPath)) {
+            return Optional.of(true);
+        }
+
+        Matcher matcher = SECRET_KEY_PATH_PATTERN.matcher(servletPath);
 
         if (!matcher.matches()) {
             return Optional.empty();
@@ -51,13 +58,7 @@ public class ManagementMcpServerSecretVerifier implements McpServerSecretVerifie
 
         String mcpServerSecretKey = matcher.group(1);
 
-        Optional<Property> property;
-
-        try {
-            property = propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null);
-        } catch (RuntimeException runtimeException) {
-            return Optional.of(false);
-        }
+        Optional<Property> property = fetchMcpServerProperty();
 
         return Optional.of(
             property
@@ -67,5 +68,9 @@ public class ManagementMcpServerSecretVerifier implements McpServerSecretVerifie
                 .map(secretKey -> MessageDigest.isEqual(
                     secretKey.getBytes(StandardCharsets.UTF_8), mcpServerSecretKey.getBytes(StandardCharsets.UTF_8)))
                 .orElse(false));
+    }
+
+    private Optional<Property> fetchMcpServerProperty() {
+        return propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null);
     }
 }

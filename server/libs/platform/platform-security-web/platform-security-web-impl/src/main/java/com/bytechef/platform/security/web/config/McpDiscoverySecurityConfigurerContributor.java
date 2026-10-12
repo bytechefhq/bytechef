@@ -34,7 +34,7 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 @Configuration
 public class McpDiscoverySecurityConfigurerContributor implements SecurityConfigurerContributor {
 
-    private static final String MCP_PATH_REGEX = "^/api/(automation|management)/.+/mcp";
+    private static final String MCP_PATH_REGEX = "^/api/(automation/.+|management(/[^/]+)?)/mcp$";
 
     private final ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider;
     private final McpResourceServerProperties mcpResourceServerProperties;

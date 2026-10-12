@@ -40,9 +40,10 @@ public class AutomationMcpServerSecurityConfigurer extends McpApiKeyHttpConfigur
         UserService userService) {
 
         super(
-            PATH_PATTERN, MCP_SERVER_SECRET_PATTERN,
+            PATH_PATTERN, MCP_SERVER_SECRET_PATTERN, null,
             new McpApiKeyAuthenticationConverter(environmentService, "/api/automation/"),
             new AutomationMcpServerApiKeyAuthenticationProvider(
-                apiKeyService, authorityService, mcpServerService, userService));
+                apiKeyService, authorityService, mcpServerService, userService),
+            AUTHENTICATED_OR_ANONYMOUS_TYPES);
     }
 }
