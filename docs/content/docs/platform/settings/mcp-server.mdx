@@ -18,32 +18,38 @@ See the [AI MCP Server configuration reference](/platform/use-bytechef/self-host
 
 ## Get Your MCP Server URL
 
-{/* TODO screenshot: Settings → MCP Server page - the client tabs (Claude / Cursor / Windsurf / Other) below with a config snippet and its Refresh control */}
+{/* TODO screenshot: Settings → MCP Server page - the MCP server URL with the client tabs (Claude / Cursor / Windsurf / Other) and, below it, the URL for external identity providers with its Refresh control */}
 
-The settings page presents the server URL inside ready-to-copy configuration snippets, grouped into per-client tabs - **Claude**, **Cursor**, **Windsurf**, and **Other**. Each snippet has a **Refresh** control that rotates the secret in the URL. The server speaks the Streamable HTTP transport only.
+The management server has two URLs. Most people only need the first one.
+
+| URL | Use it for |
+|---|---|
+| `https://<your-host>/api/management/mcp` | Everything by default: MCP directories, AI assistants and coding agents. The URL is the same for every ByteChef account and contains no secret. It accepts an admin API key or signing in with your ByteChef account (this requires the embedded authorization server - see [Sign in with ByteChef](#sign-in-with-bytechef-optional)). |
+| `https://<your-host>/api/management/<secret-key>/mcp` | Clients that sign in through your own identity provider (Okta, Microsoft Entra, Keycloak, …). The secret key tells ByteChef which account's identity providers to trust. |
 
 1. Open ByteChef and go to **Settings** → **MCP Server**
-2. Copy the MCP server URL - it has the form:
+2. Copy the **MCP server URL**. The snippets are grouped into per-client tabs - **Claude**, **Cursor**, **Windsurf**, and **Other**.
+3. If your clients sign in through your own identity provider, copy the **URL for external identity providers** instead. It has a **Refresh** control that rotates the secret key.
 
-   ```
-   https://<your-host>/api/management/<secret-key>/mcp
-   ```
+The server speaks the Streamable HTTP transport only.
 
-> **Keep this URL private.** The secret key identifies your MCP server. You can regenerate it at any time from the same settings page; requests that still use the old secret are rejected with `401`, even with a valid API key, until each client is updated.
+Because the first URL has no secret and is the same for everyone, you can add it to an MCP directory or share it with teammates. ByteChef works out which account a request belongs to from the credential: the API key, or the account you signed in with.
 
-The settings page - reading and rotating the URL - is available to tenant admins only.
+> **Keep the secret URL private.** Its secret key identifies your account for external identity providers. Regenerating it makes requests that still use the old secret fail with `401`, even with a valid credential, until each client is updated. The other URL is not affected.
 
-The URL alone is never enough to connect: every request must also carry a credential - see [Authentication](#authentication).
+If the management MCP server is turned off for your account, both URLs reject requests with `401`.
+
+The settings page - reading and rotating the URLs - is available to tenant admins only.
+
+Either URL alone is never enough to connect: every request must also carry a credential - see [Authentication](#authentication).
 
 ---
 
 ## Authentication
 
-The URL secret identifies the server, and a separate credential authenticates the caller. Every request must carry a valid admin API key or a JWT from a trusted issuer; requests without one are rejected with `401`. There is no anonymous mode.
+Every request must carry a credential: an admin API key, a sign-in through ByteChef itself, or - on the secret URL only - a JWT from a trusted issuer. Requests without one are rejected with `401`. There is no anonymous mode.
 
-> **Upgrading?** Earlier versions had a **Require authentication** setting that could be switched off. That setting is gone: a server that had it off now requires a credential like any other, so its clients must send one - see [API key](#api-key-default) below.
-
-Keep the URL secret private - it is still required alongside the credential.
+> **Upgrading?** Earlier versions had a **Require authentication** setting that could be switched off. That setting is gone: a server that had it off now requires a credential like any other, so its clients must send one - see [API key](#api-key-default) below. Admin API keys are an Enterprise Edition feature; on Community Edition, connect with a [JWT from a trusted issuer](#jwt-from-a-trusted-issuer-optional). Clients that already use such a JWT must now connect through the secret-key URL (`/api/management/<secret-key>/mcp`); the tenant-less URL rejects external-issuer tokens.
 
 ### API key (default)
 
@@ -57,9 +63,25 @@ It must be an **Admin** API key. A workspace API key - the kind under **Settings
 
 The connection snippets below include this header. The API key is bound to an environment, and it must match the environment named in the `X-ENVIRONMENT` header (`PRODUCTION` when omitted; an unknown value is rejected with `401`). The header only selects which key environment is accepted: tools that work inside a workspace take their own `environment` argument, which defaults to Development. A key that belongs to a deactivated user is rejected. Because the key is bound to your user account, the AI assistant acts with your permissions - and you can revoke a single client by deleting its key without touching the server URL or other clients.
 
+### Sign in with ByteChef (optional)
+
+When the embedded OAuth2 authorization server is enabled, an MCP client that supports OAuth can connect to `https://<your-host>/api/management/mcp` without an API key. The client registers itself, you sign in with your ByteChef account and approve the connection, and the client then acts with your permissions. An administrator can see and revoke these connections under [OAuth2 Clients](/platform/settings/oauth2-clients); a revoked connection stops working on its next request.
+
+Two settings are needed. First, turn the server on with `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=true`. Second, tell ByteChef to trust its own tokens by adding an issuer entry for itself:
+
+```
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF=true
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI=<your public URL>
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM=tenant_id
+```
+
+If an external issuer already uses index `0`, add the self issuer at the next free index instead (for example `_1_`). Discovery advertises the first issuer, so put the self issuer at index `0` only when it should be the advertised sign-in.
+
+See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration) for details.
+
 ### JWT from a trusted issuer (optional)
 
-The MCP endpoints can also accept JWTs issued by an identity provider you trust (Okta, Microsoft Entra, Keycloak, …). List each trusted issuer and its claim mapping under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). JWT support stays dormant until at least one issuer is configured. A token from an issuer that is not listed is rejected with `401`, and a token for this server must carry the `mcp:management` scope. API keys keep working alongside JWTs.
+The secret-key MCP endpoint can also accept JWTs issued by an identity provider you trust (Okta, Microsoft Entra, Keycloak, …). List each trusted issuer and its claim mapping under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). JWT support stays dormant until at least one issuer is configured. A token from an issuer that is not listed is rejected with `401`. Tokens from external issuers are accepted on the secret URL only; on the tenant-less URL they are rejected with `401`. A token for this server must carry the `mcp:management` scope. API keys keep working alongside JWTs.
 
 ---
 
@@ -70,7 +92,7 @@ The MCP endpoints can also accept JWTs issued by an identity provider you trust 
 
 **Claude.ai (web)**
 
-> claude.ai integrations cannot send custom headers, so they cannot send the admin API key this server requires. Use Claude Desktop instead.
+> claude.ai integrations cannot send custom headers, so they cannot send the admin API key this server requires. Use Claude Desktop instead - unless the embedded authorization server is enabled, in which case claude.ai can connect to the tenant-less URL by signing in with ByteChef (see [Sign in with ByteChef](#sign-in-with-bytechef-optional)).
 
 **Claude Desktop**
 
@@ -86,7 +108,7 @@ The MCP endpoints can also accept JWTs issued by an identity provider you trust 
          "args": [
            "-y",
            "mcp-remote",
-           "https://<your-host>/api/management/<secret-key>/mcp",
+           "https://<your-host>/api/management/mcp",
            "--header",
            "Authorization: Bearer YOUR_API_KEY"
          ]
@@ -110,7 +132,7 @@ The MCP endpoints can also accept JWTs issued by an identity provider you trust 
          "headers": {
            "Authorization": "Bearer YOUR_API_KEY"
          },
-         "url": "https://<your-host>/api/management/<secret-key>/mcp"
+         "url": "https://<your-host>/api/management/mcp"
        }
      }
    }
@@ -131,7 +153,7 @@ The MCP endpoints can also accept JWTs issued by an identity provider you trust 
          "headers": {
            "Authorization": "Bearer YOUR_API_KEY"
          },
-         "url": "https://<your-host>/api/management/<secret-key>/mcp"
+         "url": "https://<your-host>/api/management/mcp"
        }
      }
    }
@@ -145,10 +167,10 @@ The MCP endpoints can also accept JWTs issued by an identity provider you trust 
 Any MCP-compatible client that supports Streamable HTTP transport can connect using the raw server URL:
 
 ```
-https://<your-host>/api/management/<secret-key>/mcp
+https://<your-host>/api/management/mcp
 ```
 
-When the server requires authentication, send an admin API key with every request as an `Authorization: Bearer` header, or a JWT from a [trusted issuer](#jwt-from-a-trusted-issuer-optional).
+Send an admin API key with every request as an `Authorization: Bearer` header, or a JWT from a [trusted issuer](#jwt-from-a-trusted-issuer-optional) (the JWT option requires the secret-key URL, `https://<your-host>/api/management/<secret-key>/mcp`).
 
 </Tab>
 </Tabs>
@@ -159,7 +181,13 @@ When the server requires authentication, send an admin API key with every reques
 
 The MCP server exposes the following tools to connected AI assistants.
 
-Most tools work inside a workspace. When a call names no `workspaceId` and the account has more than one workspace, the tool returns a `workspace_required` error listing the workspaces, and the assistant retries with one of them; with a single workspace it is picked automatically.
+Tools that list, search or create things inside a workspace take a `workspaceId`. The assistant finds it with `listWorkspaces`; a call that needs a workspace and names none returns an error pointing there. Tools that take a project or workflow id act on that object directly, and your permissions in its workspace decide whether the call is allowed.
+
+### Workspaces
+
+| Tool | Description |
+|---|---|
+| `listWorkspaces` | List the workspaces you can access (all workspaces for an admin), with their ids |
 
 ### Projects
 
@@ -169,7 +197,7 @@ Most tools work inside a workspace. When a call names no `workspaceId` and the a
 | `updateProject` | Update an existing project |
 | `deleteProject` | Delete a project |
 | `getProject` | Get project details |
-| `listProjects` | List all projects |
+| `listProjects` | List the projects of a workspace |
 | `searchProjects` | Search projects by keyword |
 | `publishProject` | Publish a project |
 | `getProjectStatus` | Get the current status of a project |
@@ -256,7 +284,7 @@ These tools address a *task* through a `type` argument - an action, a trigger, a
 
 ### Delegate tools
 
-Some capabilities are exposed as a single delegate tool that takes a natural-language instruction and calls the underlying operations itself, rather than as a flat list of tools like the ones above. Each accepts an optional `workspaceId`, auto-selected when the account has exactly one workspace.
+Some capabilities are exposed as a single delegate tool that takes a natural-language instruction and calls the underlying operations itself, rather than as a flat list of tools like the ones above. Each accepts a `workspaceId` (find it with `listWorkspaces`).
 
 | Tool | Description |
 |---|---|
