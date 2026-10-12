@@ -107,6 +107,41 @@ class McpApiKeyAuthenticationConverterTest {
             .isThrownBy(() -> mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest));
     }
 
+    @Test
+    void testConvertCanonicalManagementPathProducesNullServerSecretKey() {
+        McpApiKeyAuthenticationConverter managementMcpApiKeyAuthenticationConverter =
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/management/");
+
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest("POST", "/api/management/mcp");
+
+        mockHttpServletRequest.setServletPath("/api/management/mcp");
+        mockHttpServletRequest.addHeader("Authorization", "Bearer api-secret");
+
+        McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) Objects.requireNonNull(
+            managementMcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest), "authentication is required")
+            .getCredentials();
+
+        assertThat(mcpApiKeyCredentials.getMcpServerSecretKey()).isNull();
+        assertThat(mcpApiKeyCredentials.getSecret()).isEqualTo("api-secret");
+    }
+
+    @Test
+    void testConvertKeepsServerSecretKeyContainingMcp() {
+        McpApiKeyAuthenticationConverter managementMcpApiKeyAuthenticationConverter =
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/management/");
+
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(
+            "POST", "/api/management/abcmcpxyz/mcp");
+
+        mockHttpServletRequest.setServletPath("/api/management/abcmcpxyz/mcp");
+
+        McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) Objects.requireNonNull(
+            managementMcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest), "authentication is required")
+            .getCredentials();
+
+        assertThat(mcpApiKeyCredentials.getMcpServerSecretKey()).isEqualTo("abcmcpxyz");
+    }
+
     private ApiKeyAuthenticationToken convertToApiKeyToken(MockHttpServletRequest mockHttpServletRequest) {
         return (ApiKeyAuthenticationToken) Objects.requireNonNull(
             mcpApiKeyAuthenticationConverter.convert(mockHttpServletRequest), "authentication is required");

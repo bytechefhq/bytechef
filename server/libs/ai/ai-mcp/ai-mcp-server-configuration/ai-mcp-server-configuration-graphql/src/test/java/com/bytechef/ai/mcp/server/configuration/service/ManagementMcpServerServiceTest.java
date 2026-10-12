@@ -24,6 +24,7 @@ import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
@@ -78,6 +79,42 @@ class ManagementMcpServerServiceTest {
             .isEqualTo("http://localhost:8080/api/management/abc/mcp");
 
         verify(propertyService, never()).save(any(), any(), any(), any());
+    }
+
+    @Test
+    void testGetManagementMcpServerCanonicalUrlReturnsTenantlessUrlWithoutTouchingTheProperty() {
+        assertThat(managementMcpServerService.getManagementMcpServerCanonicalUrl())
+            .isEqualTo("http://localhost:8080/api/management/mcp");
+
+        verifyNoInteractions(propertyService);
+    }
+
+    @Test
+    void testGetManagementMcpServerCanonicalUrlStripsTrailingSlashFromPublicUrl() {
+        applicationProperties.setPublicUrl("http://localhost:8080/");
+
+        ManagementMcpServerServiceImpl trailingSlashManagementMcpServerService = new ManagementMcpServerServiceImpl(
+            applicationProperties, propertyService);
+
+        assertThat(trailingSlashManagementMcpServerService.getManagementMcpServerCanonicalUrl())
+            .isEqualTo("http://localhost:8080/api/management/mcp");
+    }
+
+    @Test
+    void testGetManagementMcpServerUrlStripsTrailingSlashFromPublicUrl() {
+        applicationProperties.setPublicUrl("http://localhost:8080/");
+
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn("abc");
+        when(propertyService.fetchProperty(MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null))
+            .thenReturn(Optional.of(property));
+
+        ManagementMcpServerServiceImpl trailingSlashManagementMcpServerService = new ManagementMcpServerServiceImpl(
+            applicationProperties, propertyService);
+
+        assertThat(trailingSlashManagementMcpServerService.getManagementMcpServerUrl())
+            .isEqualTo("http://localhost:8080/api/management/abc/mcp");
     }
 
     @Test
