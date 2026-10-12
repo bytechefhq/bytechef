@@ -84,4 +84,31 @@ describe('McpServerConfiguration', () => {
         expect(screen.getByText(/This server does not require authentication/)).toBeInTheDocument();
         expect(screen.queryByText(/This URL requires an API key/)).not.toBeInTheDocument();
     });
+
+    it('mentions signing in with ByteChef as an alternative to the API key when it is available', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <McpServerConfiguration
+                authenticationRequired
+                mcpServerUrl={MCP_SERVER_URL}
+                onRefresh={vi.fn()}
+                signInWithByteChefAvailable
+            />
+        );
+
+        expect(screen.getByText(/sign in with a ByteChef account instead/)).toBeInTheDocument();
+        expect(screen.queryByText(/Requests without a valid API key are rejected/)).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('tab', {name: 'Other'}));
+
+        expect(screen.getByText(/or sign in with a ByteChef account/)).toBeInTheDocument();
+        expect(screen.queryByText(/This URL requires an API key/)).not.toBeInTheDocument();
+    });
+
+    it('does not mention signing in with ByteChef by default', () => {
+        const {container} = render(<McpServerConfiguration mcpServerUrl={MCP_SERVER_URL} onRefresh={vi.fn()} />);
+
+        expect(container.textContent).not.toContain('ByteChef account');
+    });
 });
