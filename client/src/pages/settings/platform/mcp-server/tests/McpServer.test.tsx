@@ -1,16 +1,13 @@
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import McpServer from '../McpServer';
 
-const hoisted = vi.hoisted(() => ({
-    updateMcpServerUrlMutate: vi.fn(),
-}));
-
 vi.mock('@/shared/middleware/graphql', () => ({
-    useManagementMcpServerUrlQuery: () => ({data: {managementMcpServerUrl: 'https://example.com/mcp/abc'}}),
-    useUpdateManagementMcpServerUrlMutation: () => ({mutate: hoisted.updateMcpServerUrlMutate}),
+    useManagementMcpServerCanonicalUrlQuery: () => ({
+        data: {managementMcpServerCanonicalUrl: 'https://app.example.com/api/management/mcp'},
+    }),
 }));
 
 vi.mock('@/shared/layout/LayoutContainer', () => ({
@@ -26,25 +23,25 @@ vi.mock('@/shared/components/mcp-server/McpServerConfiguration', () => ({
         authenticationRequired,
         mcpServerUrl,
         onRefresh,
+        signInWithByteChefAvailable,
     }: {
         authenticationRequired?: boolean;
         mcpServerUrl: string;
-        onRefresh: () => void;
+        onRefresh?: () => void;
+        signInWithByteChefAvailable?: boolean;
     }) => (
-        <button
+        <div
             data-authentication-required={String(authenticationRequired)}
             data-mcp-server-url={mcpServerUrl}
+            data-sign-in-with-bytechef-available={String(signInWithByteChefAvailable)}
             data-testid="mcp-server-configuration"
-            onClick={onRefresh}
-        />
+        >
+            {onRefresh && <button onClick={onRefresh}>Regenerate canonical</button>}
+        </div>
     ),
 }));
 
 describe('McpServer', () => {
-    beforeEach(() => {
-        hoisted.updateMcpServerUrlMutate.mockClear();
-    });
-
     it('offers no switch to turn authentication off', () => {
         render(<McpServer />);
 
@@ -55,20 +52,29 @@ describe('McpServer', () => {
         );
     });
 
-    it('shows the stored server url', () => {
+    it('shows the canonical url under the MCP server URL heading', () => {
         render(<McpServer />);
 
+        expect(screen.getByRole('heading', {name: 'MCP server URL'})).toBeInTheDocument();
         expect(screen.getByTestId('mcp-server-configuration')).toHaveAttribute(
             'data-mcp-server-url',
-            'https://example.com/mcp/abc'
+            'https://app.example.com/api/management/mcp'
         );
     });
 
-    it('rotates the server url on refresh', () => {
+    it('tells the canonical url block that signing in with ByteChef is an alternative to the API key', () => {
         render(<McpServer />);
 
-        fireEvent.click(screen.getByTestId('mcp-server-configuration'));
+        expect(screen.getByTestId('mcp-server-configuration')).toHaveAttribute(
+            'data-sign-in-with-bytechef-available',
+            'true'
+        );
+    });
 
-        expect(hoisted.updateMcpServerUrlMutate).toHaveBeenCalledWith({});
+    it('shows no url for external identity providers', () => {
+        render(<McpServer />);
+
+        expect(screen.queryByRole('group', {name: 'URL for external identity providers'})).not.toBeInTheDocument();
+        expect(screen.queryAllByRole('button')).toHaveLength(0);
     });
 });

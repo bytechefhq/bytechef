@@ -1,29 +1,10 @@
 import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConfiguration';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useManagementMcpServerUrlQuery, useUpdateManagementMcpServerUrlMutation} from '@/shared/middleware/graphql';
-import {useEffect, useState} from 'react';
+import {useManagementMcpServerCanonicalUrlQuery} from '@/shared/middleware/graphql';
 
 const McpServer = () => {
-    const [mcpServerUrl, setMcpServerUrl] = useState<string | undefined>(undefined);
-
-    const {data} = useManagementMcpServerUrlQuery();
-
-    const updateManagementMcpServerUrlMutation = useUpdateManagementMcpServerUrlMutation({
-        onSuccess: (data) => {
-            setMcpServerUrl(data.updateManagementMcpServerUrl);
-        },
-    });
-
-    const handleRefresh = () => {
-        updateManagementMcpServerUrlMutation.mutate({});
-    };
-
-    useEffect(() => {
-        if (data?.managementMcpServerUrl) {
-            setMcpServerUrl(data.managementMcpServerUrl);
-        }
-    }, [data?.managementMcpServerUrl]);
+    const {data: canonicalUrlData} = useManagementMcpServerCanonicalUrlQuery();
 
     return (
         <LayoutContainer
@@ -38,7 +19,16 @@ const McpServer = () => {
             leftSidebarOpen={false}
         >
             <div className="max-w-(--breakpoint-lg) self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
-                {mcpServerUrl && <McpServerConfiguration mcpServerUrl={mcpServerUrl} onRefresh={handleRefresh} />}
+                {canonicalUrlData?.managementMcpServerCanonicalUrl && (
+                    <div className="space-y-4">
+                        <h2 className="font-semibold text-foreground">MCP server URL</h2>
+
+                        <McpServerConfiguration
+                            mcpServerUrl={canonicalUrlData.managementMcpServerCanonicalUrl}
+                            signInWithByteChefAvailable
+                        />
+                    </div>
+                )}
             </div>
         </LayoutContainer>
     );
