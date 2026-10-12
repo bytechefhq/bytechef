@@ -46,7 +46,8 @@ import org.springframework.web.servlet.function.ServerResponse;
  *
  * This configuration registers a set of deterministic CE automation/platform tools directly, and folds in any
  * {@link McpServerToolCallbackContributor} beans (EE deployments contribute the Copilot subagent agent-tools). The
- * server is exposed via Streamable HTTP at /api/management/{secretKey}/mcp.
+ * server is exposed via Streamable HTTP at /api/management/{secretKey}/mcp and at the tenant-less /api/management/mcp,
+ * where the tenant comes from the credential.
  *
  * @author Ivica Cardic
  */
@@ -129,24 +130,30 @@ public class ManagementMcpServerConfiguration {
     }
 
     @Bean
+    WebMvcStreamableServerTransportProvider canonicalWebMvcStreamableHttpServerTransportProvider() {
+        return WebMvcStreamableServerTransportProvider.builder()
+            .mcpEndpoint("/api/management/mcp")
+            .build();
+    }
+
+    @Bean
     RouterFunction<ServerResponse> mcpRouterFunction() {
         return webMvcStreamableHttpServerTransportProvider().getRouterFunction();
     }
 
     @Bean
+    RouterFunction<ServerResponse> canonicalMcpRouterFunction() {
+        return canonicalWebMvcStreamableHttpServerTransportProvider().getRouterFunction();
+    }
+
+    @Bean
     McpAsyncServer mcpAsyncServer() {
-        return McpServer.async(webMvcStreamableHttpServerTransportProvider())
-            .serverInfo("mcp-server", "1.0.0")
-            .instructions(INSTRUCTIONS)
-            .capabilities(
-                McpSchema.ServerCapabilities.builder()
-                    .resources(false, true)
-                    .tools(true)
-                    .prompts(true)
-                    .logging()
-                    .build())
-            .tools(McpToolUtils.toAsyncToolSpecifications(toolCallbackProvider().getToolCallbacks()))
-            .build();
+        return createMcpAsyncServer(webMvcStreamableHttpServerTransportProvider());
+    }
+
+    @Bean
+    McpAsyncServer canonicalMcpAsyncServer() {
+        return createMcpAsyncServer(canonicalWebMvcStreamableHttpServerTransportProvider());
     }
 
     ToolCallbackProvider toolCallbackProvider() {
@@ -161,5 +168,20 @@ public class ManagementMcpServerConfiguration {
         }
 
         return ToolCallbackProvider.from(toolCallbacks);
+    }
+
+    private McpAsyncServer createMcpAsyncServer(WebMvcStreamableServerTransportProvider transportProvider) {
+        return McpServer.async(transportProvider)
+            .serverInfo("mcp-server", "1.0.0")
+            .instructions(INSTRUCTIONS)
+            .capabilities(
+                McpSchema.ServerCapabilities.builder()
+                    .resources(false, true)
+                    .tools(true)
+                    .prompts(true)
+                    .logging()
+                    .build())
+            .tools(McpToolUtils.toAsyncToolSpecifications(toolCallbackProvider().getToolCallbacks()))
+            .build();
     }
 }

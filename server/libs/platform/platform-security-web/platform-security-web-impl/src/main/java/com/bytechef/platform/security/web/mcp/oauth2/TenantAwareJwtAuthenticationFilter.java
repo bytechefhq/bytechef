@@ -34,7 +34,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -52,7 +55,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger log = LoggerFactory.getLogger(TenantAwareJwtAuthenticationFilter.class);
+
     private static final String AUTOMATION_SCOPE = "mcp:automation";
+    private static final Pattern CANONICAL_MANAGEMENT_PATTERN = Pattern.compile("^/api/management/mcp$");
     private static final String MANAGEMENT_SCOPE = "mcp:management";
     private static final Pattern MCP_SECRET_PATTERN = Pattern.compile("/api/(?:automation|management)/(.+)/mcp");
     private static final String SCOPE_AUTHORITY_PREFIX = "SCOPE_";
@@ -60,12 +66,12 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     private final RequestMatcher automationRequestMatcher =
         RegexRequestMatcher.regexMatcher("^/api/automation/.+/mcp");
     private final RequestMatcher managementRequestMatcher =
-        RegexRequestMatcher.regexMatcher("^/api/management/.+/mcp");
+        RegexRequestMatcher.regexMatcher("^/api/management(/[^/]+)?/mcp$");
     private final McpAudienceValidator mcpAudienceValidator;
     private final McpJwtIdentityMapper mcpJwtIdentityMapper;
     private final McpResourceServerProperties mcpResourceServerProperties;
     private final List<McpServerSecretVerifier> mcpServerSecretVerifiers;
-    private final SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker;
+    private final @Nullable SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker;
     private final UserService userService;
 
     @SuppressFBWarnings("EI2")
@@ -100,23 +106,49 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
 
         String issuerUri = String.valueOf(jwt.getIssuer());
 
+        Optional<Issuer> staticIssuer = mcpResourceServerProperties.findIssuer(issuerUri);
+
         String urlTenantId;
 
         try {
-            urlTenantId = resolveUrlTenantId(request);
+            urlTenantId = resolveUrlTenantId(request, jwt, staticIssuer.orElse(null));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            log.warn(
+                "Rejecting MCP JWT for {}: {}", request.getServletPath(), illegalArgumentException.getMessage(),
+                illegalArgumentException);
+
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+
+            return;
+        } catch (IllegalStateException illegalStateException) {
+            log.error(
+                "Rejecting MCP JWT for {}: {}", request.getServletPath(), illegalStateException.getMessage(),
+                illegalStateException);
+
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+
+            return;
+        }
+
+        boolean mcpServerSecretVerified;
+
+        try {
+            mcpServerSecretVerified = isMcpServerSecretVerified(request, urlTenantId);
         } catch (RuntimeException runtimeException) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            log.error(
+                "Rejecting MCP JWT for {}: MCP server secret verification failed in tenant {}",
+                request.getServletPath(), urlTenantId, runtimeException);
+
+            response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 
             return;
         }
 
-        if (!isMcpServerSecretVerified(request, urlTenantId)) {
+        if (!mcpServerSecretVerified) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 
             return;
         }
-
-        Optional<Issuer> staticIssuer = mcpResourceServerProperties.findIssuer(issuerUri);
 
         if (staticIssuer.isEmpty()) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -167,10 +199,14 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return null;
         }
 
-        if (issuer.isSelf() && isRevoked(jwt, urlTenantId)) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        if (issuer.isSelf()) {
+            Integer revocationErrorStatus = getRevocationErrorStatus(jwt, urlTenantId);
 
-            return null;
+            if (revocationErrorStatus != null) {
+                response.sendError(revocationErrorStatus);
+
+                return null;
+            }
         }
 
         try {
@@ -190,7 +226,13 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         return queryIndex >= 0 ? url.substring(0, queryIndex) : url;
     }
 
-    private String resolveUrlTenantId(HttpServletRequest request) {
+    private String resolveUrlTenantId(HttpServletRequest request, Jwt jwt, @Nullable Issuer issuer) {
+        Matcher canonicalManagementMatcher = CANONICAL_MANAGEMENT_PATTERN.matcher(request.getServletPath());
+
+        if (canonicalManagementMatcher.matches()) {
+            return resolveClaimTenantId(jwt, issuer);
+        }
+
         Matcher matcher = MCP_SECRET_PATTERN.matcher(request.getRequestURI());
 
         if (!matcher.find()) {
@@ -201,18 +243,34 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             .getTenantId();
     }
 
-    private boolean isMcpServerSecretVerified(HttpServletRequest request, String urlTenantId) {
-        try {
-            return TenantContext.callWithTenantId(
-                urlTenantId,
-                () -> mcpServerSecretVerifiers.stream()
-                    .map(mcpServerSecretVerifier -> mcpServerSecretVerifier.verifyMcpServerSecret(request))
-                    .flatMap(Optional::stream)
-                    .findFirst()
-                    .orElse(false));
-        } catch (RuntimeException runtimeException) {
-            return false;
+    private static String resolveClaimTenantId(Jwt jwt, @Nullable Issuer issuer) {
+        if (issuer == null || !issuer.isSelf()) {
+            throw new IllegalArgumentException("Tenant-less MCP endpoint accepts only self-issued tokens");
         }
+
+        String tenantClaim = issuer.getTenantClaim();
+
+        if (StringUtils.isBlank(tenantClaim)) {
+            throw new IllegalStateException("Self issuer has no tenant claim configured");
+        }
+
+        String claimTenantId = jwt.getClaimAsString(tenantClaim);
+
+        if (StringUtils.isBlank(claimTenantId)) {
+            throw new IllegalArgumentException("Token carries no tenant claim");
+        }
+
+        return claimTenantId;
+    }
+
+    private boolean isMcpServerSecretVerified(HttpServletRequest request, String urlTenantId) {
+        return TenantContext.callWithTenantId(
+            urlTenantId,
+            () -> mcpServerSecretVerifiers.stream()
+                .map(mcpServerSecretVerifier -> mcpServerSecretVerifier.verifyMcpServerSecret(request))
+                .flatMap(Optional::stream)
+                .findFirst()
+                .orElse(false));
     }
 
     private boolean isActiveByteChefUser(String login, String tenantId) {
@@ -223,12 +281,26 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
                 .orElse(false));
     }
 
-    private boolean isRevoked(Jwt jwt, String tenantId) {
+    @Nullable
+    private Integer getRevocationErrorStatus(Jwt jwt, String tenantId) {
         if (selfIssuedTokenRevocationChecker == null) {
-            return false;
+            log.error("Rejecting self-issued MCP token: no SelfIssuedTokenRevocationChecker is configured");
+
+            return HttpServletResponse.SC_UNAUTHORIZED;
         }
 
-        return selfIssuedTokenRevocationChecker.isRevoked(jwt.getTokenValue(), tenantId);
+        boolean revoked;
+
+        try {
+            revoked = selfIssuedTokenRevocationChecker.isRevoked(jwt.getTokenValue(), tenantId);
+        } catch (RuntimeException runtimeException) {
+            log.error(
+                "Rejecting self-issued MCP token: revocation check failed for tenant {}", tenantId, runtimeException);
+
+            return HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+        }
+
+        return revoked ? Integer.valueOf(HttpServletResponse.SC_UNAUTHORIZED) : null;
     }
 
     @Nullable

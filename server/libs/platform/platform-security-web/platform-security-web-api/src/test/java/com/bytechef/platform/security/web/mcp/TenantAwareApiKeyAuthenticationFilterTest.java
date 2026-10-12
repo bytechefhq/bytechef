@@ -56,8 +56,14 @@ class TenantAwareApiKeyAuthenticationFilterTest {
     private final TenantAwareApiKeyAuthenticationFilter tenantAwareApiKeyAuthenticationFilter =
         new TenantAwareApiKeyAuthenticationFilter(
             RegexRequestMatcher.regexMatcher("^/api/automation/.+/mcp"),
-            Pattern.compile("/api/automation/(.+)/mcp"), authenticationManager,
+            Pattern.compile("/api/automation/(.+)/mcp"), null, authenticationManager,
             new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/automation/"));
+
+    private final TenantAwareApiKeyAuthenticationFilter managementTenantAwareApiKeyAuthenticationFilter =
+        new TenantAwareApiKeyAuthenticationFilter(
+            RegexRequestMatcher.regexMatcher("^/api/management(/[^/]+)?/mcp$"),
+            Pattern.compile("/api/management/([^/]+)/mcp"), "/api/management/mcp", authenticationManager,
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/management/"));
 
     private final FilterChain recordingFilterChain =
         (request, response) -> chainTenantIds.add(TenantContext.getCurrentTenantId());
@@ -173,6 +179,38 @@ class TenantAwareApiKeyAuthenticationFilterTest {
     }
 
     @Test
+    void testPathSecretWithMalformedTenantIdIsRejected() throws Exception {
+        String path = "/api/automation/%s/mcp".formatted(TenantKey.of("bad;tenant"));
+
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest("POST", path);
+
+        mockHttpServletRequest.setServletPath(path);
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        tenantAwareApiKeyAuthenticationFilter.doFilter(
+            mockHttpServletRequest, mockHttpServletResponse, recordingFilterChain);
+
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
+        assertThat(chainTenantIds).isEmpty();
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void testTenantlessBearerWithMalformedTenantIdNeverEntersThatTenant() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest("POST", "/api/management/mcp");
+
+        mockHttpServletRequest.setServletPath("/api/management/mcp");
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + TenantKey.of("bad;tenant"));
+
+        managementTenantAwareApiKeyAuthenticationFilter.doFilter(
+            mockHttpServletRequest, new MockHttpServletResponse(), recordingFilterChain);
+
+        assertThat(chainTenantIds).doesNotContain("bad;tenant");
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
     void testRequestWithNonApiKeyBearerFallsThrough() throws Exception {
         MockHttpServletRequest mockHttpServletRequest = getMcpRequest();
 
@@ -186,6 +224,98 @@ class TenantAwareApiKeyAuthenticationFilterTest {
 
         assertThat(mockHttpServletResponse.getStatus()).isEqualTo(200);
         assertThat(mockFilterChain.getRequest()).isNotNull();
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void testTenantlessPathRunsInsideApiKeyTenant() throws Exception {
+        String apiKey = String.valueOf(TenantKey.of(PATH_TENANT_ID));
+
+        MockHttpServletRequest mockHttpServletRequest = getCanonicalManagementRequest();
+
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + apiKey);
+
+        List<String> mcpServerSecretKeys = new ArrayList<>();
+
+        when(authenticationManager.authenticate(any())).thenAnswer(invocation -> {
+            McpApiKeyCredentials mcpApiKeyCredentials = getCredentials(invocation.getArgument(0));
+
+            authenticationTenantIds.add(TenantContext.getCurrentTenantId());
+            mcpServerSecretKeys.add(mcpApiKeyCredentials.getMcpServerSecretKey());
+            presentedApiKeys.add(mcpApiKeyCredentials.getSecret());
+
+            return McpAnonymousAuthenticationToken.ofAutomationMcpServer(1L);
+        });
+
+        managementTenantAwareApiKeyAuthenticationFilter.doFilter(
+            mockHttpServletRequest, new MockHttpServletResponse(), recordingFilterChain);
+
+        assertThat(authenticationTenantIds).containsExactly(PATH_TENANT_ID);
+        assertThat(chainTenantIds).containsExactly(PATH_TENANT_ID);
+        assertThat(presentedApiKeys).containsExactly(apiKey);
+        assertThat(mcpServerSecretKeys).containsExactly((String) null);
+    }
+
+    @Test
+    void testTenantlessPathWithoutBearerTokenIsRejected() throws Exception {
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        managementTenantAwareApiKeyAuthenticationFilter.doFilter(
+            getCanonicalManagementRequest(), mockHttpServletResponse, recordingFilterChain);
+
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
+        assertThat(chainTenantIds).isEmpty();
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void testTenantlessPathWithNonApiKeyBearerFallsThrough() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = getCanonicalManagementRequest();
+
+        mockHttpServletRequest.addHeader("Authorization", "Bearer not-a-tenant-key");
+
+        MockFilterChain mockFilterChain = new MockFilterChain();
+
+        managementTenantAwareApiKeyAuthenticationFilter.doFilter(
+            mockHttpServletRequest, new MockHttpServletResponse(), mockFilterChain);
+
+        assertThat(mockFilterChain.getRequest()).isNotNull();
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void testUnanchoredMatcherWithQueryIsNotTreatedAsTenantlessPath() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest("POST", "/api/automation/mcp");
+
+        mockHttpServletRequest.setServletPath("/api/automation/mcp");
+        mockHttpServletRequest.setQueryString("a=/x/mcp");
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + TenantKey.of(PATH_TENANT_ID));
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        tenantAwareApiKeyAuthenticationFilter.doFilter(
+            mockHttpServletRequest, mockHttpServletResponse, recordingFilterChain);
+
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
+        assertThat(chainTenantIds).isEmpty();
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void testManagementSecretPathIsNotTreatedAsTenantless() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(
+            "POST", "/api/management/not-a-key/mcp");
+
+        mockHttpServletRequest.setServletPath("/api/management/not-a-key/mcp");
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + TenantKey.of(PATH_TENANT_ID));
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        managementTenantAwareApiKeyAuthenticationFilter.doFilter(
+            mockHttpServletRequest, mockHttpServletResponse, recordingFilterChain);
+
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
+        assertThat(chainTenantIds).isEmpty();
         verifyNoInteractions(authenticationManager);
     }
 
@@ -206,6 +336,14 @@ class TenantAwareApiKeyAuthenticationFilterTest {
 
     private static McpApiKeyCredentials getCredentials(ApiKeyAuthenticationToken apiKeyAuthenticationToken) {
         return (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
+    }
+
+    private static MockHttpServletRequest getCanonicalManagementRequest() {
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest("POST", "/api/management/mcp");
+
+        mockHttpServletRequest.setServletPath("/api/management/mcp");
+
+        return mockHttpServletRequest;
     }
 
     private static MockHttpServletRequest getMcpRequest() {

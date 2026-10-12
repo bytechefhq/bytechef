@@ -34,10 +34,12 @@ public final class McpApiKeyCredentials implements ApiKey {
 
     private final Environment environment;
     private final String id;
-    private final String mcpServerSecretKey;
+    private final @Nullable String mcpServerSecretKey;
     private final @Nullable String secretKey;
 
-    public McpApiKeyCredentials(Environment environment, String mcpServerSecretKey, @Nullable String secretKey) {
+    public McpApiKeyCredentials(
+        Environment environment, @Nullable String mcpServerSecretKey, @Nullable String secretKey) {
+
         this.environment = environment;
         this.id = secretKey == null ? "" : fingerprint(secretKey);
         this.mcpServerSecretKey = mcpServerSecretKey;
@@ -59,6 +61,10 @@ public final class McpApiKeyCredentials implements ApiKey {
         return environment;
     }
 
+    /**
+     * Returns the server secret key taken from the request path, or {@code null} for a tenant-less endpoint URL.
+     */
+    @Nullable
     public String getMcpServerSecretKey() {
         return mcpServerSecretKey;
     }

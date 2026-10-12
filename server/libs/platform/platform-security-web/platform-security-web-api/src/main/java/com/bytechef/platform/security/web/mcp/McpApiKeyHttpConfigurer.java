@@ -18,13 +18,19 @@ package com.bytechef.platform.security.web.mcp;
 
 import java.util.List;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
@@ -38,25 +44,34 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
  */
 public class McpApiKeyHttpConfigurer extends AbstractHttpConfigurer<McpApiKeyHttpConfigurer, HttpSecurity> {
 
+    public static final List<Class<? extends Authentication>> AUTHENTICATED_TYPES = List.of(
+        ApiKeyAuthenticationToken.class, JwtAuthenticationToken.class);
+
+    public static final List<Class<? extends Authentication>> AUTHENTICATED_OR_ANONYMOUS_TYPES = List.of(
+        ApiKeyAuthenticationToken.class, JwtAuthenticationToken.class, McpAnonymousAuthenticationToken.class);
+
+    private final List<Class<? extends Authentication>> acceptedAuthenticationTypes;
     private final AuthenticationConverter authenticationConverter;
     private final AuthenticationProvider authenticationProvider;
     private final Pattern mcpServerSecretPattern;
     private final String pathPatternRegex;
+    private final @Nullable String tenantlessPath;
 
     public McpApiKeyHttpConfigurer(
-        String pathPatternRegex, Pattern mcpServerSecretPattern, AuthenticationConverter authenticationConverter,
-        AuthenticationProvider authenticationProvider) {
+        String pathPatternRegex, Pattern mcpServerSecretPattern, @Nullable String tenantlessPath,
+        AuthenticationConverter authenticationConverter, AuthenticationProvider authenticationProvider,
+        List<Class<? extends Authentication>> acceptedAuthenticationTypes) {
 
+        this.acceptedAuthenticationTypes = List.copyOf(acceptedAuthenticationTypes);
         this.authenticationConverter = authenticationConverter;
         this.authenticationProvider = authenticationProvider;
         this.mcpServerSecretPattern = mcpServerSecretPattern;
         this.pathPatternRegex = pathPatternRegex;
+        this.tenantlessPath = tenantlessPath;
     }
 
     @Override
     public void init(HttpSecurity http) {
-        http.authenticationProvider(authenticationProvider);
-
         CsrfConfigurer<?> csrf = http.getConfigurer(CsrfConfigurer.class);
 
         if (csrf != null) {
@@ -66,22 +81,33 @@ public class McpApiKeyHttpConfigurer extends AbstractHttpConfigurer<McpApiKeyHtt
 
     @Override
     public void configure(HttpSecurity http) {
-        AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-
         TenantAwareApiKeyAuthenticationFilter tenantAwareApiKeyAuthenticationFilter =
             new TenantAwareApiKeyAuthenticationFilter(
-                RegexRequestMatcher.regexMatcher(pathPatternRegex), mcpServerSecretPattern, authenticationManager,
-                authenticationConverter);
+                RegexRequestMatcher.regexMatcher(pathPatternRegex), mcpServerSecretPattern, tenantlessPath,
+                createAuthenticationManager(http), authenticationConverter);
 
         http.addFilterBefore(tenantAwareApiKeyAuthenticationFilter, BasicAuthenticationFilter.class);
 
         McpAuthenticationGuardFilter mcpAuthenticationGuardFilter = new McpAuthenticationGuardFilter(
             RegexRequestMatcher.regexMatcher(pathPatternRegex),
-            List.of(ApiKeyAuthenticationToken.class, JwtAuthenticationToken.class,
-                McpAnonymousAuthenticationToken.class),
-            getAuthenticationEntryPoint(http));
+            acceptedAuthenticationTypes, getAuthenticationEntryPoint(http));
 
         http.addFilterBefore(mcpAuthenticationGuardFilter, AuthorizationFilter.class);
+    }
+
+    private AuthenticationManager createAuthenticationManager(HttpSecurity http) {
+        ProviderManager providerManager = new ProviderManager(authenticationProvider);
+
+        ApplicationContext applicationContext = http.getSharedObject(ApplicationContext.class);
+
+        if (applicationContext != null) {
+            ObjectProvider<AuthenticationEventPublisher> authenticationEventPublisherProvider =
+                applicationContext.getBeanProvider(AuthenticationEventPublisher.class);
+
+            authenticationEventPublisherProvider.ifUnique(providerManager::setAuthenticationEventPublisher);
+        }
+
+        return providerManager;
     }
 
     private static AuthenticationEntryPoint getAuthenticationEntryPoint(HttpSecurity http) {

@@ -27,6 +27,7 @@ import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -100,7 +101,11 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
         return ApiKeyAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    private A2aServer getA2aServer(String a2aServerSecretKey) {
+    private A2aServer getA2aServer(@Nullable String a2aServerSecretKey) {
+        if (a2aServerSecretKey == null) {
+            throw new BadCredentialsException("Invalid A2A server secret key");
+        }
+
         return a2aServerService.fetchA2aServer(a2aServerSecretKey)
             .orElseThrow(() -> new BadCredentialsException("Invalid A2A server secret key"));
     }

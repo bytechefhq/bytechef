@@ -21,6 +21,8 @@ package com.bytechef.ai.mcp.server.configuration.service;
  */
 public interface ManagementMcpServerService {
 
+    String getManagementMcpServerCanonicalUrl();
+
     String getManagementMcpServerUrl();
 
     String updateManagementMcpServerUrl();

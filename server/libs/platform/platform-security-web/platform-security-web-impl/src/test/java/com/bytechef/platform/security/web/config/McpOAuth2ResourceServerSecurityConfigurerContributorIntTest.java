@@ -85,6 +85,7 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05",\
         "capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}}}""";
     private static final String MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of("public"));
+    private static final String CANONICAL_ENDPOINT_PATH = "/api/management/mcp";
     private static final String MANAGEMENT_ENDPOINT_PATH = "/api/management/" + MCP_SERVER_SECRET_KEY + "/mcp";
 
     @Autowired
@@ -208,6 +209,59 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         assertThat(wwwAuthenticate)
             .contains("Bearer")
             .contains("resource_metadata");
+    }
+
+    @Test
+    void testCanonicalEndpointUnauthenticatedRequestReturnsDiscoveryChallenge() throws Exception {
+        HttpResponse<String> httpResponse = postInitializeTo(CANONICAL_ENDPOINT_PATH, null);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+
+        String wwwAuthenticate = httpResponse.headers()
+            .firstValue("WWW-Authenticate")
+            .orElse("");
+
+        assertThat(wwwAuthenticate)
+            .contains("Bearer")
+            .contains("resource_metadata=\"http://localhost:" + port +
+                "/.well-known/oauth-protected-resource/api/management/mcp\"");
+    }
+
+    @Test
+    void testCanonicalEndpointInitializesWithSelfIssuerJwt() {
+        String token = signManagementJwt("http://localhost:" + port + CANONICAL_ENDPOINT_PATH);
+
+        try (McpSyncClient mcpSyncClient = createMcpSyncClient(CANONICAL_ENDPOINT_PATH, token)) {
+            McpSchema.InitializeResult initializeResult = mcpSyncClient.initialize();
+
+            assertThat(initializeResult.serverInfo()
+                .name()).isEqualTo("mcp-server");
+        }
+    }
+
+    @Test
+    void testCanonicalEndpointRejectsJwtWhenTenantHasNoManagementServer() throws Exception {
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
+            .thenReturn(Optional.empty());
+
+        String token = signManagementJwt("http://localhost:" + port + CANONICAL_ENDPOINT_PATH);
+
+        HttpResponse<String> httpResponse = postInitializeTo(CANONICAL_ENDPOINT_PATH, token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void testCanonicalEndpointRejectsJwtWithoutTenantClaim() throws Exception {
+        String token = sign(
+            baseClaims(ISSUER_URI)
+                .claim("scope", "mcp:management")
+                .audience(List.of("http://localhost:" + port + CANONICAL_ENDPOINT_PATH))
+                .build());
+
+        HttpResponse<String> httpResponse = postInitializeTo(CANONICAL_ENDPOINT_PATH, token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
     }
 
     @Test
@@ -335,9 +389,13 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     }
 
     private McpSyncClient createMcpSyncClient(String bearerToken) {
+        return createMcpSyncClient("/api/management/" + MCP_SERVER_SECRET_KEY + "/mcp", bearerToken);
+    }
+
+    private McpSyncClient createMcpSyncClient(String endpoint, String bearerToken) {
         HttpClientStreamableHttpTransport transport =
             HttpClientStreamableHttpTransport.builder("http://localhost:" + port)
-                .endpoint("/api/management/" + MCP_SERVER_SECRET_KEY + "/mcp")
+                .endpoint(endpoint)
                 .httpRequestCustomizer((httpRequestBuilder, method, uri, body, transportContext) -> {
                     if (bearerToken != null) {
                         httpRequestBuilder.header("Authorization", "Bearer " + bearerToken);
@@ -355,8 +413,12 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     }
 
     private HttpResponse<String> postInitialize(String bearerToken, String mcpServerSecretKey) throws Exception {
+        return postInitializeTo("/api/management/" + mcpServerSecretKey + "/mcp", bearerToken);
+    }
+
+    private HttpResponse<String> postInitializeTo(String endpoint, String bearerToken) throws Exception {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port + "/api/management/" + mcpServerSecretKey + "/mcp"))
+            .uri(URI.create("http://localhost:" + port + endpoint))
             .header("Content-Type", "application/json")
             .header("Accept", "application/json, text/event-stream")
             .POST(HttpRequest.BodyPublishers.ofString(INITIALIZE_REQUEST));

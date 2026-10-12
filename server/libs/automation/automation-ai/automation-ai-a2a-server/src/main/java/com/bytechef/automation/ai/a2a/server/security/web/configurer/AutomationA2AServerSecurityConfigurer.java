@@ -42,9 +42,10 @@ public class AutomationA2AServerSecurityConfigurer extends McpApiKeyHttpConfigur
         UserService userService) {
 
         super(
-            PATH_PATTERN, A2A_SERVER_SECRET_PATTERN,
+            PATH_PATTERN, A2A_SERVER_SECRET_PATTERN, null,
             new A2aApiKeyAuthenticationConverter(environmentService, "/api/automation/a2a/"),
             new AutomationA2AServerApiKeyAuthenticationProvider(
-                apiKeyService, authorityService, a2aServerService, userService));
+                apiKeyService, authorityService, a2aServerService, userService),
+            AUTHENTICATED_OR_ANONYMOUS_TYPES);
     }
 }

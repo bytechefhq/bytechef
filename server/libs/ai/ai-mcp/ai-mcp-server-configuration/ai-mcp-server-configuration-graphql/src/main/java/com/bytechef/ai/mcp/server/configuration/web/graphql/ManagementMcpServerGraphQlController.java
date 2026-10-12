@@ -39,6 +39,11 @@ class ManagementMcpServerGraphQlController {
     }
 
     @QueryMapping
+    String managementMcpServerCanonicalUrl() {
+        return managementMcpServerService.getManagementMcpServerCanonicalUrl();
+    }
+
+    @QueryMapping
     String managementMcpServerUrl() {
         return managementMcpServerService.getManagementMcpServerUrl();
     }

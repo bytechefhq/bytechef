@@ -37,6 +37,7 @@ import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.mcp.security.server.apikey.ApiKeyImpl;
@@ -134,6 +135,30 @@ class ManagementMcpServerApiKeyAuthenticationProviderTest {
     }
 
     @Test
+    void testCanonicalPathSkipsServerSecretComparison() {
+        mockApiKey(null, Environment.PRODUCTION);
+
+        Authentication authentication = managementMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.PRODUCTION, null));
+
+        assertThat(authentication.isAuthenticated()).isTrue();
+        verify(apiKeyService).updateLastUsedDate(7L);
+    }
+
+    @Test
+    void testCanonicalPathRequiresManagementServerProperty() {
+        mockApiKey(null, Environment.PRODUCTION);
+
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(
+                getUnauthenticatedToken(Environment.PRODUCTION, null)));
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
     void testAuthenticateWithForeignApiKeyCredentialsFails() {
         ApiKeyAuthenticationToken apiKeyAuthenticationToken = ApiKeyAuthenticationToken.unauthenticated(
             ApiKeyImpl.from("key-id.api-secret"));
@@ -142,7 +167,9 @@ class ManagementMcpServerApiKeyAuthenticationProviderTest {
             () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(apiKeyAuthenticationToken));
     }
 
-    private ApiKeyAuthenticationToken getUnauthenticatedToken(Environment environment, String mcpServerSecretKey) {
+    private ApiKeyAuthenticationToken getUnauthenticatedToken(
+        Environment environment, @Nullable String mcpServerSecretKey) {
+
         return ApiKeyAuthenticationToken.unauthenticated(
             new McpApiKeyCredentials(environment, mcpServerSecretKey, "api-secret"));
     }

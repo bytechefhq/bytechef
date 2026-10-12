@@ -53,7 +53,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  */
 class TenantAwareJwtAuthenticationFilterTest {
 
+    private static final String CANONICAL_MANAGEMENT_PATH = "/api/management/mcp";
     private static final String ISSUER_URI = "https://as.bytechef.test";
+    private static final SelfIssuedTokenRevocationChecker NOT_REVOKED_CHECKER = (tokenValue, tenantId) -> false;
 
     private final List<String> mcpServerSecretVerificationTenantIds = new ArrayList<>();
     private final UserService userService = mock(UserService.class);
@@ -245,7 +247,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testAllowsSelfIssuerTokenWhenByteChefUserIsActive() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
-            List.of(mcpServerSecretVerifier), null);
+            List.of(mcpServerSecretVerifier), NOT_REVOKED_CHECKER);
 
         User user = mock(User.class);
 
@@ -389,7 +391,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     }
 
     @Test
-    void testRejectsMcpServerSecretWhenVerifierFails() throws Exception {
+    void testRespondsServiceUnavailableWhenMcpServerSecretVerifierFails() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties(), userService,
             List.of(request -> {
@@ -406,7 +408,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         filter.doFilter(request(path), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
 
-        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(response.getStatus()).isEqualTo(503);
         assertThat(chainInvoked).isFalse();
     }
 
@@ -418,10 +420,19 @@ class TenantAwareJwtAuthenticationFilterTest {
     }
 
     @Test
-    void testSkipsRevocationCheckWithoutChecker() throws Exception {
+    void testRejectsSelfIssuedTokenWhenNoRevocationCheckerIsConfigured() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker(null);
 
-        assertThat(doSelfIssuerRequest(filter)).isEqualTo(200);
+        assertThat(doSelfIssuerRequest(filter)).isEqualTo(401);
+    }
+
+    @Test
+    void testRejectsSelfIssuedTokenWithServiceUnavailableWhenRevocationCheckFails() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker((tokenValue, tenantId) -> {
+            throw new IllegalStateException("revocation store unavailable");
+        });
+
+        assertThat(doSelfIssuerRequest(filter)).isEqualTo(503);
     }
 
     @Test
@@ -436,6 +447,121 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         assertThat(doSelfIssuerRequest(filter)).isEqualTo(200);
         assertThat(checked).containsExactly("token@acme");
+    }
+
+    @Test
+    void testCanonicalManagementPathTakesTenantFromSelfIssuedClaim() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker(NOT_REVOKED_CHECKER);
+
+        authenticate(
+            jwtWithTenant("acme", "mcp:management", endpointUrl(CANONICAL_MANAGEMENT_PATH)), "SCOPE_mcp:management");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicReference<String> tenantId = new AtomicReference<>();
+
+        filter.doFilter(
+            request(CANONICAL_MANAGEMENT_PATH), response,
+            (servletRequest, servletResponse) -> tenantId.set(TenantContext.getCurrentTenantId()));
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(tenantId.get()).isEqualTo("acme");
+        assertThat(mcpServerSecretVerificationTenantIds).containsExactly("acme");
+    }
+
+    @Test
+    void testCanonicalManagementPathChecksRevocationInClaimTenant() throws Exception {
+        List<String> checked = new ArrayList<>();
+
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker((tokenValue, tenantId) -> {
+            checked.add(tokenValue + "@" + tenantId);
+
+            return true;
+        });
+
+        authenticate(
+            jwtWithTenant("acme", "mcp:management", endpointUrl(CANONICAL_MANAGEMENT_PATH)), "SCOPE_mcp:management");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request(CANONICAL_MANAGEMENT_PATH), response, (servletRequest, servletResponse) -> {});
+
+        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(checked).containsExactly("token@acme");
+    }
+
+    @Test
+    void testCanonicalManagementPathRejectsExternalIssuer() throws Exception {
+        authenticate(
+            jwtWithTenant("acme", "mcp:management", endpointUrl(CANONICAL_MANAGEMENT_PATH)), "SCOPE_mcp:management");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicBoolean chainInvoked = new AtomicBoolean();
+
+        tenantAwareJwtAuthenticationFilter.doFilter(
+            request(CANONICAL_MANAGEMENT_PATH), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(chainInvoked).isFalse();
+        assertThat(mcpServerSecretVerificationTenantIds).isEmpty();
+    }
+
+    @Test
+    void testCanonicalManagementPathRejectsTokenWithoutTenantClaim() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker(NOT_REVOKED_CHECKER);
+
+        authenticate(jwtNoTenant("mcp:management", endpointUrl(CANONICAL_MANAGEMENT_PATH)), "SCOPE_mcp:management");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicBoolean chainInvoked = new AtomicBoolean();
+
+        filter.doFilter(
+            request(CANONICAL_MANAGEMENT_PATH), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(chainInvoked).isFalse();
+    }
+
+    @Test
+    void testCanonicalManagementPathRejectsTenantWithoutManagementServer() throws Exception {
+        User user = mock(User.class);
+
+        when(user.isActivated()).thenReturn(true);
+        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
+
+        TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
+            new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
+            List.of(request -> Optional.of(false)), null);
+
+        authenticate(
+            jwtWithTenant("acme", "mcp:management", endpointUrl(CANONICAL_MANAGEMENT_PATH)), "SCOPE_mcp:management");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicBoolean chainInvoked = new AtomicBoolean();
+
+        filter.doFilter(
+            request(CANONICAL_MANAGEMENT_PATH), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(chainInvoked).isFalse();
+    }
+
+    @Test
+    void testTenantlessAutomationPathIsRejected() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker(NOT_REVOKED_CHECKER);
+
+        String path = "/api/automation/mcp";
+
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request(path), response, (servletRequest, servletResponse) -> {});
+
+        assertThat(response.getStatus()).isEqualTo(401);
     }
 
     private TenantAwareJwtAuthenticationFilter selfIssuerFilterWithChecker(

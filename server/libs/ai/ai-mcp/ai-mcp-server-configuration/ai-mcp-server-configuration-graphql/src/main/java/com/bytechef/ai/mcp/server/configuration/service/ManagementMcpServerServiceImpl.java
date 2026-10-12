@@ -23,6 +23,7 @@ import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,13 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
         ApplicationProperties applicationProperties, PropertyService propertyService) {
 
         this.propertyService = propertyService;
-        this.publicUrl = applicationProperties.getPublicUrl();
+        this.publicUrl = removeTrailingSlash(applicationProperties.getPublicUrl());
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public String getManagementMcpServerCanonicalUrl() {
+        return publicUrl + "/api/management/mcp";
     }
 
     @Override
@@ -78,5 +85,19 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
 
     private String toManagementMcpServerUrl(String secretKey) {
         return publicUrl + "/api/management/" + secretKey + "/mcp";
+    }
+
+    private static String removeTrailingSlash(@Nullable String url) {
+        if (url == null) {
+            return "";
+        }
+
+        String strippedUrl = url.strip();
+
+        if (strippedUrl.endsWith("/")) {
+            return strippedUrl.substring(0, strippedUrl.length() - 1);
+        }
+
+        return strippedUrl;
     }
 }

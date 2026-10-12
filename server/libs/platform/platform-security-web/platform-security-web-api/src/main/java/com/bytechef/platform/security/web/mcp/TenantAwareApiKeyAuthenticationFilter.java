@@ -45,16 +45,19 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
 
     private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final Pattern TENANT_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
     private final Pattern mcpServerSecretPattern;
+    private final @Nullable String tenantlessPath;
 
     public TenantAwareApiKeyAuthenticationFilter(
-        RequestMatcher requestMatcher, Pattern mcpServerSecretPattern, AuthenticationManager authenticationManager,
-        AuthenticationConverter authenticationConverter) {
+        RequestMatcher requestMatcher, Pattern mcpServerSecretPattern, @Nullable String tenantlessPath,
+        AuthenticationManager authenticationManager, AuthenticationConverter authenticationConverter) {
 
         super(authenticationManager, new PathTenantAuthenticationConverter(authenticationConverter));
 
         this.mcpServerSecretPattern = mcpServerSecretPattern;
+        this.tenantlessPath = tenantlessPath;
 
         setRequestMatcher(requestMatcher);
     }
@@ -82,9 +85,15 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
             return;
         }
 
-        String pathTenantId = resolvePathTenantId(httpServletRequest);
+        String tenantId = resolvePathTenantId(httpServletRequest);
 
-        if (pathTenantId == null) {
+        if (tenantId == null && isTenantlessPath(httpServletRequest) && authorization != null &&
+            authorization.startsWith(BEARER_PREFIX)) {
+
+            tenantId = parseTenantId(authorization.substring(BEARER_PREFIX.length()));
+        }
+
+        if (tenantId == null) {
             AuthenticationFailureHandler authenticationFailureHandler = getFailureHandler();
 
             authenticationFailureHandler.onAuthenticationFailure(
@@ -94,7 +103,11 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
         }
 
         TenantContext.runWithTenantId(
-            pathTenantId, () -> super.doFilterInternal(httpServletRequest, httpServletResponse, filterChain));
+            tenantId, () -> super.doFilterInternal(httpServletRequest, httpServletResponse, filterChain));
+    }
+
+    private boolean isTenantlessPath(HttpServletRequest httpServletRequest) {
+        return tenantlessPath != null && tenantlessPath.equals(httpServletRequest.getServletPath());
     }
 
     @Nullable
@@ -110,13 +123,23 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
 
     @Nullable
     private static String parseTenantId(String tenantKeyString) {
+        String tenantId;
+
         try {
             TenantKey tenantKey = TenantKey.parse(tenantKeyString);
 
-            return tenantKey.getTenantId();
+            tenantId = tenantKey.getTenantId();
         } catch (RuntimeException runtimeException) {
             return null;
         }
+
+        if (tenantId == null || !TENANT_ID_PATTERN.matcher(tenantId)
+            .matches()) {
+
+            return null;
+        }
+
+        return tenantId;
     }
 
     private static final class PathTenantAuthenticationConverter implements AuthenticationConverter {
