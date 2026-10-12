@@ -46,6 +46,12 @@ public class McpResourceServerProperties implements InitializingBean {
                     "bytechef.oauth2.resource-server.issuers[" + index + "].uri must not be blank");
             }
 
+            if (issuer.isSelf() && StringUtils.isBlank(issuer.getTenantClaim())) {
+                throw new IllegalStateException(
+                    "bytechef.oauth2.resource-server.issuers[" + index + "].tenant-claim must not be blank when self " +
+                        "is true");
+            }
+
             if (issuer.isSelf() && StringUtils.isNotBlank(issuer.getAudience())) {
                 throw new IllegalStateException(
                     "bytechef.oauth2.resource-server.issuers[" + index + "] must not set audience when self is true");
