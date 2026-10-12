@@ -4,8 +4,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowEditorProjectSelect, {
     ALL_PROJECTS_VALUE,
 } from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorProjectSelect';
-import AutomationWorkflowEditorWorkflowsFilter from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorWorkflowsFilter';
 import AutomationWorkflowEditorWorkflowsListItem from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorWorkflowsListItem';
+import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
 import {AutomationWorkflowProjectsQuery, useAutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
@@ -126,7 +126,7 @@ const AutomationWorkflowEditorLeftSidebar = ({currentWorkflowId}: AutomationWork
                     </div>
                 )}
 
-                <AutomationWorkflowEditorWorkflowsFilter
+                <WorkflowsListFilter
                     ref={searchInputRef}
                     searchValue={searchValue}
                     setSearchValue={setSearchValue}

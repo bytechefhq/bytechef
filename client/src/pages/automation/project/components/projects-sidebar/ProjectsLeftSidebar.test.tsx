@@ -35,7 +35,7 @@ vi.mock('@/pages/automation/project/components/projects-sidebar/components/Proje
     default: ({project}: any) => <div data-testid="project-workflows-list">Project:{project.id}</div>,
 }));
 
-vi.mock('@/pages/automation/project/components/projects-sidebar/components/WorkflowsListFilter', () => ({
+vi.mock('@/shared/components/workflow/WorkflowsListFilter', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     default: ({sortBy}: any) => <div data-testid="workflows-list-filter">Sort:{sortBy}</div>,
 }));

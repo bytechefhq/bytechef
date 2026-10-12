@@ -2,7 +2,6 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationSelect from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationSelect';
 import IntegrationWorkflowsList from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsList';
-import IntegrationWorkflowsListFilter from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListFilter';
 import IntegrationWorkflowsListItem from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListItem';
 import IntegrationWorkflowsListSkeleton from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListSkeleton';
 import {useIntegrationsLeftSidebar} from '@/ee/pages/embedded/integration/components/integrations-sidebar/hooks/useIntegrationsLeftSidebar';
@@ -12,6 +11,7 @@ import {
     useGetIntegrationWorkflowsQuery,
 } from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
 import {useQueries} from '@tanstack/react-query';
 import {useEffect, useMemo, useRef, useState} from 'react';
 
@@ -120,7 +120,7 @@ const IntegrationsLeftSidebar = ({
                     )
                 )}
 
-                <IntegrationWorkflowsListFilter
+                <WorkflowsListFilter
                     ref={searchInputRef}
                     searchValue={searchValue}
                     setSearchValue={setSearchValue}
