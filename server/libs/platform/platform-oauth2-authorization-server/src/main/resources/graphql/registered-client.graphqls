@@ -1,0 +1,38 @@
+extend type Query {
+    oauth2ConsentClient(clientId: String!): OAuth2ConsentClient
+    registeredClients: [RegisteredClient]
+    registeredClientGrants(registeredClientId: ID!): [RegisteredClientGrant]
+}
+
+extend type Mutation {
+    deleteRegisteredClient(id: ID!): Boolean!
+    revokeRegisteredClientGrant(registeredClientId: ID!, principalName: String!): Boolean!
+    revokeRegisteredClientGrants(registeredClientId: ID!): Boolean!
+}
+
+type OAuth2ConsentClient {
+    clientId: String!
+    clientName: String
+    redirectHosts: [String!]!
+}
+
+type RegisteredClient {
+    id: ID
+    clientId: String
+    clientName: String
+    clientIdIssuedAt: Long
+    scopes: [String]
+    authorizationGrantTypes: [String]
+    redirectUris: [String]
+    grantCount: Int
+    deletable: Boolean
+}
+
+type RegisteredClientGrant {
+    principalName: String
+    scopes: [String]
+    mcpServers: [String]
+    authorizedAt: Long
+    lastIssuedAt: Long
+    expiresAt: Long
+}
