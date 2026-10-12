@@ -1,0 +1,7 @@
+query oauth2ConsentClient($clientId: String!) {
+    oauth2ConsentClient(clientId: $clientId) {
+        clientId
+        clientName
+        redirectHosts
+    }
+}
