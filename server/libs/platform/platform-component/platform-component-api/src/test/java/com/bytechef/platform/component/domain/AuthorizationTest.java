@@ -16,12 +16,13 @@
 
 package com.bytechef.platform.component.domain;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.component.definition.Authorization;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,9 +32,34 @@ class AuthorizationTest {
 
     @Test
     void testRefreshOnDefaultsToUnauthorized() {
-        ModifiableAuthorization authorization = ComponentDsl.authorization(
-            Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+        ModifiableAuthorization authorization = authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
 
-        assertEquals(List.of(401), authorization.getRefreshOn());
+        assertThat(authorization.getRefreshOn()).isEqualTo(List.of(401));
+    }
+
+    @Test
+    void testIsDiscoveryWhenProtectedResourceUrlIsDeclared() {
+        Authorization authorization = new Authorization(
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE)
+                .protectedResourceUrl(
+                    (connectionParameters, context) -> connectionParameters.getRequiredString("url")));
+
+        assertThat(authorization.isDiscovery()).isTrue();
+    }
+
+    @Test
+    void testIsNotDiscoveryWithoutProtectedResourceUrl() {
+        Authorization authorization = new Authorization(
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE));
+
+        assertThat(authorization.isDiscovery()).isFalse();
+    }
+
+    @Test
+    void testOAuth2AuthorizationParametersFourArgumentConstructorLeavesContextNull() {
+        OAuth2AuthorizationParameters parameters = new OAuth2AuthorizationParameters(
+            "https://auth.example.com/authorize", "client", Map.of(), Map.of());
+
+        assertThat(parameters.authorizationContext()).isNull();
     }
 }

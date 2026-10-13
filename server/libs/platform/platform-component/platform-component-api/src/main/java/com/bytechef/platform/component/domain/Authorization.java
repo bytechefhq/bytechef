@@ -18,10 +18,12 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization.ProtectedResourceUrlFunction;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -31,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 public final class Authorization {
 
     private String description;
+    private boolean discovery;
     private List<String> detectOn;
     private String name;
     private List<? extends Property> properties;
@@ -57,11 +60,20 @@ public final class Authorization {
             .orElse(name);
 
         this.refreshOn = authorization.getRefreshOn();
+
+        Optional<ProtectedResourceUrlFunction> protectedResourceUrlFunctionOptional =
+            authorization.getProtectedResourceUrl();
+
+        this.discovery = protectedResourceUrlFunctionOptional.isPresent();
     }
 
     @Nullable
     public String getDescription() {
         return description;
+    }
+
+    public boolean isDiscovery() {
+        return discovery;
     }
 
     public String getName() {
@@ -90,14 +102,15 @@ public final class Authorization {
             return false;
         }
 
-        return Objects.equals(description, that.description) && Objects.equals(detectOn, that.detectOn) &&
+        return Objects.equals(description, that.description) && discovery == that.discovery &&
+            Objects.equals(detectOn, that.detectOn) &&
             Objects.equals(name, that.name) && Objects.equals(properties, that.properties) &&
             Objects.equals(refreshOn, that.refreshOn) && Objects.equals(title, that.title) && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(description, name, properties, title, type);
+        return Objects.hash(description, discovery, name, properties, title, type);
     }
 
     public List<String> getDetectOn() {
@@ -118,6 +131,7 @@ public final class Authorization {
             ", properties=" + properties +
             ", refreshOn=" + refreshOn +
             ", detectOn=" + detectOn +
+            ", discovery=" + discovery +
             '}';
     }
 }

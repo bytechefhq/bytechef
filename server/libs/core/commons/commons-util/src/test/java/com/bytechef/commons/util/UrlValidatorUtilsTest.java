@@ -52,6 +52,72 @@ class UrlValidatorUtilsTest {
     }
 
     @Test
+    void testZeroNetworkBlocked() {
+        assertThat(UrlValidatorUtils.isValid("http://0.0.0.0", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://0.1.2.3", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.resolvesToPrivateAddress("0.1.2.3")).isTrue();
+    }
+
+    @Test
+    void testNat64WithPrivateIpv4Blocked() {
+        assertThat(UrlValidatorUtils.isValid("http://[64:ff9b::a9fe:a9fe]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[64:ff9b::a00:1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[64:ff9b::7f00:1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[64:ff9b::c0a8:101]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[64:ff9b::6440:1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[64:ff9b::]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.resolvesToPrivateAddress("64:ff9b::a9fe:a9fe")).isTrue();
+    }
+
+    @Test
+    void test6to4WithPrivateIpv4Blocked() {
+        assertThat(UrlValidatorUtils.isValid("http://[2002:a9fe:a9fe::]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[2002:a00:1::1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[2002:7f00:1::]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[2002:c0a8:101::]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[2002:6440:1::]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[2002::]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.resolvesToPrivateAddress("2002:a9fe:a9fe::")).isTrue();
+    }
+
+    @Test
+    void test6to4WithPublicIpv4Allowed() {
+        assertThat(UrlValidatorUtils.isValid("https://[2002:808:808::1]", Set.of())).isTrue();
+        assertThat(UrlValidatorUtils.resolvesToPrivateAddress("2002:808:808::1")).isFalse();
+    }
+
+    @Test
+    void testIpv4CompatibleWithPrivateIpv4Blocked() {
+        assertThat(UrlValidatorUtils.isValid("http://[::a9fe:a9fe]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[::a00:1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[::7f00:1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[::6440:1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.resolvesToPrivateAddress("::a9fe:a9fe")).isTrue();
+    }
+
+    @Test
+    void testIpv4MappedWithPrivateIpv4Blocked() {
+        assertThat(UrlValidatorUtils.isValid("http://[::ffff:a9fe:a9fe]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[::ffff:10.0.0.1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[::ffff:127.0.0.1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[::ffff:100.64.0.1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("https://[::ffff:8.8.8.8]", Set.of())).isTrue();
+    }
+
+    @Test
+    void testNat64WithPublicIpv4Allowed() {
+        assertThat(UrlValidatorUtils.isValid("https://[64:ff9b::101:101]", Set.of())).isTrue();
+        assertThat(UrlValidatorUtils.isValid("https://[64:ff9b::808:808]/path", Set.of())).isTrue();
+        assertThat(UrlValidatorUtils.resolvesToPrivateAddress("64:ff9b::808:808")).isFalse();
+    }
+
+    @Test
+    void testIpv6UniqueLocalAndLinkLocalBlocked() {
+        assertThat(UrlValidatorUtils.isValid("http://[fd00::1]", Set.of())).isFalse();
+        assertThat(UrlValidatorUtils.isValid("http://[fe80::1]", Set.of())).isFalse();
+    }
+
+    @Test
     void testNonHttpSchemeBlocked() {
         assertThat(UrlValidatorUtils.isValid("ftp://1.1.1.1", Set.of())).isFalse();
     }
