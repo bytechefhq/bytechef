@@ -2937,6 +2937,7 @@ export enum PropertyType {
 export type Query = {
   __typename?: 'Query';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
+  a2aEligibleProjectVersionWorkflows: Array<ProjectWorkflow>;
   a2aProjectWorkflowsByA2aProjectId?: Maybe<Array<Maybe<A2aProjectWorkflow>>>;
   a2aProjects?: Maybe<Array<Maybe<A2aProject>>>;
   a2aProjectsByServerId?: Maybe<Array<Maybe<A2aProject>>>;
@@ -3115,6 +3116,12 @@ export type Query = {
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
+};
+
+
+export type QueryA2aEligibleProjectVersionWorkflowsArgs = {
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
 };
 
 
