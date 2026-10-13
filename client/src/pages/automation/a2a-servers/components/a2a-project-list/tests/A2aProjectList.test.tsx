@@ -68,9 +68,13 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         isPending: false,
         mutate: hoisted.updateEnabledMutate,
     }),
-    useUpdateA2aProjectWorkflowParametersMutation: () => ({
+    useUpdateA2aProjectWorkflowParametersMutation: (options?: {onSuccess?: () => void}) => ({
         isPending: false,
-        mutate: hoisted.updateParametersMutate,
+        mutate: (variables: unknown) => {
+            hoisted.updateParametersMutate(variables);
+
+            options?.onSuccess?.();
+        },
     }),
 }));
 
@@ -359,5 +363,28 @@ describe('A2aProjectList', () => {
             id: '21',
             input: {skillDescription: 'Qualifies inbound leads', skillName: 'Qualify lead'},
         });
+        expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['a2aProjectWorkflowsByA2aProjectId']});
+
+        await waitFor(() => expect(screen.queryByText('Edit Lead intake Skill')).not.toBeInTheDocument());
+    });
+
+    it('closes the skill popover without saving', async () => {
+        const user = userEvent.setup();
+
+        render(<A2aProjectList a2aServer={a2aServer} />);
+
+        await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
+
+        for (const closeButtonName of ['Cancel', 'Close']) {
+            await user.click(screen.getByRole('button', {name: 'Configure Lead intake'}));
+
+            expect(await screen.findByText('Edit Lead intake Skill')).toBeInTheDocument();
+
+            await user.click(screen.getByRole('button', {name: closeButtonName}));
+
+            await waitFor(() => expect(screen.queryByText('Edit Lead intake Skill')).not.toBeInTheDocument());
+        }
+
+        expect(hoisted.updateParametersMutate).not.toHaveBeenCalled();
     });
 });
