@@ -24,8 +24,41 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     useUpdateA2aProjectMutation: () => ({mutate: hoisted.updateMutate}),
 }));
 
-vi.mock('@/shared/queries/automation/projects.queries', () => ({
+vi.mock('@/shared/queries/automation/projects.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/projects.queries')>()),
     useGetWorkspaceProjectsQuery: () => ({data: [{id: 5, name: 'Sales project'}]}),
+}));
+
+vi.mock('@/shared/queries/automation/projectWorkflows.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/projectWorkflows.queries')>()),
+    useGetProjectVersionWorkflowsQuery: (_id: number, _version: number, _all: boolean, enabled: boolean) => ({
+        data: enabled
+            ? [
+                  {id: 'workflow-a', inputs: [], label: 'Answer question', tasks: [], triggers: []},
+                  {id: 'workflow-b', inputs: [], label: 'Create lead', tasks: [], triggers: []},
+              ]
+            : undefined,
+    }),
+}));
+
+vi.mock('@/shared/queries/automation/projectDeployments.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/projectDeployments.queries')>()),
+    useGetProjectDeploymentQuery: (_id: number, enabled: boolean) => ({
+        data: enabled ? {environmentId: 2, id: 31, projectDeploymentWorkflows: []} : undefined,
+    }),
+}));
+
+vi.mock('@/shared/queries/automation/connections.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/connections.queries')>()),
+    useGetWorkspaceConnectionsQuery: () => ({data: []}),
+}));
+
+vi.mock('@/shared/components/ConnectionConfigurationList', () => ({
+    default: () => <div data-testid="connection-configuration-list" />,
+}));
+
+vi.mock('@/shared/components/InputConfigurationList', () => ({
+    default: () => <div data-testid="input-configuration-list" />,
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => {
@@ -87,6 +120,7 @@ const renderDialog = (a2aProject?: A2aProjectItemType) =>
 const selectProjectVersion = async (user: ReturnType<typeof userEvent.setup>, versionLabel = 'Version 1') => {
     await user.click(screen.getByRole('button', {name: 'Pick project'}));
     await user.click(await screen.findByRole('button', {name: versionLabel}));
+    await user.click(screen.getByRole('button', {name: 'Next'}));
 };
 
 describe('A2aServerWorkflowDialog', () => {
@@ -99,7 +133,7 @@ describe('A2aServerWorkflowDialog', () => {
     it('starts in create mode without a project, even when the server already has projects', () => {
         renderDialog();
 
-        expect(screen.getByText('Select Workflows')).toBeInTheDocument();
+        expect(screen.getAllByText('Add Workflows')[0]).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Pick project'})).toBeInTheDocument();
     });
 
@@ -113,10 +147,10 @@ describe('A2aServerWorkflowDialog', () => {
         renderDialog();
 
         await selectProjectVersion(user);
-        await user.click(screen.getAllByRole('checkbox')[0]);
+        await user.click(screen.getAllByRole('switch')[0]);
         await user.click(screen.getByRole('button', {name: 'Add'}));
 
-        await waitFor(() => expect(screen.queryByRole('checkbox')).not.toBeInTheDocument());
+        await waitFor(() => expect(screen.queryByRole('switch')).not.toBeInTheDocument());
 
         expect(screen.queryByRole('button', {name: 'Version 1'})).not.toBeInTheDocument();
     });
@@ -130,21 +164,21 @@ describe('A2aServerWorkflowDialog', () => {
 
         expect(screen.getByRole('button', {name: 'Add'})).toBeDisabled();
 
-        await user.click(screen.getAllByRole('checkbox')[0]);
+        await user.click(screen.getAllByRole('switch')[0]);
 
         expect(screen.getByRole('button', {name: 'Add'})).toBeEnabled();
     });
 
-    it('names each workflow checkbox after its workflow and toggles it from the label', async () => {
+    it('names each workflow switch after its workflow and toggles it from the label', async () => {
         const user = userEvent.setup();
 
         renderDialog();
 
         await selectProjectVersion(user);
 
-        const answerQuestionCheckbox = screen.getByRole('checkbox', {name: 'Answer question'});
+        const answerQuestionCheckbox = screen.getByRole('switch', {name: 'Answer question'});
 
-        expect(screen.getByRole('checkbox', {name: 'Create lead'})).not.toBeChecked();
+        expect(screen.getByRole('switch', {name: 'Create lead'})).not.toBeChecked();
         expect(answerQuestionCheckbox).not.toBeChecked();
 
         await user.click(screen.getByText('Answer question'));
@@ -158,7 +192,7 @@ describe('A2aServerWorkflowDialog', () => {
         renderDialog();
 
         await selectProjectVersion(user);
-        await user.click(screen.getAllByRole('checkbox')[1]);
+        await user.click(screen.getAllByRole('switch')[1]);
         await user.click(screen.getByRole('button', {name: 'Add'}));
 
         await waitFor(() => expect(hoisted.createMutate).toHaveBeenCalledTimes(1));
@@ -169,6 +203,7 @@ describe('A2aServerWorkflowDialog', () => {
                 projectId: '5',
                 projectVersion: 1,
                 selectedWorkflowIds: ['workflow-b'],
+                workflowConfigurations: [{connections: [], inputs: {}, workflowId: 'workflow-b'}],
             },
         });
         expect(hoisted.updateMutate).not.toHaveBeenCalled();
@@ -180,13 +215,15 @@ describe('A2aServerWorkflowDialog', () => {
         renderDialog();
 
         await selectProjectVersion(user);
-        await user.click(screen.getAllByRole('checkbox')[0]);
+        await user.click(screen.getAllByRole('switch')[0]);
 
-        expect(screen.getAllByRole('checkbox')[0]).toBeChecked();
+        expect(screen.getAllByRole('switch')[0]).toBeChecked();
 
+        await user.click(screen.getByRole('button', {name: /^Basic/}));
         await user.click(screen.getByRole('button', {name: 'Version 2'}));
+        await user.click(screen.getByRole('button', {name: 'Next'}));
 
-        expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked();
+        expect(screen.getAllByRole('switch')[0]).not.toBeChecked();
         expect(screen.getByRole('button', {name: 'Add'})).toBeDisabled();
     });
 
@@ -196,9 +233,9 @@ describe('A2aServerWorkflowDialog', () => {
         renderDialog();
 
         await selectProjectVersion(user);
-        await user.click(screen.getAllByRole('checkbox')[0]);
-        await user.click(screen.getAllByRole('checkbox')[1]);
-        await user.click(screen.getAllByRole('checkbox')[0]);
+        await user.click(screen.getAllByRole('switch')[0]);
+        await user.click(screen.getAllByRole('switch')[1]);
+        await user.click(screen.getAllByRole('switch')[0]);
         await user.click(screen.getByRole('button', {name: 'Add'}));
 
         await waitFor(() => expect(hoisted.createMutate).toHaveBeenCalledTimes(1));
@@ -216,7 +253,7 @@ describe('A2aServerWorkflowDialog', () => {
         await selectProjectVersion(user);
 
         expect(screen.getByText(/No tool-eligible workflows found for this project version/)).toBeInTheDocument();
-        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+        expect(screen.queryByRole('switch')).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Add'})).toBeDisabled();
     });
 
@@ -232,22 +269,30 @@ describe('A2aServerWorkflowDialog', () => {
             workflowIds: ['workflow-a'],
         });
 
-        expect(screen.getByDisplayValue('Sales project')).toBeDisabled();
-        expect(screen.getByDisplayValue('v2')).toBeDisabled();
+        await waitFor(() => expect(screen.getAllByRole('switch')[0]).toBeChecked());
 
-        await waitFor(() => expect(screen.getAllByRole('checkbox')[0]).toBeChecked());
+        expect(screen.getAllByRole('switch')[1]).not.toBeChecked();
 
-        expect(screen.getAllByRole('checkbox')[1]).not.toBeChecked();
-
-        await user.click(screen.getAllByRole('checkbox')[1]);
+        await user.click(screen.getAllByRole('switch')[1]);
         await user.click(screen.getByRole('button', {name: 'Update'}));
 
         await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
 
         expect(hoisted.updateMutate.mock.calls[0][0]).toEqual({
             id: '11',
-            input: {selectedWorkflowIds: ['workflow-a', 'workflow-b']},
+            input: {
+                selectedWorkflowIds: ['workflow-a', 'workflow-b'],
+                workflowConfigurations: [
+                    {connections: [], inputs: {}, workflowId: 'workflow-a'},
+                    {connections: [], inputs: {}, workflowId: 'workflow-b'},
+                ],
+            },
         });
         expect(hoisted.createMutate).not.toHaveBeenCalled();
+
+        await user.click(screen.getByRole('button', {name: /^Basic/}));
+
+        expect(screen.getByDisplayValue('Sales project')).toBeDisabled();
+        expect(screen.getByDisplayValue('v2')).toBeDisabled();
     });
 });

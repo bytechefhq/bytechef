@@ -1,19 +1,12 @@
-import Button from '@/components/Button/Button';
-import {
-    Dialog,
-    DialogBody,
-    DialogCancelButton,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogMain,
-} from '@/components/Dialog';
+import {Dialog} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
-import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
+import ServerProjectWorkflowsList from '@/pages/automation/server-workflows/ServerProjectWorkflowsList';
+import useServerProjectWorkflowsForm from '@/pages/automation/server-workflows/useServerProjectWorkflowsForm';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import ServerWorkflowsDialogContent from '@/shared/components/server-workflows-dialog/ServerWorkflowsDialogContent';
 import {
     A2aServer,
     useCreateA2aProjectMutation,
@@ -23,7 +16,8 @@ import {
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useMemo, useState} from 'react';
+import {NetworkIcon} from 'lucide-react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
@@ -78,10 +72,35 @@ const A2aServerWorkflowDialog = ({a2aProject, a2aServer, onOpenChange, open}: A2
     const updateA2aProjectMutation = useUpdateA2aProjectMutation();
 
     const isEditMode = !!a2aProject;
-    const eligibleWorkflows = eligibleWorkflowsData?.toolEligibleProjectVersionWorkflows;
     const selectedWorkflowIds = form.watch('selectedWorkflowIds');
 
-    const hasNoEligibleWorkflows = !!(currentProjectId && currentProjectVersion && eligibleWorkflows?.length === 0);
+    const eligibleWorkflowIds = useMemo(
+        () =>
+            eligibleWorkflowsData?.toolEligibleProjectVersionWorkflows.map(
+                (projectWorkflow) => projectWorkflow.workflow.id
+            ),
+        [eligibleWorkflowsData]
+    );
+
+    const {
+        connections,
+        form: workflowsForm,
+        getWorkflowConfigurations,
+        workflows,
+    } = useServerProjectWorkflowsForm({
+        eligibleWorkflowIds,
+        environmentId: Number(a2aServer.environmentId),
+        projectDeploymentId: a2aProject ? Number(a2aProject.projectDeploymentId) : undefined,
+        projectId: currentProjectId,
+        projectVersion: currentProjectVersion,
+    });
+
+    const {setValue} = form;
+
+    const handleSelectedWorkflowIdsChange = useCallback(
+        (workflowIds: string[]) => setValue('selectedWorkflowIds', workflowIds),
+        [setValue]
+    );
 
     const editModeProjectName = useMemo(
         () => projects?.find((project) => Number(project.id) === Number(a2aProject?.projectId))?.name,
@@ -94,9 +113,11 @@ const A2aServerWorkflowDialog = ({a2aProject, a2aServer, onOpenChange, open}: A2
             onOpenChange(false);
         };
 
+        const workflowConfigurations = getWorkflowConfigurations(values.selectedWorkflowIds);
+
         if (isEditMode && a2aProject) {
             updateA2aProjectMutation.mutate(
-                {id: a2aProject.id, input: {selectedWorkflowIds: values.selectedWorkflowIds}},
+                {id: a2aProject.id, input: {selectedWorkflowIds: values.selectedWorkflowIds, workflowConfigurations}},
                 {onSuccess}
             );
         } else {
@@ -107,6 +128,7 @@ const A2aServerWorkflowDialog = ({a2aProject, a2aServer, onOpenChange, open}: A2
                         projectId: values.projectId.toString(),
                         projectVersion: values.projectVersion,
                         selectedWorkflowIds: values.selectedWorkflowIds,
+                        workflowConfigurations,
                     },
                 },
                 {
@@ -123,6 +145,104 @@ const A2aServerWorkflowDialog = ({a2aProject, a2aServer, onOpenChange, open}: A2
         }
     };
 
+    const handleComplete = async () => {
+        const workflowsValid = await workflowsForm.trigger();
+
+        if (!workflowsValid) {
+            return;
+        }
+
+        await form.handleSubmit(onSubmit)();
+    };
+
+    const basicStepContent = (
+        <Form {...form}>
+            <fieldset className="space-y-4 border-0">
+                <FormItem>
+                    <FormLabel>A2A Server</FormLabel>
+
+                    <Input disabled value={a2aServer.name} />
+                </FormItem>
+
+                {isEditMode ? (
+                    <>
+                        <FormItem>
+                            <FormLabel>Project</FormLabel>
+
+                            <Input disabled value={editModeProjectName || `Project #${a2aProject?.projectId}`} />
+                        </FormItem>
+
+                        <FormItem>
+                            <FormLabel>Project Version</FormLabel>
+
+                            <Input disabled value={`v${a2aProject?.projectVersion}`} />
+                        </FormItem>
+                    </>
+                ) : (
+                    <>
+                        <FormField
+                            control={form.control}
+                            name="projectId"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Project</FormLabel>
+
+                                    <FormControl>
+                                        <ProjectDeploymentDialogBasicStepProjectsComboBox
+                                            onBlur={field.onBlur}
+                                            onChange={(item) => {
+                                                if (item) {
+                                                    form.setValue('projectId', item.value);
+                                                    form.resetField('projectVersion');
+                                                    form.setValue('selectedWorkflowIds', []);
+
+                                                    setCurrentProjectId(item.value);
+                                                    setCurrentProjectVersion(undefined);
+                                                }
+                                            }}
+                                            projects={projects}
+                                            value={field.value}
+                                        />
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                            shouldUnregister={false}
+                        />
+
+                        {currentProjectId && (
+                            <FormField
+                                control={form.control}
+                                name="projectVersion"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Project Version</FormLabel>
+
+                                        <FormControl>
+                                            <ProjectDeploymentDialogBasicStepProjectVersionsSelect
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                    setCurrentProjectVersion(value);
+                                                    form.setValue('selectedWorkflowIds', []);
+                                                }}
+                                                projectId={currentProjectId}
+                                                projectVersion={currentProjectVersion}
+                                            />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                shouldUnregister={false}
+                            />
+                        )}
+                    </>
+                )}
+            </fieldset>
+        </Form>
+    );
+
     useEffect(() => {
         if (open && a2aProject?.projectId && a2aProject.projectVersion) {
             setCurrentProjectId(Number(a2aProject.projectId));
@@ -138,180 +258,34 @@ const A2aServerWorkflowDialog = ({a2aProject, a2aServer, onOpenChange, open}: A2
 
     return (
         <Dialog onOpenChange={onOpenChange} open={open}>
-            <DialogContent>
-                <DialogMain>
-                    <DialogHeader
-                        description="Expose agent-backed workflows (those with a New Workflow Call trigger) as A2A skills of this server."
-                        title={isEditMode ? 'Edit Skills' : 'Select Workflows'}
-                    />
-
-                    <Form {...form}>
-                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-                            <DialogBody>
-                                {isEditMode && (
-                                    <>
-                                        <FormItem>
-                                            <FormLabel>Project</FormLabel>
-
-                                            <Input
-                                                disabled
-                                                value={editModeProjectName || `Project #${a2aProject?.projectId}`}
-                                            />
-                                        </FormItem>
-
-                                        <FormItem>
-                                            <FormLabel>Project Version</FormLabel>
-
-                                            <Input disabled value={`v${a2aProject?.projectVersion}`} />
-                                        </FormItem>
-                                    </>
-                                )}
-
-                                {!isEditMode && (
-                                    <>
-                                        <FormField
-                                            control={form.control}
-                                            name="projectId"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Project</FormLabel>
-
-                                                    <FormControl>
-                                                        <ProjectDeploymentDialogBasicStepProjectsComboBox
-                                                            onBlur={field.onBlur}
-                                                            onChange={(item) => {
-                                                                if (item) {
-                                                                    form.setValue('projectId', item.value);
-                                                                    form.resetField('projectVersion');
-
-                                                                    setCurrentProjectId(item.value);
-                                                                    setCurrentProjectVersion(undefined);
-                                                                }
-                                                            }}
-                                                            projects={projects}
-                                                            value={field.value}
-                                                        />
-                                                    </FormControl>
-
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                            shouldUnregister={false}
-                                        />
-
-                                        {currentProjectId && (
-                                            <FormField
-                                                control={form.control}
-                                                name="projectVersion"
-                                                render={({field}) => (
-                                                    <FormItem>
-                                                        <FormLabel>Project Version</FormLabel>
-
-                                                        <FormControl>
-                                                            <ProjectDeploymentDialogBasicStepProjectVersionsSelect
-                                                                onChange={(value) => {
-                                                                    field.onChange(value);
-                                                                    setCurrentProjectVersion(value);
-                                                                    form.setValue('selectedWorkflowIds', []);
-                                                                }}
-                                                                projectId={currentProjectId}
-                                                                projectVersion={currentProjectVersion}
-                                                            />
-                                                        </FormControl>
-
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                                shouldUnregister={false}
-                                            />
-                                        )}
-                                    </>
-                                )}
-
-                                {hasNoEligibleWorkflows && (
-                                    <p className="text-sm text-content-neutral-secondary">
-                                        No tool-eligible workflows found for this project version. Only workflows with a
-                                        New Workflow Call trigger can be exposed as A2A skills.
-                                    </p>
-                                )}
-
-                                {eligibleWorkflows && eligibleWorkflows.length > 0 && (
-                                    <FormField
-                                        control={form.control}
-                                        name="selectedWorkflowIds"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Workflows</FormLabel>
-
-                                                <div className="space-y-2">
-                                                    {eligibleWorkflows.map((projectWorkflow) => (
-                                                        <div
-                                                            className="flex items-center space-x-2"
-                                                            key={projectWorkflow.id}
-                                                        >
-                                                            <Checkbox
-                                                                checked={field.value?.includes(
-                                                                    projectWorkflow.workflow.id || ''
-                                                                )}
-                                                                id={`a2a-server-workflow-${projectWorkflow.id}`}
-                                                                onCheckedChange={(checked) => {
-                                                                    const currentValues = field.value || [];
-
-                                                                    if (checked) {
-                                                                        field.onChange([
-                                                                            ...currentValues,
-                                                                            projectWorkflow.workflow.id,
-                                                                        ]);
-                                                                    } else {
-                                                                        field.onChange(
-                                                                            currentValues.filter(
-                                                                                (workflowId) =>
-                                                                                    workflowId !==
-                                                                                    projectWorkflow.workflow.id
-                                                                            )
-                                                                        );
-                                                                    }
-                                                                }}
-                                                            />
-
-                                                            <label
-                                                                className="text-sm leading-none font-medium"
-                                                                htmlFor={`a2a-server-workflow-${projectWorkflow.id}`}
-                                                            >
-                                                                {projectWorkflow.workflow.label ||
-                                                                    projectWorkflow.workflow.id}
-                                                            </label>
-                                                        </div>
-                                                    ))}
-                                                </div>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                        shouldUnregister={false}
-                                    />
-                                )}
-
-                                {isEditMode && a2aProject && <A2aServerSkillsEditor a2aProjectId={a2aProject.id} />}
-                            </DialogBody>
-
-                            <DialogFooter>
-                                <DialogCancelButton />
-
-                                <Button
-                                    disabled={
-                                        hasNoEligibleWorkflows ||
-                                        !selectedWorkflowIds ||
-                                        selectedWorkflowIds.length === 0
-                                    }
-                                    label={isEditMode ? 'Update' : 'Add'}
-                                    type="submit"
-                                />
-                            </DialogFooter>
-                        </form>
-                    </Form>
-                </DialogMain>
-            </DialogContent>
+            <ServerWorkflowsDialogContent
+                basicStepContent={basicStepContent}
+                canProceedFromBasicStep={isEditMode || !!(currentProjectId && currentProjectVersion)}
+                description="Expose agent-backed workflows (those with a New Workflow Call trigger) as A2A skills of this server."
+                icon={<NetworkIcon />}
+                isEditMode={isEditMode}
+                isSubmitPending={createA2aProjectMutation.isPending || updateA2aProjectMutation.isPending}
+                noEligibleWorkflowsMessage="No tool-eligible workflows found for this project version. Only workflows with a New Workflow Call trigger can be exposed as A2A skills."
+                onComplete={handleComplete}
+                selectedWorkflowIds={selectedWorkflowIds}
+                title={isEditMode ? 'Edit Skills' : 'Add Workflows'}
+                validateBasicStep={() => form.trigger(['projectId', 'projectVersion'])}
+                workflowCount={workflows?.length}
+                workflowsList={
+                    workflows && (
+                        <ServerProjectWorkflowsList
+                            connections={connections}
+                            form={workflowsForm}
+                            onSelectedWorkflowIdsChange={handleSelectedWorkflowIdsChange}
+                            selectedWorkflowIds={selectedWorkflowIds}
+                            workflows={workflows}
+                        />
+                    )
+                }
+                workflowsStepFooter={
+                    isEditMode && a2aProject ? <A2aServerSkillsEditor a2aProjectId={a2aProject.id} /> : undefined
+                }
+            />
         </Dialog>
     );
 };
