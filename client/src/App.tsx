@@ -219,7 +219,6 @@ function App() {
         }
     }, [account, helpHub, userGuiding]);
 
-    // A layout effect runs before every passive effect, so a page such as Settings can still name the tab itself.
     useLayoutEffect(() => {
         document.title =
             [...automationNavigation, ...embeddedNavigation, ...platformNavigation]
