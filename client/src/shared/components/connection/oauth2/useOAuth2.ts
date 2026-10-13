@@ -12,6 +12,7 @@ export interface TokenPayloadI {
 }
 
 export interface CodePayloadI {
+    authorizationContext?: string;
     code: string;
     code_verifier?: string;
     [key: string]: string | undefined;
@@ -103,6 +104,7 @@ type ResponseType = 'code' | 'token';
 export type OAuth2AbortReasonType = 'cancelled' | 'popup_closed' | 'timeout' | 'unmounted';
 
 export interface UseOAuth2Props {
+    authorizationContext?: string;
     authorizationUrl: string;
     clientId: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,6 +119,7 @@ export interface UseOAuth2Props {
 }
 
 const useOAuth2 = ({
+    authorizationContext,
     authorizationUrl,
     clientId,
     extraQueryParameters,
@@ -134,6 +137,7 @@ const useOAuth2 = ({
     }>({error: null, loading: false});
 
     const abortRef = useRef<((reason: OAuth2AbortReasonType) => void) | undefined>(undefined);
+    const authorizationContextRef = useRef(authorizationContext);
     const extraQueryParametersRef = useRef(extraQueryParameters);
     const popupRef = useRef<Window | null>(null);
     const curStateRef = useRef(undefined);
@@ -148,6 +152,9 @@ const useOAuth2 = ({
 
         clearStorageResponse();
 
+        const authorizationContextSnapshot = authorizationContextRef.current;
+        const extraQueryParametersSnapshot = extraQueryParametersRef.current;
+
         const state = generateState();
 
         saveState(state);
@@ -159,7 +166,7 @@ const useOAuth2 = ({
         const selectedScopes = selectedScopeKeys.join(' ');
 
         const authorizationQueryParameters = Object.fromEntries(
-            Object.entries(extraQueryParametersRef.current ?? {}).filter(([key]) => key !== 'code_verifier')
+            Object.entries(extraQueryParametersSnapshot ?? {}).filter(([key]) => key !== 'code_verifier')
         );
 
         const authQuery = objectToQuery({
@@ -224,7 +231,8 @@ const useOAuth2 = ({
                     if (responseType === 'code' && onCodeSuccess) {
                         onCodeSuccess({
                             ...payload,
-                            code_verifier: extraQueryParametersRef.current?.code_verifier,
+                            authorizationContext: authorizationContextSnapshot,
+                            code_verifier: extraQueryParametersSnapshot?.code_verifier,
                         });
                     } else {
                         if (onTokenSuccess) {
@@ -357,6 +365,14 @@ const useOAuth2 = ({
     ]);
 
     const cancel = useCallback(() => abortRef.current?.('cancelled'), []);
+
+    useEffect(() => {
+        authorizationContextRef.current = authorizationContext;
+    }, [authorizationContext]);
+
+    useEffect(() => {
+        extraQueryParametersRef.current = extraQueryParameters;
+    }, [extraQueryParameters]);
 
     // Without this, a popup left open after the button unmounts can still save a connection later.
     useEffect(() => () => abortRef.current?.('unmounted'), []);

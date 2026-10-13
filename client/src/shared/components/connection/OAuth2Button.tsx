@@ -5,6 +5,7 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useOAuth2, {CodePayloadI, OAuth2AbortReasonType, TokenPayloadI} from './oauth2/useOAuth2';
 
 interface OAuth2ButtonProps {
+    authorizationContext?: string;
     authorizationUrl: string;
     clientId: string;
     componentName?: string;
@@ -20,6 +21,7 @@ interface OAuth2ButtonProps {
 }
 
 const OAuth2Button = ({
+    authorizationContext,
     authorizationUrl,
     clientId,
     componentName,
@@ -36,6 +38,7 @@ const OAuth2Button = ({
         useAnalytics();
 
     const {cancel, getAuth, loading} = useOAuth2({
+        authorizationContext,
         authorizationUrl,
         clientId,
         extraQueryParameters,
