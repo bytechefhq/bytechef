@@ -92,7 +92,69 @@ const BasicStepHarness = () => {
     );
 };
 
+const ChangeVersionHarness = ({
+    onDeploymentSelect,
+    projectDeployments,
+}: {
+    onDeploymentSelect: (deployment: ProjectDeployment) => void;
+    projectDeployments: ProjectDeployment[];
+}) => {
+    const form = useForm<ProjectDeployment>({defaultValues: {name: '', projectId: 1}});
+
+    return (
+        <Form {...form}>
+            <ProjectDeploymentDialogBasicStep
+                basicStepTab="change-version"
+                changeProjectVersion={false}
+                control={form.control}
+                getValues={form.getValues}
+                handleTabChange={vi.fn()}
+                onDeploymentSelect={onDeploymentSelect}
+                projectDeployment={undefined}
+                projectDeployments={projectDeployments}
+                projectDeploymentsLoading={false}
+                setValue={form.setValue}
+                showTabs
+            />
+        </Form>
+    );
+};
+
 describe('ProjectDeploymentDialogBasicStep', () => {
+    it('should preselect the deployment of a project that has only one', () => {
+        const onDeploymentSelect = vi.fn();
+        const projectDeployment = {environmentId: 1, id: 7, name: 'Production', projectId: 1, projectVersion: 3};
+
+        render(
+            <ChangeVersionHarness
+                onDeploymentSelect={onDeploymentSelect}
+                projectDeployments={[projectDeployment] as ProjectDeployment[]}
+            />
+        );
+
+        expect(onDeploymentSelect).toHaveBeenCalledWith(projectDeployment);
+        expect(screen.getByText('Production - V3')).toBeInTheDocument();
+    });
+
+    it('should leave the deployment unselected when a project has several', () => {
+        const onDeploymentSelect = vi.fn();
+
+        render(
+            <ChangeVersionHarness
+                onDeploymentSelect={onDeploymentSelect}
+                projectDeployments={
+                    [
+                        {environmentId: 1, id: 7, name: 'Production', projectId: 1, projectVersion: 3},
+                        {environmentId: 1, id: 8, name: 'Staging', projectId: 1, projectVersion: 4},
+                    ] as ProjectDeployment[]
+                }
+            />
+        );
+
+        expect(onDeploymentSelect).not.toHaveBeenCalled();
+        expect(screen.getByText('Select deployment')).toBeInTheDocument();
+    });
+
     it('should clear the version error once a version is selected', async () => {
         render(<BasicStepHarness />);
 
