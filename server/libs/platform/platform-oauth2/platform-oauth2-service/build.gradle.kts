@@ -12,5 +12,6 @@ dependencies {
 
     testImplementation("org.springframework.security:spring-security-core")
     testImplementation(libs.org.wiremock.wiremock)
+    testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:test:test-support"))
 }
