@@ -48,9 +48,9 @@ A new server requires authentication (see [Authentication](#authentication)); th
 Expand the server row. It has **Component Tools**, **Workflow Tools** and **Connect** tabs:
 
 - **Add Component** (on the **Component Tools** tab) -- opens a two-step dialog: **Select Component** (pick the third-party component) then **Select Tools from &lt;component&gt;** (choose which of its actions are exposed as tools, and configure each tool's parameters).
-- **Add Workflows** (on the **Workflow Tools** tab) -- pick an integration instance configuration, then the workflows within it to expose. Only workflows carrying a **New Workflow Call** trigger are eligible; a configuration with none shows "No tool-eligible workflows found".
+- **Add Workflows** (on the **Workflow Tools** tab) -- opens a two-step dialog: **Basic** (pick an integration instance configuration) then **Workflows** (switch on the workflows within it to expose, and set each one's **Inputs** and the **Connections** of components other than the integration's own, which each connected user supplies). Only workflows carrying a **New Workflow Call** trigger are eligible; a configuration with none shows "No tool-eligible workflows found". The inputs and connections are saved on the integration instance configuration's workflows.
 
-Each exposed workflow's ellipsis (⋮) menu has **Configure** (its tool mapping), **Edit** (its connections and inputs in the integration instance configuration) and **Delete**.
+Each exposed workflow has a **Configure** button (its tool mapping) and an ellipsis (⋮) menu with **Edit** (its connections and inputs in the integration instance configuration) and **Delete**.
 
 For each exposed component action, you choose which parameters you fix yourself and which the connected agent fills at call time, using the `fromAi(...)` expression - the same mechanism as attaching tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
 
@@ -58,7 +58,7 @@ For each exposed component action, you choose which parameters you fix yourself 
 
 ### Enabling and disabling individual tools
 
-Expand a server row, then expand one of its components to see the tools it exposes. Each tool has a switch and an ellipsis (⋮) menu with **Configure**, which opens the tool's parameters, and **Delete**.
+Expand a server row, then expand one of its components to see the tools it exposes. Each tool has a **Configure** button, which opens the tool's parameters, a switch, and an ellipsis (⋮) menu with **Delete**.
 
 - **Switch on** - the tool is offered to agents.
 - **Switch off** - the tool is not offered to any agent and cannot be called, whatever a connected user has enabled for themselves.
