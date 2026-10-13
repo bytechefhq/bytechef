@@ -24,5 +24,13 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record OAuth2AuthorizationParameters(
-    String authorizationUrl, String clientId, Map<String, String> extraQueryParameters, Map<String, Boolean> scopes) {
+    String authorizationUrl, String clientId, Map<String, String> extraQueryParameters, Map<String, Boolean> scopes,
+    String authorizationContext) {
+
+    public OAuth2AuthorizationParameters(
+        String authorizationUrl, String clientId, Map<String, String> extraQueryParameters,
+        Map<String, Boolean> scopes) {
+
+        this(authorizationUrl, clientId, extraQueryParameters, scopes, null);
+    }
 }

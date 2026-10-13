@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 public final class Authorization {
 
     private String description;
+    private boolean discovery;
     private List<String> detectOn;
     private String name;
     private List<? extends Property> properties;
@@ -56,11 +57,18 @@ public final class Authorization {
         this.title = OptionalUtils.orElse(authorization.getTitle(), name);
 
         this.refreshOn = authorization.getRefreshOn();
+
+        this.discovery = authorization.getProtectedResourceUrl()
+            .isPresent();
     }
 
     @Nullable
     public String getDescription() {
         return description;
+    }
+
+    public boolean isDiscovery() {
+        return discovery;
     }
 
     public String getName() {
@@ -89,14 +97,15 @@ public final class Authorization {
             return false;
         }
 
-        return Objects.equals(description, that.description) && Objects.equals(detectOn, that.detectOn) &&
+        return Objects.equals(description, that.description) && discovery == that.discovery &&
+            Objects.equals(detectOn, that.detectOn) &&
             Objects.equals(name, that.name) && Objects.equals(properties, that.properties) &&
             Objects.equals(refreshOn, that.refreshOn) && Objects.equals(title, that.title) && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(description, name, properties, title, type);
+        return Objects.hash(description, discovery, name, properties, title, type);
     }
 
     public List<String> getDetectOn() {
@@ -117,6 +126,7 @@ public final class Authorization {
             ", properties=" + properties +
             ", refreshOn=" + refreshOn +
             ", detectOn=" + detectOn +
+            ", discovery=" + discovery +
             '}';
     }
 }

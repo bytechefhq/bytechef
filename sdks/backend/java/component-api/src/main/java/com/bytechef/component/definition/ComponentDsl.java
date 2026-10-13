@@ -936,6 +936,7 @@ public final class ComponentDsl {
         private String name;
         private OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction;
         private PkceFunction pkceFunction;
+        private ProtectedResourceUrlFunction protectedResourceUrlFunction;
         private List<? extends Property> properties = List.of();
         private RefreshFunction refreshFunction;
         private List<Object> refreshOn = DEFAULT_REFRESH_ON;
@@ -1024,6 +1025,12 @@ public final class ComponentDsl {
 
         public ModifiableAuthorization pkce(PkceFunction pkce) {
             this.pkceFunction = Objects.requireNonNull(pkce);
+
+            return this;
+        }
+
+        public ModifiableAuthorization protectedResourceUrl(ProtectedResourceUrlFunction protectedResourceUrl) {
+            this.protectedResourceUrlFunction = Objects.requireNonNull(protectedResourceUrl);
 
             return this;
         }
@@ -1144,6 +1151,11 @@ public final class ComponentDsl {
         @Override
         public Optional<PkceFunction> getPkce() {
             return Optional.ofNullable(pkceFunction);
+        }
+
+        @Override
+        public Optional<ProtectedResourceUrlFunction> getProtectedResourceUrl() {
+            return Optional.ofNullable(protectedResourceUrlFunction);
         }
 
         @Override
