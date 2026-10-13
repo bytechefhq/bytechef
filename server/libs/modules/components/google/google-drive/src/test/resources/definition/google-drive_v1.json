@@ -444,8 +444,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -559,8 +559,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "perform": { },
@@ -744,8 +744,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -859,8 +859,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "perform": { },
@@ -1278,6 +1278,306 @@
     } ],
     "resumePerform": null,
     "title": "Download File",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Finds a folder by name inside the parent folder and returns it; if no such folder exists, creates it and returns the new folder. Safe to call repeatedly, e.g. inside a loop, without producing duplicate folders.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#find-or-create-folder"
+    },
+    "metadata": null,
+    "name": "findOrCreateFolder",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The ID of the file.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "id",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "Identifies what kind of resource this is.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "kind",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The MIME type of the file.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "mimeType",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The name of the file.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "name",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          } ],
+          "required": false,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": {
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType": "application/vnd.google-apps.folder",
+          "name": "new-folder"
+        }
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The ID of the file.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "id",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Identifies what kind of resource this is.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "kind",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The MIME type of the file.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "mimeType",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The name of the file.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "name",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        } ],
+        "required": false,
+        "type": "OBJECT"
+      },
+      "sampleOutput": {
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "application/vnd.google-apps.folder",
+        "name": "new-folder"
+      }
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The exact name of the folder to find, or to create if it does not exist. If several folders share this name in the parent folder, the oldest one is returned.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Folder Name",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "folderName",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the folder in which to look for the folder, and in which it will be created if missing; if no folder is selected, the root folder is used.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Parent Folder ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "folderId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "title": "Find or Create Folder",
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -2497,8 +2797,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -2612,8 +2912,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "perform": { },
@@ -3186,8 +3486,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -3301,8 +3601,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "processErrorResponse": null,
@@ -3483,8 +3783,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -3598,8 +3898,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "processErrorResponse": null,
@@ -4009,6 +4309,303 @@
       "type": "STRING"
     } ],
     "title": "Download File",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "findOrCreateFolder",
+    "description": "Finds a folder by name inside the parent folder and returns it; if no such folder exists, creates it and returns the new folder. Safe to call repeatedly, e.g. inside a loop, without producing duplicate folders.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The ID of the file.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "id",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "Identifies what kind of resource this is.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "kind",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The MIME type of the file.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "mimeType",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The name of the file.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "name",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          } ],
+          "required": false,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": {
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType": "application/vnd.google-apps.folder",
+          "name": "new-folder"
+        }
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The ID of the file.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "id",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Identifies what kind of resource this is.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "kind",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The MIME type of the file.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "mimeType",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The name of the file.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "name",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        } ],
+        "required": false,
+        "type": "OBJECT"
+      },
+      "sampleOutput": {
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType": "application/vnd.google-apps.folder",
+        "name": "new-folder"
+      }
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The exact name of the folder to find, or to create if it does not exist. If several folders share this name in the parent folder, the oldest one is returned.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Folder Name",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "folderName",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the folder in which to look for the folder, and in which it will be created if missing; if no folder is selected, the root folder is used.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Parent Folder ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "folderId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "Find or Create Folder",
     "type": {
       "name": "TOOLS",
       "key": "tools",
@@ -5212,8 +5809,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -5327,8 +5924,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "processErrorResponse": null,
