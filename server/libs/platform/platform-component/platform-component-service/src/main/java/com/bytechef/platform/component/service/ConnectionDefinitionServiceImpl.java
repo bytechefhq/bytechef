@@ -35,6 +35,7 @@ import com.bytechef.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.component.definition.Authorization.ClientSecretFunction;
 import com.bytechef.component.definition.Authorization.OAuth2AuthorizationExtraQueryParametersFunction;
 import com.bytechef.component.definition.Authorization.PkceFunction;
+import com.bytechef.component.definition.Authorization.ProtectedResourceUrlFunction;
 import com.bytechef.component.definition.Authorization.RefreshFunction;
 import com.bytechef.component.definition.Authorization.RefreshTokenFunction;
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
@@ -46,6 +47,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.exception.ErrorType;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
@@ -59,6 +61,13 @@ import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.exception.ConnectionDefinitionErrorType;
+import com.bytechef.platform.component.util.OAuth2DiscoveryUtils;
+import com.bytechef.platform.oauth2.domain.DiscoveredAuthorizationServer;
+import com.bytechef.platform.oauth2.domain.OAuth2AuthorizationContext;
+import com.bytechef.platform.oauth2.domain.RegisteredClient;
+import com.bytechef.platform.oauth2.exception.OAuth2ErrorType;
+import com.bytechef.platform.oauth2.service.OAuth2AuthorizationContextService;
+import com.bytechef.platform.oauth2.service.OAuth2DiscoveryService;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import java.net.URI;
@@ -76,9 +85,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.type.TypeReference;
@@ -95,14 +106,20 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
+    private final ObjectProvider<OAuth2AuthorizationContextService> oAuth2AuthorizationContextServiceProvider;
+    private final ObjectProvider<OAuth2DiscoveryService> oAuth2DiscoveryServiceProvider;
     private final TokenRefreshHandler tokenRefreshHandler;
 
     public ConnectionDefinitionServiceImpl(
         @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
-        @Lazy TokenRefreshHandler tokenRefreshHandler) {
+        @Lazy TokenRefreshHandler tokenRefreshHandler,
+        ObjectProvider<OAuth2DiscoveryService> oAuth2DiscoveryServiceProvider,
+        ObjectProvider<OAuth2AuthorizationContextService> oAuth2AuthorizationContextServiceProvider) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
+        this.oAuth2AuthorizationContextServiceProvider = oAuth2AuthorizationContextServiceProvider;
+        this.oAuth2DiscoveryServiceProvider = oAuth2DiscoveryServiceProvider;
         this.tokenRefreshHandler = tokenRefreshHandler;
     }
 
@@ -358,7 +375,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
 
-        String verifier = MapUtils.getString(connectionParameters, "code_verifier");
+        String verifier = MapUtils.getString(connectionParameters, Authorization.CODE_VERIFIER);
 
         AuthorizationCallbackFunction authorizationCallbackFunction = authorization.getAuthorizationCallback()
             .orElse(
@@ -544,8 +561,18 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return (connectionParameters, code, redirectUri, codeVerifier, context) -> {
             FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
-            builder.query("client_id", clientIdFunction.apply(connectionParameters, context));
-            builder.query("client_secret", clientSecretFunction.apply(connectionParameters, context));
+            String clientId = clientIdFunction.apply(connectionParameters, context);
+            String clientSecret = clientSecretFunction.apply(connectionParameters, context);
+            String tokenEndpointAuthMethod = MapUtils.getString(
+                connectionParameters, Authorization.TOKEN_ENDPOINT_AUTH_METHOD,
+                Authorization.TOKEN_ENDPOINT_AUTH_METHOD_POST);
+
+            builder.query("client_id", clientId);
+
+            if (sendsSecretInBody(clientSecret, tokenEndpointAuthMethod)) {
+                builder.query("client_secret", clientSecret);
+            }
+
             builder.query("code", code);
             builder.query("grant_type", "authorization_code");
             builder.query("redirect_uri", redirectUri);
@@ -554,17 +581,21 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 builder.query("code_verifier", codeVerifier);
             }
 
+            addResource(builder, connectionParameters);
+
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .POST(builder.build())
+                .uri(URI.create(tokenUrlFunction.apply(connectionParameters, context)))
+                .header("Accept", "application/json");
+
+            applyBasicAuthentication(requestBuilder, clientId, clientSecret, tokenEndpointAuthMethod);
+
             try (HttpClient httpClient = Methanol.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .build()) {
 
                 HttpResponse<String> httpResponse = httpClient.send(
-                    HttpRequest.newBuilder()
-                        .POST(builder.build())
-                        .uri(URI.create(tokenUrlFunction.apply(connectionParameters, context)))
-                        .header("Accept", "application/json")
-                        .build(),
-                    HttpResponse.BodyHandlers.ofString());
+                    requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
 
                 if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
                     throw new ConfigurationException(
@@ -609,22 +640,36 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return (connectionParameters, context) -> {
             FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
-            builder.query("client_id", clientIdFunction.apply(connectionParameters, context));
-            builder.query("client_secret", clientSecretFunction.apply(connectionParameters, context));
+            String clientId = clientIdFunction.apply(connectionParameters, context);
+            String clientSecret = clientSecretFunction.apply(connectionParameters, context);
+            String tokenEndpointAuthMethod = MapUtils.getString(
+                connectionParameters, Authorization.TOKEN_ENDPOINT_AUTH_METHOD,
+                Authorization.TOKEN_ENDPOINT_AUTH_METHOD_POST);
+
+            builder.query("client_id", clientId);
+
+            if (sendsSecretInBody(clientSecret, tokenEndpointAuthMethod)) {
+                builder.query("client_secret", clientSecret);
+            }
+
             builder.query("refresh_token", refreshTokenFunction.apply(connectionParameters, context));
             builder.query("grant_type", "refresh_token");
+
+            addResource(builder, connectionParameters);
+
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .POST(builder.build())
+                .uri(URI.create(refreshUrlFunction.apply(connectionParameters, context)))
+                .header("Accept", "application/json");
+
+            applyBasicAuthentication(requestBuilder, clientId, clientSecret, tokenEndpointAuthMethod);
 
             try (HttpClient httpClient = Methanol.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .build()) {
 
                 HttpResponse<String> httpResponse = httpClient.send(
-                    HttpRequest.newBuilder()
-                        .POST(builder.build())
-                        .uri(URI.create(refreshUrlFunction.apply(connectionParameters, context)))
-                        .header("Accept", "application/json")
-                        .build(),
-                    HttpResponse.BodyHandlers.ofString());
+                    requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
 
                 if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
                     throw new ConfigurationException(
@@ -662,8 +707,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return MapUtils.getRequiredString(connectionParameters, Authorization.CLIENT_ID);
     }
 
+    @Nullable
     private static String getDefaultClientSecret(Parameters connectionParameters) {
-        return MapUtils.getRequiredString(connectionParameters, Authorization.CLIENT_SECRET);
+        return MapUtils.getString(connectionParameters, Authorization.CLIENT_SECRET);
     }
 
     private static String getDefaultRefreshToken(Parameters connectionParameters) {
@@ -753,38 +799,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Parameters parameters = ParametersFactory.create(connectionParameters);
 
         if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
-            PkceFunction pkceFunction = authorization.getPkce()
-                .orElse(getDefaultPkceFunction());
-
-            String verifier = generateVerifier(context);
-            String challenge;
-
-            try {
-                challenge = generateChallenge(verifier, context);
-            } catch (Exception e) {
-                throw new ConfigurationException(
-                    e, ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
-            }
-
-            try {
-                Authorization.Pkce pkce = pkceFunction.apply(verifier, challenge, "S256", context);
-
-                Map<String, String> extraQueryParameters = new LinkedHashMap<>(
-                    oAuth2AuthorizationExtraQueryParametersFunction.apply(parameters, context));
-
-                extraQueryParameters.put("code_challenge", pkce.challenge());
-                extraQueryParameters.put("code_challenge_method", pkce.challengeMethod());
-                extraQueryParameters.put("code_verifier", pkce.verifier());
-
-                return new OAuth2AuthorizationParameters(
-                    authorizationUrlFunction.apply(parameters, context),
-                    clientIdFunction.apply(parameters, context),
-                    extraQueryParameters,
-                    scopesFunction.apply(parameters, context));
-            } catch (Exception e) {
-                throw new ConfigurationException(
-                    e, ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
-            }
+            return getOAuth2AuthorizationCodePkceParameters(
+                componentName, connectionVersion, authorization, parameters, context, authorizationUrlFunction,
+                clientIdFunction, scopesFunction, oAuth2AuthorizationExtraQueryParametersFunction);
         }
 
         try {
@@ -800,6 +817,121 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         } catch (Exception e) {
             throw new ConfigurationException(
                 e, ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
+        }
+    }
+
+    private OAuth2AuthorizationParameters getOAuth2AuthorizationCodePkceParameters(
+        String componentName, int connectionVersion, Authorization authorization, Parameters parameters,
+        Context context, AuthorizationUrlFunction authorizationUrlFunction, ClientIdFunction clientIdFunction,
+        ScopesFunction scopesFunction,
+        OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction) {
+
+        OAuth2AuthorizationContextService authorizationContextService = requireAvailable(
+            oAuth2AuthorizationContextServiceProvider, "OAuth2 authorization context service",
+            ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
+        PkceFunction pkceFunction = authorization.getPkce()
+            .orElse(getDefaultPkceFunction());
+
+        try {
+            String verifier = generateVerifier(context);
+
+            Authorization.Pkce pkce =
+                pkceFunction.apply(verifier, generateChallenge(verifier, context), "S256", context);
+
+            Map<String, String> extraQueryParameters = new LinkedHashMap<>(
+                oAuth2AuthorizationExtraQueryParametersFunction.apply(parameters, context));
+
+            extraQueryParameters.put("code_challenge", pkce.challenge());
+            extraQueryParameters.put("code_challenge_method", pkce.challengeMethod());
+
+            Optional<ProtectedResourceUrlFunction> protectedResourceUrlFunctionOptional =
+                authorization.getProtectedResourceUrl();
+
+            if (OAuth2DiscoveryUtils.runsDiscovery(protectedResourceUrlFunctionOptional.isPresent(), parameters)) {
+                OAuth2DiscoveryService discoveryService = requireAvailable(
+                    oAuth2DiscoveryServiceProvider, "OAuth2 discovery service",
+                    OAuth2ErrorType.DISCOVERY_NOT_AVAILABLE);
+
+                ProtectedResourceUrlFunction protectedResourceUrlFunction = protectedResourceUrlFunctionOptional.get();
+
+                DiscoveredAuthorizationServer authorizationServer = discoveryService.discover(
+                    protectedResourceUrlFunction.apply(parameters, context));
+
+                RegisteredClient registeredClient = discoveryService.register(authorizationServer);
+
+                extraQueryParameters.put(Authorization.RESOURCE, authorizationServer.resource());
+
+                String authorizationContext = authorizationContextService.seal(
+                    OAuth2AuthorizationContext.ofDiscovery(
+                        componentName, connectionVersion, pkce.verifier(), registeredClient, authorizationServer));
+
+                return new OAuth2AuthorizationParameters(
+                    authorizationServer.authorizationEndpoint(), registeredClient.clientId(), extraQueryParameters,
+                    toScopes(authorizationServer.scopes()), authorizationContext);
+            }
+
+            String authorizationContext = authorizationContextService.seal(
+                OAuth2AuthorizationContext.ofPkce(componentName, connectionVersion, pkce.verifier()));
+
+            return new OAuth2AuthorizationParameters(
+                authorizationUrlFunction.apply(parameters, context), clientIdFunction.apply(parameters, context),
+                extraQueryParameters, scopesFunction.apply(parameters, context), authorizationContext);
+        } catch (ConfigurationException configurationException) {
+            throw configurationException;
+        } catch (Exception exception) {
+            throw new ConfigurationException(
+                exception, ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
+        }
+    }
+
+    private static <T> T requireAvailable(ObjectProvider<T> serviceProvider, String serviceName, ErrorType errorType) {
+        T service = serviceProvider.getIfAvailable();
+
+        if (service == null) {
+            throw new ConfigurationException(serviceName + " is not available in this deployment", errorType);
+        }
+
+        return service;
+    }
+
+    private static Map<String, Boolean> toScopes(@Nullable List<String> scopes) {
+        Map<String, Boolean> scopeMap = new LinkedHashMap<>();
+
+        if (scopes == null) {
+            return scopeMap;
+        }
+
+        for (String scope : scopes) {
+            scopeMap.put(scope, true);
+        }
+
+        return scopeMap;
+    }
+
+    private static boolean sendsSecretInBody(@Nullable String clientSecret, String tokenEndpointAuthMethod) {
+        return StringUtils.isNotBlank(clientSecret) &&
+            !Authorization.TOKEN_ENDPOINT_AUTH_METHOD_BASIC.equals(tokenEndpointAuthMethod) &&
+            !Authorization.TOKEN_ENDPOINT_AUTH_METHOD_NONE.equals(tokenEndpointAuthMethod);
+    }
+
+    private static void applyBasicAuthentication(
+        HttpRequest.Builder requestBuilder, String clientId, @Nullable String clientSecret,
+        String tokenEndpointAuthMethod) {
+
+        if (Authorization.TOKEN_ENDPOINT_AUTH_METHOD_BASIC.equals(tokenEndpointAuthMethod) &&
+            StringUtils.isNotBlank(clientSecret)) {
+
+            String credentials = EncodingUtils.urlEncode(clientId) + ":" + EncodingUtils.urlEncode(clientSecret);
+
+            requestBuilder.header("Authorization", "Basic " + EncodingUtils.base64EncodeToString(credentials));
+        }
+    }
+
+    private static void addResource(FormBodyPublisher.Builder builder, Parameters connectionParameters) {
+        String resource = MapUtils.getString(connectionParameters, Authorization.RESOURCE);
+
+        if (StringUtils.isNotBlank(resource)) {
+            builder.query("resource", resource);
         }
     }
 
