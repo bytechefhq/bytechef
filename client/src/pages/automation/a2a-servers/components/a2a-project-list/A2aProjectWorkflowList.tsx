@@ -9,6 +9,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {Popover} from '@/components/ui/popover';
+import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
 import {
     useA2aProjectWorkflowsByA2aProjectIdQuery,
     useDeleteA2aProjectMutation,
@@ -19,14 +21,17 @@ import {useQueryClient} from '@tanstack/react-query';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
+import A2aProjectWorkflowEditDialog from './A2aProjectWorkflowEditDialog';
+import A2aProjectWorkflowSkillPopover from './A2aProjectWorkflowSkillPopover';
 import {A2aProjectItemType} from './hooks/useA2aProjectList';
 
 interface A2aProjectWorkflowListProps {
     a2aProject: A2aProjectItemType;
-    onEditClick: () => void;
 }
 
-const A2aProjectWorkflowList = ({a2aProject, onEditClick}: A2aProjectWorkflowListProps) => {
+const A2aProjectWorkflowList = ({a2aProject}: A2aProjectWorkflowListProps) => {
+    const [a2aProjectWorkflowIdToConfigure, setA2aProjectWorkflowIdToConfigure] = useState<string>();
+    const [workflowIdToEdit, setWorkflowIdToEdit] = useState<string>();
     const [workflowIdToRemove, setWorkflowIdToRemove] = useState<string>();
 
     const queryClient = useQueryClient();
@@ -79,65 +84,102 @@ const A2aProjectWorkflowList = ({a2aProject, onEditClick}: A2aProjectWorkflowLis
                     const workflowLabel =
                         a2aProjectWorkflow.workflowLabel || a2aProjectWorkflow.workflowId || 'Unnamed Workflow';
 
+                    const isSkillPopoverOpen = a2aProjectWorkflowIdToConfigure === a2aProjectWorkflow.id;
+
                     return (
-                        <div className="flex items-center gap-2 py-0.5" key={a2aProjectWorkflow.id}>
-                            <div className="flex min-w-0 flex-1 flex-col">
-                                <span className="truncate text-sm font-medium">{workflowLabel}</span>
+                        <Popover
+                            key={a2aProjectWorkflow.id}
+                            onOpenChange={(open) => !open && setA2aProjectWorkflowIdToConfigure(undefined)}
+                            open={isSkillPopoverOpen}
+                        >
+                            <div className="flex items-center gap-2 py-0.5">
+                                <div className="flex min-w-0 flex-1 flex-col">
+                                    <span className="truncate text-sm font-medium">{workflowLabel}</span>
 
-                                {a2aProjectWorkflow.skillName && a2aProjectWorkflow.skillName !== workflowLabel && (
-                                    <span className="truncate text-xs text-muted-foreground">
-                                        {`Skill: ${a2aProjectWorkflow.skillName}`}
-                                    </span>
-                                )}
+                                    {a2aProjectWorkflow.skillName && a2aProjectWorkflow.skillName !== workflowLabel && (
+                                        <span className="truncate text-xs text-muted-foreground">
+                                            {`Skill: ${a2aProjectWorkflow.skillName}`}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="flex shrink-0 items-center gap-2">
+                                    <McpToolConfigureButton
+                                        anchorsPopover
+                                        label={workflowLabel}
+                                        onClick={() => setA2aProjectWorkflowIdToConfigure(a2aProjectWorkflow.id)}
+                                    />
+
+                                    <Switch
+                                        aria-label={`Enable ${workflowLabel}`}
+                                        checked={a2aProjectWorkflow.enabled}
+                                        className="mr-2"
+                                        disabled={updateA2aProjectWorkflowEnabledMutation.isPending}
+                                        onCheckedChange={(enabled) =>
+                                            updateA2aProjectWorkflowEnabledMutation.mutate({
+                                                enabled,
+                                                id: a2aProjectWorkflow.id,
+                                            })
+                                        }
+                                    />
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                aria-label={`${workflowLabel} actions`}
+                                                icon={<EllipsisVerticalIcon />}
+                                                size="iconSm"
+                                                variant="ghost"
+                                            />
+                                        </DropdownMenuTrigger>
+
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                                className="dropdown-menu-item"
+                                                onClick={() =>
+                                                    setWorkflowIdToEdit(a2aProjectWorkflow.workflowId ?? undefined)
+                                                }
+                                            >
+                                                <EditIcon /> Edit
+                                            </DropdownMenuItem>
+
+                                            <DropdownMenuSeparator />
+
+                                            <DropdownMenuItem
+                                                className="dropdown-menu-item-destructive"
+                                                onClick={() =>
+                                                    setWorkflowIdToRemove(a2aProjectWorkflow.workflowId ?? undefined)
+                                                }
+                                                variant="destructive"
+                                            >
+                                                <Trash2Icon /> Remove
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </div>
 
-                            <div className="flex shrink-0 items-center gap-2">
-                                <Switch
-                                    aria-label={`Enable ${workflowLabel}`}
-                                    checked={a2aProjectWorkflow.enabled}
-                                    className="mr-2"
-                                    disabled={updateA2aProjectWorkflowEnabledMutation.isPending}
-                                    onCheckedChange={(enabled) =>
-                                        updateA2aProjectWorkflowEnabledMutation.mutate({
-                                            enabled,
-                                            id: a2aProjectWorkflow.id,
-                                        })
-                                    }
+                            {isSkillPopoverOpen && (
+                                <A2aProjectWorkflowSkillPopover
+                                    a2aProjectWorkflowId={a2aProjectWorkflow.id}
+                                    onClose={() => setA2aProjectWorkflowIdToConfigure(undefined)}
+                                    skillDescription={a2aProjectWorkflow.skillDescription}
+                                    skillName={a2aProjectWorkflow.skillName}
+                                    workflowLabel={workflowLabel}
                                 />
-
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-label={`${workflowLabel} actions`}
-                                            icon={<EllipsisVerticalIcon />}
-                                            size="iconSm"
-                                            variant="ghost"
-                                        />
-                                    </DropdownMenuTrigger>
-
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
-                                            <EditIcon /> Edit
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuSeparator />
-
-                                        <DropdownMenuItem
-                                            className="dropdown-menu-item-destructive"
-                                            onClick={() =>
-                                                setWorkflowIdToRemove(a2aProjectWorkflow.workflowId ?? undefined)
-                                            }
-                                            variant="destructive"
-                                        >
-                                            <Trash2Icon /> Remove
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                        </div>
+                            )}
+                        </Popover>
                     );
                 })}
             </div>
+
+            {workflowIdToEdit && (
+                <A2aProjectWorkflowEditDialog
+                    a2aProject={a2aProject}
+                    onClose={() => setWorkflowIdToEdit(undefined)}
+                    workflowId={workflowIdToEdit}
+                />
+            )}
 
             <AlertDialog
                 isPending={deleteA2aProjectMutation.isPending || updateA2aProjectMutation.isPending}
