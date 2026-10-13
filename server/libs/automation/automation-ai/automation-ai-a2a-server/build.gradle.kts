@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-a2a:automation-ai-a2a-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-a2a-api"))
     implementation(project(":server:libs:platform:platform-api"))
