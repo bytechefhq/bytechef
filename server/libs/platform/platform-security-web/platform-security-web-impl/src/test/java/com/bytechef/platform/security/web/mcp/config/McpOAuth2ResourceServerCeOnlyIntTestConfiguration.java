@@ -22,6 +22,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpServerSecretVerifier;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.McpDiscoverySecurityConfigurerContributor;
@@ -194,7 +195,7 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
                 .permitAll())
             .with(
                 new ManagementMcpServerSecurityConfigurer(
-                    apiKeyService, authorityService, propertyService, userService),
+                    apiKeyService, authorityService, () -> List.of(Environment.values()), propertyService, userService),
                 withDefaults())
             .with(resourceServerContributor.getSecurityConfigurerAdapter(), withDefaults())
             .with(jwtContributor.getSecurityConfigurerAdapter(), withDefaults())

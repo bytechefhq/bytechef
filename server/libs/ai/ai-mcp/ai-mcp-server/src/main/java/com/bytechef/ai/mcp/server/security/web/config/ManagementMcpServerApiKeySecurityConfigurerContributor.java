@@ -19,6 +19,7 @@ package com.bytechef.ai.mcp.server.security.web.config;
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpAuthenticationRequiredResolver;
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpServerSecretVerifier;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
@@ -40,16 +41,19 @@ public class ManagementMcpServerApiKeySecurityConfigurerContributor implements S
 
     private final ApiKeyService apiKeyService;
     private final AuthorityService authorityService;
+    private final EnvironmentService environmentService;
     private final PropertyService propertyService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerApiKeySecurityConfigurerContributor(
-        ApiKeyService apiKeyService, AuthorityService authorityService, PropertyService propertyService,
+        ApiKeyService apiKeyService, AuthorityService authorityService, EnvironmentService environmentService,
+        PropertyService propertyService,
         UserService userService) {
 
         this.apiKeyService = apiKeyService;
         this.authorityService = authorityService;
+        this.environmentService = environmentService;
         this.propertyService = propertyService;
         this.userService = userService;
     }
@@ -58,7 +62,7 @@ public class ManagementMcpServerApiKeySecurityConfigurerContributor implements S
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
         return (T) new ManagementMcpServerSecurityConfigurer(
-            apiKeyService, authorityService, propertyService, userService);
+            apiKeyService, authorityService, environmentService, propertyService, userService);
     }
 
     @Bean

@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
@@ -36,7 +37,7 @@ import org.springframework.security.core.Authentication;
 class A2aApiKeyAuthenticationConverterTest {
 
     private final A2aApiKeyAuthenticationConverter converter =
-        new A2aApiKeyAuthenticationConverter("/api/automation/a2a/");
+        new A2aApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/automation/a2a/");
 
     @Test
     void testExtractsSecretKeyFromAgentCardPath() {

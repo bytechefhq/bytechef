@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.bytechef.platform.configuration.domain.Environment;
+import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
@@ -32,7 +33,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 class McpApiKeyAuthenticationConverterTest {
 
     private final McpApiKeyAuthenticationConverter mcpApiKeyAuthenticationConverter =
-        new McpApiKeyAuthenticationConverter("/api/automation/");
+        new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/automation/");
 
     @Test
     void testConvertWithBearerTokenReturnsUnauthenticatedToken() {

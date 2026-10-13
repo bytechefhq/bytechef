@@ -22,10 +22,12 @@ import com.bytechef.automation.ai.a2a.server.security.web.configurer.AutomationA
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.ai.a2a.A2AAgentCardFactory;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -82,7 +84,8 @@ public class AutomationA2AServerSecurityIntTestConfiguration {
                 .permitAll())
             .with(
                 new AutomationA2AServerSecurityConfigurer(
-                    apiKeyService, authorityService, a2aServerService, userService),
+                    apiKeyService, authorityService, () -> List.of(Environment.values()), a2aServerService,
+                    userService),
                 Customizer.withDefaults())
             .build();
     }

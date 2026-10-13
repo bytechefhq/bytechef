@@ -16,46 +16,21 @@
 
 package com.bytechef.automation.ai.a2a.server.security.web.authentication;
 
-import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
+import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.security.web.mcp.AbstractMcpApiKeyAuthenticationConverter;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Locale;
-import org.apache.commons.lang3.StringUtils;
-import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationConverter;
 
 /**
  * @author Ivica Cardic
  */
-public class A2aApiKeyAuthenticationConverter implements AuthenticationConverter {
+public class A2aApiKeyAuthenticationConverter extends AbstractMcpApiKeyAuthenticationConverter {
 
-    private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
-    private static final String ENVIRONMENT_HEADER_NAME = "X-ENVIRONMENT";
-
-    private final String pathPrefix;
-
-    public A2aApiKeyAuthenticationConverter(String pathPrefix) {
-        this.pathPrefix = pathPrefix;
+    public A2aApiKeyAuthenticationConverter(EnvironmentService environmentService, String pathPrefix) {
+        super(environmentService, pathPrefix);
     }
 
     @Override
-    public Authentication convert(HttpServletRequest request) {
-        String authorization = request.getHeader(AUTHORIZATION_HEADER_NAME);
-
-        String secretKey = null;
-
-        if (authorization != null && authorization.startsWith(BEARER_PREFIX)) {
-            secretKey = authorization.substring(BEARER_PREFIX.length());
-        }
-
-        return ApiKeyAuthenticationToken.unauthenticated(
-            new McpApiKeyCredentials(getEnvironment(request), extractA2aServerSecretKey(request), secretKey));
-    }
-
-    private String extractA2aServerSecretKey(HttpServletRequest request) {
+    protected String extractServerSecretKey(HttpServletRequest request) {
         String servletPath = request.getServletPath();
 
         int prefixIndex = servletPath.indexOf(pathPrefix);
@@ -69,19 +44,5 @@ public class A2aApiKeyAuthenticationConverter implements AuthenticationConverter
         int slashIndex = remainder.indexOf('/');
 
         return slashIndex >= 0 ? remainder.substring(0, slashIndex) : remainder;
-    }
-
-    private Environment getEnvironment(HttpServletRequest request) {
-        String environment = request.getHeader(ENVIRONMENT_HEADER_NAME);
-
-        if (StringUtils.isBlank(environment)) {
-            return Environment.PRODUCTION;
-        }
-
-        try {
-            return Environment.valueOf(environment.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException illegalArgumentException) {
-            throw new BadCredentialsException("Invalid X-ENVIRONMENT header", illegalArgumentException);
-        }
     }
 }
