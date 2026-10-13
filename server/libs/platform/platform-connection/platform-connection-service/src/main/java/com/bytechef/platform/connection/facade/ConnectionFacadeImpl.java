@@ -153,11 +153,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
             connection.getComponentName(), connection.getConnectionVersion());
 
-        List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
-            .stream()
-            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
-            .map(BaseProperty::getName)
-            .toList();
+        List<String> authorizationPropertyNames = getAuthorizationPropertyNames(connectionDefinition);
 
         Map<String, Object> replacedParameters = new HashMap<>(connection.getParameters());
 
@@ -344,6 +340,36 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Map<String, ?> getReauthorizationParameters(long id, String componentName, int connectionVersion) {
+        Connection connection = connectionService.getConnection(id);
+
+        validateOwnerOrAdmin(connection);
+
+        if (!Objects.equals(connection.getComponentName(), componentName) ||
+            connection.getConnectionVersion() != connectionVersion) {
+
+            throw new ConfigurationException(
+                "Connection id=%s does not belong to component %s version %s".formatted(
+                    id, componentName, connectionVersion),
+                ConnectionErrorType.INVALID_CONNECTION_COMPONENT_NAME);
+        }
+
+        ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
+            componentName, connectionVersion);
+
+        List<String> authorizationPropertyNames = getAuthorizationPropertyNames(connectionDefinition);
+
+        List<String> connectionPropertyNames = connectionDefinition.getProperties()
+            .stream()
+            .map(BaseProperty::getName)
+            .filter(propertyName -> !authorizationPropertyNames.contains(propertyName))
+            .toList();
+
+        return getConnectionParameters(connection.getParameters(), connectionPropertyNames);
+    }
+
+    @Override
     public void update(long id, List<Tag> tags) {
         validateOwnerOrAdmin(connectionService.getConnection(id));
 
@@ -404,6 +430,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return tags
             .stream()
             .filter(tag -> containsTag(connection, tag))
+            .toList();
+    }
+
+    private static List<String> getAuthorizationPropertyNames(ConnectionDefinition connectionDefinition) {
+        return connectionDefinition.getAuthorizations()
+            .stream()
+            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
+            .map(BaseProperty::getName)
             .toList();
     }
 
@@ -504,11 +538,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
             componentName, connectionVersion);
 
-        List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
-            .stream()
-            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
-            .map(BaseProperty::getName)
-            .toList();
+        List<String> authorizationPropertyNames = getAuthorizationPropertyNames(connectionDefinition);
         List<String> connectionPropertyNames = connectionDefinition.getProperties()
             .stream()
             .map(BaseProperty::getName)

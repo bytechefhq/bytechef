@@ -522,6 +522,10 @@ paths:
                 componentName:
                   description: "The name of a component that uses this connection."
                   type: "string"
+                connectionId:
+                  description: "The id of a connection whose credentials are being updated."
+                  type: "integer"
+                  format: "int64"
                 connectionVersion:
                   description: "The version of a connection."
                   type: "integer"

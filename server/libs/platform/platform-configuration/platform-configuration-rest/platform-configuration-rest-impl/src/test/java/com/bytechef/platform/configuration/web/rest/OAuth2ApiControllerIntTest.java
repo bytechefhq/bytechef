@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.web.rest;
 
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
@@ -62,7 +63,7 @@ class OAuth2ApiControllerIntTest {
     void testGetOAuth2AuthorizationParametersReturnsAuthorizationContext() {
         when(
             oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
-                eq("mcpClient"), eq(1), anyMap(), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE)))
+                eq("mcpClient"), eq(1), anyMap(), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), isNull()))
                     .thenReturn(
                         new OAuth2AuthorizationParameters(
                             "https://auth.example.com/authorize", "reg-1",
@@ -87,6 +88,31 @@ class OAuth2ApiControllerIntTest {
             .isEqualTo("reg-1")
             .jsonPath("$.extraQueryParameters.resource")
             .isEqualTo("https://mcp.example.com/mcp")
+            .jsonPath("$.authorizationContext")
+            .isEqualTo("sealed-context");
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParametersPassesConnectionIdToFacade() {
+        when(
+            oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+                eq("mcpClient"), eq(1), eq(Map.of()), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), eq(42L)))
+                    .thenReturn(
+                        new OAuth2AuthorizationParameters(
+                            "https://auth.example.com/authorize", "reg-1", Map.of(), Map.of(), "sealed-context"));
+
+        webTestClient.post()
+            .uri("/internal/oauth2/authorization-parameters")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                """
+                    {"componentName":"mcpClient","connectionId":42,"connectionVersion":1,
+                     "authorizationType":"OAUTH2_AUTHORIZATION_CODE_PKCE","parameters":{}}
+                    """)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
             .jsonPath("$.authorizationContext")
             .isEqualTo("sealed-context");
     }

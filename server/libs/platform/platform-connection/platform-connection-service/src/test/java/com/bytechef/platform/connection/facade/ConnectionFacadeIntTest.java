@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.connection.facade;
 
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -40,6 +43,7 @@ import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -693,6 +697,71 @@ class ConnectionFacadeIntTest {
             .containsEntry("refresh_token", "new-rt")
             .doesNotContainKeys(
                 Authorization.CODE, Authorization.CODE_VERIFIER, Authorization.AUTHORIZATION_CONTEXT, "state");
+    }
+
+    @Test
+    void testGetReauthorizationParametersReturnsOnlyStoredConnectionProperties() {
+        stubReauthorizationConnectionDefinition();
+
+        long connectionId = createReauthorizationConnection();
+
+        Assertions.assertThat(connectionFacade.getReauthorizationParameters(connectionId, "componentName", 1))
+            .isEqualTo(Map.of("url", "https://mcp.example.com/mcp", "transportType", "SSE"));
+    }
+
+    @Test
+    void testGetReauthorizationParametersRejectsMismatchedComponent() {
+        stubReauthorizationConnectionDefinition();
+
+        long connectionId = createReauthorizationConnection();
+
+        Throwable throwable = catchThrowable(
+            () -> connectionFacade.getReauthorizationParameters(connectionId, "otherComponent", 1));
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ConfigurationException.class);
+        Assertions.assertThat(((ConfigurationException) throwable).getErrorKey())
+            .isEqualTo(ConnectionErrorType.INVALID_CONNECTION_COMPONENT_NAME.getErrorKey());
+        Assertions
+            .assertThatThrownBy(() -> connectionFacade.getReauthorizationParameters(connectionId, "componentName", 2))
+            .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
+    void testGetReauthorizationParametersByNonOwnerNonAdminIsDenied() {
+        stubReauthorizationConnectionDefinition();
+
+        long connectionId = createReauthorizationConnection();
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("user@localhost.com", null, AuthorityConstants.USER));
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.getReauthorizationParameters(connectionId, "componentName", 1))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    private long createReauthorizationConnection() {
+        return connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", "transportType", "SSE", Authorization.CLIENT_ID, "reg-1",
+                    Authorization.CLIENT_SECRET, "secret", "access_token", "at", "refresh_token", "rt")),
+            PlatformType.AUTOMATION);
+    }
+
+    private void stubReauthorizationConnectionDefinition() {
+        when(connectionDefinitionService.getConnectionConnectionDefinition("componentName", 1))
+            .thenReturn(
+                new ConnectionDefinition(
+                    connection()
+                        .properties(string("url"), string("transportType"), string(Authorization.CLIENT_ID))
+                        .authorizations(
+                            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                                .properties(string(Authorization.CLIENT_ID), string(Authorization.CLIENT_SECRET))),
+                    "componentName", "componentTitle", null));
     }
 
     private static void assertOAuth2Error(ThrowingCallable callable, OAuth2ErrorType expected) {

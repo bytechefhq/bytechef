@@ -45,6 +45,8 @@ public interface ConnectionFacade {
 
     List<Tag> getConnectionTags(PlatformType type);
 
+    Map<String, ?> getReauthorizationParameters(long id, String componentName, int connectionVersion);
+
     void update(long id, List<Tag> tags);
 
     void update(long id, String name, List<Tag> tags, int version);

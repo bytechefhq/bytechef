@@ -33,6 +33,8 @@ public class GetOAuth2AuthorizationParametersRequestModel {
 
   private String componentName;
 
+  private @Nullable Long connectionId;
+
   private @Nullable Integer connectionVersion;
 
   private Map<String, Object> parameters = new HashMap<>();
@@ -90,6 +92,27 @@ public class GetOAuth2AuthorizationParametersRequestModel {
   @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
+  }
+
+  public GetOAuth2AuthorizationParametersRequestModel connectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
+    return this;
+  }
+
+  /**
+   * The id of a connection whose credentials are being updated.
+   * @return connectionId
+   */
+  
+  @Schema(name = "connectionId", description = "The id of a connection whose credentials are being updated.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionId")
+  public @Nullable Long getConnectionId() {
+    return connectionId;
+  }
+
+  @JsonProperty("connectionId")
+  public void setConnectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
   }
 
   public GetOAuth2AuthorizationParametersRequestModel connectionVersion(@Nullable Integer connectionVersion) {
@@ -153,13 +176,14 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     GetOAuth2AuthorizationParametersRequestModel getOAuth2AuthorizationParametersRequest = (GetOAuth2AuthorizationParametersRequestModel) o;
     return Objects.equals(this.authorizationType, getOAuth2AuthorizationParametersRequest.authorizationType) &&
         Objects.equals(this.componentName, getOAuth2AuthorizationParametersRequest.componentName) &&
+        Objects.equals(this.connectionId, getOAuth2AuthorizationParametersRequest.connectionId) &&
         Objects.equals(this.connectionVersion, getOAuth2AuthorizationParametersRequest.connectionVersion) &&
         Objects.equals(this.parameters, getOAuth2AuthorizationParametersRequest.parameters);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationType, componentName, connectionVersion, parameters);
+    return Objects.hash(authorizationType, componentName, connectionId, connectionVersion, parameters);
   }
 
   @Override
@@ -168,6 +192,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     sb.append("class GetOAuth2AuthorizationParametersRequestModel {\n");
     sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("}");

@@ -66,7 +66,7 @@ public class OAuth2ApiController implements Oauth2Api {
                     parametersRequestModel.getComponentName(),
                     Objects.requireNonNull(parametersRequestModel.getConnectionVersion()),
                     parametersRequestModel.getParameters(),
-                    AuthorizationType.valueOf(authorizationType.name())),
+                    AuthorizationType.valueOf(authorizationType.name()), parametersRequestModel.getConnectionId()),
                 OAuth2AuthorizationParametersModel.class));
     }
 
