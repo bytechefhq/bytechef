@@ -37,6 +37,11 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
     }
 
     @Override
+    public void copyWorkflowTestConfigurations(String sourceWorkflowId, String targetWorkflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void delete(String workflowId) {
         throw new UnsupportedOperationException();
     }

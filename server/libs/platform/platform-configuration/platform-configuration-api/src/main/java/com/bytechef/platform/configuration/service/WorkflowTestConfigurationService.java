@@ -27,6 +27,8 @@ import java.util.Optional;
  */
 public interface WorkflowTestConfigurationService {
 
+    void copyWorkflowTestConfigurations(String sourceWorkflowId, String targetWorkflowId);
+
     void delete(String workflowId);
 
     void delete(String workflowId, long environmentId);

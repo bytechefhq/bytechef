@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -159,6 +160,9 @@ class AutomationWorkflowProjectFacadeIntTest {
 
     @Autowired
     private TagService tagService;
+
+    @Autowired
+    private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @BeforeEach
     void setUp() {
@@ -439,6 +443,20 @@ class AutomationWorkflowProjectFacadeIntTest {
         assertThat(automationWorkflowProjectFacade.getProject(projectId)
             .workflowTemplates()).extracting(ConnectedUserWorkflowTemplateDTO::workflowUuid)
                 .containsExactlyInAnyOrder(workflowUuid, duplicateWorkflowUuid);
+    }
+
+    @Test
+    void testDuplicateProjectWorkflowCopiesWorkflowTestConfigurations() {
+        long projectId = automationWorkflowProjectFacade.createProject(
+            "DuplicateTestConfiguration", "", null, List.of(), null, null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        String duplicateWorkflowUuid = automationWorkflowProjectFacade.duplicateProjectWorkflow(workflowUuid);
+
+        verify(workflowTestConfigurationService).copyWorkflowTestConfigurations(
+            projectWorkflowService.getLastWorkflowId(workflowUuid),
+            projectWorkflowService.getLastWorkflowId(duplicateWorkflowUuid));
     }
 
     @Test
