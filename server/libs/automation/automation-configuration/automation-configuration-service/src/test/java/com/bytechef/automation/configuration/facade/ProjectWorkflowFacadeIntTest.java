@@ -46,6 +46,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateSummary;
@@ -57,6 +58,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -109,6 +111,9 @@ public class ProjectWorkflowFacadeIntTest {
     @Autowired
     private WorkflowCrudRepository workflowRepository;
 
+    @Autowired
+    private WorkflowTestConfigurationService workflowTestConfigurationService;
+
     @MockitoBean
     private SharedTemplateFileStorage sharedTemplateFileStorage;
 
@@ -130,7 +135,11 @@ public class ProjectWorkflowFacadeIntTest {
 
         // Clean up workflow records by finding all and deleting individually
         workflowRepository.findAll()
-            .forEach(workflow -> workflowRepository.deleteById(workflow.getId()));
+            .forEach(workflow -> {
+                workflowTestConfigurationService.delete(workflow.getId());
+
+                workflowRepository.deleteById(workflow.getId());
+            });
 
         workspaceRepository.deleteAll();
 
@@ -141,6 +150,30 @@ public class ProjectWorkflowFacadeIntTest {
     @BeforeEach
     public void beforeEach() {
         workspace = workspaceRepository.save(new Workspace("test"));
+    }
+
+    @Test
+    public void testDuplicateWorkflowCopiesWorkflowTestConfigurationInputs() {
+        Project project = new Project();
+
+        project.setName("Test Duplicate Project");
+        project.setWorkspaceId(workspace.getId());
+        project = projectRepository.save(project);
+
+        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
+            project.getId(), "{\"label\":\"Test Duplicate Workflow\",\"inputs\":[{\"name\":\"count\"}],\"tasks\":[]}");
+
+        String workflowId = projectWorkflow.getWorkflowId();
+
+        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(workflowId, "count", "42", 0);
+
+        String duplicatedWorkflowId = projectWorkflowFacade.duplicateWorkflow(project.getId(), workflowId);
+
+        assertThat(duplicatedWorkflowId).isNotEqualTo(workflowId);
+        assertThat(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(duplicatedWorkflowId, 0))
+            .isEqualTo(Map.of("count", "42"));
+        assertThat(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .isEqualTo(Map.of("count", "42"));
     }
 
     @Test

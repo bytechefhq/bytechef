@@ -234,6 +234,9 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         ProjectWorkflow newProjectWorkflow = projectWorkflowFacade.addWorkflow(projectId, newDefinition);
 
+        workflowTestConfigurationService.copyWorkflowTestConfigurations(
+            workflowId, newProjectWorkflow.getWorkflowId());
+
         return newProjectWorkflow.getUuidAsString();
     }
 

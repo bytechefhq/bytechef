@@ -49,6 +49,25 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
+    public void copyWorkflowTestConfigurations(String sourceWorkflowId, String targetWorkflowId) {
+        for (WorkflowTestConfiguration workflowTestConfiguration : workflowTestConfigurationRepository
+            .findAllByWorkflowId(sourceWorkflowId)) {
+
+            List<WorkflowTestConfigurationConnection> connections = workflowTestConfiguration.getConnections()
+                .stream()
+                .map(connection -> new WorkflowTestConfigurationConnection(
+                    connection.getConnectionId(), connection.getWorkflowConnectionKey(),
+                    connection.getWorkflowNodeName()))
+                .toList();
+
+            workflowTestConfigurationRepository.save(
+                new WorkflowTestConfiguration(
+                    workflowTestConfiguration.getEnvironmentId(), workflowTestConfiguration.getInputs(),
+                    targetWorkflowId, connections));
+        }
+    }
+
+    @Override
     public void delete(String workflowId) {
         workflowTestConfigurationRepository.deleteAll(
             workflowTestConfigurationRepository.findAllByWorkflowId(workflowId));
