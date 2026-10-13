@@ -19,14 +19,15 @@ package com.bytechef.platform.security.web.mcp;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 
 /**
- * Builds {@link McpApiKeyCredentials} from the bearer API key, the {@code X-ENVIRONMENT} header and the server secret
- * key carried in the request path.
+ * Builds {@link McpApiKeyCredentials} from the bearer API key, the {@code X-ENVIRONMENT} header and, when the request
+ * path carries one, the server secret key.
  *
  * @author Ivica Cardic
  */
@@ -59,6 +60,11 @@ public abstract class AbstractMcpApiKeyAuthenticationConverter implements Authen
             new McpApiKeyCredentials(getEnvironment(request), extractServerSecretKey(request), secretKey));
     }
 
+    /**
+     * Returns the server secret key from the request path, or {@code null} when the path carries none, as on a
+     * tenant-less endpoint.
+     */
+    @Nullable
     protected abstract String extractServerSecretKey(HttpServletRequest request);
 
     private Environment getEnvironment(HttpServletRequest request) {

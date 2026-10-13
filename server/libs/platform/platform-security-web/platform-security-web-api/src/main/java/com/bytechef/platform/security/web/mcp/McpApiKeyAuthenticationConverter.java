@@ -18,6 +18,7 @@ package com.bytechef.platform.security.web.mcp;
 
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -29,6 +30,7 @@ public class McpApiKeyAuthenticationConverter extends AbstractMcpApiKeyAuthentic
     }
 
     @Override
+    @Nullable
     protected String extractServerSecretKey(HttpServletRequest request) {
         String servletPath = request.getServletPath();
 
