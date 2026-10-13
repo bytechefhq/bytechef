@@ -21,8 +21,10 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -130,16 +132,74 @@ public final class UrlValidatorUtils {
             int first = bytes[0] & 0xFF;
             int second = bytes[1] & 0xFF;
 
-            return first == 100 && second >= 64 && second <= 127;
+            return first == 0 || (first == 100 && second >= 64 && second <= 127);
         }
 
         if (address instanceof Inet6Address) {
             byte[] bytes = address.getAddress();
 
+            InetAddress embeddedIpv4Address = toEmbeddedIpv4Address(bytes);
+
+            if (embeddedIpv4Address != null) {
+                return isPrivateAddress(embeddedIpv4Address);
+            }
+
             return (bytes[0] & 0xFE) == 0xFC;
         }
 
         return false;
+    }
+
+    private static boolean isNat64Address(byte[] bytes) {
+        if ((bytes[0] & 0xFF) != 0x00 || (bytes[1] & 0xFF) != 0x64 || (bytes[2] & 0xFF) != 0xFF ||
+            (bytes[3] & 0xFF) != 0x9B) {
+
+            return false;
+        }
+
+        return isZero(bytes, 4, 12);
+    }
+
+    private static boolean is6to4Address(byte[] bytes) {
+        return (bytes[0] & 0xFF) == 0x20 && (bytes[1] & 0xFF) == 0x02;
+    }
+
+    private static boolean isIpv4CompatibleAddress(byte[] bytes) {
+        return isZero(bytes, 0, 12);
+    }
+
+    private static boolean isIpv4MappedAddress(byte[] bytes) {
+        return isZero(bytes, 0, 10) && (bytes[10] & 0xFF) == 0xFF && (bytes[11] & 0xFF) == 0xFF;
+    }
+
+    private static boolean isZero(byte[] bytes, int fromIndex, int toIndex) {
+        for (int index = fromIndex; index < toIndex; index++) {
+            if (bytes[index] != 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static @Nullable InetAddress toEmbeddedIpv4Address(byte[] bytes) {
+        if (isNat64Address(bytes) || isIpv4CompatibleAddress(bytes) || isIpv4MappedAddress(bytes)) {
+            return toInet4Address(Arrays.copyOfRange(bytes, 12, 16));
+        }
+
+        if (is6to4Address(bytes)) {
+            return toInet4Address(Arrays.copyOfRange(bytes, 2, 6));
+        }
+
+        return null;
+    }
+
+    private static InetAddress toInet4Address(byte[] ipv4Bytes) {
+        try {
+            return InetAddress.getByAddress(ipv4Bytes);
+        } catch (UnknownHostException unknownHostException) {
+            throw new IllegalStateException(unknownHostException);
+        }
     }
 
     private static void rejectPrivateAddress(String host, InetAddress address) {
@@ -159,6 +219,11 @@ public final class UrlValidatorUtils {
             int first = bytes[0] & 0xFF;
             int second = bytes[1] & 0xFF;
 
+            if (first == 0) {
+                throw new UrlValidationException(
+                    "URL host '" + host + "' resolves to an address in 0.0.0.0/8, which is not allowed");
+            }
+
             if (first == 100 && second >= 64 && second <= 127) {
                 throw new UrlValidationException(
                     "URL host '" + host + "' resolves to a CGNAT address, which is not allowed");
@@ -169,6 +234,12 @@ public final class UrlValidatorUtils {
             if ((bytes[0] & 0xFE) == 0xFC) {
                 throw new UrlValidationException(
                     "URL host '" + host + "' resolves to an IPv6 unique local address, which is not allowed");
+            }
+
+            InetAddress embeddedIpv4Address = toEmbeddedIpv4Address(bytes);
+
+            if (embeddedIpv4Address != null) {
+                rejectPrivateAddress(host, embeddedIpv4Address);
             }
         }
     }

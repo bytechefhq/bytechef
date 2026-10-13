@@ -59,6 +59,14 @@ public interface Authorization {
      */
     String AUTHORIZATION = "Authorization";
 
+    String AUTHORIZATION_CONTEXT = "authorizationContext";
+    String CODE_VERIFIER = "code_verifier";
+    String RESOURCE = "resource";
+    String TOKEN_ENDPOINT_AUTH_METHOD = "tokenEndpointAuthMethod";
+    String TOKEN_ENDPOINT_AUTH_METHOD_BASIC = "client_secret_basic";
+    String TOKEN_ENDPOINT_AUTH_METHOD_NONE = "none";
+    String TOKEN_ENDPOINT_AUTH_METHOD_POST = "client_secret_post";
+
     /**
      * Parameter key identifying the {@link AuthorizationType} of a connection.
      */
@@ -338,6 +346,10 @@ public interface Authorization {
         return Optional.empty();
     }
 
+    default Optional<ProtectedResourceUrlFunction> getProtectedResourceUrl() {
+        return Optional.empty();
+    }
+
     /**
      * Returns the input properties that define the credentials and settings collected from the user for this
      * authorization.
@@ -551,6 +563,12 @@ public interface Authorization {
          * @throws Exception if the parameters cannot be produced
          */
         Map<String, String> apply(Parameters connectionParameters, Context context) throws Exception;
+    }
+
+    @FunctionalInterface
+    interface ProtectedResourceUrlFunction {
+
+        String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
