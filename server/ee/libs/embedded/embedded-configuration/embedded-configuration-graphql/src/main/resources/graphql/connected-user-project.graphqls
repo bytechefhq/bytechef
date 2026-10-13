@@ -28,6 +28,7 @@ type ConnectedUserProjectWorkflow {
     enabled: Boolean!
     lastExecutionDate: String
     projectId: ID!
+    staticWebhookUrl: String
     workflow: Workflow!
     workflowUuid: ID!
     workflowVersion: Int
