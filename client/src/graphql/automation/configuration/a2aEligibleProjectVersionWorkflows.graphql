@@ -1,0 +1,9 @@
+query a2aEligibleProjectVersionWorkflows($projectId: ID!, $projectVersion: Int!) {
+    a2aEligibleProjectVersionWorkflows(projectId: $projectId, projectVersion: $projectVersion) {
+        id
+        workflow {
+            id
+            label
+        }
+    }
+}
