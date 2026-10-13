@@ -109,6 +109,8 @@ public interface ConnectedUserIntegrationMapper {
             target = "workflows", source = "integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows")
         IntegrationModel convert(ConnectedUserIntegrationDTO connectedUserIntegrationDTO);
 
+        @Mapping(
+            target = "authorizationContext", source = "oAuth2.oAuth2AuthorizationParameters.authorizationContext")
         @Mapping(target = "authorizationUrl", source = "oAuth2.oAuth2AuthorizationParameters.authorizationUrl")
         @Mapping(target = "clientId", source = "oAuth2.oAuth2AuthorizationParameters.clientId")
         @Mapping(target = "extraQueryParameters", source = "oAuth2.oAuth2AuthorizationParameters.extraQueryParameters")

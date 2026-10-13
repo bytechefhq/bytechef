@@ -2647,6 +2647,9 @@ components:
           type: "object"
           additionalProperties:
             type: "boolean"
+        authorizationContext:
+          description: "Opaque, server-sealed state the client must post back with the authorization code."
+          type: "string"
     OAuth2Properties:
       properties:
         redirectUri:

@@ -11,6 +11,7 @@ Name | Type
 `clientId` | string
 `redirectUri` | string
 `scopes` | { [key: string]: string; }
+`authorizationContext` | string
 
 ## Example
 
@@ -24,6 +25,7 @@ const example = {
   "clientId": null,
   "redirectUri": null,
   "scopes": null,
+  "authorizationContext": null,
 } satisfies OAuth2
 
 console.log(example)

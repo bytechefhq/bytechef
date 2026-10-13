@@ -2620,6 +2620,9 @@ components:
           type: "object"
           additionalProperties:
             type: "string"
+        authorizationContext:
+          description: "Opaque, server-sealed state the client must post back with the authorization code."
+          type: "string"
     Workflow:
       description: "A group of tasks that make one logical workflow."
       type: "object"

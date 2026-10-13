@@ -39,6 +39,12 @@ export interface OAuth2 {
      * 
      */
     scopes?: { [key: string]: string; };
+    /**
+     * Opaque, server-sealed state the client must post back with the authorization code.
+     * @type {string}
+     * @memberof OAuth2
+     */
+    authorizationContext?: string;
 }
 
 /**
@@ -63,6 +69,7 @@ export function OAuth2FromJSONTyped(json: any, ignoreDiscriminator: boolean): OA
         'clientId': json['clientId'] == null ? undefined : json['clientId'],
         'redirectUri': json['redirectUri'] == null ? undefined : json['redirectUri'],
         'scopes': json['scopes'] == null ? undefined : json['scopes'],
+        'authorizationContext': json['authorizationContext'] == null ? undefined : json['authorizationContext'],
     };
 }
 
@@ -82,6 +89,7 @@ export function OAuth2ToJSONTyped(value?: OAuth2 | null, ignoreDiscriminator: bo
         'clientId': value['clientId'],
         'redirectUri': value['redirectUri'],
         'scopes': value['scopes'],
+        'authorizationContext': value['authorizationContext'],
     };
 }
 
