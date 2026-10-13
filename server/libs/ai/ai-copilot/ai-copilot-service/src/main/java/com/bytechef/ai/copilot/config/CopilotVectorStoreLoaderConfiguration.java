@@ -85,7 +85,7 @@ class CopilotVectorStoreLoaderConfiguration {
         VectorStore vectorStore = copilotDocsLoaderVectorStoreProvider.getIfAvailable();
 
         if (vectorStore == null) {
-            log.info(
+            log.warn(
                 "Skipping copilot documentation indexing: no internal Copilot embedding key " +
                     "(bytechef.ai.copilot.embedding.api-key) is set. Set it and restart to index copilot docs.");
 
@@ -284,20 +284,24 @@ class CopilotVectorStoreLoaderConfiguration {
     }
 
     private void storeDocsDocuments(VectorStore vectorStore, List<Map<String, Object>> vectorsMetadataList) {
-        List<Document> documentList = new ArrayList<>();
+        List<Document> documents = new ArrayList<>();
         Set<String> resourceNames = new HashSet<>();
 
-        storeDocsFromClasspath(vectorStore, vectorsMetadataList, documentList, resourceNames);
+        storeDocsFromClasspath(vectorStore, vectorsMetadataList, documents, resourceNames);
 
-        for (List<Document> batch : batchingStrategy.batch(documentList)) {
+        for (List<Document> batch : batchingStrategy.batch(documents)) {
             vectorStore.add(batch);
         }
 
         deleteStaleDocsFromVectorStore(vectorStore, vectorsMetadataList, resourceNames);
+
+        log.info(
+            "Copilot documentation indexing completed: {} docs scanned, {} chunks added to the vector store",
+            resourceNames.size(), documents.size());
     }
 
     private void storeDocsFromClasspath(
-        VectorStore vectorStore, List<Map<String, Object>> vectorsMetadataList, List<Document> documentList,
+        VectorStore vectorStore, List<Map<String, Object>> vectorsMetadataList, List<Document> documents,
         Set<String> resourceNames) {
 
         try {
@@ -310,7 +314,7 @@ class CopilotVectorStoreLoaderConfiguration {
                         String docName = extractDocName(resource);
 
                         resourceNames.add(docName);
-                        addToDocuments(vectorStore, vectorsMetadataList, docName, content, documentList);
+                        addToDocuments(vectorStore, vectorsMetadataList, docName, content, documents);
                     }
                 }
             }
@@ -318,5 +322,4 @@ class CopilotVectorStoreLoaderConfiguration {
             throw new RuntimeException("Error loading docs from classpath", ioException);
         }
     }
-
 }
