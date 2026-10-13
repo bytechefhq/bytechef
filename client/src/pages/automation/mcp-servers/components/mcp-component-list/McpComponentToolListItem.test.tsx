@@ -93,6 +93,12 @@ const renderEmbeddedToolListItem = (tool: McpTool = mcpTool) =>
         </QueryClientProvider>
     );
 
+const configureTool = async (toolLabel = 'Create Opportunity') => {
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', {name: `Configure ${toolLabel}`}));
+};
+
 const chooseToolAction = async (actionName: string, toolLabel = 'Create Opportunity') => {
     const user = userEvent.setup();
 
@@ -123,7 +129,7 @@ describe('McpComponentToolListItem', () => {
             </QueryClientProvider>
         );
 
-        await chooseToolAction('Configure');
+        await configureTool();
 
         expect(screen.getByText('tool-properties-popover')).toHaveAttribute('data-connection-required', 'true');
     });
@@ -132,7 +138,7 @@ describe('McpComponentToolListItem', () => {
 
         expect(screen.getByTestId('active-popover-id')).toHaveTextContent('NONE');
 
-        await chooseToolAction('Configure');
+        await configureTool();
 
         expect(screen.getByTestId('active-popover-id')).toHaveTextContent('component-tool-42');
         expect(screen.getByText('tool-properties-popover')).toBeInTheDocument();
@@ -284,7 +290,7 @@ describe('McpComponentToolListItem', () => {
 
         expect(dropdownMenuHookMock).toHaveBeenCalledWith({embedded: true, mcpTool});
 
-        await chooseToolAction('Configure');
+        await configureTool();
 
         expect(screen.getByText('tool-properties-popover')).toHaveAttribute('data-embedded', 'true');
     });

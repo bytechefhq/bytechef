@@ -56,8 +56,8 @@ describe('McpIntegrationInstanceConfigurationWorkflowListItem', () => {
         );
     });
 
-    it('opens the workflow configuration from the actions menu', async () => {
-        await chooseAction('Configure');
+    it('opens the workflow configuration from the Configure button', async () => {
+        await userEvent.setup().click(screen.getByRole('button', {name: 'Configure Sync contacts'}));
 
         expect(hoisted.openPopover).toHaveBeenCalledWith('integration-workflow-9');
     });
