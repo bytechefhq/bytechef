@@ -9,6 +9,7 @@ const objectToQuery = (object: Record<string, string>) => {
 };
 
 interface Oauth2Props {
+    authorizationContext?: string;
     authorizationUrl: string;
     clientId: string;
     redirectUri: string;
@@ -105,6 +106,7 @@ const cleanup = (
 };
 
 const useOAuth2 = ({
+    authorizationContext,
     authorizationUrl,
     clientId,
     extraQueryParameters,
@@ -115,6 +117,7 @@ const useOAuth2 = ({
     responseType,
     scope = '',
 }: Oauth2Props) => {
+    const authorizationContextRef = useRef(authorizationContext);
     const extraQueryParametersRef = useRef(extraQueryParameters);
     const popupRef = useRef<Window | null>(null);
     const currentStateRef = useRef(undefined);
@@ -199,6 +202,7 @@ const useOAuth2 = ({
                     if (responseType === 'code' && onCodeSuccess) {
                         onCodeSuccess({
                             ...payload,
+                            authorizationContext: authorizationContextRef.current,
                             code_verifier: extraQueryParametersRef.current?.code_verifier,
                         });
                     } else {
@@ -256,6 +260,10 @@ const useOAuth2 = ({
             }
         };
     }, [authorizationUrl, clientId, redirectUri, scope, responseType, onCodeSuccess, onTokenSuccess, onError, setUI]);
+
+    useEffect(() => {
+        authorizationContextRef.current = authorizationContext;
+    }, [authorizationContext]);
 
     useEffect(() => {
         extraQueryParametersRef.current = extraQueryParameters;

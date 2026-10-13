@@ -4,6 +4,7 @@ export interface ConnectionConfigType {
     authorizationType: string;
     inputs?: PropertyType[];
     oauth2?: {
+        authorizationContext?: string;
         authorizationUrl: string;
         scopes: Record<string, string> | string[] | string;
         redirectUri: string;
@@ -167,8 +168,9 @@ export interface TokenPayloadI {
 }
 
 export interface CodePayloadI {
+    authorizationContext?: string;
     code: string;
-    [key: string]: string;
+    [key: string]: string | undefined;
 }
 
 export type ApiFetch = <T>(
