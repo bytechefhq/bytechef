@@ -61,6 +61,8 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.WorkflowConnectionDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -73,6 +75,7 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -839,6 +842,79 @@ class McpProjectFacadeIntTest {
                     .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.getConnections())
                         .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
                         .containsExactly(79L));
+        }
+
+        @Test
+        void testCreateMcpProjectDeploysTheConfiguredConnectionAndInputs() {
+            stubRequiredSlackConnection();
+            stubConnection(90L, "slack", Environment.DEVELOPMENT);
+
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1),
+                List.of(slackWorkflowConfiguration(workflowId1, 90L, Map.of("channel", "general"))));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                mcpProject.getProjectDeploymentId()))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> {
+                        assertThat(projectDeploymentWorkflow.getConnections())
+                            .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                            .containsExactly(90L);
+                        assertThat(projectDeploymentWorkflow.getInputs()).isEqualTo(Map.of("channel", "general"));
+                    });
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsAConfiguredConnectionFromAnotherEnvironment() {
+            stubRequiredSlackConnection();
+            stubConnection(90L, "slack", Environment.PRODUCTION);
+
+            assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1),
+                List.of(slackWorkflowConfiguration(workflowId1, 90L, Map.of()))))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Connection 90 cannot be used");
+        }
+
+        @Test
+        void testCreateMcpProjectRejectsAConfigurationWithoutTheRequiredConnection() {
+            stubRequiredSlackConnection();
+
+            assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1),
+                List.of(new WorkflowConfigurationDTO(workflowId1, List.of(), Map.of()))))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("requires a slack connection");
+        }
+
+        @Test
+        void testUpdateMcpProjectAppliesTheConfigurationOfAKeptWorkflow() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            stubRequiredSlackConnection();
+            stubConnection(91L, "slack", Environment.DEVELOPMENT);
+
+            mcpProjectFacade.updateMcpProject(
+                mcpProject.getId(), List.of(workflowId1),
+                List.of(slackWorkflowConfiguration(workflowId1, 91L, Map.of("channel", "random"))));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                mcpProject.getProjectDeploymentId()))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> {
+                        assertThat(projectDeploymentWorkflow.getConnections())
+                            .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                            .containsExactly(91L);
+                        assertThat(projectDeploymentWorkflow.getInputs()).isEqualTo(Map.of("channel", "random"));
+                    });
+        }
+
+        private WorkflowConfigurationDTO slackWorkflowConfiguration(
+            String workflowId, long connectionId, Map<String, Object> inputs) {
+
+            return new WorkflowConfigurationDTO(
+                workflowId, List.of(new WorkflowConnectionDTO(connectionId, "slack", "newWorkflowCall_1")), inputs);
         }
 
         private void stubConnection(long connectionId, String componentName, Environment environment) {
