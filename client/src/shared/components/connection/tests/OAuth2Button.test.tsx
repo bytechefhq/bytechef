@@ -1,5 +1,6 @@
 import OAuth2Button from '@/shared/components/connection/OAuth2Button';
-import {render, screen} from '@testing-library/react';
+import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from '@/shared/components/connection/oauth2/constants';
+import {act, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import posthog from 'posthog-js';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -74,5 +75,36 @@ describe('OAuth2Button', () => {
                 reason: 'unmounted',
             })
         );
+    });
+
+    it('should forward authorizationContext into the code payload', async () => {
+        const onCodeSuccess = vi.fn();
+
+        render(
+            <OAuth2Button
+                authorizationContext="sealed-context"
+                authorizationUrl="https://auth.example.com/authorize"
+                clientId="test-client-id"
+                componentName="mcpClient"
+                onClick={(getAuth) => getAuth()}
+                onCodeSuccess={onCodeSuccess}
+                redirectUri="https://app.example.com/oauth"
+                responseType="code"
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Connect'}));
+
+        const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+
+        act(() => {
+            window.dispatchEvent(
+                new MessageEvent('message', {
+                    data: {payload: {code: 'the-code', state: savedState}, type: OAUTH_RESPONSE},
+                })
+            );
+        });
+
+        expect(onCodeSuccess).toHaveBeenCalledWith(expect.objectContaining({authorizationContext: 'sealed-context'}));
     });
 });

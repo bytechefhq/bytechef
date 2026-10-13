@@ -120,8 +120,12 @@ const ConnectedUserIntegrationCredentialsDialog = ({
     const showOAuth2Button =
         updating && codeRequired && !code && !updateIntegrationInstanceCredentialsMutation.isPending;
 
-    const handleCodeSuccess = ({code, code_verifier: codeVerifier}: CodePayloadI) => {
+    const handleCodeSuccess = ({authorizationContext, code, code_verifier: codeVerifier}: CodePayloadI) => {
         setValue('connectionParameters.code', code);
+
+        if (authorizationContext) {
+            setValue('connectionParameters.authorizationContext', authorizationContext);
+        }
 
         if (codeVerifier) {
             setValue('connectionParameters.code_verifier', codeVerifier);
@@ -212,6 +216,7 @@ const ConnectedUserIntegrationCredentialsDialog = ({
                                 oAuth2AuthorizationParameters?.authorizationUrl &&
                                 oAuth2AuthorizationParameters.clientId && (
                                     <OAuth2Button
+                                        authorizationContext={oAuth2AuthorizationParameters.authorizationContext}
                                         authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
                                         clientId={oAuth2AuthorizationParameters.clientId}
                                         componentName={provisionableIntegration.integration!.componentName}

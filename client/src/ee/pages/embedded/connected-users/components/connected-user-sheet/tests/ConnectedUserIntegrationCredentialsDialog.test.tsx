@@ -113,14 +113,24 @@ vi.mock('@/shared/components/EnvironmentBadge', () => ({
 
 vi.mock('@/shared/components/connection/OAuth2Button', () => ({
     default: ({
+        authorizationContext,
         onClick,
         onCodeSuccess,
     }: {
+        authorizationContext?: string;
         onClick: (getAuth: () => void) => void;
-        onCodeSuccess: (payload: {code: string; code_verifier?: string}) => void;
+        onCodeSuccess: (payload: {authorizationContext?: string; code: string; code_verifier?: string}) => void;
     }) => (
         <button
-            onClick={() => onClick(() => onCodeSuccess({code: 'auth-code', code_verifier: 'verifier'}))}
+            onClick={() =>
+                onClick(() =>
+                    onCodeSuccess(
+                        authorizationContext
+                            ? {authorizationContext, code: 'auth-code'}
+                            : {code: 'auth-code', code_verifier: 'verifier'}
+                    )
+                )
+            }
             type="button"
         >
             Authorize
@@ -391,6 +401,44 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
                 id: 40,
                 updateConnectionCredentialsRequest: {
                     parameters: {code: 'auth-code', code_verifier: 'verifier'},
+                    version: 6,
+                },
+            })
+        );
+    });
+
+    it('posts the sealed authorization context back with the code of a PKCE integration', async () => {
+        const pkceConfiguration = buildConfiguration(2, 'OAUTH2_AUTHORIZATION_CODE_PKCE');
+
+        mockProvisionableConfiguration({
+            ...pkceConfiguration,
+            oAuth2AuthorizationParameters: {
+                ...pkceConfiguration.oAuth2AuthorizationParameters,
+                authorizationContext: 'sealed-context',
+            },
+        } as ReturnType<typeof buildConfiguration>);
+
+        hoisted.getIntegrationInstanceConnection.mockResolvedValue({
+            authorizationParameters: {clientId: 'cid'},
+            authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+            componentName: 'slack',
+            connectionVersion: 1,
+            id: 70,
+            name: 'Slack',
+            parameters: {},
+            version: 6,
+        });
+
+        renderDialog();
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Update credentials'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Authorize'}));
+
+        await waitFor(() =>
+            expect(hoisted.updateIntegrationInstanceCredentials).toHaveBeenCalledWith({
+                id: 40,
+                updateConnectionCredentialsRequest: {
+                    parameters: {authorizationContext: 'sealed-context', code: 'auth-code'},
                     version: 6,
                 },
             })

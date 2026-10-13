@@ -105,6 +105,7 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
 
         return (
             <OAuth2Button
+                authorizationContext={oAuth2AuthorizationParameters.authorizationContext}
                 authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
                 clientId={oAuth2AuthorizationParameters.clientId}
                 componentName={provisionableIntegration.integration!.componentName}
@@ -157,8 +158,12 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
 
     const handleConfigurationChange = (value: number) => selectConfiguration(provisionableIntegration, value);
 
-    const handleCodeSuccess = ({code, code_verifier: codeVerifier}: CodePayloadI) => {
+    const handleCodeSuccess = ({authorizationContext, code, code_verifier: codeVerifier}: CodePayloadI) => {
         setValue('connectionParameters.code', code);
+
+        if (authorizationContext) {
+            setValue('connectionParameters.authorizationContext', authorizationContext);
+        }
 
         if (codeVerifier) {
             setValue('connectionParameters.code_verifier', codeVerifier);

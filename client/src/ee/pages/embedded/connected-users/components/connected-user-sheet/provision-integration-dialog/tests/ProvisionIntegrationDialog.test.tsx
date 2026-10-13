@@ -111,14 +111,22 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () 
 
 vi.mock('@/shared/components/connection/OAuth2Button', () => ({
     default: ({
+        authorizationContext,
         extraQueryParameters,
         onCodeSuccess,
     }: {
+        authorizationContext?: string;
         extraQueryParameters?: Record<string, string>;
-        onCodeSuccess: (payload: {code: string; code_verifier?: string}) => void;
+        onCodeSuccess: (payload: {authorizationContext?: string; code: string; code_verifier?: string}) => void;
     }) => (
         <button
-            onClick={() => onCodeSuccess({code: 'auth-code', code_verifier: extraQueryParameters?.code_verifier})}
+            onClick={() =>
+                onCodeSuccess({
+                    authorizationContext,
+                    code: 'auth-code',
+                    code_verifier: extraQueryParameters?.code_verifier,
+                })
+            }
             type="button"
         >
             Authorize
@@ -314,6 +322,42 @@ describe('ProvisionIntegrationDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Authorize'}));
 
         expect(screen.getByRole('button', {name: 'Provision'})).toBeEnabled();
+    });
+
+    it('submits the authorization code with the sealed authorization context of a PKCE configuration', async () => {
+        const pkceConfiguration = buildConfiguration(3, 'OAUTH2_AUTHORIZATION_CODE_PKCE', false);
+
+        hoisted.getProvisionableIntegrations.mockResolvedValue([
+            {
+                componentVersion: 3,
+                integration: {componentName: 'slack', id: 1, name: 'Slack'},
+                integrationInstanceConfigurations: [
+                    {
+                        ...pkceConfiguration,
+                        oAuth2AuthorizationParameters: {
+                            ...pkceConfiguration.oAuth2AuthorizationParameters,
+                            authorizationContext: 'sealed-context',
+                            extraQueryParameters: {code_challenge: 'challenge-1', code_challenge_method: 'S256'},
+                        },
+                    },
+                ],
+            },
+        ]);
+
+        renderDialog();
+
+        await chooseIntegration();
+
+        await chooseConfiguration('Config 3');
+        await userEvent.click(screen.getByRole('button', {name: 'Authorize'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Provision'}));
+
+        await waitFor(() => expect(hoisted.provisionIntegrationInstance).toHaveBeenCalled());
+
+        expect(
+            hoisted.provisionIntegrationInstance.mock.calls[0][0].provisionIntegrationInstanceRequest
+                .connectionParameters
+        ).toEqual({authorizationContext: 'sealed-context', code: 'auth-code'});
     });
 
     it('submits the authorization code and the PKCE code verifier of a PKCE configuration', async () => {
