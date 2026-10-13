@@ -126,4 +126,33 @@ describe('Settings', () => {
         expect(screen.queryByText('Custom Components')).not.toBeInTheDocument();
         expect(screen.getByText('Users')).toBeInTheDocument();
     });
+    it('names the browser tab after the current settings page', () => {
+        renderSettings([aiNavGroup], '/automation/settings/ai/skills/1056');
+
+        expect(document.title).toBe('Skills');
+    });
+
+    it('names the browser tab after an absolute settings link', () => {
+        renderSettings(
+            [
+                {href: '/automation/settings/workspaces', title: 'Workspaces'},
+                {href: 'workspace-api-keys', title: 'API Keys'},
+            ],
+            '/automation/settings/workspaces'
+        );
+
+        expect(document.title).toBe('Workspaces');
+    });
+
+    it('does not take a link whose name only ends another page name', () => {
+        renderSettings(
+            [
+                {href: 'keys', title: 'Keys'},
+                {href: 'signing-keys', title: 'Signing Keys'},
+            ],
+            '/embedded/settings/signing-keys'
+        );
+
+        expect(document.title).toBe('Signing Keys');
+    });
 });

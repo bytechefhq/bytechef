@@ -5,6 +5,7 @@ import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav
 import SettingsNavGroup, {SettingsNavGroupItemI} from '@/shared/layout/SettingsNavGroup';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {useEffect, useMemo} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 
 export interface SettingsNavItemI {
@@ -12,6 +13,14 @@ export interface SettingsNavItemI {
     items?: SettingsNavItemI[];
     title: string;
 }
+
+const isCurrentHref = (pathname: string, href: string) => {
+    if (href.startsWith('/')) {
+        return pathname === href || pathname.startsWith(`${href}/`);
+    }
+
+    return pathname.endsWith(`/${href}`) || pathname.includes(`/${href}/`);
+};
 
 interface SettingsProps {
     sidebarNavItems: SettingsNavItemI[];
@@ -83,6 +92,21 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         (navItem, index, visibleNavItems) =>
             !isHeading(navItem) || (visibleNavItems[index + 1] !== undefined && !isHeading(visibleNavItems[index + 1]))
     );
+
+    const currentNavItemTitle = useMemo(
+        () =>
+            sidebarNavItems
+                .flatMap((navItem) => navItem.items ?? [navItem])
+                .filter((navItem) => navItem.href && isCurrentHref(location.pathname, navItem.href))
+                .sort((navItem, otherNavItem) => otherNavItem.href!.length - navItem.href!.length)[0]?.title,
+        [location.pathname, sidebarNavItems]
+    );
+
+    useEffect(() => {
+        if (currentNavItemTitle) {
+            document.title = currentNavItemTitle;
+        }
+    }, [currentNavItemTitle]);
 
     return (
         <LayoutContainer
