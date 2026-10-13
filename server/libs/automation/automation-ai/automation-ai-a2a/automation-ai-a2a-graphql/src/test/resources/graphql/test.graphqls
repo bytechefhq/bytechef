@@ -26,3 +26,8 @@ input WorkflowConnectionInput {
     workflowConnectionKey: String!
     workflowNodeName: String!
 }
+
+type ProjectWorkflow {
+    id: ID!
+    workflowId: String!
+}

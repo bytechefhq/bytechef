@@ -32,12 +32,14 @@ import com.bytechef.automation.ai.a2a.web.graphql.config.AutomationA2aGraphQlCon
 import com.bytechef.automation.ai.a2a.web.graphql.config.AutomationA2aGraphQlTestConfiguration;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.WorkflowConnectionDTO;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -288,6 +290,26 @@ class A2aProjectGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(a2aProjectFacade).deleteA2aProject(11L);
+    }
+
+    @Test
+    void testA2aEligibleProjectVersionWorkflows() {
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(42L, 3, "workflow-a", UUID.randomUUID());
+
+        when(a2aProjectFacade.getA2aEligibleProjectVersionWorkflows(42L, 3)).thenReturn(List.of(projectWorkflow));
+
+        graphQlTester
+            .document("""
+                query {
+                    a2aEligibleProjectVersionWorkflows(projectId: "42", projectVersion: 3) {
+                        workflowId
+                    }
+                }
+                """)
+            .execute()
+            .path("a2aEligibleProjectVersionWorkflows[0].workflowId")
+            .entity(String.class)
+            .isEqualTo("workflow-a");
     }
 
     @Test
