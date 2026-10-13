@@ -9,8 +9,8 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ServerWorkflowsDialogContent from '@/shared/components/server-workflows-dialog/ServerWorkflowsDialogContent';
 import {
     A2aServer,
+    useA2aEligibleProjectVersionWorkflowsQuery,
     useCreateA2aProjectMutation,
-    useToolEligibleProjectVersionWorkflowsQuery,
     useUpdateA2aProjectMutation,
 } from '@/shared/middleware/graphql';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -48,7 +48,7 @@ const A2aServerWorkflowDialog = ({a2aProject, a2aServer, onOpenChange, open}: A2
         includeAllFields: false,
     });
 
-    const {data: eligibleWorkflowsData} = useToolEligibleProjectVersionWorkflowsQuery(
+    const {data: eligibleWorkflowsData} = useA2aEligibleProjectVersionWorkflowsQuery(
         {
             projectId: String(currentProjectId || 0),
             projectVersion: currentProjectVersion || 0,
@@ -75,7 +75,7 @@ const A2aServerWorkflowDialog = ({a2aProject, a2aServer, onOpenChange, open}: A2
 
     const eligibleWorkflowIds = useMemo(
         () =>
-            eligibleWorkflowsData?.toolEligibleProjectVersionWorkflows.map(
+            eligibleWorkflowsData?.a2aEligibleProjectVersionWorkflows.map(
                 (projectWorkflow) => projectWorkflow.workflow.id
             ),
         [eligibleWorkflowsData]
@@ -264,7 +264,7 @@ const A2aServerWorkflowDialog = ({a2aProject, a2aServer, onOpenChange, open}: A2
                 icon={<NetworkIcon />}
                 isEditMode={isEditMode}
                 isSubmitPending={createA2aProjectMutation.isPending || updateA2aProjectMutation.isPending}
-                noEligibleWorkflowsMessage="No tool-eligible workflows found for this project version. Only workflows with a New Workflow Call trigger can be exposed as A2A skills."
+                noEligibleWorkflowsMessage="No A2A-eligible workflows found for this project version. Only workflows with a New Workflow Call trigger that requires no input other than message can be exposed as A2A skills."
                 onComplete={handleComplete}
                 selectedWorkflowIds={selectedWorkflowIds}
                 title={isEditMode ? 'Edit Skills' : 'Add Workflows'}
