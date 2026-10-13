@@ -17,10 +17,10 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
-    useCreateA2aProjectMutation: () => ({mutate: hoisted.createMutate}),
-    useToolEligibleProjectVersionWorkflowsQuery: (_variables: unknown, options?: {enabled?: boolean}) => ({
-        data: options?.enabled ? {toolEligibleProjectVersionWorkflows: hoisted.eligibleWorkflows} : undefined,
+    useA2aEligibleProjectVersionWorkflowsQuery: (_variables: unknown, options?: {enabled?: boolean}) => ({
+        data: options?.enabled ? {a2aEligibleProjectVersionWorkflows: hoisted.eligibleWorkflows} : undefined,
     }),
+    useCreateA2aProjectMutation: () => ({mutate: hoisted.createMutate}),
     useUpdateA2aProjectMutation: () => ({mutate: hoisted.updateMutate}),
 }));
 
@@ -250,7 +250,7 @@ describe('A2aServerWorkflowDialog', () => {
 
         await selectProjectVersion(user);
 
-        expect(screen.getByText(/No tool-eligible workflows found for this project version/)).toBeInTheDocument();
+        expect(screen.getByText(/No A2A-eligible workflows found for this project version/)).toBeInTheDocument();
         expect(screen.queryByRole('switch')).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Add'})).toBeDisabled();
     });
