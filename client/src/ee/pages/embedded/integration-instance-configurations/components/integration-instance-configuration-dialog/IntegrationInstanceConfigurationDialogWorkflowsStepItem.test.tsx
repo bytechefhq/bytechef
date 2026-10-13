@@ -1,3 +1,4 @@
+import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -107,6 +108,37 @@ const QueryWrapper = ({children}: {children: ReactNode}) => {
     const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
 
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+};
+
+const ToggleTestForm = ({
+    enabled,
+    onEnabledChange,
+}: {
+    enabled?: boolean;
+    onEnabledChange?: (enabled: boolean) => void;
+}) => {
+    const {control, formState, setValue} = useForm<IntegrationInstanceConfiguration>({
+        defaultValues: {
+            integrationInstanceConfigurationWorkflows: [
+                {connections: [], enabled: false, inputs: {}},
+            ] as IntegrationInstanceConfiguration['integrationInstanceConfigurationWorkflows'],
+        },
+    });
+
+    return (
+        <IntegrationInstanceConfigurationDialogWorkflowsStepItem
+            componentName="someApp"
+            control={control}
+            enabled={enabled}
+            formState={formState}
+            label="Sync contacts"
+            onEnabledChange={onEnabledChange}
+            setValue={setValue}
+            showWorkflowToggle
+            workflow={workflow}
+            workflowIndex={0}
+        />
+    );
 };
 
 const TestForm = ({componentName = 'someApp'}: {componentName?: string}) => {
@@ -219,5 +251,41 @@ describe('IntegrationInstanceConfigurationDialogWorkflowsStepItem', () => {
 
         expect(screen.queryByText('Channel')).not.toBeInTheDocument();
         expect(screen.queryByText('Legacy')).not.toBeInTheDocument();
+    });
+
+    it('stores the toggle in the form and the workflows enabled store without an enabled handler', async () => {
+        useWorkflowsEnabledStore.getState().reset();
+
+        render(
+            <QueryWrapper>
+                <ToggleTestForm />
+            </QueryWrapper>
+        );
+
+        expect(screen.queryByRole('tab', {name: /Inputs/})).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('switch', {name: 'Sync contacts'}));
+
+        expect(useWorkflowsEnabledStore.getState().workflowEnabledMap.get('wf1')).toBe(true);
+        expect(screen.getByRole('tab', {name: /Inputs/})).toBeInTheDocument();
+    });
+
+    it('hands the toggle to the enabled handler and follows the enabled prop', async () => {
+        const onEnabledChange = vi.fn();
+
+        useWorkflowsEnabledStore.getState().reset();
+
+        render(
+            <QueryWrapper>
+                <ToggleTestForm enabled onEnabledChange={onEnabledChange} />
+            </QueryWrapper>
+        );
+
+        expect(screen.getByRole('tab', {name: /Inputs/})).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('switch', {name: 'Sync contacts'}));
+
+        expect(onEnabledChange).toHaveBeenCalledWith(false);
+        expect(useWorkflowsEnabledStore.getState().workflowEnabledMap.get('wf1')).toBeUndefined();
     });
 });
