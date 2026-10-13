@@ -236,6 +236,8 @@ bytechef:
 #        clientId: 123456789
 #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
+    discovery:
+      allowed-hosts: []
   observability:
     logging:
       aws:

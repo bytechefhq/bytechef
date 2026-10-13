@@ -4538,10 +4538,16 @@ public class ApplicationProperties {
          */
         private String redirectUri;
 
+        private Discovery discovery = new Discovery();
+
         private ResourceServer resourceServer = new ResourceServer();
 
         public AuthorizationServer getAuthorizationServer() {
             return authorizationServer;
+        }
+
+        public Discovery getDiscovery() {
+            return discovery;
         }
 
         public Map<String, OAuth2App> getPredefinedApps() {
@@ -4558,6 +4564,10 @@ public class ApplicationProperties {
 
         public void setAuthorizationServer(AuthorizationServer authorizationServer) {
             this.authorizationServer = authorizationServer;
+        }
+
+        public void setDiscovery(Discovery discovery) {
+            this.discovery = discovery;
         }
 
         public void setResourceServer(ResourceServer resourceServer) {
@@ -4589,6 +4599,19 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+        }
+
+        public static class Discovery {
+
+            private List<String> allowedHosts;
+
+            public List<String> getAllowedHosts() {
+                return allowedHosts;
+            }
+
+            public void setAllowedHosts(List<String> allowedHosts) {
+                this.allowedHosts = allowedHosts;
             }
         }
 
