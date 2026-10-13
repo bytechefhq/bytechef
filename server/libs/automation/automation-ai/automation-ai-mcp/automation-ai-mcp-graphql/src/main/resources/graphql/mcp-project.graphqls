@@ -29,8 +29,10 @@ input CreateMcpProjectInput {
     projectId: ID!
     projectVersion: Int!
     selectedWorkflowIds: [String!]!
+    workflowConfigurations: [WorkflowConfigurationInput!]
 }
 
 input UpdateMcpProjectInput {
     selectedWorkflowIds: [String!]!
+    workflowConfigurations: [WorkflowConfigurationInput!]
 }

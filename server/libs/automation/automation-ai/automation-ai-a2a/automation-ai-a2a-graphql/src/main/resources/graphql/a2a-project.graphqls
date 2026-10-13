@@ -24,8 +24,10 @@ input CreateA2aProjectInput {
     projectId: ID!
     projectVersion: Int!
     selectedWorkflowIds: [String!]!
+    workflowConfigurations: [WorkflowConfigurationInput!]
 }
 
 input UpdateA2aProjectInput {
     selectedWorkflowIds: [String!]!
+    workflowConfigurations: [WorkflowConfigurationInput!]
 }

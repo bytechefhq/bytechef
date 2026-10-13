@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.a2a.facade;
 
 import com.bytechef.automation.ai.a2a.domain.A2aProject;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
 import java.util.List;
 
 /**
@@ -26,7 +27,14 @@ public interface A2aProjectFacade {
 
     A2aProject createA2aProject(long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds);
 
+    A2aProject createA2aProject(
+        long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
+        List<WorkflowConfigurationDTO> workflowConfigurations);
+
     void deleteA2aProject(long a2aProjectId);
 
     A2aProject updateA2aProject(long a2aProjectId, List<String> selectedWorkflowIds);
+
+    A2aProject updateA2aProject(
+        long a2aProjectId, List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations);
 }

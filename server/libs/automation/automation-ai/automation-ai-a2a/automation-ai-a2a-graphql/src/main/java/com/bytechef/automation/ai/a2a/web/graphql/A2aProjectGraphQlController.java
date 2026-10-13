@@ -26,6 +26,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,12 +79,13 @@ public class A2aProjectGraphQlController {
     @MutationMapping
     public A2aProject createA2aProject(@Argument CreateA2aProjectInput input) {
         return a2aProjectFacade.createA2aProject(
-            input.a2aServerId(), input.projectId(), input.projectVersion(), input.selectedWorkflowIds());
+            input.a2aServerId(), input.projectId(), input.projectVersion(), input.selectedWorkflowIds(),
+            input.workflowConfigurations());
     }
 
     @MutationMapping
     public A2aProject updateA2aProject(@Argument long id, @Argument UpdateA2aProjectInput input) {
-        return a2aProjectFacade.updateA2aProject(id, input.selectedWorkflowIds());
+        return a2aProjectFacade.updateA2aProject(id, input.selectedWorkflowIds(), input.workflowConfigurations());
     }
 
     @MutationMapping
@@ -135,10 +137,20 @@ public class A2aProjectGraphQlController {
 
     @SuppressFBWarnings("EI")
     public record CreateA2aProjectInput(
-        long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
+        long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
+        List<WorkflowConfigurationDTO> workflowConfigurations) {
+
+        public CreateA2aProjectInput {
+            workflowConfigurations = workflowConfigurations == null ? List.of() : workflowConfigurations;
+        }
     }
 
     @SuppressFBWarnings("EI")
-    public record UpdateA2aProjectInput(List<String> selectedWorkflowIds) {
+    public record UpdateA2aProjectInput(
+        List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations) {
+
+        public UpdateA2aProjectInput {
+            workflowConfigurations = workflowConfigurations == null ? List.of() : workflowConfigurations;
+        }
     }
 }

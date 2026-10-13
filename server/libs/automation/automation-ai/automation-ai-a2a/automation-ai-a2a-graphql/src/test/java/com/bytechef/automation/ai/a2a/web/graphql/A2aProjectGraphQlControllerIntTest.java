@@ -17,6 +17,8 @@
 package com.bytechef.automation.ai.a2a.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -32,7 +34,10 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.WorkflowConnectionDTO;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -224,7 +229,7 @@ class A2aProjectGraphQlControllerIntTest {
 
     @Test
     void testCreateA2aProjectDelegatesToTheFacade() {
-        when(a2aProjectFacade.createA2aProject(7L, 42L, 3, List.of("wf-1")))
+        when(a2aProjectFacade.createA2aProject(7L, 42L, 3, List.of("wf-1"), List.of()))
             .thenReturn(createA2aProject(11L, 100L, 7L));
 
         graphQlTester
@@ -245,12 +250,12 @@ class A2aProjectGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("11");
 
-        verify(a2aProjectFacade).createA2aProject(7L, 42L, 3, List.of("wf-1"));
+        verify(a2aProjectFacade).createA2aProject(7L, 42L, 3, List.of("wf-1"), List.of());
     }
 
     @Test
     void testUpdateA2aProjectDelegatesToTheFacade() {
-        when(a2aProjectFacade.updateA2aProject(11L, List.of("wf-1", "wf-2")))
+        when(a2aProjectFacade.updateA2aProject(11L, List.of("wf-1", "wf-2"), List.of()))
             .thenReturn(createA2aProject(11L, 100L, 7L));
 
         graphQlTester
@@ -266,7 +271,7 @@ class A2aProjectGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("11");
 
-        verify(a2aProjectFacade).updateA2aProject(11L, List.of("wf-1", "wf-2"));
+        verify(a2aProjectFacade).updateA2aProject(11L, List.of("wf-1", "wf-2"), List.of());
     }
 
     @Test
@@ -283,6 +288,39 @@ class A2aProjectGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(a2aProjectFacade).deleteA2aProject(11L);
+    }
+
+    @Test
+    void testUpdateA2aProjectWithWorkflowConfigurations() {
+        when(a2aProjectFacade.updateA2aProject(eq(11L), eq(List.of("wf-1")), any()))
+            .thenReturn(createA2aProject(11L, 100L, 7L));
+
+        graphQlTester
+            .document(
+                """
+                    mutation {
+                        updateA2aProject(id: "11", input: {
+                            selectedWorkflowIds: ["wf-1"],
+                            workflowConfigurations: [{
+                                workflowId: "wf-1",
+                                connections: [{connectionId: "5", workflowConnectionKey: "slack", workflowNodeName: "slack_1"}],
+                                inputs: {limit: 10}
+                            }]
+                        }) {
+                            id
+                        }
+                    }
+                    """)
+            .execute()
+            .path("updateA2aProject.id")
+            .entity(String.class)
+            .isEqualTo("11");
+
+        verify(a2aProjectFacade).updateA2aProject(
+            11L, List.of("wf-1"),
+            List.of(
+                new WorkflowConfigurationDTO(
+                    "wf-1", List.of(new WorkflowConnectionDTO(5L, "slack", "slack_1")), Map.of("limit", 10))));
     }
 
     private static A2aProject createA2aProject(long id, long projectDeploymentId, long a2aServerId) {

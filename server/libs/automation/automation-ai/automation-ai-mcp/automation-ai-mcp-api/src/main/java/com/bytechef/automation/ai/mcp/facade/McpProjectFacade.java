@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.mcp.facade;
 
 import com.bytechef.automation.ai.mcp.domain.McpProject;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
 import java.util.List;
 
 /**
@@ -38,6 +39,10 @@ public interface McpProjectFacade {
     McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds);
 
+    McpProject createMcpProject(
+        long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
+        List<WorkflowConfigurationDTO> workflowConfigurations);
+
     /**
      * Deletes an MCP project identified by its unique ID.
      *
@@ -54,6 +59,9 @@ public interface McpProjectFacade {
      * @return the updated MCP project
      */
     McpProject updateMcpProject(long mcpProjectId, List<String> selectedWorkflowIds);
+
+    McpProject updateMcpProject(
+        long mcpProjectId, List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations);
 
     McpProject cloneMcpProject(long mcpProjectId, long targetMcpServerId);
 }
