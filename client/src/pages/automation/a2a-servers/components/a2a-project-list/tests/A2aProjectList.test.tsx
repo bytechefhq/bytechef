@@ -14,6 +14,7 @@ const hoisted = vi.hoisted(() => ({
     isLoading: false,
     updateEnabledMutate: vi.fn(),
     updateMutate: vi.fn(),
+    updateParametersMutate: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -67,6 +68,10 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         isPending: false,
         mutate: hoisted.updateEnabledMutate,
     }),
+    useUpdateA2aProjectWorkflowParametersMutation: () => ({
+        isPending: false,
+        mutate: hoisted.updateParametersMutate,
+    }),
 }));
 
 vi.mock('@tanstack/react-query', async (importOriginal) => ({
@@ -113,6 +118,12 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
     }) => <div>{`Changing version of deployment ${projectDeployment.id} for ${filterWorkflowUuids.join(',')}`}</div>,
 }));
 
+vi.mock('../A2aProjectWorkflowEditDialog', () => ({
+    default: ({a2aProject, workflowId}: {a2aProject: A2aProjectItemType; workflowId: string}) => (
+        <div>{`Editing workflow ${workflowId} of A2A project ${a2aProject.id}`}</div>
+    ),
+}));
+
 vi.mock('../../A2aServerWorkflowDialog', () => ({
     default: ({a2aProject, open}: {a2aProject?: A2aProjectItemType; open: boolean}) =>
         open ? <div>{`Editing skills of A2A project ${a2aProject?.id}`}</div> : null,
@@ -148,6 +159,7 @@ describe('A2aProjectList', () => {
     beforeEach(() => {
         hoisted.a2aProjects = [salesA2aProject, null, supportA2aProject];
         hoisted.deleteMutate.mockReset();
+        hoisted.updateParametersMutate.mockReset();
         hoisted.invalidateQueries.mockReset();
         hoisted.isError = false;
         hoisted.isLoading = false;
@@ -308,7 +320,7 @@ describe('A2aProjectList', () => {
         expect(hoisted.updateEnabledMutate).toHaveBeenCalledWith({enabled: true, id: '22'});
     });
 
-    it('edits a workflow from its actions menu', async () => {
+    it('edits only the chosen workflow from its actions menu', async () => {
         const user = userEvent.setup();
 
         render(<A2aProjectList a2aServer={a2aServer} />);
@@ -317,6 +329,35 @@ describe('A2aProjectList', () => {
         await user.click(screen.getByRole('button', {name: 'Lead intake actions'}));
         await user.click(await screen.findByRole('menuitem', {name: 'Edit'}));
 
-        expect(await screen.findByText('Editing skills of A2A project 11')).toBeInTheDocument();
+        expect(await screen.findByText('Editing workflow workflow-a of A2A project 11')).toBeInTheDocument();
+        expect(screen.queryByText('Editing skills of A2A project 11')).not.toBeInTheDocument();
+    });
+
+    it('configures the skill of a workflow from the Configure button before its toggle', async () => {
+        const user = userEvent.setup();
+
+        render(<A2aProjectList a2aServer={a2aServer} />);
+
+        await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
+
+        const configureButton = screen.getByRole('button', {name: 'Configure Lead intake'});
+
+        expect(
+            configureButton.compareDocumentPosition(screen.getByRole('switch', {name: 'Enable Lead intake'})) &
+                Node.DOCUMENT_POSITION_FOLLOWING
+        ).toBeTruthy();
+
+        await user.click(configureButton);
+
+        expect(await screen.findByText('Edit Lead intake Skill')).toBeInTheDocument();
+        expect(screen.getByLabelText('Skill Name')).toHaveValue('Qualify lead');
+
+        await user.type(screen.getByLabelText('Skill Description'), 'Qualifies inbound leads');
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.updateParametersMutate).toHaveBeenCalledWith({
+            id: '21',
+            input: {skillDescription: 'Qualifies inbound leads', skillName: 'Qualify lead'},
+        });
     });
 });

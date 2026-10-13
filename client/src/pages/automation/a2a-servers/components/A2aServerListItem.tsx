@@ -187,7 +187,7 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                 <Tabs onValueChange={setActiveTab} value={activeTab}>
                     <div className="flex items-center justify-between">
                         <TabsList>
-                            <TabsTrigger value="projects">Workflows</TabsTrigger>
+                            <TabsTrigger value="projects">Workflow Skills</TabsTrigger>
 
                             <TabsTrigger value="connect">Connect</TabsTrigger>
                         </TabsList>

@@ -21,7 +21,6 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
-import A2aServerSkillsEditor from './A2aServerSkillsEditor';
 import {A2aProjectItemType} from './a2a-project-list/hooks/useA2aProjectList';
 
 const formSchema = z.object({
@@ -281,9 +280,6 @@ const A2aServerWorkflowDialog = ({a2aProject, a2aServer, onOpenChange, open}: A2
                             workflows={workflows}
                         />
                     )
-                }
-                workflowsStepFooter={
-                    isEditMode && a2aProject ? <A2aServerSkillsEditor a2aProjectId={a2aProject.id} /> : undefined
                 }
             />
         </Dialog>

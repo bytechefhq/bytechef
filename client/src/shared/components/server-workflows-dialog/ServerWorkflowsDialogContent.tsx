@@ -31,7 +31,6 @@ interface ServerWorkflowsDialogContentProps {
     validateBasicStep: () => boolean | Promise<boolean>;
     workflowCount?: number;
     workflowsList: ReactNode;
-    workflowsStepFooter?: ReactNode;
 }
 
 interface ServerWorkflowsDialogStepContentProps {
@@ -62,7 +61,6 @@ const ServerWorkflowsDialogContent = ({
     validateBasicStep,
     workflowCount,
     workflowsList,
-    workflowsStepFooter,
 }: ServerWorkflowsDialogContentProps) => {
     const steps = useMemo<DialogStepI[]>(
         () => [
@@ -92,11 +90,9 @@ const ServerWorkflowsDialogContent = ({
                 ) : (
                     workflowsList
                 )}
-
-                {workflowsStepFooter}
             </div>
         );
-    }, [noEligibleWorkflowsMessage, workflowCount, workflowsList, workflowsStepFooter]);
+    }, [noEligibleWorkflowsMessage, workflowCount, workflowsList]);
 
     const validateStep = (step: DialogStepI) => (step.id === 'basic' ? validateBasicStep() : true);
 
