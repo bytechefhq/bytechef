@@ -34,6 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
 import com.bytechef.component.ai.llm.advisor.JsonSchemaValidationAdvisor;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
@@ -74,6 +75,7 @@ import org.springframework.ai.chat.client.DefaultChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -114,6 +116,44 @@ class AbstractAiAgentChatActionTest {
 
     @Mock
     private ToolCallingManager toolCallingManager;
+
+    @Test
+    void testChatMemoryToolExecutionNotifiesToolExecutionListener() {
+        ToolCallback conversationSearchToolCallback = new ToolCallback() {
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return DefaultToolDefinition.builder()
+                    .name("conversation_search")
+                    .description("Search the conversation")
+                    .inputSchema("{}")
+                    .build();
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return "[{\"text\":\"My dog is called Pixel.\"}]";
+            }
+        };
+
+        ChatMemoryFunction.Result chatMemoryResult = new ChatMemoryFunction.Result(
+            mock(BaseAdvisor.class), conversationId -> List.of(), List.of(conversationSearchToolCallback), false);
+        List<ToolExecutionEvent> toolExecutionEvents = new ArrayList<>();
+
+        List<ToolCallback> toolCallbacks = AbstractAiAgentChatAction.concatToolCallbacks(
+            List.of(), Optional.of(chatMemoryResult), toolExecutionEvents::add, mock(ActionContext.class));
+
+        ToolCallback toolCallback = toolCallbacks.getFirst();
+
+        toolCallback.call("{\"query\":\"Pixel\"}");
+
+        assertThat(toolExecutionEvents)
+            .singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.toolName()).isEqualTo("conversation_search");
+                assertThat(toolExecutionEvent.inputs()).containsEntry("query", "Pixel");
+            });
+    }
 
     @Test
     void testGetChatClientRequestSpecWithNullParameterValues() throws Exception {
