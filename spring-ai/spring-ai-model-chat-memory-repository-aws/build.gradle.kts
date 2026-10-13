@@ -8,6 +8,7 @@ version = "1.0"
 
 dependencies {
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${libs.findVersion("spring-cloud-aws").get()}"))
+    implementation(platform("software.amazon.awssdk:bom:${libs.findVersion("aws-sdk").get()}"))
     implementation(platform("org.springframework.ai:spring-ai-bom:${libs.findVersion("spring-ai").get()}"))
 
     compileOnly("org.jspecify:jspecify")
