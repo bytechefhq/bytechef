@@ -1,6 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import JsonView from '@/shared/components/JsonView';
+import JsonView, {useJsonViewLoaded} from '@/shared/components/JsonView';
 import {
     type EditorJobFileLogsQuery,
     type JobFileLogsQuery,
@@ -149,15 +149,6 @@ const LogEntryMessage = ({collapsed, message}: {collapsed?: boolean; message: st
             <div className="min-w-0 flex-1 wrap-anywhere">
                 <JsonView
                     collapsed={false}
-                    fallback={
-                        collapsed ? (
-                            <span className="font-mono text-sm text-muted-foreground">
-                                {Array.isArray(parsedJson) ? '[…]' : '{…}'}
-                            </span>
-                        ) : (
-                            <span className="text-sm">{message}</span>
-                        )
-                    }
                     name={false}
                     shouldCollapse={collapsed ? (field) => field.src === parsedJson : undefined}
                     src={parsedJson}
@@ -290,6 +281,8 @@ const WorkflowExecutionLogsContent = ({
         }
     );
 
+    const jsonViewLoaded = useJsonViewLoaded();
+
     const {error, isLoading, logsData} = selectLogsQuery({
         editorQuery,
         isEditorEnvironment,
@@ -329,7 +322,7 @@ const WorkflowExecutionLogsContent = ({
         );
     };
 
-    if (isLoading) {
+    if (isLoading || !jsonViewLoaded) {
         return (
             <div className="flex items-center justify-center p-4">
                 <span className="text-sm text-muted-foreground">Loading logs...</span>

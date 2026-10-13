@@ -1,14 +1,15 @@
 import {fireEvent, render, screen, within} from '@testing-library/react';
-import {type ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionLogsContent from '../WorkflowExecutionLogsContent';
 
-const {editorJobFileLogsQueryMock, jobFileLogsQueryMock, triggerExecutionFileLogsQueryMock} = vi.hoisted(() => ({
-    editorJobFileLogsQueryMock: vi.fn(),
-    jobFileLogsQueryMock: vi.fn(),
-    triggerExecutionFileLogsQueryMock: vi.fn(),
-}));
+const {editorJobFileLogsQueryMock, jobFileLogsQueryMock, jsonViewLoadedMock, triggerExecutionFileLogsQueryMock} =
+    vi.hoisted(() => ({
+        editorJobFileLogsQueryMock: vi.fn(),
+        jobFileLogsQueryMock: vi.fn(),
+        jsonViewLoadedMock: vi.fn(),
+        triggerExecutionFileLogsQueryMock: vi.fn(),
+    }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     LogLevel: {
@@ -26,12 +27,10 @@ vi.mock('@/shared/middleware/graphql', () => ({
 vi.mock('@/shared/components/JsonView', () => ({
     default: ({
         collapsed,
-        fallback,
         shouldCollapse,
         src,
     }: {
         collapsed?: boolean | number;
-        fallback?: ReactNode;
         shouldCollapse?: (field: {src: object}) => boolean;
         src: object;
     }) => (
@@ -40,10 +39,9 @@ vi.mock('@/shared/components/JsonView', () => ({
             data-nested-collapsed={String(!!shouldCollapse?.({src: {}}))}
             data-root-collapsed={String(!!shouldCollapse?.({src}))}
             data-testid="json-view"
-        >
-            <div data-testid="json-view-fallback">{fallback}</div>
-        </div>
+        />
     ),
+    useJsonViewLoaded: jsonViewLoadedMock,
 }));
 
 const idleQuery = {data: undefined, error: undefined, isLoading: false};
@@ -76,6 +74,7 @@ describe('WorkflowExecutionLogsContent', () => {
         editorJobFileLogsQueryMock.mockReturnValue(idleQuery);
         jobFileLogsQueryMock.mockReturnValue(idleQuery);
         triggerExecutionFileLogsQueryMock.mockReturnValue(idleQuery);
+        jsonViewLoadedMock.mockReturnValue(true);
     });
 
     it('reads the trigger execution logs when the trigger item is selected', () => {
@@ -187,7 +186,8 @@ describe('WorkflowExecutionLogsContent', () => {
         expect(jsonView()).toHaveAttribute('data-nested-collapsed', 'false');
     });
 
-    it('keeps a collapsed entry collapsed while the JSON viewer is still loading', () => {
+    it('keeps showing the loading state until the JSON viewer has loaded, so rows render at their final height', () => {
+        jsonViewLoadedMock.mockReturnValue(false);
         jobFileLogsQueryMock.mockReturnValue({
             data: {jobFileLogs: {content: [logEntry('INFO', '{"toolName":"TodoWrite"}')]}},
             error: undefined,
@@ -196,14 +196,8 @@ describe('WorkflowExecutionLogsContent', () => {
 
         render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" />);
 
-        const fallback = () => screen.getByTestId('json-view-fallback');
-
-        expect(fallback()).toHaveTextContent('{…}');
-        expect(fallback()).not.toHaveTextContent('TodoWrite');
-
-        fireEvent.click(screen.getByRole('button', {name: 'Expand all'}));
-
-        expect(fallback()).toHaveTextContent('{"toolName":"TodoWrite"}');
+        expect(screen.getByText('Loading logs...')).toBeInTheDocument();
+        expect(screen.queryByTestId('json-view')).not.toBeInTheDocument();
     });
 
     it('shows the expand toggle as a single button that switches between expand and collapse', () => {
