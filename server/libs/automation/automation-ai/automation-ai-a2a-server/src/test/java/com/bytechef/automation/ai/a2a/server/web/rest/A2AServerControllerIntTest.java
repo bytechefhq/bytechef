@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bytechef.automation.ai.a2a.server.facade.AutomationA2AServerFacade;
+import com.bytechef.automation.ai.a2a.server.executor.A2AAgentExecutorImpl;
 import com.bytechef.automation.ai.a2a.server.web.rest.config.AutomationA2AServerRestTestConfiguration;
 import com.bytechef.platform.ai.a2a.A2AAgentDescriptor;
 import com.bytechef.platform.ai.a2a.A2AAgentDescriptor.A2ASkill;
@@ -80,7 +80,7 @@ class A2AServerControllerIntTest {
     private static final A2ATaskReference TASK_REFERENCE = new A2ATaskReference("durable-task", "durable-context");
 
     @MockitoBean
-    private AutomationA2AServerFacade automationA2AServerFacade;
+    private A2AAgentExecutorImpl a2aAgentExecutor;
 
     @Autowired
     private MockMvc mockMvc;
@@ -90,7 +90,7 @@ class A2AServerControllerIntTest {
 
     @Test
     void testStreamMessageIsHandedToTheProtocolHandler() throws Exception {
-        when(automationA2AServerFacade.start(any(A2AAgentRequest.class)))
+        when(a2aAgentExecutor.start(any(A2AAgentRequest.class)))
             .thenReturn(A2AAgentRun.started(TASK_REFERENCE, new CompletableFuture<>()));
 
         performStream();
@@ -102,7 +102,7 @@ class A2AServerControllerIntTest {
     void testStreamWritesTheWorkingAndTheFinalEventAsServerSentEvents() throws Exception {
         CompletableFuture<A2AAgentResult> result = new CompletableFuture<>();
 
-        when(automationA2AServerFacade.start(any(A2AAgentRequest.class)))
+        when(a2aAgentExecutor.start(any(A2AAgentRequest.class)))
             .thenReturn(A2AAgentRun.started(TASK_REFERENCE, result));
 
         MvcResult mvcResult = performStream();
@@ -125,7 +125,7 @@ class A2AServerControllerIntTest {
     void testStreamWritesNothingAfterTheClientDisconnects() throws Exception {
         CompletableFuture<A2AAgentResult> result = new CompletableFuture<>();
 
-        when(automationA2AServerFacade.start(any(A2AAgentRequest.class)))
+        when(a2aAgentExecutor.start(any(A2AAgentRequest.class)))
             .thenReturn(A2AAgentRun.started(TASK_REFERENCE, result));
 
         MvcResult mvcResult = performStream();
@@ -155,8 +155,8 @@ class A2AServerControllerIntTest {
 
         verify(protocolHandler).handleGetTask(SECRET_KEY, "r1", "t1");
         verify(protocolHandler).handleCancelTask(SECRET_KEY, "r2", "t2");
-        verify(automationA2AServerFacade).pollTask(SECRET_KEY, "t1");
-        verify(automationA2AServerFacade).pollTask(SECRET_KEY, "t2");
+        verify(a2aAgentExecutor).pollTask(SECRET_KEY, "t1");
+        verify(a2aAgentExecutor).pollTask(SECRET_KEY, "t2");
     }
 
     @Nested
@@ -182,7 +182,7 @@ class A2AServerControllerIntTest {
                 }
             }
 
-            verifyNoInteractions(protocolHandler, automationA2AServerFacade);
+            verifyNoInteractions(protocolHandler, a2aAgentExecutor);
         }
 
         @Test
@@ -200,7 +200,7 @@ class A2AServerControllerIntTest {
                 }
             }
 
-            verifyNoInteractions(protocolHandler, automationA2AServerFacade);
+            verifyNoInteractions(protocolHandler, a2aAgentExecutor);
         }
 
         @Test
@@ -241,7 +241,7 @@ class A2AServerControllerIntTest {
                     .isEqualTo(-32600);
         }
 
-        verifyNoInteractions(protocolHandler, automationA2AServerFacade);
+        verifyNoInteractions(protocolHandler, a2aAgentExecutor);
     }
 
     @Test
@@ -260,7 +260,7 @@ class A2AServerControllerIntTest {
                 .isFalse();
         }
 
-        verifyNoInteractions(protocolHandler, automationA2AServerFacade);
+        verifyNoInteractions(protocolHandler, a2aAgentExecutor);
     }
 
     @Test
@@ -271,12 +271,12 @@ class A2AServerControllerIntTest {
             .asInt()).isEqualTo(-32602);
         assertThat(body.get("id")
             .asText()).isEqualTo("r3");
-        verifyNoInteractions(automationA2AServerFacade);
+        verifyNoInteractions(a2aAgentExecutor);
     }
 
     @Test
     void testSendMessageReturnsTheSerializedTaskOverTheWire() throws Exception {
-        when(automationA2AServerFacade.start(any(A2AAgentRequest.class)))
+        when(a2aAgentExecutor.start(any(A2AAgentRequest.class)))
             .thenReturn(A2AAgentRun.of(A2AAgentResult.ofInputRequired("approve at the link", TASK_REFERENCE)));
 
         JsonNode body = performJsonRpc(jsonRpcRequest(7, "message/send", MESSAGE_PARAMS));
@@ -301,7 +301,7 @@ class A2AServerControllerIntTest {
 
     @Test
     void testUnknownTaskIsATaskNotFoundErrorOverTheWire() throws Exception {
-        when(automationA2AServerFacade.pollTask(SECRET_KEY, "missing")).thenReturn(null);
+        when(a2aAgentExecutor.pollTask(SECRET_KEY, "missing")).thenReturn(null);
 
         JsonNode body = performJsonRpc(jsonRpcRequest(9, "tasks/get", "{\"id\": \"missing\"}"));
 
@@ -309,12 +309,12 @@ class A2AServerControllerIntTest {
             .asInt()).isEqualTo(9);
         assertThat(body.at("/error/code")
             .asInt()).isEqualTo(-32001);
-        verify(automationA2AServerFacade).pollTask(SECRET_KEY, "missing");
+        verify(a2aAgentExecutor).pollTask(SECRET_KEY, "missing");
     }
 
     @Test
     void testAgentCardSerializesARealCard() throws Exception {
-        stubAgentDescriptor(automationA2AServerFacade);
+        stubAgentDescriptor(a2aAgentExecutor);
 
         JsonNode agentCard = getAgentCard(mockMvc);
 
@@ -330,11 +330,11 @@ class A2AServerControllerIntTest {
 
     @Test
     void testAgentCardUrlFallsBackToTheRequestUrlWithoutAPublicUrl() throws Exception {
-        stubAgentDescriptor(automationA2AServerFacade);
+        stubAgentDescriptor(a2aAgentExecutor);
 
         getAgentCard(mockMvc);
 
-        verify(automationA2AServerFacade).getAgentDescriptor(
+        verify(a2aAgentExecutor).getAgentDescriptor(
             SECRET_KEY, "http://localhost/api/automation/a2a/server-secret");
     }
 
@@ -346,17 +346,17 @@ class A2AServerControllerIntTest {
         private MockMvc publicUrlMockMvc;
 
         @Autowired
-        private AutomationA2AServerFacade publicUrlAutomationA2AServerFacade;
+        private A2AAgentExecutorImpl publicUrlA2AAgentExecutor;
 
         @Test
         void testAgentCardAdvertisesThePublicUrl() throws Exception {
-            stubAgentDescriptor(publicUrlAutomationA2AServerFacade);
+            stubAgentDescriptor(publicUrlA2AAgentExecutor);
 
             JsonNode agentCard = getAgentCard(publicUrlMockMvc);
 
             assertThat(agentCard.get("url")
                 .asText()).isEqualTo(PUBLIC_URL + "/api/automation/a2a/server-secret");
-            verify(publicUrlAutomationA2AServerFacade).getAgentDescriptor(
+            verify(publicUrlA2AAgentExecutor).getAgentDescriptor(
                 SECRET_KEY, PUBLIC_URL + "/api/automation/a2a/server-secret");
         }
     }
@@ -395,8 +395,8 @@ class A2AServerControllerIntTest {
                 .getContentAsString());
     }
 
-    private static void stubAgentDescriptor(AutomationA2AServerFacade stubbedAutomationA2AServerFacade) {
-        when(stubbedAutomationA2AServerFacade.getAgentDescriptor(eq(SECRET_KEY), anyString()))
+    private static void stubAgentDescriptor(A2AAgentExecutorImpl stubbedA2AAgentExecutor) {
+        when(stubbedA2AAgentExecutor.getAgentDescriptor(eq(SECRET_KEY), anyString()))
             .thenAnswer(invocation -> new A2AAgentDescriptor(
                 "Support Agent", "Answers questions", invocation.getArgument(1), "1.0.0",
                 List.of(new A2ASkill("wf1", "Q&A", "Answers", List.of("support")))));

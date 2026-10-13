@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.ai.a2a.server.web.rest;
 
-import com.bytechef.automation.ai.a2a.server.facade.AutomationA2AServerFacade;
+import com.bytechef.automation.ai.a2a.server.executor.A2AAgentExecutorImpl;
 import com.bytechef.platform.ai.a2a.A2AAgentCardFactory;
 import com.bytechef.platform.ai.a2a.A2AAgentDescriptor;
 import com.bytechef.platform.ai.a2a.A2AProtocolHandler;
@@ -63,23 +63,23 @@ class A2AServerController {
 
     private final A2AAgentCardFactory agentCardFactory;
     private final A2AProtocolHandler protocolHandler;
-    private final AutomationA2AServerFacade automationA2AServerFacade;
+    private final A2AAgentExecutorImpl a2aAgentExecutor;
     private final String publicUrl;
 
     @SuppressFBWarnings("EI")
     A2AServerController(
         A2AAgentCardFactory agentCardFactory, A2AProtocolHandler protocolHandler,
-        AutomationA2AServerFacade automationA2AServerFacade, @Value("${bytechef.public-url:}") String publicUrl) {
+        A2AAgentExecutorImpl a2aAgentExecutor, @Value("${bytechef.public-url:}") String publicUrl) {
 
         this.agentCardFactory = agentCardFactory;
         this.protocolHandler = protocolHandler;
-        this.automationA2AServerFacade = automationA2AServerFacade;
+        this.a2aAgentExecutor = a2aAgentExecutor;
         this.publicUrl = publicUrl;
     }
 
     @GetMapping(value = "/{secretKey}/.well-known/agent-card.json", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<String> getAgentCard(@PathVariable String secretKey, HttpServletRequest request) throws Exception {
-        A2AAgentDescriptor descriptor = automationA2AServerFacade.getAgentDescriptor(
+        A2AAgentDescriptor descriptor = a2aAgentExecutor.getAgentDescriptor(
             secretKey, resolveEndpointUrl(secretKey, request));
 
         AgentCard agentCard = agentCardFactory.create(descriptor);

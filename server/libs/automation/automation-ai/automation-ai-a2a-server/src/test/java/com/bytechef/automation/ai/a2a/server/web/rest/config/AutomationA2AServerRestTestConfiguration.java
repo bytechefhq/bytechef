@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.ai.a2a.server.web.rest.config;
 
-import com.bytechef.automation.ai.a2a.server.facade.AutomationA2AServerFacade;
+import com.bytechef.automation.ai.a2a.server.executor.A2AAgentExecutorImpl;
 import com.bytechef.platform.ai.a2a.A2AAgentCardFactory;
 import com.bytechef.platform.ai.a2a.A2AProtocolHandler;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +34,7 @@ public class AutomationA2AServerRestTestConfiguration {
     }
 
     @Bean
-    A2AProtocolHandler a2aProtocolHandler(AutomationA2AServerFacade automationA2AServerFacade) {
-        return new A2AProtocolHandler(automationA2AServerFacade);
+    A2AProtocolHandler a2aProtocolHandler(A2AAgentExecutorImpl a2aAgentExecutor) {
+        return new A2AProtocolHandler(a2aAgentExecutor);
     }
 }

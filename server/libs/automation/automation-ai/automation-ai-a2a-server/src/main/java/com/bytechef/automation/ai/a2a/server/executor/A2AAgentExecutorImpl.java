@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.a2a.server.facade;
+package com.bytechef.automation.ai.a2a.server.executor;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -77,7 +77,7 @@ import org.springframework.beans.factory.ObjectProvider;
 /**
  * @author Ivica Cardic
  */
-public class AutomationA2AServerFacade implements A2AAgentExecutor {
+public class A2AAgentExecutorImpl implements A2AAgentExecutor {
 
     static final String A2A_CONTEXT_ID_METADATA_KEY = "a2aContextId";
     static final String A2A_TASK_NONCE_METADATA_KEY = "a2aTaskNonce";
@@ -87,7 +87,7 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
 
     private static final String AGENT_VERSION = "1.0.0";
 
-    private static final Logger log = LoggerFactory.getLogger(AutomationA2AServerFacade.class);
+    private static final Logger log = LoggerFactory.getLogger(A2AAgentExecutorImpl.class);
 
     private final A2aProjectService a2aProjectService;
     private final A2aProjectWorkflowService a2aProjectWorkflowService;
@@ -105,7 +105,7 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public AutomationA2AServerFacade(
+    public A2AAgentExecutorImpl(
         A2aProjectService a2aProjectService, A2aProjectWorkflowService a2aProjectWorkflowService,
         A2aServerService a2aServerService, ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
         JobCompletionAwaiter jobCompletionAwaiter, JobService jobService,
@@ -306,7 +306,7 @@ public class AutomationA2AServerFacade implements A2AAgentExecutor {
 
     private static String getSkillIds(List<ExposedWorkflow> exposedWorkflows) {
         return exposedWorkflows.stream()
-            .map(AutomationA2AServerFacade::getSkillId)
+            .map(A2AAgentExecutorImpl::getSkillId)
             .collect(Collectors.joining(", "));
     }
 

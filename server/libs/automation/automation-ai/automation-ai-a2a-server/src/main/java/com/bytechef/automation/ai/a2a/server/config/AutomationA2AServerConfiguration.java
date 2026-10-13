@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.automation.ai.a2a.server.facade.AutomationA2AServerFacade;
+import com.bytechef.automation.ai.a2a.server.executor.A2AAgentExecutorImpl;
 import com.bytechef.automation.ai.a2a.service.A2aProjectService;
 import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
@@ -52,7 +52,7 @@ public class AutomationA2AServerConfiguration {
     }
 
     @Bean
-    AutomationA2AServerFacade automationA2AServerFacade(
+    A2AAgentExecutorImpl a2aAgentExecutor(
         A2aProjectService a2aProjectService, A2aProjectWorkflowService a2aProjectWorkflowService,
         A2aServerService a2aServerService, ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
         JobCompletionAwaiter jobCompletionAwaiter, JobService jobService,
@@ -63,7 +63,7 @@ public class AutomationA2AServerConfiguration {
         TaskFileStorage durableTaskFileStorage,
         WorkflowService workflowService) {
 
-        return new AutomationA2AServerFacade(
+        return new A2AAgentExecutorImpl(
             a2aProjectService, a2aProjectWorkflowService, a2aServerService, approvalTokensObjectProvider,
             jobCompletionAwaiter, jobService, principalJobFacade, principalJobService,
             projectDeploymentWorkflowService, publicUrl, runCompletionExecutor(syncWorkerExecutor),
@@ -77,7 +77,7 @@ public class AutomationA2AServerConfiguration {
     }
 
     @Bean
-    A2AProtocolHandler a2aProtocolHandler(AutomationA2AServerFacade automationA2AServerFacade) {
-        return new A2AProtocolHandler(automationA2AServerFacade);
+    A2AProtocolHandler a2aProtocolHandler(A2AAgentExecutorImpl a2aAgentExecutor) {
+        return new A2AProtocolHandler(a2aAgentExecutor);
     }
 }

@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.server.config.AutomationA2AServerSecurityIntTestConfiguration;
-import com.bytechef.automation.ai.a2a.server.facade.AutomationA2AServerFacade;
+import com.bytechef.automation.ai.a2a.server.executor.A2AAgentExecutorImpl;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.platform.ai.a2a.A2AAgentDescriptor;
 import com.bytechef.platform.ai.a2a.A2AProtocolHandler;
@@ -105,7 +105,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
     private AuthorityService authorityService;
 
     @MockitoBean
-    private AutomationA2AServerFacade automationA2AServerFacade;
+    private A2AAgentExecutorImpl a2aAgentExecutor;
 
     @Autowired
     private DataSource dataSource;
@@ -135,7 +135,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         when(user.getAuthorityIds()).thenReturn(List.of());
         when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(user));
 
-        when(automationA2AServerFacade.getAgentDescriptor(anyString(), anyString())).thenAnswer(invocation -> {
+        when(a2aAgentExecutor.getAgentDescriptor(anyString(), anyString())).thenAnswer(invocation -> {
             recordHandlerInvocation();
 
             return new A2AAgentDescriptor("agent", "description", invocation.getArgument(1), "1.0.0", List.of());
@@ -163,7 +163,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         assertThat(httpResponse.statusCode()).isEqualTo(401);
 
         verify(a2aServerService).fetchA2aServer(A2A_SERVER_SECRET_KEY);
-        verifyNoInteractions(apiKeyService, automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
     }
 
     @Test
@@ -175,7 +175,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         assertThat(httpResponse.statusCode()).isEqualTo(401);
 
         verify(a2aServerService).fetchA2aServer(A2A_SERVER_SECRET_KEY);
-        verifyNoInteractions(apiKeyService, automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
     }
 
     @Test
@@ -189,7 +189,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         assertThat(httpResponse.statusCode()).isEqualTo(200);
         assertThat(httpResponse.body()).contains("\"name\":\"agent\"");
 
-        verify(automationA2AServerFacade).getAgentDescriptor(anyString(), anyString());
+        verify(a2aAgentExecutor).getAgentDescriptor(anyString(), anyString());
         verify(apiKeyService).updateLastUsedDate(apiKey.getId());
 
         assertApiKeyAuthentication(apiKey);
@@ -250,7 +250,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         verify(a2aServerService).fetchA2aServer(A2A_SERVER_SECRET_KEY);
         verify(apiKeyService).fetchApiKey(unknownApiSecretKey);
         verify(apiKeyService, never()).updateLastUsedDate(anyLong());
-        verifyNoInteractions(automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(a2aAgentExecutor, a2aProtocolHandler);
     }
 
     @Test
@@ -306,7 +306,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         assertThat(httpResponse.statusCode()).isEqualTo(401);
 
         verify(a2aServerService).fetchA2aServer(A2A_SERVER_SECRET_KEY);
-        verifyNoInteractions(apiKeyService, automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
     }
 
     @Test
@@ -318,7 +318,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         assertThat(httpResponse.statusCode()).isEqualTo(401);
 
         verify(a2aServerService).fetchA2aServer(A2A_SERVER_SECRET_KEY);
-        verifyNoInteractions(apiKeyService, automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
     }
 
     @Test
@@ -333,7 +333,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         assertThat(httpResponse.statusCode()).isEqualTo(401);
 
         verify(a2aServerService).fetchA2aServer(unknownA2aServerSecretKey);
-        verifyNoInteractions(apiKeyService, automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
     }
 
     @Test
@@ -344,7 +344,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
 
-        verifyNoInteractions(a2aServerService, apiKeyService, automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(a2aServerService, apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
     }
 
     @Test
@@ -381,7 +381,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         assertThat(a2aServerLookupTenantIds).containsExactly(OTHER_TENANT_ID);
 
         verify(a2aServerService).fetchA2aServer(OTHER_TENANT_A2A_SERVER_SECRET_KEY);
-        verifyNoInteractions(apiKeyService, automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
     }
 
     @Test
@@ -397,7 +397,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
 
-        verifyNoInteractions(a2aServerService, apiKeyService, automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(a2aServerService, apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
     }
 
     private void assertAnonymousAuthentication() {
@@ -423,7 +423,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
         verify(a2aServerService).fetchA2aServer(A2A_SERVER_SECRET_KEY);
         verify(apiKeyService).fetchApiKey(apiKey.getSecretKey());
         verify(apiKeyService, never()).updateLastUsedDate(anyLong());
-        verifyNoInteractions(automationA2AServerFacade, a2aProtocolHandler);
+        verifyNoInteractions(a2aAgentExecutor, a2aProtocolHandler);
     }
 
     private HttpResponse<String> getAgentCard(String a2aServerSecretKey, String bearerSecretKey) throws Exception {
