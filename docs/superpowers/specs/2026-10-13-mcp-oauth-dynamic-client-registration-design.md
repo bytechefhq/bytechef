@@ -103,9 +103,7 @@ New dependencies for `platform-oauth2-service`: `:server:libs:core:encryption:en
 - The `OAuth2AuthorizationParameters` record in `platform-component-api` gains `authorizationContext`, as do its
   REST models in `platform-configuration-rest-impl/openapi.yaml` and EE
   `embedded-configuration-public-rest/openapi.yaml` (the latter via `ConnectedUserIntegrationDTO`).
-- **Embedded exclusion:** when the embedded facade requests parameters for a discovery-mode authorization, the
-  service fails with a dedicated `ConnectionDefinitionErrorType` instead of registering a client. Only the
-  automation `ConnectionDialog` path runs discovery.
+- **Embedded exclusion:** the embedded facade does not compute OAuth2 parameters for a discovery-mode authorization (the DTO carries `null`), so listing integrations never registers a client. A connection posted with a discovery context and `PlatformType.EMBEDDED` is rejected by `ConnectionFacadeImpl` with `OAuth2ErrorType.DISCOVERY_NOT_AVAILABLE`. Only the automation `ConnectionDialog` path runs discovery.
 - **Registration is a side effect of this request.** The dialog's `useGetOAuth2AuthorizationParametersQuery` must
   not refetch on window focus or remount while on the OAuth step (`staleTime: Infinity`,
   `refetchOnWindowFocus: false`); each fetch would register another client.

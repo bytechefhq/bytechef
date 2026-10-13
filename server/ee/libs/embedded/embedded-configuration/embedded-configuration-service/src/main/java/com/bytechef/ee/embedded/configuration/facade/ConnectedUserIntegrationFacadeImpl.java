@@ -56,6 +56,7 @@ import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.util.OAuth2DiscoveryUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
@@ -315,7 +316,10 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         AuthorizationType authorizationType = authorization == null ? null : authorization.getType();
 
-        if (authorizationType != null && StringUtils.startsWith(authorizationType.name(), "OAUTH2")) {
+        if (authorizationType != null && StringUtils.startsWith(authorizationType.name(), "OAUTH2") &&
+            !OAuth2DiscoveryUtils.runsDiscovery(
+                authorization.isDiscovery(), integrationInstanceConfigurationDTO.connectionParameters())) {
+
             oAuth2AuthorizationParameters = oAuth2ParametersFacade
                 .getOAuth2AuthorizationParameters(integrationDTO.componentName(), connectionDefinition.getVersion(),
                     integrationInstanceConfigurationDTO.connectionParameters(),
@@ -864,6 +868,15 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         AuthorizationType authorizationType = integrationInstanceConfigurationDTO.authorizationType();
 
         if (authorizationType == null || !StringUtils.startsWith(authorizationType.name(), "OAUTH2")) {
+            return null;
+        }
+
+        boolean discovery = connectionDefinition.getAuthorizations()
+            .stream()
+            .filter(authorization -> authorization.getType() == authorizationType)
+            .anyMatch(Authorization::isDiscovery);
+
+        if (OAuth2DiscoveryUtils.runsDiscovery(discovery, integrationInstanceConfigurationDTO.connectionParameters())) {
             return null;
         }
 

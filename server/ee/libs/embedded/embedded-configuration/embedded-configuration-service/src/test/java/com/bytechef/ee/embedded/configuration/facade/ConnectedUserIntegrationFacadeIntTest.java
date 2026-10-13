@@ -488,6 +488,9 @@ class ConnectedUserIntegrationFacadeIntTest {
         @Autowired
         private IntegrationWorkflowRepository integrationWorkflowRepository;
 
+        @Autowired
+        private OAuth2ParametersFacade oAuth2ParametersFacade;
+
         @BeforeEach
         void beforeEach() {
             when(componentDefinitionService.getComponentDefinition(anyString(), any()))
@@ -761,6 +764,62 @@ class ConnectedUserIntegrationFacadeIntTest {
         }
 
         @Test
+        void testDiscoveryAuthorizationWithManualEndpointsCarriesTheOAuth2Parameters() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+
+            createIntegrationInstanceConfiguration(
+                integrationId, 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE,
+                Map.of(
+                    "url", "https://api.elevenlabs.io/mcp", "authorizationUrl",
+                    "https://elevenlabs.io/app/oauth/authorize", "tokenUrl",
+                    "https://api.us.elevenlabs.io/v1/oauth/token", "clientId", "manual"));
+
+            stubDiscoveryConnectionDefinition();
+
+            OAuth2AuthorizationParameters oAuth2AuthorizationParameters = new OAuth2AuthorizationParameters(
+                "https://elevenlabs.io/app/oauth/authorize", "manual", Map.of(), Map.of());
+
+            when(oAuth2ParametersFacade.getOAuth2AuthorizationParameters(anyString(), anyInt(), any(), any()))
+                .thenReturn(oAuth2AuthorizationParameters);
+
+            ConnectedUserIntegrationDTO connectedUserIntegrationDTO =
+                connectedUserIntegrationFacade.getConnectedUserIntegration(
+                    externalUserId, integrationId, true, Environment.PRODUCTION);
+
+            assertThat(connectedUserIntegrationDTO.oAuth2AuthorizationParameters())
+                .isEqualTo(oAuth2AuthorizationParameters);
+            assertThat(connectedUserIntegrationDTO.connectionConfig()
+                .oauth2()
+                .oAuth2AuthorizationParameters()).isEqualTo(oAuth2AuthorizationParameters);
+        }
+
+        @Test
+        void testDiscoveryAuthorizationWithoutManualEndpointsSkipsTheOAuth2Parameters() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+
+            createIntegrationInstanceConfiguration(
+                integrationId, 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE,
+                Map.of("url", "https://mcp.example.com/mcp", "authorizationUrl", "https://auth.example.com/authorize"));
+
+            stubDiscoveryConnectionDefinition();
+
+            ConnectedUserIntegrationDTO connectedUserIntegrationDTO =
+                connectedUserIntegrationFacade.getConnectedUserIntegration(
+                    externalUserId, integrationId, true, Environment.PRODUCTION);
+
+            assertThat(connectedUserIntegrationDTO.oAuth2AuthorizationParameters()).isNull();
+            assertThat(connectedUserIntegrationDTO.connectionConfig()
+                .oauth2()).isNull();
+
+            verify(oAuth2ParametersFacade, never()).getOAuth2AuthorizationParameters(
+                anyString(), anyInt(), any(), any());
+        }
+
+        @Test
         void testIntegrationListsOnlyItsOwnInstancesWhenAnotherIntegrationSharesTheComponent() {
             String externalUserId = createConnectedUser(Map.of());
 
@@ -911,6 +970,21 @@ class ConnectedUserIntegrationFacadeIntTest {
                 .inputs())
                     .extracting(ConnectedUserIntegrationDTO.Input::name)
                     .containsExactly("token");
+        }
+
+        private void stubDiscoveryConnectionDefinition() {
+            when(componentDefinitionService.getComponentDefinition(anyString(), any()))
+                .thenReturn(
+                    new ComponentDefinition(
+                        component("slack")
+                            .connection(
+                                connection()
+                                    .authorizations(
+                                        authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE)
+                                            .properties(string("authorizationUrl"), string("tokenUrl"))
+                                            .protectedResourceUrl(
+                                                (connectionParameters, context) -> connectionParameters
+                                                    .getRequiredString("url"))))));
         }
 
         private void stubSlackConnectionDefinition() {
@@ -1112,13 +1186,21 @@ class ConnectedUserIntegrationFacadeIntTest {
         private long createIntegrationInstanceConfiguration(
             long integrationId, int integrationVersion, AuthorizationType authorizationType) {
 
+            return createIntegrationInstanceConfiguration(integrationId, integrationVersion, authorizationType,
+                Map.of());
+        }
+
+        private long createIntegrationInstanceConfiguration(
+            long integrationId, int integrationVersion, AuthorizationType authorizationType,
+            Map<String, Object> connectionParameters) {
+
             IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
             if (authorizationType != null) {
                 integrationInstanceConfiguration.setAuthorizationType(authorizationType);
             }
 
-            integrationInstanceConfiguration.setConnectionParameters(Map.of());
+            integrationInstanceConfiguration.setConnectionParameters(connectionParameters);
             integrationInstanceConfiguration.setEnvironment(Environment.PRODUCTION);
             integrationInstanceConfiguration.setIntegrationId(integrationId);
             integrationInstanceConfiguration.setIntegrationVersion(integrationVersion);
