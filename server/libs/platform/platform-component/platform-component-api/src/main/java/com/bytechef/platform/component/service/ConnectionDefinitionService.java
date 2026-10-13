@@ -74,6 +74,10 @@ public interface ConnectionDefinitionService extends OperationDefinitionService 
 
     ConnectionDefinition getConnectionConnectionDefinition(String componentName, int connectionVersion);
 
+    Optional<String> getProtectedResourceUrl(
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters);
+
     ConnectionDefinition getConnectionDefinition(String componentName, @Nullable Integer componentVersion);
 
     List<ConnectionDefinition> getConnectionDefinitions();

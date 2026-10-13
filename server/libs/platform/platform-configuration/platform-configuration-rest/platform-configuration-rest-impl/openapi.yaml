@@ -522,6 +522,10 @@ paths:
                 componentName:
                   description: "The name of a component that uses this connection."
                   type: "string"
+                connectionId:
+                  description: "The id of a connection whose credentials are being updated."
+                  type: "integer"
+                  format: "int64"
                 connectionVersion:
                   description: "The version of a connection."
                   type: "integer"
@@ -529,6 +533,12 @@ paths:
                   description: "The parameters of a connection."
                   type: "object"
                   additionalProperties: true
+                type:
+                  description: "The platform type the connection is authorized for."
+                  type: "string"
+                  enum:
+                  - "AUTOMATION"
+                  - "EMBEDDED"
         required: true
       responses:
         "200":
@@ -2787,6 +2797,9 @@ components:
           type: "object"
           additionalProperties:
             type: "boolean"
+        authorizationContext:
+          description: "Opaque, server-sealed state the client must post back with the authorization code."
+          type: "string"
     OAuth2Properties:
       properties:
         redirectUri:
