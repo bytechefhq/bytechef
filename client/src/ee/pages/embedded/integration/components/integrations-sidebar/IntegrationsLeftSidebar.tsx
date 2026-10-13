@@ -103,8 +103,8 @@ const IntegrationsLeftSidebar = ({
     }, [isLoading, selectedIntegrationId]);
 
     return (
-        <aside className="flex h-full min-w-[355px] flex-col items-center gap-2 bg-surface-main px-4 pt-3">
-            <div className="flex w-full flex-col gap-2">
+        <aside className="flex h-full min-w-[355px] flex-col items-center gap-2 bg-surface-main px-4 pt-2.5">
+            <div className="flex w-full flex-col gap-4">
                 {integrationsLoading ? (
                     <Skeleton className="h-9 w-full rounded-md" />
                 ) : (
