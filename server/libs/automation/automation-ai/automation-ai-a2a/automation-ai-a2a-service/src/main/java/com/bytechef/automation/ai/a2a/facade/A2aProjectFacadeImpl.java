@@ -157,6 +157,16 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public List<ProjectWorkflow> getA2aEligibleProjectVersionWorkflows(long projectId, int projectVersion) {
+        return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
+            .stream()
+            .filter(projectWorkflow -> A2aWorkflowTriggerUtils.isA2aCallable(
+                workflowService.getWorkflow(projectWorkflow.getWorkflowId())))
+            .toList();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteA2aProject(long a2aProjectId) {
         A2aProject a2aProject = a2aProjectService.fetchA2aProject(a2aProjectId)
             .orElseThrow(() -> new IllegalArgumentException("A2aProject not found: " + a2aProjectId));
@@ -306,12 +316,18 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
-            if (A2aWorkflowTriggerUtils.fetchNewWorkflowCallTrigger(workflow)
-                .isEmpty()) {
-
-                throw new IllegalArgumentException(
+            WorkflowTrigger newWorkflowCallTrigger = A2aWorkflowTriggerUtils.fetchNewWorkflowCallTrigger(workflow)
+                .orElseThrow(() -> new IllegalArgumentException(
                     "Workflow " + workflowId + " has no New Workflow Call trigger and cannot be exposed as an A2A " +
-                        "skill");
+                        "skill"));
+
+            List<String> unsupportedRequiredInputNames =
+                A2aWorkflowTriggerUtils.getUnsupportedRequiredInputNames(newWorkflowCallTrigger);
+
+            if (!unsupportedRequiredInputNames.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Workflow " + workflowId + " requires the inputs " + unsupportedRequiredInputNames +
+                        ", which an A2A message cannot supply; only the message input is filled");
             }
         }
 

@@ -613,6 +613,34 @@ class A2aProjectFacadeIntTest {
         }
 
         @Test
+        void testCreateA2aProjectRejectsAWorkflowRequiringInputsBesidesTheMessage() {
+            String ticketWorkflowId = createProjectWorkflow(
+                newWorkflowCallDefinition("[\\\"message\\\", \\\"ticketId\\\"]"));
+
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> a2aProjectFacade.createA2aProject(
+                    a2aServer.getId(), project.getId(), 1, List.of(ticketWorkflowId)))
+                .withMessageContaining(ticketWorkflowId)
+                .withMessageContaining("[ticketId]");
+
+            assertThat(projectDeploymentRepository.findAll()).isEmpty();
+        }
+
+        @Test
+        void testGetA2aEligibleProjectVersionWorkflowsLeavesOutWorkflowsAnA2aMessageCannotCall() {
+            String messageWorkflowId = createProjectWorkflow(newWorkflowCallDefinition("[\\\"message\\\"]"));
+            String ticketWorkflowId = createProjectWorkflow(
+                newWorkflowCallDefinition("[\\\"message\\\", \\\"ticketId\\\"]"));
+            String webhookWorkflowId = createProjectWorkflow(
+                workflowDefinition("webhook/v1/autoRespondingWithHTTP200"));
+
+            assertThat(a2aProjectFacade.getA2aEligibleProjectVersionWorkflows(project.getId(), 1))
+                .extracting(ProjectWorkflow::getWorkflowId)
+                .contains(workflowId, messageWorkflowId)
+                .doesNotContain(ticketWorkflowId, webhookWorkflowId);
+        }
+
+        @Test
         void testUpdateA2aProjectRejectsAWorkflowWithoutANewWorkflowCallTrigger() {
             String webhookWorkflowId = createProjectWorkflow(
                 workflowDefinition("webhook/v1/autoRespondingWithHTTP200"));
@@ -947,6 +975,20 @@ class A2aProjectFacadeIntTest {
             when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(
                 testConfigurationWorkflowId, environment.ordinal()))
                     .thenReturn(Optional.of(workflowTestConfiguration));
+        }
+
+        private static String newWorkflowCallDefinition(String requiredInputNames) {
+            return """
+                {
+                    "label": "A2A skill",
+                    "triggers": [{
+                        "name": "newWorkflowCall_1",
+                        "type": "workflow/v1/newWorkflowCall",
+                        "parameters": {"inputSchema": "{\\"type\\": \\"object\\", \\"required\\": REQUIRED}"}
+                    }],
+                    "tasks": []
+                }
+                """.replace("REQUIRED", requiredInputNames);
         }
 
         private static String workflowDefinition(String triggerType) {
