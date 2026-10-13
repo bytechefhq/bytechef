@@ -77,9 +77,11 @@ public final class McpClientCallToolAction {
         try (McpSyncClient mcpSyncClient = createMcpSyncClient(
             connectionParameters, connectionDefinitionService, actionContext)) {
 
-            mcpSyncClient.initialize();
+            return McpClientUtils.translateAuthorizationErrors(() -> {
+                mcpSyncClient.initialize();
 
-            return mcpSyncClient.callTool(new McpSchema.CallToolRequest(toolName, toolArguments));
+                return mcpSyncClient.callTool(new McpSchema.CallToolRequest(toolName, toolArguments));
+            });
         }
     }
 }
