@@ -798,6 +798,7 @@ export type CreateA2aProjectInput = {
   projectId: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
 export type CreateA2aServerInput = {
@@ -833,6 +834,7 @@ export type CreateMcpIntegrationInstanceConfigurationInput = {
   integrationInstanceConfigurationId: Scalars['ID']['input'];
   mcpServerId: Scalars['ID']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
 export type CreateMcpProjectInput = {
@@ -840,6 +842,7 @@ export type CreateMcpProjectInput = {
   projectId: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
 export type CreateWorkspaceMcpServerInput = {
@@ -4037,6 +4040,7 @@ export enum UnifiedApiCategory {
 
 export type UpdateA2aProjectInput = {
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
 export type UpdateA2aServerInput = {
@@ -4089,6 +4093,7 @@ export type UpdateKnowledgeBaseTagsInput = {
 
 export type UpdateMcpIntegrationInstanceConfigurationInput = {
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
 export type UpdateMcpIntegrationInstanceConfigurationVersionInput = {
@@ -4098,6 +4103,7 @@ export type UpdateMcpIntegrationInstanceConfigurationVersionInput = {
 
 export type UpdateMcpProjectInput = {
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
 export type UpdateRowInput = {
@@ -4119,6 +4125,18 @@ export type Workflow = {
   tasks: Array<WorkflowTask>;
   triggers: Array<WorkflowTrigger>;
   version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type WorkflowConfigurationInput = {
+  connections?: InputMaybe<Array<WorkflowConnectionInput>>;
+  inputs?: InputMaybe<Scalars['Map']['input']>;
+  workflowId: Scalars['String']['input'];
+};
+
+export type WorkflowConnectionInput = {
+  connectionId: Scalars['ID']['input'];
+  workflowConnectionKey: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
 };
 
 export type WorkflowInfo = {
