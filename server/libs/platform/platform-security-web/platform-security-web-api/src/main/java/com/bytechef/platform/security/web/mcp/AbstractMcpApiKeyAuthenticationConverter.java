@@ -26,9 +26,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 
 /**
- * Builds {@link McpApiKeyCredentials} from the bearer API key, the {@code X-ENVIRONMENT} header and the server secret
- * key carried in the request path.
- *
  * @author Ivica Cardic
  */
 public abstract class AbstractMcpApiKeyAuthenticationConverter implements AuthenticationConverter {
@@ -64,6 +61,7 @@ public abstract class AbstractMcpApiKeyAuthenticationConverter implements Authen
                 requestedEnvironment, extractServerSecretKey(request), secretKey));
     }
 
+    @Nullable
     protected abstract String extractServerSecretKey(HttpServletRequest request);
 
     @Nullable
