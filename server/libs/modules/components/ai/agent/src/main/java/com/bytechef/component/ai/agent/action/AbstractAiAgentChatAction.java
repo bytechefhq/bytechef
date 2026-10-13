@@ -183,7 +183,7 @@ public abstract class AbstractAiAgentChatAction {
                         getToolCallbacks(
                             clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
                             toolExecutionListener, toolSimulations, chatModel, conversationId, context),
-                        chatMemoryResult)
+                        chatMemoryResult, toolExecutionListener, context)
                             .toArray());
 
         if (conversationId != null && hasChatMemoryToolCallbacks(chatMemoryResult)) {
@@ -610,14 +610,23 @@ public abstract class AbstractAiAgentChatAction {
         }
     }
 
-    private static List<ToolCallback> concatToolCallbacks(
-        List<? extends ToolCallback> toolCallbacks, Optional<ChatMemoryFunction.Result> chatMemoryResult) {
+    static List<ToolCallback> concatToolCallbacks(
+        List<? extends ToolCallback> toolCallbacks, Optional<ChatMemoryFunction.Result> chatMemoryResult,
+        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context) {
 
         List<ToolCallback> combinedToolCallbacks = new ArrayList<>(toolCallbacks);
 
-        chatMemoryResult
+        List<ToolCallback> chatMemoryToolCallbacks = chatMemoryResult
             .map(ChatMemoryFunction.Result::toolCallbacks)
-            .ifPresent(combinedToolCallbacks::addAll);
+            .orElse(List.of());
+
+        for (ToolCallback chatMemoryToolCallback : chatMemoryToolCallbacks) {
+            combinedToolCallbacks.add(
+                toolExecutionListener == null
+                    ? chatMemoryToolCallback
+                    : createObservableToolCallback(
+                        chatMemoryToolCallback, new AtomicReference<>(), toolExecutionListener, context));
+        }
 
         return combinedToolCallbacks;
     }
