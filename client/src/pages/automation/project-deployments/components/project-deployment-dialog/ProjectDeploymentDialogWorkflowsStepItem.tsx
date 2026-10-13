@@ -20,8 +20,10 @@ export interface ProjectDeploymentDialogWorkflowListItemProps {
     connections?: Connection[];
     connectionsGrouped?: boolean;
     control: Control<ProjectDeployment>;
+    enabled?: boolean;
     formState: FormState<ProjectDeployment>;
     label?: string;
+    onEnabledChange?: (enabled: boolean) => void;
     setValue: UseFormSetValue<ProjectDeployment>;
     showWorkflowToggle?: boolean;
     workflow: Workflow;
@@ -33,8 +35,10 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     connections,
     connectionsGrouped,
     control,
+    enabled,
     formState,
     label,
+    onEnabledChange,
     setValue,
     showWorkflowToggle = false,
     workflow,
@@ -62,7 +66,19 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
         name: `projectDeploymentWorkflows.${workflowIndex}.connections`,
     });
 
-    const workflowEnabled = workflowEnabledMap.get(workflow.id!);
+    const workflowEnabled = enabled ?? workflowEnabledMap.get(workflow.id!);
+
+    const handleEnabledChange = (value: boolean) => {
+        if (onEnabledChange) {
+            onEnabledChange(value);
+
+            return;
+        }
+
+        setValue(`projectDeploymentWorkflows.${workflowIndex!}.enabled`, value);
+
+        setWorkflowEnabled(workflow.id!, value);
+    };
 
     return (
         <div
@@ -98,13 +114,10 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                     </Label>
 
                     <Switch
+                        aria-label={label}
                         checked={workflowEnabled}
                         id={`projectDeploymentWorkflows.${workflowIndex}`}
-                        onCheckedChange={(value) => {
-                            setValue(`projectDeploymentWorkflows.${workflowIndex!}.enabled`, value);
-
-                            setWorkflowEnabled(workflow.id!, value);
-                        }}
+                        onCheckedChange={handleEnabledChange}
                     />
                 </div>
             )}

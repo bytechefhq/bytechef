@@ -29,7 +29,56 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
 });
 
 vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries', () => ({
+    useGetIntegrationInstanceConfigurationQuery: () => ({
+        data: {
+            id: 42,
+            integration: {componentName: 'gmail'},
+            integrationId: 7,
+            integrationInstanceConfigurationWorkflows: [
+                {
+                    connections: [{connectionId: 9, workflowConnectionKey: 'slack', workflowNodeName: 'slack_1'}],
+                    inputs: {subject: 'Hello'},
+                    workflowId: 'w1',
+                },
+            ],
+            integrationVersion: 1,
+        },
+    }),
     useGetIntegrationInstanceConfigurationsQuery: () => ({data: []}),
+}));
+
+vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
+    useGetIntegrationVersionWorkflowsQuery: () => ({
+        data: [
+            {
+                id: 'w1',
+                inputs: [],
+                label: 'Workflow One',
+                tasks: [
+                    {
+                        connections: [
+                            {componentName: 'gmail', key: 'gmail', required: true, workflowNodeName: 'gmail_1'},
+                            {componentName: 'slack', key: 'slack', required: true, workflowNodeName: 'slack_1'},
+                        ],
+                        name: 'slack_1',
+                        type: 'slack/v1/send',
+                    },
+                ],
+                triggers: [],
+            },
+        ],
+    }),
+}));
+
+vi.mock(
+    '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections',
+    () => ({
+        default: () => <div data-testid="connections" />,
+    })
+);
+
+vi.mock('@/shared/components/InputConfigurationList', () => ({
+    default: () => <div data-testid="input-configuration-list" />,
 }));
 
 const mcpServer = {id: 's1', name: 'Server'} as McpServer;
@@ -87,12 +136,23 @@ describe('McpIntegrationInstanceConfigurationWorkflowDialog', () => {
 
         expect(screen.queryByText(/No tool-eligible workflows found/i)).not.toBeInTheDocument();
 
+        expect(screen.getByRole('switch', {name: 'Workflow One'})).toBeChecked();
+
         await userEvent.click(screen.getByRole('button', {name: 'Update'}));
 
-        expect(hoisted.updateMutate).toHaveBeenCalledTimes(1);
-        expect(hoisted.updateMutate.mock.calls[0][0]).toMatchObject({
+        await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
+        expect(hoisted.updateMutate.mock.calls[0][0]).toEqual({
             id: 'cfg1',
-            input: {selectedWorkflowIds: ['w1']},
+            input: {
+                selectedWorkflowIds: ['w1'],
+                workflowConfigurations: [
+                    {
+                        connections: [{connectionId: '9', workflowConnectionKey: 'slack', workflowNodeName: 'slack_1'}],
+                        inputs: {subject: 'Hello'},
+                        workflowId: 'w1',
+                    },
+                ],
+            },
         });
     });
 });
