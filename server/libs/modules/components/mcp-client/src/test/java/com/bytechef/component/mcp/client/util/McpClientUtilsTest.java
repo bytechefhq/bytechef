@@ -17,7 +17,23 @@
 package com.bytechef.component.mcp.client.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.mcp.client.constant.McpClientConstants;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import io.modelcontextprotocol.client.McpSyncClient;
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -51,5 +67,56 @@ class McpClientUtilsTest {
             McpClientUtils.createToolContextToMcpMetaConverter();
 
         assertThat(toolContextToMcpMetaConverter.convert(new ToolContext(Map.of()))).isEmpty();
+    }
+
+    @Test
+    void testCreateMcpSyncClientAppliesClientCredentialsAuthorization() {
+        assertAppliedAuthorizationType(
+            Map.of(
+                Authorization.CLIENT_ID, "client-id",
+                Authorization.CLIENT_SECRET, "client-secret",
+                Authorization.TOKEN_URL, "https://auth.example.com/token"),
+            AuthorizationType.OAUTH2_CLIENT_CREDENTIALS);
+    }
+
+    @Test
+    void testCreateMcpSyncClientAppliesAuthorizationCodeAuthorization() {
+        assertAppliedAuthorizationType(
+            Map.of(
+                Authorization.ACCESS_TOKEN, "access-token",
+                Authorization.AUTHORIZATION_URL, "https://auth.example.com/authorize",
+                Authorization.CLIENT_ID, "client-id",
+                Authorization.CLIENT_SECRET, "client-secret",
+                Authorization.TOKEN_URL, "https://auth.example.com/token"),
+            AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+    }
+
+    @Test
+    void testCreateMcpSyncClientAppliesBearerTokenAuthorization() {
+        assertAppliedAuthorizationType(Map.of(Authorization.TOKEN, "token"), AuthorizationType.BEARER_TOKEN);
+    }
+
+    private static void assertAppliedAuthorizationType(
+        Map<String, Object> authorizationParameters, AuthorizationType expectedAuthorizationType) {
+
+        Map<String, Object> connectionParameterMap = new HashMap<>(authorizationParameters);
+
+        connectionParameterMap.put(McpClientConstants.URL, "https://mcp.example.com/mcp");
+
+        Parameters connectionParameters = MockParametersFactory.create(connectionParameterMap);
+        ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);
+        Context context = mock(Context.class);
+
+        when(connectionDefinitionService.executeAuthorizationApply(any(), eq(1), any(), anyMap(), any()))
+            .thenReturn(ApplyResponse.ofHeaders(Map.of()));
+
+        try (McpSyncClient mcpSyncClient = McpClientUtils.createMcpSyncClient(
+            connectionParameters, connectionDefinitionService, context)) {
+
+            assertThat(mcpSyncClient).isNotNull();
+        }
+
+        verify(connectionDefinitionService).executeAuthorizationApply(
+            eq(McpClientConstants.MCP_CLIENT), eq(1), eq(expectedAuthorizationType), anyMap(), eq(context));
     }
 }

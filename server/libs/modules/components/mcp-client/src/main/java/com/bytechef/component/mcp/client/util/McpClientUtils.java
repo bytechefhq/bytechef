@@ -322,6 +322,13 @@ public class McpClientUtils {
             return AuthorizationType.OAUTH2_CLIENT_CREDENTIALS;
         }
 
+        if (isNotBlank(connectionParameters.getString(Authorization.CLIENT_ID)) &&
+            isNotBlank(connectionParameters.getString(Authorization.CLIENT_SECRET)) &&
+            isNotBlank(connectionParameters.getString(Authorization.TOKEN_URL))) {
+
+            return AuthorizationType.OAUTH2_CLIENT_CREDENTIALS;
+        }
+
         String key = connectionParameters.getString(KEY);
 
         if (key != null && !key.isBlank()) {
@@ -329,5 +336,9 @@ public class McpClientUtils {
         }
 
         return null;
+    }
+
+    private static boolean isNotBlank(String value) {
+        return value != null && !value.isBlank();
     }
 }
