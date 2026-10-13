@@ -24,11 +24,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.oauth2.exception.OAuth2ErrorType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.HashMap;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
@@ -43,7 +50,9 @@ import org.springframework.security.access.AccessDeniedException;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class OAuth2ParametersFacadeTest {
 
     private static final AuthorizationType AUTHORIZATION_TYPE = AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE;
@@ -74,7 +83,7 @@ class OAuth2ParametersFacadeTest {
             .getReauthorizationParameters(42L, "mcpClient", 1);
 
         oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
-            "mcpClient", 1, Map.of("transportType", "HTTP_STREAMABLE"), AUTHORIZATION_TYPE, 42L);
+            "mcpClient", 1, Map.of("transportType", "HTTP_STREAMABLE"), AUTHORIZATION_TYPE, 42L, null);
 
         Assertions.assertThat(captureDefinitionServiceParameters())
             .isEqualTo(Map.of("url", "https://mcp.example.com/mcp", "transportType", "HTTP_STREAMABLE"));
@@ -100,11 +109,128 @@ class OAuth2ParametersFacadeTest {
 
         Assertions.assertThatThrownBy(
             () -> oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
-                "mcpClient", 1, Map.of(), AUTHORIZATION_TYPE, 42L))
+                "mcpClient", 1, Map.of(), AUTHORIZATION_TYPE, 42L, null))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(connectionDefinitionService, never()).getOAuth2AuthorizationParameters(
             eq("mcpClient"), eq(1), eq(AUTHORIZATION_TYPE), anyMap());
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParametersRejectsDiscoveryForEmbeddedBeforeDiscoveryRuns() {
+        stubDiscoveryConnectionDefinition();
+
+        Throwable throwable = Assertions.catchThrowable(
+            () -> oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+                "mcpClient", 1, Map.of("url", "https://mcp.example.com/mcp"), AUTHORIZATION_TYPE, null,
+                PlatformType.EMBEDDED));
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("Authorization URL and Token URL");
+        Assertions.assertThat(((ConfigurationException) throwable).getEntityClass())
+            .isEqualTo(OAuth2ErrorType.class);
+        Assertions.assertThat(((ConfigurationException) throwable).getErrorKey())
+            .isEqualTo(OAuth2ErrorType.DISCOVERY_NOT_AVAILABLE.getErrorKey());
+
+        verify(connectionDefinitionService, never()).getOAuth2AuthorizationParameters(
+            eq("mcpClient"), eq(1), eq(AUTHORIZATION_TYPE), anyMap());
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParametersAllowsManualEndpointsForEmbedded() {
+        stubDiscoveryConnectionDefinition();
+        stubParameterPassThrough();
+
+        oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+            "mcpClient", 1,
+            Map.of(
+                "url", "https://mcp.example.com/mcp", Authorization.AUTHORIZATION_URL,
+                "https://auth.example.com/authorize", Authorization.TOKEN_URL, "https://auth.example.com/token",
+                Authorization.CLIENT_ID, "manual-client"),
+            AUTHORIZATION_TYPE, null, PlatformType.EMBEDDED);
+
+        Assertions.assertThat(captureDefinitionServiceParameters())
+            .containsEntry(Authorization.TOKEN_URL, "https://auth.example.com/token");
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParametersRejectsManualEndpointsWithoutAClientId() {
+        stubDiscoveryConnectionDefinition();
+
+        when(oAuth2Service.checkPredefinedParameters(eq("mcpClient"), anyMap()))
+            .thenAnswer(invocation -> invocation.getArgument(1));
+
+        Throwable throwable = Assertions.catchThrowable(
+            () -> oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+                "mcpClient", 1,
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", Authorization.AUTHORIZATION_URL,
+                    "https://auth.example.com/authorize", Authorization.TOKEN_URL, "https://auth.example.com/token",
+                    Authorization.CLIENT_ID, " "),
+                AUTHORIZATION_TYPE, null, PlatformType.AUTOMATION));
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("Client Id");
+        Assertions.assertThat(((ConfigurationException) throwable).getErrorKey())
+            .isEqualTo(OAuth2ErrorType.CLIENT_ID_REQUIRED.getErrorKey());
+
+        verify(connectionDefinitionService, never()).getOAuth2AuthorizationParameters(
+            eq("mcpClient"), eq(1), eq(AUTHORIZATION_TYPE), anyMap());
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParametersAcceptsManualEndpointsWithAPredefinedClientId() {
+        when(oAuth2Service.checkPredefinedParameters(eq("mcpClient"), anyMap()))
+            .thenAnswer(invocation -> {
+                Map<String, Object> parameters = new HashMap<>(invocation.getArgument(1));
+
+                parameters.put(Authorization.CLIENT_ID, "predefined-client");
+
+                return parameters;
+            });
+        when(connectionDefinitionService.getOAuth2AuthorizationParameters(
+            eq("mcpClient"), eq(1), eq(AUTHORIZATION_TYPE), anyMap()))
+                .thenReturn(new OAuth2AuthorizationParameters(null, null, Map.of(), Map.of(), null));
+
+        oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+            "mcpClient", 1,
+            Map.of(
+                "url", "https://mcp.example.com/mcp", Authorization.AUTHORIZATION_URL,
+                "https://auth.example.com/authorize", Authorization.TOKEN_URL, "https://auth.example.com/token"),
+            AUTHORIZATION_TYPE, null, PlatformType.AUTOMATION);
+
+        Assertions.assertThat(captureDefinitionServiceParameters())
+            .containsEntry(Authorization.CLIENT_ID, "predefined-client");
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParametersRunsDiscoveryForAutomation() {
+        stubParameterPassThrough();
+
+        oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+            "mcpClient", 1, Map.of("url", "https://mcp.example.com/mcp"), AUTHORIZATION_TYPE, null,
+            PlatformType.AUTOMATION);
+
+        verify(connectionDefinitionService, never()).getConnectionConnectionDefinition("mcpClient", 1);
+
+        Assertions.assertThat(captureDefinitionServiceParameters())
+            .isEqualTo(Map.of("url", "https://mcp.example.com/mcp"));
+    }
+
+    private void stubDiscoveryConnectionDefinition() {
+        when(connectionDefinitionService.getConnectionConnectionDefinition("mcpClient", 1))
+            .thenReturn(
+                new ConnectionDefinition(
+                    ComponentDsl.connection()
+                        .properties(ComponentDsl.string("url"))
+                        .authorizations(
+                            ComponentDsl.authorization(AUTHORIZATION_TYPE)
+                                .protectedResourceUrl(
+                                    (connectionParameters, context) -> connectionParameters.getRequiredString(
+                                        "url"))),
+                    "mcpClient", "MCP Client", null));
     }
 
     private Map<String, Object> captureDefinitionServiceParameters() {
