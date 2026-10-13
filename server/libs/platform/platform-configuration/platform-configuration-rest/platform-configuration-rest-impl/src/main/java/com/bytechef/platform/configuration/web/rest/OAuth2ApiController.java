@@ -23,6 +23,7 @@ import com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel
 import com.bytechef.platform.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import com.bytechef.platform.configuration.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
@@ -59,6 +60,7 @@ public class OAuth2ApiController implements Oauth2Api {
 
         AuthorizationTypeModel authorizationType =
             Objects.requireNonNull(parametersRequestModel.getAuthorizationType());
+        GetOAuth2AuthorizationParametersRequestModel.TypeEnum type = parametersRequestModel.getType();
 
         return ResponseEntity.ok(
             conversionService.convert(
@@ -66,7 +68,8 @@ public class OAuth2ApiController implements Oauth2Api {
                     parametersRequestModel.getComponentName(),
                     Objects.requireNonNull(parametersRequestModel.getConnectionVersion()),
                     parametersRequestModel.getParameters(),
-                    AuthorizationType.valueOf(authorizationType.name()), parametersRequestModel.getConnectionId()),
+                    AuthorizationType.valueOf(authorizationType.name()), parametersRequestModel.getConnectionId(),
+                    type == null ? null : PlatformType.valueOf(type.name())),
                 OAuth2AuthorizationParametersModel.class));
     }
 

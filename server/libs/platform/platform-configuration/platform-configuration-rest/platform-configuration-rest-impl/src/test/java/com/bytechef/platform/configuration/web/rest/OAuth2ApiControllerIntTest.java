@@ -26,6 +26,7 @@ import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.web.rest.config.PlatformConfigurationRestTestConfiguration;
 import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,8 @@ class OAuth2ApiControllerIntTest {
     void testGetOAuth2AuthorizationParametersReturnsAuthorizationContext() {
         when(
             oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
-                eq("mcpClient"), eq(1), anyMap(), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), isNull()))
+                eq("mcpClient"), eq(1), anyMap(), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), isNull(),
+                isNull()))
                     .thenReturn(
                         new OAuth2AuthorizationParameters(
                             "https://auth.example.com/authorize", "reg-1",
@@ -96,7 +98,8 @@ class OAuth2ApiControllerIntTest {
     void testGetOAuth2AuthorizationParametersPassesConnectionIdToFacade() {
         when(
             oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
-                eq("mcpClient"), eq(1), eq(Map.of()), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), eq(42L)))
+                eq("mcpClient"), eq(1), eq(Map.of()), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), eq(42L),
+                isNull()))
                     .thenReturn(
                         new OAuth2AuthorizationParameters(
                             "https://auth.example.com/authorize", "reg-1", Map.of(), Map.of(), "sealed-context"));
@@ -115,5 +118,31 @@ class OAuth2ApiControllerIntTest {
             .expectBody()
             .jsonPath("$.authorizationContext")
             .isEqualTo("sealed-context");
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParametersPassesThePlatformTypeToFacade() {
+        when(
+            oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+                eq("mcpClient"), eq(1), eq(Map.of()), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), isNull(),
+                eq(PlatformType.EMBEDDED)))
+                    .thenReturn(
+                        new OAuth2AuthorizationParameters(
+                            "https://auth.example.com/authorize", "manual", Map.of(), Map.of(), "sealed-context"));
+
+        webTestClient.post()
+            .uri("/internal/oauth2/authorization-parameters")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                """
+                    {"componentName":"mcpClient","connectionVersion":1,"type":"EMBEDDED",
+                     "authorizationType":"OAUTH2_AUTHORIZATION_CODE_PKCE","parameters":{}}
+                    """)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.clientId")
+            .isEqualTo("manual");
     }
 }
