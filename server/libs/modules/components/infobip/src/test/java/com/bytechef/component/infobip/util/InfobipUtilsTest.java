@@ -22,8 +22,10 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEMPLATE_NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -43,6 +45,7 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
@@ -151,5 +154,44 @@ class InfobipUtilsTest {
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
+    }
+
+    @Test
+    void testUnsubscribeWebhook(
+        TriggerContext mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
+
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+
+        InfobipUtils.unsubscribeWebhook("abc", mockedContext);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/resource-management/1/inbound-message-configurations/abc", stringArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testUnsubscribeWebhookWhenConfigurationNoLongerExists(
+        TriggerContext mockedContext, Executor mockedExecutor, Http mockedHttp) {
+
+        when(mockedHttp.delete(anyString()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenThrow(new ProviderException.NotFoundException("404"));
+
+        assertDoesNotThrow(() -> InfobipUtils.unsubscribeWebhook("abc", mockedContext));
+    }
+
+    @Test
+    void testUnsubscribeWebhookWhenProviderFails(
+        TriggerContext mockedContext, Executor mockedExecutor, Http mockedHttp) {
+
+        when(mockedHttp.delete(anyString()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenThrow(new ProviderException.ForbiddenException("403"));
+
+        assertThrows(
+            ProviderException.ForbiddenException.class, () -> InfobipUtils.unsubscribeWebhook("abc", mockedContext));
     }
 }

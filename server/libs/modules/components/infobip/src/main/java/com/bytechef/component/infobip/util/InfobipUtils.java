@@ -35,6 +35,7 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,8 +138,13 @@ public class InfobipUtils {
     }
 
     public static void unsubscribeWebhook(String configurationKey, TriggerContext triggerContext) {
-        triggerContext.http(http -> http.delete(
-            "/resource-management/1/inbound-message-configurations/%s".formatted(configurationKey)))
-            .execute();
+        try {
+            triggerContext.http(http -> http.delete(
+                "/resource-management/1/inbound-message-configurations/%s".formatted(configurationKey)))
+                .execute();
+        } catch (ProviderException.NotFoundException notFoundException) {
+            triggerContext.log(log -> log.debug(
+                "Infobip inbound message configuration {} no longer exists", configurationKey));
+        }
     }
 }
