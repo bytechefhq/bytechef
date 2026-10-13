@@ -82,8 +82,6 @@ public class GoogleDriveFindOrCreateFolderAction {
     }
 
     public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-        String folderName = inputParameters.getRequiredString(FOLDER_NAME);
         String parentFolderId = inputParameters.getString(FOLDER_ID);
 
         if (StringUtils.isBlank(parentFolderId)) {
@@ -91,10 +89,13 @@ public class GoogleDriveFindOrCreateFolderAction {
         }
 
         try {
-            File existingFolder = findFolder(drive, folderName, parentFolderId);
+            Drive drive = GoogleServices.getDrive(connectionParameters);
+            String folderName = inputParameters.getRequiredString(FOLDER_NAME);
 
-            if (existingFolder != null) {
-                return existingFolder;
+            File folder = findFolder(drive, folderName, parentFolderId);
+
+            if (folder != null) {
+                return folder;
             }
 
             File folderFile = new File()
@@ -118,9 +119,10 @@ public class GoogleDriveFindOrCreateFolderAction {
     }
 
     private static File findFolder(Drive drive, String folderName, String parentFolderId) throws IOException {
-        String query = "mimeType = '%s' and name = '%s' and '%s' in parents and trashed = false".formatted(
-            APPLICATION_VND_GOOGLE_APPS_FOLDER, escapeQueryValue(folderName),
-            parentFolderId == null ? ROOT_FOLDER_ALIAS : escapeQueryValue(parentFolderId));
+        String query =
+            "mimeType = '%s' and name = '%s' and '%s' in parents and trashed = false".formatted(
+                APPLICATION_VND_GOOGLE_APPS_FOLDER, escapeQueryValue(folderName),
+                parentFolderId == null ? ROOT_FOLDER_ALIAS : escapeQueryValue(parentFolderId));
 
         FileList fileList = drive
             .files()
