@@ -177,10 +177,7 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
 
                 <CollapsibleContent>
                     <div className="border-t border-border/50 px-3 py-2 pl-10">
-                        <A2aProjectWorkflowList
-                            a2aProject={a2aProject}
-                            onEditClick={() => setShowEditSkillsDialog(true)}
-                        />
+                        <A2aProjectWorkflowList a2aProject={a2aProject} />
                     </div>
                 </CollapsibleContent>
             </Collapsible>

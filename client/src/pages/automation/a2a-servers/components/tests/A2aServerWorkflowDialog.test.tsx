@@ -95,8 +95,6 @@ vi.mock(
     })
 );
 
-vi.mock('../A2aServerSkillsEditor', () => ({default: () => null}));
-
 const a2aServer = {
     authenticationRequired: true,
     enabled: true,
