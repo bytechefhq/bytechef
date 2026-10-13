@@ -92,4 +92,86 @@ describe('useOAuth2', () => {
             state: savedState,
         });
     });
+
+    it('posts authorizationContext back with the authorization code', () => {
+        const onCodeSuccess = vi.fn();
+
+        const {result} = renderHook(() =>
+            useOAuth2({
+                authorizationContext: 'sealed-context',
+                authorizationUrl: 'https://auth.example.com/authorize',
+                clientId: 'client',
+                extraQueryParameters: {code_challenge: 'challenge', code_challenge_method: 'S256'},
+                onCodeSuccess,
+                redirectUri: 'https://bytechef.example.com/callback',
+                responseType: 'code',
+                scope: 'read',
+            })
+        );
+
+        act(() => {
+            stopAuthFunctions.push(result.current.getAuth());
+        });
+
+        const popupUrl = new URL(vi.mocked(window.open).mock.calls[0][0] as string);
+
+        expect(popupUrl.searchParams.has('code_verifier')).toBe(false);
+
+        const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+
+        act(() => {
+            window.dispatchEvent(
+                new MessageEvent('message', {
+                    data: {payload: {code: 'the-code', state: savedState}, type: OAUTH_RESPONSE},
+                })
+            );
+        });
+
+        expect(onCodeSuccess).toHaveBeenCalledWith({
+            authorizationContext: 'sealed-context',
+            code: 'the-code',
+            state: savedState,
+        });
+    });
+
+    it('pairs the posted authorization context with the challenge used for the popup after a rerender', () => {
+        const onCodeSuccess = vi.fn();
+
+        const buildProps = (version: number) => ({
+            authorizationContext: `context-${version}`,
+            authorizationUrl: 'https://auth.example.com/authorize',
+            clientId: 'client',
+            extraQueryParameters: {code_challenge: `challenge-${version}`, code_challenge_method: 'S256'},
+            onCodeSuccess,
+            redirectUri: 'https://bytechef.example.com/callback',
+            responseType: 'code' as const,
+            scope: 'read',
+        });
+
+        const {rerender, result} = renderHook((props: ReturnType<typeof buildProps>) => useOAuth2(props), {
+            initialProps: buildProps(1),
+        });
+
+        rerender(buildProps(2));
+
+        act(() => {
+            stopAuthFunctions.push(result.current.getAuth());
+        });
+
+        rerender(buildProps(3));
+
+        const popupUrl = new URL(vi.mocked(window.open).mock.calls[0][0] as string);
+        const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+
+        act(() => {
+            window.dispatchEvent(
+                new MessageEvent('message', {
+                    data: {payload: {code: 'the-code', state: savedState}, type: OAUTH_RESPONSE},
+                })
+            );
+        });
+
+        expect(popupUrl.searchParams.get('code_challenge')).toBe('challenge-2');
+        expect(onCodeSuccess).toHaveBeenCalledWith(expect.objectContaining({authorizationContext: 'context-2'}));
+    });
 });
