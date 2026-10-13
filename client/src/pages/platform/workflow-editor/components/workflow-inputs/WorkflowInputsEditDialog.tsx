@@ -13,7 +13,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {WorkflowInputType} from '@/shared/types';
-import {RefObject, useEffect, useRef} from 'react';
+import {RefObject} from 'react';
 import {UseFormReturn, useWatch} from 'react-hook-form';
 
 const INPUT_NAME_PATTERN = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
@@ -42,8 +42,6 @@ const WorkflowInputsEditDialog = ({
     openEditDialog,
     saveWorkflowInput,
 }: WorkflowInputsEditDialogProps) => {
-    const previousTypeRef = useRef<string | undefined>(form.getValues('type'));
-
     const selectedType = useWatch({control: form.control, name: 'type'});
 
     const testValueInputTypeMap: Record<string, string> = {
@@ -55,16 +53,6 @@ const WorkflowInputsEditDialog = ({
     };
 
     const testValueInputType = (selectedType && testValueInputTypeMap[selectedType]) ?? 'text';
-
-    useEffect(() => {
-        if (previousTypeRef.current === selectedType) {
-            return;
-        }
-
-        previousTypeRef.current = selectedType;
-
-        form.setValue('testValue', '');
-    }, [form, selectedType]);
 
     return (
         <Dialog
@@ -146,7 +134,16 @@ const WorkflowInputsEditDialog = ({
                                             </FormLabel>
 
                                             <FormControl>
-                                                <Select onValueChange={field.onChange} value={field.value ?? ''}>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        if (value !== field.value) {
+                                                            form.setValue('testValue', '');
+                                                        }
+
+                                                        field.onChange(value);
+                                                    }}
+                                                    value={field.value ?? ''}
+                                                >
                                                     <SelectTrigger className="w-full">
                                                         <SelectValue placeholder="Select input type" />
                                                     </SelectTrigger>

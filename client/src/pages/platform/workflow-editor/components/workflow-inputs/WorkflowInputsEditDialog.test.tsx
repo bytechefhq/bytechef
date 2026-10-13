@@ -8,7 +8,7 @@ import {
     waitFor,
     windowResizeObserver,
 } from '@/shared/util/test-utils';
-import {useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import {useForm} from 'react-hook-form';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -33,6 +33,33 @@ const EditDialogHarness = ({
         <WorkflowInputsEditDialog
             closeDialog={vi.fn()}
             currentInputIndex={currentInputIndex}
+            form={form}
+            isEditDialogOpen={true}
+            nameInputRef={nameInputRef}
+            openEditDialog={vi.fn()}
+            saveWorkflowInput={saveWorkflowInput}
+        />
+    );
+};
+
+interface ResetOnOpenHarnessProps {
+    openedInput: WorkflowInputType;
+    saveWorkflowInput?: (input: WorkflowInputType) => void;
+}
+
+const ResetOnOpenHarness = ({openedInput, saveWorkflowInput = vi.fn()}: ResetOnOpenHarnessProps) => {
+    const nameInputRef = useRef<HTMLInputElement>(null);
+
+    const form = useForm<WorkflowInputType, unknown, WorkflowInputType>();
+
+    useEffect(() => {
+        form.reset(openedInput);
+    }, [form, openedInput]);
+
+    return (
+        <WorkflowInputsEditDialog
+            closeDialog={vi.fn()}
+            currentInputIndex={0}
             form={form}
             isEditDialogOpen={true}
             nameInputRef={nameInputRef}
@@ -77,6 +104,31 @@ describe('WorkflowInputsEditDialog', () => {
         expect(await screen.findByLabelText('Test Value')).toHaveValue(
             'a-very-long-test-value-that-overflows-the-workflow-inputs-panel'
         );
+    });
+
+    it('should keep the existing test value when the form is reset with the opened input', async () => {
+        const saveWorkflowInput = vi.fn();
+
+        render(
+            <ResetOnOpenHarness
+                openedInput={{
+                    label: 'Count',
+                    name: 'count',
+                    required: false,
+                    testValue: '42',
+                    type: 'integer',
+                }}
+                saveWorkflowInput={saveWorkflowInput}
+            />
+        );
+
+        await waitFor(() => expect(screen.getByLabelText('Test Value')).toHaveValue(42));
+
+        fireEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(saveWorkflowInput).toHaveBeenCalled());
+
+        expect(saveWorkflowInput.mock.calls[0][0]).toMatchObject({name: 'count', testValue: '42'});
     });
 
     it('should clear the test value when the input type changes', async () => {
