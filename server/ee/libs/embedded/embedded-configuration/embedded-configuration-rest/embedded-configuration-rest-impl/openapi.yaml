@@ -2159,6 +2159,9 @@ components:
       description: "The parameters needed to start an OAuth2 authorization flow."
       type: "object"
       properties:
+        authorizationContext:
+          description: "Opaque, server-sealed state the client must post back with the authorization code."
+          type: "string"
         authorizationUrl:
           description: "The authorization url."
           type: "string"

@@ -36,6 +36,8 @@ public class OAuth2Model {
 
   private Map<String, String> scopes = new HashMap<>();
 
+  private @Nullable String authorizationContext;
+
   public OAuth2Model authorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
     return this;
@@ -157,6 +159,27 @@ public class OAuth2Model {
     this.scopes = scopes;
   }
 
+  public OAuth2Model authorizationContext(@Nullable String authorizationContext) {
+    this.authorizationContext = authorizationContext;
+    return this;
+  }
+
+  /**
+   * Opaque, server-sealed state the client must post back with the authorization code.
+   * @return authorizationContext
+   */
+  
+  @Schema(name = "authorizationContext", description = "Opaque, server-sealed state the client must post back with the authorization code.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationContext")
+  public @Nullable String getAuthorizationContext() {
+    return authorizationContext;
+  }
+
+  @JsonProperty("authorizationContext")
+  public void setAuthorizationContext(@Nullable String authorizationContext) {
+    this.authorizationContext = authorizationContext;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -170,12 +193,13 @@ public class OAuth2Model {
         Objects.equals(this.extraQueryParameters, oauth2.extraQueryParameters) &&
         Objects.equals(this.clientId, oauth2.clientId) &&
         Objects.equals(this.redirectUri, oauth2.redirectUri) &&
-        Objects.equals(this.scopes, oauth2.scopes);
+        Objects.equals(this.scopes, oauth2.scopes) &&
+        Objects.equals(this.authorizationContext, oauth2.authorizationContext);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationUrl, extraQueryParameters, clientId, redirectUri, scopes);
+    return Objects.hash(authorizationUrl, extraQueryParameters, clientId, redirectUri, scopes, authorizationContext);
   }
 
   @Override
@@ -187,6 +211,7 @@ public class OAuth2Model {
     sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    redirectUri: ").append(toIndentedString(redirectUri)).append("\n");
     sb.append("    scopes: ").append(toIndentedString(scopes)).append("\n");
+    sb.append("    authorizationContext: ").append(toIndentedString(authorizationContext)).append("\n");
     sb.append("}");
     return sb.toString();
   }

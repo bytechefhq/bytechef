@@ -35,6 +35,9 @@ import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.oauth2.domain.OAuth2AuthorizationContext;
+import com.bytechef.platform.oauth2.exception.OAuth2ErrorType;
+import com.bytechef.platform.oauth2.service.OAuth2AuthorizationContextService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -43,15 +46,19 @@ import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -67,9 +74,16 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectionFacadeImpl.class);
 
+    private static final String ISSUER_PARAMETER_NAME = "iss";
+
+    private static final List<String> DISCOVERY_PARAMETER_NAMES = List.of(
+        CLIENT_SECRET, Authorization.REFRESH_URL, Authorization.TOKEN_URL, Authorization.AUTHORIZATION_URL,
+        Authorization.TOKEN_ENDPOINT_AUTH_METHOD, Authorization.RESOURCE);
+
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private final OAuth2AuthorizationContextService oAuth2AuthorizationContextService;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -77,12 +91,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        OAuth2AuthorizationContextService oAuth2AuthorizationContextService, OAuth2Service oAuth2Service,
+        TagService tagService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.oAuth2AuthorizationContextService = oAuth2AuthorizationContextService;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
@@ -92,21 +108,17 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public long create(ConnectionDTO connectionDTO, PlatformType type) {
         Connection connection = connectionDTO.toConnection();
 
+        connection.setType(type);
+
         resolveOAuth2AuthorizationCode(connection);
 
-        Map<String, ?> parameters = new HashMap<>(connection.getParameters());
-
-        parameters.remove("state");
-
-        connection.setParameters(parameters);
+        removeTransientOAuth2Parameters(connection);
 
         List<Tag> tags = checkTags(connectionDTO.tags());
 
         if (!tags.isEmpty()) {
             connection.setTags(tags);
         }
-
-        connection.setType(type);
 
         connection = connectionService.create(connection);
 
@@ -171,11 +183,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         resolveOAuth2AuthorizationCode(connection);
 
-        Map<String, ?> updatedParameters = new HashMap<>(connection.getParameters());
+        removeTransientOAuth2Parameters(connection);
 
-        updatedParameters.remove("state");
-
-        return updatedParameters;
+        return connection.getParameters();
     }
 
     private Connection getConnectionWithReplacedAuthorizationParameters(long id, Map<String, ?> parameters) {
@@ -205,47 +215,218 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     private void resolveOAuth2AuthorizationCode(Connection connection) {
-        if (connection.getAuthorizationType() != null && connection.containsParameter(Authorization.CODE)) {
+        if (connection.getAuthorizationType() == null || !connection.containsParameter(Authorization.CODE)) {
+            return;
+        }
 
-            // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
+        AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
+            connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationType());
 
-            AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
-                connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationType());
+        if (authorizationType != AuthorizationType.OAUTH2_AUTHORIZATION_CODE &&
+            authorizationType != AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
-            if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
-                authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+            return;
+        }
 
-                Map<String, ?> predefinedParameters = oAuth2Service.checkPredefinedParameters(
-                    connection.getComponentName(), connection.getParameters());
+        Map<String, Object> callbackParameters = new HashMap<>(
+            oAuth2Service.checkPredefinedParameters(connection.getComponentName(), connection.getParameters()));
+        OAuth2AuthorizationContext authorizationContext = unsealAuthorizationContext(connection);
 
-                AuthorizationCallbackResponse authorizationCallbackResponse = Objects.requireNonNull(
-                    connectionDefinitionService.executeAuthorizationCallback(
-                        connection.getComponentName(), connection.getConnectionVersion(),
-                        connection.getAuthorizationType(), predefinedParameters,
-                        oAuth2Service.getRedirectUri()),
-                    "Authorization callback returned no response for component " + connection.getComponentName());
+        if (authorizationContext == null && authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE &&
+            !(callbackParameters.get(Authorization.CODE_VERIFIER) instanceof String codeVerifier &&
+                !codeVerifier.isBlank())) {
 
-                connection.putAllParameters(authorizationCallbackResponse.result());
+            throw new ConfigurationException(
+                "The sign-in response is missing its authorization context, so the sign-in can't be completed. " +
+                    "Start the sign-in again from the same page; if this keeps happening, the page or the embedded " +
+                    "SDK that started it is out of date.",
+                OAuth2ErrorType.AUTHORIZATION_CONTEXT_MISSING);
+        }
 
-                Map<String, ?> parameters = connection.getParameters();
+        if (authorizationContext != null) {
+            callbackParameters.put(Authorization.CODE_VERIFIER, authorizationContext.codeVerifier());
 
-                Object clientId = parameters.get(CLIENT_ID);
-                Object clientSecret = parameters.get(CLIENT_SECRET);
-
-                if ((clientId == null || clientId.equals("")) && (clientSecret == null || clientSecret.equals(""))) {
-                    connection.putAllParameters(
-                        Map.of(
-                            CLIENT_ID, predefinedParameters.get(CLIENT_ID),
-                            CLIENT_SECRET, predefinedParameters.get(CLIENT_SECRET)));
+            if (authorizationContext.isDiscovery()) {
+                if (connection.getType() == PlatformType.EMBEDDED) {
+                    throw new ConfigurationException(
+                        "Automatic OAuth2 discovery isn't available for embedded integrations yet. Use OAuth2 " +
+                            "(PKCE) with the server's Authorization URL and Token URL, or OAuth2 (manual).",
+                        OAuth2ErrorType.DISCOVERY_NOT_AVAILABLE);
                 }
 
-                if (log.isWarnEnabled() && !connection.containsParameter(Authorization.REFRESH_TOKEN)) {
-                    log.warn(
-                        "OAuth2 authorization code connection for component {} does not contain refresh token",
-                        connection.getComponentName());
-                }
+                validateDiscoveryResource(connection, authorizationContext);
+                validateIssuer(connection, authorizationContext);
+
+                Map<String, Object> discoveryParameters = authorizationContext.toConnectionParameters();
+
+                removeParametersNotSuppliedByDiscovery(callbackParameters, discoveryParameters);
+
+                callbackParameters.putAll(discoveryParameters);
             }
         }
+
+        AuthorizationCallbackResponse authorizationCallbackResponse = Objects.requireNonNull(
+            connectionDefinitionService.executeAuthorizationCallback(
+                connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationType(),
+                callbackParameters, oAuth2Service.getRedirectUri()),
+            "Authorization callback returned no response for component " + connection.getComponentName());
+
+        if (authorizationContext != null && authorizationContext.isDiscovery()) {
+            Map<String, Object> discoveryParameters = authorizationContext.toConnectionParameters();
+            Map<String, Object> connectionParameters = new HashMap<>(connection.getParameters());
+
+            removeParametersNotSuppliedByDiscovery(connectionParameters, discoveryParameters);
+
+            connectionParameters.putAll(discoveryParameters);
+
+            connection.setParameters(connectionParameters);
+        }
+
+        connection.putAllParameters(authorizationCallbackResponse.result());
+
+        removeParameter(connection, ISSUER_PARAMETER_NAME);
+
+        Map<String, ?> parameters = connection.getParameters();
+
+        Object clientId = parameters.get(CLIENT_ID);
+        Object clientSecret = parameters.get(CLIENT_SECRET);
+        Object predefinedClientId = callbackParameters.get(CLIENT_ID);
+        Object predefinedClientSecret = callbackParameters.get(CLIENT_SECRET);
+
+        if ((clientId == null || clientId.equals("")) && (clientSecret == null || clientSecret.equals("")) &&
+            predefinedClientId != null && predefinedClientSecret != null) {
+
+            connection.putAllParameters(Map.of(CLIENT_ID, predefinedClientId, CLIENT_SECRET, predefinedClientSecret));
+        }
+
+        if (log.isWarnEnabled() && !connection.containsParameter(Authorization.REFRESH_TOKEN)) {
+            log.warn(
+                "OAuth2 authorization code connection for component {} does not contain refresh token",
+                connection.getComponentName());
+        }
+    }
+
+    private static void removeParametersNotSuppliedByDiscovery(
+        Map<String, Object> parameters, Map<String, Object> discoveryParameters) {
+
+        DISCOVERY_PARAMETER_NAMES.stream()
+            .filter(parameterName -> !discoveryParameters.containsKey(parameterName))
+            .forEach(parameters::remove);
+    }
+
+    private OAuth2AuthorizationContext unsealAuthorizationContext(Connection connection) {
+        Map<String, ?> parameters = connection.getParameters();
+
+        Object sealedAuthorizationContext = parameters.get(Authorization.AUTHORIZATION_CONTEXT);
+
+        if (!(sealedAuthorizationContext instanceof String sealed) || sealed.isBlank()) {
+            return null;
+        }
+
+        return oAuth2AuthorizationContextService.unseal(
+            sealed, connection.getComponentName(), connection.getConnectionVersion());
+    }
+
+    private void validateDiscoveryResource(Connection connection, OAuth2AuthorizationContext authorizationContext) {
+        Optional<String> protectedResourceUrlOptional = connectionDefinitionService.getProtectedResourceUrl(
+            connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationType(),
+            connection.getParameters());
+
+        String resource = authorizationContext.resource();
+
+        if (protectedResourceUrlOptional.isEmpty() || resource == null) {
+            throw new ConfigurationException(
+                "This sign-in was started for another server; try again",
+                OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+        }
+
+        String sealedOrigin = originOf(resource);
+        String currentOrigin = originOf(protectedResourceUrlOptional.get());
+
+        if (sealedOrigin == null || currentOrigin == null) {
+            throw new ConfigurationException(
+                "This sign-in was started for another server; try again",
+                OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+        }
+
+        if (!sealedOrigin.equals(currentOrigin)) {
+            throw new ConfigurationException(
+                "The server URL changed after this sign-in started. Start the sign-in again with the current " +
+                    "server URL.",
+                OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+        }
+    }
+
+    private static void validateIssuer(Connection connection, OAuth2AuthorizationContext authorizationContext) {
+        Map<String, ?> parameters = connection.getParameters();
+
+        if (!(parameters.get(ISSUER_PARAMETER_NAME) instanceof String issuer) || issuer.isBlank()) {
+            if (authorizationContext.issParameterRequired()) {
+                throw new ConfigurationException(
+                    "The sign-in response did not say which authorization server sent it; try again",
+                    OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+            }
+
+            return;
+        }
+
+        String expectedIssuer = authorizationContext.issuer();
+
+        if (expectedIssuer == null || !Objects.equals(stripTrailingSlash(issuer), stripTrailingSlash(expectedIssuer))) {
+            throw new ConfigurationException(
+                "The sign-in response came from an unexpected authorization server; try again",
+                OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+        }
+    }
+
+    private static @Nullable String originOf(String url) {
+        URI uri;
+
+        try {
+            uri = URI.create(url);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return null;
+        }
+
+        String scheme = uri.getScheme();
+        String host = uri.getHost();
+
+        if (scheme == null || host == null) {
+            return null;
+        }
+
+        int port = uri.getPort();
+
+        String origin = scheme.toLowerCase(Locale.ROOT) + "://" + host.toLowerCase(Locale.ROOT);
+
+        return port == -1 ? origin : origin + ":" + port;
+    }
+
+    private static String stripTrailingSlash(String value) {
+        return value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
+    }
+
+    private static void removeParameter(Connection connection, String parameterName) {
+        if (!connection.containsParameter(parameterName)) {
+            return;
+        }
+
+        Map<String, Object> parameters = new HashMap<>(connection.getParameters());
+
+        parameters.remove(parameterName);
+
+        connection.setParameters(parameters);
+    }
+
+    private static void removeTransientOAuth2Parameters(Connection connection) {
+        Map<String, Object> parameters = new HashMap<>(connection.getParameters());
+
+        parameters.remove("state");
+        parameters.remove(Authorization.CODE);
+        parameters.remove(Authorization.CODE_VERIFIER);
+        parameters.remove(Authorization.AUTHORIZATION_CONTEXT);
+
+        connection.setParameters(parameters);
     }
 
     @Override
@@ -320,6 +501,37 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 .map(Connection::getTagIds)
                 .flatMap(Collection::stream)
                 .toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, ?> getReauthorizationParameters(long id, String componentName, int connectionVersion) {
+        Connection connection = connectionService.getConnection(id);
+
+        validateOwnerOrAdmin(connection);
+
+        if (!Objects.equals(connection.getComponentName(), componentName) ||
+            connection.getConnectionVersion() != connectionVersion) {
+
+            throw new ConfigurationException(
+                "Connection id=%s does not belong to component %s version %s".formatted(
+                    id, componentName, connectionVersion),
+                ConnectionErrorType.INVALID_CONNECTION_COMPONENT_NAME);
+        }
+
+        ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
+            componentName, connectionVersion);
+
+        List<String> authorizationPropertyNames = getAuthorizationPropertyNames(connectionDefinition);
+
+        List<? extends BaseProperty> connectionProperties = connectionDefinition.getProperties();
+
+        List<String> connectionPropertyNames = connectionProperties.stream()
+            .map(BaseProperty::getName)
+            .filter(propertyName -> !authorizationPropertyNames.contains(propertyName))
+            .toList();
+
+        return getConnectionParameters(connection.getParameters(), connectionPropertyNames);
     }
 
     @Override
@@ -413,6 +625,16 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return tags
             .stream()
             .filter(tag -> containsTag(connection, tag))
+            .toList();
+    }
+
+    private static List<String> getAuthorizationPropertyNames(ConnectionDefinition connectionDefinition) {
+        List<com.bytechef.platform.component.domain.Authorization> authorizations =
+            connectionDefinition.getAuthorizations();
+
+        return authorizations.stream()
+            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
+            .map(BaseProperty::getName)
             .toList();
     }
 
@@ -513,11 +735,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
             componentName, connectionVersion);
 
-        List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
-            .stream()
-            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
-            .map(BaseProperty::getName)
-            .toList();
+        List<String> authorizationPropertyNames = getAuthorizationPropertyNames(connectionDefinition);
         List<String> connectionPropertyNames = connectionDefinition.getProperties()
             .stream()
             .map(BaseProperty::getName)

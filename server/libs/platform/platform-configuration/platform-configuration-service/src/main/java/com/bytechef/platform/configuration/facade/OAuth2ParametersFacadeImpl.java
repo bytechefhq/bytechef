@@ -19,8 +19,12 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,22 +34,37 @@ import org.springframework.stereotype.Service;
 public class OAuth2ParametersFacadeImpl implements OAuth2ParametersFacade {
 
     private final ConnectionDefinitionService connectionDefinitionService;
+    private final ConnectionFacade connectionFacade;
     private final OAuth2Service oAuth2Service;
 
+    @SuppressFBWarnings("EI2")
     public OAuth2ParametersFacadeImpl(
-        ConnectionDefinitionService connectionDefinitionService, OAuth2Service oAuth2Service) {
+        ConnectionDefinitionService connectionDefinitionService, ConnectionFacade connectionFacade,
+        OAuth2Service oAuth2Service) {
 
         this.connectionDefinitionService = connectionDefinitionService;
+        this.connectionFacade = connectionFacade;
         this.oAuth2Service = oAuth2Service;
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters,
-        AuthorizationType authorizationType) {
+        AuthorizationType authorizationType, @Nullable Long connectionId) {
+
+        Map<String, Object> parameters = new HashMap<>();
+
+        if (connectionId != null) {
+            parameters.putAll(
+                connectionFacade.getReauthorizationParameters(connectionId, componentName, connectionVersion));
+        }
+
+        if (connectionParameters != null) {
+            parameters.putAll(connectionParameters);
+        }
 
         return connectionDefinitionService.getOAuth2AuthorizationParameters(
             componentName, connectionVersion, authorizationType,
-            oAuth2Service.checkPredefinedParameters(componentName, connectionParameters));
+            oAuth2Service.checkPredefinedParameters(componentName, parameters));
     }
 }

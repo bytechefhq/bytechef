@@ -27,6 +27,8 @@ import jakarta.annotation.Generated;
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T19:43:07.740396+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class OAuth2AuthorizationParametersModel {
 
+  private @Nullable String authorizationContext;
+
   private @Nullable String authorizationUrl;
 
   private @Nullable String clientId;
@@ -34,6 +36,27 @@ public class OAuth2AuthorizationParametersModel {
   private Map<String, String> extraQueryParameters = new HashMap<>();
 
   private Map<String, Boolean> scopes = new HashMap<>();
+
+  public OAuth2AuthorizationParametersModel authorizationContext(@Nullable String authorizationContext) {
+    this.authorizationContext = authorizationContext;
+    return this;
+  }
+
+  /**
+   * Opaque, server-sealed state the client must post back with the authorization code.
+   * @return authorizationContext
+   */
+  
+  @Schema(name = "authorizationContext", description = "Opaque, server-sealed state the client must post back with the authorization code.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationContext")
+  public @Nullable String getAuthorizationContext() {
+    return authorizationContext;
+  }
+
+  @JsonProperty("authorizationContext")
+  public void setAuthorizationContext(@Nullable String authorizationContext) {
+    this.authorizationContext = authorizationContext;
+  }
 
   public OAuth2AuthorizationParametersModel authorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
@@ -144,7 +167,8 @@ public class OAuth2AuthorizationParametersModel {
       return false;
     }
     OAuth2AuthorizationParametersModel oauth2AuthorizationParameters = (OAuth2AuthorizationParametersModel) o;
-    return Objects.equals(this.authorizationUrl, oauth2AuthorizationParameters.authorizationUrl) &&
+    return Objects.equals(this.authorizationContext, oauth2AuthorizationParameters.authorizationContext) &&
+        Objects.equals(this.authorizationUrl, oauth2AuthorizationParameters.authorizationUrl) &&
         Objects.equals(this.clientId, oauth2AuthorizationParameters.clientId) &&
         Objects.equals(this.extraQueryParameters, oauth2AuthorizationParameters.extraQueryParameters) &&
         Objects.equals(this.scopes, oauth2AuthorizationParameters.scopes);
@@ -152,13 +176,14 @@ public class OAuth2AuthorizationParametersModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationUrl, clientId, extraQueryParameters, scopes);
+    return Objects.hash(authorizationContext, authorizationUrl, clientId, extraQueryParameters, scopes);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class OAuth2AuthorizationParametersModel {\n");
+    sb.append("    authorizationContext: ").append(toIndentedString(authorizationContext)).append("\n");
     sb.append("    authorizationUrl: ").append(toIndentedString(authorizationUrl)).append("\n");
     sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    extraQueryParameters: ").append(toIndentedString(extraQueryParameters)).append("\n");

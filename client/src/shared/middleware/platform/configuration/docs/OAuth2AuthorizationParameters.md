@@ -10,6 +10,7 @@ Name | Type
 `extraQueryParameters` | { [key: string]: string; }
 `clientId` | string
 `scopes` | { [key: string]: boolean; }
+`authorizationContext` | string
 
 ## Example
 
@@ -22,6 +23,7 @@ const example = {
   "extraQueryParameters": null,
   "clientId": null,
   "scopes": null,
+  "authorizationContext": null,
 } satisfies OAuth2AuthorizationParameters
 
 console.log(example)

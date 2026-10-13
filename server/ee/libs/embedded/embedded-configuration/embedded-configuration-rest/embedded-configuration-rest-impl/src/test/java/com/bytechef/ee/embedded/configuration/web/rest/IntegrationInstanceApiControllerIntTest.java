@@ -333,6 +333,8 @@ class IntegrationInstanceApiControllerIntTest {
             .isEqualTo("https://auth.example.com")
             .jsonPath("$[0].integrationInstanceConfigurations[0].oAuth2AuthorizationParameters.scopes.read")
             .isEqualTo(true)
+            .jsonPath("$[0].integrationInstanceConfigurations[0].oAuth2AuthorizationParameters.authorizationContext")
+            .isEqualTo("sealed-context")
             .jsonPath("$[0].integrationInstanceConfigurations[0].redirectUri")
             .isEqualTo("https://app.example.com/callback")
             .jsonPath("$[0].mcpWorkflowUuids[0]")
@@ -537,7 +539,7 @@ class IntegrationInstanceApiControllerIntTest {
                 new ProvisionableIntegrationInstanceConfiguration(
                     integrationInstanceConfigurationDTO, true, List.of("clientId"),
                     new OAuth2AuthorizationParameters(
-                        "https://auth.example.com", "client-id", Map.of(), Map.of("read", true)),
+                        "https://auth.example.com", "client-id", Map.of(), Map.of("read", true), "sealed-context"),
                     "https://app.example.com/callback")),
             List.of("mcp-workflow-uuid"), List.of("tool-only-workflow-uuid"));
     }

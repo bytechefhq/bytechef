@@ -16,15 +16,24 @@
 
 package com.bytechef.platform.connection.facade;
 
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Property;
@@ -37,9 +46,16 @@ import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSha
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.oauth2.domain.DiscoveredAuthorizationServer;
+import com.bytechef.platform.oauth2.domain.OAuth2AuthorizationContext;
+import com.bytechef.platform.oauth2.domain.RegisteredClient;
+import com.bytechef.platform.oauth2.exception.OAuth2ErrorType;
+import com.bytechef.platform.oauth2.service.OAuth2AuthorizationContextService;
+import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
@@ -54,9 +70,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -83,6 +101,23 @@ import org.springframework.security.test.context.support.WithMockUser;
 @ConnectionIntTestConfigurationSharedMocks
 class ConnectionFacadeIntTest {
 
+    private static final String REDIRECT_URI = "https://bytechef.example.com/callback";
+
+    private static final OAuth2AuthorizationContext DISCOVERY_CONTEXT = OAuth2AuthorizationContext.ofDiscovery(
+        "componentName", 1, "sealed-verifier", new RegisteredClient("reg-1", null, "none"),
+        new DiscoveredAuthorizationServer(
+            "https://auth.example.com", "https://auth.example.com/authorize", "https://auth.example.com/token",
+            "https://auth.example.com/register", "https://mcp.example.com/mcp", List.of(), List.of("S256"),
+            List.of("none")));
+
+    private static final OAuth2AuthorizationContext ISS_REQUIRING_DISCOVERY_CONTEXT =
+        OAuth2AuthorizationContext.ofDiscovery(
+            "componentName", 1, "sealed-verifier", new RegisteredClient("reg-1", null, "none"),
+            new DiscoveredAuthorizationServer(
+                "https://auth.example.com", "https://auth.example.com/authorize", "https://auth.example.com/token",
+                "https://auth.example.com/register", "https://mcp.example.com/mcp", List.of(), List.of("S256"),
+                List.of("none"), true));
+
     @Autowired
     private ConnectionDefinitionService connectionDefinitionService;
 
@@ -94,6 +129,12 @@ class ConnectionFacadeIntTest {
 
     @Autowired
     private ConnectionService connectionService;
+
+    @Autowired
+    private OAuth2AuthorizationContextService oAuth2AuthorizationContextService;
+
+    @Autowired
+    private OAuth2Service oAuth2Service;
 
     @Autowired
     private TagRepository tagRepository;
@@ -704,6 +745,607 @@ class ConnectionFacadeIntTest {
 
         when(connectionDefinitionService.getConnectionConnectionDefinition(componentName, 1))
             .thenReturn(connectionDefinition);
+    }
+
+    @Test
+    void testCreateExchangesCodeWithUnsealedDiscoveryContextAndStripsTransientParameters() {
+        stubOAuth2Exchange(Map.of("access_token", "at", "refresh_token", "rt", "expires_in", 3600));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", Authorization.CODE, "the-code", "state", "s",
+                    Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.AUTOMATION);
+
+        Assertions.assertThat(captureCallbackParameters())
+            .containsEntry(Authorization.CODE, "the-code")
+            .containsEntry(Authorization.CODE_VERIFIER, "sealed-verifier")
+            .containsEntry(Authorization.CLIENT_ID, "reg-1")
+            .containsEntry(Authorization.TOKEN_URL, "https://auth.example.com/token")
+            .containsEntry(Authorization.RESOURCE, "https://mcp.example.com/mcp");
+
+        Map<String, Object> storedParameters = getStoredParameters(connectionId);
+
+        Assertions.assertThat(storedParameters)
+            .containsEntry("url", "https://mcp.example.com/mcp")
+            .containsEntry(Authorization.CLIENT_ID, "reg-1")
+            .containsEntry(Authorization.TOKEN_ENDPOINT_AUTH_METHOD, "none")
+            .containsEntry(Authorization.AUTHORIZATION_URL, "https://auth.example.com/authorize")
+            .containsEntry(Authorization.TOKEN_URL, "https://auth.example.com/token")
+            .containsEntry(Authorization.RESOURCE, "https://mcp.example.com/mcp")
+            .containsEntry("access_token", "at")
+            .containsEntry("refresh_token", "rt")
+            .doesNotContainKeys(
+                Authorization.CODE, Authorization.CODE_VERIFIER, Authorization.AUTHORIZATION_CONTEXT, "state");
+    }
+
+    @Test
+    void testCreateWithDiscoveryContextIgnoresConflictingBrowserPostedParameters() {
+        stubOAuth2Exchange(Map.of("access_token", "at", "refresh_token", "rt"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", Authorization.CODE, "the-code",
+                    Authorization.AUTHORIZATION_CONTEXT, "sealed", Authorization.CLIENT_ID, "browser-client",
+                    Authorization.CLIENT_SECRET, "browser-secret", Authorization.TOKEN_URL,
+                    "https://evil.example.com/token",
+                    Authorization.REFRESH_URL, "https://evil.example.com/refresh", Authorization.CODE_VERIFIER,
+                    "browser-verifier")),
+            PlatformType.AUTOMATION);
+
+        Assertions.assertThat(captureCallbackParameters())
+            .containsEntry(Authorization.CLIENT_ID, "reg-1")
+            .containsEntry(Authorization.TOKEN_URL, "https://auth.example.com/token")
+            .containsEntry(Authorization.CODE_VERIFIER, "sealed-verifier")
+            .doesNotContainKeys(Authorization.CLIENT_SECRET, Authorization.REFRESH_URL);
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry(Authorization.CLIENT_ID, "reg-1")
+            .containsEntry(Authorization.TOKEN_URL, "https://auth.example.com/token")
+            .containsEntry(Authorization.TOKEN_ENDPOINT_AUTH_METHOD, "none")
+            .containsEntry("refresh_token", "rt")
+            .doesNotContainKeys(Authorization.CLIENT_SECRET, Authorization.REFRESH_URL, Authorization.CODE_VERIFIER);
+    }
+
+    @Test
+    void testCreateUsesSealedVerifierForPlainPkceContext() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1))
+            .thenReturn(OAuth2AuthorizationContext.ofPkce("componentName", 1, "sealed-verifier"));
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    Authorization.CLIENT_ID, "manual", Authorization.CODE, "c", Authorization.AUTHORIZATION_CONTEXT,
+                    "sealed")),
+            PlatformType.AUTOMATION);
+
+        Assertions.assertThat(captureCallbackParameters())
+            .containsEntry(Authorization.CODE_VERIFIER, "sealed-verifier")
+            .containsEntry(Authorization.CLIENT_ID, "manual")
+            .doesNotContainKeys(Authorization.TOKEN_URL, Authorization.RESOURCE);
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry(Authorization.CLIENT_ID, "manual")
+            .containsEntry("access_token", "at")
+            .doesNotContainKeys(Authorization.CODE, Authorization.CODE_VERIFIER, Authorization.AUTHORIZATION_CONTEXT);
+    }
+
+    @Test
+    void testCreateWithoutAuthorizationContextBehavesAsBeforeForAuthorizationCode() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(
+            connectionDefinitionService.getAuthorizationType(
+                "componentName", 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE))
+                    .thenReturn(AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(Map.of(Authorization.CLIENT_ID, "manual", Authorization.CODE, "c", "state", "s")),
+            PlatformType.AUTOMATION);
+
+        verify(oAuth2AuthorizationContextService, never()).unseal(any(), any(), anyInt());
+
+        Assertions.assertThat(captureCallbackParameters())
+            .containsEntry(Authorization.CODE, "c")
+            .doesNotContainKey(Authorization.CODE_VERIFIER);
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry(Authorization.CLIENT_ID, "manual")
+            .containsEntry("access_token", "at")
+            .doesNotContainKeys("state", Authorization.CODE);
+    }
+
+    @Test
+    void testCreateRejectsDiscoveryContextForEmbeddedConnection() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        ThrowingCallable createCallable = () -> connectionFacade.create(
+            oAuth2ConnectionDTO(Map.of(Authorization.CODE, "c", Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.EMBEDDED);
+
+        assertOAuth2Error(createCallable, OAuth2ErrorType.DISCOVERY_NOT_AVAILABLE);
+
+        Assertions.assertThat(catchThrowable(createCallable))
+            .hasMessageContaining("Use OAuth2 (PKCE) with the server's Authorization URL and Token URL");
+
+        verify(connectionDefinitionService, never()).executeAuthorizationCallback(
+            any(), anyInt(), any(), anyMap(), any());
+
+        Assertions.assertThat(connectionRepository.count())
+            .isZero();
+    }
+
+    @Test
+    void testCreateAcceptsPlainPkceContextForEmbeddedConnection() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1))
+            .thenReturn(OAuth2AuthorizationContext.ofPkce("componentName", 1, "sealed-verifier"));
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    Authorization.CLIENT_ID, "manual", Authorization.CODE, "c", Authorization.AUTHORIZATION_CONTEXT,
+                    "sealed")),
+            PlatformType.EMBEDDED);
+
+        Assertions.assertThat(captureCallbackParameters())
+            .containsEntry(Authorization.CODE_VERIFIER, "sealed-verifier")
+            .containsEntry(Authorization.CLIENT_ID, "manual");
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry("access_token", "at");
+    }
+
+    @Test
+    void testCreateRejectsExpiredAuthorizationContext() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1))
+            .thenThrow(
+                new ConfigurationException(
+                    "Sign-in took too long; try again", OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT));
+
+        assertOAuth2Error(
+            () -> connectionFacade.create(
+                oAuth2ConnectionDTO(Map.of(Authorization.CODE, "c", Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+                PlatformType.AUTOMATION),
+            OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+
+        verify(connectionDefinitionService, never()).executeAuthorizationCallback(
+            any(), anyInt(), any(), anyMap(), any());
+
+        Assertions.assertThat(connectionRepository.count())
+            .isZero();
+    }
+
+    @Test
+    void testCreateRejectsPkceExchangeWithoutAuthorizationContextOrVerifier() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        ThrowingCallable createCallable = () -> connectionFacade.create(
+            oAuth2ConnectionDTO(Map.of(Authorization.CLIENT_ID, "manual", Authorization.CODE, "c", "state", "s")),
+            PlatformType.EMBEDDED);
+
+        assertOAuth2Error(createCallable, OAuth2ErrorType.AUTHORIZATION_CONTEXT_MISSING);
+
+        Assertions.assertThat(catchThrowable(createCallable))
+            .hasMessageContaining("Start the sign-in again");
+
+        verify(connectionDefinitionService, never()).executeAuthorizationCallback(
+            any(), anyInt(), any(), anyMap(), any());
+
+        Assertions.assertThat(connectionRepository.count())
+            .isZero();
+    }
+
+    @Test
+    void testCreateAcceptsPkceExchangeWithAPostedVerifierAndNoAuthorizationContext() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    Authorization.CLIENT_ID, "manual", Authorization.CODE, "c", Authorization.CODE_VERIFIER,
+                    "posted-verifier")),
+            PlatformType.EMBEDDED);
+
+        Assertions.assertThat(captureCallbackParameters())
+            .containsEntry(Authorization.CODE_VERIFIER, "posted-verifier");
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry("access_token", "at")
+            .doesNotContainKey(Authorization.CODE_VERIFIER);
+    }
+
+    @Test
+    void testCreateUnsealsWithTheConnectionVersionOfTheConnection() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", Authorization.CODE, "c",
+                    Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.AUTOMATION);
+
+        verify(oAuth2AuthorizationContextService).unseal("sealed", "componentName", 1);
+    }
+
+    @Test
+    void testCreateRejectsDiscoveryContextSealedForAnotherServer() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+        when(
+            connectionDefinitionService.getProtectedResourceUrl(
+                eq("componentName"), eq(1), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), anyMap()))
+                    .thenReturn(Optional.of("https://other.example.com/mcp"));
+
+        ThrowingCallable createCallable = () -> connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://other.example.com/mcp", Authorization.CODE, "c",
+                    Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.AUTOMATION);
+
+        assertOAuth2Error(createCallable, OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+
+        Assertions.assertThatThrownBy(createCallable)
+            .hasMessageContaining("The server URL changed after this sign-in started")
+            .hasMessageContaining("Start the sign-in again")
+            .hasMessageNotContaining("Save the connection");
+
+        verify(connectionDefinitionService, never()).executeAuthorizationCallback(
+            any(), anyInt(), any(), anyMap(), any());
+
+        Assertions.assertThat(connectionRepository.count())
+            .isZero();
+    }
+
+    @Test
+    void testCreateRejectsDiscoveryContextWhenNeitherServerOriginCanBeDetermined() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        OAuth2AuthorizationContext contextWithoutOrigin = OAuth2AuthorizationContext.ofDiscovery(
+            "componentName", 1, "sealed-verifier", new RegisteredClient("reg-1", null, "none"),
+            new DiscoveredAuthorizationServer(
+                "https://auth.example.com", "https://auth.example.com/authorize", "https://auth.example.com/token",
+                null, "mcp.example.com/mcp", List.of(), List.of("S256"), List.of("none")));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(contextWithoutOrigin);
+        when(
+            connectionDefinitionService.getProtectedResourceUrl(
+                eq("componentName"), eq(1), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), anyMap()))
+                    .thenReturn(Optional.of("mcp.example.com/mcp"));
+
+        ThrowingCallable createCallable = () -> connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "mcp.example.com/mcp", Authorization.CODE, "c", Authorization.AUTHORIZATION_CONTEXT,
+                    "sealed")),
+            PlatformType.AUTOMATION);
+
+        assertOAuth2Error(createCallable, OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+
+        verify(connectionDefinitionService, never()).executeAuthorizationCallback(
+            any(), anyInt(), any(), anyMap(), any());
+    }
+
+    @Test
+    void testCreateRejectsAuthorizationResponseFromAnotherIssuer() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        ThrowingCallable createCallable = () -> connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", Authorization.CODE, "c", "iss", "https://evil.example.com",
+                    Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.AUTOMATION);
+
+        assertOAuth2Error(createCallable, OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+
+        verify(connectionDefinitionService, never()).executeAuthorizationCallback(
+            any(), anyInt(), any(), anyMap(), any());
+    }
+
+    @Test
+    void testCreateRejectsAMissingIssuerWhenTheAuthorizationServerAdvertisesTheIssParameter() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1))
+            .thenReturn(ISS_REQUIRING_DISCOVERY_CONTEXT);
+
+        ThrowingCallable createCallable = () -> connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", Authorization.CODE, "c",
+                    Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.AUTOMATION);
+
+        assertOAuth2Error(createCallable, OAuth2ErrorType.INVALID_AUTHORIZATION_CONTEXT);
+
+        verify(connectionDefinitionService, never()).executeAuthorizationCallback(
+            any(), anyInt(), any(), anyMap(), any());
+    }
+
+    @Test
+    void testCreateAcceptsTheIssuerWhenTheAuthorizationServerAdvertisesTheIssParameter() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1))
+            .thenReturn(ISS_REQUIRING_DISCOVERY_CONTEXT);
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", Authorization.CODE, "c", "iss", "https://auth.example.com",
+                    Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.AUTOMATION);
+
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry("access_token", "at")
+            .doesNotContainKey("iss");
+    }
+
+    @Test
+    void testCreateAcceptsMatchingIssuerAndDoesNotStoreIt() {
+        stubOAuth2Exchange(Map.of("access_token", "at"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", Authorization.CODE, "c", "iss", "https://auth.example.com/",
+                    Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.AUTOMATION);
+
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry("access_token", "at")
+            .doesNotContainKey("iss");
+    }
+
+    @Test
+    void testCreateWithDiscoveryContextDropsThePredefinedAppSecretForAPublicClient() {
+        stubOAuth2Exchange(Map.of("access_token", "at", "refresh_token", "rt"));
+
+        when(oAuth2Service.checkPredefinedParameters(eq("componentName"), anyMap()))
+            .thenAnswer(invocation -> {
+                Map<String, Object> parameters = new HashMap<>(invocation.getArgument(1));
+
+                parameters.put(Authorization.CLIENT_ID, "predefined-client");
+                parameters.put(Authorization.CLIENT_SECRET, "predefined-secret");
+
+                return parameters;
+            });
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", Authorization.CODE, "c",
+                    Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.AUTOMATION);
+
+        Assertions.assertThat(captureCallbackParameters())
+            .containsEntry(Authorization.CLIENT_ID, "reg-1")
+            .doesNotContainKey(Authorization.CLIENT_SECRET);
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry(Authorization.CLIENT_ID, "reg-1")
+            .containsEntry("access_token", "at")
+            .doesNotContainKey(Authorization.CLIENT_SECRET)
+            .doesNotContainValue("predefined-secret");
+    }
+
+    @Test
+    void testUpdateCredentialsRejectsDiscoveryContextForEmbeddedConnection() {
+        stubOAuth2Exchange(Map.of("access_token", "new-at"));
+        stubConnectionDefinitionWithProperties("componentName", "url");
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(Map.of("url", "https://mcp.example.com/mcp", "access_token", "old-at")),
+            PlatformType.EMBEDDED);
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        int version = connection.getVersion();
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        assertOAuth2Error(
+            () -> connectionFacade.updateCredentials(
+                connectionId, Map.of(Authorization.CODE, "c", Authorization.AUTHORIZATION_CONTEXT, "sealed"),
+                version),
+            OAuth2ErrorType.DISCOVERY_NOT_AVAILABLE);
+
+        verify(connectionDefinitionService, never()).executeAuthorizationCallback(
+            any(), anyInt(), any(), anyMap(), any());
+
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry("access_token", "old-at")
+            .doesNotContainKey(Authorization.CLIENT_ID);
+    }
+
+    @Test
+    void testCreateStoresTokensWhenRefreshTokenIsMissing() {
+        stubOAuth2Exchange(Map.of("access_token", "at", "expires_in", "3600"));
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(Map.of(Authorization.CODE, "c", Authorization.AUTHORIZATION_CONTEXT, "sealed")),
+            PlatformType.AUTOMATION);
+
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry("access_token", "at")
+            .containsEntry("expires_in", "3600")
+            .containsEntry(Authorization.CLIENT_ID, "reg-1")
+            .doesNotContainKey("refresh_token");
+    }
+
+    @Test
+    void testReplaceAuthorizationParametersExchangesCodeWithSealedContextAndStripsTransientParameters() {
+        stubOAuth2Exchange(Map.of("access_token", "new-at", "refresh_token", "new-rt"));
+        stubConnectionDefinitionWithProperties("componentName", "url");
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(Map.of("url", "https://mcp.example.com/mcp")), PlatformType.AUTOMATION);
+
+        when(oAuth2AuthorizationContextService.unseal("sealed", "componentName", 1)).thenReturn(DISCOVERY_CONTEXT);
+
+        connectionFacade.replaceAuthorizationParameters(
+            connectionId,
+            Map.of(Authorization.CODE, "the-code", "state", "s", Authorization.AUTHORIZATION_CONTEXT, "sealed"));
+
+        Assertions.assertThat(captureCallbackParameters())
+            .containsEntry(Authorization.CODE, "the-code")
+            .containsEntry(Authorization.CODE_VERIFIER, "sealed-verifier")
+            .containsEntry(Authorization.CLIENT_ID, "reg-1")
+            .containsEntry(Authorization.TOKEN_URL, "https://auth.example.com/token");
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry("url", "https://mcp.example.com/mcp")
+            .containsEntry(Authorization.CLIENT_ID, "reg-1")
+            .containsEntry("access_token", "new-at")
+            .containsEntry("refresh_token", "new-rt")
+            .doesNotContainKeys(
+                Authorization.CODE, Authorization.CODE_VERIFIER, Authorization.AUTHORIZATION_CONTEXT, "state");
+    }
+
+    @Test
+    void testGetReauthorizationParametersReturnsOnlyStoredConnectionProperties() {
+        stubReauthorizationConnectionDefinition();
+
+        long connectionId = createReauthorizationConnection();
+
+        Assertions.assertThat(connectionFacade.getReauthorizationParameters(connectionId, "componentName", 1))
+            .isEqualTo(Map.of("url", "https://mcp.example.com/mcp", "transportType", "SSE"));
+    }
+
+    @Test
+    void testGetReauthorizationParametersRejectsMismatchedComponent() {
+        stubReauthorizationConnectionDefinition();
+
+        long connectionId = createReauthorizationConnection();
+
+        Throwable throwable = catchThrowable(
+            () -> connectionFacade.getReauthorizationParameters(connectionId, "otherComponent", 1));
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ConfigurationException.class);
+        Assertions.assertThat(((ConfigurationException) throwable).getErrorKey())
+            .isEqualTo(ConnectionErrorType.INVALID_CONNECTION_COMPONENT_NAME.getErrorKey());
+        Assertions
+            .assertThatThrownBy(() -> connectionFacade.getReauthorizationParameters(connectionId, "componentName", 2))
+            .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
+    void testGetReauthorizationParametersByNonOwnerNonAdminIsDenied() {
+        stubReauthorizationConnectionDefinition();
+
+        long connectionId = createReauthorizationConnection();
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("user@localhost.com", null, AuthorityConstants.USER));
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.getReauthorizationParameters(connectionId, "componentName", 1))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    private long createReauthorizationConnection() {
+        return connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", "transportType", "SSE", Authorization.CLIENT_ID, "reg-1",
+                    Authorization.CLIENT_SECRET, "secret", "access_token", "at", "refresh_token", "rt")),
+            PlatformType.AUTOMATION);
+    }
+
+    private void stubReauthorizationConnectionDefinition() {
+        when(connectionDefinitionService.getConnectionConnectionDefinition("componentName", 1))
+            .thenReturn(
+                new ConnectionDefinition(
+                    connection()
+                        .properties(string("url"), string("transportType"), string(Authorization.CLIENT_ID))
+                        .authorizations(
+                            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                                .properties(string(Authorization.CLIENT_ID), string(Authorization.CLIENT_SECRET))),
+                    "componentName", "componentTitle", null));
+    }
+
+    private static void assertOAuth2Error(ThrowingCallable callable, OAuth2ErrorType expected) {
+        Throwable throwable = catchThrowable(callable);
+
+        Assertions.assertThat(throwable)
+            .isInstanceOf(ConfigurationException.class);
+
+        ConfigurationException configurationException = (ConfigurationException) throwable;
+
+        Assertions.assertThat(configurationException.getEntityClass())
+            .isEqualTo(OAuth2ErrorType.class);
+        Assertions.assertThat(configurationException.getErrorKey())
+            .isEqualTo(expected.getErrorKey());
+    }
+
+    private Map<String, Object> captureCallbackParameters() {
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, ?>> callbackParametersCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(connectionDefinitionService).executeAuthorizationCallback(
+            eq("componentName"), eq(1), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE),
+            callbackParametersCaptor.capture(), eq(REDIRECT_URI));
+
+        return new HashMap<>(callbackParametersCaptor.getValue());
+    }
+
+    private Map<String, Object> getStoredParameters(long connectionId) {
+        Connection connection = connectionRepository.findById(connectionId)
+            .orElseThrow();
+
+        return new HashMap<>(connection.getParameters());
+    }
+
+    private static ConnectionDTO oAuth2ConnectionDTO(Map<String, ?> parameters) {
+        return ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("oauth")
+            .parameters(parameters)
+            .build();
+    }
+
+    private void stubOAuth2Exchange(Map<String, Object> tokenResponse) {
+        when(
+            connectionDefinitionService.getAuthorizationType(
+                "componentName", 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE))
+                    .thenReturn(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE);
+        when(oAuth2Service.checkPredefinedParameters(eq("componentName"), anyMap()))
+            .thenAnswer(invocation -> invocation.getArgument(1));
+        when(oAuth2Service.getRedirectUri()).thenReturn(REDIRECT_URI);
+        when(
+            connectionDefinitionService.getProtectedResourceUrl(
+                eq("componentName"), eq(1), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), anyMap()))
+                    .thenReturn(Optional.of("https://mcp.example.com/mcp"));
+        when(
+            connectionDefinitionService.executeAuthorizationCallback(
+                eq("componentName"), eq(1), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE), anyMap(),
+                eq(REDIRECT_URI)))
+                    .thenReturn(new AuthorizationCallbackResponse(tokenResponse));
     }
 
     @ComponentScan(basePackages = {

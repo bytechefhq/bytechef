@@ -35,6 +35,12 @@ export interface OAuth2AuthorizationParameters {
      * 
      */
     scopes?: { [key: string]: boolean; };
+    /**
+     * Opaque, server-sealed state the client must post back with the authorization code.
+     * @type {string}
+     * @memberof OAuth2AuthorizationParameters
+     */
+    authorizationContext?: string;
 }
 
 /**
@@ -58,6 +64,7 @@ export function OAuth2AuthorizationParametersFromJSONTyped(json: any, ignoreDisc
         'extraQueryParameters': json['extraQueryParameters'] == null ? undefined : json['extraQueryParameters'],
         'clientId': json['clientId'] == null ? undefined : json['clientId'],
         'scopes': json['scopes'] == null ? undefined : json['scopes'],
+        'authorizationContext': json['authorizationContext'] == null ? undefined : json['authorizationContext'],
     };
 }
 
@@ -76,6 +83,7 @@ export function OAuth2AuthorizationParametersToJSONTyped(value?: OAuth2Authoriza
         'extraQueryParameters': value['extraQueryParameters'],
         'clientId': value['clientId'],
         'scopes': value['scopes'],
+        'authorizationContext': value['authorizationContext'],
     };
 }
 
