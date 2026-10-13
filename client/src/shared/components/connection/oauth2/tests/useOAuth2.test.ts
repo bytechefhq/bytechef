@@ -901,4 +901,50 @@ describe('useOAuth2', () => {
         hasFocusSpy.mockRestore();
         vi.useRealTimers();
     });
+
+    it('should never put code_verifier into the authorization URL', () => {
+        const props: UseOAuth2Props = {
+            ...defaultProps,
+            extraQueryParameters: {code_challenge: 'challenge', code_challenge_method: 'S256'},
+        };
+
+        const {result} = renderHook(() => useOAuth2(props));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const openCall = vi.mocked(window.open).mock.calls[0];
+        const url = new URL(openCall[0] as string);
+
+        expect(url.searchParams.get('code_challenge')).toBe('challenge');
+        expect(url.searchParams.has('code_verifier')).toBe(false);
+    });
+
+    it('should include authorizationContext in the code payload', () => {
+        const onCodeSuccess = vi.fn();
+        const props: UseOAuth2Props = {...defaultProps, authorizationContext: 'sealed-context', onCodeSuccess};
+
+        const {result} = renderHook(() => useOAuth2(props));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+
+        act(() => {
+            window.dispatchEvent(
+                new MessageEvent('message', {
+                    data: {payload: {code: 'the-code', state: savedState}, type: OAUTH_RESPONSE},
+                })
+            );
+        });
+
+        expect(onCodeSuccess).toHaveBeenCalledWith({
+            authorizationContext: 'sealed-context',
+            code: 'the-code',
+            state: savedState,
+        });
+    });
 });

@@ -37,6 +37,7 @@ import {
     useGetConnectionDefinitionsQuery,
 } from '@/shared/queries/platform/connectionDefinitions.queries';
 import {
+    OAuth2Keys,
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
@@ -170,7 +171,10 @@ const ConnectionDialog = ({
         data: oAuth2AuthorizationParameters,
         error: oAuth2AuthorizationParametersError,
         isLoading: oAuth2AuthorizationParametersLoading,
-    } = useGetOAuth2AuthorizationParametersQuery(getNewOAuth2AuthorizationParameters(), wizardStep === 'oauth_step');
+    } = useGetOAuth2AuthorizationParametersQuery(
+        getNewOAuth2AuthorizationParameters(),
+        isOpen && wizardStep === 'oauth_step'
+    );
 
     const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetConnectionTagsQuery();
 
@@ -283,6 +287,8 @@ const ConnectionDialog = ({
     function closeDialog() {
         setIsOpen(false);
 
+        removeOAuth2AuthorizationParameters();
+
         setTimeout(() => {
             formReset();
 
@@ -305,7 +311,13 @@ const ConnectionDialog = ({
 
     async function handleCodeSuccess(payload: CodePayloadI) {
         if (payload.code) {
-            await saveConnection(payload);
+            try {
+                await saveConnection(payload);
+            } catch (error) {
+                removeOAuth2AuthorizationParameters();
+
+                throw error;
+            }
         }
     }
 
@@ -313,6 +325,10 @@ const ConnectionDialog = ({
         if (payload.access_token) {
             await saveConnection(payload);
         }
+    }
+
+    function removeOAuth2AuthorizationParameters() {
+        queryClient.removeQueries({queryKey: OAuth2Keys.oAuth2AuthorizationParametersPrefix});
     }
 
     function getAuthorizationType() {
@@ -926,6 +942,9 @@ const ConnectionDialog = ({
                                             oAuth2AuthorizationParameters?.authorizationUrl &&
                                             oAuth2AuthorizationParameters?.clientId && (
                                                 <OAuth2Button
+                                                    authorizationContext={
+                                                        oAuth2AuthorizationParameters.authorizationContext
+                                                    }
                                                     authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
                                                     clientId={oAuth2AuthorizationParameters.clientId}
                                                     componentName={selectedComponentDefinition?.name}

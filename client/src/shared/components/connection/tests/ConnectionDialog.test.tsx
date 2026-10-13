@@ -1,8 +1,10 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import OAuth2Button from '@/shared/components/connection/OAuth2Button';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {useGetOAuth2AuthorizationParametersQuery} from '@/shared/queries/platform/oauth2.queries';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen, waitFor} from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps, ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
@@ -13,7 +15,12 @@ vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionsQuery: vi.fn(() => ({data: undefined})),
 }));
 
+const hoisted = vi.hoisted(() => ({
+    removeQueries: vi.fn(),
+}));
+
 vi.mock('@/shared/queries/platform/oauth2.queries', () => ({
+    OAuth2Keys: {oAuth2AuthorizationParametersPrefix: ['automation_connections', 'oAuth2AuthorizationParameters']},
     useGetOAuth2AuthorizationParametersQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
     useGetOAuth2PropertiesQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
 }));
@@ -31,7 +38,7 @@ vi.mock('@/shared/components/connection/ConnectionParameters', () => ({
 }));
 
 vi.mock('@/shared/components/connection/OAuth2Button', () => ({
-    default: () => null,
+    default: vi.fn(() => null),
 }));
 
 vi.mock('@/shared/components/connection/Scopes', () => ({
@@ -54,6 +61,7 @@ vi.mock('@tanstack/react-query', async () => {
         ...actual,
         useQueryClient: vi.fn(() => ({
             invalidateQueries: vi.fn().mockResolvedValue(undefined),
+            removeQueries: hoisted.removeQueries,
         })),
     };
 });
@@ -86,6 +94,14 @@ const renderDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = 
 
 describe('ConnectionDialog', () => {
     beforeEach(() => {
+        hoisted.removeQueries.mockClear();
+
+        vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+            data: undefined,
+            error: null,
+            isLoading: false,
+        } as never);
+
         vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
             data: undefined,
             error: null,
@@ -151,6 +167,18 @@ describe('ConnectionDialog', () => {
             expect(
                 screen.queryByText('Create your connection to connect to the chosen service')
             ).not.toBeInTheDocument();
+        });
+    });
+
+    it('drops the cached authorization parameters when the dialog closes', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        renderDialog();
+
+        await user.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        expect(hoisted.removeQueries).toHaveBeenCalledWith({
+            queryKey: ['automation_connections', 'oAuth2AuthorizationParameters'],
         });
     });
 
@@ -250,5 +278,104 @@ describe('ConnectionDialog', () => {
 
         expect(screen.getByText('Component', {selector: 'label'})).toHaveTextContent(/^Component\*$/);
         expect(screen.getByText('Name', {selector: 'label'})).toHaveTextContent(/^Name\*$/);
+    });
+
+    describe('creating an automatic OAuth2 connection', () => {
+        beforeEach(() => {
+            vi.mocked(OAuth2Button).mockClear();
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {authorizations: [{title: 'OAuth2 (automatic)', type: 'OAUTH2_AUTHORIZATION_CODE_PKCE'}]},
+                error: null,
+                isLoading: false,
+            } as never);
+
+            vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                data: {
+                    authorizationContext: 'sealed-context',
+                    authorizationUrl: 'https://auth.example.com/authorize',
+                    clientId: 'reg-1',
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+        });
+
+        const renderCreateDialog = (mutateAsync = vi.fn()) =>
+            renderDialog({
+                componentDefinition: {name: 'mcpClient', title: 'MCP Client'} as never,
+                useCreateConnectionMutation: (() => ({isPending: false, mutateAsync, reset: vi.fn()})) as never,
+            });
+
+        const getLastOAuth2ButtonProps = () => vi.mocked(OAuth2Button).mock.lastCall![0];
+
+        it('moves to the OAuth step and hands the sealed authorization context to the OAuth2 button', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderCreateDialog();
+
+            expect(OAuth2Button).not.toHaveBeenCalled();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(OAuth2Button).toHaveBeenCalled());
+
+            expect(screen.queryByRole('button', {name: 'Next'})).not.toBeInTheDocument();
+            expect(useGetOAuth2AuthorizationParametersQuery).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+                    componentName: 'mcpClient',
+                }),
+                true
+            );
+            expect(getLastOAuth2ButtonProps()).toEqual(
+                expect.objectContaining({
+                    authorizationContext: 'sealed-context',
+                    authorizationUrl: 'https://auth.example.com/authorize',
+                    clientId: 'reg-1',
+                })
+            );
+        });
+
+        it('disables the authorization-parameters query before dropping it when the dialog closes', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderCreateDialog();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(OAuth2Button).toHaveBeenCalled());
+
+            hoisted.removeQueries.mockClear();
+
+            await user.keyboard('{Escape}');
+
+            expect(hoisted.removeQueries).toHaveBeenCalledWith({
+                queryKey: ['automation_connections', 'oAuth2AuthorizationParameters'],
+            });
+            expect(vi.mocked(useGetOAuth2AuthorizationParametersQuery).mock.lastCall![1]).toBe(false);
+        });
+
+        it('drops the cached authorization parameters when the code exchange fails', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderCreateDialog(vi.fn().mockRejectedValue(new Error('Sign-in took too long; try again')));
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(OAuth2Button).toHaveBeenCalled());
+
+            hoisted.removeQueries.mockClear();
+
+            await act(async () => {
+                await expect(getLastOAuth2ButtonProps().onCodeSuccess!({code: 'the-code'} as never)).rejects.toThrow(
+                    'Sign-in took too long; try again'
+                );
+            });
+
+            expect(hoisted.removeQueries).toHaveBeenCalledWith({
+                queryKey: ['automation_connections', 'oAuth2AuthorizationParameters'],
+            });
+        });
     });
 });

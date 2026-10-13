@@ -12,6 +12,7 @@ export interface TokenPayloadI {
 }
 
 export interface CodePayloadI {
+    authorizationContext?: string;
     code: string;
     code_verifier?: string;
     [key: string]: string | undefined;
@@ -103,6 +104,7 @@ type ResponseType = 'code' | 'token';
 export type OAuth2AbortReasonType = 'cancelled' | 'popup_closed' | 'timeout' | 'unmounted';
 
 export interface UseOAuth2Props {
+    authorizationContext?: string;
     authorizationUrl: string;
     clientId: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,6 +119,7 @@ export interface UseOAuth2Props {
 }
 
 const useOAuth2 = ({
+    authorizationContext,
     authorizationUrl,
     clientId,
     extraQueryParameters,
@@ -134,6 +137,7 @@ const useOAuth2 = ({
     }>({error: null, loading: false});
 
     const abortRef = useRef<((reason: OAuth2AbortReasonType) => void) | undefined>(undefined);
+    const authorizationContextRef = useRef(authorizationContext);
     const extraQueryParametersRef = useRef(extraQueryParameters);
     const popupRef = useRef<Window | null>(null);
     const curStateRef = useRef(undefined);
@@ -224,6 +228,7 @@ const useOAuth2 = ({
                     if (responseType === 'code' && onCodeSuccess) {
                         onCodeSuccess({
                             ...payload,
+                            authorizationContext: authorizationContextRef.current,
                             code_verifier: extraQueryParametersRef.current?.code_verifier,
                         });
                     } else {
@@ -357,6 +362,10 @@ const useOAuth2 = ({
     ]);
 
     const cancel = useCallback(() => abortRef.current?.('cancelled'), []);
+
+    useEffect(() => {
+        authorizationContextRef.current = authorizationContext;
+    }, [authorizationContext]);
 
     // Without this, a popup left open after the button unmounts can still save a connection later.
     useEffect(() => () => abortRef.current?.('unmounted'), []);
