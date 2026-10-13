@@ -492,7 +492,8 @@ class AutomationMcpServerSecurityConfigurerIntTest {
                         .permitAll())
                     .with(
                         new AutomationMcpServerSecurityConfigurer(
-                            apiKeyService, authorityService, mcpServerService, userService),
+                            apiKeyService, authorityService, () -> List.of(Environment.values()), mcpServerService,
+                            userService),
                         Customizer.withDefaults())
                     .build();
             }

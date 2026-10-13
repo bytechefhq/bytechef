@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -109,7 +110,7 @@ public class ManagementMcpServerSecurityIntTestConfiguration {
                 .permitAll())
             .with(
                 new ManagementMcpServerSecurityConfigurer(
-                    apiKeyService, authorityService, propertyService, userService),
+                    apiKeyService, authorityService, () -> List.of(Environment.values()), propertyService, userService),
                 Customizer.withDefaults())
             .build();
     }

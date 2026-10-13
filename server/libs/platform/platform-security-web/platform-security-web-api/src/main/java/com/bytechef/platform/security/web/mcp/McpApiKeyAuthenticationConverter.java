@@ -16,60 +16,23 @@
 
 package com.bytechef.platform.security.web.mcp;
 
-import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Locale;
-import org.apache.commons.lang3.StringUtils;
-import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationConverter;
 
 /**
  * @author Ivica Cardic
  */
-public class McpApiKeyAuthenticationConverter implements AuthenticationConverter {
+public class McpApiKeyAuthenticationConverter extends AbstractMcpApiKeyAuthenticationConverter {
 
-    private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
-    private static final String ENVIRONMENT_HEADER_NAME = "X-ENVIRONMENT";
-
-    private final String pathPrefix;
-
-    public McpApiKeyAuthenticationConverter(String pathPrefix) {
-        this.pathPrefix = pathPrefix;
+    public McpApiKeyAuthenticationConverter(EnvironmentService environmentService, String pathPrefix) {
+        super(environmentService, pathPrefix);
     }
 
     @Override
-    public Authentication convert(HttpServletRequest request) {
-        String authorization = request.getHeader(AUTHORIZATION_HEADER_NAME);
-
-        String secretKey = null;
-
-        if (authorization != null && authorization.startsWith(BEARER_PREFIX)) {
-            secretKey = authorization.substring(BEARER_PREFIX.length());
-        }
-
+    protected String extractServerSecretKey(HttpServletRequest request) {
         String servletPath = request.getServletPath();
 
-        String mcpServerSecretKey = servletPath.replace(pathPrefix, "")
+        return servletPath.replace(pathPrefix, "")
             .replace("/mcp", "");
-
-        return ApiKeyAuthenticationToken.unauthenticated(
-            new McpApiKeyCredentials(getEnvironment(request), mcpServerSecretKey, secretKey));
-    }
-
-    private Environment getEnvironment(HttpServletRequest request) {
-        String environment = request.getHeader(ENVIRONMENT_HEADER_NAME);
-
-        if (StringUtils.isBlank(environment)) {
-            return Environment.PRODUCTION;
-        }
-
-        try {
-            return Environment.valueOf(environment.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException illegalArgumentException) {
-            throw new BadCredentialsException("Invalid X-ENVIRONMENT header", illegalArgumentException);
-        }
     }
 }

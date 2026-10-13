@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.server.security.web.configurer;
 
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpServerApiKeyAuthenticationProvider;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.mcp.McpApiKeyAuthenticationConverter;
@@ -34,11 +35,13 @@ public class ManagementMcpServerSecurityConfigurer extends McpApiKeyHttpConfigur
     private static final String PATH_PATTERN = "^/api/management/.+/mcp";
 
     public ManagementMcpServerSecurityConfigurer(
-        ApiKeyService apiKeyService, AuthorityService authorityService, PropertyService propertyService,
+        ApiKeyService apiKeyService, AuthorityService authorityService, EnvironmentService environmentService,
+        PropertyService propertyService,
         UserService userService) {
 
         super(
-            PATH_PATTERN, MCP_SERVER_SECRET_PATTERN, new McpApiKeyAuthenticationConverter("/api/management/"),
+            PATH_PATTERN, MCP_SERVER_SECRET_PATTERN,
+            new McpApiKeyAuthenticationConverter(environmentService, "/api/management/"),
             new ManagementMcpServerApiKeyAuthenticationProvider(
                 apiKeyService, authorityService, propertyService, userService));
     }
