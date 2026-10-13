@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.security.web.config;
 
 import com.bytechef.ee.automation.security.web.configurer.AutomationApiKeySecurityConfigurer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -28,14 +29,17 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 public class AutomationApiKeySecurityConfigurerContributor implements SecurityConfigurerContributor {
 
     private final ApiKeyService apiKeyService;
+    private final EnvironmentService environmentService;
     private final AuthorityService authorityService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
     public AutomationApiKeySecurityConfigurerContributor(
-        ApiKeyService apiKeyService, AuthorityService authorityService, UserService userService) {
+        ApiKeyService apiKeyService, EnvironmentService environmentService, AuthorityService authorityService,
+        UserService userService) {
 
         this.apiKeyService = apiKeyService;
+        this.environmentService = environmentService;
         this.authorityService = authorityService;
         this.userService = userService;
     }
@@ -43,6 +47,7 @@ public class AutomationApiKeySecurityConfigurerContributor implements SecurityCo
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
-        return (T) new AutomationApiKeySecurityConfigurer(apiKeyService, authorityService, userService);
+        return (T) new AutomationApiKeySecurityConfigurer(apiKeyService, environmentService, authorityService,
+            userService);
     }
 }

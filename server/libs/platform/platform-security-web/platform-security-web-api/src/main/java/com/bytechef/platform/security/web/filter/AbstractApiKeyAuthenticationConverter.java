@@ -17,9 +17,9 @@
 package com.bytechef.platform.security.web.filter;
 
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.tenant.domain.TenantKey;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -31,6 +31,12 @@ import org.springframework.security.web.authentication.AuthenticationConverter;
 public abstract class AbstractApiKeyAuthenticationConverter implements AuthenticationConverter {
 
     protected static final String AUTH_TOKEN_HEADER_NAME = "Authorization";
+
+    private final EnvironmentService environmentService;
+
+    protected AbstractApiKeyAuthenticationConverter(EnvironmentService environmentService) {
+        this.environmentService = environmentService;
+    }
 
     @Override
     @Nullable
@@ -72,10 +78,10 @@ public abstract class AbstractApiKeyAuthenticationConverter implements Authentic
     protected Environment getEnvironment(HttpServletRequest request) {
         String environment = request.getHeader("X-ENVIRONMENT");
 
-        if (StringUtils.isNotBlank(environment)) {
-            return Environment.valueOf(environment.toUpperCase());
+        try {
+            return environmentService.getEnvironment(environment);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new BadCredentialsException("Invalid X-ENVIRONMENT header", illegalArgumentException);
         }
-
-        return Environment.PRODUCTION;
     }
 }

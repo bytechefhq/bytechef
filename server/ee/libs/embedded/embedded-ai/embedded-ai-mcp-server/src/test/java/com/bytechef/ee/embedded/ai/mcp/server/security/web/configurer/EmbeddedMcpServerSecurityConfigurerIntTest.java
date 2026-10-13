@@ -265,7 +265,8 @@ class EmbeddedMcpServerSecurityConfigurerIntTest {
                         .permitAll())
                     .with(
                         new EmbeddedMcpServerSecurityConfigurer(
-                            connectedUserService, mcpServerService, signingKeyService),
+                            connectedUserService, () -> List.of(Environment.values()), mcpServerService,
+                            signingKeyService),
                         Customizer.withDefaults())
                     .build();
             }

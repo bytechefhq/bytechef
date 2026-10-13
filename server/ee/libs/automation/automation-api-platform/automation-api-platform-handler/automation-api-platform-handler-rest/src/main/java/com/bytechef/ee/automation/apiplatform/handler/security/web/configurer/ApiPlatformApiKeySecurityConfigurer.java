@@ -11,6 +11,7 @@ import static org.springframework.security.web.util.matcher.RegexRequestMatcher.
 
 import com.bytechef.ee.automation.apiplatform.handler.security.web.authentication.ApiPlatformApiKeyAuthenticationProvider;
 import com.bytechef.ee.automation.apiplatform.handler.security.web.authentication.ApiPlatformApiKeyAuthenticationToken;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
 import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
@@ -26,10 +27,10 @@ public class ApiPlatformApiKeySecurityConfigurer extends AbstractApiKeyHttpConfi
 
     protected static final String PATH_PATTERN = "^/api/o/.+";
 
-    public ApiPlatformApiKeySecurityConfigurer(ApiKeyService apiKeyService) {
+    public ApiPlatformApiKeySecurityConfigurer(ApiKeyService apiKeyService, EnvironmentService environmentService) {
 
         super(
-            PATH_PATTERN, new ApiPlatformApiKeyAuthenticationConverter(),
+            PATH_PATTERN, new ApiPlatformApiKeyAuthenticationConverter(environmentService),
             new ApiPlatformApiKeyAuthenticationProvider(apiKeyService));
     }
 
@@ -39,6 +40,10 @@ public class ApiPlatformApiKeySecurityConfigurer extends AbstractApiKeyHttpConfi
     }
 
     private static class ApiPlatformApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
+
+        ApiPlatformApiKeyAuthenticationConverter(EnvironmentService environmentService) {
+            super(environmentService);
+        }
 
         @Override
         protected Authentication doConvert(int environment, String authToken, String tenantId) {

@@ -11,6 +11,7 @@ import static org.springframework.security.web.util.matcher.RegexRequestMatcher.
 
 import com.bytechef.ee.automation.security.web.authentication.AutomationApiKeyAuthenticationProvider;
 import com.bytechef.ee.automation.security.web.authentication.AutomationApiKeyAuthenticationToken;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
 import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
@@ -29,10 +30,11 @@ public class AutomationApiKeySecurityConfigurer extends AbstractApiKeyHttpConfig
     protected static final String PATH_PATTERN = "^/api/automation/v[0-9]+/.+";
 
     public AutomationApiKeySecurityConfigurer(
-        ApiKeyService apiKeyService, AuthorityService authorityService, UserService userService) {
+        ApiKeyService apiKeyService, EnvironmentService environmentService, AuthorityService authorityService,
+        UserService userService) {
 
         super(
-            PATH_PATTERN, new AutomationApiKeyAuthenticationConverter(),
+            PATH_PATTERN, new AutomationApiKeyAuthenticationConverter(environmentService),
             new AutomationApiKeyAuthenticationProvider(apiKeyService, authorityService, userService));
     }
 
@@ -42,6 +44,10 @@ public class AutomationApiKeySecurityConfigurer extends AbstractApiKeyHttpConfig
     }
 
     private static class AutomationApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
+
+        AutomationApiKeyAuthenticationConverter(EnvironmentService environmentService) {
+            super(environmentService);
+        }
 
         @Override
         protected Authentication doConvert(int environment, String authToken, String tenantId) {

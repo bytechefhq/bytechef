@@ -34,6 +34,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -66,7 +67,8 @@ class EmbeddedMcpServerConfigurationIntTest {
     private static final List<Class<?>> MOCKED_DEPENDENCY_TYPES = List.of(
         ApplicationProperties.class, ChildJobPrincipalFactory.class, ClusterElementDefinitionFacade.class,
         ClusterElementDefinitionService.class, ComponentDefinitionService.class, ConnectedUserService.class,
-        ContextService.class, CounterService.class, Evaluator.class, IntegrationInstanceConfigurationService.class,
+        ContextService.class, CounterService.class, EnvironmentService.class, Evaluator.class,
+        IntegrationInstanceConfigurationService.class,
         IntegrationInstanceConfigurationWorkflowService.class, IntegrationInstanceService.class,
         IntegrationInstanceWorkflowService.class, IntegrationService.class, JobCompletionAwaiter.class,
         JobService.class, JwtTokenService.class, McpComponentService.class,

@@ -48,6 +48,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -250,7 +251,8 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     SecurityConfigurerContributor embeddedMcpServerSecurityConfigurerContributor(
-        ConnectedUserService connectedUserService, McpServerService mcpServerService,
+        ConnectedUserService connectedUserService, EnvironmentService environmentService,
+        McpServerService mcpServerService,
         SigningKeyService signingKeyService) {
 
         return new SecurityConfigurerContributor() {
@@ -261,7 +263,7 @@ public class EmbeddedMcpServerConfiguration {
                 getSecurityConfigurerAdapter() {
 
                 return (T) new EmbeddedMcpServerSecurityConfigurer(
-                    connectedUserService, mcpServerService, signingKeyService);
+                    connectedUserService, environmentService, mcpServerService, signingKeyService);
             }
         };
     }
