@@ -56,6 +56,7 @@ import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.model.tool.ToolCallingManager;
@@ -65,6 +66,8 @@ import reactor.core.publisher.Flux;
  * @author Ivica Cardic
  */
 public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
+
+    static final String REFUSAL_NOTICE = "The model declined to respond to this request.";
 
     public static ActionDefinition of(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
@@ -344,6 +347,14 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                     events.add(turnTextSeparator.apply(text));
                 }
             }
+
+            ChatGenerationMetadata chatGenerationMetadata = result.getMetadata();
+
+            if ("refusal".equalsIgnoreCase(chatGenerationMetadata.getFinishReason())) {
+                events.add(turnTextSeparator.applyNotice(REFUSAL_NOTICE));
+
+                context.log(log -> log.warn("AI agent response stopped by a model refusal"));
+            }
         }
 
         Map<String, Object> guardrailMetadata = ModelUtils.extractGuardrailMetadata(chatResponse);
@@ -389,6 +400,18 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             }
 
             return separate ? SEPARATOR + text : text;
+        }
+
+        String applyNotice(String notice) {
+            String text = textEmitted.get() ? SEPARATOR + notice : notice;
+
+            textEmitted.set(true);
+
+            synchronized (turnTextBuilder) {
+                turnTextBuilder.append(text);
+            }
+
+            return text;
         }
 
         String getTurnText() {
