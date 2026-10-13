@@ -1,14 +1,65 @@
-import {type CSSProperties, type ReactNode, Suspense, lazy, useMemo} from 'react';
+import {type CSSProperties, type ReactNode, useEffect, useMemo, useState} from 'react';
+
+import type ReactJsonViewComponent from 'react-json-view';
 
 const LARGE_PAYLOAD_CHARS = 100_000;
 
-const ReactJson = lazy(async () => {
-    const module = await import('react-json-view');
+let reactJsonComponent: typeof ReactJsonViewComponent | null = null;
+let reactJsonComponentPromise: Promise<typeof ReactJsonViewComponent> | null = null;
 
-    const component = (module.default as unknown as Record<string, unknown>)?.default || module.default;
+const loadReactJsonComponent = () => {
+    if (!reactJsonComponentPromise) {
+        reactJsonComponentPromise = import('react-json-view').then((module) => {
+            reactJsonComponent =
+                ((module.default as unknown as Record<string, unknown>)?.default as typeof module.default) ||
+                module.default;
 
-    return {default: component} as typeof module;
-});
+            return reactJsonComponent;
+        });
+
+        reactJsonComponentPromise.catch(() => {
+            reactJsonComponentPromise = null;
+        });
+    }
+
+    return reactJsonComponentPromise;
+};
+
+export const useJsonViewLoaded = () => {
+    const [loadError, setLoadError] = useState<unknown>(null);
+    const [loaded, setLoaded] = useState(() => reactJsonComponent !== null);
+
+    useEffect(() => {
+        if (loaded) {
+            return;
+        }
+
+        let active = true;
+
+        loadReactJsonComponent().then(
+            () => {
+                if (active) {
+                    setLoaded(true);
+                }
+            },
+            (error: unknown) => {
+                if (active) {
+                    setLoadError(error ?? new Error('Failed to load the JSON viewer'));
+                }
+            }
+        );
+
+        return () => {
+            active = false;
+        };
+    }, [loaded]);
+
+    if (loadError) {
+        throw loadError;
+    }
+
+    return loaded;
+};
 
 const exceedsCharBudget = (src: unknown, limit: number): boolean => {
     let remaining = limit;
@@ -98,24 +149,30 @@ const JsonView = ({
     src,
     style,
 }: JsonViewProps) => {
+    const loaded = useJsonViewLoaded();
+
     const resolvedCollapsed = useMemo(
         () => (collapsed === undefined ? getJsonViewCollapsed(src) : collapsed),
         [collapsed, src]
     );
 
+    const ReactJson = reactJsonComponent;
+
+    if (!loaded || !ReactJson) {
+        return fallback;
+    }
+
     return (
-        <Suspense fallback={fallback}>
-            <ReactJson
-                collapseStringsAfterLength={collapseStringsAfterLength}
-                collapsed={resolvedCollapsed}
-                enableClipboard={enableClipboard}
-                name={name}
-                shouldCollapse={shouldCollapse}
-                sortKeys={sortKeys}
-                src={src}
-                style={style}
-            />
-        </Suspense>
+        <ReactJson
+            collapseStringsAfterLength={collapseStringsAfterLength}
+            collapsed={resolvedCollapsed}
+            enableClipboard={enableClipboard}
+            name={name}
+            shouldCollapse={shouldCollapse}
+            sortKeys={sortKeys}
+            src={src}
+            style={style}
+        />
     );
 };
 
