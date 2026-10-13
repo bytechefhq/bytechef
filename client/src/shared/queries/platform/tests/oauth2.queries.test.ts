@@ -38,6 +38,7 @@ describe('getOAuth2AuthorizationParametersQueryOptions', () => {
         const options = getOAuth2AuthorizationParametersQueryOptions({
             authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
             componentName: 'mcpClient',
+            connectionId: 7,
             connectionVersion: 1,
             parameters: {url: 'https://mcp.example.com/mcp'},
         });
@@ -45,5 +46,6 @@ describe('getOAuth2AuthorizationParametersQueryOptions', () => {
         expect(options.queryKey.slice(0, OAuth2Keys.oAuth2AuthorizationParametersPrefix.length)).toEqual([
             ...OAuth2Keys.oAuth2AuthorizationParametersPrefix,
         ]);
+        expect(options.queryKey).toContain(7);
     });
 });
