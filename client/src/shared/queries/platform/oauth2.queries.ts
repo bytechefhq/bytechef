@@ -15,6 +15,7 @@ export const OAuth2Keys = {
     oAuth2AuthorizationParameters: (request: GetOAuth2AuthorizationParametersRequest) => [
         ...oAuth2AuthorizationParametersPrefix,
         request.componentName,
+        request.connectionId,
         request.connectionVersion,
         request.authorizationType,
         request.parameters,

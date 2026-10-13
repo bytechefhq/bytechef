@@ -280,6 +280,55 @@ describe('ConnectionDialog', () => {
         expect(screen.getByText('Name', {selector: 'label'})).toHaveTextContent(/^Name\*$/);
     });
 
+    describe('updating the credentials of an automatic OAuth2 connection', () => {
+        const oAuth2Connection = {
+            authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+            componentName: 'mcpClient',
+            credentialStatus: 'INVALID',
+            id: 7,
+            name: 'MCP',
+            tags: [],
+            version: 1,
+        };
+
+        beforeEach(() => {
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizations: [{title: 'OAuth2 (automatic)', type: 'OAUTH2_AUTHORIZATION_CODE_PKCE'}],
+                    properties: [{name: 'url', type: 'STRING'}],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+        });
+
+        it('sends the connection id with the authorization-parameters request', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderDialog({
+                connection: oAuth2Connection as never,
+                useUpdateConnectionCredentialsMutation: (() => ({
+                    isPending: false,
+                    mutateAsync: vi.fn(),
+                    reset: vi.fn(),
+                })) as never,
+                useUpdateConnectionMutation: (() => ({isPending: false, mutate: vi.fn(), reset: vi.fn()})) as never,
+            });
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() =>
+                expect(useGetOAuth2AuthorizationParametersQuery).toHaveBeenLastCalledWith(
+                    expect.objectContaining({
+                        authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+                        connectionId: 7,
+                    }),
+                    true
+                )
+            );
+        });
+    });
+
     describe('creating an automatic OAuth2 connection', () => {
         beforeEach(() => {
             vi.mocked(OAuth2Button).mockClear();

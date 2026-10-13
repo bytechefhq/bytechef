@@ -9,6 +9,7 @@ Name | Type
 ------------ | -------------
 `authorizationType` | [AuthorizationType](AuthorizationType.md)
 `componentName` | string
+`connectionId` | number
 `connectionVersion` | number
 `parameters` | { [key: string]: any; }
 
@@ -21,6 +22,7 @@ import type { GetOAuth2AuthorizationParametersRequest } from ''
 const example = {
   "authorizationType": null,
   "componentName": null,
+  "connectionId": null,
   "connectionVersion": null,
   "parameters": null,
 } satisfies GetOAuth2AuthorizationParametersRequest

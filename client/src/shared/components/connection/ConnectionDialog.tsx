@@ -370,7 +370,8 @@ const ConnectionDialog = ({
 
         return {
             authorizationType: authorizationType as AuthorizationType,
-            componentName,
+            componentName: componentName || (connection?.componentName as string),
+            connectionId: isUpdatingCredentials ? connection?.id : undefined,
             connectionVersion,
             parameters: {
                 ...parameters,

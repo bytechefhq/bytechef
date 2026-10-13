@@ -36,6 +36,12 @@ export interface GetOAuth2AuthorizationParametersRequest {
      */
     componentName: string;
     /**
+     * The id of a connection whose credentials are being updated.
+     * @type {number}
+     * @memberof GetOAuth2AuthorizationParametersRequest
+     */
+    connectionId?: number;
+    /**
      * The version of a connection.
      */
     connectionVersion?: number;
@@ -69,6 +75,7 @@ export function GetOAuth2AuthorizationParametersRequestFromJSONTyped(json: any, 
         
         'authorizationType': AuthorizationTypeFromJSON(json['authorizationType']),
         'componentName': json['componentName'],
+        'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
         'connectionVersion': json['connectionVersion'] == null ? undefined : json['connectionVersion'],
         'parameters': json['parameters'],
     };
@@ -87,6 +94,7 @@ export function GetOAuth2AuthorizationParametersRequestToJSONTyped(value?: GetOA
         
         'authorizationType': AuthorizationTypeToJSON(value['authorizationType']),
         'componentName': value['componentName'],
+        'connectionId': value['connectionId'],
         'connectionVersion': value['connectionVersion'],
         'parameters': value['parameters'],
     };
