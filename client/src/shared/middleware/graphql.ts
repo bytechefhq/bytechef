@@ -1007,7 +1007,7 @@ export type ConnectedUserProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, connectedUserId: string, enabled: boolean, lastExecutionDate: string | null, projectId: string, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }> }> };
+export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, connectedUserId: string, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }> }> };
 
 export type CreateEmbeddedMcpServerMutationVariables = Exact<{
   input: Types.CreateEmbeddedMcpServerInput;
@@ -5445,6 +5445,7 @@ export const ConnectedUserProjectsDocument = new TypedDocumentString(`
       enabled
       lastExecutionDate
       projectId
+      staticWebhookUrl
       workflowUuid
       workflowVersion
       workflow {
