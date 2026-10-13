@@ -34,6 +34,9 @@ import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.oauth2.domain.OAuth2AuthorizationContext;
+import com.bytechef.platform.oauth2.exception.OAuth2ErrorType;
+import com.bytechef.platform.oauth2.service.OAuth2AuthorizationContextService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -66,9 +69,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectionFacadeImpl.class);
 
+    private static final List<String> DISCOVERY_PARAMETER_NAMES = List.of(
+        CLIENT_SECRET, Authorization.REFRESH_URL, Authorization.TOKEN_URL, Authorization.AUTHORIZATION_URL,
+        Authorization.TOKEN_ENDPOINT_AUTH_METHOD, Authorization.RESOURCE);
+
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private final OAuth2AuthorizationContextService oAuth2AuthorizationContextService;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -76,12 +84,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        OAuth2AuthorizationContextService oAuth2AuthorizationContextService, OAuth2Service oAuth2Service,
+        TagService tagService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.oAuth2AuthorizationContextService = oAuth2AuthorizationContextService;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
@@ -91,21 +101,17 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public long create(ConnectionDTO connectionDTO, PlatformType type) {
         Connection connection = connectionDTO.toConnection();
 
+        connection.setType(type);
+
         resolveOAuth2AuthorizationCode(connection);
 
-        Map<String, ?> parameters = new HashMap<>(connection.getParameters());
-
-        parameters.remove("state");
-
-        connection.setParameters(parameters);
+        removeTransientOAuth2Parameters(connection);
 
         List<Tag> tags = checkTags(connectionDTO.tags());
 
         if (!tags.isEmpty()) {
             connection.setTags(tags);
         }
-
-        connection.setType(type);
 
         connection = connectionService.create(connection);
 
@@ -134,11 +140,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         resolveOAuth2AuthorizationCode(connection);
 
-        Map<String, ?> updatedParameters = new HashMap<>(connection.getParameters());
+        removeTransientOAuth2Parameters(connection);
 
-        updatedParameters.remove("state");
-
-        connectionService.replaceConnectionParameters(id, updatedParameters);
+        connectionService.replaceConnectionParameters(id, connection.getParameters());
 
         connectionService.updateConnectionCredentialStatus(id, Connection.CredentialStatus.VALID);
     }
@@ -167,47 +171,110 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     private void resolveOAuth2AuthorizationCode(Connection connection) {
-        if (connection.getAuthorizationType() != null && connection.containsParameter(Authorization.CODE)) {
+        if (connection.getAuthorizationType() == null || !connection.containsParameter(Authorization.CODE)) {
+            return;
+        }
 
-            // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
+        AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
+            connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationType());
 
-            AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
-                connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationType());
+        if (authorizationType != AuthorizationType.OAUTH2_AUTHORIZATION_CODE &&
+            authorizationType != AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
-            if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
-                authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+            return;
+        }
 
-                Map<String, ?> predefinedParameters = oAuth2Service.checkPredefinedParameters(
-                    connection.getComponentName(), connection.getParameters());
+        Map<String, Object> callbackParameters = new HashMap<>(
+            oAuth2Service.checkPredefinedParameters(connection.getComponentName(), connection.getParameters()));
+        OAuth2AuthorizationContext authorizationContext = unsealAuthorizationContext(connection);
 
-                AuthorizationCallbackResponse authorizationCallbackResponse = Objects.requireNonNull(
-                    connectionDefinitionService.executeAuthorizationCallback(
-                        connection.getComponentName(), connection.getConnectionVersion(),
-                        connection.getAuthorizationType(), predefinedParameters,
-                        oAuth2Service.getRedirectUri()),
-                    "Authorization callback returned no response for component " + connection.getComponentName());
+        if (authorizationContext != null) {
+            callbackParameters.put(Authorization.CODE_VERIFIER, authorizationContext.codeVerifier());
 
-                connection.putAllParameters(authorizationCallbackResponse.result());
-
-                Map<String, ?> parameters = connection.getParameters();
-
-                Object clientId = parameters.get(CLIENT_ID);
-                Object clientSecret = parameters.get(CLIENT_SECRET);
-
-                if ((clientId == null || clientId.equals("")) && (clientSecret == null || clientSecret.equals(""))) {
-                    connection.putAllParameters(
-                        Map.of(
-                            CLIENT_ID, predefinedParameters.get(CLIENT_ID),
-                            CLIENT_SECRET, predefinedParameters.get(CLIENT_SECRET)));
+            if (authorizationContext.isDiscovery()) {
+                if (connection.getType() == PlatformType.EMBEDDED) {
+                    throw new ConfigurationException(
+                        "Automatic OAuth2 discovery isn't available for embedded integrations yet. Use OAuth2 " +
+                            "(PKCE) with the server's Authorization URL and Token URL, or OAuth2 (manual).",
+                        OAuth2ErrorType.DISCOVERY_NOT_AVAILABLE);
                 }
 
-                if (log.isWarnEnabled() && !connection.containsParameter(Authorization.REFRESH_TOKEN)) {
-                    log.warn(
-                        "OAuth2 authorization code connection for component {} does not contain refresh token",
-                        connection.getComponentName());
-                }
+                Map<String, Object> discoveryParameters = authorizationContext.toConnectionParameters();
+
+                removeParametersNotSuppliedByDiscovery(callbackParameters, discoveryParameters);
+
+                callbackParameters.putAll(discoveryParameters);
             }
         }
+
+        AuthorizationCallbackResponse authorizationCallbackResponse = Objects.requireNonNull(
+            connectionDefinitionService.executeAuthorizationCallback(
+                connection.getComponentName(), connection.getConnectionVersion(), connection.getAuthorizationType(),
+                callbackParameters, oAuth2Service.getRedirectUri()),
+            "Authorization callback returned no response for component " + connection.getComponentName());
+
+        if (authorizationContext != null && authorizationContext.isDiscovery()) {
+            Map<String, Object> discoveryParameters = authorizationContext.toConnectionParameters();
+            Map<String, Object> connectionParameters = new HashMap<>(connection.getParameters());
+
+            removeParametersNotSuppliedByDiscovery(connectionParameters, discoveryParameters);
+
+            connectionParameters.putAll(discoveryParameters);
+
+            connection.setParameters(connectionParameters);
+        }
+
+        connection.putAllParameters(authorizationCallbackResponse.result());
+
+        Map<String, ?> parameters = connection.getParameters();
+
+        Object clientId = parameters.get(CLIENT_ID);
+        Object clientSecret = parameters.get(CLIENT_SECRET);
+        Object predefinedClientId = callbackParameters.get(CLIENT_ID);
+        Object predefinedClientSecret = callbackParameters.get(CLIENT_SECRET);
+
+        if ((clientId == null || clientId.equals("")) && (clientSecret == null || clientSecret.equals("")) &&
+            predefinedClientId != null && predefinedClientSecret != null) {
+
+            connection.putAllParameters(Map.of(CLIENT_ID, predefinedClientId, CLIENT_SECRET, predefinedClientSecret));
+        }
+
+        if (log.isWarnEnabled() && !connection.containsParameter(Authorization.REFRESH_TOKEN)) {
+            log.warn(
+                "OAuth2 authorization code connection for component {} does not contain refresh token",
+                connection.getComponentName());
+        }
+    }
+
+    private static void removeParametersNotSuppliedByDiscovery(
+        Map<String, Object> parameters, Map<String, Object> discoveryParameters) {
+
+        DISCOVERY_PARAMETER_NAMES.stream()
+            .filter(parameterName -> !discoveryParameters.containsKey(parameterName))
+            .forEach(parameters::remove);
+    }
+
+    private OAuth2AuthorizationContext unsealAuthorizationContext(Connection connection) {
+        Map<String, ?> parameters = connection.getParameters();
+
+        Object sealedAuthorizationContext = parameters.get(Authorization.AUTHORIZATION_CONTEXT);
+
+        if (!(sealedAuthorizationContext instanceof String sealed) || sealed.isBlank()) {
+            return null;
+        }
+
+        return oAuth2AuthorizationContextService.unseal(sealed, connection.getComponentName());
+    }
+
+    private static void removeTransientOAuth2Parameters(Connection connection) {
+        Map<String, Object> parameters = new HashMap<>(connection.getParameters());
+
+        parameters.remove("state");
+        parameters.remove(Authorization.CODE);
+        parameters.remove(Authorization.CODE_VERIFIER);
+        parameters.remove(Authorization.AUTHORIZATION_CONTEXT);
+
+        connection.setParameters(parameters);
     }
 
     @Override
