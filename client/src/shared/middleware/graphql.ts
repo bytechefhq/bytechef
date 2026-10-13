@@ -401,6 +401,14 @@ export type UpdateApprovalTaskMutationVariables = Exact<{
 
 export type UpdateApprovalTaskMutation = { updateApprovalTask: { assigneeId: string | null, description: string | null, dueDate: string | null, id: string, name: string, priority: Types.ApprovalTaskPriority, status: Types.ApprovalTaskStatus, version: number } | null };
 
+export type A2aEligibleProjectVersionWorkflowsQueryVariables = Exact<{
+  projectId: string | number;
+  projectVersion: number;
+}>;
+
+
+export type A2aEligibleProjectVersionWorkflowsQuery = { a2aEligibleProjectVersionWorkflows: Array<{ id: string, workflow: { id: string, label: string } }> };
+
 export type A2aProjectWorkflowsByA2aProjectIdQueryVariables = Exact<{
   a2aProjectId: string | number;
 }>;
@@ -3563,6 +3571,37 @@ export const useUpdateApprovalTaskMutation = <
       {
     mutationKey: ['updateApprovalTask'],
     mutationFn: (variables?: UpdateApprovalTaskMutationVariables) => fetcher<UpdateApprovalTaskMutation, UpdateApprovalTaskMutationVariables>(UpdateApprovalTaskDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const A2aEligibleProjectVersionWorkflowsDocument = new TypedDocumentString(`
+    query a2aEligibleProjectVersionWorkflows($projectId: ID!, $projectVersion: Int!) {
+  a2aEligibleProjectVersionWorkflows(
+    projectId: $projectId
+    projectVersion: $projectVersion
+  ) {
+    id
+    workflow {
+      id
+      label
+    }
+  }
+}
+    `);
+
+export const useA2aEligibleProjectVersionWorkflowsQuery = <
+      TData = A2aEligibleProjectVersionWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: A2aEligibleProjectVersionWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<A2aEligibleProjectVersionWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<A2aEligibleProjectVersionWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<A2aEligibleProjectVersionWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['a2aEligibleProjectVersionWorkflows', variables],
+    queryFn: fetcher<A2aEligibleProjectVersionWorkflowsQuery, A2aEligibleProjectVersionWorkflowsQueryVariables>(A2aEligibleProjectVersionWorkflowsDocument, variables),
     ...options
   }
     )};
