@@ -12,6 +12,7 @@ import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
+import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
@@ -42,6 +43,8 @@ const IntegrationHeader = ({
     updateWorkflowMutation,
 }: IntegrationHeaderProps) => {
     const copilotLayoutShifted = useCopilotLayoutShifted();
+
+    useCopilotCompactHeader();
     const {leftSidebarOpen, setLeftSidebarOpen} = useIntegrationsLeftSidebarStore(
         useShallow((state) => ({
             leftSidebarOpen: state.leftSidebarOpen,

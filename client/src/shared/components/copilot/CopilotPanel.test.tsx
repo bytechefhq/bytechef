@@ -101,3 +101,26 @@ describe('CopilotPanel', () => {
         expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(false);
     });
 });
+
+describe('CopilotPanel header', () => {
+    beforeEach(() => {
+        useCopilotPanelStore.setState({compactHeader: false, copilotPanelOpen: true});
+    });
+
+    const header = () => screen.getByRole('heading', {name: 'AI Copilot'}).parentElement?.parentElement;
+
+    it('keeps the page header padding by default', () => {
+        renderCopilotPanel();
+
+        expect(header()).toHaveClass('p-4');
+    });
+
+    it('lines up with a workflow editor toolbar when the page asks for a compact header', () => {
+        useCopilotPanelStore.setState({compactHeader: true});
+
+        renderCopilotPanel();
+
+        expect(header()).toHaveClass('px-4', 'py-2.5');
+        expect(header()).not.toHaveClass('p-4');
+    });
+});
