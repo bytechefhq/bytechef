@@ -43,6 +43,8 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.WorkflowConnectionDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -110,6 +112,15 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     public A2aProject createA2aProject(
         long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
+        return createA2aProject(a2aServerId, projectId, projectVersion, selectedWorkflowIds, List.of());
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public A2aProject createA2aProject(
+        long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
+        List<WorkflowConfigurationDTO> workflowConfigurations) {
+
         validateProjectVersionPublished(projectId, projectVersion);
 
         Set<String> workflowIds = validateWorkflowIds(projectId, projectVersion, selectedWorkflowIds);
@@ -118,8 +129,8 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
         validateProjectNotAttached(a2aServerId, projectId);
 
-        Map<String, List<ProjectDeploymentWorkflowConnection>> workflowConnectionsMap = resolveConnections(
-            projectId, workflowIds, a2aServer.getEnvironment());
+        Map<String, WorkflowDeploymentSettings> workflowDeploymentSettingsMap = resolveWorkflowDeploymentSettings(
+            projectId, workflowIds, workflowConfigurations, a2aServer.getEnvironment());
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
@@ -134,7 +145,7 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
         A2aProject a2aProject = a2aProjectService.create(projectDeployment.getId(), a2aServerId, projectId);
 
-        for (Map.Entry<String, List<ProjectDeploymentWorkflowConnection>> entry : workflowConnectionsMap.entrySet()) {
+        for (Map.Entry<String, WorkflowDeploymentSettings> entry : workflowDeploymentSettingsMap.entrySet()) {
             ProjectDeploymentWorkflow projectDeploymentWorkflow = createProjectDeploymentWorkflow(
                 projectDeployment.getId(), entry.getKey(), entry.getValue());
 
@@ -156,6 +167,14 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public A2aProject updateA2aProject(long a2aProjectId, List<String> selectedWorkflowIds) {
+        return updateA2aProject(a2aProjectId, selectedWorkflowIds, List.of());
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public A2aProject updateA2aProject(
+        long a2aProjectId, List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations) {
+
         A2aProject a2aProject = a2aProjectService.fetchA2aProject(a2aProjectId)
             .orElseThrow(() -> new IllegalArgumentException("A2aProject not found: " + a2aProjectId));
 
@@ -190,11 +209,31 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
         addedWorkflowIds.removeAll(existingWorkflowIdMap.keySet());
 
-        Map<String, List<ProjectDeploymentWorkflowConnection>> addedWorkflowConnectionsMap = resolveConnections(
-            projectDeployment.getProjectId(), addedWorkflowIds, projectDeployment.getEnvironment());
+        Map<String, WorkflowDeploymentSettings> addedWorkflowDeploymentSettingsMap =
+            resolveWorkflowDeploymentSettings(
+                projectDeployment.getProjectId(), addedWorkflowIds, workflowConfigurations,
+                projectDeployment.getEnvironment());
 
-        for (Map.Entry<String, List<ProjectDeploymentWorkflowConnection>> entry : addedWorkflowConnectionsMap
-            .entrySet()) {
+        for (WorkflowConfigurationDTO workflowConfiguration : workflowConfigurations) {
+            A2aProjectWorkflow a2aProjectWorkflow = existingWorkflowIdMap.get(workflowConfiguration.workflowId());
+
+            if (a2aProjectWorkflow == null || !selectedWorkflowIdSet.contains(workflowConfiguration.workflowId())) {
+                continue;
+            }
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowMap.get(
+                a2aProjectWorkflow.getProjectDeploymentWorkflowId());
+
+            projectDeploymentWorkflow.setConnections(
+                toProjectDeploymentWorkflowConnections(
+                    workflowConfiguration.workflowId(), workflowConfiguration.connections(),
+                    projectDeployment.getEnvironment()));
+            projectDeploymentWorkflow.setInputs(workflowConfiguration.inputs());
+
+            projectDeploymentWorkflowService.update(projectDeploymentWorkflow);
+        }
+
+        for (Map.Entry<String, WorkflowDeploymentSettings> entry : addedWorkflowDeploymentSettingsMap.entrySet()) {
 
             ProjectDeploymentWorkflow projectDeploymentWorkflow = createProjectDeploymentWorkflow(
                 a2aProject.getProjectDeploymentId(), entry.getKey(), entry.getValue());
@@ -364,29 +403,91 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
         return projectDeploymentWorkflowConnections;
     }
 
-    private Map<String, List<ProjectDeploymentWorkflowConnection>> resolveConnections(
-        long projectId, Set<String> workflowIds, Environment environment) {
+    private Map<String, WorkflowDeploymentSettings> resolveWorkflowDeploymentSettings(
+        long projectId, Set<String> workflowIds, List<WorkflowConfigurationDTO> workflowConfigurations,
+        Environment environment) {
 
-        Map<String, List<ProjectDeploymentWorkflowConnection>> workflowConnectionsMap = new LinkedHashMap<>();
+        Map<String, WorkflowConfigurationDTO> workflowConfigurationMap = new HashMap<>();
 
-        for (String workflowId : workflowIds) {
-            workflowConnectionsMap.put(workflowId, resolveConnections(projectId, workflowId, environment));
+        for (WorkflowConfigurationDTO workflowConfiguration : workflowConfigurations) {
+            workflowConfigurationMap.put(workflowConfiguration.workflowId(), workflowConfiguration);
         }
 
-        return workflowConnectionsMap;
+        Map<String, WorkflowDeploymentSettings> workflowDeploymentSettingsMap = new LinkedHashMap<>();
+
+        for (String workflowId : workflowIds) {
+            WorkflowConfigurationDTO workflowConfiguration = workflowConfigurationMap.get(workflowId);
+
+            if (workflowConfiguration == null) {
+                workflowDeploymentSettingsMap.put(
+                    workflowId,
+                    new WorkflowDeploymentSettings(resolveConnections(projectId, workflowId, environment), Map.of()));
+            } else {
+                workflowDeploymentSettingsMap.put(
+                    workflowId,
+                    new WorkflowDeploymentSettings(
+                        toProjectDeploymentWorkflowConnections(
+                            workflowId, workflowConfiguration.connections(), environment),
+                        workflowConfiguration.inputs()));
+            }
+        }
+
+        return workflowDeploymentSettingsMap;
+    }
+
+    private List<ProjectDeploymentWorkflowConnection> toProjectDeploymentWorkflowConnections(
+        String workflowId, List<WorkflowConnectionDTO> workflowConnections, Environment environment) {
+
+        List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections = new ArrayList<>();
+
+        for (ComponentConnection componentConnection : getComponentConnections(
+            workflowService.getWorkflow(workflowId))) {
+
+            Optional<WorkflowConnectionDTO> workflowConnection = workflowConnections.stream()
+                .filter(curWorkflowConnection -> Objects.equals(
+                    curWorkflowConnection.workflowNodeName(), componentConnection.workflowNodeName()) &&
+                    Objects.equals(curWorkflowConnection.workflowConnectionKey(), componentConnection.key()))
+                .findFirst();
+
+            if (workflowConnection.isPresent()) {
+                long connectionId = workflowConnection.get()
+                    .connectionId();
+
+                if (!isConnectionUsable(connectionId, componentConnection, environment)) {
+                    throw new IllegalArgumentException(
+                        "Connection " + connectionId + " cannot be used for " + componentConnection.workflowNodeName() +
+                            " of workflow " + workflowId + ": it must be a " + componentConnection.componentName() +
+                            " connection in the " + environment + " environment");
+                }
+
+                projectDeploymentWorkflowConnections.add(
+                    new ProjectDeploymentWorkflowConnection(
+                        connectionId, componentConnection.key(), componentConnection.workflowNodeName()));
+            } else if (componentConnection.required()) {
+                throw new IllegalArgumentException(
+                    "Workflow " + workflowId + " requires a " + componentConnection.componentName() +
+                        " connection for " + componentConnection.workflowNodeName());
+            }
+        }
+
+        return projectDeploymentWorkflowConnections;
     }
 
     private ProjectDeploymentWorkflow createProjectDeploymentWorkflow(
-        long projectDeploymentId, String workflowId, List<ProjectDeploymentWorkflowConnection> connections) {
+        long projectDeploymentId, String workflowId, WorkflowDeploymentSettings workflowDeploymentSettings) {
 
         ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
         projectDeploymentWorkflow.setProjectDeploymentId(projectDeploymentId);
         projectDeploymentWorkflow.setWorkflowId(workflowId);
         projectDeploymentWorkflow.setEnabled(true);
-        projectDeploymentWorkflow.setInputs(Map.of());
-        projectDeploymentWorkflow.setConnections(connections);
+        projectDeploymentWorkflow.setInputs(workflowDeploymentSettings.inputs());
+        projectDeploymentWorkflow.setConnections(workflowDeploymentSettings.connections());
 
         return projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
+    }
+
+    private record WorkflowDeploymentSettings(
+        List<ProjectDeploymentWorkflowConnection> connections, Map<String, Object> inputs) {
     }
 }

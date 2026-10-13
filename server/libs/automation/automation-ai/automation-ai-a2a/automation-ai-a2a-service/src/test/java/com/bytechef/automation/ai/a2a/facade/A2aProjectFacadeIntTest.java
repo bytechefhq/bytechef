@@ -69,6 +69,8 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
+import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.WorkflowConnectionDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -80,6 +82,7 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -843,6 +846,71 @@ class A2aProjectFacadeIntTest {
                 .filter(projectDeploymentWorkflow -> workflowId.equals(projectDeploymentWorkflow.getWorkflowId()))
                 .findFirst()
                 .orElseThrow();
+        }
+
+        @Test
+        void testCreateA2aProjectDeploysTheConfiguredConnectionAndInputs() {
+            stubSlackConnection(true);
+            stubConnection(90L, "slack", Environment.DEVELOPMENT);
+
+            A2aProject a2aProject = a2aProjectFacade.createA2aProject(
+                a2aServer.getId(), project.getId(), 1, List.of(workflowId),
+                List.of(slackWorkflowConfiguration(workflowId, 90L, Map.of("tone", "formal"))));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                a2aProject.getProjectDeploymentId()))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> {
+                        assertThat(projectDeploymentWorkflow.getConnections())
+                            .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                            .containsExactly(90L);
+                        assertThat(projectDeploymentWorkflow.getInputs()).isEqualTo(Map.of("tone", "formal"));
+                    });
+        }
+
+        @Test
+        void testCreateA2aProjectRejectsAConfiguredConnectionOfAnotherComponent() {
+            stubSlackConnection(true);
+            stubConnection(90L, "github", Environment.DEVELOPMENT);
+
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> a2aProjectFacade.createA2aProject(
+                    a2aServer.getId(), project.getId(), 1, List.of(workflowId),
+                    List.of(slackWorkflowConfiguration(workflowId, 90L, Map.of()))))
+                .withMessageContaining("Connection 90 cannot be used");
+
+            assertThat(a2aProjectRepository.findAllByA2aServerId(a2aServer.getId())).isEmpty();
+        }
+
+        @Test
+        void testUpdateA2aProjectAppliesTheConfigurationOfAKeptWorkflow() {
+            A2aProject a2aProject = a2aProjectFacade.createA2aProject(
+                a2aServer.getId(), project.getId(), 1, List.of(workflowId));
+
+            stubSlackConnection(true);
+            stubConnection(91L, "slack", Environment.DEVELOPMENT);
+
+            a2aProjectFacade.updateA2aProject(
+                a2aProject.getId(), List.of(workflowId),
+                List.of(slackWorkflowConfiguration(workflowId, 91L, Map.of("tone", "casual"))));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                a2aProject.getProjectDeploymentId()))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> {
+                        assertThat(projectDeploymentWorkflow.getConnections())
+                            .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                            .containsExactly(91L);
+                        assertThat(projectDeploymentWorkflow.getInputs()).isEqualTo(Map.of("tone", "casual"));
+                    });
+        }
+
+        private WorkflowConfigurationDTO slackWorkflowConfiguration(
+            String configuredWorkflowId, long connectionId, Map<String, Object> inputs) {
+
+            return new WorkflowConfigurationDTO(
+                configuredWorkflowId, List.of(new WorkflowConnectionDTO(connectionId, "slack", "newWorkflowCall_1")),
+                inputs);
         }
 
         private void stubConnection(long connectionId, String componentName, Environment environment) {

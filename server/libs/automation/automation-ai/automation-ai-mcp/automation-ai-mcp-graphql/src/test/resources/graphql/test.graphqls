@@ -193,3 +193,15 @@ type ArrayProperty implements Property {
     label: String
     placeholder: String
 }
+
+input WorkflowConfigurationInput {
+    workflowId: String!
+    connections: [WorkflowConnectionInput!]
+    inputs: Map
+}
+
+input WorkflowConnectionInput {
+    connectionId: ID!
+    workflowConnectionKey: String!
+    workflowNodeName: String!
+}

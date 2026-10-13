@@ -35,4 +35,9 @@ public class AutomationA2aGraphQlTestConfiguration {
     RuntimeWiringConfigurer longScalarWiringConfigurer() {
         return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.longScalar());
     }
+
+    @Bean
+    RuntimeWiringConfigurer mapScalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.mapScalar());
+    }
 }

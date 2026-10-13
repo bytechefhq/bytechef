@@ -1,4 +1,5 @@
 scalar Long
+scalar Map
 
 type Query
 
@@ -12,4 +13,16 @@ type Tag {
 input TagInput {
     id: ID
     name: String!
+}
+
+input WorkflowConfigurationInput {
+    workflowId: String!
+    connections: [WorkflowConnectionInput!]
+    inputs: Map
+}
+
+input WorkflowConnectionInput {
+    connectionId: ID!
+    workflowConnectionKey: String!
+    workflowNodeName: String!
 }
