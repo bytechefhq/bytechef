@@ -421,29 +421,30 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
                 return true;
             })
-            .filter(connectedUserProject -> {
-                if (environment != null) {
-                    return projectDeploymentService
-                        .fetchProjectDeployment(connectedUserProject.getProjectId(), environment)
-                        .map(projectDeployment -> projectDeployment.getEnvironment() == environment)
-                        .orElse(false);
-                }
+            .map(connectedUserProject -> Map.entry(
+                connectedUserProject, connectedUserService.getConnectedUser(connectedUserProject.getConnectedUserId())))
+            .filter(entry -> {
+                ConnectedUser connectedUser = entry.getValue();
 
-                return true;
+                return environment == null || connectedUser.getEnvironment() == environment;
             })
-            .map(connectedUserProject -> {
-                ConnectedUser connectedUser = connectedUserService.getConnectedUser(
-                    connectedUserProject.getConnectedUserId());
+            .map(entry -> {
+                ConnectedUserProject connectedUserProject = entry.getKey();
+                ConnectedUser connectedUser = entry.getValue();
 
                 List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflows =
                     getConnectedUserProjectWorkflows(connectedUserProject, connectedUser.getEnvironment());
 
-                ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
-                    connectedUserProject.getProjectId(), connectedUser.getEnvironment());
+                // The project is deployed only once the connected user copies a workflow, references run on the
+                // automation workflow project's deployment
+                ProjectDeployment projectDeployment = projectDeploymentService
+                    .fetchProjectDeployment(connectedUserProject.getProjectId(), connectedUser.getEnvironment())
+                    .orElse(null);
 
                 return new ConnectedUserProjectDTO(
                     connectedUserProject, connectedUser, connectedUserProjectWorkflows,
-                    getProjectDeploymentLastExecutionDate(projectDeployment.getId()), projectDeployment);
+                    projectDeployment == null ? null : getProjectDeploymentLastExecutionDate(projectDeployment.getId()),
+                    projectDeployment);
             })
             .toList();
     }

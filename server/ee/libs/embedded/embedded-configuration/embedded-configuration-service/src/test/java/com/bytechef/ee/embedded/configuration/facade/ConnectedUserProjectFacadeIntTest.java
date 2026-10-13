@@ -36,6 +36,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
@@ -43,6 +44,7 @@ import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWor
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -367,6 +369,58 @@ class ConnectedUserProjectFacadeIntTest {
                 assertThat(connectedUserProjectWorkflowDTO.components()).extracting("name")
                     .containsExactly("slack");
             });
+    }
+
+    @Test
+    void testGetConnectedUserProjectsListsAReferenceOfAConnectedUserWhoseProjectIsNotDeployed() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Reference Only");
+
+        String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
+
+        List<ConnectedUserProjectDTO> connectedUserProjectDTOs = connectedUserProjectFacade.getConnectedUserProjects(
+            externalUserId, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectDTOs)
+            .singleElement()
+            .satisfies(connectedUserProjectDTO -> {
+                assertThat(connectedUserProjectDTO.environment()).isEqualTo(Environment.PRODUCTION);
+                assertThat(connectedUserProjectDTO.projectVersion()).isNull();
+                assertThat(connectedUserProjectDTO.lastExecutionDate()).isNull();
+                assertThat(connectedUserProjectDTO.connectedUserProjectWorkflows())
+                    .singleElement()
+                    .satisfies(connectedUserProjectWorkflowDTO -> {
+                        assertThat(connectedUserProjectWorkflowDTO.kind())
+                            .isEqualTo(ConnectedUserProjectWorkflowDTO.Kind.REFERENCE);
+                        assertThat(connectedUserProjectWorkflowDTO.automationWorkflowUuid())
+                            .isEqualTo(automationWorkflowUuid);
+                    });
+            });
+    }
+
+    @Test
+    void testGetConnectedUserProjectsLeavesOutConnectedUsersOfAnotherEnvironment() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Reference Other Environment");
+
+        String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, Environment.PRODUCTION);
+
+        Long connectedUserId = connectedUser.getId();
+
+        assertThat(connectedUserProjectFacade.getConnectedUserProjects(connectedUserId, Environment.DEVELOPMENT))
+            .isEmpty();
+        assertThat(connectedUserProjectFacade.getConnectedUserProjects(connectedUserId, null))
+            .hasSize(1);
     }
 
     @Test
