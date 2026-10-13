@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer;
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerApiKeyAuthenticationToken;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
@@ -38,7 +39,10 @@ class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthe
 
     private final SigningKeyService signingKeyService;
 
-    EmbeddedMcpServerApiKeyAuthenticationConverter(SigningKeyService signingKeyService) {
+    EmbeddedMcpServerApiKeyAuthenticationConverter(EnvironmentService environmentService,
+        SigningKeyService signingKeyService) {
+        super(environmentService);
+
         this.signingKeyService = signingKeyService;
     }
 

@@ -848,7 +848,8 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
                         .authenticated())
                     .with(
                         new EmbeddedApiKeySecurityConfigurer(
-                            apiKeyService, connectedUserService, jwtTokenService, signingKeyService),
+                            apiKeyService, connectedUserService, () -> List.of(Environment.values()), jwtTokenService,
+                            signingKeyService),
                         withDefaults());
 
                 return httpSecurity.build();
