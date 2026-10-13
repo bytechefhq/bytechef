@@ -14,8 +14,10 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerApiKeyAuthenticationToken;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.domain.TenantKey;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -30,7 +32,8 @@ class EmbeddedMcpServerApiKeyAuthenticationConverterTest {
     private static final String MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of("tenant-a"));
 
     private final EmbeddedMcpServerApiKeyAuthenticationConverter embeddedMcpServerApiKeyAuthenticationConverter =
-        new EmbeddedMcpServerApiKeyAuthenticationConverter(mock(SigningKeyService.class));
+        new EmbeddedMcpServerApiKeyAuthenticationConverter(() -> List.of(Environment.values()),
+            mock(SigningKeyService.class));
 
     @Test
     void testConvertWithoutAuthorizationHeaderYieldsTokenWithoutExternalUser() {

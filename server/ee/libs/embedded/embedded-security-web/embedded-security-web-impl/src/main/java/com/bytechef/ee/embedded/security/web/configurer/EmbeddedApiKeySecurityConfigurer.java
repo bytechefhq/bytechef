@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationProvider;
 import com.bytechef.ee.embedded.security.web.filter.EmbeddedAutomationAuthorizationSkipFilter;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -30,7 +31,8 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
 
     @SuppressFBWarnings("EI")
     public EmbeddedApiKeySecurityConfigurer(
-        ApiKeyService apiKeyService, ConnectedUserService connectedUserService, JwtTokenService jwtTokenService,
+        ApiKeyService apiKeyService, ConnectedUserService connectedUserService, EnvironmentService environmentService,
+        JwtTokenService jwtTokenService,
         SigningKeyService signingKeyService) {
 
         super(
@@ -38,7 +40,7 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
                 ((regexMatcher("^/api/(?:automation|embedded|platform)/internal/.+").matches(request) ||
                     regexMatcher("^/graphql$").matches(request)) &&
                     request.getHeader("Authorization") != null),
-            new EmbeddedApiKeyAuthenticationConverter(jwtTokenService, signingKeyService),
+            new EmbeddedApiKeyAuthenticationConverter(environmentService, jwtTokenService, signingKeyService),
             new EmbeddedApiKeyAuthenticationProvider(apiKeyService, connectedUserService));
     }
 

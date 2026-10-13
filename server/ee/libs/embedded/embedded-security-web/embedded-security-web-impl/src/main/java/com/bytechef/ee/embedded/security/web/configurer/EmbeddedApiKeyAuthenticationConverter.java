@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
@@ -49,7 +50,11 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
     private final JwtTokenService jwtTokenService;
     private final SigningKeyService signingKeyService;
 
-    EmbeddedApiKeyAuthenticationConverter(JwtTokenService jwtTokenService, SigningKeyService signingKeyService) {
+    EmbeddedApiKeyAuthenticationConverter(
+        EnvironmentService environmentService, JwtTokenService jwtTokenService, SigningKeyService signingKeyService) {
+
+        super(environmentService);
+
         this.jwtTokenService = jwtTokenService;
         this.signingKeyService = signingKeyService;
     }

@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.configurer.EmbeddedApiKeySecurityConfigurer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -30,16 +31,19 @@ public class EmbeddedApiKeySecurityConfigurerContributor implements SecurityConf
 
     private final ApiKeyService apiKeyService;
     private final ConnectedUserService connectedUserService;
+    private final EnvironmentService environmentService;
     private final JwtTokenService jwtTokenService;
     private final SigningKeyService signingKeyService;
 
     @SuppressFBWarnings("EI")
     public EmbeddedApiKeySecurityConfigurerContributor(
-        ApiKeyService apiKeyService, ConnectedUserService connectedUserService, JwtTokenService jwtTokenService,
+        ApiKeyService apiKeyService, ConnectedUserService connectedUserService, EnvironmentService environmentService,
+        JwtTokenService jwtTokenService,
         SigningKeyService signingKeyService) {
 
         this.apiKeyService = apiKeyService;
         this.connectedUserService = connectedUserService;
+        this.environmentService = environmentService;
         this.jwtTokenService = jwtTokenService;
         this.signingKeyService = signingKeyService;
     }
@@ -48,6 +52,6 @@ public class EmbeddedApiKeySecurityConfigurerContributor implements SecurityConf
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
         return (T) new EmbeddedApiKeySecurityConfigurer(
-            apiKeyService, connectedUserService, jwtTokenService, signingKeyService);
+            apiKeyService, connectedUserService, environmentService, jwtTokenService, signingKeyService);
     }
 }

@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,7 +56,8 @@ class EmbeddedApiKeyAuthenticationConverterTest {
         jwtTokenService = mock(JwtTokenService.class);
         signingKeyService = mock(SigningKeyService.class);
 
-        converter = new EmbeddedApiKeyAuthenticationConverter(jwtTokenService, signingKeyService);
+        converter = new EmbeddedApiKeyAuthenticationConverter(() -> List.of(Environment.values()), jwtTokenService,
+            signingKeyService);
         request = mock(HttpServletRequest.class);
     }
 
@@ -102,6 +104,19 @@ class EmbeddedApiKeyAuthenticationConverterTest {
         assertThat(token.getExternalUserId()).isEqualTo(externalUserId);
         assertThat(token.getTenantId()).isEqualTo(tenantId);
         assertThat(token.getEnvironmentId()).isEqualTo(Environment.PRODUCTION.ordinal());
+    }
+
+    @Test
+    void testConvertWithUnknownEnvironmentHeaderThrowsBadCredentialsException() {
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant:randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn("moon");
+        when(request.getRequestURI()).thenReturn("/api/embedded/v1/user123/endpoint");
+
+        assertThatThrownBy(() -> converter.convert(request))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("Invalid X-ENVIRONMENT header");
     }
 
     @Test
