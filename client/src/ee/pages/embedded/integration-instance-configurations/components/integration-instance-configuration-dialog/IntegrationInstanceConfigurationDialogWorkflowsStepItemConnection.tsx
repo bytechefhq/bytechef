@@ -77,8 +77,8 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                             onValueChange={field.onChange}
                         >
                             <FormControl>
-                                <div className="flex space-x-2">
-                                    <SelectTrigger>
+                                <div className="flex space-x-2 bg-surface-neutral-primary">
+                                    <SelectTrigger className="shadow-none">
                                         <SelectValue placeholder="Choose Connection..." />
                                     </SelectTrigger>
 
