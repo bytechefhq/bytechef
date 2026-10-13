@@ -17,6 +17,7 @@
 package com.bytechef.component.mcp.client.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,10 +30,16 @@ import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.mcp.client.constant.McpClientConstants;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import io.modelcontextprotocol.client.McpSyncClient;
+import io.modelcontextprotocol.client.transport.HttpRequestSnapshot;
+import io.modelcontextprotocol.client.transport.McpHttpClientTransportAuthorizationException;
+import java.net.URI;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -94,6 +101,65 @@ class McpClientUtilsTest {
     @Test
     void testCreateMcpSyncClientAppliesBearerTokenAuthorization() {
         assertAppliedAuthorizationType(Map.of(Authorization.TOKEN, "token"), AuthorizationType.BEARER_TOKEN);
+    }
+
+    @Test
+    void testTranslateAuthorizationErrorsMapsSdk401ToProviderException() {
+        McpHttpClientTransportAuthorizationException authorizationException = authorizationException(401);
+
+        assertThatThrownBy(() -> McpClientUtils.translateAuthorizationErrors(() -> {
+            throw authorizationException;
+        }))
+            .isInstanceOf(ProviderException.class)
+            .extracting("statusCode")
+            .isEqualTo(401);
+    }
+
+    @Test
+    void testCreateMcpSyncClientTranslatesWrappedAuthorizationError() {
+        RuntimeException wrapped = new RuntimeException("reactor wrapper", authorizationException(403));
+
+        assertThatThrownBy(() -> McpClientUtils.translateAuthorizationErrors(() -> {
+            throw wrapped;
+        }))
+            .isInstanceOf(ProviderException.class)
+            .hasCause(wrapped)
+            .extracting("statusCode")
+            .isEqualTo(403);
+    }
+
+    @Test
+    void testTranslateAuthorizationErrorsLeavesOtherExceptionsAlone() {
+        IllegalStateException other = new IllegalStateException("boom");
+
+        assertThatThrownBy(() -> McpClientUtils.translateAuthorizationErrors(() -> {
+            throw other;
+        })).isSameAs(other);
+    }
+
+    @Test
+    void testCreateMcpSyncClientAppliesBearerTokenForDiscoveryConnection() {
+        assertAppliedAuthorizationType(
+            Map.of(
+                Authorization.ACCESS_TOKEN, "access-token",
+                Authorization.AUTHORIZATION_URL, "https://auth.example.com/authorize",
+                Authorization.TOKEN_URL, "https://auth.example.com/token",
+                Authorization.CLIENT_ID, "reg-1",
+                Authorization.TOKEN_ENDPOINT_AUTH_METHOD, "none",
+                Authorization.RESOURCE, "https://mcp.example.com/mcp"),
+            AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+    }
+
+    private static McpHttpClientTransportAuthorizationException authorizationException(int statusCode) {
+        HttpResponse.ResponseInfo responseInfo = mock(HttpResponse.ResponseInfo.class);
+
+        when(responseInfo.statusCode()).thenReturn(statusCode);
+
+        return new McpHttpClientTransportAuthorizationException(
+            "Authorization error",
+            new HttpRequestSnapshot(
+                URI.create("https://mcp.example.com/mcp"), "POST", HttpHeaders.of(Map.of(), (name, value) -> true)),
+            responseInfo);
     }
 
     private static void assertAppliedAuthorizationType(

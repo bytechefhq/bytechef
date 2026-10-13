@@ -58,6 +58,30 @@ public class McpClientConnection {
                 .required(true))
         .authorizationRequired(false)
         .authorizations(
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE)
+                .title("OAuth2 (PKCE)")
+                .description(
+                    "Sign in to the MCP server with PKCE. Leave the Authorization URL and Token URL empty and " +
+                        "ByteChef discovers the authorization server and registers itself, with no client id or " +
+                        "secret needed. Fill them in to use an OAuth app registered with the server instead.")
+                .properties(
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .description("The client id of an OAuth app registered with the MCP server."),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .description("The client secret of that OAuth app; leave empty for a public client."),
+                    string(AUTHORIZATION_URL)
+                        .label("Authorization URL")
+                        .description("The authorization endpoint of the server's OAuth app."),
+                    string(TOKEN_URL)
+                        .label("Token URL")
+                        .description("The token endpoint of the server's OAuth app."),
+                    string(SCOPES)
+                        .label("Scopes")
+                        .description("Optional comma-delimited list of scopes")
+                        .controlType(ControlType.TEXT_AREA))
+                .protectedResourceUrl((connectionParameters, context) -> connectionParameters.getRequiredString(URL)),
             authorization(AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
@@ -65,7 +89,7 @@ public class McpClientConnection {
                         .label("Token")
                         .required(true)),
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
+                .title("OAuth2 (manual)")
                 .properties(
                     string(AUTHORIZATION_URL)
                         .label("Authorization URL")

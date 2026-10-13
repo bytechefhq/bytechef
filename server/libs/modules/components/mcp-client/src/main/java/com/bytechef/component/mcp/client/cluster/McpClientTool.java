@@ -100,7 +100,7 @@ public class McpClientTool {
         McpSyncClient mcpSyncClient = createMcpSyncClient(
             connectionParameters, connectionDefinitionService, context);
 
-        mcpSyncClient.initialize();
+        McpClientUtils.translateAuthorizationErrors(mcpSyncClient::initialize);
 
         McpToolFilter toolFilter = createToolFilter(inputParameters);
 

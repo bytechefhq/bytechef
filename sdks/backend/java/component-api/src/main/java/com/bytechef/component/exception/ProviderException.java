@@ -73,6 +73,12 @@ public class ProviderException extends RuntimeException {
         this.statusCode = statusCode;
     }
 
+    public ProviderException(Integer statusCode, String message, Exception exception) {
+        super(message, exception);
+
+        this.statusCode = statusCode;
+    }
+
     /**
      *
      * @return
