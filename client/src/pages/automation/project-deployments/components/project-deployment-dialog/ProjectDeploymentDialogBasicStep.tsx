@@ -20,7 +20,7 @@ import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {InfoIcon, LayersIcon, PlusIcon, RefreshCwIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -294,6 +294,26 @@ const ProjectDeploymentDialogBasicStep = ({
         </>
     );
 
+    useEffect(() => {
+        if (
+            !showTabs ||
+            basicStepTab !== 'change-version' ||
+            selectedDeploymentId ||
+            projectDeploymentsLoading ||
+            projectDeployments?.length !== 1
+        ) {
+            return;
+        }
+
+        const onlyDeploymentId = projectDeployments[0].id;
+
+        if (onlyDeploymentId != null) {
+            handleDeploymentSelectChange(onlyDeploymentId.toString());
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [basicStepTab, projectDeployments, projectDeploymentsLoading, selectedDeploymentId, showTabs]);
+
     if (!showTabs) {
         return <div className="flex flex-col gap-4">{newDeploymentForm}</div>;
     }
@@ -302,6 +322,10 @@ const ProjectDeploymentDialogBasicStep = ({
         <Tabs
             onValueChange={(value) => {
                 const normalizedValue = value as 'new-deployment' | 'change-version';
+
+                if (normalizedValue === 'new-deployment') {
+                    setSelectedDeploymentId(undefined);
+                }
 
                 handleTabChange(normalizedValue);
             }}
