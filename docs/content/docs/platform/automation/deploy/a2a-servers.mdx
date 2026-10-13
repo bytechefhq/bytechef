@@ -49,7 +49,9 @@ A server exposes nothing until you add a project to it.
 1. Expand the server's card, open the **Workflow Skills** tab and click **Add Workflows**.
 2. On the **Basic** step, **select a project** and a published **version**, then click **Next**.
 3. On the **Workflows** step, switch on the workflows to expose. Only workflows with a **New Workflow Call** trigger
-   (`workflow/v1/newWorkflowCall`) are listed - that trigger is what lets the workflow be invoked as a skill.
+   (`workflow/v1/newWorkflowCall`) are listed - that trigger is what lets the workflow be invoked as a skill. A
+   workflow whose trigger input schema requires any input other than `message` is left out too: an A2A call only
+   fills `message`, with the text of the caller's message, so the other inputs could never be supplied.
 4. For each switched-on workflow, pick its **Connections** and fill in its **Inputs**, then click **Add**. Every
    required connection must be set; a connection must belong to the server's environment.
 
