@@ -28,6 +28,7 @@ import com.bytechef.component.google.drive.action.GoogleDriveCreateNewFolderActi
 import com.bytechef.component.google.drive.action.GoogleDriveCreateNewTextFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveDeleteFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveDownloadFileAction;
+import com.bytechef.component.google.drive.action.GoogleDriveFindOrCreateFolderAction;
 import com.bytechef.component.google.drive.action.GoogleDriveGetFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveListFilesAction;
 import com.bytechef.component.google.drive.action.GoogleDriveListFoldersAction;
@@ -61,6 +62,7 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             GoogleDriveCreateNewTextFileAction.ACTION_DEFINITION,
             GoogleDriveDeleteFileAction.ACTION_DEFINITION,
             GoogleDriveDownloadFileAction.ACTION_DEFINITION,
+            GoogleDriveFindOrCreateFolderAction.ACTION_DEFINITION,
             GoogleDriveGetFileAction.ACTION_DEFINITION,
             GoogleDriveListFilesAction.ACTION_DEFINITION,
             GoogleDriveListFoldersAction.ACTION_DEFINITION,
@@ -73,6 +75,7 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             tool(GoogleDriveCreateNewTextFileAction.ACTION_DEFINITION),
             tool(GoogleDriveDeleteFileAction.ACTION_DEFINITION),
             tool(GoogleDriveDownloadFileAction.ACTION_DEFINITION),
+            tool(GoogleDriveFindOrCreateFolderAction.ACTION_DEFINITION),
             tool(GoogleDriveGetFileAction.ACTION_DEFINITION),
             tool(GoogleDriveListFilesAction.ACTION_DEFINITION),
             tool(GoogleDriveListFoldersAction.ACTION_DEFINITION),
