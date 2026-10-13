@@ -3,6 +3,7 @@ import Switch from '@/components/Switch/Switch';
 import {Popover} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
+import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
 
 import McpProjectWorkflowPropertiesPopover from './McpProjectWorkflowPropertiesPopover';
@@ -43,6 +44,12 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                     <span className="min-w-0 flex-1 truncate text-sm font-medium">{workflowLabel}</span>
 
                     <div className="flex shrink-0 items-center gap-2">
+                        <McpToolConfigureButton
+                            anchorsPopover
+                            label={workflowLabel}
+                            onClick={() => openPopover(popoverId)}
+                        />
+
                         <Switch
                             aria-label={`Enable ${workflowLabel}`}
                             checked={mcpProjectWorkflow.enabled}
@@ -52,9 +59,7 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                         />
 
                         <McpToolActionsMenu
-                            anchorsPopover
                             label={workflowLabel}
-                            onConfigureClick={() => openPopover(popoverId)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditWorkflowDialog(true)}
                         />

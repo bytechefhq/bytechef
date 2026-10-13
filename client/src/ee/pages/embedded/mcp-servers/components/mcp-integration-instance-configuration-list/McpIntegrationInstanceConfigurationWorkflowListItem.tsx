@@ -2,6 +2,7 @@ import AlertDialog from '@/components/AlertDialog';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
+import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
 
 import McpIntegrationInstanceConfigurationWorkflowPropertiesPopover from './McpIntegrationInstanceConfigurationWorkflowPropertiesPopover';
@@ -44,9 +45,10 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
                     <div className="flex items-center gap-2 py-0.5">
                         <span className="min-w-0 flex-1 truncate text-sm font-medium">{workflowLabel}</span>
 
+                        <McpToolConfigureButton label={workflowLabel} onClick={() => openPopover(popoverId)} />
+
                         <McpToolActionsMenu
                             label={workflowLabel}
-                            onConfigureClick={() => openPopover(popoverId)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditWorkflowDialog(true)}
                         />
