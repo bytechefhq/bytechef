@@ -76,6 +76,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
     );
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const compactHeader = useCopilotPanelStore((state) => state.compactHeader);
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const location = useLocation();
     const navigate = useNavigate();
@@ -129,7 +130,13 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
 
     return (
         <div className={twMerge('relative h-full min-h-[50vh] w-[450px] bg-surface-main', className)}>
-            <div className={twMerge('flex items-center justify-between p-4', headerClassName)}>
+            <div
+                className={twMerge(
+                    'flex items-center justify-between',
+                    compactHeader ? 'px-4 py-2.5' : 'p-4',
+                    headerClassName
+                )}
+            >
                 <div className="flex items-center space-x-1">
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
                 </div>

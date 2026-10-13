@@ -21,6 +21,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
+import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {
     useAutomationWorkflowProjectCategoriesQuery,
@@ -83,6 +84,8 @@ const AutomationWorkflowEditorHeader = ({
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const copilotLayoutShifted = useCopilotLayoutShifted();
+
+    useCopilotCompactHeader();
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
     const navigate = useNavigate();
