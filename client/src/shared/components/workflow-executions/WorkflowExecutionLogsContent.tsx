@@ -1,5 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/ui/input';
 import JsonView, {useJsonViewLoaded} from '@/shared/components/JsonView';
 import {
     type EditorJobFileLogsQuery,
@@ -19,6 +20,7 @@ import {
     ChevronsUpDownIcon,
     InfoIcon,
     MessageSquareIcon,
+    SearchIcon,
 } from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {createPortal} from 'react-dom';
@@ -240,6 +242,7 @@ const WorkflowExecutionLogsContent = ({
     const [expansionVersion, setExpansionVersion] = useState(0);
     const [hiddenLevels, setHiddenLevels] = useState<LogLevel[]>([]);
     const [page] = useState(0);
+    const [searchText, setSearchText] = useState('');
     const [size] = useState(100);
 
     const isTriggerLogs = !isEditorEnvironment && !!triggerExecutionId;
@@ -302,10 +305,15 @@ const WorkflowExecutionLogsContent = ({
         [logs]
     );
 
-    const visibleLogs = useMemo(
-        () => logs.filter((logEntry) => !hiddenLevels.includes(logEntry.level)),
-        [hiddenLevels, logs]
-    );
+    const visibleLogs = useMemo(() => {
+        const normalizedSearchText = searchText.trim().toLowerCase();
+
+        return logs.filter(
+            (logEntry) =>
+                !hiddenLevels.includes(logEntry.level) &&
+                (!normalizedSearchText || logEntry.message.toLowerCase().includes(normalizedSearchText))
+        );
+    }, [hiddenLevels, logs, searchText]);
 
     const allExpanded = collapsed === false;
 
@@ -372,6 +380,19 @@ const WorkflowExecutionLogsContent = ({
                     />
                 );
             })}
+
+            <div className="relative ml-2 w-48">
+                <SearchIcon className="absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+
+                <Input
+                    aria-label="Search logs"
+                    className="h-7 pl-7 text-xs"
+                    onChange={(event) => setSearchText(event.target.value)}
+                    placeholder="Search logs..."
+                    type="search"
+                    value={searchText}
+                />
+            </div>
 
             <Button
                 aria-label={allExpanded ? 'Collapse all' : 'Expand all'}

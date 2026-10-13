@@ -160,6 +160,37 @@ describe('WorkflowExecutionLogsContent', () => {
         expect(screen.getByText('debug message')).toBeInTheDocument();
     });
 
+    it('shows only the entries whose message contains the search text, ignoring case', () => {
+        jobFileLogsQueryMock.mockReturnValue({
+            data: {
+                jobFileLogs: {
+                    content: [
+                        logEntry('INFO', 'AI agent response: Pixel'),
+                        logEntry('DEBUG', '{"toolName":"conversation_search"}'),
+                        logEntry('DEBUG', 'debug message'),
+                    ],
+                },
+            },
+            error: undefined,
+            isLoading: false,
+        });
+
+        render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" />);
+
+        const searchInput = screen.getByRole('searchbox', {name: 'Search logs'});
+
+        fireEvent.change(searchInput, {target: {value: 'PIXEL'}});
+
+        expect(screen.getByText('AI agent response: Pixel')).toBeInTheDocument();
+        expect(screen.queryByText('debug message')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('json-view')).not.toBeInTheDocument();
+
+        fireEvent.change(searchInput, {target: {value: 'conversation_search'}});
+
+        expect(screen.getByTestId('json-view')).toBeInTheDocument();
+        expect(screen.queryByText('AI agent response: Pixel')).not.toBeInTheDocument();
+    });
+
     it('expands and collapses every JSON entry at once', () => {
         jobFileLogsQueryMock.mockReturnValue({
             data: {jobFileLogs: {content: [logEntry('INFO', '{"toolName":"TodoWrite"}')]}},
