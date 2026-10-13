@@ -220,6 +220,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
         projectWorkflowService.addWorkflow(projectId, project.getLastProjectVersion(), workflow.getId());
 
+        workflowTestConfigurationService.copyWorkflowTestConfigurations(workflowId, workflow.getId());
+
         return workflow.getId();
     }
 
