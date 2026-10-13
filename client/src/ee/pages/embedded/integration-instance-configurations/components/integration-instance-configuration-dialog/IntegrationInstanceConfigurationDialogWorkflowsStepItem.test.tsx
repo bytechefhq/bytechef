@@ -2,6 +2,7 @@ import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {ReactNode} from 'react';
 import {useForm} from 'react-hook-form';
 import {describe, expect, it, vi} from 'vitest';
@@ -166,12 +167,26 @@ const TestFormWithInternalOnlyInputs = () => {
 };
 
 describe('IntegrationInstanceConfigurationDialogWorkflowsStepItem', () => {
+    it('opens on the Connections tab and counts the connections and inputs of the workflow', () => {
+        render(
+            <QueryWrapper>
+                <TestForm />
+            </QueryWrapper>
+        );
+
+        expect(screen.getByRole('tab', {name: /Connections\s*\(0\)/})).toHaveAttribute('data-state', 'active');
+        expect(screen.getByRole('tab', {name: /Inputs\s*\(2\)/})).toBeInTheDocument();
+        expect(screen.getByTestId('connections')).toBeInTheDocument();
+    });
+
     it('renders component-defined inputs through the shared InputConfigurationList', async () => {
         render(
             <QueryWrapper>
                 <TestForm />
             </QueryWrapper>
         );
+
+        await userEvent.click(screen.getByRole('tab', {name: /Inputs/}));
 
         await waitFor(() => expect(screen.getByText('Channel')).toBeInTheDocument());
         await waitFor(() => expect(screen.getByText('Spreadsheet')).toBeInTheDocument());
@@ -184,6 +199,8 @@ describe('IntegrationInstanceConfigurationDialogWorkflowsStepItem', () => {
             </QueryWrapper>
         );
 
+        await userEvent.click(screen.getByRole('tab', {name: /Inputs/}));
+
         await waitFor(() => expect(screen.getByText('Spreadsheet')).toBeInTheDocument());
 
         expect(screen.queryByText('Channel')).not.toBeInTheDocument();
@@ -195,6 +212,8 @@ describe('IntegrationInstanceConfigurationDialogWorkflowsStepItem', () => {
                 <TestFormWithInternalOnlyInputs />
             </QueryWrapper>
         );
+
+        await userEvent.click(screen.getByRole('tab', {name: /Inputs/}));
 
         await waitFor(() => expect(screen.getByText('API Key')).toBeInTheDocument());
 
