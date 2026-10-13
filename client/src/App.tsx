@@ -35,7 +35,7 @@ import {
     Workflow,
     ZapIcon,
 } from 'lucide-react';
-import {Suspense, lazy, useEffect, useState} from 'react';
+import {Suspense, lazy, useEffect, useLayoutEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -219,11 +219,14 @@ function App() {
         }
     }, [account, helpHub, userGuiding]);
 
-    useEffect(() => {
+    // A layout effect runs before every passive effect, so a page such as Settings can still name the tab itself.
+    useLayoutEffect(() => {
         document.title =
-            [...automationNavigation, ...embeddedNavigation, ...platformNavigation].find(
-                (navItem) => navItem.href === location.pathname
-            )?.name ?? 'ByteChef';
+            [...automationNavigation, ...embeddedNavigation, ...platformNavigation]
+                .filter(
+                    (navItem) => location.pathname === navItem.href || location.pathname.startsWith(`${navItem.href}/`)
+                )
+                .sort((navItem, otherNavItem) => otherNavItem.href.length - navItem.href.length)[0]?.name ?? 'ByteChef';
     }, [location]);
 
     useEffect(() => {
