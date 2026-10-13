@@ -522,7 +522,7 @@ The MCP row above previously covered A2A as well.
 
 | **Agentic AI** *(coming soon)* | `server/libs/modules/components/ai/agentic-ai` (opt-in, `agentic` profile) | Wraps Embabel's goal-oriented action planning (GOAP) engine: instead of a fixed task sequence, the planner chooses which actions to run and in what order to reach a declared goal, using the canvas-selected model for both action prompts and goal evaluation. |
 | **AI Gateway** *(coming soon, Enterprise)* | `automation-ai-gateway` | Routes every AI call through one place for model selection, budget/rate limits, and per-project cost tracking, independent of which surface (canvas AI Agent, AI Hub, Copilot) issued the call. |
-| **MCP / A2A servers** *(A2A coming soon)* | `automation-ai-mcp-*` / `automation-ai-a2a` (+ CE protocol core `platform-ai-a2a`) | Expose a workflow's `workflow/newWorkflowCall` trigger as a tool an MCP client can call, or as a skill an A2A-speaking agent can delegate to - the workflow itself is unmodified, only the trigger surface changes. |
+| **MCP / A2A servers** *(A2A coming soon)* | `automation-ai-mcp-*` / `automation-ai-a2a` (+ CE protocol core `platform-ai-a2a-api`) | Expose a workflow's `workflow/newWorkflowCall` trigger as a tool an MCP client can call, or as a skill an A2A-speaking agent can delegate to - the workflow itself is unmodified, only the trigger surface changes. |
 */}
 
 ## Putting it together
