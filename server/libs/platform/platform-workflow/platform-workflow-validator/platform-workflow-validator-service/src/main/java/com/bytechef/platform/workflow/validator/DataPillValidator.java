@@ -323,7 +323,7 @@ class DataPillValidator {
 
             String dataPillExpression = matcher.group(1);
 
-            if (dataPillExpression.contains(".")) {
+            if (!getPropertyPath(dataPillExpression).isEmpty()) {
                 validatePropertyReference(
                     dataPillExpression, fieldPath, currentTaskName, taskOutput, taskNames, taskNameToTypeMap, errors,
                     warnings, context, text, allTasksMap, taskDefinition, rootParametersJsonNode);
@@ -409,14 +409,8 @@ class DataPillValidator {
         String dataPillContent = itemsDataPill.substring(2, itemsDataPill.length() - 1);
 
         // Parse the task name (e.g., "task1" from "task1.items")
-        String[] parts = dataPillContent.split("\\.", 2);
-
-        if (parts.length < 1) {
-            return;
-        }
-
-        String sourceTaskName = parts[0];
-        String sourcePropertyName = parts.length > 1 ? parts[1] : ""; // e.g., "elements" from "task1.elements"
+        String sourceTaskName = getReferencedTaskName(dataPillContent);
+        String sourcePropertyName = getPropertyPath(dataPillContent); // e.g., "elements" from "task1.elements"
 
         JsonNode sourceTaskJsonNode = allTasksMap.get(sourceTaskName);
 
@@ -512,9 +506,8 @@ class DataPillValidator {
         StringBuilder errors, StringBuilder warnings, TaskValidationContext context, String text,
         Map<String, JsonNode> allTasksMap, List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
 
-        String[] parts = dataPillExpression.split("\\.", 2);
-        String referencedTaskName = parts[0];
-        String propertyName = parts[1];
+        String referencedTaskName = getReferencedTaskName(dataPillExpression);
+        String propertyName = getPropertyPath(dataPillExpression);
 
         // Skip task order validation for nested tasks (e.g., condition flow tasks)
         if (!context.skipTaskOrderValidation) {
@@ -546,6 +539,41 @@ class DataPillValidator {
                 context.nodeOutputMap.get(referencedTaskName), getVariableOutputInfo(referencedTaskName, context),
                 errors, warnings, text, referencedTaskName, allTasksMap, taskDefinition, rootParametersJsonNode);
         }
+    }
+
+    private static String getReferencedTaskName(String dataPillExpression) {
+        int propertyPathIndex = getPropertyPathIndex(dataPillExpression);
+
+        return propertyPathIndex < 0 ? dataPillExpression : dataPillExpression.substring(0, propertyPathIndex);
+    }
+
+    private static String getPropertyPath(String dataPillExpression) {
+        int propertyPathIndex = getPropertyPathIndex(dataPillExpression);
+
+        if (propertyPathIndex < 0) {
+            return "";
+        }
+
+        if (dataPillExpression.charAt(propertyPathIndex) == '.') {
+            return dataPillExpression.substring(propertyPathIndex + 1);
+        }
+
+        return dataPillExpression.substring(propertyPathIndex);
+    }
+
+    private static int getPropertyPathIndex(String dataPillExpression) {
+        int dotIndex = dataPillExpression.indexOf('.');
+        int bracketIndex = dataPillExpression.indexOf('[');
+
+        if (dotIndex < 0) {
+            return bracketIndex;
+        }
+
+        if (bracketIndex < 0) {
+            return dotIndex;
+        }
+
+        return Math.min(dotIndex, bracketIndex);
     }
 
     private static boolean isVariablePropertyReference(

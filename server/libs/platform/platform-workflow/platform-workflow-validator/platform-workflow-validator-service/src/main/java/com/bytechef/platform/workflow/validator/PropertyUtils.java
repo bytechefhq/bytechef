@@ -144,7 +144,7 @@ class PropertyUtils {
                 .stream()
                 .anyMatch(prop -> arrayName.equals(prop.name()));
 
-        if (arrayName.equals(outputInfo.name()) || anyMatch) {
+        if (arrayName.isEmpty() || arrayName.equals(outputInfo.name()) || anyMatch) {
             PropertyInfo arrayPropertyInfo = findArrayProperty(outputInfo, arrayName);
 
             if (arrayPropertyInfo != null && "ARRAY".equals(arrayPropertyInfo.type())) {
@@ -169,7 +169,7 @@ class PropertyUtils {
     }
 
     private static @Nullable PropertyInfo findArrayProperty(PropertyInfo outputInfo, String arrayName) {
-        if (arrayName.equals(outputInfo.name())) {
+        if (arrayName.isEmpty() || arrayName.equals(outputInfo.name())) {
             return outputInfo;
         } else if (outputInfo.nestedProperties() != null) {
             return outputInfo.nestedProperties()
@@ -257,7 +257,7 @@ class PropertyUtils {
                 .stream()
                 .anyMatch(prop -> arrayName.equals(prop.name()));
 
-        if (arrayName.equals(outputPropertyInfo.name()) || anyMatch) {
+        if (arrayName.isEmpty() || arrayName.equals(outputPropertyInfo.name()) || anyMatch) {
             PropertyInfo arrayPropertyInfo = findArrayProperty(outputPropertyInfo, arrayName);
 
             if (arrayPropertyInfo != null && "ARRAY".equals(arrayPropertyInfo.type())) {
