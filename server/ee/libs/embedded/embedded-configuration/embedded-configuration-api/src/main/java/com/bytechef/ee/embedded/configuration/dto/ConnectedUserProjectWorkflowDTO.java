@@ -27,7 +27,7 @@ public record ConnectedUserProjectWorkflowDTO(
     String workflowUuid, Integer workflowVersion, Kind kind, String automationWorkflowUuid,
     String copiedFromWorkflowUuid, boolean dangling, List<ConnectedUserWorkflowTemplateDTO.Component> components,
     List<ConnectedUserWorkflowTemplateDTO.Input> inputs, Map<String, ?> inputValues,
-    @Nullable String attentionReason) {
+    @Nullable String attentionReason, @Nullable String staticWebhookUrl) {
     public enum Kind {
         COPY, REFERENCE
     }
@@ -50,7 +50,8 @@ public record ConnectedUserProjectWorkflowDTO(
             connectedUserProjectWorkflow.getId(), connectedUserId, enabled, lastExecutionDate,
             projectWorkflow.getProjectId(), workflow, projectWorkflow.getUuidAsString(),
             connectedUserProjectWorkflow.getWorkflowVersion(), Kind.COPY, null,
-            connectedUserProjectWorkflow.getCopiedFromWorkflowUuid(), false, components, inputs, inputValues, null);
+            connectedUserProjectWorkflow.getCopiedFromWorkflowUuid(), false, components, inputs, inputValues, null,
+            null);
     }
 
     public static ConnectedUserProjectWorkflowDTO ofReference(
@@ -68,6 +69,18 @@ public record ConnectedUserProjectWorkflowDTO(
             reference.getId(), connectedUserId, reference.isEnabled(), null, 0L, automationWorkflow,
             reference.getAutomationWorkflowUuid(), reference.getWorkflowVersion(), Kind.REFERENCE,
             reference.getAutomationWorkflowUuid(), null, reference.isDangling(), components, inputs, inputValues,
-            attentionReason);
+            attentionReason, null);
+    }
+
+    /**
+     * @param staticWebhookUrl the url that starts the workflow through its static webhook trigger, {@code null} if it
+     *                         has none
+     * @return a copy carrying the static webhook url
+     */
+    public ConnectedUserProjectWorkflowDTO withStaticWebhookUrl(@Nullable String staticWebhookUrl) {
+        return new ConnectedUserProjectWorkflowDTO(
+            id, connectedUserId, enabled, lastExecutionDate, projectId, workflow, workflowUuid, workflowVersion, kind,
+            automationWorkflowUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues,
+            attentionReason, staticWebhookUrl);
     }
 }

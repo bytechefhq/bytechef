@@ -104,6 +104,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver;
     private final ConnectedUserService connectedUserService;
+    private final ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver;
     private final ConnectionService connectionService;
     private final @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator;
     private final EnvironmentService environmentService;
@@ -134,7 +135,9 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver,
-        ConnectedUserService connectedUserService, ConnectionService connectionService,
+        ConnectedUserService connectedUserService,
+        ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver,
+        ConnectionService connectionService,
         @Lazy @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator, EnvironmentService environmentService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, JobService jobService, PrincipalJobService principalJobService,
@@ -154,6 +157,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectedUserReferenceAttentionResolver = connectedUserReferenceAttentionResolver;
         this.connectedUserService = connectedUserService;
+        this.connectedUserWorkflowWebhookUrlResolver = connectedUserWorkflowWebhookUrlResolver;
         this.connectionService = connectionService;
         this.copilotWorkflowGenerator = copilotWorkflowGenerator;
         this.environmentService = environmentService;
@@ -652,6 +656,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         Map<UUID, Workflow> publishedWorkflows = getPublishedWorkflows(project);
 
+        Long projectDeploymentId = projectDeploymentService.fetchProjectDeployment(project.getId(), environment)
+            .map(ProjectDeployment::getId)
+            .orElse(null);
+
         List<ConnectedUserProjectWorkflowDTO> copies = workflowService.getWorkflows(latestWorkflowIds)
             .stream()
             .map(workflow -> {
@@ -668,13 +676,17 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 Workflow publishedWorkflow = projectWorkflowUuid == null
                     ? workflow : publishedWorkflows.getOrDefault(projectWorkflowUuid, workflow);
 
-                return new ConnectedUserProjectWorkflowDTO(
+                ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO = new ConnectedUserProjectWorkflowDTO(
                     connectedUserProject.getConnectedUserId(), connectedUserProjectWorkflow,
                     isProjectDeploymentWorkflowEnabled(latestProjectWorkflow, environment),
                     getWorkflowLastExecutionDate(latestProjectWorkflow.getWorkflowId()), latestProjectWorkflow,
                     new WorkflowDTO(publishedWorkflow, List.of(), List.of()), toComponents(publishedWorkflow),
                     toInputs(workflow),
                     fetchInputValues(connectedUserProject.getProjectId(), latestProjectWorkflow, environment));
+
+                return connectedUserProjectWorkflowDTO.withStaticWebhookUrl(
+                    connectedUserWorkflowWebhookUrlResolver.resolve(
+                        projectDeploymentId, latestProjectWorkflow.getUuidAsString()));
             })
             .toList();
 
@@ -737,11 +749,16 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
                 ReferenceState referenceState = connectedUserReferenceAttentionResolver.resolve(reference);
 
-                return ConnectedUserProjectWorkflowDTO.ofReference(
-                    connectedUser.getId(), reference, new WorkflowDTO(workflow, List.of(), List.of()),
-                    template == null ? List.of() : template.components(),
-                    template == null ? List.of() : template.inputs(), referenceState.inputs(),
-                    referenceState.attentionReason());
+                ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO =
+                    ConnectedUserProjectWorkflowDTO.ofReference(
+                        connectedUser.getId(), reference, new WorkflowDTO(workflow, List.of(), List.of()),
+                        template == null ? List.of() : template.components(),
+                        template == null ? List.of() : template.inputs(), referenceState.inputs(),
+                        referenceState.attentionReason());
+
+                return connectedUserProjectWorkflowDTO.withStaticWebhookUrl(
+                    reference.isDangling() ? null : connectedUserWorkflowWebhookUrlResolver.resolve(
+                        reference.getProjectDeploymentId(), reference.getAutomationWorkflowUuid()));
             })
             .toList();
     }
