@@ -744,6 +744,7 @@ export type ConnectedUserProjectWorkflow = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   projectId: Scalars['ID']['output'];
+  staticWebhookUrl?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
   workflow: Workflow;
   workflowUuid: Scalars['ID']['output'];

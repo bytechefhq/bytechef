@@ -1,5 +1,6 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -10,7 +11,10 @@ import {
     useEnableConnectedUserProjectWorkflowMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
+import {useCopyToClipboard} from '@uidotdev/usehooks';
+import {ClipboardIcon} from 'lucide-react';
 import {useState} from 'react';
+import {toast} from 'sonner';
 
 export type ConnectedUserProjectWorkflowType =
     ConnectedUserProjectsQuery['connectedUserProjects'][number]['connectedUserProjectWorkflows'][number];
@@ -22,6 +26,8 @@ const ConnectedUserProjectWorkflowListItem = ({
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const [_, copyToClipboard] = useCopyToClipboard();
     const queryClient = useQueryClient();
 
     const deleteConnectedUserProjectWorkflowMutation = useDeleteConnectedUserProjectWorkflowMutation({
@@ -44,13 +50,48 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     const isDraft = connectedUserProjectWorkflow.workflowVersion == null;
 
+    const {staticWebhookUrl} = connectedUserProjectWorkflow;
+
+    const handleCopyStaticWebhookUrlClick = () => {
+        if (staticWebhookUrl) {
+            copyToClipboard(staticWebhookUrl);
+
+            toast('Webhook URL copied to clipboard');
+        }
+    };
+
     return (
         <>
             <li className="mb-2 flex items-center justify-between rounded border border-border/50 p-3 hover:bg-surface-neutral-primary-hover">
-                <div className="flex min-h-8 min-w-0 flex-1 items-center">
+                <div className="flex min-h-8 min-w-0 flex-1 flex-col justify-center gap-y-1">
                     <span className="truncate text-sm font-semibold">
                         {connectedUserProjectWorkflow.workflow.label}
                     </span>
+
+                    {staticWebhookUrl && (
+                        <div className="flex min-w-0 items-center gap-x-1">
+                            <span
+                                className="truncate font-mono text-xs text-content-neutral-secondary"
+                                title={staticWebhookUrl}
+                            >
+                                {staticWebhookUrl}
+                            </span>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        aria-label="Copy webhook URL"
+                                        icon={<ClipboardIcon />}
+                                        onClick={handleCopyStaticWebhookUrlClick}
+                                        size="iconXs"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                            </Tooltip>
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-x-2">
