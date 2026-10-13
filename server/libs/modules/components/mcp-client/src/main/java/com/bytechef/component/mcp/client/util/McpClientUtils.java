@@ -46,6 +46,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.mcp.client.constant.McpClientConstants;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -53,16 +54,19 @@ import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
+import io.modelcontextprotocol.client.transport.McpHttpClientTransportAuthorizationException;
 import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.net.URI;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.mcp.McpToolFilter;
 import org.springframework.ai.mcp.ToolContextToMcpMetaConverter;
@@ -81,9 +85,11 @@ public class McpClientUtils {
 
         try (McpSyncClient mcpSyncClient = createMcpSyncClient(
             connectionParameters, connectionDefinitionService, context)) {
-            mcpSyncClient.initialize();
+            McpSchema.ListToolsResult listToolsResult = translateAuthorizationErrors(() -> {
+                mcpSyncClient.initialize();
 
-            McpSchema.ListToolsResult listToolsResult = mcpSyncClient.listTools();
+                return mcpSyncClient.listTools();
+            });
 
             List<McpSchema.Tool> tools = listToolsResult.tools();
 
@@ -106,10 +112,13 @@ public class McpClientUtils {
         try (McpSyncClient mcpSyncClient = createMcpSyncClient(
             connectionParameters, connectionDefinitionService, context)) {
 
-            mcpSyncClient.initialize();
+            McpSchema.ListToolsResult listToolsResult = translateAuthorizationErrors(() -> {
+                mcpSyncClient.initialize();
 
-            List<McpSchema.Tool> tools = mcpSyncClient.listTools()
-                .tools();
+                return mcpSyncClient.listTools();
+            });
+
+            List<McpSchema.Tool> tools = listToolsResult.tools();
 
             McpSchema.Tool tool = tools.stream()
                 .filter(mcpTool -> toolName.equals(mcpTool.name()))
@@ -153,6 +162,27 @@ public class McpClientUtils {
             }
 
             return properties;
+        }
+    }
+
+    public static <T> T translateAuthorizationErrors(Supplier<T> mcpCall) {
+        try {
+            return mcpCall.get();
+        } catch (RuntimeException runtimeException) {
+            Throwable throwable = runtimeException;
+
+            while (throwable != null) {
+                if (throwable instanceof McpHttpClientTransportAuthorizationException authorizationException) {
+                    HttpResponse.ResponseInfo responseInfo = authorizationException.getResponseInfo();
+
+                    throw new ProviderException(
+                        responseInfo.statusCode(), authorizationException.getMessage(), runtimeException);
+                }
+
+                throwable = throwable.getCause();
+            }
+
+            throw runtimeException;
         }
     }
 
