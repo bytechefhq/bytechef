@@ -46,10 +46,12 @@ A server exposes nothing until you add a project to it.
 
 ## Expose workflows as skills
 
-1. Expand the server's card, open the **Workflows** tab and click **Add Workflows**.
-2. **Select a project** and a published **version**.
-3. **Select the workflows** to expose. Only workflows with a **New Workflow Call** trigger
+1. Expand the server's card, open the **Workflow Skills** tab and click **Add Workflows**.
+2. On the **Basic** step, **select a project** and a published **version**, then click **Next**.
+3. On the **Workflows** step, switch on the workflows to expose. Only workflows with a **New Workflow Call** trigger
    (`workflow/v1/newWorkflowCall`) are listed - that trigger is what lets the workflow be invoked as a skill.
+4. For each switched-on workflow, pick its **Connections** and fill in its **Inputs**, then click **Add**. Every
+   required connection must be set; a connection must belong to the server's environment.
 
 Adding a project does not touch your own deployments. The server deploys the selected workflows itself, in a deployment
 of its own in the server's environment that does not appear in the Deployments list. Each selected workflow becomes a
@@ -59,20 +61,20 @@ A server can hold one version of a project: adding a project the server already 
 you pick. To expose more of its workflows, edit the workflows of the project already on the server; to switch to
 another version, choose **Change Project Version** from the project's menu.
 
-Each project on the **Workflows** tab expands to list its exposed workflows. From the project's menu:
+Each project on the **Workflow Skills** tab expands to list its exposed workflows. From the project's menu:
 
-- **Edit Workflows** changes the selection and describes the skills. Under **Skill details** you can give each workflow
-  a **skill name** and a **skill description** and save each one with **Save skill**. Left blank, they fall back to the
-  workflow's own label and description.
+- **Edit Workflows** changes the selection, and the connections and inputs of every exposed workflow.
 - **Change Project Version** moves the server's deployment of the project to another published version.
 - **Delete** removes the project and its skills from the server.
 
-Each workflow row has its own toggle and menu:
+Each workflow row has a **Configure** button, a toggle and a menu:
 
+- **Configure** gives the skill a **Skill Name** and a **Skill Description**. Left blank, they fall back to the
+  workflow's own label and description.
 - The **toggle** switches the skill off without removing it. A disabled workflow is left out of the agent card and
   cannot be run; switch it back on to expose it again.
-- **Edit** opens the same dialog as **Edit Workflows**; **Remove** takes the workflow off the server. Removing the last
-  workflow of a project removes the project.
+- **Edit** changes the connections and inputs of that workflow only; **Remove** takes the workflow off the server.
+  Removing the last workflow of a project removes the project.
 
 ### Tags and filters
 
