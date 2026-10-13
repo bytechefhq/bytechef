@@ -18,7 +18,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStep = ({
     workflows,
 }: IntegrationInstanceConfigurationDialogWorkflowsStepProps) => {
     return (
-        <div className="h-full space-y-4">
+        <div className="min-h-full space-y-5">
             {workflows?.map((workflow, workflowIndex) => (
                 <IntegrationInstanceConfigurationDialogWorkflowsStepItem
                     componentName={componentName}
