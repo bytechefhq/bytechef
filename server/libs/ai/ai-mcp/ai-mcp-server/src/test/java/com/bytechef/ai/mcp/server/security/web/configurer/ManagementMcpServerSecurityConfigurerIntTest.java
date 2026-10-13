@@ -345,7 +345,8 @@ class ManagementMcpServerSecurityConfigurerIntTest {
                         .permitAll())
                     .with(
                         new ManagementMcpServerSecurityConfigurer(
-                            apiKeyService, authorityService, propertyService, userService),
+                            apiKeyService, authorityService, () -> List.of(Environment.values()), propertyService,
+                            userService),
                         Customizer.withDefaults())
                     .build();
             }

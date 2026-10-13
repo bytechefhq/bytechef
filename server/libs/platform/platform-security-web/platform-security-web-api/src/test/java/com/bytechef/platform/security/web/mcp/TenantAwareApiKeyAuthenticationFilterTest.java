@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
 import jakarta.servlet.FilterChain;
@@ -56,7 +57,7 @@ class TenantAwareApiKeyAuthenticationFilterTest {
         new TenantAwareApiKeyAuthenticationFilter(
             RegexRequestMatcher.regexMatcher("^/api/automation/.+/mcp"),
             Pattern.compile("/api/automation/(.+)/mcp"), authenticationManager,
-            new McpApiKeyAuthenticationConverter("/api/automation/"));
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/automation/"));
 
     private final FilterChain recordingFilterChain =
         (request, response) -> chainTenantIds.add(TenantContext.getCurrentTenantId());

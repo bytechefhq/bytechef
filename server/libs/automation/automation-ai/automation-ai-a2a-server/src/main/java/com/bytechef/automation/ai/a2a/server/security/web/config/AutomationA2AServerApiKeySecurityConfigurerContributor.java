@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.a2a.server.security.web.config;
 
 import com.bytechef.automation.ai.a2a.server.security.web.configurer.AutomationA2AServerSecurityConfigurer;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -35,16 +36,19 @@ public class AutomationA2AServerApiKeySecurityConfigurerContributor implements S
 
     private final ApiKeyService apiKeyService;
     private final AuthorityService authorityService;
+    private final EnvironmentService environmentService;
     private final A2aServerService a2aServerService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
     public AutomationA2AServerApiKeySecurityConfigurerContributor(
-        ApiKeyService apiKeyService, AuthorityService authorityService, A2aServerService a2aServerService,
+        ApiKeyService apiKeyService, AuthorityService authorityService, EnvironmentService environmentService,
+        A2aServerService a2aServerService,
         UserService userService) {
 
         this.apiKeyService = apiKeyService;
         this.authorityService = authorityService;
+        this.environmentService = environmentService;
         this.a2aServerService = a2aServerService;
         this.userService = userService;
     }
@@ -53,6 +57,6 @@ public class AutomationA2AServerApiKeySecurityConfigurerContributor implements S
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
         return (T) new AutomationA2AServerSecurityConfigurer(
-            apiKeyService, authorityService, a2aServerService, userService);
+            apiKeyService, authorityService, environmentService, a2aServerService, userService);
     }
 }

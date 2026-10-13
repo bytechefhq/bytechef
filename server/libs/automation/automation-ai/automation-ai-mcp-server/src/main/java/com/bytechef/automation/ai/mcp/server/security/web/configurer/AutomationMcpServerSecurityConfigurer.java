@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.mcp.server.security.web.configurer;
 
 import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpServerApiKeyAuthenticationProvider;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.mcp.McpApiKeyAuthenticationConverter;
@@ -34,11 +35,13 @@ public class AutomationMcpServerSecurityConfigurer extends McpApiKeyHttpConfigur
     private static final String PATH_PATTERN = "^/api/automation/.+/mcp";
 
     public AutomationMcpServerSecurityConfigurer(
-        ApiKeyService apiKeyService, AuthorityService authorityService, McpServerService mcpServerService,
+        ApiKeyService apiKeyService, AuthorityService authorityService, EnvironmentService environmentService,
+        McpServerService mcpServerService,
         UserService userService) {
 
         super(
-            PATH_PATTERN, MCP_SERVER_SECRET_PATTERN, new McpApiKeyAuthenticationConverter("/api/automation/"),
+            PATH_PATTERN, MCP_SERVER_SECRET_PATTERN,
+            new McpApiKeyAuthenticationConverter(environmentService, "/api/automation/"),
             new AutomationMcpServerApiKeyAuthenticationProvider(
                 apiKeyService, authorityService, mcpServerService, userService));
     }

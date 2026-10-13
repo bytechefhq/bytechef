@@ -22,6 +22,7 @@ import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationM
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -29,6 +30,7 @@ import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -97,7 +99,8 @@ public class AutomationMcpServerSecurityIntTestConfiguration {
                 .permitAll())
             .with(
                 new AutomationMcpServerSecurityConfigurer(
-                    apiKeyService, authorityService, mcpServerService, userService),
+                    apiKeyService, authorityService, () -> List.of(Environment.values()), mcpServerService,
+                    userService),
                 Customizer.withDefaults())
             .build();
     }
