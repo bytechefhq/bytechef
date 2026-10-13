@@ -42,6 +42,9 @@ class PropertyUtilsTest {
             new PropertyInfo("data", "OBJECT", null, false, false, null, List.of(FILE_PROPERTY_INFO)),
             new PropertyInfo("items", "ARRAY", null, false, false, null, List.of(ITEM_PROPERTY_INFO))));
 
+    private static final PropertyInfo ROOT_ARRAY_PROPERTY_INFO = new PropertyInfo(
+        null, "ARRAY", null, false, false, null, List.of(ITEM_PROPERTY_INFO));
+
     @Test
     void testGetPropertyReturnsTopLevelProperty() {
         PropertyInfo propertyInfo = PropertyUtils.getProperty(OUTPUT_PROPERTY_INFO, "body");
@@ -90,5 +93,20 @@ class PropertyUtilsTest {
         assertThat(PropertyUtils.getPropertyType(OUTPUT_PROPERTY_INFO, "data.file")).isEqualTo("FILE_ENTRY");
         assertThat(PropertyUtils.getPropertyType(OUTPUT_PROPERTY_INFO, "items[0].id")).isEqualTo("INTEGER");
         assertThat(PropertyUtils.getPropertyType(OUTPUT_PROPERTY_INFO, "missing")).isNull();
+    }
+
+    @Test
+    void testGetPropertyReturnsRootArrayItem() {
+        assertThat(PropertyUtils.getProperty(ROOT_ARRAY_PROPERTY_INFO, "[0]")).isSameAs(ITEM_PROPERTY_INFO);
+        assertThat(PropertyUtils.getPropertyType(ROOT_ARRAY_PROPERTY_INFO, "[0].id")).isEqualTo("INTEGER");
+        assertThat(PropertyUtils.getProperty(ROOT_ARRAY_PROPERTY_INFO, "[0].missing")).isNull();
+    }
+
+    @Test
+    void testCheckPropertyExistsResolvesRootArrayItem() {
+        assertThat(PropertyUtils.checkPropertyExists(ROOT_ARRAY_PROPERTY_INFO, "[0]")).isTrue();
+        assertThat(PropertyUtils.checkPropertyExists(ROOT_ARRAY_PROPERTY_INFO, "[0].id")).isTrue();
+        assertThat(PropertyUtils.checkPropertyExists(ROOT_ARRAY_PROPERTY_INFO, "[0].missing")).isFalse();
+        assertThat(PropertyUtils.checkPropertyExists(OUTPUT_PROPERTY_INFO, "[0]")).isFalse();
     }
 }
