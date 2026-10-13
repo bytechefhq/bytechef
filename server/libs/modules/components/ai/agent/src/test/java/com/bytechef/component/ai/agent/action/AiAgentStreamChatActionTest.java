@@ -91,6 +91,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -469,6 +470,36 @@ class AiAgentStreamChatActionTest {
         } finally {
             Hooks.disableAutomaticContextPropagation();
         }
+    }
+
+    @Test
+    void testRefusalWithoutTextEmitsNotice() {
+        ActionContext context = mock(ActionContext.class);
+        AiAgentStreamChatAction.TurnTextSeparator turnTextSeparator = new AiAgentStreamChatAction.TurnTextSeparator();
+
+        assertThat(AiAgentStreamChatAction.toSseEvents(refusalChatResponse(""), turnTextSeparator, context))
+            .containsExactly(AiAgentStreamChatAction.REFUSAL_NOTICE);
+        assertThat(turnTextSeparator.getTurnText()).isEqualTo(AiAgentStreamChatAction.REFUSAL_NOTICE);
+    }
+
+    @Test
+    void testRefusalAfterStreamedTextAppendsNotice() {
+        ActionContext context = mock(ActionContext.class);
+        AiAgentStreamChatAction.TurnTextSeparator turnTextSeparator = new AiAgentStreamChatAction.TurnTextSeparator();
+
+        assertThat(AiAgentStreamChatAction.toSseEvents(chatResponse("Partial"), turnTextSeparator, context))
+            .containsExactly("Partial");
+        assertThat(AiAgentStreamChatAction.toSseEvents(refusalChatResponse(""), turnTextSeparator, context))
+            .containsExactly("\n\n" + AiAgentStreamChatAction.REFUSAL_NOTICE);
+    }
+
+    private static ChatResponse refusalChatResponse(String text) {
+        return ChatResponse.builder()
+            .generations(List.of(new Generation(
+                new AssistantMessage(text), ChatGenerationMetadata.builder()
+                    .finishReason("refusal")
+                    .build())))
+            .build();
     }
 
     private static ChatResponse chatResponse(String text) {
