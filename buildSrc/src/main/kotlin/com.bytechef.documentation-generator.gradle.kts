@@ -554,6 +554,13 @@ ${properties?.joinToString("\n")}
 
         override fun toString(): String {
             val label = if (title == null) name else title;
+            if (properties.isNullOrEmpty()) {
+                return """
+### $label
+
+"""
+            }
+
             return """
 ### $label
 
