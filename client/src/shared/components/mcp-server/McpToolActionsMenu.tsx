@@ -7,25 +7,16 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {PopoverAnchor} from '@/components/ui/popover';
-import {BoltIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 interface McpToolActionsMenuProps {
-    anchorsPopover?: boolean;
     label: string;
-    onConfigureClick: () => void;
     onDeleteClick: () => void;
     onEditClick?: () => void;
 }
 
-const McpToolActionsMenu = ({
-    anchorsPopover = false,
-    label,
-    onConfigureClick,
-    onDeleteClick,
-    onEditClick,
-}: McpToolActionsMenuProps) => {
-    const trigger = (
+const McpToolActionsMenu = ({label, onDeleteClick, onEditClick}: McpToolActionsMenuProps) => (
+    <DropdownMenu>
         <DropdownMenuTrigger asChild>
             <Button
                 aria-label={`${label} actions`}
@@ -35,35 +26,23 @@ const McpToolActionsMenu = ({
                 variant="ghost"
             />
         </DropdownMenuTrigger>
-    );
 
-    return (
-        <DropdownMenu>
-            {anchorsPopover ? <PopoverAnchor asChild>{trigger}</PopoverAnchor> : trigger}
-
-            <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
-                <DropdownMenuItem className="dropdown-menu-item" onSelect={onConfigureClick}>
-                    <BoltIcon /> Configure
-                </DropdownMenuItem>
-
-                {onEditClick && (
+        <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
+            {onEditClick && (
+                <>
                     <DropdownMenuItem className="dropdown-menu-item" onSelect={onEditClick}>
                         <EditIcon /> Edit
                     </DropdownMenuItem>
-                )}
 
-                <DropdownMenuSeparator />
+                    <DropdownMenuSeparator />
+                </>
+            )}
 
-                <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
-                    onSelect={onDeleteClick}
-                    variant="destructive"
-                >
-                    <Trash2Icon /> Delete
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    );
-};
+            <DropdownMenuItem className="dropdown-menu-item-destructive" onSelect={onDeleteClick} variant="destructive">
+                <Trash2Icon /> Delete
+            </DropdownMenuItem>
+        </DropdownMenuContent>
+    </DropdownMenu>
+);
 
 export default McpToolActionsMenu;

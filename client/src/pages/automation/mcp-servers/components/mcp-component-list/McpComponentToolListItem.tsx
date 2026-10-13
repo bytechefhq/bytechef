@@ -3,6 +3,7 @@ import Switch from '@/components/Switch/Switch';
 import {Popover} from '@/components/ui/popover';
 import McpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover';
 import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
+import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
 import {
     McpTool,
@@ -91,6 +92,12 @@ const McpComponentToolListItem = ({
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2">
+                        <McpToolConfigureButton
+                            anchorsPopover
+                            label={toolLabel}
+                            onClick={() => openPopover(popoverId)}
+                        />
+
                         {(embedded || enabledSwitchVisible) && (
                             <Switch
                                 aria-label={`Enable ${toolLabel}`}
@@ -101,12 +108,7 @@ const McpComponentToolListItem = ({
                             />
                         )}
 
-                        <McpToolActionsMenu
-                            anchorsPopover
-                            label={toolLabel}
-                            onConfigureClick={() => openPopover(popoverId)}
-                            onDeleteClick={() => setShowDeleteDialog(true)}
-                        />
+                        <McpToolActionsMenu label={toolLabel} onDeleteClick={() => setShowDeleteDialog(true)} />
                     </div>
                 </div>
 
