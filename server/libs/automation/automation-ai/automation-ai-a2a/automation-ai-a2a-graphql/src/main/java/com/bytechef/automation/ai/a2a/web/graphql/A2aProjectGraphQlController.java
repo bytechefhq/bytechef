@@ -24,6 +24,7 @@ import com.bytechef.automation.ai.a2a.service.A2aProjectService;
 import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
@@ -62,6 +63,13 @@ public class A2aProjectGraphQlController {
         this.a2aProjectWorkflowService = a2aProjectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+    }
+
+    @QueryMapping
+    public List<ProjectWorkflow> a2aEligibleProjectVersionWorkflows(
+        @Argument long projectId, @Argument int projectVersion) {
+
+        return a2aProjectFacade.getA2aEligibleProjectVersionWorkflows(projectId, projectVersion);
     }
 
     @QueryMapping

@@ -17,9 +17,13 @@
 package com.bytechef.automation.ai.a2a.util;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -27,6 +31,10 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public final class A2aWorkflowTriggerUtils {
+
+    public static final String MESSAGE_INPUT = "message";
+
+    private static final String REQUIRED = "required";
 
     private A2aWorkflowTriggerUtils() {
     }
@@ -43,5 +51,26 @@ public final class A2aWorkflowTriggerUtils {
         }
 
         return Optional.empty();
+    }
+
+    public static List<String> getUnsupportedRequiredInputNames(WorkflowTrigger workflowTrigger) {
+        String inputSchema = MapUtils.getString(workflowTrigger.getParameters(), WorkflowConstants.INPUT_SCHEMA);
+
+        if (inputSchema == null || inputSchema.isBlank()) {
+            return List.of();
+        }
+
+        Map<String, ?> schema = JsonUtils.readMap(inputSchema);
+
+        return MapUtils.getList(schema, REQUIRED, String.class, List.of())
+            .stream()
+            .filter(requiredInputName -> !Objects.equals(requiredInputName, MESSAGE_INPUT))
+            .toList();
+    }
+
+    public static boolean isA2aCallable(Workflow workflow) {
+        return fetchNewWorkflowCallTrigger(workflow)
+            .map(workflowTrigger -> getUnsupportedRequiredInputNames(workflowTrigger).isEmpty())
+            .orElse(false);
     }
 }
