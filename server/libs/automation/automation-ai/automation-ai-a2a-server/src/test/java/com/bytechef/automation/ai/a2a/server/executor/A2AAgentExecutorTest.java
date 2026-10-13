@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.a2a.server.facade;
+package com.bytechef.automation.ai.a2a.server.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -85,7 +85,7 @@ import org.springframework.beans.factory.ObjectProvider;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-class AutomationA2AServerFacadeTest {
+class A2AAgentExecutorTest {
 
     private static final String SECRET_KEY = "secret";
 
@@ -106,7 +106,7 @@ class AutomationA2AServerFacadeTest {
     private final ObjectProvider<ApprovalTokens> approvalTokensObjectProvider =
         (ObjectProvider<ApprovalTokens>) mock(ObjectProvider.class);
 
-    private final AutomationA2AServerFacade facade = createFacade(Runnable::run);
+    private final A2AAgentExecutorImpl a2aAgentExecutor = createA2AAgentExecutor(Runnable::run);
 
     private final List<A2aProjectWorkflow> exposedA2aProjectWorkflows = new ArrayList<>();
 
@@ -118,7 +118,7 @@ class AutomationA2AServerFacadeTest {
 
         when(a2aServerService.getA2aServer(SECRET_KEY)).thenReturn(a2aServer);
 
-        A2AAgentRun agentRun = facade.start(request(null));
+        A2AAgentRun agentRun = a2aAgentExecutor.start(request(null));
 
         assertThat(agentRun.taskReference()).isNull();
         assertThat(agentRun.result()
@@ -130,7 +130,7 @@ class AutomationA2AServerFacadeTest {
     void testStartReturnsFailedWhenNoWorkflowExposed() {
         stubServer();
 
-        A2AAgentRun agentRun = facade.start(request(null));
+        A2AAgentRun agentRun = a2aAgentExecutor.start(request(null));
 
         assertThat(agentRun.result()
             .join()).isInstanceOfSatisfying(
@@ -154,13 +154,13 @@ class AutomationA2AServerFacadeTest {
         JobParametersDTO jobParametersDTO = jobParametersDTOArgumentCaptor.getValue();
 
         assertThat(jobParametersDTO.getInputs())
-            .containsEntry("newWorkflowCall_1", Map.of(AutomationA2AServerFacade.MESSAGE_INPUT, "hi"))
+            .containsEntry("newWorkflowCall_1", Map.of(A2AAgentExecutorImpl.MESSAGE_INPUT, "hi"))
             .containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, "newWorkflowCall_1")
             .containsEntry("deploymentInput", "value");
 
         Map<String, Object> metadata = jobParametersDTO.getMetadata();
 
-        assertThat(metadata).containsEntry(AutomationA2AServerFacade.A2A_CONTEXT_ID_METADATA_KEY, "context-1");
+        assertThat(metadata).containsEntry(A2AAgentExecutorImpl.A2A_CONTEXT_ID_METADATA_KEY, "context-1");
 
         A2ATaskReference taskReference = agentRun.taskReference();
 
@@ -172,7 +172,7 @@ class AutomationA2AServerFacadeTest {
 
         assertThat(a2aTaskId.jobId()).isEqualTo(100L);
         assertThat(a2aTaskId.nonce()
-            .toString()).isEqualTo(metadata.get(AutomationA2AServerFacade.A2A_TASK_NONCE_METADATA_KEY));
+            .toString()).isEqualTo(metadata.get(A2AAgentExecutorImpl.A2A_TASK_NONCE_METADATA_KEY));
     }
 
     @Test
@@ -406,11 +406,11 @@ class AutomationA2AServerFacadeTest {
 
     @Test
     void testToOutputTextWritesStructuredOutputAsJson() {
-        assertThat(AutomationA2AServerFacade.toOutputText(null)).isEmpty();
-        assertThat(AutomationA2AServerFacade.toOutputText("plain")).isEqualTo("plain");
-        assertThat(AutomationA2AServerFacade.toOutputText(Map.of("message", "hello"))).isEqualTo("hello");
-        assertThat(AutomationA2AServerFacade.toOutputText(Map.of("count", 3))).isEqualTo("{\"count\":3}");
-        assertThat(AutomationA2AServerFacade.toOutputText(List.of("a", "b"))).isEqualTo("[\"a\",\"b\"]");
+        assertThat(A2AAgentExecutorImpl.toOutputText(null)).isEmpty();
+        assertThat(A2AAgentExecutorImpl.toOutputText("plain")).isEqualTo("plain");
+        assertThat(A2AAgentExecutorImpl.toOutputText(Map.of("message", "hello"))).isEqualTo("hello");
+        assertThat(A2AAgentExecutorImpl.toOutputText(Map.of("count", 3))).isEqualTo("{\"count\":3}");
+        assertThat(A2AAgentExecutorImpl.toOutputText(List.of("a", "b"))).isEqualTo("[\"a\",\"b\"]");
     }
 
     @Test
@@ -461,7 +461,7 @@ class AutomationA2AServerFacadeTest {
         when(taskFileStorage.readJobOutputs(any())).thenThrow(new IllegalStateException("missing blob"));
 
         assertThatExceptionOfType(IllegalStateException.class)
-            .isThrownBy(() -> facade.pollTask(SECRET_KEY, taskId));
+            .isThrownBy(() -> a2aAgentExecutor.pollTask(SECRET_KEY, taskId));
     }
 
     @Test
@@ -472,7 +472,7 @@ class AutomationA2AServerFacadeTest {
         when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(100L);
         when(jobCompletionAwaiter.await(anyLong(), any())).thenThrow(new IllegalStateException("database down"));
 
-        A2AAgentRun agentRun = facade.start(request(null));
+        A2AAgentRun agentRun = a2aAgentExecutor.start(request(null));
 
         assertThat(agentRun.taskReference()).isNotNull();
         assertThat(agentRun.result()
@@ -483,7 +483,7 @@ class AutomationA2AServerFacadeTest {
 
     @Test
     void testRunResultIsReadOnTheCompletionExecutorUnderTheCallersTenant() throws InterruptedException {
-        AutomationA2AServerFacade threadedFacade = createFacade(
+        A2AAgentExecutorImpl threadedA2AAgentExecutor = createA2AAgentExecutor(
             runnable -> new Thread(runnable, "a2a-run-completion-test").start());
 
         stubServer();
@@ -509,7 +509,8 @@ class AutomationA2AServerFacadeTest {
         when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(100L);
         when(jobCompletionAwaiter.await(anyLong(), any())).thenReturn(jobFuture);
 
-        A2AAgentRun agentRun = TenantContext.callWithTenantId("tenant-1", () -> threadedFacade.start(request(null)));
+        A2AAgentRun agentRun =
+            TenantContext.callWithTenantId("tenant-1", () -> threadedA2AAgentExecutor.start(request(null)));
 
         Thread brokerThread = new Thread(
             () -> TenantContext.runWithTenantId("tenant-2", () -> jobFuture.complete(job)), "broker-thread");
@@ -528,7 +529,7 @@ class AutomationA2AServerFacadeTest {
     void testPollTaskReturnsTheRunWhenTheJobBelongsToTheServer() {
         String taskId = stubJobOfTask(7L, 30L, Job.Status.COMPLETED);
 
-        A2AAgentResult agentResult = facade.pollTask(SECRET_KEY, taskId);
+        A2AAgentResult agentResult = a2aAgentExecutor.pollTask(SECRET_KEY, taskId);
 
         assertThat(agentResult).isInstanceOf(Completed.class);
         assertThat(agentResult.taskReference()).isEqualTo(new A2ATaskReference(taskId, "context-7"));
@@ -538,14 +539,14 @@ class AutomationA2AServerFacadeTest {
     void testPollTaskReturnsWorkingWhileTheRunIsInProgress() {
         String taskId = stubJobOfTask(7L, 30L, Job.Status.STARTED);
 
-        assertThat(facade.pollTask(SECRET_KEY, taskId)).isInstanceOf(Working.class);
+        assertThat(a2aAgentExecutor.pollTask(SECRET_KEY, taskId)).isInstanceOf(Working.class);
     }
 
     @Test
     void testPollTaskReturnsNullWhenTheJobBelongsToAnotherDeployment() {
         String taskId = stubJobOfTask(7L, 99L, Job.Status.COMPLETED);
 
-        assertThat(facade.pollTask(SECRET_KEY, taskId)).isNull();
+        assertThat(a2aAgentExecutor.pollTask(SECRET_KEY, taskId)).isNull();
     }
 
     @Test
@@ -554,7 +555,7 @@ class AutomationA2AServerFacadeTest {
 
         String forgedTaskId = new A2aTaskId(7L, UUID.randomUUID()).asString();
 
-        assertThat(facade.pollTask(SECRET_KEY, forgedTaskId)).isNull();
+        assertThat(a2aAgentExecutor.pollTask(SECRET_KEY, forgedTaskId)).isNull();
     }
 
     @Test
@@ -563,14 +564,14 @@ class AutomationA2AServerFacadeTest {
 
         when(jobService.fetchJob(8L)).thenReturn(Optional.empty());
 
-        assertThat(facade.pollTask(SECRET_KEY, taskId)).isNull();
+        assertThat(a2aAgentExecutor.pollTask(SECRET_KEY, taskId)).isNull();
     }
 
     @Test
     void testPollTaskRejectsResumeTokensAndUnparseableIds() {
-        assertThat(facade.pollTask(SECRET_KEY, JobResumeId.of(7L)
+        assertThat(a2aAgentExecutor.pollTask(SECRET_KEY, JobResumeId.of(7L)
             .toString())).isNull();
-        assertThat(facade.pollTask(SECRET_KEY, "not-a-task-id")).isNull();
+        assertThat(a2aAgentExecutor.pollTask(SECRET_KEY, "not-a-task-id")).isNull();
         verify(jobService, never()).fetchJob(anyLong());
     }
 
@@ -585,7 +586,7 @@ class AutomationA2AServerFacadeTest {
 
         stubExposedWorkflow("wf2", 21L, Map.of());
 
-        A2AAgentDescriptor agentDescriptor = facade.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
+        A2AAgentDescriptor agentDescriptor = a2aAgentExecutor.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
 
         assertThat(agentDescriptor.skills()).containsExactly(
             new A2ASkill("wf1", "Summarize", "Summarizes text", List.of()),
@@ -607,7 +608,7 @@ class AutomationA2AServerFacadeTest {
 
         stubExposedWorkflowWithTriggers("wf3", 41L, "[]");
 
-        A2AAgentDescriptor agentDescriptor = facade.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
+        A2AAgentDescriptor agentDescriptor = a2aAgentExecutor.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
 
         assertThat(agentDescriptor.skills()).extracting(A2ASkill::id)
             .containsExactly("wf1");
@@ -622,7 +623,7 @@ class AutomationA2AServerFacadeTest {
 
         disabledA2aProjectWorkflow.setEnabled(false);
 
-        A2AAgentDescriptor agentDescriptor = facade.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
+        A2AAgentDescriptor agentDescriptor = a2aAgentExecutor.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
 
         assertThat(agentDescriptor.skills()).extracting(A2ASkill::id)
             .containsExactly("wf1");
@@ -660,7 +661,7 @@ class AutomationA2AServerFacadeTest {
         stubExposedWorkflowWithTriggers(
             "wf4", 42L, "[{\"name\": \"webhook_1\", \"type\": \"webhook/v1/autoRespondingWithHTTP200\"}]");
 
-        A2AAgentDescriptor agentDescriptor = facade.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
+        A2AAgentDescriptor agentDescriptor = a2aAgentExecutor.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
 
         assertThat(agentDescriptor.skills()).extracting(A2ASkill::id)
             .containsExactly("wf1");
@@ -689,11 +690,11 @@ class AutomationA2AServerFacadeTest {
         when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(100L);
         when(jobCompletionAwaiter.await(anyLong(), any())).thenReturn(jobFuture);
 
-        return facade.start(request(skillId));
+        return a2aAgentExecutor.start(request(skillId));
     }
 
-    private AutomationA2AServerFacade createFacade(Executor runCompletionExecutor) {
-        return new AutomationA2AServerFacade(
+    private A2AAgentExecutorImpl createA2AAgentExecutor(Executor runCompletionExecutor) {
+        return new A2AAgentExecutorImpl(
             a2aProjectService, a2aProjectWorkflowService, a2aServerService, approvalTokensObjectProvider,
             jobCompletionAwaiter, jobService, principalJobFacade, principalJobService, projectDeploymentWorkflowService,
             "https://example.com", runCompletionExecutor, taskExecutionService, taskFileStorage, workflowService);
@@ -706,8 +707,8 @@ class AutomationA2AServerFacadeTest {
 
         when(job.getId()).thenReturn(jobId);
         when(job.getStatus()).thenReturn(status);
-        when(job.getMetadata(AutomationA2AServerFacade.A2A_TASK_NONCE_METADATA_KEY)).thenReturn(nonce.toString());
-        when(job.getMetadata(AutomationA2AServerFacade.A2A_CONTEXT_ID_METADATA_KEY)).thenReturn("context-" + jobId);
+        when(job.getMetadata(A2AAgentExecutorImpl.A2A_TASK_NONCE_METADATA_KEY)).thenReturn(nonce.toString());
+        when(job.getMetadata(A2AAgentExecutorImpl.A2A_CONTEXT_ID_METADATA_KEY)).thenReturn("context-" + jobId);
         when(jobService.fetchJob(jobId)).thenReturn(Optional.of(job));
         when(principalJobService.fetchJobPrincipalId(jobId, PlatformType.AUTOMATION))
             .thenReturn(Optional.of(projectDeploymentId));

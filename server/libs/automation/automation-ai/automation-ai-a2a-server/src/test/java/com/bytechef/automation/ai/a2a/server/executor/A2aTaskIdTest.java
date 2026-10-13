@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.a2a.server.facade;
+package com.bytechef.automation.ai.a2a.server.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
