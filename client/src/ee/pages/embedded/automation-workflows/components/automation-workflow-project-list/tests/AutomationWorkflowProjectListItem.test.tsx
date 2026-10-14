@@ -11,6 +11,7 @@ const handlers = {
     onCreateWorkflow: vi.fn(),
     onDeleteProject: vi.fn(),
     onEditProject: vi.fn(),
+    onEditProjectSource: vi.fn(),
     onImportWorkflow: vi.fn(),
     onPublishProject: vi.fn(),
     onSelectWorkflow: vi.fn(),
@@ -19,6 +20,9 @@ const handlers = {
 
 const project: AutomationWorkflowProjectType = {
     categoryId: null,
+    codeWorkflowDraftPublishable: null,
+    codeWorkflowLanguage: null,
+    codeWorkflowProject: false,
     configurationCount: 0,
     description: null,
     id: 'project-1',

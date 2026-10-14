@@ -1,0 +1,10 @@
+query connectedUserCodeWorkflowReferences($automationWorkflowUuids: [ID!]!) {
+    connectedUserCodeWorkflowReferences(automationWorkflowUuids: $automationWorkflowUuids) {
+        automationWorkflowUuid
+        externalUserId
+        environment
+        enabled
+        dangling
+        danglingReason
+    }
+}

@@ -14,6 +14,9 @@ import PublishPopover from '@/pages/automation/project/components/project-header
 import SettingsMenu from '@/pages/automation/project/components/project-header/components/settings-menu/SettingsMenu';
 import {useProjectHeader} from '@/pages/automation/project/components/project-header/hooks/useProjectHeader';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
+import CodeWorkflowHeaderActions, {
+    CodeWorkflowSaveButton,
+} from '@/pages/platform/code-workflow/components/CodeWorkflowHeaderActions';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -35,6 +38,7 @@ const subscribeToOnlineStatus = (onOnlineStatusChange: () => void) => onlineMana
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     chatTrigger?: boolean;
+    codeWorkflow?: boolean;
     embedded?: boolean;
     onWorkflowChange?: (projectWorkflowId: number) => void;
     projectId: number;
@@ -48,6 +52,7 @@ interface ProjectHeaderProps {
 const ProjectHeader = ({
     bottomResizablePanelRef,
     chatTrigger,
+    codeWorkflow,
     embedded,
     onWorkflowChange,
     projectId,
@@ -109,6 +114,8 @@ const ProjectHeader = ({
         <LoadingIndicator isFetching={isSaving} isOnline={isOnline} showLabel />
     );
 
+    const settingsMenuVisible = !codeWorkflow;
+
     if (!project) {
         return <ProjectSkeleton />;
     }
@@ -162,8 +169,11 @@ const ProjectHeader = ({
             </div>
 
             <div className="flex items-center gap-1">
+                {codeWorkflow && <CodeWorkflowHeaderActions />}
+
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
+                    leadingAction={codeWorkflow ? <CodeWorkflowSaveButton /> : undefined}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
                     runDisabled={runDisabled}
@@ -186,7 +196,7 @@ const ProjectHeader = ({
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                {!embedded && (
+                {!embedded && settingsMenuVisible && (
                     <SettingsMenu
                         bottomResizablePanelRef={bottomResizablePanelRef}
                         project={project}

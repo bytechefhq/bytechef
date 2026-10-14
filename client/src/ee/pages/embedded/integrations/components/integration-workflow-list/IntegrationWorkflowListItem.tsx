@@ -15,10 +15,12 @@ import {
 } from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {isJavaCodeWorkflow} from '@/shared/util/codeWorkflowLanguage-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {WorkflowIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 const IntegrationWorkflowListItem = ({
     filteredComponentNames,
@@ -38,6 +40,8 @@ const IntegrationWorkflowListItem = ({
     };
 }) => {
     const [isPermissionExpressionSeeded, setIsPermissionExpressionSeeded] = useState(false);
+    const javaCodeWorkflow = isJavaCodeWorkflow(integration.codeWorkflow, integration.codeWorkflowLanguage);
+
     const [permissionExpression, setPermissionExpression] = useState<string | null>('');
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
@@ -131,7 +135,9 @@ const IntegrationWorkflowListItem = ({
             key={workflow.id}
         >
             <Link
-                className="flex flex-1 items-center"
+                aria-disabled={javaCodeWorkflow || undefined}
+                className={twMerge('flex flex-1 items-center', javaCodeWorkflow && 'pointer-events-none')}
+                tabIndex={javaCodeWorkflow ? -1 : undefined}
                 to={`/embedded/integrations/${integration.id}/integration-workflows/${workflow.integrationWorkflowId}?${searchParams}`}
             >
                 <div className="flex w-80 items-center gap-2 text-sm font-semibold">
@@ -160,14 +166,16 @@ const IntegrationWorkflowListItem = ({
                     <TooltipContent>Last Modified Date</TooltipContent>
                 </Tooltip>
 
-                <WorkflowListRowDropdownMenu
-                    exportUrl={`/api/embedded/internal/workflows/${workflow.id}/export`}
-                    onDeleteClick={() => setShowDeleteDialog(true)}
-                    onEditClick={() => {
-                        setIsPermissionExpressionSeeded(false);
-                        setShowEditDialog(true);
-                    }}
-                />
+                {!integration.codeWorkflow && (
+                    <WorkflowListRowDropdownMenu
+                        exportUrl={`/api/embedded/internal/workflows/${workflow.id}/export`}
+                        onDeleteClick={() => setShowDeleteDialog(true)}
+                        onEditClick={() => {
+                            setIsPermissionExpressionSeeded(false);
+                            setShowEditDialog(true);
+                        }}
+                    />
+                )}
             </div>
 
             {showDeleteDialog && (
