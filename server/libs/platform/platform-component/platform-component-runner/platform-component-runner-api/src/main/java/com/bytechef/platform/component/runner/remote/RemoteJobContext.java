@@ -20,6 +20,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import java.time.Duration;
 import java.util.Map;
+import java.util.TreeSet;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -46,5 +47,20 @@ public record RemoteJobContext(
 
     public boolean isOperatorFlagEnabled(String propertyName) {
         return Boolean.parseBoolean(operatorProperties.get(propertyName));
+    }
+
+    /**
+     * Names the connection and lists only the keys of the operator properties and runner parameters, so credentials
+     * never reach a log line.
+     */
+    @Override
+    public String toString() {
+        String connectionText = connection == null
+            ? "none" : connection.getComponentName() + "/v" + connection.getVersion();
+
+        return ("RemoteJobContext[connection=%s, operatorProperties=%s, taskHost=%s, runnerParameters=%s, " +
+            "maxTransferBytes=%d, completionBudget=%s]").formatted(
+                connectionText, new TreeSet<>(operatorProperties.keySet()), taskHost,
+                new TreeSet<>(runnerParameters.keySet()), maxTransferBytes, completionBudget);
     }
 }
