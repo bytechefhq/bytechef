@@ -348,6 +348,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl"))
+    implementation(project(":server:ee:libs:platform:platform-component:platform-component-runner-kubernetes"))
     implementation(project(":server:ee:libs:platform:platform-component-rule:platform-component-rule-graphql"))
     implementation(project(":server:ee:libs:platform:platform-component-rule:platform-component-rule-service"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-rest"))
