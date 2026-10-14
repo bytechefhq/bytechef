@@ -16,7 +16,8 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@bytechef/embedded-api": ["../sdks/api/typescript/src/configuration/index.ts"]
         }
     },
     "include": ["src"],

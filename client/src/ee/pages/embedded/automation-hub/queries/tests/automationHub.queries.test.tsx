@@ -24,7 +24,7 @@ const {automationProjectApiMock, connectedUserProjectWorkflowApiMock, connection
     },
 }));
 
-vi.mock('@/ee/shared/middleware/embedded/public', () => ({
+vi.mock('@bytechef/embedded-api', () => ({
     AutomationProjectApi: class {
         constructor() {
             return automationProjectApiMock;
