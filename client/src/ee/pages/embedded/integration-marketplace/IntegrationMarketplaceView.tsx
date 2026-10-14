@@ -7,7 +7,7 @@ import {
     useGetMarketplaceIntegrationsQuery,
 } from '@/ee/pages/embedded/integration-marketplace/queries/integrationMarketplace.queries';
 import {getEmbedParentOrigin} from '@/ee/pages/embedded/shared/useEmbedHandshake';
-import {IntegrationBasic} from '@/ee/shared/middleware/embedded/public';
+import {IntegrationBasic} from '@bytechef/embedded-api';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 import InlineSVG from 'react-inlinesvg';

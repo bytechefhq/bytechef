@@ -1,4 +1,4 @@
-import {Connection, ResponseError} from '@/ee/shared/middleware/embedded/public';
+import {Connection, ResponseError} from '@bytechef/embedded-api';
 import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
