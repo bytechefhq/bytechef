@@ -297,6 +297,8 @@ bytechef:
       # kept separate so a burst of scheduled runs cannot leave an interactive caller waiting for a permit.
       sync-concurrency-limit: 5
   workflow:
+    code-workflow:
+      java-enabled: true
     output-storage:
       # Output storage provider for workflow output data (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
       provider: JDBC

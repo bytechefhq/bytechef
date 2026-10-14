@@ -29,6 +29,7 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -42,6 +43,7 @@ import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConf
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -65,16 +67,20 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -193,6 +199,9 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     private IntegrationWorkflowService integrationWorkflowService;
 
     @Autowired
+    private OAuth2Service oAuth2Service;
+
+    @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
 
     @Autowired
@@ -204,6 +213,8 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             .thenReturn(new ComponentDefinition("componentName"));
         when(connectionDefinitionService.getConnectionDefinition(anyString(), any()))
             .thenReturn(new ConnectionDefinition(ComponentDsl.connection(), "componentName", null, null));
+        when(workflowService.getWorkflow(anyString()))
+            .thenReturn(new Workflow("{\"tasks\":[]}", Workflow.Format.JSON));
     }
 
     @AfterEach
@@ -215,6 +226,7 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         integrationInstanceConfigurationWorkflowRepository.deleteAll();
         integrationWorkflowRepository.deleteAll();
         integrationInstanceConfigurationRepository.deleteAll();
+        integrationWorkflowRepository.deleteAll();
         integrationRepository.deleteAll();
     }
 
@@ -530,9 +542,286 @@ class IntegrationInstanceConfigurationFacadeIntTest {
                 any(), eq(newConnectionId), any(), anyLong());
     }
 
+    @Test
+    void testEnableIntegrationVersionCreatesAnEnabledInstanceConfiguration() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long integrationInstanceConfigurationId = integrationInstanceConfigurationFacade.enableIntegrationVersion(
+            integration.getId(), 1, Environment.STAGING);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstanceConfigurationId);
+
+        assertThat(integrationInstanceConfiguration.getEnvironment()).isEqualTo(Environment.STAGING);
+        assertThat(integrationInstanceConfiguration.getIntegrationVersion()).isEqualTo(1);
+        assertThat(integrationInstanceConfiguration.isEnabled()).isTrue();
+        assertThat(integrationInstanceConfiguration.getAuthorizationType()).isEqualTo(AuthorizationType.API_KEY);
+        assertThat(
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                integrationInstanceConfigurationId))
+                    .singleElement()
+                    .satisfies(integrationInstanceConfigurationWorkflow -> {
+                        assertThat(integrationInstanceConfigurationWorkflow.getWorkflowId()).isEqualTo("workflow-a");
+                        assertThat(integrationInstanceConfigurationWorkflow.isEnabled()).isTrue();
+                    });
+    }
+
+    @Test
+    void testEnableIntegrationVersionCreatesWithAnAuthorizationTheConnectedUserCompletes() {
+        authenticate(admin());
+
+        stubConnection(AuthorizationType.OAUTH2_AUTHORIZATION_CODE, AuthorizationType.API_KEY);
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long integrationInstanceConfigurationId = integrationInstanceConfigurationFacade.enableIntegrationVersion(
+            integration.getId(), 1, Environment.PRODUCTION);
+
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId)
+                .getAuthorizationType())
+                    .isEqualTo(AuthorizationType.API_KEY);
+    }
+
+    @Test
+    void testEnableIntegrationVersionCreatesWithAPredefinedOAuth2App() {
+        authenticate(admin());
+
+        stubConnection(AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+
+        when(oAuth2Service.getPredefinedApps()).thenReturn(List.of("componentName"));
+        when(oAuth2Service.checkPredefinedParameters(anyString(), any()))
+            .thenAnswer(invocation -> Map.of("clientId", "predefined-client-id"));
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long integrationInstanceConfigurationId = integrationInstanceConfigurationFacade.enableIntegrationVersion(
+            integration.getId(), 1, Environment.PRODUCTION);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstanceConfigurationId);
+
+        assertThat(integrationInstanceConfiguration.getAuthorizationType())
+            .isEqualTo(AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+        Map<String, ?> connectionParameters = integrationInstanceConfiguration.getConnectionParameters();
+
+        assertThat(connectionParameters.get("clientId")).isEqualTo("predefined-client-id");
+    }
+
+    @Test
+    void testEnableIntegrationVersionRefusesCreationWhenAnAdminMustRegisterAnOAuth2App() {
+        authenticate(admin());
+
+        stubConnection(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE);
+
+        when(oAuth2Service.getPredefinedApps()).thenReturn(List.of());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.enableIntegrationVersion(
+                integration.getId(), 1, Environment.PRODUCTION))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(109));
+
+        assertThat(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(integration.getId()))
+            .isEmpty();
+    }
+
+    @Test
+    void testEnableIntegrationVersionMovesTheExistingInstanceConfigurationToTheVersion() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            integration.getId(), Environment.STAGING, false);
+
+        long carriedIntegrationInstanceConfigurationWorkflowId = createIntegrationInstanceConfigurationWorkflow(
+            integrationInstanceConfigurationId, "workflow-a");
+
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
+            "workflow-a");
+
+        integrationWorkflowRepository.save(
+            new IntegrationWorkflow(
+                integration.getId(), 2, "workflow-a-v2", UUID.fromString(integrationWorkflow.getUuidAsString())));
+        integrationWorkflowService.addWorkflow(integration.getId(), 2, "workflow-b");
+
+        integrationService.publishIntegration(integration.getId(), null);
+
+        assertThat(
+            integrationInstanceConfigurationFacade.enableIntegrationVersion(
+                integration.getId(), 2, Environment.STAGING))
+                    .isEqualTo(integrationInstanceConfigurationId);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstanceConfigurationId);
+
+        assertThat(integrationInstanceConfiguration.getIntegrationVersion()).isEqualTo(2);
+        assertThat(integrationInstanceConfiguration.isEnabled()).isTrue();
+        assertThat(integrationInstanceConfiguration.getAuthorizationType()).isEqualTo(AuthorizationType.API_KEY);
+
+        Map<String, ?> connectionParameters = integrationInstanceConfiguration.getConnectionParameters();
+
+        assertThat(connectionParameters.get("key")).isEqualTo("admin-value");
+
+        assertThat(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(integration.getId()))
+            .hasSize(1);
+
+        Map<String, IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
+            integrationInstanceConfigurationWorkflowService
+                .getIntegrationInstanceConfigurationWorkflows(integrationInstanceConfigurationId)
+                .stream()
+                .collect(
+                    Collectors.toMap(
+                        IntegrationInstanceConfigurationWorkflow::getWorkflowId, Function.identity()));
+
+        assertThat(integrationInstanceConfigurationWorkflows).containsOnlyKeys("workflow-a-v2", "workflow-b");
+
+        IntegrationInstanceConfigurationWorkflow carriedIntegrationInstanceConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflows.get("workflow-a-v2");
+
+        assertThat(carriedIntegrationInstanceConfigurationWorkflow.getId())
+            .isEqualTo(carriedIntegrationInstanceConfigurationWorkflowId);
+        assertThat(carriedIntegrationInstanceConfigurationWorkflow.isEnabled()).isFalse();
+
+        Map<String, ?> inputs = carriedIntegrationInstanceConfigurationWorkflow.getInputs();
+
+        assertThat(inputs.get("channel")).isEqualTo("general");
+
+        assertThat(integrationInstanceConfigurationWorkflows.get("workflow-b")
+            .isEnabled()).isTrue();
+    }
+
+    @Test
+    void testEnableIntegrationVersionMovesTheOnlyEnabledOfSeveralInstanceConfigurations() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long disabledIntegrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            integration.getId(), Environment.STAGING, false);
+        long enabledIntegrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            integration.getId(), Environment.STAGING, true);
+
+        integrationWorkflowService.addWorkflow(integration.getId(), 2, "workflow-b");
+
+        integrationService.publishIntegration(integration.getId(), null);
+
+        assertThat(
+            integrationInstanceConfigurationFacade.enableIntegrationVersion(
+                integration.getId(), 2, Environment.STAGING))
+                    .isEqualTo(enabledIntegrationInstanceConfigurationId);
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                disabledIntegrationInstanceConfigurationId)
+                .getIntegrationVersion())
+                    .isEqualTo(1);
+    }
+
+    @Test
+    void testEnableIntegrationVersionRefusesWhenSeveralInstanceConfigurationsAreEquallyCandidates() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        createIntegrationInstanceConfiguration(integration.getId(), Environment.STAGING, false);
+        createIntegrationInstanceConfiguration(integration.getId(), Environment.STAGING, false);
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.enableIntegrationVersion(
+                integration.getId(), 1, Environment.STAGING))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(110));
+    }
+
+    @Test
+    void testEnableIntegrationVersionIsAdminOnly() {
+        authenticate(nonAdmin());
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.enableIntegrationVersion(1L, 1, Environment.STAGING))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
     private static Authentication admin() {
         return new UsernamePasswordAuthenticationToken(
             "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN)));
+    }
+
+    private long createIntegrationInstanceConfiguration(
+        long integrationId, Environment environment, boolean enabled) {
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setAuthorizationType(AuthorizationType.API_KEY);
+        integrationInstanceConfiguration.setConnectionParameters(Map.of("key", "admin-value"));
+        integrationInstanceConfiguration.setEnvironment(environment);
+        integrationInstanceConfiguration.setIntegrationId(integrationId);
+        integrationInstanceConfiguration.setIntegrationVersion(1);
+        integrationInstanceConfiguration.setName("instance-configuration-" + UUID.randomUUID());
+
+        integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
+            integrationInstanceConfiguration);
+
+        long integrationInstanceConfigurationId = integrationInstanceConfiguration.getId();
+
+        integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfigurationId, enabled);
+
+        return integrationInstanceConfigurationId;
+    }
+
+    private long createIntegrationInstanceConfigurationWorkflow(
+        long integrationInstanceConfigurationId, String workflowId) {
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setEnabled(false);
+        integrationInstanceConfigurationWorkflow.setInputs(Map.of("channel", "general"));
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
+
+        integrationInstanceConfigurationWorkflow = integrationInstanceConfigurationWorkflowService.create(
+            integrationInstanceConfigurationWorkflow);
+
+        return integrationInstanceConfigurationWorkflow.getId();
+    }
+
+    private Integration createPublishedIntegration(String workflowId) {
+        Integration integration = new Integration();
+
+        integration.setComponentName("componentName");
+        integration.setName("integration-" + UUID.randomUUID());
+
+        integration = integrationService.create(integration);
+
+        integrationWorkflowService.addWorkflow(integration.getId(), 1, workflowId);
+
+        integrationService.publishIntegration(integration.getId(), null);
+
+        return integrationService.getIntegration(integration.getId());
+    }
+
+    private void stubConnection(AuthorizationType... authorizationTypes) {
+        ModifiableAuthorization[] authorizations = Arrays.stream(authorizationTypes)
+            .map(ComponentDsl::authorization)
+            .toArray(ModifiableAuthorization[]::new);
+
+        when(componentDefinitionService.getComponentDefinition(anyString(), any()))
+            .thenReturn(
+                new ComponentDefinition(
+                    ComponentDsl.component("componentName")
+                        .connection(
+                            ComponentDsl.connection()
+                                .authorizations(authorizations))));
     }
 
     private static Authentication anonymous() {

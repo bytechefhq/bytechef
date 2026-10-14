@@ -22,7 +22,12 @@ import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
+import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
+import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
+import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
@@ -87,6 +92,31 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 })
 @Configuration
 public class AutomationWorkflowProjectFacadeIntTestConfiguration {
+
+    @Bean
+    ProjectCodeWorkflowService projectCodeWorkflowService() {
+        return mock(ProjectCodeWorkflowService.class);
+    }
+
+    @Bean
+    ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService() {
+        return mock(ProjectCodeWorkflowDraftService.class);
+    }
+
+    @Bean
+    CodeWorkflowContainerFacade codeWorkflowContainerFacade() {
+        return mock(CodeWorkflowContainerFacade.class);
+    }
+
+    @Bean
+    CodeWorkflowContainerService codeWorkflowContainerService() {
+        return mock(CodeWorkflowContainerService.class);
+    }
+
+    @Bean
+    CodeWorkflowFileStorage codeWorkflowFileStorage() {
+        return mock(CodeWorkflowFileStorage.class);
+    }
 
     @Bean
     ComponentDefinitionFacade componentDefinitionFacade() {

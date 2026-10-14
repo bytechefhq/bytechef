@@ -30,9 +30,12 @@ dependencies {
 
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:ee:libs:automation:automation-code-workflow-loader"))
+    implementation(project(":server:ee:libs:embedded:embedded-code-workflow-loader"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
+    implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
 
     testImplementation(rootProject.libs.org.graalvm.polyglot.polyglot)
     testImplementation("org.liquibase:liquibase-core")

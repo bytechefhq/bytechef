@@ -76,6 +76,7 @@ dependencies {
     testImplementation(project(":server:libs:test:test-support"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-api"))
     testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-api"))
     testImplementation(project(":spring-ai:spring-ag-ui:utils:json"))
 
     testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))

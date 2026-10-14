@@ -125,6 +125,10 @@ public class CodeWorkflowContainer {
         codeWorkflows.add(new CodeWorkflow(id, name));
     }
 
+    public void removeCodeWorkflow(String workflowName) {
+        codeWorkflows.removeIf(codeWorkflow -> Objects.equals(codeWorkflow.getName(), workflowName));
+    }
+
     @Override
     public int hashCode() {
         return getClass().hashCode();

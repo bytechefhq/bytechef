@@ -15,9 +15,11 @@ dependencies {
 
     implementation(project(":server:ee:libs:automation:automation-code-workflow-loader"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation(rootProject.libs.org.graalvm.polyglot.polyglot)
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-crypto")
@@ -41,6 +43,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 
     testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
     testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))

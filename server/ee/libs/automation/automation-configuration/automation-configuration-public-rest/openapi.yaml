@@ -18,11 +18,29 @@ paths:
       tags:
         - "project-code-workflow"
       operationId: "deployProject"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "enable"
+          description: "Whether to make the published project live in the environment: create and enable its\
+            \ deployment when it has none there, otherwise move the existing one to the published version and\
+            \ enable it."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            default: false
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: "object"
+              required:
+                - "workspaceId"
               properties:
                 workspaceId:
                   description: "The id of a workspace this project will belong."
@@ -54,3 +72,7 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+components:
+  schemas:
+    Environment:
+      $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"

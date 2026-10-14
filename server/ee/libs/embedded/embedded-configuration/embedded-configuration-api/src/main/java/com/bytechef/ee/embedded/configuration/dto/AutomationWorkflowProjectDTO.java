@@ -21,6 +21,6 @@ import org.jspecify.annotations.Nullable;
 public record AutomationWorkflowProjectDTO(
     long id, String name, String description, Long categoryId, List<Long> tagIds, boolean published, int version,
     Integer lastPublishedVersion, List<ConnectedUserWorkflowTemplateDTO> workflowTemplates,
-    String permissionExpression, boolean automationHubVisible, int configurationCount,
+    String permissionExpression, boolean codeWorkflowProject, boolean automationHubVisible, int configurationCount,
     @Nullable Instant lastPublishedDate) {
 }

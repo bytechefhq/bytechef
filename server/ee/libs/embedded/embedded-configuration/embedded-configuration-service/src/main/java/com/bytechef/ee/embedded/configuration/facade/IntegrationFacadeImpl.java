@@ -11,14 +11,18 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
+import com.bytechef.ee.embedded.configuration.service.IntegrationCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
+import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
@@ -36,6 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -52,7 +58,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class IntegrationFacadeImpl implements IntegrationFacade {
 
     private final CategoryService categoryService;
+    private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final ComponentDefinitionService componentDefinitionService;
+    private final IntegrationCodeWorkflowService integrationCodeWorkflowService;
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
@@ -65,9 +73,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @SuppressFBWarnings("EI2")
     public IntegrationFacadeImpl(
-        CategoryService categoryService,
+        CategoryService categoryService, CodeWorkflowContainerService codeWorkflowContainerService,
         ComponentDefinitionService componentDefinitionService,
-        IntegrationService integrationService,
+        IntegrationCodeWorkflowService integrationCodeWorkflowService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
@@ -77,7 +85,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
         this.categoryService = categoryService;
+        this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.componentDefinitionService = componentDefinitionService;
+        this.integrationCodeWorkflowService = integrationCodeWorkflowService;
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
@@ -217,6 +227,25 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                 .collect(
                     Collectors.groupingBy(IntegrationInstanceConfiguration::getIntegrationId, Collectors.counting()));
 
+            Set<Long> codeWorkflowIntegrationIds =
+                Set.copyOf(integrationCodeWorkflowService.getCodeWorkflowIntegrationIds());
+
+            Map<Long, String> codeWorkflowLanguages = new HashMap<>();
+
+            for (Integration integration : integrations) {
+                Long integrationId = integration.getId();
+
+                if (!codeWorkflowIntegrationIds.contains(integrationId)) {
+                    continue;
+                }
+
+                integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(integrationId)
+                    .flatMap(this::fetchCodeWorkflowContainer)
+                    .ifPresent(codeWorkflowContainer -> codeWorkflowLanguages.put(
+                        integrationId, codeWorkflowContainer.getLanguage()
+                            .name()));
+            }
+
             return CollectionUtils.map(
                 integrations,
                 integration -> new IntegrationDTO(
@@ -227,7 +256,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                     getIntegrationWorkflowIds(integration),
                     CollectionUtils.filter(
                         tags, tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId())),
-                    Math.toIntExact(developmentConfigurationCounts.getOrDefault(integration.getId(), 0L))));
+                    Math.toIntExact(developmentConfigurationCounts.getOrDefault(integration.getId(), 0L)),
+                    codeWorkflowIntegrationIds.contains(integration.getId()),
+                    codeWorkflowLanguages.get(integration.getId())));
         } else {
             return CollectionUtils.map(integrations, IntegrationDTO::new);
         }
@@ -292,11 +323,30 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     private IntegrationDTO toIntegrationDTO(Integration integration) {
+        Optional<CodeWorkflowContainer> codeWorkflowContainer = integrationCodeWorkflowService
+            .fetchIntegrationCodeWorkflow(integration.getId())
+            .flatMap(this::fetchCodeWorkflowContainer);
+
         return new IntegrationDTO(
             getCategory(integration),
             componentDefinitionService.fetchComponentDefinition(integration.getComponentName(), null)
                 .orElse(null),
             integration, getIntegrationWorkflowIds(integration),
-            tagService.getTags(integration.getTagIds()));
+            tagService.getTags(integration.getTagIds()), codeWorkflowContainer.isPresent(),
+            codeWorkflowContainer.map(container -> container.getLanguage()
+                .name())
+                .orElse(null));
+    }
+
+    private Optional<CodeWorkflowContainer> fetchCodeWorkflowContainer(
+        IntegrationCodeWorkflow integrationCodeWorkflow) {
+
+        try {
+            return Optional.of(
+                codeWorkflowContainerService.getCodeWorkflowContainer(
+                    integrationCodeWorkflow.getCodeWorkflowContainerId()));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
 }

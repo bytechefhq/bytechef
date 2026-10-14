@@ -1347,6 +1347,14 @@ components:
           properties:
             category:
               $ref: "#/components/schemas/Category"
+            codeWorkflow:
+              description: "Whether the project is backed by a code workflow."
+              type: "boolean"
+              readOnly: true
+            codeWorkflowLanguage:
+              description: "The programming language of the code workflow, if the project is code-backed."
+              type: "string"
+              readOnly: true
             developmentDeploymentCount:
               description: "The number of the project's deployments in the Development environment. Only set by the workspace project list."
               type: "integer"

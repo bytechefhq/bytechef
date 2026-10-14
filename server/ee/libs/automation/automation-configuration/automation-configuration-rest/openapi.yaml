@@ -8,9 +8,39 @@ servers:
 tags:
   - name: "workspace"
     description: "The Automation Workspace Internal API"
+  - name: "project-code-workflow"
+    description: "The Automation Project Code Workflow Internal API"
   - name: "project-git"
     description: "The Automation Project Git Internal API"
 paths:
+  /projects/deploy:
+    post:
+      description: "Deploy a code based project."
+      summary: "Deploy a code based project"
+      tags:
+        - "project-code-workflow"
+      operationId: "deployProject"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              required:
+                - "projectFile"
+                - "workspaceId"
+              properties:
+                workspaceId:
+                  description: "The id of a workspace this project will belong."
+                  type: "integer"
+                  format: "int64"
+                projectFile:
+                  description: "The file of a code-native project."
+                  type: "string"
+                  format: "binary"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /projects/{id}/project-git-configuration:
     get:
       description: "Get git configuration of a project."

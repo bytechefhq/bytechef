@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProvisionableIntegration", description = "An integration that can be provisioned to a connected user.")
 @JsonTypeName("ProvisionableIntegration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T19:46:00.733909+02:00[Europe/Zagreb]", comments = "Generator version: 7.25.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T23:11:44.401718+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ProvisionableIntegrationModel {
 
   private @Nullable IntegrationBasicModel integration;
@@ -95,7 +95,7 @@ public class ProvisionableIntegrationModel {
    * Get integrationInstanceConfigurations
    * @return integrationInstanceConfigurations
    */
-  @Valid 
+  
   @Schema(name = "integrationInstanceConfigurations", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstanceConfigurations")
   public List<@Valid ProvisionableIntegrationInstanceConfigurationModel> getIntegrationInstanceConfigurations() {
