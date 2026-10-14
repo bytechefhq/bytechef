@@ -2,22 +2,27 @@ import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
+import {ButtonGroup} from '@/components/ui/button-group';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {EMBEDDED_INTEGRATIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationsFilterTitle from '@/ee/pages/embedded/integrations/components/IntegrationsFilterTitle';
+import NewIntegrationCodeWorkflowDialog from '@/ee/pages/embedded/integrations/components/NewIntegrationCodeWorkflowDialog';
 import UnifiedApiLeftSidebarNav from '@/ee/pages/embedded/integrations/components/UnifiedApiLeftSidebarNav';
 import IntegrationList from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationList';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationCategoriesQuery} from '@/ee/shared/queries/embedded/integrationCategories.queries';
 import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
-import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {IntegrationKeys, useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import ImportCodeWorkflowDialog from '@/pages/platform/code-workflow/components/ImportCodeWorkflowDialog';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {FilterXIcon, SquareIcon} from 'lucide-react';
+import {useQueryClient} from '@tanstack/react-query';
+import {ChevronDownIcon, CodeIcon, FileUpIcon, FilterXIcon, PlusIcon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -35,7 +40,9 @@ const INTEGRATION_STEPS = [
 
 const Integrations = () => {
     const [newlyCreatedIntegrationId, setNewlyCreatedIntegrationId] = useState<number | undefined>();
+    const [showImportCodeWorkflowDialog, setShowImportCodeWorkflowDialog] = useState(false);
     const [showIntegrationDialog, setShowIntegrationDialog] = useState(false);
+    const [showNewCodeWorkflowDialog, setShowNewCodeWorkflowDialog] = useState(false);
 
     const [searchParams] = useSearchParams();
 
@@ -51,6 +58,8 @@ const Integrations = () => {
     };
 
     const navigate = useNavigate();
+
+    const queryClient = useQueryClient();
 
     const {
         data: integrations,
@@ -87,11 +96,38 @@ const Integrations = () => {
                     right={
                         integrations &&
                         (integrations.length > 0 || hasActiveFilter) && (
-                            <Button
-                                aria-label="Create Integration"
-                                label="New Integration"
-                                onClick={() => setShowIntegrationDialog(true)}
-                            />
+                            <ButtonGroup>
+                                <Button
+                                    aria-label="Create Integration"
+                                    label="New Integration"
+                                    onClick={() => setShowIntegrationDialog(true)}
+                                />
+
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button>
+                                            <ChevronDownIcon />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => setShowIntegrationDialog(true)}>
+                                            <PlusIcon className="mr-2 size-4" />
+                                            New Integration
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem onClick={() => setShowNewCodeWorkflowDialog(true)}>
+                                            <CodeIcon className="mr-2 size-4" />
+                                            New Code Integration
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem onClick={() => setShowImportCodeWorkflowDialog(true)}>
+                                            <FileUpIcon className="mr-2 size-4" />
+                                            Import Code Integration
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </ButtonGroup>
                         )
                     }
                     title={
@@ -142,11 +178,38 @@ const Integrations = () => {
                 ) : (
                     <EmptyState
                         actions={
-                            <Button
-                                aria-label="Create Integration"
-                                label="Create Integration"
-                                onClick={() => setShowIntegrationDialog(true)}
-                            />
+                            <ButtonGroup className="mx-auto">
+                                <Button
+                                    aria-label="Create Integration"
+                                    label="Create Integration"
+                                    onClick={() => setShowIntegrationDialog(true)}
+                                />
+
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button>
+                                            <ChevronDownIcon />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => setShowIntegrationDialog(true)}>
+                                            <PlusIcon className="mr-2 size-4" />
+                                            New Integration
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem onClick={() => setShowNewCodeWorkflowDialog(true)}>
+                                            <CodeIcon className="mr-2 size-4" />
+                                            New Code Integration
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem onClick={() => setShowImportCodeWorkflowDialog(true)}>
+                                            <FileUpIcon className="mr-2 size-4" />
+                                            Import Code Integration
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </ButtonGroup>
                         }
                         description="An integration connects your product to a third-party app, like Slack or HubSpot. You build its workflows here, and your users turn it on from inside your product."
                         docsLink={{href: EMBEDDED_INTEGRATIONS_DOCUMENTATION_URL, label: 'How integrations work'}}
@@ -172,6 +235,21 @@ const Integrations = () => {
                     }}
                     onSuccess={(integrationId) => integrationId && setNewlyCreatedIntegrationId(integrationId)}
                 />
+            )}
+
+            {showImportCodeWorkflowDialog && (
+                <ImportCodeWorkflowDialog
+                    deployUrl="/api/embedded/internal/integrations/deploy"
+                    description="Upload a built code integration. If a code integration for the same component exists, it is redeployed."
+                    fileFieldName="integrationFile"
+                    onClose={() => setShowImportCodeWorkflowDialog(false)}
+                    onImported={() => queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations})}
+                    title="Import Code Integration"
+                />
+            )}
+
+            {showNewCodeWorkflowDialog && (
+                <NewIntegrationCodeWorkflowDialog onClose={() => setShowNewCodeWorkflowDialog(false)} />
             )}
         </LayoutContainer>
     );

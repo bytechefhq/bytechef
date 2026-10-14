@@ -13,6 +13,9 @@ import ConfigurationsListButton from '@/ee/pages/embedded/shared/ConfigurationsL
 import ConfigureButton from '@/ee/pages/embedded/shared/ConfigureButton';
 import {isIntegrationConfigurable} from '@/ee/pages/embedded/shared/integrationPublication';
 import {IntegrationInstanceConfiguration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import CodeWorkflowHeaderActions, {
+    CodeWorkflowSaveButton,
+} from '@/pages/platform/code-workflow/components/CodeWorkflowHeaderActions';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -96,6 +99,8 @@ const IntegrationHeader = ({
         <LoadingIndicator isFetching={isSaving} isOnline={isOnline} showLabel />
     );
 
+    const settingsMenuVisible = !integration?.codeWorkflow;
+
     if (!integration) {
         return <IntegrationSkeleton />;
     }
@@ -136,8 +141,11 @@ const IntegrationHeader = ({
             </div>
 
             <div className="flex items-center gap-1">
+                {integration?.codeWorkflow && <CodeWorkflowHeaderActions />}
+
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
+                    leadingAction={integration?.codeWorkflow ? <CodeWorkflowSaveButton /> : undefined}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
                     runDisabled={runDisabled}
@@ -170,12 +178,14 @@ const IntegrationHeader = ({
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                <SettingsMenu
-                    bottomResizablePanelRef={bottomResizablePanelRef}
-                    integration={integration}
-                    updateWorkflowMutation={updateWorkflowMutation}
-                    workflow={workflow as Workflow}
-                />
+                {settingsMenuVisible && (
+                    <SettingsMenu
+                        bottomResizablePanelRef={bottomResizablePanelRef}
+                        integration={integration}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                        workflow={workflow as Workflow}
+                    />
+                )}
             </div>
 
             {configurationDialogOpen && (

@@ -16,6 +16,7 @@ import {PlatformType} from '@/shared/middleware/graphql';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
+import {useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -51,6 +52,8 @@ const Project = () => {
         useGetConnectionsQuery,
     } = useProject();
 
+    const {data: project} = useGetProjectQuery(projectId, undefined, !!projectId);
+
     const {runDisabled} = useRun();
 
     const chatTrigger = useTestRunChatTrigger(workflow);
@@ -84,6 +87,7 @@ const Project = () => {
                     <ProjectHeader
                         bottomResizablePanelRef={bottomResizablePanelRef}
                         chatTrigger={chatTrigger}
+                        codeWorkflow={project?.codeWorkflow}
                         projectId={projectId}
                         projectWorkflowId={projectWorkflowId}
                         runDisabled={runDisabled}
@@ -98,6 +102,8 @@ const Project = () => {
                                 value={{
                                     ConnectionKeys: ConnectionKeys,
                                     cancelWorkflowQueries,
+                                    codeWorkflow: project?.codeWorkflow,
+                                    codeWorkflowLanguage: project?.codeWorkflowLanguage,
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
                                     invalidateWorkflowQueries,

@@ -15,6 +15,7 @@ import loadProject from '@/pages/automation/project/loadProject';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import ImportCodeWorkflowDialog from '@/pages/platform/code-workflow/components/ImportCodeWorkflowDialog';
 import {getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
@@ -28,13 +29,24 @@ import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectC
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, FilterXIcon, FolderIcon, LayoutTemplateIcon, UploadIcon} from 'lucide-react';
+import {
+    ChevronDownIcon,
+    CodeIcon,
+    FileUpIcon,
+    FilterXIcon,
+    FolderIcon,
+    LayoutTemplateIcon,
+    PlusIcon,
+    UploadIcon,
+} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
+import NewCodeWorkflowDialog from './components/NewCodeWorkflowDialog';
 import ProjectDialog from './components/ProjectDialog';
 import ProjectList from './components/project-list/ProjectList';
 
@@ -48,8 +60,11 @@ const FIRST_RUN_JOURNEY = getAutomationJourney([], []);
 
 const Projects = () => {
     const [newlyCreatedProjectId, setNewlyCreatedProjectId] = useState<number | undefined>();
+    const [showImportCodeWorkflowDialog, setShowImportCodeWorkflowDialog] = useState(false);
+    const [showNewCodeWorkflowDialog, setShowNewCodeWorkflowDialog] = useState(false);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const isEnterpriseEdition = useApplicationInfoStore((state) => state.application?.edition === EditionType.EE);
 
     const [searchParams] = useSearchParams();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -168,6 +183,20 @@ const Projects = () => {
                                         </DropdownMenuTrigger>
 
                                         <DropdownMenuContent align="end">
+                                            <ProjectDialog
+                                                onSuccess={(projectId) =>
+                                                    projectId && setNewlyCreatedProjectId(projectId)
+                                                }
+                                                project={undefined}
+                                                triggerNode={
+                                                    <DropdownMenuItem
+                                                        icon={<PlusIcon />}
+                                                        label="New Project"
+                                                        onSelect={(event) => event.preventDefault()}
+                                                    />
+                                                }
+                                            />
+
                                             <DropdownMenuItem
                                                 icon={<LayoutTemplateIcon />}
                                                 label="From Template"
@@ -179,6 +208,22 @@ const Projects = () => {
                                                 label="Import Project"
                                                 onClick={() => fileInputRef.current?.click()}
                                             />
+
+                                            {isEnterpriseEdition && (
+                                                <>
+                                                    <DropdownMenuItem
+                                                        icon={<CodeIcon />}
+                                                        label="New Code Project"
+                                                        onClick={() => setShowNewCodeWorkflowDialog(true)}
+                                                    />
+
+                                                    <DropdownMenuItem
+                                                        icon={<FileUpIcon />}
+                                                        label="Import Code Project"
+                                                        onClick={() => setShowImportCodeWorkflowDialog(true)}
+                                                    />
+                                                </>
+                                            )}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </ButtonGroup>
@@ -261,6 +306,18 @@ const Projects = () => {
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="start" alignOffset={alignOffset}>
+                                        <ProjectDialog
+                                            onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
+                                            project={undefined}
+                                            triggerNode={
+                                                <DropdownMenuItem
+                                                    icon={<PlusIcon />}
+                                                    label="New Project"
+                                                    onSelect={(event) => event.preventDefault()}
+                                                />
+                                            }
+                                        />
+
                                         <DropdownMenuItem
                                             icon={<LayoutTemplateIcon />}
                                             label="From Template"
@@ -272,6 +329,22 @@ const Projects = () => {
                                             label="Import Project"
                                             onClick={() => fileInputRef.current?.click()}
                                         />
+
+                                        {isEnterpriseEdition && (
+                                            <>
+                                                <DropdownMenuItem
+                                                    icon={<CodeIcon />}
+                                                    label="New Code Project"
+                                                    onClick={() => setShowNewCodeWorkflowDialog(true)}
+                                                />
+
+                                                <DropdownMenuItem
+                                                    icon={<FileUpIcon />}
+                                                    label="Import Code Project"
+                                                    onClick={() => setShowImportCodeWorkflowDialog(true)}
+                                                />
+                                            </>
+                                        )}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
@@ -296,6 +369,20 @@ const Projects = () => {
                 style={{display: 'none'}}
                 type="file"
             />
+
+            {showImportCodeWorkflowDialog && (
+                <ImportCodeWorkflowDialog
+                    deployUrl="/api/automation/internal/projects/deploy"
+                    description="Upload a built code project. If a project with the same name exists, it is redeployed."
+                    fileFieldName="projectFile"
+                    formFields={{workspaceId: String(currentWorkspaceId)}}
+                    onClose={() => setShowImportCodeWorkflowDialog(false)}
+                    onImported={() => queryClient.invalidateQueries({queryKey: ProjectKeys.projects})}
+                    title="Import Code Project"
+                />
+            )}
+
+            {showNewCodeWorkflowDialog && <NewCodeWorkflowDialog onClose={() => setShowNewCodeWorkflowDialog(false)} />}
         </LayoutContainer>
     );
 };
