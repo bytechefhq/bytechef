@@ -6,4 +6,6 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("jakarta.validation:jakarta.validation-api")
+
+    testImplementation(libs.org.wiremock.wiremock)
 }
