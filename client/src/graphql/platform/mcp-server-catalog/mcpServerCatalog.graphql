@@ -1,0 +1,26 @@
+query mcpServerCatalog {
+    mcpServerCatalog {
+        slug
+        title
+        description
+        url
+        urlParameters
+        transportType
+        authentication {
+            type
+            dynamicClientRegistration
+            clientIdMetadataDocument
+            authorizationUrl
+            tokenUrl
+            pkce
+            scopes
+            headers {
+                name
+                description
+                secret
+            }
+        }
+        websiteUrl
+        component
+    }
+}
