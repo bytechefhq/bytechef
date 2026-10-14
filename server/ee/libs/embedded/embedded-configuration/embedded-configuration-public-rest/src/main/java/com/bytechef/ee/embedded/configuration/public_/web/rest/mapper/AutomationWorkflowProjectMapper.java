@@ -35,6 +35,7 @@ public interface AutomationWorkflowProjectMapper
     extends Converter<AutomationWorkflowProjectDTO, AutomationWorkflowProjectModel> {
 
     @Override
+    @Mapping(target = "kind", source = "codeWorkflowProject")
     AutomationWorkflowProjectModel convert(AutomationWorkflowProjectDTO automationWorkflowProjectDTO);
 
     AutomationWorkflowProjectComponentModel toComponentModel(ConnectedUserWorkflowTemplateDTO.Component component);
@@ -60,5 +61,11 @@ public interface AutomationWorkflowProjectMapper
             .stream()
             .map(this::toComponentModel)
             .toList();
+    }
+
+    default AutomationWorkflowProjectModel.KindEnum mapKind(boolean codeWorkflowProject) {
+        return codeWorkflowProject
+            ? AutomationWorkflowProjectModel.KindEnum.REFERENCE
+            : AutomationWorkflowProjectModel.KindEnum.COPY;
     }
 }

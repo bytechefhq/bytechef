@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -24,6 +25,10 @@ import org.springframework.stereotype.Repository;
 public interface IntegrationRepository
     extends ListPagingAndSortingRepository<Integration, Long>, ListCrudRepository<Integration, Long>,
     CustomIntegrationRepository {
+
+    Optional<Integration> findByComponentNameIgnoreCase(String componentName);
+
+    List<Integration> findAllByComponentNameIgnoreCase(String componentName);
 
     @Query("""
         SELECT integration.* FROM integration

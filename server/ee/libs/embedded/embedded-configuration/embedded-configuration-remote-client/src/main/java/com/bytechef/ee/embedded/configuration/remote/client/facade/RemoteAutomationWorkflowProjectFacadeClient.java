@@ -20,6 +20,7 @@ import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -57,6 +58,11 @@ public class RemoteAutomationWorkflowProjectFacadeClient implements AutomationWo
 
     @Override
     public long duplicateProject(long projectId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Long> fetchProjectIdByName(String name) {
         throw new UnsupportedOperationException();
     }
 
