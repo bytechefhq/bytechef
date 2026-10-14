@@ -77,6 +77,7 @@ Each action runs in the environment selected by its **Task Runner** property. Th
 | Process | `process` | Runs the script in a child process on the same host. The server's own environment is cleared before the script starts — only `PATH`, `HOME` and the runner's own `BYTECHEF_*` names are put back — so the script cannot read the server's credentials by name. Enable with `bytechef.script.runners.process.enabled=true`. |
 | Docker | `docker` | Runs the script in a single-use container, on the operator's daemon or — when the operator allows it — on the daemon the task names. The task chooses the image, CPU, memory and network; the operator caps only how long the server waits and how much it transfers. Enable with `bytechef.script.runners.docker.enabled=true`. This is the same runner the **Commands** component uses; its README documents every property. |
 | Kubernetes | `kubernetes` | Enterprise. Runs the script as a pod on the cluster the task's **Kubernetes** connection names. Enable with `bytechef.script.runners.kubernetes.enabled=true`; the **Commands** component's README documents its properties, RBAC and resume behaviour. |
+| AWS Batch | `aws-batch` | Enterprise. Runs the script as an AWS Batch job in the account the task's **AWS** connection names. Enable with `bytechef.script.runners.aws-batch.enabled=true`; the **Commands** component's README documents its properties, sizing, IAM and resume behaviour. |
 
 The `Script Task Runners Demo` sample workflow (`demo/script-runners.json` in `automation-demo-config`, seeded into
 the Demo project on a `demo` profile install) shows this authoring shape as one `javascript` action: a workflow
@@ -99,7 +100,7 @@ The shape of an action's result depends on which runner ran it, and this is the 
 
 Under **GraalVM**, the action returns exactly what the script's `perform()` function returned.
 
-Under **Process**, **Docker** or **Kubernetes**, the action instead always returns this map:
+Under **Process**, **Docker**, **Kubernetes** or **AWS Batch**, the action instead always returns this map:
 
 ```json
 {
