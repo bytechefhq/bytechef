@@ -29,6 +29,7 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.File;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.runner.TaskRunnerRequest;
@@ -252,6 +253,25 @@ class DockerTaskRunnerBackendIntTest {
         return DockerClientImpl.getInstance(dockerClientConfig, dockerHttpClient);
     }
 
+    @Test
+    void testADeclaredConnectionReachesTheContainerAndIsMasked() {
+        TaskRunnerRequest request = new TaskRunnerRequest(
+            "shell", null,
+            List.of(
+                "test \"$BYTECHEF_CONNECTION_SLACK_TOKEN\" = 'xoxb-123456' && echo matched",
+                "echo \"token=$BYTECHEF_CONNECTION_SLACK_TOKEN\""),
+            Map.of(), Map.of(), Map.of(), List.of(), ParametersFactory.create(Map.of()),
+            ParametersFactory.create(Map.of("image", IMAGE)), TIMEOUT,
+            Map.of("slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null)),
+            storingActionContext(new LinkedHashMap<>(), null));
+
+        TaskRunnerResult taskRunnerResult = taskRunner().run(request);
+
+        assertThat(taskRunnerResult.stdout()).contains("matched")
+            .contains("token=******")
+            .doesNotContain("xoxb-123456");
+    }
+
     private static ApplicationProperties applicationProperties() {
         ApplicationProperties.Script.Runner runner = new ApplicationProperties.Script.Runner();
 
@@ -267,6 +287,7 @@ class DockerTaskRunnerBackendIntTest {
         runners.put("docker", runner);
 
         script.setRunners(runners);
+        script.setInjectConnections(true);
 
         return applicationProperties;
     }

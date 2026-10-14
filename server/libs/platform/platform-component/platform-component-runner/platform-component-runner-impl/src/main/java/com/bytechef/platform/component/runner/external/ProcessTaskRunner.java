@@ -23,6 +23,7 @@ import static com.bytechef.platform.component.runner.TaskRunnerConstants.INTERPR
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.PROCESS;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.polyglot.GuestLoggingOutputStream;
 import com.bytechef.platform.component.runner.TaskRunner;
 import com.bytechef.platform.component.runner.TaskRunnerCapability;
@@ -63,6 +64,12 @@ public class ProcessTaskRunner implements TaskRunner {
         ExternalLanguage.JAVASCRIPT, "node",
         ExternalLanguage.PYTHON, "python3",
         ExternalLanguage.SHELL, "/bin/sh");
+
+    private final ApplicationProperties applicationProperties;
+
+    public ProcessTaskRunner(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
+    }
 
     @Override
     public String getType() {
@@ -143,6 +150,11 @@ public class ProcessTaskRunner implements TaskRunner {
     private TaskRunnerResult run(TaskRunnerRequest request, TaskRunnerWorkingDirectory workingDirectory)
         throws IOException, InterruptedException {
 
+        TaskRunnerConnectionEnvironment connectionEnvironment = TaskRunnerConnectionEnvironment.of(
+            request, applicationProperties);
+
+        SecretMasker secretMasker = connectionEnvironment.secretMasker();
+
         String languageId = request.languageId();
         String script = request.script();
 
@@ -160,7 +172,7 @@ public class ProcessTaskRunner implements TaskRunner {
             workingDirectory.getPath()
                 .toFile());
 
-        applyEnvironment(processBuilder, request, workingDirectory);
+        applyEnvironment(processBuilder, request, workingDirectory, connectionEnvironment.variables());
 
         Process process = processBuilder.start();
 
@@ -171,10 +183,11 @@ public class ProcessTaskRunner implements TaskRunner {
 
         Thread stdoutThread = drain(process.getInputStream(), stdout, line -> {
             if (log.isInfoEnabled()) {
-                log.info("[process] {}", line);
+                log.info("[process] {}", secretMasker.mask(line));
             }
         });
-        Thread stderrThread = drain(process.getErrorStream(), stderr, line -> log.warn("[process] {}", line));
+        Thread stderrThread =
+            drain(process.getErrorStream(), stderr, line -> log.warn("[process] {}", secretMasker.mask(line)));
 
         Duration requestTimeout = request.timeout();
         Duration timeout = requestTimeout == null ? DEFAULT_TIMEOUT : requestTimeout;
@@ -205,7 +218,7 @@ public class ProcessTaskRunner implements TaskRunner {
         if (!exited) {
             throw new IllegalStateException(
                 "The process task runner timed out after %s; stdout tail: %s; stderr tail: %s".formatted(
-                    timeout, stdout.get(), stderr.get()));
+                    timeout, secretMasker.mask(stdout.get()), secretMasker.mask(stderr.get())));
         }
 
         int exitCode = process.exitValue();
@@ -213,11 +226,12 @@ public class ProcessTaskRunner implements TaskRunner {
         if (exitCode != 0) {
             throw new IllegalStateException(
                 "The process exited with code %d; stdout tail: %s; stderr tail: %s".formatted(
-                    exitCode, stdout.get(), stderr.get()));
+                    exitCode, secretMasker.mask(stdout.get()), secretMasker.mask(stderr.get())));
         }
 
         return new TaskRunnerResult(
-            TaskRunnerOutputs.readOutputJson(workingDirectory), exitCode, stdout.get(), stderr.get(),
+            TaskRunnerOutputs.readOutputJson(workingDirectory), exitCode, secretMasker.mask(stdout.get()),
+            secretMasker.mask(stderr.get()),
             TaskRunnerOutputs.collectOutputFiles(request, workingDirectory));
     }
 
@@ -249,7 +263,8 @@ public class ProcessTaskRunner implements TaskRunner {
     }
 
     private static void applyEnvironment(
-        ProcessBuilder processBuilder, TaskRunnerRequest request, TaskRunnerWorkingDirectory workingDirectory) {
+        ProcessBuilder processBuilder, TaskRunnerRequest request, TaskRunnerWorkingDirectory workingDirectory,
+        Map<String, String> connectionVariables) {
 
         Map<String, String> environment = processBuilder.environment();
 
@@ -269,6 +284,7 @@ public class ProcessTaskRunner implements TaskRunner {
                     .toString());
         }
 
+        environment.putAll(connectionVariables);
         environment.putAll(request.env());
         environment.putAll(workingDirectory.getEnvironment());
     }
