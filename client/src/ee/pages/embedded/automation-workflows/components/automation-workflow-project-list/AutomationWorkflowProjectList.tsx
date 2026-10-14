@@ -35,6 +35,7 @@ interface AutomationWorkflowProjectListProps {
     onDeleteProject: (projectId: string) => void;
     onDeleteWorkflow: (workflowUuid: string) => void;
     onEditProject: (project: AutomationWorkflowProjectType) => void;
+    onEditProjectSource: (projectId: string) => void;
     onEditWorkflow: (workflow: AutomationWorkflowProjectType['workflowTemplates'][number]) => void;
     onImportWorkflow: (projectId: string) => void;
     onPublishProject: (projectId: string) => void;
@@ -50,6 +51,7 @@ const AutomationWorkflowProjectList = ({
     onDeleteProject,
     onDeleteWorkflow,
     onEditProject,
+    onEditProjectSource,
     onEditWorkflow,
     onImportWorkflow,
     onPublishProject,
@@ -101,6 +103,7 @@ const AutomationWorkflowProjectList = ({
                         onCreateWorkflow={onCreateWorkflow}
                         onDeleteProject={onDeleteProject}
                         onEditProject={onEditProject}
+                        onEditProjectSource={onEditProjectSource}
                         onImportWorkflow={onImportWorkflow}
                         onPublishProject={onPublishProject}
                         onSelectWorkflow={onSelectWorkflow}
@@ -113,39 +116,41 @@ const AutomationWorkflowProjectList = ({
                         <AutomationWorkflowProjectListItemTabs
                             actions={
                                 (activeTabs[project.id] || 'workflows') === 'workflows' ? (
-                                    <ButtonGroup aria-label="Workflow Creation Actions">
-                                        <Button
-                                            aria-label="Create Workflow"
-                                            onClick={() => onCreateWorkflow(project.id)}
-                                            size="sm"
-                                            variant="secondary"
-                                        >
-                                            <PlusIcon />
-                                            New Workflow
-                                        </Button>
+                                    !project.codeWorkflowProject && (
+                                        <ButtonGroup aria-label="Workflow Creation Actions">
+                                            <Button
+                                                aria-label="Create Workflow"
+                                                onClick={() => onCreateWorkflow(project.id)}
+                                                size="sm"
+                                                variant="secondary"
+                                            >
+                                                <PlusIcon />
+                                                New Workflow
+                                            </Button>
 
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    aria-label="More Workflow Creation Actions"
-                                                    icon={<ChevronDownIcon />}
-                                                    size="sm"
-                                                    variant="secondary"
-                                                >
-                                                    <> </>
-                                                </Button>
-                                            </DropdownMenuTrigger>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        aria-label="More Workflow Creation Actions"
+                                                        icon={<ChevronDownIcon />}
+                                                        size="sm"
+                                                        variant="secondary"
+                                                    >
+                                                        <> </>
+                                                    </Button>
+                                                </DropdownMenuTrigger>
 
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem
-                                                    aria-label="Import Workflow"
-                                                    icon={<UploadIcon />}
-                                                    label="Import Workflow"
-                                                    onClick={() => onImportWorkflow(project.id)}
-                                                />
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </ButtonGroup>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem
+                                                        aria-label="Import Workflow"
+                                                        icon={<UploadIcon />}
+                                                        label="Import Workflow"
+                                                        onClick={() => onImportWorkflow(project.id)}
+                                                    />
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </ButtonGroup>
+                                    )
                                 ) : (
                                     <Tooltip>
                                         <TooltipTrigger asChild>

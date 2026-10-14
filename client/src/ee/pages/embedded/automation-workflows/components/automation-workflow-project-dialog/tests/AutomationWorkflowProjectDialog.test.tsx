@@ -1,10 +1,14 @@
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectDialog from '../AutomationWorkflowProjectDialog';
 
 const existingProject = {
     categoryId: null,
+    codeWorkflowDraftPublishable: null,
+    codeWorkflowLanguage: null,
+    codeWorkflowProject: false,
     configurationCount: 0,
     description: null,
     id: '1',
@@ -122,6 +126,32 @@ describe('AutomationWorkflowProjectDialog', () => {
             await user.click(screen.getByRole('button', {name: 'Save'}));
 
             expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({name: 'New project'}));
+        });
+    });
+
+    describe('code workflow mode', () => {
+        it('asks for a language and submits it in code workflow mode', async () => {
+            const user = userEvent.setup();
+
+            render(<AutomationWorkflowProjectDialog {...defaultProps} categories={[]} codeWorkflow tags={[]} />);
+
+            expect(screen.getByText('New Code Project')).toBeInTheDocument();
+            expect(screen.getByText('Language')).toBeInTheDocument();
+
+            await user.type(screen.getByPlaceholderText('My CRM Project'), 'orders');
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(onSubmit).toHaveBeenCalledWith(
+                    expect.objectContaining({language: CodeWorkflowLanguage.Javascript, name: 'orders'})
+                )
+            );
+        });
+
+        it('does not ask for a language for a visual project', () => {
+            render(<AutomationWorkflowProjectDialog {...defaultProps} />);
+
+            expect(screen.queryByText('Language')).not.toBeInTheDocument();
         });
     });
 });
