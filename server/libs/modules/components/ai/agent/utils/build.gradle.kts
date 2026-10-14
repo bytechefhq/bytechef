@@ -11,6 +11,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-polyglot"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-runner:platform-component-runner-impl"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("org.mockito:mockito-core")

@@ -32,7 +32,12 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.script.action.definition.ScriptActionDefinition;
-import com.bytechef.component.script.engine.PolyglotEngine;
+import com.bytechef.platform.component.runner.TaskRunnerCapability;
+import com.bytechef.platform.component.runner.TaskRunnerPropertyFactory;
+import com.bytechef.platform.component.runner.TaskRunnerRegistry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Matija Petanjek
@@ -40,29 +45,38 @@ import com.bytechef.component.script.engine.PolyglotEngine;
  */
 public class ScriptPythonAction {
 
-    public static ScriptActionDefinition of(PolyglotEngine polyglotEngine) {
+    public static ScriptActionDefinition of(TaskRunnerRegistry taskRunnerRegistry) {
+        List<Property> properties = new ArrayList<>();
+
+        properties.add(
+            object(INPUT)
+                .label("Input")
+                .description("Initialize parameter values used in the custom code.")
+                .additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
+                    time())
+                .expressionEnabled(false));
+        properties.add(
+            string(SCRIPT)
+                .label("Python Code")
+                .description("Add your Python custom logic here.")
+                .controlType(Property.ControlType.CODE_EDITOR)
+                .languageId("python")
+                .defaultValue("def perform(input, context):\n\treturn None")
+                .required(true));
+        properties.add(
+            TaskRunnerPropertyFactory.taskRunnerProperty(
+                taskRunnerRegistry, Set.of(TaskRunnerCapability.INLINE_SCRIPT)));
+        properties.addAll(TaskRunnerPropertyFactory.externalProperties(taskRunnerRegistry));
+
         return new ScriptActionDefinition(
             action("python")
                 .title("Python")
                 .description("Executes custom Python code.")
-                .properties(
-                    object(INPUT)
-                        .label("Input")
-                        .description("Initialize parameter values used in the custom code.")
-                        .additionalProperties(
-                            array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
-                            time())
-                        .expressionEnabled(false),
-                    string(SCRIPT)
-                        .label("Python Code")
-                        .description("Add your Python custom logic here.")
-                        .controlType(Property.ControlType.CODE_EDITOR)
-                        .languageId("python")
-                        .defaultValue("def perform(input, context):\n\treturn None")
-                        .required(true))
+                .properties(properties)
                 .output()
                 .help("", "https://docs.bytechef.io/reference/components/script_v1#python"),
-            "python", polyglotEngine);
+            "python", taskRunnerRegistry);
     }
 
     private ScriptPythonAction() {

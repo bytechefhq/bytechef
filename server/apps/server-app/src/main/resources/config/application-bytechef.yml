@@ -221,6 +221,12 @@ bytechef:
       clustered: false
       # How often a clustered scheduler checks in, in milliseconds. default: 15000
       cluster-checkin-interval: 15000
+  script:
+    # Task runner allowlist. A runner absent from this map is disabled, which is the intended default for the
+    # out-of-process runners but not for GraalVM, the in-process runner every script action falls back to.
+    runners:
+      graalvm:
+        enabled: true
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' https://*.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.command.ai https://*.commandbar.com https://*.i.posthog.com https://cdn.jsdelivr.net https://storage.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://*.commandbar.com https://cdn.jsdelivr.net https://*.command.ai https://unpkg.com; img-src 'self' https://*.command.ai data:; font-src 'self' data:; media-src 'self' https://*.command.ai; connect-src 'self' https://*.command.ai https://*.i.posthog.com https://*.commandbar.com; worker-src blob: 'self';"
     social-login:
