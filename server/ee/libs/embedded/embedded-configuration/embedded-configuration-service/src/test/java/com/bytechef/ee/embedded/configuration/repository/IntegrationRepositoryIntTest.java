@@ -70,6 +70,18 @@ class IntegrationRepositoryIntTest {
     }
 
     @Test
+    void testFindByComponentNameIgnoreCase() {
+        Integration integration = integrationRepository.save(getIntegration());
+
+        assertThat(integrationRepository.findByComponentNameIgnoreCase("componentName"))
+            .hasValue(integration);
+        assertThat(integrationRepository.findByComponentNameIgnoreCase("COMPONENTNAME"))
+            .hasValue(integration);
+        assertThat(integrationRepository.findByComponentNameIgnoreCase("nonExistentComponentName"))
+            .isEmpty();
+    }
+
+    @Test
     void testFindById() {
         Integration integration = integrationRepository.save(getIntegration());
 

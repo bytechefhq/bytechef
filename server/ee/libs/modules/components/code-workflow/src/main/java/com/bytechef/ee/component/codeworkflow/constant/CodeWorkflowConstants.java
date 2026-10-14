@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.component.codeworkflow.constant;
 
+import java.util.Set;
+
 /**
  * @version ee
  *
@@ -15,5 +17,12 @@ package com.bytechef.ee.component.codeworkflow.constant;
 public class CodeWorkflowConstants {
 
     public static final String CODE_WORKFLOW = "codeWorkflow";
+
+    public static final String INPUT = "input";
+
+    public static final String CONCURRENT_TASK_NAMES = "concurrentTaskNames";
     public static final String PERFORM = "perform";
+
+    public static final Set<String> DISPATCH_PARAMETERS = Set.of(
+        "codeWorkflowContainerUuid", "workflowName", "taskName", INPUT, CONCURRENT_TASK_NAMES, "type");
 }
