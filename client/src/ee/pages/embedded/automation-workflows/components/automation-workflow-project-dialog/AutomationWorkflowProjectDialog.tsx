@@ -9,6 +9,7 @@ import {
     DialogHeader,
     DialogMain,
 } from '@/components/Dialog';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import DescriptionFormField from '@/shared/components/entity-form/DescriptionFormField';
@@ -18,6 +19,7 @@ import {
     AutomationWorkflowProjectCategoriesQuery,
     AutomationWorkflowProjectTagsQuery,
     AutomationWorkflowProjectsQuery,
+    CodeWorkflowLanguage,
 } from '@/shared/middleware/graphql';
 import {useForm} from 'react-hook-form';
 
@@ -28,6 +30,7 @@ type EmbeddedTagType = AutomationWorkflowProjectTagsQuery['automationWorkflowPro
 export interface AutomationWorkflowProjectFormValuesI {
     category?: string;
     description: string;
+    language?: CodeWorkflowLanguage;
     name: string;
     permissionExpression: string;
     tags: Array<string>;
@@ -36,6 +39,7 @@ export interface AutomationWorkflowProjectFormValuesI {
 interface AutomationWorkflowProjectFormI {
     category?: SelectOptionType;
     description: string;
+    language?: CodeWorkflowLanguage;
     name: string;
     permissionExpression: string;
     tags: Array<SelectOptionType>;
@@ -43,6 +47,7 @@ interface AutomationWorkflowProjectFormI {
 
 interface AutomationWorkflowProjectDialogProps {
     categories: EmbeddedCategoryType[] | undefined;
+    codeWorkflow?: boolean;
     onClose: () => void;
     onSubmit: (values: AutomationWorkflowProjectFormValuesI) => void;
     project?: AutomationWorkflowProjectType;
@@ -51,6 +56,7 @@ interface AutomationWorkflowProjectDialogProps {
 
 const AutomationWorkflowProjectDialog = ({
     categories,
+    codeWorkflow,
     onClose,
     onSubmit,
     project,
@@ -82,6 +88,7 @@ const AutomationWorkflowProjectDialog = ({
         defaultValues: {
             category: existingCategoryName ? {label: existingCategoryName, value: existingCategoryName} : undefined,
             description: project?.description || '',
+            language: codeWorkflow ? CodeWorkflowLanguage.Javascript : undefined,
             name: project?.name || '',
             permissionExpression: project?.permissionExpression ?? '',
             tags: existingTagNames.map((name) => ({label: name, value: name})),
@@ -94,6 +101,7 @@ const AutomationWorkflowProjectDialog = ({
         onSubmit({
             category: formValues.category?.value || undefined,
             description: formValues.description,
+            language: codeWorkflow ? formValues.language : undefined,
             name: formValues.name,
             permissionExpression: formValues.permissionExpression,
             tags: (formValues.tags || []).map((tag) => tag.value),
@@ -114,11 +122,47 @@ const AutomationWorkflowProjectDialog = ({
                     <Form {...form}>
                         <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveProject)}>
                             <DialogHeader
-                                description={`Use this to ${project ? 'edit' : 'create'} a project which will contain workflows`}
-                                title={`${project ? 'Edit' : 'Create'} Project`}
+                                description={
+                                    codeWorkflow
+                                        ? 'Create a code-backed project and start editing its source.'
+                                        : `Use this to ${project ? 'edit' : 'create'} a project which will contain workflows`
+                                }
+                                title={codeWorkflow ? 'New Code Project' : `${project ? 'Edit' : 'Create'} Project`}
                             />
 
                             <DialogBody>
+                                {codeWorkflow && (
+                                    <FormField
+                                        control={control}
+                                        name="language"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Language</FormLabel>
+
+                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+
+                                                    <SelectContent>
+                                                        <SelectItem value={CodeWorkflowLanguage.Javascript}>
+                                                            JavaScript
+                                                        </SelectItem>
+
+                                                        <SelectItem value={CodeWorkflowLanguage.Python}>
+                                                            Python
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+
                                 <NameFormField placeholder="My CRM Project" />
 
                                 <DescriptionFormField placeholder="Cute description of your project" />

@@ -23,6 +23,7 @@ import {
 import {useState} from 'react';
 
 interface AutomationWorkflowEditorSettingsMenuProps {
+    codeWorkflowProject?: boolean;
     onDeleteProjectClick: () => void;
     onDeleteWorkflowClick: () => void;
     onDuplicateProjectClick: () => void;
@@ -37,6 +38,7 @@ interface AutomationWorkflowEditorSettingsMenuProps {
 }
 
 const AutomationWorkflowEditorSettingsMenu = ({
+    codeWorkflowProject = false,
     onDeleteProjectClick,
     onDeleteWorkflowClick,
     onDuplicateProjectClick,
@@ -154,7 +156,7 @@ const AutomationWorkflowEditorSettingsMenu = ({
                             />
                         )}
 
-                        {canCreateProject && (
+                        {canCreateProject && !codeWorkflowProject && (
                             <DropdownMenuItem
                                 icon={<CopyIcon />}
                                 label="Duplicate"

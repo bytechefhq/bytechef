@@ -47,6 +47,7 @@ const AutomationWorkflowProjectWorkflowList = ({
                     <ul className="divide-y divide-stroke-neutral-primary">
                         {workflows.map((workflow) => (
                             <AutomationWorkflowProjectWorkflowListItem
+                                codeWorkflowProject={project.codeWorkflowProject}
                                 key={workflow.workflowUuid}
                                 onDeleteWorkflow={setWorkflowUuidToDelete}
                                 onEditWorkflow={onEditWorkflow}
@@ -66,9 +67,11 @@ const AutomationWorkflowProjectWorkflowList = ({
                         }
                         icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message={
-                            canCreateWorkflow
-                                ? 'Get started by creating a new workflow.'
-                                : 'There are no workflows yet.'
+                            project.codeWorkflowProject
+                                ? 'Add a workflow to the project source.'
+                                : canCreateWorkflow
+                                  ? 'Get started by creating a new workflow.'
+                                  : 'There are no workflows yet.'
                         }
                         title="No Workflows"
                     />

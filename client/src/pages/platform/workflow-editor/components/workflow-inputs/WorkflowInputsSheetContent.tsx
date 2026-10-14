@@ -1,6 +1,7 @@
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {SheetCloseButton} from '@/components/ui/sheet';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {PlusIcon, SlidersIcon} from 'lucide-react';
@@ -36,7 +37,11 @@ const WorkflowInputsSheetContent = ({
         workflow,
     } = useWorkflowInputs({invalidateWorkflowQueries, workflowTestConfiguration});
 
+    const {codeWorkflow} = useWorkflowEditor();
+
     const readOnly = useWorkflowEditorReadOnly();
+
+    const sourceOwnsInputs = codeWorkflow === true;
 
     return (
         <>
@@ -44,7 +49,7 @@ const WorkflowInputsSheetContent = ({
                 <span className="text-lg font-semibold">Workflow Inputs</span>
 
                 <div className="flex items-center gap-1">
-                    {!readOnly && !!workflow.inputs?.length && (
+                    {!readOnly && !!workflow.inputs?.length && !sourceOwnsInputs && (
                         <Button icon={<PlusIcon />} label="New Input" onClick={() => openEditDialog()} size="sm" />
                     )}
 
@@ -74,10 +79,12 @@ const WorkflowInputsSheetContent = ({
                             <h2 className="text-sm font-semibold">No inputs</h2>
 
                             <p className="text-sm text-content-neutral-secondary">
-                                Get started by creating a new input.
+                                {sourceOwnsInputs
+                                    ? "Declare them in the workflow's source, then set their test values here."
+                                    : 'Get started by creating a new input.'}
                             </p>
 
-                            {!readOnly && (
+                            {!readOnly && !sourceOwnsInputs && (
                                 <Button icon={<PlusIcon />} label="New Input" onClick={() => openEditDialog()} />
                             )}
                         </div>
@@ -102,6 +109,7 @@ const WorkflowInputsSheetContent = ({
 
                 {!!workflow.inputs?.length && (
                     <WorkflowInputsTable
+                        codeWorkflow={sourceOwnsInputs}
                         internalOnlyVisible={internalOnlyVisible}
                         openDeleteDialog={openDeleteDialog}
                         openEditDialog={openEditDialog}
