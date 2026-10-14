@@ -157,7 +157,7 @@ const ProjectsLeftSidebar = ({
                                     <DropdownMenuTrigger asChild>
                                         <TooltipTrigger asChild>
                                             <Button
-                                                aria-label="New project"
+                                                aria-label="New Project"
                                                 className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                                                 icon={<PlusIcon />}
                                                 size="icon"
@@ -166,7 +166,7 @@ const ProjectsLeftSidebar = ({
                                         </TooltipTrigger>
                                     </DropdownMenuTrigger>
 
-                                    <TooltipContent side="left">New project</TooltipContent>
+                                    <TooltipContent side="left">New Project</TooltipContent>
                                 </Tooltip>
 
                                 <DropdownMenuContent align="end">
