@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.engine;
+package com.bytechef.platform.component.runner;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.ComponentConnection;
@@ -30,16 +30,16 @@ import org.springframework.context.ApplicationContext;
 /**
  * @author Ivica Cardic
  */
-class ScriptComponentActionInvoker implements ComponentActionInvoker {
+class PolyglotComponentActionInvoker implements ComponentActionInvoker {
 
     private final ApplicationContext applicationContext;
     private final Map<String, ComponentConnection> componentConnections;
     private final JobContextAware jobContextAware;
-    private final ScriptComponentCatalog componentCatalog;
+    private final PolyglotComponentCatalog componentCatalog;
 
-    ScriptComponentActionInvoker(
+    PolyglotComponentActionInvoker(
         ApplicationContext applicationContext, Map<String, ComponentConnection> componentConnections,
-        JobContextAware jobContextAware, ScriptComponentCatalog componentCatalog) {
+        JobContextAware jobContextAware, PolyglotComponentCatalog componentCatalog) {
 
         this.applicationContext = applicationContext;
         this.componentConnections = componentConnections;

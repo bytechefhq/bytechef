@@ -32,13 +32,14 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.script.constant.ScriptConstants;
-import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
+import com.bytechef.platform.component.polyglot.ScriptSandboxMode;
+import com.bytechef.platform.component.runner.PolyglotEngine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -254,7 +255,8 @@ public class AiAgentUtilsSkillsTool implements AiAgentUtilsClusterElementContrib
                         ScriptConstants.INPUT, scriptInput != null ? scriptInput : Map.of()));
 
                 return polyglotEngine.execute(
-                    languageId, scriptParams, componentConnections, false, jobContextAware);
+                    ScriptSandboxMode.STRICT, null, languageId, scriptParams, componentConnections, false,
+                    jobContextAware);
             })
             .inputType(Map.class)
             .inputSchema(SCRIPT_TOOL_INPUT_SCHEMA)

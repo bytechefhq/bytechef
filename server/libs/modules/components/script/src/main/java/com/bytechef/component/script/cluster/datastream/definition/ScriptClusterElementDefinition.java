@@ -22,11 +22,12 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.AbstractClusterElementDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.datastream.ItemProcessor;
+import com.bytechef.platform.component.polyglot.ScriptSandboxMode;
+import com.bytechef.platform.component.runner.PolyglotEngine;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map;
 
@@ -62,7 +63,8 @@ public class ScriptClusterElementDefinition
         ClusterElementContext context) {
 
         return (Map<String, Object>) polyglotEngine.execute(
-            languageId, ParametersFactory.create(MapUtils.concat(inputParameters, Map.of(INPUT, Map.of("item", item)))),
-            null, (ClusterElementContextAware) context);
+            ScriptSandboxMode.STRICT, null, languageId,
+            ParametersFactory.create(MapUtils.concat(inputParameters, Map.of(INPUT, Map.of("item", item)))), null,
+            (ClusterElementContextAware) context);
     }
 }

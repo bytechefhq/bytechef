@@ -23,7 +23,7 @@ import static com.bytechef.platform.component.definition.datastream.ItemProcesso
 
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
-import com.bytechef.component.script.engine.PolyglotEngine;
+import com.bytechef.platform.component.runner.PolyglotEngine;
 
 /**
  * @author Ivica Cardic

@@ -21,8 +21,8 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.script.cluster.datastream.ScriptJavaItemProcessor;
 import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
-import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.datastream.ItemProcessor;
+import com.bytechef.platform.component.runner.PolyglotEngine;
 import org.junit.jupiter.api.Test;
 
 /**
