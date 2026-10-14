@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
+    implementation(project(":server:libs:platform:platform-github-proxy-client"))
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
