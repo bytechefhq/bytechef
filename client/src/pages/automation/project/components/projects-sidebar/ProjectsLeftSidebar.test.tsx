@@ -1,6 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen, waitFor} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import React from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -18,7 +18,33 @@ const createTestQueryClient = () =>
 
 let queryClient: QueryClient;
 
-// Mocks for UI components used inside the scroll area
+// Mocks for UI components used inside dropdown/scroll
+vi.mock('@/components/Button/Button', () => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    default: ({children, icon, label, ...props}: any) => (
+        <button data-testid="btn" {...props}>
+            {icon}
+
+            {label ?? children}
+        </button>
+    ),
+}));
+
+vi.mock('@/components/ui/dropdown-menu', () => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    DropdownMenu: ({children}: any) => <div>{children}</div>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    DropdownMenuContent: ({children}: any) => <div>{children}</div>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    DropdownMenuItem: ({children, disabled, onClick}: any) => (
+        <div aria-disabled={disabled ? 'true' : undefined} onClick={disabled ? undefined : onClick} role="menuitem">
+            {children}
+        </div>
+    ),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    DropdownMenuTrigger: ({children}: any) => <div>{children}</div>,
+}));
+
 vi.mock('@/components/ui/scroll-area', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ScrollArea: ({children, ...props}: any) => <div {...props}>{children}</div>,
@@ -49,7 +75,35 @@ vi.mock('@/pages/automation/project/components/projects-sidebar/components/Workf
     default: () => <div data-testid="skeleton">Loading...</div>,
 }));
 
+vi.mock('@/pages/automation/projects/components/ProjectDialog', () => ({
+    default: () => <div role="dialog">ProjectDialog</div>,
+}));
+
+vi.mock('@/shared/components/workflow/WorkflowDialog', () => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    default: ({parentId}: any) => <div role="dialog">WorkflowDialog:{parentId}</div>,
+}));
+
 // Hooks and stores
+const mockUseCreateProjectWorkflow = vi.hoisted(() => vi.fn());
+vi.mock('@/pages/automation/project/hooks/useCreateProjectWorkflow', () => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    useCreateProjectWorkflow: (args: any) => mockUseCreateProjectWorkflow(args),
+}));
+
+const mockUseImportProjectWorkflow = vi.hoisted(() => vi.fn());
+vi.mock('@/pages/automation/project/hooks/useImportProjectWorkflow', () => ({
+    useImportProjectWorkflow: (projectId: number) => mockUseImportProjectWorkflow(projectId),
+}));
+
+vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
+    useImportProjectMutation: () => ({mutate: vi.fn()}),
+}));
+
+vi.mock('@/shared/queries/automation/workflows.queries', () => ({
+    useGetWorkflowQuery: vi.fn(),
+}));
+
 const mockGetProjectWorkflowsQuery = vi.fn();
 const mockGetWorkflowsQuery = vi.fn();
 vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
@@ -61,6 +115,7 @@ vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
 
 const mockGetWorkspaceProjectsQuery = vi.fn();
 vi.mock('@/shared/queries/automation/projects.queries', async () => ({
+    ProjectKeys: {project: (id: number) => ['project', id], projects: ['projects']},
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useGetWorkspaceProjectsQuery: (args: any) => mockGetWorkspaceProjectsQuery(args),
 }));
@@ -86,6 +141,22 @@ vi.mock('@tanstack/react-query', async () => {
         useQueryClient: () => ({invalidateQueries: vi.fn()}),
     };
 });
+
+const mockNavigate = vi.hoisted(() => vi.fn());
+
+vi.mock('react-router-dom', async () => ({
+    useNavigate: () => mockNavigate,
+}));
+
+const setupImportProjectWorkflow = ({importN8nWorkflowDisabled = false} = {}) =>
+    mockUseImportProjectWorkflow.mockReturnValue({
+        handleN8nWorkflowFileChange: vi.fn(),
+        handleWorkflowFileChange: vi.fn(),
+        importN8nWorkflowDisabled,
+        isImportingN8nWorkflow: false,
+        n8nWorkflowFileInputRef: {current: null},
+        workflowFileInputRef: {current: null},
+    });
 
 // Helper to set default mocks per test scenario
 const setupQueries = ({
@@ -131,6 +202,8 @@ describe('ProjectsLeftSidebar', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         queryClient = createTestQueryClient();
+
+        setupImportProjectWorkflow();
     });
 
     afterEach(() => {
@@ -167,17 +240,81 @@ describe('ProjectsLeftSidebar', () => {
         expect(items).toHaveLength(workflows.length);
     });
 
-    it('leaves project and workflow creation to the settings menu', async () => {
+    it('shows the Workflow button and opens WorkflowDialog for the selected project on click', async () => {
         setupQueries({selectedProjectId: 9});
 
         renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
 
-        await screen.findAllByTestId('workflow-item');
+        fireEvent.click(screen.getByText('Workflow'));
 
-        expect(screen.queryByLabelText('New project')).not.toBeInTheDocument();
-        expect(screen.queryByText('Workflow')).not.toBeInTheDocument();
-        expect(screen.queryByText('Import Workflow')).not.toBeInTheDocument();
-        expect(document.querySelector('input[type="file"]')).toBeNull();
+        expect(await screen.findByRole('dialog')).toHaveTextContent('WorkflowDialog:9');
+        expect(mockUseCreateProjectWorkflow).toHaveBeenCalledWith(expect.objectContaining({projectId: 9}));
+        expect(mockUseImportProjectWorkflow).toHaveBeenCalledWith(9);
+    });
+
+    it('creates workflows in the current project when all projects are listed', async () => {
+        setupQueries({selectedProjectId: 0});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={0} />);
+
+        fireEvent.click(screen.getByText('Workflow'));
+
+        expect(await screen.findByRole('dialog')).toHaveTextContent('WorkflowDialog:0');
+    });
+
+    it('opens the ProjectDialog from the New project menu', async () => {
+        setupQueries({selectedProjectId: 9});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
+
+        expect(screen.getByLabelText('New project')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('From Scratch'));
+
+        expect(await screen.findByRole('dialog')).toHaveTextContent('ProjectDialog');
+    });
+
+    it('renders hidden file inputs for workflow, n8n workflow and project imports', () => {
+        setupQueries({selectedProjectId: 9});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
+
+        const acceptValues = Array.from(document.querySelectorAll('input[type="file"]')).map((input) =>
+            input.getAttribute('accept')
+        );
+
+        expect(acceptValues).toEqual(['.json,.yaml,.yml', '.json', '.zip']);
+    });
+
+    it('disables the Import n8n Workflow item when no AI provider is enabled', async () => {
+        setupImportProjectWorkflow({importN8nWorkflowDisabled: true});
+        setupQueries({selectedProjectId: 5});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
+
+        const menuItem = (await screen.findByText('Import n8n Workflow')).closest('[role="menuitem"]');
+
+        expect(menuItem).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('opens the template pages with absolute routes', () => {
+        setupQueries({selectedProjectId: 5});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
+
+        const templateItems = screen
+            .getAllByRole('menuitem')
+            .filter((menuItem) => /From Template/.test(menuItem.textContent ?? ''));
+
+        expect(templateItems).toHaveLength(2);
+
+        fireEvent.click(templateItems[0]);
+
+        expect(mockNavigate).toHaveBeenCalledWith('/automation/projects/templates');
+
+        fireEvent.click(templateItems[1]);
+
+        expect(mockNavigate).toHaveBeenCalledWith('/automation/projects/5/templates');
     });
 
     it('updates selectedProjectId when projectId prop changes', async () => {
