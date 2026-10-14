@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDT
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -27,6 +28,8 @@ public interface AutomationWorkflowProjectFacade {
     String duplicateProjectWorkflow(String workflowUuid);
 
     long duplicateProject(long projectId);
+
+    Optional<Long> fetchProjectIdByName(String name);
 
     List<AutomationWorkflowProjectVersionDTO> getProjectVersions(long projectId);
 

@@ -11,10 +11,14 @@ import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import org.springframework.cache.CacheManager;
 
 /**
@@ -24,13 +28,19 @@ import org.springframework.cache.CacheManager;
  */
 public class ProjectHandlerLoader {
 
+    /**
+     * <b>Security Note:</b> Path traversal is intentional. The URL is derived from internal code workflow container
+     * configuration, not from untrusted user input.
+     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public static ProjectHandler loadProjectHandler(
         URL url, Language language, String cacheKey, CacheManager cacheManager) {
 
         try {
             return switch (language) {
                 case JAVA -> loadJavaProjectHandler(url, cacheKey, cacheManager);
-                case JAVASCRIPT, PYTHON, RUBY -> loadPolyglotProjectHandler(url, language);
+                case JAVASCRIPT, PYTHON, RUBY -> ProjectHandlerPolyglotEngine.load(
+                    getLanguageId(language), Files.readString(toLocalPath(url)));
             };
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -47,24 +57,31 @@ public class ProjectHandlerLoader {
         }
     }
 
-    /**
-     * <b>Security Note:</b> Path traversal is intentional. The URL is derived from internal code workflow container
-     * configuration, not from untrusted user input.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
-    private static ProjectHandler loadPolyglotProjectHandler(URL url, Language language)
-        throws URISyntaxException, IOException {
-
-        return ProjectHandlerPolyglotEngine.load(getLanguageId(language), Files.readString(Paths.get(url.toURI())));
-    }
-
     private static String getLanguageId(Language language) {
         return switch (language) {
-//            case JAVA -> "java";
             case JAVASCRIPT -> "js";
             case PYTHON -> "python";
             case RUBY -> "ruby";
             default -> throw new IllegalArgumentException("Unsupported language: " + language);
         };
+    }
+
+    @SuppressFBWarnings({
+        "PATH_TRAVERSAL_IN", "URLCONNECTION_SSRF_FD"
+    })
+    private static Path toLocalPath(URL url) throws IOException, URISyntaxException {
+        URI uri = url.toURI();
+
+        if ("file".equals(uri.getScheme())) {
+            return Paths.get(uri);
+        }
+
+        Path tempFile = Files.createTempFile("code_workflow", null);
+
+        try (InputStream inputStream = url.openStream()) {
+            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return tempFile;
     }
 }

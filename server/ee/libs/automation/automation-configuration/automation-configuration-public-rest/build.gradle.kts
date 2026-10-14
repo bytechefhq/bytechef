@@ -7,6 +7,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     configOptions.set(
         mapOf(
             "interfaceOnly" to "true",
+            "useEnumCaseInsensitive" to "true",
             "useSpringBoot3" to "true",
             "useTags" to "true"
         )
@@ -41,6 +42,7 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.org.mapstruct)
     implementation(libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations)
+    implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")

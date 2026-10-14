@@ -47,7 +47,7 @@ public class CodeWorkflowContainerServiceImpl implements CodeWorkflowContainerSe
     }
 
     @Override
-    public CodeWorkflowContainer getCodeWorkflowContainer(long id) {
+    public CodeWorkflowContainer getCodeWorkflowContainer(Long id) {
         return codeWorkflowContainerRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("CodeWorkflowContainer not found"));
     }
@@ -58,4 +58,11 @@ public class CodeWorkflowContainerServiceImpl implements CodeWorkflowContainerSe
             .orElseThrow(() -> new IllegalArgumentException("CodeWorkflowContainer not found"));
     }
 
+    @Override
+    public CodeWorkflowContainer update(CodeWorkflowContainer codeWorkflowContainer) {
+        Assert.notNull(codeWorkflowContainer, "'codeWorkflow' must not be null");
+        Assert.notNull(codeWorkflowContainer.getId(), "'id' must not be null");
+
+        return codeWorkflowContainerRepository.save(codeWorkflowContainer);
+    }
 }

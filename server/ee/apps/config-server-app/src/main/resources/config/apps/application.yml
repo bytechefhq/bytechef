@@ -331,6 +331,8 @@ bytechef:
       # Concurrent executions in the synchronous, interactive lane (API Platform sync path, editor Test button)
       sync-concurrency-limit: 5
   workflow:
+    code-workflow:
+      java-enabled: true
     output-storage:
       # Output storage provider for workflow output data (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
       provider: JDBC

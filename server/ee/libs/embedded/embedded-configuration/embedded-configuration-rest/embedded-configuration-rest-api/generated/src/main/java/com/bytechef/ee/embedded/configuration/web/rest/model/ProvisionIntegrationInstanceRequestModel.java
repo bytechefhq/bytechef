@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProvisionIntegrationInstanceRequest", description = "The request to provision an integration instance.")
 @JsonTypeName("ProvisionIntegrationInstanceRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T19:46:00.733909+02:00[Europe/Zagreb]", comments = "Generator version: 7.25.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T23:11:44.401718+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ProvisionIntegrationInstanceRequestModel {
 
   private Long integrationInstanceConfigurationId;
@@ -115,7 +115,7 @@ public class ProvisionIntegrationInstanceRequestModel {
    * The workflows to enable on the integration instance.
    * @return workflows
    */
-  @Valid 
+  
   @Schema(name = "workflows", description = "The workflows to enable on the integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflows")
   public List<@Valid ProvisionIntegrationInstanceWorkflowModel> getWorkflows() {

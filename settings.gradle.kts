@@ -562,15 +562,14 @@ include("server:libs:modules:task-dispatchers:terminate")
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
 
-include("sdks:backend:embedded:ai-componentkit")
-include("sdks:backend:embedded:ai-componentkit-spring")
-include("sdks:backend:embedded:integration-api")
+include("sdks:backend:java:automation:project-api")
 include("sdks:backend:java:component-api")
 include("sdks:backend:java:component-test")
 include("sdks:backend:java:definition-api")
+include("sdks:backend:java:embedded:componentkit")
+include("sdks:backend:java:embedded:componentkit-spring")
+include("sdks:backend:java:embedded:integration-api")
 include("sdks:backend:java:workflow-api")
-
-include("sdks:backend:automation:project-api")
 
 // EE
 
@@ -634,6 +633,7 @@ include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-graphql")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-remote-client")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-server")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-service")
+include("server:ee:libs:embedded:embedded-code-workflow-loader")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-api")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-graphql")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl")

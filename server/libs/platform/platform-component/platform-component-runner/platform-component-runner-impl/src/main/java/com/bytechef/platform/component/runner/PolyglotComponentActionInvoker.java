@@ -86,7 +86,7 @@ class PolyglotComponentActionInvoker implements ComponentActionInvoker {
 
         return actionDefinitionService.executePerformForPolyglot(
             componentDefinition.getName(), componentDefinition.getVersion(), actionName, (Map) input,
-            componentConnection, jobContextAware.getEnvironmentId(), newActionContext);
+            componentConnection, componentConnections, Map.of(), jobContextAware.getEnvironmentId(), newActionContext);
     }
 
     private Map.Entry<String, ComponentConnection> getComponentConnectionEntry(String connectionName) {
