@@ -301,6 +301,12 @@ bytechef:
   scheduler:
     # Trigger scheduler provider (AWS(EE) | QUARTZ) default: QUARTZ
     provider: QUARTZ
+  script:
+    # Task runner allowlist. A runner absent from this map is disabled, which is the intended default for the
+    # out-of-process runners but not for GraalVM, the in-process runner every script action falls back to.
+    runners:
+      graalvm:
+        enabled: true
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; script-src: https://*.command.ai; frame-src: https://*.command.ai; img-src: https://*.command.ai; media-src: https://*.command.ai; connect-src: https://*.command.ai; style-src: https://*.command.ai;"
   sign-up:

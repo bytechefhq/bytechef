@@ -65,3 +65,19 @@ function perform(input, context) {
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
 <iframe src="https://www.guidejar.com/embed/6ec7275a-fbd9-4bd9-b97b-1c1a460acd9a?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0">
 </iframe></div>
+
+
+### Task Runners
+
+Each action runs in the environment selected by its **Task Runner** property. The runners available in a given deployment depend on what the operator has enabled with `bytechef.script.runners.<type>.enabled`, so this list may be shorter in your installation.
+
+| Runner | Type | What it does |
+| --- | --- | --- |
+| GraalVM | `graalvm` | Runs the script inside the server process, in a GraalVM polyglot context. The only runner where `context.component.*` is available. |
+
+The GraalVM runner has two modes:
+
+- **Strict** (default) — no file system, no environment, no process creation, and CPU and memory ceilings. Use this unless you have a specific reason not to.
+- **Trusted** — every restriction lifted. The script runs inside the server process with full reflection, so it can reach anything the server can, including other tenants' data. Enable it only on a single-tenant deployment you control, with `bytechef.script.runners.graalvm.properties.trusted-enabled=true`. Until an operator sets that flag the Trusted option is not offered at all.
+
+Workflow data reaches a script through the **Input** property, not by interpolating expressions into the source.

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.engine;
+package com.bytechef.platform.component.runner;
 
-import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.component.definition.Parameters;
@@ -26,9 +25,12 @@ import com.bytechef.platform.component.polyglot.ComponentActionInvoker;
 import com.bytechef.platform.component.polyglot.ContextProxyObject;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotValues;
+import com.bytechef.platform.component.polyglot.ScriptSandboxMode;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.graalvm.polyglot.Value;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +41,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PolyglotEngine {
 
+    private static final String INPUT = "input";
+
     private final ApplicationContext applicationContext;
 
     public PolyglotEngine(ApplicationContext applicationContext) {
@@ -46,10 +50,10 @@ public class PolyglotEngine {
     }
 
     public Object execute(
-        String languageId, Parameters inputParameters, Map<String, ComponentConnection> componentConnections,
-        JobContextAware jobContextAware) {
+        ScriptSandboxMode mode, @Nullable Duration timeout, String languageId, Parameters inputParameters,
+        Map<String, ComponentConnection> componentConnections, JobContextAware jobContextAware) {
 
-        return PolyglotSandbox.call(languageId, polyglotContext -> {
+        return PolyglotSandbox.call(mode, languageId, timeout, polyglotContext -> {
             polyglotContext.eval(languageId, inputParameters.getString(SCRIPT, switch (languageId) {
                 case "java" ->
                     "public static Object perform(Map<String, ?> input, Context context) {\n\treturn null;\n}";
@@ -62,8 +66,8 @@ public class PolyglotEngine {
             Map<String, Object> inputMap = removeNotEvaluatedEntries(
                 inputParameters.getMap(INPUT, Object.class, Map.of()));
 
-            ScriptComponentCatalog componentCatalog = new ScriptComponentCatalog(applicationContext);
-            ComponentActionInvoker componentActionInvoker = new ScriptComponentActionInvoker(
+            PolyglotComponentCatalog componentCatalog = new PolyglotComponentCatalog(applicationContext);
+            ComponentActionInvoker componentActionInvoker = new PolyglotComponentActionInvoker(
                 applicationContext, componentConnections, jobContextAware, componentCatalog);
 
             ContextProxyObject contextProxyObject = new ContextProxyObject(
