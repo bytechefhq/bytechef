@@ -55,7 +55,13 @@ vi.mock('@/ee/pages/embedded/integrations/components/IntegrationDialog', () => (
 }));
 
 vi.mock('@/shared/components/workflow/WorkflowDialog', () => ({
-    default: ({parentId}: {parentId: number}) => <div role="dialog">WorkflowDialog:{parentId}</div>,
+    default: ({onClose, parentId}: {onClose: () => void; parentId: number}) => (
+        <div role="dialog">
+            <span>WorkflowDialog:{parentId}</span>
+
+            <button onClick={onClose}>Close dialog</button>
+        </div>
+    ),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/workflows.queries', () => ({
@@ -197,6 +203,10 @@ describe('IntegrationsLeftSidebar', () => {
 
         expect(await screen.findByRole('dialog')).toHaveTextContent('WorkflowDialog:9');
         expect(hoisted.createIntegrationWorkflow).toHaveBeenCalledWith(expect.objectContaining({integrationId: 9}));
+
+        fireEvent.click(screen.getByText('Close dialog'));
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('follows the integrationId prop when it changes', async () => {
