@@ -6,8 +6,10 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation(libs.com.github.docker.java.docker.java.core)
     implementation(libs.com.github.docker.java.docker.java.transport.httpclient5)
+    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-polyglot"))
 
     testImplementation("ch.qos.logback:logback-classic")

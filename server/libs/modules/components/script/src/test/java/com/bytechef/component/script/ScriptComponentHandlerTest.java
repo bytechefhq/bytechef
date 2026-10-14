@@ -17,6 +17,8 @@
 package com.bytechef.component.script;
 
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.CPU;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.CREDENTIALS;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.DELETE;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.DOCKER;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.ENTRYPOINT;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.ENV;
@@ -24,15 +26,20 @@ import static com.bytechef.platform.component.runner.TaskRunnerConstants.EXTRA_H
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.GRAALVM;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.IMAGE;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.INPUT_FILES;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.KILL_GRACE_PERIOD;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.MEMORY;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.NETWORK_MODE;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.OUTPUT_FILES;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.PRIVILEGED;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.PROCESS;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.PULL_POLICY;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.RESUME;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.TASK_RUNNER;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.TIMEOUT;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.TYPE;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.USER;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.WAIT_UNTIL_COMPLETION;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.WAIT_UNTIL_RUNNING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.definition.ActionDefinition;
@@ -45,7 +52,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.runner.GraalVmTaskRunner;
 import com.bytechef.platform.component.runner.TaskRunnerRegistry;
 import com.bytechef.platform.component.runner.TaskRunnerRegistryImpl;
-import com.bytechef.platform.component.runner.external.DockerTaskRunner;
+import com.bytechef.platform.component.runner.external.DockerTaskRunnerBackend;
 import com.bytechef.platform.component.runner.external.ProcessTaskRunner;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.HashMap;
@@ -121,7 +128,8 @@ public class ScriptComponentHandlerTest {
                     .orElseThrow());
 
             assertThat(displayConditions).containsKeys(
-                CPU, ENTRYPOINT, EXTRA_HOSTS, IMAGE, MEMORY, NETWORK_MODE, PULL_POLICY, USER);
+                CPU, ENTRYPOINT, EXTRA_HOSTS, IMAGE, MEMORY, NETWORK_MODE, PULL_POLICY, USER, PRIVILEGED, CREDENTIALS,
+                KILL_GRACE_PERIOD, RESUME, DELETE, WAIT_UNTIL_RUNNING, WAIT_UNTIL_COMPLETION);
         }
     }
 
@@ -215,9 +223,7 @@ public class ScriptComponentHandlerTest {
         script.setRunners(runners);
 
         return new TaskRunnerRegistryImpl(
-            List.of(
-                new DockerTaskRunner(applicationProperties), new GraalVmTaskRunner(null, applicationProperties),
-                new ProcessTaskRunner(applicationProperties)),
-            applicationProperties);
+            List.of(new GraalVmTaskRunner(null, applicationProperties), new ProcessTaskRunner()),
+            List.of(new DockerTaskRunnerBackend()), applicationProperties);
     }
 }

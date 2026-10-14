@@ -52,21 +52,16 @@ bytechef:
           trusted-enabled: false
       process:
         enabled: false
-        properties:
-          inherit-environment-enabled: false
       docker:
         enabled: false
         properties:
           host: ""
-          allowed-images: ""
-          allowed-network-modes: ""
-          allow-host-network: false
+          allow-task-host: false
           allow-volume-mounts: false
-          default-cpu: 1
-          max-cpu: 4
-          default-memory: 512m
-          max-memory: 2g
-          pids-limit: 512
+    runner-limits:
+      max-wait: PT1H
+      max-log-bytes: 1MB
+      max-transfer-bytes: 512MB
 ```
 
 Only `graalvm` is enabled by the shipped configuration; `process` and `docker` need their own `enabled: true` before
@@ -75,21 +70,20 @@ anything else under them takes effect. What each key costs to turn on:
 - `graalvm.trusted-enabled`: lets a workflow's `script` task ask for `mode: trusted`, which drops GraalVM's guest
   sandbox entirely and grants the guest context full host access (`HostAccess.ALL`) with no resource ceilings - the
   same access the server process itself has. Off by default for that reason.
-- `process.inherit-environment-enabled`: hands the server process's own environment - including datasource passwords
-  and any cloud credentials it holds - to the child process, instead of the cleared environment `process` normally
-  builds from nothing.
+- `process.enabled`: any workflow author can run arbitrary commands on the ByteChef host as the server's user - with
+  that user's files, credentials and network reach. Leave it off unless every workflow author is trusted with the host.
+- `docker.enabled`: any workflow author can choose any image, `user`, `privileged: true` and `networkMode: host` -
+  effectively root on the daemon's host. Turn it on only where workflow authors are trusted with that host.
 - `docker.host`: points the runner at a remote Docker daemon instead of the local socket. Whoever controls that
   daemon controls every container this runner starts, so this is only as safe as the daemon it names.
-- `docker.allowed-images` / `docker.allowed-network-modes`: fail-closed allowlists - see below.
-- `docker.allow-host-network`: lets a workflow's `networkMode: host` request succeed, putting the container on the
-  host's own network stack instead of an isolated one.
-- `docker.allow-volume-mounts`: accepted but read by nothing in this version - see "There is no `volumes` property"
-  below.
-- `docker.default-cpu` / `docker.max-cpu` / `docker.default-memory` / `docker.max-memory` / `docker.pids-limit`: the
-  container's resource ceilings - see below. Raising `max-cpu` or `max-memory` widens what a workflow may ask for; a
-  request above the maximum is *refused*, not silently reduced to it, so an operator upgrading from a version that
-  read none of these keys should expect workflows that previously ran with no ceiling at all to start failing once
-  they ask for more than the new default `max-cpu` (`4`) or `max-memory` (`2g`) allows.
+- `docker.allow-task-host`: lets a workflow name its own Docker API through the runner's `host` property; whoever
+  controls that daemon controls every container it starts, so leave it off unless workflow authors are trusted with the
+  daemons they can reach.
+- `docker.allow-volume-mounts`: offers the runner's `volumes` property; a host bind mount chosen by a workflow author is
+  a container escape.
+- `runner-limits`: ceilings on what a remote execution may cost this server: the longest a worker waits on one job, the
+  most log bytes it keeps, and the most bytes it moves in or out; any runner may override them under its own
+  `properties`.
 
 **The published property list below is configuration-dependent, and this page's is not necessarily yours.** The
 `taskRunner` property's schema on this reference page - the JSON-derived `{type, interpreter}` shown in the
@@ -121,13 +115,22 @@ Its own properties:
 | Property | What it does |
 | --- | --- |
 | `image` | The container image the task runs in. Optional - see the defaults below. |
-| `pullPolicy` | `ALWAYS`, `IF_NOT_PRESENT` (default) or `NEVER`. |
 | `entrypoint` | Replaces the interpreter the source file is handed to. The source file is appended either way. |
 | `user` | The user the container runs as, as a name or a numeric `uid[:gid]`. |
-| `cpu` | How many CPUs the container may use, as a decimal fraction of one CPU. Defaults to the operator's allowance; a request above the operator's maximum is refused. |
-| `memory` | How much memory the container may use, in bytes or with a `b`, `k`, `m` or `g` suffix. Defaults to the operator's allowance; a request above the operator's maximum is refused. |
-| `networkMode` | One of the modes the operator allows - `bridge` or `none` by default, `host` only where an operator has enabled it. Nothing else is accepted - not a named Docker network, not `container:<id>`. Left blank, it resolves to the first mode the operator allows. |
+| `cpu` | How many CPUs the container may use, as a decimal fraction of one CPU. |
+| `memory` | How much memory the container may use, in bytes or with a `b`, `k`, `m` or `g` suffix. |
+| `networkMode` | `bridge`, `none`, `host` or a named network; left blank the daemon's default applies. |
 | `extraHosts` | Additional entries for the container's hosts file, each written as `host:ip`. |
+| `privileged` | Gives the container every capability of the daemon's host. |
+| `credentials` | `registry`, `username`, `password`, `registryToken` for a private registry. |
+| `killGracePeriod` | How long a still-running container is given to stop on its own when it is killed - on a timeout or a non-resumable shutdown - before it is forced, as an ISO-8601 duration. Zero (the default) forces it at once. |
+| `host` | The Docker API this task talks to; only when the operator set `allow-task-host`. |
+| `volumes` | Bind mounts; only when the operator set `allow-volume-mounts`; each entry `host-path:container-path[:ro]`. |
+| `pullPolicy` | When the image is pulled from its registry: `ALWAYS`, `IF_NOT_PRESENT` (default) or `NEVER`. |
+| `resume` | After a server restart, re-attach to the job this task execution already started instead of starting another one. Defaults to `true`. |
+| `delete` | Remove the job and whatever it left behind once it has finished. Turn it off to inspect a failed job by hand. Defaults to `true`. |
+| `waitUntilRunning` | How long the job may take to be scheduled, pull its image and start, as an ISO-8601 duration. Defaults to `PT10M`. |
+| `waitUntilCompletion` | How long the job may run before it is killed, as an ISO-8601 duration. The task's Timeout, when set, takes precedence; both are capped by the operator's `max-wait`. Defaults to `PT1H`. |
 
 Each action runs in a default image when `image` is left blank:
 
@@ -137,25 +140,6 @@ Each action runs in a default image when `image` is left blank:
 | Python | `python:3.12-slim` |
 | Node | `node:22-alpine` |
 
-**The image allowlist is fail-closed, and an empty allowlist runs nothing.** An operator lists the images that may be
-run, as a comma-separated string:
-
-```yaml
-bytechef:
-  script:
-    runners:
-      docker:
-        enabled: true
-        properties:
-          allowed-images: python:3.12-slim,node:22-alpine,ubuntu:24.04
-```
-
-Matching is exact string equality - no prefixes, no wildcards, no registry normalisation, so `python:3.12` is not
-`python:3.12-slim` and two tags means two entries. Until at least one image is listed, *every* image is refused,
-including the per-action defaults above: a default saves you from typing an image, it never gets you past the
-allowlist. The image select in the editor offers exactly the allowed images, but the check that matters happens when
-the task runs, so a hand-edited workflow naming an unlisted image is refused there too.
-
 **`HOME` is the working directory under both runners.** Several interpreters write caches relative to it and fall
 over when it is unset, so the Process runner re-seeds it and the Docker runner sets it to the container's working
 directory rather than leaving it to the image - where it would be `/root`, or `/` for a numeric `user` that appears in
@@ -163,51 +147,22 @@ no `/etc/passwd`. Without that, `pip install --user` under `user: "1000:1000"` s
 fails on the Docker runner with a permission error, for a reason that has nothing to do with the execution
 environment. A declared `env` entry named `HOME` still wins.
 
-**Every container is bounded, whether or not the workflow asked to be.** A PID ceiling, a CPU allowance and a memory
-allowance go on every container. The workflow's own `cpu` and `memory` are used where it names them, the operator's
-defaults where it does not, and a request above the operator's maximum is *refused* rather than quietly cut down - the
-same answer the image allowlist gives an image it does not hold, and for the same reason: an execution silently given a
-quarter of what it asked for fails much later as a timeout, in a message that names nothing. The PID ceiling has no
-workflow-facing property at all, because a fork bomb is a one-line `shell` action and a limit an attacker opts into is
-not a limit.
+**Resource limits are the workflow's own choice.** `cpu` and `memory` are applied exactly as written and nothing is
+applied when they are blank. The operator's only ceilings are the `runner-limits` above, which bound what the *server*
+spends on a job, not what the container may use.
 
-| Operator key | Default | What it does |
-| --- | --- | --- |
-| `default-cpu` | `1` | The CPU allowance a container gets when its workflow names none. |
-| `max-cpu` | `4` | The largest CPU allowance a workflow may ask for. |
-| `default-memory` | `512m` | The memory allowance a container gets when its workflow names none. |
-| `max-memory` | `2g` | The largest memory allowance a workflow may ask for. |
-| `pids-limit` | `512` | The number of processes one container may hold open. Operator-only; zero or below is refused rather than read as "unlimited". |
+**A restart does not lose a running container.** Every container carries an `io.bytechef.managed-by=bytechef` label and
+an `io.bytechef.task-execution-id` label whose value combines the tenant, the job and the task execution
+(`<tenant>-<job>-<task execution>`), so executions of different tenants never share a key. When a task execution is
+redelivered - after a server restart, say - the runner finds the container that execution already started and waits
+for it instead of starting another (`resume`). With `delete: false` the finished container is kept, so a failed run can
+be inspected by hand.
 
-A malformed ceiling refuses every execution with a message naming its key, rather than quietly becoming unlimited.
-
-**An operator chooses which networks a container may reach.** `allowed-network-modes` takes the same shape as
-`allowed-images` - a comma-separated string matched by exact equality - and defaults to every mode the runner knows, so
-nothing changes for a deployment that never sets it. Because `allow-host-network` is off by default, the *effective*
-default is `bridge` and `none`; `host` still needs its own flag on top of appearing in this list.
-
-```yaml
-bytechef:
-  script:
-    runners:
-      docker:
-        enabled: true
-        properties:
-          allowed-images: python:3.12-slim,node:22-alpine,ubuntu:24.04
-          allowed-network-modes: none
-```
-
-That configuration is the isolated one: no container reaches anything, including a workflow that left `networkMode`
-blank. A blank `networkMode` resolves to the first mode the operator allows rather than being left to the daemon,
-which answers `bridge` - so before this key existed, an operator could not turn container networking off for the
-workflows that simply did not fill the field in.
-
-**There is no `volumes` property.** A host bind mount chosen by a workflow author is a container escape - `/` mounted
-read-write is the whole host - so this version offers no way to ask for one, and none is put on the container by any
-other route. Files cross the boundary as archives instead: `inputFiles` are copied into the container before it
-starts, and the output directory is copied back out after it exits. That also works unchanged when ByteChef itself
-runs in a container talking to a mounted Docker socket, where a host path a bind mount named would mean nothing to the
-daemon.
+Re-attaching only happens when something redelivers the task, which takes a durable message broker. With the default
+in-memory broker nothing is redelivered after a restart, so a graceful shutdown with `resume` on leaves the container
+behind: keep `delete` on, and remove leftovers by hand with
+`docker rm -f $(docker ps -aq --filter label=io.bytechef.managed-by=bytechef)`. The key is unique within one ByteChef
+installation only, so two installations should not share one Docker daemon while `resume` is on.
 
 ## Workflow data reaches commands through `env`, not `${…}`
 

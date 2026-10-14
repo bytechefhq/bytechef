@@ -103,7 +103,7 @@ class ScriptExternalRunnerPropertiesTest {
         script.setRunners(runners);
 
         return new TaskRunnerRegistryImpl(
-            List.of(new GraalVmTaskRunner(null, applicationProperties), new ProcessTaskRunner(applicationProperties)),
-            applicationProperties);
+            List.of(new GraalVmTaskRunner(null, applicationProperties), new ProcessTaskRunner()),
+            List.of(), applicationProperties);
     }
 }
