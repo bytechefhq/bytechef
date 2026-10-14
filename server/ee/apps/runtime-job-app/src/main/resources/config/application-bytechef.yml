@@ -121,6 +121,9 @@ bytechef:
     runners:
       graalvm:
         enabled: true
+    # Gives script and commands tasks on the process, docker, kubernetes and aws-batch runners the parameters of the
+    # connections they declare, in the JSON file BYTECHEF_CONNECTIONS_FILE names, masked in the captured output.
+    inject-connections: true
   # Tenant support mode (SINGLE | MULTI - EE only) default: SINGLE
   tenant:
     mode: SINGLE
