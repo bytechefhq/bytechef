@@ -87,7 +87,7 @@ public class RemoteTaskRunner implements TaskRunner {
             .toString());
     }
 
-    RemoteTaskRunner(
+    public RemoteTaskRunner(
         RemoteTaskRunnerBackend backend, ApplicationProperties applicationProperties,
         Supplier<String> randomKeySupplier) {
 

@@ -26,21 +26,22 @@ properties - the Process runner's `interpreter` override, or the Docker runner's
 ## Task runners
 
 Commands only offers runners that declare the **Commands** capability - that excludes GraalVM entirely, since
-GraalVM's in-process component bridge cannot run a list of shell commands. Two built-in runners declare it:
+GraalVM's in-process component bridge cannot run a list of shell commands. Three built-in runners declare it:
 
 | Runner | Type | What it does |
 | --- | --- | --- |
 | Process | `process` | Runs the commands in a child process on the same host, with the server's own environment cleared. |
 | Docker | `docker` | Runs the commands in a single-use container, on the local daemon or on whichever daemon the operator's `host` names. |
+| Kubernetes | `kubernetes` | Enterprise. Runs the commands as a pod on the cluster the task's **Kubernetes** connection names. |
 
-Both are **off** until an operator turns them on with `bytechef.script.runners.<type>.enabled=true` - the shipped
+All three are **off** until an operator turns them on with `bytechef.script.runners.<type>.enabled=true` - the shipped
 configuration enables only `graalvm`, which Commands never offers. So this list is what your installation *may* have,
 not what it has; it may also include a runner contributed by another module. If no runner declaring the Commands
 capability is enabled at all, running any of these actions fails with a message naming the configuration key to set.
 
 ### Operator configuration
 
-Every key these three runners read, together, with its default:
+Every key these runners read, together, with its default:
 
 ```yaml
 bytechef:
@@ -58,13 +59,15 @@ bytechef:
           host: ""
           allow-task-host: false
           allow-volume-mounts: false
+      kubernetes:
+        enabled: false
     runner-limits:
       max-wait: PT1H
       max-log-bytes: 1MB
       max-transfer-bytes: 512MB
 ```
 
-Only `graalvm` is enabled by the shipped configuration; `process` and `docker` need their own `enabled: true` before
+Only `graalvm` is enabled by the shipped configuration; `process`, `docker` and `kubernetes` need their own `enabled: true` before
 anything else under them takes effect. What each key costs to turn on:
 
 - `graalvm.trusted-enabled`: lets a workflow's `script` task ask for `mode: trusted`, which drops GraalVM's guest
@@ -74,6 +77,7 @@ anything else under them takes effect. What each key costs to turn on:
   that user's files, credentials and network reach. Leave it off unless every workflow author is trusted with the host.
 - `docker.enabled`: any workflow author can choose any image, `user`, `privileged: true` and `networkMode: host` -
   effectively root on the daemon's host. Turn it on only where workflow authors are trusted with that host.
+- `kubernetes.enabled`: any workflow author with a Kubernetes connection can run any image on that connection's cluster, within what the connection's credentials allow. Authors choose the pod's `namespace` and `serviceAccountName`, so the pod can run in any namespace the connection can create pods in, as any service account there. ByteChef adds no limits of its own beyond `runner-limits`; give the connection a dedicated namespace and enforce Pod Security Admission (for example the `restricted` level) on it.
 - `docker.host`: points the runner at a remote Docker daemon instead of the local socket. Whoever controls that
   daemon controls every container this runner starts, so this is only as safe as the daemon it names.
 - `docker.allow-task-host`: lets a workflow name its own Docker API through the runner's `host` property; whoever
@@ -163,6 +167,93 @@ in-memory broker nothing is redelivered after a restart, so a graceful shutdown 
 behind: keep `delete` on, and remove leftovers by hand with
 `docker rm -f $(docker ps -aq --filter label=io.bytechef.managed-by=bytechef)`. The key is unique within one ByteChef
 installation only, so two installations should not share one Docker daemon while `resume` is on.
+
+### The Kubernetes runner (Enterprise)
+
+The Kubernetes runner is the Docker runner's sibling for clusters: the same `env`, `inputFiles`, `outputFiles` and
+`timeout` handling and the same five-key result, but the task runs as a single-use pod on the cluster that the task's
+**Kubernetes** connection names. It is available with `bytechef.edition=ee` and `bytechef.script.runners.kubernetes.enabled=true`.
+
+**What it needs.** A `kubernetes` connection with the API server URL, an optional CA certificate (PEM or base64 PEM), a
+bearer token or a client certificate and key, a default namespace, and "Skip TLS Verification" for test clusters only.
+Client keys may be RSA or EC in PEM `BEGIN EC PRIVATE KEY` form; an EC key in PKCS#8 form (`BEGIN PRIVATE KEY`) is read
+as RSA and does not work. The task's image must provide `/bin/sh`.
+
+Its own properties:
+
+| Property | What it does |
+| --- | --- |
+| `image` | The container image the task runs in. Optional - the defaults are the Docker runner's. |
+| `entrypoint` | Replaces the interpreter the source file is handed to. The source file is appended either way. |
+| `namespace` | The namespace the pod runs in; defaults to the connection's namespace. |
+| `serviceAccountName` | The service account the pod runs as. Without one, no service account token is mounted into the pod. |
+| `resources` | `cpuRequest`, `cpuLimit`, `memoryRequest`, `memoryLimit`, each a Kubernetes quantity such as `500m` or `256Mi`. |
+| `nodeSelector` | Node labels the pod must match. |
+| `tolerations` | Taints the pod tolerates. |
+| `labels` | Additional labels for the pod. |
+| `annotations` | Additional annotations for the pod. Keys under `bytechef.io/` are reserved. |
+| `credentials` | `registry`, `username`, `password` for a private registry. Becomes a temporary image pull secret that is owned by the pod, so it is removed with the pod. |
+| `fileSidecarImage` | The image of the file sidecar containers. Defaults to `busybox:1.36`; it needs `sh`, `head`, `tar`, `test`, `sleep` and `touch`. |
+| `killGracePeriod` | How long a still-running pod is given to stop on its own when it is killed - on a timeout or a non-resumable shutdown - before it is forced, as an ISO-8601 duration. A finished pod is deleted at once. |
+| `pullPolicy` | When the image is pulled from its registry: `ALWAYS`, `IF_NOT_PRESENT` (default) or `NEVER`. |
+| `resume` | After a server restart, re-attach to the pod this task execution already started instead of starting another one. Defaults to `true`. |
+| `delete` | Remove the pod and its pull secret once it has finished. Turn it off to inspect a failed pod by hand. Defaults to `true`. |
+| `waitUntilRunning` | How long the pod may take to be scheduled, pull its images and start, as an ISO-8601 duration. Defaults to `PT10M`. |
+| `waitUntilCompletion` | How long the pod may run before it is killed, as an ISO-8601 duration. The task's Timeout, when set, takes precedence; both are capped by the operator's `max-wait`. Defaults to `PT1H`. |
+
+**How a run works.**
+
+- The pod has three containers sharing an `emptyDir` sized at twice `max-transfer-bytes`. The file sidecar (an init
+  container) receives the inputs, `main` runs the task with stderr redirected to `.stderr`, and the output sidecar hands
+  back `output/` and `.stderr` before the pod completes. Inputs are sent as one archive that the file sidecar unpacks
+  with `sh -c "head -c <size> | tar -xf - -C /bytechef/work"` over `pods/exec`, because the exec protocol cannot signal
+  the end of its input.
+- `activeDeadlineSeconds` is the completion budget plus one minute, so a pod whose ByteChef worker died still stops.
+- Image pull and configuration errors fail within seconds.
+- A pod that cannot be scheduled fails after `waitUntilRunning` with the cluster's scheduling message.
+- `OOMKilled` and evictions are named in the failure.
+
+**Resume.**
+
+- Pods carry `bytechef.io/managed-by=bytechef` and `bytechef.io/task-execution-id` (the tenant-job-task key, or a `k-`
+  SHA-256 prefix when it does not fit a label value). The full key is in the annotation `bytechef.io/key`.
+- A redelivered task re-attaches to a pod whose inputs were delivered and whose outputs were not yet collected. Any
+  other match is deleted and the task resubmitted.
+- The same durable-broker caveat as Docker applies. Clean up leftovers with
+  `kubectl delete pod -l bytechef.io/managed-by=bytechef` and
+  `kubectl delete secret -l bytechef.io/managed-by=bytechef`.
+- The key is unique within one ByteChef installation only, so two installations must not share one namespace while
+  `resume` is on.
+
+**RBAC.** The connection's identity needs a Role like this one:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bytechef-task-runner
+  namespace: <namespace>
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["create", "get", "list", "watch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create", "get"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["list"]
+```
+
+Secrets are only needed when tasks use `credentials`; `patch` ties each pull secret to its pod through an owner
+reference, so the cluster removes the secret with the pod even when ByteChef cannot. Without `events`, scheduling failures are reported without the
+cluster's message.
 
 ## Workflow data reaches commands through `env`, not `${…}`
 
