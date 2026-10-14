@@ -11,7 +11,7 @@ import {
 import {Label} from '@/components/ui/label';
 import {useUpdateAutomationInputsMutation} from '@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations';
 import {toInputValueText} from '@/ee/pages/embedded/automation-hub/utils/inputValue';
-import {AutomationWorkflowProjectWorkflowInput} from '@/ee/shared/middleware/embedded/public';
+import {AutomationWorkflowProjectWorkflowInput} from '@bytechef/embedded-api';
 import {useState} from 'react';
 
 const INPUT_TYPE_ATTRIBUTES: Record<string, string> = {
