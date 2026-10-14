@@ -20,4 +20,12 @@ package com.bytechef.workflow.definition;
  * @author Ivica Cardic
  */
 public interface Input {
+
+    String getLabel();
+
+    String getName();
+
+    boolean isRequired();
+
+    String getType();
 }

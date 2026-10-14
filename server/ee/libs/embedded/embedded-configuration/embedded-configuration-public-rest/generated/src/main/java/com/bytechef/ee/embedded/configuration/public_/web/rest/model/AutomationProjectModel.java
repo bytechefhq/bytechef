@@ -6,6 +6,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationP
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +39,43 @@ public class AutomationProjectModel {
   private @Nullable Boolean automationHubVisible;
 
   private List<@Valid AutomationProjectWorkflowTemplateModel> workflowTemplates = new ArrayList<>();
+
+  /**
+   * Whether copying this project's templates creates a per-user copy or a shared reference.
+   */
+  public enum KindEnum {
+    COPY("COPY"),
+    
+    REFERENCE("REFERENCE");
+
+    private final String value;
+
+    KindEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static KindEnum fromValue(String value) {
+      for (KindEnum b : KindEnum.values()) {
+        if (b.value.equalsIgnoreCase(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable KindEnum kind;
 
   public AutomationProjectModel id(@Nullable Long id) {
     this.id = id;
@@ -152,6 +190,27 @@ public class AutomationProjectModel {
     this.workflowTemplates = workflowTemplates;
   }
 
+  public AutomationProjectModel kind(@Nullable KindEnum kind) {
+    this.kind = kind;
+    return this;
+  }
+
+  /**
+   * Whether copying this project's templates creates a per-user copy or a shared reference.
+   * @return kind
+   */
+  
+  @Schema(name = "kind", description = "Whether copying this project's templates creates a per-user copy or a shared reference.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("kind")
+  public @Nullable KindEnum getKind() {
+    return kind;
+  }
+
+  @JsonProperty("kind")
+  public void setKind(@Nullable KindEnum kind) {
+    this.kind = kind;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -165,12 +224,13 @@ public class AutomationProjectModel {
         Objects.equals(this.name, automationProject.name) &&
         Objects.equals(this.description, automationProject.description) &&
         Objects.equals(this.automationHubVisible, automationProject.automationHubVisible) &&
-        Objects.equals(this.workflowTemplates, automationProject.workflowTemplates);
+        Objects.equals(this.workflowTemplates, automationProject.workflowTemplates) &&
+        Objects.equals(this.kind, automationProject.kind);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, description, automationHubVisible, workflowTemplates);
+    return Objects.hash(id, name, description, automationHubVisible, workflowTemplates, kind);
   }
 
   @Override
@@ -182,6 +242,7 @@ public class AutomationProjectModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    automationHubVisible: ").append(toIndentedString(automationHubVisible)).append("\n");
     sb.append("    workflowTemplates: ").append(toIndentedString(workflowTemplates)).append("\n");
+    sb.append("    kind: ").append(toIndentedString(kind)).append("\n");
     sb.append("}");
     return sb.toString();
   }

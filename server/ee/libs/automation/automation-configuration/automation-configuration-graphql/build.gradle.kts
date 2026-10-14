@@ -5,6 +5,8 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:platform:platform-api"))
 
+    implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
+
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.security:spring-security-core")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")

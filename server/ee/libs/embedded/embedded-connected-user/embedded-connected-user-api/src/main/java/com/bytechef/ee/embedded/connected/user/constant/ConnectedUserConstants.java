@@ -19,8 +19,8 @@ public final class ConnectedUserConstants {
     public static final int MAX_EXTERNAL_ID_LENGTH = 50;
 
     public static final Set<String> FRONTEND_RESERVED_PATH_SEGMENTS = Set.of(
-        "app-events", "automation", "components", "connections", "external",
-        "integration-instances", "integrations", "me", "unified", "workflows");
+        "app-events", "automation", "automation-project-code-workflows", "components", "connections", "external",
+        "integration-code-workflows", "integration-instances", "integrations", "me", "unified", "workflows");
 
     private ConnectedUserConstants() {
     }

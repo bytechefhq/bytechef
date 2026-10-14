@@ -19,6 +19,8 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
+import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.audit.AutomationProjectAuditEvents;
 import com.bytechef.ee.embedded.configuration.audit.WorkflowAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProject;
@@ -32,6 +34,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ProvidedNames;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
@@ -40,6 +43,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
@@ -102,6 +106,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationService integrationService;
+    private final ProjectCodeWorkflowService projectCodeWorkflowService;
     private final ProjectService projectService;
     private final ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
@@ -122,8 +127,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationService integrationService, ProjectService projectService,
-        ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
+        IntegrationService integrationService, ProjectCodeWorkflowService projectCodeWorkflowService,
+        ProjectService projectService, ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
         ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
@@ -139,6 +144,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
+        this.projectCodeWorkflowService = projectCodeWorkflowService;
         this.projectService = projectService;
         this.projectVersionWorkflowChangeService = projectVersionWorkflowChangeService;
         this.projectWorkflowFacade = projectWorkflowFacade;
@@ -250,6 +256,14 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
         Project project = getProjectOfAutomationProject(lastProjectWorkflow.getProjectId());
 
+        if (projectCodeWorkflowService.fetchProjectCodeWorkflow(project.getId())
+            .isPresent()) {
+
+            throw new ConfigurationException(
+                "A workflow of a code project cannot be deleted here; remove it from the source instead",
+                CodeWorkflowErrorType.CODE_PROJECT_WORKFLOW_NOT_DELETABLE);
+        }
+
         projectWorkflowService.fetchProjectWorkflow(project.getId(), project.getLastProjectVersion(), workflowUuid)
             .ifPresent(draftProjectWorkflow -> projectWorkflowFacade.deleteWorkflow(
                 draftProjectWorkflow.getWorkflowId()));
@@ -297,6 +311,13 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     public long duplicateProject(long projectId) {
         Project sourceProject = getProjectOfAutomationProject(projectId);
 
+        if (projectCodeWorkflowService.fetchProjectCodeWorkflow(projectId)
+            .isPresent()) {
+
+            throw new ConfigurationException(
+                "A code project cannot be duplicated", CodeWorkflowErrorType.CODE_PROJECT_NOT_DUPLICABLE);
+        }
+
         Project newProject = new Project();
 
         newProject.setName(sourceProject.getName() + " (Copy)");
@@ -323,6 +344,14 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         }
 
         return newProject.getId();
+    }
+
+    @Override
+    public Optional<Long> fetchProjectIdByName(String name) {
+        return projectService.fetchProject(name, Workspace.DEFAULT_WORKSPACE_ID)
+            .map(Project::getId)
+            .filter(projectId -> automationProjectService.fetchAutomationProject(projectId)
+                .isPresent());
     }
 
     @Override
@@ -381,9 +410,11 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
         List<AutomationProjectConfiguration> configurations =
             automationProjectConfigurationService.getConfigurations(projectId);
+        Set<Long> codeWorkflowProjectIds = Set.copyOf(projectCodeWorkflowService.getCodeWorkflowProjectIds());
 
         return toDTO(
-            project, automationProjectService.getAutomationProject(projectId), configurations.size());
+            project, automationProjectService.getAutomationProject(projectId), codeWorkflowProjectIds,
+            configurations.size());
     }
 
     @Override
@@ -402,11 +433,12 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         Map<Long, AutomationProject> automationProjects = getAutomationProjects();
         Map<Long, Long> configurationCounts =
             getConfigurationCounts(automationProjects.keySet(), environmentId);
+        Set<Long> codeWorkflowProjectIds = Set.copyOf(projectCodeWorkflowService.getCodeWorkflowProjectIds());
 
         return getAutomationProjectProjects(automationProjects.keySet())
             .stream()
             .map(project -> toDTO(
-                project, automationProjects.get(project.getId()),
+                project, automationProjects.get(project.getId()), codeWorkflowProjectIds,
                 Math.toIntExact(configurationCounts.getOrDefault(project.getId(), 0L))))
             .toList();
     }
@@ -415,10 +447,12 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     @SkipAutomationAuthorization
     public List<AutomationProjectDTO> getPublishedProjects() {
         Map<Long, AutomationProject> automationProjects = getAutomationProjects();
+        Set<Long> codeWorkflowProjectIds = Set.copyOf(projectCodeWorkflowService.getCodeWorkflowProjectIds());
 
         return getAutomationProjectProjects(automationProjects.keySet())
             .stream()
-            .map(project -> toPublishedDTO(project, automationProjects.get(project.getId())))
+            .map(project -> toPublishedDTO(
+                project, automationProjects.get(project.getId()), codeWorkflowProjectIds))
             .toList();
     }
 
@@ -430,6 +464,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment, connectedUser);
 
         Map<Long, AutomationProject> automationProjects = getAutomationProjects();
+
+        Set<Long> codeWorkflowProjectIds = Set.copyOf(projectCodeWorkflowService.getCodeWorkflowProjectIds());
 
         List<AutomationProjectDTO> projects = new ArrayList<>();
 
@@ -449,7 +485,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
                 project, automationProjects.get(project.getId()), configuration.getProjectVersion(),
                 configuration.isAutomationHubVisible(),
                 projectWorkflow -> automationProjectConfigurationService.isWorkflowEnabled(
-                    configuration, projectWorkflow.getUuid()));
+                    configuration, projectWorkflow.getUuid()),
+                codeWorkflowProjectIds);
 
             if (embeddedPermissionEvaluator.evaluate(projectDTO.permissionExpression(), connectedUser)) {
                 projects.add(
@@ -470,6 +507,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment, connectedUser);
 
         Map<Long, AutomationProject> automationProjects = getAutomationProjects();
+
+        Set<Long> codeWorkflowProjectIds = Set.copyOf(projectCodeWorkflowService.getCodeWorkflowProjectIds());
 
         List<AutomationProjectConfigurationReleaseDTO> releases = new ArrayList<>();
 
@@ -495,7 +534,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
                     project, automationProject, configuration.getProjectVersion(),
                     configuration.isAutomationHubVisible(),
                     projectWorkflow -> automationProjectConfigurationService.isWorkflowEnabled(
-                        configuration, projectWorkflow.getUuid()));
+                        configuration, projectWorkflow.getUuid()),
+                    codeWorkflowProjectIds);
 
                 releases.add(
                     new AutomationProjectConfigurationReleaseDTO(
@@ -518,6 +558,18 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         Project project = getProjectOfAutomationProject(projectId);
 
         int oldProjectVersion = project.getLastProjectVersion();
+
+        Optional<ProjectCodeWorkflow> latestProjectCodeWorkflow =
+            projectCodeWorkflowService.fetchProjectCodeWorkflow(projectId);
+
+        if (latestProjectCodeWorkflow.isPresent()
+            && latestProjectCodeWorkflow.get()
+                .getProjectVersion() != oldProjectVersion) {
+
+            throw new ConfigurationException(
+                "The code project has no draft source to publish; edit or upload it first",
+                CodeWorkflowErrorType.CODE_WORKFLOW_DRAFT_EMPTY);
+        }
 
         List<ProjectWorkflow> oldProjectWorkflows = projectWorkflowService.getProjectWorkflows(
             project.getId(), oldProjectVersion);
@@ -733,8 +785,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         return new AutomationProjectDTO(
             project.id(), project.name(), project.description(), project.categoryId(), project.tagIds(),
             project.published(), project.version(), project.lastPublishedVersion(), visibleTemplates,
-            project.permissionExpression(), project.automationHubVisible(), project.configurationCount(),
-            project.lastPublishedDate());
+            project.permissionExpression(), project.codeWorkflowProject(), project.automationHubVisible(),
+            project.configurationCount(), project.lastPublishedDate());
     }
 
     private ConnectedUserWorkflowTemplateDTO markProvided(
@@ -835,7 +887,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     }
 
     private AutomationProjectDTO toDTO(
-        Project project, AutomationProject automationProject, int configurationCount) {
+        Project project, AutomationProject automationProject, Set<Long> codeWorkflowProjectIds,
+        int configurationCount) {
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             project.getId(), project.getLastProjectVersion());
@@ -865,24 +918,25 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         return new AutomationProjectDTO(
             project.getId(), project.getName(), project.getDescription(), project.getCategoryId(),
             project.getTagIds(), published, project.getLastProjectVersion(), lastPublishedVersion, workflowTemplates,
-            automationProject.getPermissionExpression(), true, configurationCount,
-            project.getLastPublishedDate());
+            automationProject.getPermissionExpression(), codeWorkflowProjectIds.contains(project.getId()),
+            true, configurationCount, project.getLastPublishedDate());
     }
 
     private AutomationProjectDTO toPublishedDTO(
-        Project project, AutomationProject automationProject) {
+        Project project, AutomationProject automationProject, Set<Long> codeWorkflowProjectIds) {
 
         ProjectVersion lastPublishedProjectVersion = project.getLastPublishedProjectVersion();
 
         return toPublishedDTO(
             project, automationProject,
             lastPublishedProjectVersion == null ? null : lastPublishedProjectVersion.getVersion(), true,
-            projectWorkflow -> true);
+            projectWorkflow -> true, codeWorkflowProjectIds);
     }
 
     private AutomationProjectDTO toPublishedDTO(
         Project project, AutomationProject automationProject, @Nullable Integer publishedVersion,
-        boolean automationHubVisible, Predicate<ProjectWorkflow> projectWorkflowFilter) {
+        boolean automationHubVisible, Predicate<ProjectWorkflow> projectWorkflowFilter,
+        Set<Long> codeWorkflowProjectIds) {
 
         List<ConnectedUserWorkflowTemplateDTO> workflowTemplates;
 
@@ -914,7 +968,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         return new AutomationProjectDTO(
             project.getId(), project.getName(), project.getDescription(), project.getCategoryId(),
             project.getTagIds(), publishedVersion != null, project.getLastProjectVersion(), publishedVersion,
-            workflowTemplates, automationProject.getPermissionExpression(), automationHubVisible, 0,
-            project.getLastPublishedDate());
+            workflowTemplates, automationProject.getPermissionExpression(),
+            codeWorkflowProjectIds.contains(project.getId()), automationHubVisible, 0, project.getLastPublishedDate());
     }
 }

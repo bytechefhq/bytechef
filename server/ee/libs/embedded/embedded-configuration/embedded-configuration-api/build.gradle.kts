@@ -3,6 +3,7 @@ dependencies {
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     api(project(":server:libs:platform:platform-connection:platform-connection-api"))
     api(project(":server:libs:platform:platform-tag:platform-tag-api"))
+    api(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
 
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.data:spring-data-jdbc")
