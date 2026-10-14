@@ -321,9 +321,14 @@ labels  bytechef.io/managed-by=bytechef, bytechef.io/task-execution-id=<key>, by
 ### 6.3 Flow
 
 - **`submit`:**
-  1. Create the imagePullSecret if `credentials` is set, then create the pod.
+  1. Create the imagePullSecret if `credentials` is set, then create the pod. Patch the secret with an
+     `ownerReference` to the created pod (`v1`/`Pod`, name, uid, `controller: false`, `blockOwnerDeletion: false`)
+     so the cluster's garbage collector removes it with the pod; a failed patch is logged and the explicit deletes
+     below still apply.
   2. Wait (within `waitUntilRunning`) until `bytechef-init` is running.
-  3. Run `exec tar -xf - -C /bytechef/work` in `bytechef-init`, with a tar of the local working directory on stdin.
+  3. Run `sh -c "head -c <size> | tar -xf - -C /bytechef/work"` in `bytechef-init`, with a tar of the local working
+     directory (spooled to a temporary file to learn its size) on stdin; `head -c` ends the input because the exec
+     protocol cannot signal the end of stdin.
   4. Run `exec touch /bytechef/work/.ready`.
 - **`await`:**
   - Follow the `main` container's logs into stdout. Watch the pod until `main` has a terminated state.
@@ -339,16 +344,24 @@ labels  bytechef.io/managed-by=bytechef, bytechef.io/task-execution-id=<key>, by
   code 0 **and** whose `bytechef-output` is still running (inputs delivered, outputs not yet collected). Delete any
   other match (init still waiting, or output sidecar already terminated) and return empty.
 - **`cleanup`:**
-  - `DELETE`: delete the pod with grace period `killGracePeriod` (default 0), and the secret if one was created.
-  - `KILL_AND_DELETE`: the same, with grace period 0.
+  - `DELETE`: delete the pod at once (grace period 0, because the job has already finished), and the secret if one
+    was created.
+  - `KILL_AND_DELETE`: the same, with `killGracePeriod` (default 0) as the pod's grace period.
   - `DETACH`: no-op.
+  - The deletes run with the thread's interrupt flag cleared and restore it afterwards, so an interrupted worker still
+    removes its pod and secret. The pull secret's owner reference removes it with the pod even if its own delete
+    fails.
+- **Interrupts:** fabric8 turns an interrupt inside an HTTP call into a `KubernetesClientException` caused by an
+  `InterruptedIOException` and re-sets the flag. The backend reports it as an `InterruptedException` (from `find`,
+  which cannot throw one, as an `IllegalStateException` with the flag restored), so the orchestrator detaches the job
+  when `resume` is on instead of recording an error and killing it.
 
 ### 6.4 Required RBAC (documented)
 
 - `pods`: create, get, list, watch, delete
 - `pods/log`: get
 - `pods/exec`: create, get
-- `secrets`: create, delete (only when `credentials` is used)
+- `secrets`: create, patch, delete (only when `credentials` is used)
 
 ## 7. AWS Batch backend (EE)
 
