@@ -94,6 +94,10 @@ The GraalVM runner has two modes:
 
 Workflow data reaches a script through the **Input** property, not by interpolating expressions into the source.
 
+### Connections In External Runners
+
+Under Process, Docker, Kubernetes and AWS Batch the connections a task declares (except `taskRunner`) reach the script as environment variables: `BYTECHEF_CONNECTION_<KEY>` holds all parameters as one JSON object and `BYTECHEF_CONNECTION_<KEY>_<PARAM>` one parameter each. Names are split at camelCase boundaries, upper-cased, and any character outside `[A-Z0-9_]` becomes `_`, so connection `github-bot` with parameter `accessToken` gives `BYTECHEF_CONNECTION_GITHUB_BOT_ACCESS_TOKEN`. The task's own `env` overrides an injected name. Values of 6 or more characters are replaced by `******` in `stdout`, `stderr`, failure messages and the server log, except the top-level parameters named authorizationType, region, baseUri, baseUrl, url, uri, instanceUrl, endpoint, host, hostname, port and domain, which are exported but never masked; very long lines (over 8192 characters) are split before logging, so a secret crossing that split may appear in fragments in the server log. Masking is best effort, and `vars` and `outputFiles` are not masked. GraalVM scripts keep using `context.component.*` and never see the values. Environment variables are readable outside the script on some runners; the **Commands** component's README has the exposure table and the `bytechef.script.inject-connections` switch.
+
 ### Result Shape
 
 The shape of an action's result depends on which runner ran it, and this is the change most likely to break a workflow that switches runners.

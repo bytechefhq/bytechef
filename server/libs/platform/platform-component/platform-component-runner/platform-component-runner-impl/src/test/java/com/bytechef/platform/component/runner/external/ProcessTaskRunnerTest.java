@@ -24,6 +24,8 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.runner.TaskRunnerRequest;
 import com.bytechef.platform.component.runner.TaskRunnerResult;
@@ -65,7 +67,7 @@ class ProcessTaskRunnerTest {
     private static final Set<String> NON_DISCRIMINATING_NAMES = Set.of(
         "HOME", "IFS", "OPTIND", "PATH", "PPID", "PS1", "PS2", "PS4", "PWD", "OLDPWD", "SHLVL", "_");
 
-    private final ProcessTaskRunner processTaskRunner = new ProcessTaskRunner();
+    private final ProcessTaskRunner processTaskRunner = new ProcessTaskRunner(new ApplicationProperties());
 
     @Test
     void testGetTypeIsProcess() {
@@ -571,6 +573,86 @@ class ProcessTaskRunnerTest {
 
     private static void destroyMarkerProcesses(String marker) {
         markerProcessHandles(marker).forEach(ProcessHandle::destroyForcibly);
+    }
+
+    @Test
+    void testADeclaredConnectionReachesTheProcessAndIsMaskedInStdout() {
+        assumeTrue(isExecutable("/bin/sh"));
+
+        TaskRunnerRequest request = connectionRequest(
+            List.of(
+                "test \"$BYTECHEF_CONNECTION_SLACK_TOKEN\" = 'xoxb-123456' && echo matched",
+                "echo \"token=$BYTECHEF_CONNECTION_SLACK_TOKEN\""),
+            Map.of());
+
+        TaskRunnerResult result = injectingRunner().run(request);
+
+        assertThat(result.stdout()).contains("matched")
+            .contains("token=******")
+            .doesNotContain("xoxb-123456");
+    }
+
+    @Test
+    void testTheAuthorsEnvironmentOverridesAnInjectedVariable() {
+        assumeTrue(isExecutable("/bin/sh"));
+
+        TaskRunnerRequest request = connectionRequest(
+            List.of("echo \"[$BYTECHEF_CONNECTION_SLACK_TOKEN]\""),
+            Map.of("BYTECHEF_CONNECTION_SLACK_TOKEN", "from-the-author"));
+
+        assertThat(injectingRunner().run(request)
+            .stdout()).contains("[from-the-author]");
+    }
+
+    @Test
+    void testAFailureMessageMasksTheConnectionValues() {
+        assumeTrue(isExecutable("/bin/sh"));
+
+        TaskRunnerRequest request = connectionRequest(
+            List.of("echo \"leak $BYTECHEF_CONNECTION_SLACK_TOKEN\" >&2", "exit 3"), Map.of());
+
+        assertThatThrownBy(() -> injectingRunner().run(request))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("leak ******")
+            .hasMessageNotContaining("xoxb-123456");
+    }
+
+    @Test
+    void testAPythonScriptReadsTheConnectionAsJson() {
+        assumeTrue(isOnPath("python3"));
+
+        TaskRunnerRequest request = new TaskRunnerRequest(
+            "python",
+            """
+                import json, os
+
+                def perform(input, context):
+                    return json.loads(os.environ["BYTECHEF_CONNECTION_SLACK"])["token"] == "xoxb-123456"
+                """,
+            List.of(), Map.of(), Map.of(), Map.of(), List.of(), ParametersFactory.create(Map.of()),
+            ParametersFactory.create(Map.of()), Duration.ofSeconds(30), slackConnection(), mock(ActionContext.class));
+
+        assertThat(injectingRunner().run(request)
+            .output()).isEqualTo(true);
+    }
+
+    private static TaskRunnerRequest connectionRequest(List<String> commands, Map<String, String> env) {
+        return new TaskRunnerRequest(
+            "shell", null, commands, Map.of(), env, Map.of(), List.of(), ParametersFactory.create(Map.of()),
+            ParametersFactory.create(Map.of()), Duration.ofSeconds(30), slackConnection(), mock(ActionContext.class));
+    }
+
+    private static ProcessTaskRunner injectingRunner() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getScript()
+            .setInjectConnections(true);
+
+        return new ProcessTaskRunner(applicationProperties);
+    }
+
+    private static Map<String, ComponentConnection> slackConnection() {
+        return Map.of("slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null));
     }
 
     private static String failureMessage(Runnable runnable) {

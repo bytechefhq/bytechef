@@ -221,6 +221,7 @@ bytechef:
                                                   allow-task-host: false, allow-volume-mounts: false } }
       kubernetes: { enabled: false }
       aws-batch:  { enabled: false }
+    inject-connections: true
     runner-limits:
       max-wait: PT1H
       max-log-bytes: 1MB
@@ -234,6 +235,9 @@ greater than zero - with an `IllegalArgumentException` naming the full key
 (`bytechef.script.runners.<type>.properties.<key>` for an override, `bytechef.script.runner-limits.<key>` for a global
 value).
 `runner-limits` is a new nested class on `ApplicationProperties.Script`, with no Java defaults.
+`inject-connections` (a `boolean` on `ApplicationProperties.Script`, default `true` in YAML only) switches the
+connection injection of §13 on or off for every external runner. It sits beside `runners`, not inside it, because
+`runners` binds as a map keyed by runner type.
 
 **Removed operator settings:** `allowed-images`, `allowed-network-modes`, `allow-host-network`, `default-cpu`,
 `max-cpu`, `default-memory`, `max-memory`, `pids-limit`, and the operator gate on Process `inheritEnvironment`.
@@ -570,3 +574,114 @@ runner registry on its classpath, so the connection preprocessor would not run t
 - Optional operator allowlist of Kubernetes API hosts (`allowed-api-hosts`) as SSRF hardening.
 - CloudWatch Live Tail streaming.
 - Other EE runners: Azure Batch, Google Batch, Cloud Run, EC2, GCE, Azure VM.
+- A `context.connection(name)` helper in the external-runner bootstrap, built on the JSON form of §13.
+- Kestra-style author-chosen names (`env: { X: "=connection('slack').token" }`): needs an evaluator function plus
+  late resolution and masking, so resolved secrets never land in a stored task execution input.
+- Refreshing OAuth tokens during a run.
+
+## 13. Connections in external runners (addendum, 2026-10-14)
+
+GraalVM scripts use connections indirectly, through `context.component.<component>.<action>(input, connectionName)`;
+the credentials never enter the guest. The external runners (Process, Docker, Kubernetes, AWS Batch) have no
+component bridge, so until now a Script or Commands task's connections never reached its script. This section
+gives them the connection parameters as environment variables, the way Kestra scripts receive secrets (`env` plus
+log masking), but derived automatically from the connections the task declares. GraalVM is unchanged, and there is
+no `context.connection` helper yet (§12).
+
+### 13.1 What is injected
+
+- **Source:** every entry of `TaskRunnerRequest.componentConnections()` except `taskRunner`, which only the runner
+  uses. The values are `ComponentConnection.getConnectionParameters()`, which includes `authorizationType` when set.
+- **Key:** the name the connection is declared under in the task's `connections` block (the entry's map key, the
+  same name GraalVM scripts pass as `connectionName`). It is the key, not the component name, so two connections of
+  one component stay distinct. `<KEY>` below is that name converted as follows, and `<PARAM>` is a parameter name
+  converted the same way: it is camelCase-split first (an `_` is inserted between a lowercase letter or digit and an
+  uppercase letter), then upper-cased, then every character outside `[A-Z0-9_]` becomes `_`. So `github-bot` gives
+  `GITHUB_BOT`, `accessKeyId` gives `ACCESS_KEY_ID`, `authorizationType` gives `AUTHORIZATION_TYPE` and `awsProd`
+  gives `AWS_PROD`.
+- **Two forms per connection:**
+  - `BYTECHEF_CONNECTION_<KEY>`: all parameters as one JSON object, with their exact names.
+  - `BYTECHEF_CONNECTION_<KEY>_<PARAM>`: one variable per parameter. Strings as-is, other values as JSON, nulls
+    skipped. A string containing a NUL byte cannot be an environment value: it is left out of the flat form, kept in
+    the JSON form, and a warning in the server log names the key and parameter (never the value).
+- **Example:** `connections: { slack: {...}, github-bot: {...}, taskRunner: {...} }` gives
+  `BYTECHEF_CONNECTION_SLACK`, `BYTECHEF_CONNECTION_SLACK_TOKEN`, `BYTECHEF_CONNECTION_GITHUB_BOT`,
+  `BYTECHEF_CONNECTION_GITHUB_BOT_ACCESS_TOKEN`, and nothing for `taskRunner`.
+- **Collisions:** two connections, or two parameters of one connection, that sanitise to the same variable name
+  fail the task before anything starts, with `IllegalArgumentException("The connection 'github-bot' and the connection
+  'github_bot' both map to BYTECHEF_CONNECTION_GITHUB_BOT; rename one")`; an origin is `connection '<key>'` or
+  `parameter '<param>' of connection '<key>'` (keys and parameter names only, never values).
+- **Precedence** (later wins): `HOME` (remote runners), then the injected connections, then the author's own `env`,
+  then the contract variables `BYTECHEF_WORKING_DIR`/`BYTECHEF_INPUT_FILE`/`BYTECHEF_OUTPUT_DIR`, which always win, as
+  before.
+- **Snapshot:** values are read once, when the run starts. An OAuth access token can expire during a long run; there
+  is no refresh, and the docs say so.
+- **Switch:** with `bytechef.script.inject-connections: false` (§4.1) nothing is injected and nothing is masked.
+- **Mask set exclusions:** the top-level parameters named authorizationType, region, baseUri, baseUrl, url, uri,
+  instanceUrl, endpoint, host, hostname, port and domain (compared case-insensitively, ignoring `_`, `-` and `.`) are
+  exported, for example `authorizationType` (by enum name) as `BYTECHEF_CONNECTION_<KEY>_AUTHORIZATION_TYPE`, but never
+  masked, since they are not secrets and masking them would blank ordinary words and URLs from the output. Nested values
+  stay masked.
+
+### 13.2 Where
+
+One CE class, `TaskRunnerConnectionEnvironment` in `platform-component-runner-impl` (`external` package), builds the
+variables and the mask set from a `TaskRunnerRequest` and the switch. Its two callers:
+
+- `ProcessTaskRunner`, where it builds the `ProcessBuilder` environment (before `request.env()`).
+- `RemoteTaskRunner.environment()`, so Docker, Kubernetes and AWS Batch receive the variables through
+  `RemoteJobSpec.environment()` unchanged. On AWS Batch they reach only the `main` container, never the sidecars.
+
+### 13.3 Masking
+
+- **Mask set:** every string leaf of every injected connection's parameters (nested maps and lists included), except
+  the top-level non-secret names listed in §13.1 (authorizationType, region, baseUri, baseUrl, url, uri, instanceUrl,
+  endpoint, host, hostname, port and domain), plus each connection's JSON form; values shorter than 6 characters are not
+  masked, so values like `true` do not blank out the log. Each line of a multi-line value that is itself 6 or more
+  characters is also masked.
+- **Where:** each occurrence is replaced by `******`, longest values first, wherever captured text leaves the runner:
+  when `BoundedOutputCapture` is read for the `stdout`/`stderr` result fields and the "stdout tail / stderr tail"
+  failure messages (which also covers the `.stderr` file read back from the remote runners, since it is appended to the
+  same capture), and on every guest line logged to the server log. A value cut by the capture's head/tail elision can
+  leave an unmasked fragment. The server log is masked line by line, and each line of a multi-line secret (a PEM key, a
+  service-account JSON with newlines) is in the mask set, so the lines are masked there too. Lines longer than 8192
+  characters are split before logging, so a secret crossing that split may appear in fragments in the server log.
+- **Limits:** masking is best effort, as in Kestra: a transformed value (base64, substring) is not
+  caught. `vars` and `outputFiles` are not masked; returning a secret there is the author's choice.
+
+### 13.4 Exposure
+
+Environment variables are readable outside the script:
+
+| Runner | Readable by |
+|---|---|
+| Process | the same OS user (`/proc/<pid>/environ`) |
+| Docker | anyone with `docker inspect` on the host |
+| Kubernetes | anyone who can `get pods` in the namespace (the pod spec, stored in etcd) |
+| AWS Batch | anyone with `DescribeJobDefinitions` / `DescribeJobs`; the values persist in AWS Batch after the run |
+
+On AWS Batch the values are written into a per-run job definition. Deregistering it makes it INACTIVE, not deleted,
+and it stays visible via `DescribeJobDefinitions`; `DescribeJobs` keeps returning job details for some days; on detach
+the definition stays ACTIVE. The values persist in AWS Batch after the run regardless.
+
+The Script and Commands READMEs carry this table. On AWS Batch, injected values also grow the job definition; a
+definition AWS rejects fails as "registering the job definition: ClientException (HTTP 400)", and the README advises
+passing large values such as a service-account JSON through `inputFiles` instead.
+
+### 13.5 Testing
+
+- `TaskRunnerConnectionEnvironmentTest`: sanitising (`github-bot` becomes `GITHUB_BOT`), both forms, nested values as
+  JSON, nulls skipped, `taskRunner` excluded, NUL values left out of the flat form, precedence with the author's
+  `env`, the collision error naming both keys and no values, the switch off.
+- Masking unit test: values of 6+ characters replaced, shorter ones kept, the JSON form masked, several values in one
+  line, longest first.
+- `ProcessTaskRunnerTest`: a Python and a shell run that read the variable and echo it; the script's own comparison
+  proves the value arrived, and `stdout` shows `******`.
+- Docker integration test and the Kubernetes k3s integration test: one case each, same shape.
+- AWS Batch: a job-factory unit test that the variables sit in `main`'s environment and not in the sidecars'. Real
+  Batch stays on the manual checklist, which gets one more item.
+
+### 13.6 Delivery
+
+One plan on `0_p_script_runners`, new commits on top: the environment builder and the switch; masking; wiring the
+four runners with their tests; READMEs and this section kept in step.

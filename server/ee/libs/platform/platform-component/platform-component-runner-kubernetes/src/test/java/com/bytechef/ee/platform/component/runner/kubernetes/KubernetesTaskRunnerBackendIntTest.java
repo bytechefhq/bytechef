@@ -374,6 +374,28 @@ class KubernetesTaskRunnerBackendIntTest {
         return actionContext;
     }
 
+    @Test
+    void testADeclaredConnectionReachesThePodAndIsMasked() {
+        RemoteTaskRunner runner = runner(() -> "connection-key");
+
+        Map<String, ComponentConnection> connections = new HashMap<>(connections());
+
+        connections.put("slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null));
+
+        TaskRunnerRequest request = commandsRequest(
+            List.of(
+                "test \"$BYTECHEF_CONNECTION_SLACK_TOKEN\" = 'xoxb-123456' && echo matched",
+                "echo \"token=$BYTECHEF_CONNECTION_SLACK_TOKEN\""),
+            Map.of(), List.of(), Map.of("image", SHELL_IMAGE), actionContext(null, new LinkedHashMap<>()),
+            connections);
+
+        TaskRunnerResult taskRunnerResult = runner.run(request);
+
+        assertThat(taskRunnerResult.stdout()).contains("matched")
+            .contains("token=******")
+            .doesNotContain("xoxb-123456");
+    }
+
     private static ApplicationProperties applicationProperties() {
         ApplicationProperties.Script.Runner runner = new ApplicationProperties.Script.Runner();
 
@@ -387,6 +409,8 @@ class KubernetesTaskRunnerBackendIntTest {
 
         applicationProperties.getScript()
             .setRunners(runners);
+        applicationProperties.getScript()
+            .setInjectConnections(true);
 
         return applicationProperties;
     }
@@ -395,9 +419,18 @@ class KubernetesTaskRunnerBackendIntTest {
         List<String> commands, Map<String, ?> inputFiles, List<String> outputFilePatterns,
         Map<String, ?> runnerParameters, ActionContextAware actionContext) {
 
+        return commandsRequest(
+            commands, inputFiles, outputFilePatterns, runnerParameters, actionContext, connections());
+    }
+
+    private static TaskRunnerRequest commandsRequest(
+        List<String> commands, Map<String, ?> inputFiles, List<String> outputFilePatterns,
+        Map<String, ?> runnerParameters, ActionContextAware actionContext,
+        Map<String, ComponentConnection> connections) {
+
         return new TaskRunnerRequest(
             "shell", null, commands, Map.of(), Map.of(), inputFiles, outputFilePatterns,
-            ParametersFactory.create(Map.of()), ParametersFactory.create(runnerParameters), null, connections(),
+            ParametersFactory.create(Map.of()), ParametersFactory.create(runnerParameters), null, connections,
             actionContext);
     }
 
