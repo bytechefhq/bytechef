@@ -52,9 +52,9 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     const {staticWebhookUrl} = connectedUserProjectWorkflow;
 
-    const handleCopyStaticWebhookUrlClick = () => {
+    const handleCopyStaticWebhookUrlClick = async () => {
         if (staticWebhookUrl) {
-            copyToClipboard(staticWebhookUrl);
+            await copyToClipboard(staticWebhookUrl);
 
             toast('Webhook URL copied to clipboard');
         }
