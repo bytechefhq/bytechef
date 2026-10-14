@@ -28,7 +28,7 @@ import {ISSUES_SIDEBAR_EXIT_DURATION} from '@/shared/constants';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {Suspense, lazy, useCallback, useEffect, useState} from 'react';
+import {Suspense, lazy, useCallback, useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
@@ -51,11 +51,21 @@ const AiAgentTestingPanel = lazy(
     () =>
         import('@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel')
 );
+const IntegrationCodeWorkflowDetail = lazy(
+    () => import('@/pages/platform/code-workflow/IntegrationCodeWorkflowDetail')
+);
+const ProjectCodeWorkflowDetail = lazy(() => import('@/pages/platform/code-workflow/ProjectCodeWorkflowDetail'));
+const WorkflowTestConfigurationDialog = lazy(
+    () =>
+        import('@/pages/platform/workflow-editor/components/workflow-test-configuration/WorkflowTestConfigurationDialog')
+);
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
 const WorkflowIssuesSidebar = lazy(() => import('./components/WorkflowIssuesSidebar'));
 const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSidebar'));
 const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSidebar'));
+
+const POLYGLOT_CODE_WORKFLOW_LANGUAGES = ['JAVASCRIPT', 'PYTHON', 'RUBY'];
 
 interface WorkflowEditorLayoutProps {
     customCanvasWidth?: number;
@@ -121,6 +131,8 @@ const WorkflowEditorLayout = ({
         }))
     );
 
+    const [showCodeWorkflowTestConfigurationDialog, setShowCodeWorkflowTestConfigurationDialog] = useState(false);
+
     const {
         componentDefinitions,
         filteredWorkflowNodeOutputs,
@@ -142,7 +154,7 @@ const WorkflowEditorLayout = ({
 
     const issues = useWorkflowIssues();
 
-    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {codeWorkflow, codeWorkflowLanguage, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();
@@ -154,6 +166,19 @@ const WorkflowEditorLayout = ({
             : projectWorkflowId
               ? `project:${projectId}:${projectWorkflowId}`
               : undefined
+    );
+
+    const isCodeWorkflow = useMemo(
+        () =>
+            codeWorkflow === true &&
+            !!codeWorkflowLanguage &&
+            POLYGLOT_CODE_WORKFLOW_LANGUAGES.includes(codeWorkflowLanguage),
+        [codeWorkflow, codeWorkflowLanguage]
+    );
+
+    const isJavaCodeWorkflow = useMemo(
+        () => codeWorkflow === true && codeWorkflowLanguage === 'JAVA',
+        [codeWorkflow, codeWorkflowLanguage]
     );
 
     const handleClosePlayground = useCallback(() => {
@@ -244,20 +269,52 @@ const WorkflowEditorLayout = ({
                     <SubflowBanner />
                 </div>
 
-                {componentDefinitions && taskDispatcherDefinitions && (
+                {isJavaCodeWorkflow ? (
+                    <div className="flex flex-1 items-center justify-center bg-surface-main p-8">
+                        <div className="max-w-md text-center text-sm text-content-neutral-secondary">
+                            This project&apos;s workflows are defined in a compiled Java artifact. There is no source to
+                            edit here — rebuild the JAR and deploy it again to change them.
+                        </div>
+                    </div>
+                ) : isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
                     <Suspense>
-                        <WorkflowEditor
-                            componentDefinitions={componentDefinitions}
-                            customCanvasWidth={customCanvasWidth}
-                            enableUndoRedo={enableUndoRedo}
-                            fitViewOnWorkflowChange={fitViewOnWorkflowChange}
-                            leftSidebarOpen={leftSidebarOpen}
-                            taskDispatcherDefinitions={taskDispatcherDefinitions}
+                        <IntegrationCodeWorkflowDetail
+                            headerless
+                            integrationId={integrationId}
+                            invalidateWorkflowQueries={invalidateWorkflowQueries}
+                            language={codeWorkflowLanguage}
+                            onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
+                            testConfigurationDisabled={testConfigurationDisabled}
                         />
                     </Suspense>
+                ) : isCodeWorkflow && codeWorkflowLanguage && projectId ? (
+                    <Suspense>
+                        <ProjectCodeWorkflowDetail
+                            headerless
+                            invalidateWorkflowQueries={invalidateWorkflowQueries}
+                            language={codeWorkflowLanguage}
+                            onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
+                            projectId={projectId}
+                            testConfigurationDisabled={testConfigurationDisabled}
+                        />
+                    </Suspense>
+                ) : (
+                    componentDefinitions &&
+                    taskDispatcherDefinitions && (
+                        <Suspense>
+                            <WorkflowEditor
+                                componentDefinitions={componentDefinitions}
+                                customCanvasWidth={customCanvasWidth}
+                                enableUndoRedo={enableUndoRedo}
+                                fitViewOnWorkflowChange={fitViewOnWorkflowChange}
+                                leftSidebarOpen={leftSidebarOpen}
+                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            />
+                        </Suspense>
+                    )
                 )}
 
-                {rightSidebarMounted && componentDefinitions && taskDispatcherDefinitions && (
+                {!isCodeWorkflow && rightSidebarMounted && componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense fallback={<WorkflowNodesSidebarSkeleton />}>
                         <WorkflowNodesSidebar
                             data={{
@@ -282,6 +339,7 @@ const WorkflowEditorLayout = ({
                         }
                     >
                         <WorkflowRightSidebar
+                            codeWorkflow={isCodeWorkflow}
                             copilotPanelOpen={copilotPanelOpen}
                             issueCount={issues.length}
                             issueSeverity={issues[0]?.severity}
@@ -364,6 +422,16 @@ const WorkflowEditorLayout = ({
                     sheetOpen={showWorkflowOutputsSheet}
                     workflow={workflow}
                 />
+            )}
+
+            {showCodeWorkflowTestConfigurationDialog && (
+                <Suspense>
+                    <WorkflowTestConfigurationDialog
+                        onClose={() => setShowCodeWorkflowTestConfigurationDialog(false)}
+                        workflow={workflow}
+                        workflowTestConfiguration={workflowTestConfiguration}
+                    />
+                </Suspense>
             )}
 
             {showWorkflowCodeEditorSheet && (

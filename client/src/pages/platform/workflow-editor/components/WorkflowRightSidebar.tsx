@@ -9,6 +9,7 @@ import {twMerge} from 'tailwind-merge';
 import {WorkflowIssueSeverityType} from '../stores/useWorkflowIssuesStore';
 
 export interface WorkflowRightSidebarProps {
+    codeWorkflow?: boolean;
     copilotPanelOpen: boolean;
     issueCount: number;
     issueSeverity?: WorkflowIssueSeverityType;
@@ -24,6 +25,7 @@ export interface WorkflowRightSidebarProps {
     showWorkflowInputs?: boolean;
 }
 const WorkflowRightSidebar = ({
+    codeWorkflow = false,
     copilotPanelOpen,
     issueCount,
     issueSeverity,
@@ -105,6 +107,10 @@ const WorkflowRightSidebar = ({
                     },
                 ],
             ].filter((item) => {
+                if (codeWorkflow) {
+                    return item.name === 'Workflow Inputs';
+                }
+
                 if (item.name === 'Copilot') {
                     return showCopilot && copilotEnabled;
                 }
@@ -117,6 +123,7 @@ const WorkflowRightSidebar = ({
             }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [
+            codeWorkflow,
             copilotEnabled,
             copilotPanelOpen,
             ff_1840,
@@ -130,6 +137,10 @@ const WorkflowRightSidebar = ({
 
     const activeItemStyling =
         'bg-surface-brand-secondary text-content-brand-primary hover:bg-surface-brand-secondary-hover hover:text-content-brand-primary';
+
+    if (rightSidebarNavigation.length === 0) {
+        return null;
+    }
 
     return (
         <aside className="absolute right-0 m-2 flex flex-col items-center gap-1 rounded-md border border-stroke-neutral-secondary bg-background p-1">

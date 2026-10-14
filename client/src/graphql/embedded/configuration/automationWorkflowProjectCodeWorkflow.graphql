@@ -1,0 +1,31 @@
+query automationWorkflowProjectCodeWorkflowSource($automationProjectId: ID!) {
+    automationWorkflowProjectCodeWorkflowSource(automationProjectId: $automationProjectId) {
+        content
+        language
+    }
+}
+
+mutation createAutomationWorkflowProjectCodeWorkflow(
+    $name: String!
+    $language: CodeWorkflowLanguage!
+    $description: String
+    $category: String
+    $tags: [String!]
+    $permissionExpression: String
+) {
+    createAutomationWorkflowProjectCodeWorkflow(
+        name: $name
+        language: $language
+        description: $description
+        category: $category
+        tags: $tags
+        permissionExpression: $permissionExpression
+    )
+}
+
+mutation updateAutomationWorkflowProjectCodeWorkflowSource($automationProjectId: ID!, $content: String!) {
+    updateAutomationWorkflowProjectCodeWorkflowSource(
+        automationProjectId: $automationProjectId
+        content: $content
+    )
+}

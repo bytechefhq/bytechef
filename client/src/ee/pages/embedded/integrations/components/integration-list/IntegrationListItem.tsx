@@ -33,6 +33,7 @@ import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
+import getCodeWorkflowLanguageLabel, {isJavaCodeWorkflow} from '@/shared/util/codeWorkflowLanguage-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ChevronDownIcon,
@@ -68,6 +69,8 @@ const IntegrationListItem = ({
     remainingTags,
     workflowsContent,
 }: IntegrationItemProps) => {
+    const javaCodeWorkflow = isJavaCodeWorkflow(integration.codeWorkflow, integration.codeWorkflowLanguage);
+
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showIntegrationInstanceConfigurationDialog, setShowIntegrationInstanceConfigurationDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -202,7 +205,7 @@ const IntegrationListItem = ({
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center justify-between">
                             <div className="relative flex items-center gap-2">
-                                {hasWorkflows ? (
+                                {hasWorkflows && !javaCodeWorkflow ? (
                                     <Link
                                         aria-label="Integration title link"
                                         className="group/title flex items-center gap-2"
@@ -245,6 +248,14 @@ const IntegrationListItem = ({
                                             {integration?.name}
                                         </span>
                                     </div>
+                                )}
+
+                                {integration.codeWorkflow && (
+                                    <Badge
+                                        label={getCodeWorkflowLanguageLabel(integration.codeWorkflowLanguage) ?? 'Code'}
+                                        styleType="secondary-filled"
+                                        weight="semibold"
+                                    />
                                 )}
                             </div>
                         </div>

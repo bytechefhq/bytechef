@@ -43,6 +43,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import getCodeWorkflowLanguageLabel, {isJavaCodeWorkflow} from '@/shared/util/codeWorkflowLanguage-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ChevronDownIcon,
@@ -98,6 +99,8 @@ const ProjectListItem = ({
     remainingTags,
     workflowsContent,
 }: ProjectItemProps) => {
+    const javaCodeWorkflow = isJavaCodeWorkflow(project.codeWorkflow, project.codeWorkflowLanguage);
+
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showProjectDeploymentDialog, setShowProjectDeploymentDialog] = useState(false);
@@ -293,7 +296,7 @@ const ProjectListItem = ({
                         data-testid="project-item"
                     >
                         <div className="flex items-center gap-2">
-                            {hasWorkflows ? (
+                            {hasWorkflows && !javaCodeWorkflow ? (
                                 <Link
                                     aria-label="Project title link"
                                     className="group/title"
@@ -327,10 +330,18 @@ const ProjectListItem = ({
                             ) : (
                                 <span className="text-base font-semibold">{project.name}</span>
                             )}
+
+                            {project.codeWorkflow && (
+                                <Badge
+                                    label={getCodeWorkflowLanguageLabel(project.codeWorkflowLanguage) ?? 'Code'}
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
+                            )}
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
-                            <div className="flex items-center gap-2">
+                            <div className="flex min-h-6 items-center gap-2">
                                 <CollapsibleTrigger className="group mr-2 flex items-center text-xs font-semibold text-muted-foreground">
                                     <span className="mr-1">
                                         {workflowCount === 1 ? '1 workflow' : `${workflowCount} workflows`}
@@ -548,7 +559,7 @@ const ProjectListItem = ({
             <CollapsibleContent className="mt-1 mr-3 mb-3 ml-11">
                 <ProjectListItemTabs
                     actions={
-                        activeTab === 'workflows' && hasWorkflows ? (
+                        activeTab === 'workflows' && hasWorkflows && !project.codeWorkflow ? (
                             <ButtonGroup aria-label="Workflow Creation Actions">
                                 <Button
                                     aria-label="Create Workflow"
