@@ -272,7 +272,7 @@ describe('ProjectsLeftSidebar', () => {
 
         renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
 
-        fireEvent.click(screen.getByText('Workflow'));
+        fireEvent.click(screen.getByText('New Workflow'));
 
         expect(await screen.findByRole('dialog')).toHaveTextContent('WorkflowDialog:9');
         expect(mockUseCreateProjectWorkflow).toHaveBeenCalledWith(expect.objectContaining({projectId: 9}));
@@ -284,7 +284,7 @@ describe('ProjectsLeftSidebar', () => {
 
         renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={0} />);
 
-        fireEvent.click(screen.getByText('Workflow'));
+        fireEvent.click(screen.getByText('New Workflow'));
 
         expect(await screen.findByRole('dialog')).toHaveTextContent('WorkflowDialog:0');
     });
@@ -318,7 +318,7 @@ describe('ProjectsLeftSidebar', () => {
 
         renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
 
-        fireEvent.click(screen.getByText('Workflow'));
+        fireEvent.click(screen.getByText('New Workflow'));
         fireEvent.click(await screen.findByText('Close dialog'));
 
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
