@@ -1187,4 +1187,43 @@ class SpelEvaluatorTest {
 
         assertEquals(2, MapUtils.getInteger(map, "size"));
     }
+
+    @Test
+    public void testTemplateLiteralWithABarePathIsSilentlySubstituted() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("script", "return `Hi ${name}`;"), Map.of("name", "Ada"));
+
+        assertEquals("return `Hi Ada`;", MapUtils.get(map, "script"));
+    }
+
+    @Test
+    public void testTemplateLiteralWithABarePathSurvivesWhenTheContextHasNoSuchName() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("script", "return `Hi ${name}`;"), Collections.emptyMap());
+
+        assertEquals(
+            "return `Hi ${name}`;", MapUtils.get(map, "script"),
+            "the substitution is data dependent, which is what makes it silent");
+    }
+
+    @Test
+    public void testTemplateLiteralWithArithmeticFailsTheWholeMap() {
+        ExpressionEvaluationException exception = assertThrowsExactly(
+            ExpressionEvaluationException.class,
+            () -> EVALUATOR.evaluate(Map.of("script", "return `Total: ${a + b}`;"), Map.of("a", 1, "b", 2)));
+
+        String message = exception.getMessage();
+
+        assertTrue(message.startsWith("Invalid expression:"));
+        assertFalse(message.contains("script"), "the message names neither the property nor the component");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "return `${x ? y : z}`;", "return `${fn()}`;", "return `${obj.m()}`;"
+    })
+    public void testTemplateLiteralWithAnExpressionFailsTheWholeMap(String script) {
+        assertThrowsExactly(
+            ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(Map.of("script", script), Map.of("x", true)));
+    }
 }

@@ -20,32 +20,194 @@ JavaScript statements. They are never mixed: a `Python` action does not accept s
   setting.
 
 Depending on which task runner is selected, additional properties may appear: `env` (environment variables),
-`inputFiles`, `outputFiles` (glob patterns matched after the run), `timeout` (seconds), and the runner's own
-`interpreter` override.
+`inputFiles`, `outputFiles` (glob patterns matched after the run), `timeout` (seconds), and the selected runner's own
+properties - the Process runner's `interpreter` override, or the Docker runner's `image` and container settings.
 
 ## Task runners
 
 Commands only offers runners that declare the **Commands** capability - that excludes GraalVM entirely, since
-GraalVM's in-process component bridge cannot run a list of shell commands. In a default deployment that leaves one
-built-in runner:
+GraalVM's in-process component bridge cannot run a list of shell commands. Two built-in runners declare it:
 
 | Runner | Type | What it does |
 | --- | --- | --- |
 | Process | `process` | Runs the commands in a child process on the same host, with the server's own environment cleared. |
+| Docker | `docker` | Runs the commands in a single-use container, on the local daemon or on whichever daemon the operator's `host` names. |
 
-The runners available in a given deployment depend on what the operator has enabled with
-`bytechef.script.runners.<type>.enabled`, so this list may be shorter, or include a runner contributed by another
-module, in your installation. If no runner declaring the Commands capability is enabled at all, running any of these
-actions fails with a message naming the configuration key to set - `bytechef.script.runners.process.enabled=true` for
-the built-in runner above.
+Both are **off** until an operator turns them on with `bytechef.script.runners.<type>.enabled=true` - the shipped
+configuration enables only `graalvm`, which Commands never offers. So this list is what your installation *may* have,
+not what it has; it may also include a runner contributed by another module. If no runner declaring the Commands
+capability is enabled at all, running any of these actions fails with a message naming the configuration key to set.
 
-Each action's default interpreter, when the runner's own `interpreter` property is left blank:
+### Operator configuration
+
+Every key these three runners read, together, with its default:
+
+```yaml
+bytechef:
+  script:
+    runners:
+      graalvm:
+        enabled: true
+        properties:
+          trusted-enabled: false
+      process:
+        enabled: false
+        properties:
+          inherit-environment-enabled: false
+      docker:
+        enabled: false
+        properties:
+          host: ""
+          allowed-images: ""
+          allowed-network-modes: ""
+          allow-host-network: false
+          allow-volume-mounts: false
+          default-cpu: 1
+          max-cpu: 4
+          default-memory: 512m
+          max-memory: 2g
+          pids-limit: 512
+```
+
+Only `graalvm` is enabled by the shipped configuration; `process` and `docker` need their own `enabled: true` before
+anything else under them takes effect. What each key costs to turn on:
+
+- `graalvm.trusted-enabled`: lets a workflow's `script` task ask for `mode: trusted`, which drops GraalVM's guest
+  sandbox entirely and grants the guest context full host access (`HostAccess.ALL`) with no resource ceilings - the
+  same access the server process itself has. Off by default for that reason.
+- `process.inherit-environment-enabled`: hands the server process's own environment - including datasource passwords
+  and any cloud credentials it holds - to the child process, instead of the cleared environment `process` normally
+  builds from nothing.
+- `docker.host`: points the runner at a remote Docker daemon instead of the local socket. Whoever controls that
+  daemon controls every container this runner starts, so this is only as safe as the daemon it names.
+- `docker.allowed-images` / `docker.allowed-network-modes`: fail-closed allowlists - see below.
+- `docker.allow-host-network`: lets a workflow's `networkMode: host` request succeed, putting the container on the
+  host's own network stack instead of an isolated one.
+- `docker.allow-volume-mounts`: accepted but read by nothing in this version - see "There is no `volumes` property"
+  below.
+- `docker.default-cpu` / `docker.max-cpu` / `docker.default-memory` / `docker.max-memory` / `docker.pids-limit`: the
+  container's resource ceilings - see below. Raising `max-cpu` or `max-memory` widens what a workflow may ask for; a
+  request above the maximum is *refused*, not silently reduced to it, so an operator upgrading from a version that
+  read none of these keys should expect workflows that previously ran with no ceiling at all to start failing once
+  they ask for more than the new default `max-cpu` (`4`) or `max-memory` (`2g`) allows.
+
+**The published property list below is configuration-dependent, and this page's is not necessarily yours.** The
+`taskRunner` property's schema on this reference page - the JSON-derived `{type, interpreter}` shown in the
+**Properties** table above and in the JSON example - is assembled by `TaskRunnerPropertyFactory` from whichever
+runners were enabled in the registry that generated this page's snapshot, filtered to the ones declaring the
+Commands capability. That registry enables only `process`, so this page's generated table shows the `process`
+runner's own shape and never Docker's (`image`, `cpu`, `memory`, `networkMode`, ...) - not because Docker is
+unsupported, but because it was not enabled when the snapshot was captured. Your own deployment's editor renders the
+select and properties for whichever runners *you* enabled, which may add or omit entries this page shows. The
+Docker runner's actual properties are documented by hand below, not derived from the snapshot.
+
+Each action's default interpreter, when the Process runner's `interpreter` property is left blank:
 
 | Action | Default interpreter |
 | --- | --- |
 | Shell | `/bin/sh` |
 | Python | `python3` |
 | Node | `node` |
+
+### The Docker runner
+
+The Docker runner is the Process runner's sibling: the same working directory, the same `env`, `inputFiles`,
+`outputFiles` and `timeout` handling, the same five-key result. What differs is that the interpreter is reached
+through a container image instead of the host's `PATH`, so the commands run with the host filesystem, the host's
+installed packages and the host's users all out of reach.
+
+Its own properties:
+
+| Property | What it does |
+| --- | --- |
+| `image` | The container image the task runs in. Optional - see the defaults below. |
+| `pullPolicy` | `ALWAYS`, `IF_NOT_PRESENT` (default) or `NEVER`. |
+| `entrypoint` | Replaces the interpreter the source file is handed to. The source file is appended either way. |
+| `user` | The user the container runs as, as a name or a numeric `uid[:gid]`. |
+| `cpu` | How many CPUs the container may use, as a decimal fraction of one CPU. Defaults to the operator's allowance; a request above the operator's maximum is refused. |
+| `memory` | How much memory the container may use, in bytes or with a `b`, `k`, `m` or `g` suffix. Defaults to the operator's allowance; a request above the operator's maximum is refused. |
+| `networkMode` | One of the modes the operator allows - `bridge` or `none` by default, `host` only where an operator has enabled it. Nothing else is accepted - not a named Docker network, not `container:<id>`. Left blank, it resolves to the first mode the operator allows. |
+| `extraHosts` | Additional entries for the container's hosts file, each written as `host:ip`. |
+
+Each action runs in a default image when `image` is left blank:
+
+| Action | Default image |
+| --- | --- |
+| Shell | `ubuntu:24.04` |
+| Python | `python:3.12-slim` |
+| Node | `node:22-alpine` |
+
+**The image allowlist is fail-closed, and an empty allowlist runs nothing.** An operator lists the images that may be
+run, as a comma-separated string:
+
+```yaml
+bytechef:
+  script:
+    runners:
+      docker:
+        enabled: true
+        properties:
+          allowed-images: python:3.12-slim,node:22-alpine,ubuntu:24.04
+```
+
+Matching is exact string equality - no prefixes, no wildcards, no registry normalisation, so `python:3.12` is not
+`python:3.12-slim` and two tags means two entries. Until at least one image is listed, *every* image is refused,
+including the per-action defaults above: a default saves you from typing an image, it never gets you past the
+allowlist. The image select in the editor offers exactly the allowed images, but the check that matters happens when
+the task runs, so a hand-edited workflow naming an unlisted image is refused there too.
+
+**`HOME` is the working directory under both runners.** Several interpreters write caches relative to it and fall
+over when it is unset, so the Process runner re-seeds it and the Docker runner sets it to the container's working
+directory rather than leaving it to the image - where it would be `/root`, or `/` for a numeric `user` that appears in
+no `/etc/passwd`. Without that, `pip install --user` under `user: "1000:1000"` succeeds on the Process runner and
+fails on the Docker runner with a permission error, for a reason that has nothing to do with the execution
+environment. A declared `env` entry named `HOME` still wins.
+
+**Every container is bounded, whether or not the workflow asked to be.** A PID ceiling, a CPU allowance and a memory
+allowance go on every container. The workflow's own `cpu` and `memory` are used where it names them, the operator's
+defaults where it does not, and a request above the operator's maximum is *refused* rather than quietly cut down - the
+same answer the image allowlist gives an image it does not hold, and for the same reason: an execution silently given a
+quarter of what it asked for fails much later as a timeout, in a message that names nothing. The PID ceiling has no
+workflow-facing property at all, because a fork bomb is a one-line `shell` action and a limit an attacker opts into is
+not a limit.
+
+| Operator key | Default | What it does |
+| --- | --- | --- |
+| `default-cpu` | `1` | The CPU allowance a container gets when its workflow names none. |
+| `max-cpu` | `4` | The largest CPU allowance a workflow may ask for. |
+| `default-memory` | `512m` | The memory allowance a container gets when its workflow names none. |
+| `max-memory` | `2g` | The largest memory allowance a workflow may ask for. |
+| `pids-limit` | `512` | The number of processes one container may hold open. Operator-only; zero or below is refused rather than read as "unlimited". |
+
+A malformed ceiling refuses every execution with a message naming its key, rather than quietly becoming unlimited.
+
+**An operator chooses which networks a container may reach.** `allowed-network-modes` takes the same shape as
+`allowed-images` - a comma-separated string matched by exact equality - and defaults to every mode the runner knows, so
+nothing changes for a deployment that never sets it. Because `allow-host-network` is off by default, the *effective*
+default is `bridge` and `none`; `host` still needs its own flag on top of appearing in this list.
+
+```yaml
+bytechef:
+  script:
+    runners:
+      docker:
+        enabled: true
+        properties:
+          allowed-images: python:3.12-slim,node:22-alpine,ubuntu:24.04
+          allowed-network-modes: none
+```
+
+That configuration is the isolated one: no container reaches anything, including a workflow that left `networkMode`
+blank. A blank `networkMode` resolves to the first mode the operator allows rather than being left to the daemon,
+which answers `bridge` - so before this key existed, an operator could not turn container networking off for the
+workflows that simply did not fill the field in.
+
+**There is no `volumes` property.** A host bind mount chosen by a workflow author is a container escape - `/` mounted
+read-write is the whole host - so this version offers no way to ask for one, and none is put on the container by any
+other route. Files cross the boundary as archives instead: `inputFiles` are copied into the container before it
+starts, and the output directory is copied back out after it exits. That also works unchanged when ByteChef itself
+runs in a container talking to a mounted Docker socket, where a host path a bind mount named would mean nothing to the
+daemon.
 
 ## Workflow data reaches commands through `env`, not `${…}`
 

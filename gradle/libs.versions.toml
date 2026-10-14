@@ -5,6 +5,7 @@ aws-sdk="2.54.20"
 bootui = "1.21.0"
 checkstyle = "14.3.0"
 com-google-auto-service = "1.1.1"
+docker-java = "3.5.1"
 findsecbugs = "1.14.0"
 graalvm = "25.2.4"
 io-modelcontextprotocol-sdk = "2.0.0"
@@ -32,6 +33,8 @@ springaicommunity-spring-ai-session = "0.10.0"
 testcontainers = "1.21.3"
 
 [libraries]
+com-github-docker-java-docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java" }
+com-github-docker-java-docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java" }
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.10.1"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.9.0"
 com-github-spotbugs-spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }

@@ -74,6 +74,16 @@ Each action runs in the environment selected by its **Task Runner** property. Th
 | Runner | Type | What it does |
 | --- | --- | --- |
 | GraalVM | `graalvm` | Runs the script inside the server process, in a GraalVM polyglot context. The only runner where `context.component.*` is available. |
+| Process | `process` | Runs the script in a child process on the same host. The server's own environment is cleared before the script starts — only `PATH`, `HOME` and the runner's own `BYTECHEF_*` names are put back — so the script cannot read the server's credentials by name. Enable with `bytechef.script.runners.process.enabled=true`. |
+| Docker | `docker` | Runs the script in a single-use container, on the local daemon or on whichever daemon the operator's `host` names. Every container gets a CPU allowance, a memory allowance and a PID ceiling from the operator's settings, and a script that asks for more CPU or memory than the operator's maximum is refused rather than silently cut down. Enable with `bytechef.script.runners.docker.enabled=true`. This is the same runner the **Commands** component uses; its README documents the image allowlist, the network-mode allowlist and the resource ceilings in depth. |
+
+The `Script Task Runners Demo` sample workflow (`demo/script-runners.json` in `automation-demo-config`, seeded into
+the Demo project on a `demo` profile install) shows this authoring shape as one `javascript` action: a workflow
+input passed through **Input** and a computed value returned from `perform()`. It runs unchanged under the shipped
+configuration because it leaves **Task Runner** unset, which falls back to GraalVM - the one runner every
+installation has enabled. The same task runs unchanged under `process` or `docker` too: once an operator enables one
+of them, setting the task's `taskRunner.type` to `process` or `docker` is the only edit needed, and the only thing
+that changes about the result is the shape described next - the bare returned value becomes the five-key map.
 
 The GraalVM runner has two modes:
 
@@ -81,3 +91,50 @@ The GraalVM runner has two modes:
 - **Trusted** — every restriction lifted. The script runs inside the server process with full reflection, so it can reach anything the server can, including other tenants' data. Enable it only on a single-tenant deployment you control, with `bytechef.script.runners.graalvm.properties.trusted-enabled=true`. Until an operator sets that flag the Trusted option is not offered at all.
 
 Workflow data reaches a script through the **Input** property, not by interpolating expressions into the source.
+
+### Result Shape
+
+The shape of an action's result depends on which runner ran it, and this is the change most likely to break a workflow that switches runners.
+
+Under **GraalVM**, the action returns exactly what the script's `perform()` function returned.
+
+Under **Process** or **Docker**, the action instead always returns this map:
+
+```json
+{
+  "exitCode": 0,
+  "stdout": "...",
+  "stderr": "",
+  "vars": {},
+  "outputFiles": {}
+}
+```
+
+`vars` is `perform()`'s return value — the appended bootstrap serializes it to `output.json` in the working directory, and the runner reads that file back into `vars`. So a script that returns `{"total": 42}` is read as `${myScript.total}` under GraalVM, and as `${myScript.vars.total}` under Process or Docker. Moving a script between GraalVM and an external runner means updating every downstream reference to its output, not just the Task Runner property.
+
+### Language Support By Runner
+
+The Process and Docker runners can only start an interpreter for JavaScript, Python and shell. Ruby, Java and R remain GraalVM-only, and are rejected by the runner's own validation before anything starts — the failure names the language, for example *"Language 'ruby' cannot be executed by an external task runner."*
+
+That check is deliberately not enforced earlier, in the editor: the **Task Runner** select is built from what each enabled runner declares it can do, not from what languages it can run, so an action written in a GraalVM-only language still lists Process and Docker as choices alongside GraalVM. This is the same two-layer arrangement the Docker runner's image and network-mode allowlists use elsewhere in this feature — the editor's options are a convenience, and the boundary is enforced where the task actually runs, loudly and by name, rather than hidden from the picker.
+
+In the current build this only matters for JavaScript and Python, the two languages this component ships — both resolve externally. The Ruby, Java and R actions exist in the codebase but are not registered on this component for reasons unrelated to task runners; the mismatch above becomes reachable once they are.
+
+### Inheriting The Host Environment
+
+The Process runner clears the environment before the script starts and re-seeds only `PATH`, `HOME` and its own `BYTECHEF_*` names — the server process holds datasource passwords and cloud credentials, and a script must not be able to read them by name.
+
+A workflow author can ask for the server's full environment instead, through the runner's **Inherit Environment** option, but that option only exists once an operator has enabled it with `bytechef.script.runners.process.properties.inherit-environment-enabled=true`. Until then the option is not offered in the editor, and a hand-written workflow that sets it anyway is rejected.
+
+### Limitations
+
+**Workflow expressions are not evaluated in script source.** A `${…}` written in the **JavaScript Code** or **Python Code** field reaches the interpreter exactly as you typed it. A JavaScript template literal such as `` `Hi ${name}` `` is your code, not a workflow expression, and this holds under every runner.
+
+Previously the source was passed through the workflow expression evaluator, and that is a breaking change if you relied on it: a bare `${name}` was substituted whenever the workflow context happened to carry a matching name, and anything more involved — `` `Total: ${a + b}` ``, a ternary, a function call — failed the whole task with `Invalid expression`, naming neither the script nor the property. Such a script now runs, and a script that did rely on the substitution receives a literal `${name}` instead of a value.
+
+Workflow data reaches a script through the **Input** property, whose values *are* evaluated normally — declare the value as an input and read it from `input` inside `perform()`.
+
+Two limitations of the Process and Docker runners are deliberate trade-offs, not oversights:
+
+- **A backgrounded descendant is not reaped under the Process runner.** A script whose shell command ends in something like `sleep 600 &` outlives the task: the task itself is bounded — the wait for its output has a ceiling — but the orphaned descendant keeps running after the task ends. Reaping it would need a process group, which this runner does not implement. The Docker runner does not have this problem: removing the container takes everything running inside it with it.
+- **`stdout` and `stderr` in the result are truncated.** Only the first 32 KiB and the last 32 KiB of each stream are kept, with the number of elided bytes written between them. The full, untruncated stream still reaches the server log, line by line, as it is produced — nothing is lost, it is just not all in the task's own result.

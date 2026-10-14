@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ import com.bytechef.component.ai.agent.utils.test.util.AiAgentUtilsTestUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
+import com.bytechef.platform.component.polyglot.ScriptSandboxMode;
 import com.bytechef.platform.component.runner.PolyglotEngine;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Method;
@@ -174,8 +176,9 @@ class AiAgentUtilsSkillsToolTest {
 
         when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(1L));
         when(aiSkillFacade.getAiSkillDownload(1L)).thenReturn(zipBytes);
-        when(polyglotEngine.execute(eq("js"), any(Parameters.class), eq(Map.of()), eq(context)))
-            .thenReturn(Map.of());
+        when(polyglotEngine.execute(
+            eq(ScriptSandboxMode.STRICT), isNull(), eq("js"), any(Parameters.class), eq(Map.of()), eq(context)))
+                .thenReturn(Map.of());
 
         ToolCallback scriptToolCallback = Arrays.stream(invokeApply().getToolCallbacks())
             .filter(toolCallback -> "release_notes_group_commits".equals(toolCallback.getToolDefinition()
@@ -196,7 +199,9 @@ class AiAgentUtilsSkillsToolTest {
 
         ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
-        verify(polyglotEngine).execute(eq("js"), parametersArgumentCaptor.capture(), eq(Map.of()), eq(context));
+        verify(polyglotEngine).execute(
+            eq(ScriptSandboxMode.STRICT), isNull(), eq("js"), parametersArgumentCaptor.capture(), eq(Map.of()),
+            eq(context));
 
         Parameters scriptParameters = parametersArgumentCaptor.getValue();
 

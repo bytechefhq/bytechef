@@ -1,0 +1,24 @@
+{
+  "label": "Script Task Runners Demo",
+  "inputs": [ {
+    "name": "count",
+    "label": "Count",
+    "type": "integer",
+    "required": true
+  } ],
+  "outputs": [ {
+    "name": "doubled",
+    "value": "${computeDoubled}"
+  } ],
+  "tasks": [ {
+    "name": "computeDoubled",
+    "label": "Compute the doubled count",
+    "type": "script/v1/javascript",
+    "parameters": {
+      "input": {
+        "count": "${count}"
+      },
+      "script": "function perform(input, context) {\n    return input.count * 2;\n}"
+    }
+  } ]
+}
