@@ -1,0 +1,3 @@
+mutation updateCodeWorkflowSource($projectId: ID!, $content: String!) {
+    updateCodeWorkflowSource(projectId: $projectId, content: $content)
+}

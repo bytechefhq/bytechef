@@ -350,6 +350,7 @@ const AutomationWorkflowEditorHeader = ({
 
                 <div className="relative">
                     <AutomationWorkflowEditorSettingsMenu
+                        codeWorkflowProject={project.codeWorkflowProject}
                         onDeleteProjectClick={handleDeleteProjectClick}
                         onDeleteWorkflowClick={handleDeleteWorkflowClick}
                         onDuplicateProjectClick={handleDuplicateProjectClick}

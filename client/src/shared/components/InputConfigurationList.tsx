@@ -34,6 +34,7 @@ interface InputConfigurationListProps {
     control: Control<FieldValues>;
     controlPath: string;
     duplicateSubflowStubs?: SubflowDuplicateStubI[];
+    emptyStateMessage?: string;
     formState: FormState<FieldValues>;
     inputs?: WorkflowInput[];
     onOpenInputs?: () => void;
@@ -641,6 +642,7 @@ const InputConfigurationList = ({
     control,
     controlPath,
     duplicateSubflowStubs,
+    emptyStateMessage,
     formState,
     inputs,
     onOpenInputs,
@@ -690,6 +692,16 @@ const InputConfigurationList = ({
     }, [inputs, duplicateSubflowStubs]);
 
     if (!referenceInputs.length && !regularInputs.length && !subflowInputTree.size && !topLevelStubs.length) {
+        if (emptyStateMessage) {
+            return (
+                <div className="flex flex-col items-center gap-2">
+                    <h3 className="font-medium text-content-neutral-primary">No Inputs yet</h3>
+
+                    <p className="text-sm text-content-neutral-secondary">{emptyStateMessage}</p>
+                </div>
+            );
+        }
+
         if (!onOpenInputs) {
             return <p className="p-4 text-center text-sm text-content-neutral-secondary">No Inputs yet</p>;
         }

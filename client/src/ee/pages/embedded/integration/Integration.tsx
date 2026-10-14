@@ -6,6 +6,7 @@ import {WebhookTriggerTestApi} from '@/ee/shared/middleware/embedded/configurati
 import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
+import {useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
@@ -48,6 +49,8 @@ const Integration = () => {
         updateWorkflowNodeParameterMutation,
         useGetConnectionsQuery,
     } = useIntegration();
+
+    const {data: integration} = useGetIntegrationQuery(integrationId, undefined, !!integrationId);
 
     const {runDisabled} = useRun();
 
@@ -97,6 +100,8 @@ const Integration = () => {
                                 value={{
                                     ConnectionKeys: ConnectionKeys,
                                     cancelWorkflowQueries,
+                                    codeWorkflow: integration?.codeWorkflow,
+                                    codeWorkflowLanguage: integration?.codeWorkflowLanguage,
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
                                     invalidateWorkflowQueries,

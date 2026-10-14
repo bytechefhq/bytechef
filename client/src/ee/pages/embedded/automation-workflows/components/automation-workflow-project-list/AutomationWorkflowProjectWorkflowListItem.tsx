@@ -16,6 +16,7 @@ type AutomationWorkflowProjectWorkflowTemplateType =
     AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number]['workflowTemplates'][number];
 
 interface AutomationWorkflowProjectWorkflowListItemProps {
+    codeWorkflowProject?: boolean;
     onDeleteWorkflow: (workflowUuid: string) => void;
     onEditWorkflow: (workflow: AutomationWorkflowProjectWorkflowTemplateType) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
@@ -23,6 +24,7 @@ interface AutomationWorkflowProjectWorkflowListItemProps {
 }
 
 const AutomationWorkflowProjectWorkflowListItem = ({
+    codeWorkflowProject = false,
     onDeleteWorkflow,
     onEditWorkflow,
     onSelectWorkflow,
@@ -123,17 +125,19 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                             }}
                         />
 
-                        <DropdownMenuItem
-                            aria-label="Delete Workflow"
-                            icon={<Trash2Icon />}
-                            label="Delete"
-                            onClick={(event) => {
-                                event.stopPropagation();
+                        {!codeWorkflowProject && (
+                            <DropdownMenuItem
+                                aria-label="Delete Workflow"
+                                icon={<Trash2Icon />}
+                                label="Delete"
+                                onClick={(event) => {
+                                    event.stopPropagation();
 
-                                onDeleteWorkflow(workflow.workflowUuid);
-                            }}
-                            variant="destructive"
-                        />
+                                    onDeleteWorkflow(workflow.workflowUuid);
+                                }}
+                                variant="destructive"
+                            />
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

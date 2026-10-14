@@ -102,6 +102,14 @@ export interface Integration {
      */
     category?: Category;
     /**
+     * Whether the integration is backed by a code workflow.
+     */
+    readonly codeWorkflow?: boolean;
+    /**
+     * The programming language of the code workflow, if the integration is code-backed.
+     */
+    readonly codeWorkflowLanguage?: string;
+    /**
      * The number of the integration's instance configurations in the Development environment. Only set by the integration list.
      */
     readonly developmentConfigurationCount?: number;
@@ -155,6 +163,8 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'name': json['name'] == null ? undefined : json['name'],
         'permissionExpression': json['permissionExpression'] == null ? undefined : json['permissionExpression'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
+        'codeWorkflow': json['codeWorkflow'] == null ? undefined : json['codeWorkflow'],
+        'codeWorkflowLanguage': json['codeWorkflowLanguage'] == null ? undefined : json['codeWorkflowLanguage'],
         'developmentConfigurationCount': json['developmentConfigurationCount'] == null ? undefined : json['developmentConfigurationCount'],
         'integrationWorkflowIds': json['integrationWorkflowIds'] == null ? undefined : json['integrationWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
@@ -166,7 +176,7 @@ export function IntegrationToJSON(json: any): Integration {
     return IntegrationToJSONTyped(json, false);
 }
 
-export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'|'developmentConfigurationCount'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'|'codeWorkflow'|'codeWorkflowLanguage'|'developmentConfigurationCount'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
