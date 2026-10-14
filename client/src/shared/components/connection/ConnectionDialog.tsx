@@ -14,7 +14,7 @@ import {Input} from '@/components/Input/Input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import Switch from '@/components/Switch/Switch';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
@@ -645,14 +645,21 @@ const ConnectionDialog = ({
                                             name="shared"
                                             render={({field}) => (
                                                 <FormItem>
-                                                    <FormControl>
-                                                        <Switch
-                                                            checked={field.value}
-                                                            description="Every connected user in this environment will be able to use this connection."
-                                                            label="Shared Connection"
-                                                            onCheckedChange={field.onChange}
-                                                        />
-                                                    </FormControl>
+                                                    <FormLabel>Shared Connection</FormLabel>
+
+                                                    <div className="flex items-center gap-2">
+                                                        <FormControl>
+                                                            <Switch
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                            />
+                                                        </FormControl>
+
+                                                        <FormDescription>
+                                                            Every connected user in this environment will be able to use
+                                                            this connection.
+                                                        </FormDescription>
+                                                    </div>
                                                 </FormItem>
                                             )}
                                         />
