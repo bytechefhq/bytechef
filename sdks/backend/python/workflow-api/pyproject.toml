@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bytechef-workflow-api"
+version = "0.1.0"
+description = "Type definitions for ByteChef script code workflows."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+keywords = ["bytechef", "code-workflow", "workflow", "types"]
+
+[project.urls]
+Repository = "https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/python/workflow-api"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bytechef_workflow_api"]

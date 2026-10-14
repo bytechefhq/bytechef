@@ -23,6 +23,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,6 +33,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -106,10 +108,12 @@ class CodeWorkflowContainerFacadeIntTest {
         @Bean
         CodeWorkflowContainerFacade codeWorkflowContainerFacade(
             CodeWorkflowContainerService codeWorkflowContainerService, CodeWorkflowFileStorage codeWorkflowFileStorage,
-            ObjectMapper objectMapper, WorkflowService workflowService) {
+            ObjectProvider<ComponentDefinitionService> componentDefinitionServiceProvider, ObjectMapper objectMapper,
+            WorkflowService workflowService) {
 
             return new CodeWorkflowContainerFacadeImpl(
-                codeWorkflowContainerService, codeWorkflowFileStorage, objectMapper, workflowService);
+                codeWorkflowContainerService, codeWorkflowFileStorage, componentDefinitionServiceProvider, objectMapper,
+                workflowService);
         }
 
         @Bean

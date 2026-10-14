@@ -1,0 +1,11 @@
+{
+    "name": "workflow-api-examples",
+    "private": true,
+    "scripts": {
+        "check": "tsc -p tsconfig.json"
+    },
+    "devDependencies": {
+        "@bytechef/workflow-api": "file:..",
+        "typescript": "^5.9.3"
+    }
+}

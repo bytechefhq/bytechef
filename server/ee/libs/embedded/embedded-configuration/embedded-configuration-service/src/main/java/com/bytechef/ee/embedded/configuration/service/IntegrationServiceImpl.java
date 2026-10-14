@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,18 @@ public class IntegrationServiceImpl implements IntegrationService {
     @Override
     public void delete(long id) {
         integrationRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Integration> fetchIntegration(String componentName) {
+        return integrationRepository.findByComponentNameIgnoreCase(componentName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Integration> getIntegrations(String componentName) {
+        return integrationRepository.findAllByComponentNameIgnoreCase(componentName);
     }
 
     @Override
