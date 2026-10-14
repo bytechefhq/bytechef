@@ -1,0 +1,173 @@
+---
+title: Code Integrations
+description: Build an embedded integration's workflows in JavaScript, Python or Java - create and edit it in ByteChef or deploy it from CI, then publish it to your connected users.
+comingSoon: true
+ee: true
+---
+
+A **code integration** is an embedded [integration](/platform/embedded/build/integrations) whose workflows are written
+in code instead of on the canvas. Your connected users meet it exactly like any other integration - in the
+[Integration Marketplace](/platform/embedded/build/integration-marketplace), the connect dialog and their instances -
+and its workflows run on the same engine. Only the authoring and the lifecycle differ.
+
+It uses the [code workflow contract](/platform/automation/build/workflows/code-workflows): the same workflows, inputs,
+outputs, triggers, tasks, task context and type definitions. The one difference is how it is identified: a code
+integration is keyed by the **component it integrates**, so it declares `componentName` and `componentVersion` where a
+project declares `name`.
+
+<Callout title="Enterprise Edition only">
+    Code integrations require an Enterprise Edition deployment (`bytechef.edition=ee`).
+</Callout>
+
+## The definition
+
+| Member | Type | Required | |
+|---|---|---|---|
+| `componentName` | string | Yes | The component this integration is for. It must exist on the server. |
+| `componentVersion` | integer | Yes | That component's version. |
+| `version` | string | No | Defaults to `0.0.1`. |
+| `description` | string | No | |
+| `workflows` | list of workflows | No | [Workflows](/platform/automation/build/workflows/code-workflows#workflow) as in a code project. |
+
+```javascript tab="JavaScript"
+({
+    componentName: "httpClient",
+    componentVersion: 1,
+    version: "0.0.1",
+    description: "A sample code integration built on the HTTP Client component.",
+    workflows: [
+        {
+            name: "echoMessage",
+            label: "Echo Message",
+            description: "Returns the message it was given, upper-cased.",
+            inputs: [{name: "message", label: "Message", type: "STRING", required: true}],
+            outputs: [{name: "result", task: "shout"}],
+            tasks: [
+                {
+                    name: "shout",
+                    label: "Shout",
+                    description: "Upper-cases the message.",
+                    perform: function (context) {
+                        return String(context.input("message")).toUpperCase();
+                    }
+                }
+            ]
+        }
+    ]
+})
+```
+
+```python tab="Python"
+def shout(context):
+    return str(context.input("message")).upper()
+
+
+integration = {
+    "componentName": "httpClient",
+    "componentVersion": 1,
+    "version": "0.0.1",
+    "description": "A sample code integration built on the HTTP Client component.",
+    "workflows": [
+        {
+            "name": "echoMessage",
+            "label": "Echo Message",
+            "description": "Returns the message it was given, upper-cased.",
+            "inputs": [{"name": "message", "label": "Message", "type": "STRING", "required": True}],
+            "outputs": [{"name": "result", "task": "shout"}],
+            "tasks": [
+                {"name": "shout", "label": "Shout", "description": "Upper-cases the message.", "perform": shout}
+            ],
+        }
+    ],
+}
+
+integration
+```
+
+A Java code integration is a jar with an `IntegrationHandler` implementation from
+`sdks/backend/java/embedded/integration-api`, registered through `ServiceLoader` like a
+[Java code project](/platform/automation/build/workflows/code-workflows#the-java-contract).
+
+To type-check a JavaScript or Python integration, use `ByteChef.IntegrationDefinition` from
+`@bytechef/workflow-api` or `IntegrationDefinition` from `bytechef-workflow-api`; see
+[Typed authoring](/platform/automation/build/workflows/code-workflows#typed-authoring).
+
+## Sample integrations
+
+| Language | Sample |
+|---|---|
+| Java | [bytechef-embedded-integration-sample-code-workflow-java](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-java) |
+| JavaScript | [bytechef-embedded-integration-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript) |
+| Python | [bytechef-embedded-integration-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-python) |
+
+Each sample is the `echoMessage` integration above, with a local check that evaluates the file the way the server does
+and runs its task once.
+
+## Creating a code integration
+
+On Embedded → **Integrations**, the arrow next to **New Integration** opens a menu with **New Code Integration** and
+**Import Code Integration**.
+
+- **New Code Integration** asks for the component, a language (JavaScript or Python), a name, a description, a
+  category, tags and an optional [permission expression](/platform/embedded/build/permission-expressions). ByteChef
+  creates the integration as an unpublished draft from a starter source and opens it in the code editor.
+- **Import Code Integration** uploads a `.js`, `.py` or `.jar` file and publishes it.
+
+## Editing in ByteChef
+
+A JavaScript or Python code integration opens in a **source editor** instead of the canvas.
+
+- **Save** checks the source before storing it: source that fails to load is rejected with the loader's error and the
+  draft stays as it was. The `componentName` declared in the source must stay the integration's component - renaming
+  through the source is not supported.
+- Saves change the **draft** only. Connected users keep running the last published version until you publish the
+  integration, exactly like a visual integration.
+- A workflow keeps its identity across saves, uploads and publishes as long as its name doesn't change, so instance
+  configurations and connected users' instances keep pointing at the right workflow.
+
+Java code integrations are uploaded only; the editor does not open them.
+
+## Deploying through the API
+
+```
+POST /api/embedded/v1/integration-code-workflows/deploy
+```
+
+A `multipart/form-data` request with one file part, `integrationFile`: the `.js`, `.py` or `.jar` file. The file
+name's extension picks the language. An optional `enable` query parameter (`false` by default) makes the published
+integration live in the request's environment: ByteChef creates and enables its instance configuration when it has
+none there, otherwise it moves the existing one to the published version and enables it.
+
+Authenticate with an **Embedded API key** (Embedded → Settings → **API Keys**) that belongs to an administrator -
+deploying requires the admin role, and an organization admin key is rejected with `401`. The key is looked up in the
+environment named by the `X-Environment` header (`DEVELOPMENT`, `STAGING` or `PRODUCTION`; `PRODUCTION` when absent),
+and the request runs as the key's own ByteChef user, not as a connected user. A successful deploy returns
+`204 No Content`.
+
+```bash
+curl -X POST "$BYTECHEF_URL/api/embedded/v1/integration-code-workflows/deploy?enable=true" \
+  -H "Authorization: Bearer $BYTECHEF_EMBEDDED_API_KEY" \
+  -H "X-Environment: DEVELOPMENT" \
+  -F "integrationFile=@src/sample_code_integration.py"
+```
+
+What the endpoint does:
+
+- **It saves *and* publishes.** The upload is saved as the integration's draft and published in the same call. An
+  upload replaces any unpublished editor changes.
+- **It upserts by component.** The first deploy for a component creates the integration; every deploy after that
+  publishes a new version of it. If more than one code integration is built on the same component (possible when they
+  were created in ByteChef), an upload can't tell which one to update and is refused - edit the one you mean in the
+  source editor instead.
+
+Java uploads follow the
+[`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`](/platform/automation/build/workflows/code-workflows#restricting-java-code-workflows)
+switch.
+
+## See also
+
+- [Code Workflows](/platform/automation/build/workflows/code-workflows) - the full contract: task context, inputs,
+  outputs, triggers, concurrency, connections and typed authoring.
+- [Integrations](/platform/embedded/build/integrations) - how an integration reaches your connected users.
+- [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows) - catalog code projects,
+  run by reference.

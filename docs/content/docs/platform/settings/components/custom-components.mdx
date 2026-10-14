@@ -1,6 +1,6 @@
 ---
 title: Custom Components
-description: Extend the component catalog with your own - a JavaScript, Python, or Ruby source file or a Java jar, uploaded and enabled without forking the platform.
+description: Extend the component catalog with your own - a JavaScript or Python source file or a Java jar, uploaded and enabled without forking the platform.
 comingSoon: true
 ee: true
 ---
@@ -45,13 +45,13 @@ Java components are built outside ByteChef and uploaded as a `.jar`. See the [de
 
 ### Script components
 
-JavaScript, Python, and Ruby components are written as a single source file and uploaded. No local toolchain is required.
+JavaScript and Python components are written as a single source file and uploaded. No local toolchain is required.
 
 ## The Custom Components list
 
 **Settings → Custom Components** lists what is installed. Each row shows the component title and name, a version badge, a language badge, an enable/disable toggle, and a **Delete** action. Expanding a row with its chevron shows the component's resolved definition - its actions and triggers - read-only.
 
-**Import Component** in the header opens the **Import Custom Component** dialog - "Upload a custom component JAR file to deploy it to the platform." - which takes `.jar`, `.js`, `.py`, and `.rb` files by drag-and-drop or file browse. An upload is deployed immediately; there is no separate release step.
+**Import Component** in the header opens the **Import Custom Component** dialog - "Upload a custom component JAR file to deploy it to the platform." - which takes `.jar`, `.js` and `.py` files by drag-and-drop or file browse. An upload is deployed immediately; there is no separate release step.
 
 {/* TODO screenshot: Settings → Custom Components - list of custom component rows each showing title, name, version + language badges, an enable/disable switch, and the Import Component button in the header */}
 
@@ -59,7 +59,7 @@ JavaScript, Python, and Ruby components are written as a single source file and 
 
 ### The detail page
 
-Opening a **JavaScript, Python, or Ruby** component navigates to its detail page: an editable **Monaco source editor** with **Save** and **Publish** buttons. **Save** is compile-gated - the edited source is loaded before it is persisted, and invalid source is rejected with the loader's error rather than being saved.
+Opening a **JavaScript or Python** component navigates to its detail page: an editable **Monaco source editor** with **Save** and **Publish** buttons. **Save** is compile-gated - the edited source is loaded before it is persisted, and invalid source is rejected with the loader's error rather than being saved.
 
 **Java** components do not open the editor; their source lives in your build. Instead the list row expands inline via its chevron to show the resolved definition - the component's actions and triggers - read-only. Attempting to edit Java source is rejected as `JAVA_SOURCE_NOT_EDITABLE`.
 
@@ -70,7 +70,7 @@ Opening a **JavaScript, Python, or Ruby** component navigates to its detail page
 In the page header, the **New Component** dropdown offers **Custom Component** and **Import Custom Component**.
 
 - **Custom Component** opens the **New Custom Component** dialog - a **Name** field and a **Language** selector (JavaScript today) - and generates an empty starter you flesh out in the editor. A new component starts as a **draft**.
-- **Import Custom Component** opens an upload dialog accepting one or more `.jar` / `.js` / `.py` / `.rb` files by drag-and-drop or file browse.
+- **Import Custom Component** opens an upload dialog accepting one or more `.jar` / `.js` / `.py` files by drag-and-drop or file browse.
 
 Unlike editor saves, imports and CLI deploys **publish immediately** - deploying is an explicit release action.
 
@@ -130,7 +130,6 @@ The object is expressed in each language's natural shape:
 
 - **JavaScript** - a bare object literal, `({ ... })`.
 - **Python** - a `types.SimpleNamespace`.
-- **Ruby** - a core `Struct`.
 
 ### The action perform contract
 
@@ -356,7 +355,7 @@ The same components can be deployed through the public API:
 POST /api/platform/v1/custom-components/deploy
 ```
 
-A multipart request with a `componentFile` part whose extension selects the language (`.jar`, `.js`, `.py`, `.rb`). The endpoint is admin-only and returns `204` on success.
+A multipart request with a `componentFile` part whose extension selects the language (`.jar`, `.js`, `.py`). The endpoint is admin-only and returns `204` on success.
 
 ## Authoring with the AI Hub
 
@@ -376,7 +375,7 @@ Two properties let administrators tighten how Java custom components are handled
 
 | Property | Default | Effect |
 |---|---|---|
-| `bytechef.component.custom-component.java-enabled` (`BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED`) | `true` | Set `false` to reject new Java (jar) uploads while JavaScript, Python, and Ruby components - and previously uploaded Java components - keep working. Use this when you want scripting-language extensibility without accepting arbitrary JVM bytecode. |
+| `bytechef.component.custom-component.java-enabled` (`BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED`) | `true` | Set `false` to reject new Java (jar) uploads while JavaScript and Python components - and previously uploaded Java components - keep working. Use this when you want scripting-language extensibility without accepting arbitrary JVM bytecode. |
 | `bytechef.component.custom-component.java-loader` (`BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER`) | `CLASS_LOADER` | Set `ESPRESSO` to execute Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of the in-process isolating classloader, adding a stronger boundary between component code and the host process. |
 
 The same pair exists for Java code workflows: `bytechef.workflow.code-workflow.java-enabled` and `bytechef.workflow.code-workflow.java-loader`, with the same defaults. See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#component-configuration).
