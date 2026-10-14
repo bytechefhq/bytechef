@@ -22,9 +22,14 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 
 val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+    configOptions.set(
+        mapOf(
+            "importFileExtension" to ".js"
+        )
+    )
     generatorName.set("typescript-fetch")
     inputSpec.set("$projectDir/openapi.yaml")
-    outputDir.set("$rootDir/client/src/ee/shared/middleware/embedded/public")
+    outputDir.set("$rootDir/sdks/api/typescript/src/configuration")
 }
 
 tasks.register("generateOpenAPI") {
