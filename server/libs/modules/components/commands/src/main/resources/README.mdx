@@ -26,15 +26,16 @@ properties - the Process runner's `interpreter` override, or the Docker runner's
 ## Task runners
 
 Commands only offers runners that declare the **Commands** capability - that excludes GraalVM entirely, since
-GraalVM's in-process component bridge cannot run a list of shell commands. Three built-in runners declare it:
+GraalVM's in-process component bridge cannot run a list of shell commands. Four built-in runners declare it:
 
 | Runner | Type | What it does |
 | --- | --- | --- |
 | Process | `process` | Runs the commands in a child process on the same host, with the server's own environment cleared. |
 | Docker | `docker` | Runs the commands in a single-use container, on the local daemon or on whichever daemon the operator's `host` names. |
 | Kubernetes | `kubernetes` | Enterprise. Runs the commands as a pod on the cluster the task's **Kubernetes** connection names. |
+| AWS Batch | `aws-batch` | Enterprise. Runs the commands as an AWS Batch job in the account the task's **AWS** connection names. |
 
-All three are **off** until an operator turns them on with `bytechef.script.runners.<type>.enabled=true` - the shipped
+All four are **off** until an operator turns them on with `bytechef.script.runners.<type>.enabled=true` - the shipped
 configuration enables only `graalvm`, which Commands never offers. So this list is what your installation *may* have,
 not what it has; it may also include a runner contributed by another module. If no runner declaring the Commands
 capability is enabled at all, running any of these actions fails with a message naming the configuration key to set.
@@ -59,6 +60,8 @@ bytechef:
           host: ""
           allow-task-host: false
           allow-volume-mounts: false
+      aws-batch:
+        enabled: false
       kubernetes:
         enabled: false
     runner-limits:
@@ -67,7 +70,7 @@ bytechef:
       max-transfer-bytes: 512MB
 ```
 
-Only `graalvm` is enabled by the shipped configuration; `process`, `docker` and `kubernetes` need their own `enabled: true` before
+Only `graalvm` is enabled by the shipped configuration; `process`, `docker`, `kubernetes` and `aws-batch` need their own `enabled: true` before
 anything else under them takes effect. What each key costs to turn on:
 
 - `graalvm.trusted-enabled`: lets a workflow's `script` task ask for `mode: trusted`, which drops GraalVM's guest
@@ -78,6 +81,7 @@ anything else under them takes effect. What each key costs to turn on:
 - `docker.enabled`: any workflow author can choose any image, `user`, `privileged: true` and `networkMode: host` -
   effectively root on the daemon's host. Turn it on only where workflow authors are trusted with that host.
 - `kubernetes.enabled`: any workflow author with a Kubernetes connection can run any image on that connection's cluster, within what the connection's credentials allow. Authors choose the pod's `namespace` and `serviceAccountName`, so the pod can run in any namespace the connection can create pods in, as any service account there. ByteChef adds no limits of its own beyond `runner-limits`; give the connection a dedicated namespace and enforce Pod Security Admission (for example the `restricted` level) on it.
+- `aws-batch.enabled`: any workflow author with an AWS connection can run any image on that account's Batch queues, as any job and task role the connection's identity may pass. Give the connection's identity a policy scoped to the queues, bucket and roles below.
 - `docker.host`: points the runner at a remote Docker daemon instead of the local socket. Whoever controls that
   daemon controls every container this runner starts, so this is only as safe as the daemon it names.
 - `docker.allow-task-host`: lets a workflow name its own Docker API through the runner's `host` property; whoever
@@ -254,6 +258,142 @@ rules:
 Secrets are only needed when tasks use `credentials`; `patch` ties each pull secret to its pod through an owner
 reference, so the cluster removes the secret with the pod even when ByteChef cannot. Without `events`, scheduling failures are reported without the
 cluster's message.
+
+### The AWS Batch runner (Enterprise)
+
+The AWS Batch runner is the Kubernetes runner's sibling for AWS: the same `env`, `inputFiles`, `outputFiles` and
+`timeout` handling and the same five-key result, but the task runs as an AWS Batch job in the account that the task's
+**AWS** connection names. It is available with `bytechef.edition=ee` and `bytechef.script.runners.aws-batch.enabled=true`.
+
+**What it needs.**
+
+- An `aws` connection: access key ID, secret access key, region, and optionally a role ARN and external ID. With a
+  role, its maximum session duration must cover the completion budget plus 10 minutes, at most 12 hours.
+- An **ECS-backed** job queue (Fargate or EC2; EKS queues are not supported).
+- A staging bucket.
+- On Fargate, an execution role. If the subnets have no NAT gateway, use public subnets with **Assign Public IP**, so
+  the task can pull images and reach S3.
+- The task's image must provide `/bin/sh`.
+
+Its own properties:
+
+| Property | What it does |
+| --- | --- |
+| `image` | The container image the task runs in. Optional - the defaults are the Docker runner's. |
+| `entrypoint` | Replaces the interpreter the source file is handed to. The source file is appended either way. |
+| `jobQueue` | The ECS-backed job queue the job is submitted to. |
+| `bucket` | The staging bucket for the input and output archives. |
+| `platform` | `FARGATE` (default) or `EC2`. |
+| `executionRoleArn` | The role Fargate uses to pull images and write logs. Required on Fargate. |
+| `taskRoleArn` | The role the task itself runs as. Without one, the task has no AWS permissions. |
+| `vcpu` | The task's total vCPU, sidecars included. Defaults to `1`. |
+| `memory` | The task's total memory in MiB, sidecars included. Defaults to `2048`. |
+| `assignPublicIp` | Gives the Fargate task a public IP, so it can pull images and reach S3 from public subnets. |
+| `completionCheckInterval` | How often the job's status and logs are polled, as an ISO-8601 duration. Defaults to `PT5S`. |
+| `fileSidecarImage` | The image of the file sidecar containers. Defaults to `curlimages/curl:8.11.1`; it needs `sh`, `curl` and `tar`. |
+| `pullPolicy` | Shared with the other runners, and ignored by Batch. |
+| `resume` | After a server restart, re-attach to the job this task execution already started instead of starting another one. Defaults to `true`. |
+| `delete` | Deregister the job definition and delete the staged objects once the job has finished. Defaults to `true`. |
+| `waitUntilRunning` | How long the job may stay queued, pending or starting before it fails, as an ISO-8601 duration. Defaults to `PT10M`. |
+| `waitUntilCompletion` | How long the job may run before it is killed, as an ISO-8601 duration. The task's Timeout, when set, takes precedence; both are capped by the operator's `max-wait`. Defaults to `PT1H`. |
+
+**Sizing.**
+
+- `vcpu` and `memory` are the task's totals. The two file sidecars take 0.25 vCPU / 64 MiB each, and the task's own
+  container gets the rest.
+- On Fargate the total must be a Fargate combination of at least 1 vCPU:
+
+| vCPU | Memory (MiB) | Step (MiB) |
+| --- | --- | --- |
+| 1 | 2048 to 8192 | 1024 |
+| 2 | 4096 to 16384 | 1024 |
+| 4 | 8192 to 30720 | 1024 |
+| 8 | 16384 to 61440 | 4096 |
+| 16 | 32768 to 122880 | 8192 |
+
+- EC2 queues are not checked beyond the sidecar minimum.
+
+**How a run works.**
+
+- Inputs go to `s3://<bucket>/bytechef/<job>/<name>-<random>/input.tar`. A job definition is registered for the run,
+  with three containers sharing an ephemeral volume:
+  - the file sidecar downloads and unpacks the inputs through a presigned GET;
+  - `main` runs the task with stderr redirected to `.stderr`;
+  - the essential output sidecar tars `output/` and `.stderr` and uploads them through a presigned PUT, then the job
+    ends.
+- The presigned URLs are valid for the completion budget plus 10 minutes. They sit in the job definition's
+  environment, readable by anyone allowed `batch:DescribeJobDefinitions`, and the definition is deregistered after the
+  run.
+- The same holds for the task's `env` values: they are stored in the job definition, readable through
+  `batch:DescribeJobDefinitions` and `batch:DescribeJobs`, and deregistered after the run unless the job is detached.
+  Do not put secrets in `env` on this runner.
+- The job's attempt timeout is the completion budget plus one minute.
+- The result's exit code is `main`'s, even when the job itself reports `SUCCEEDED`. If `main` succeeds but the output
+  upload fails, the task fails.
+- A job stuck in `RUNNABLE` fails after `waitUntilRunning` with "the job queue may have no capacity".
+- Logs are tailed from CloudWatch `/aws/batch/job`.
+
+**Resume.**
+
+- Jobs are named `bytechef-<key>` (`k-` plus a SHA-256 prefix when the key does not fit) and tagged `bytechef.io/key`.
+- A redelivered task re-attaches to the newest job with that key that has not finished.
+- The same durable-broker caveat as the other runners applies, and two installations must not share one queue with
+  `resume` on.
+- Clean up leftovers by terminating jobs named `bytechef-*`, deregistering `bytechef-*` job definitions, and deleting
+  `s3://<bucket>/bytechef/`.
+
+**IAM.** The connection's identity needs a policy like this one:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "batch:RegisterJobDefinition", "batch:DeregisterJobDefinition", "batch:SubmitJob", "batch:DescribeJobs",
+        "batch:ListJobs", "batch:TerminateJob", "batch:TagResource"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::<bucket>/bytechef/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::<bucket>",
+      "Condition": {"StringLike": {"s3:prefix": "bytechef/*"}}
+    },
+    {
+      "Effect": "Allow",
+      "Action": "logs:GetLogEvents",
+      "Resource": "arn:aws:logs:*:*:log-group:/aws/batch/job:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": ["<execution role ARN>", "<task role ARN>"]
+    }
+  ]
+}
+```
+
+Without `s3:ListBucket`, S3 answers 403 instead of 404 for a missing object, so a run that produced no outputs would
+fail instead of reading as "no outputs".
+
+**Verifying it.** The automated tests cover the job definition and the S3 staging (against LocalStack), but not Batch
+itself. Check these by hand on a real account:
+
+- Run a Python script and a shell command with an output file on a Fargate queue.
+- Confirm the job definition and the `bytechef/` prefix are gone afterwards.
+- Confirm a stuck queue fails after `waitUntilRunning`.
+- Confirm an init-container failure (for example an expired input URL or an unreachable S3) ends the job promptly
+  with a failure, instead of hanging until the job timeout.
+- Confirm a missing output object reads as "no outputs". This relies on the role and bucket granting
+  `s3:ListBucket`; without it S3 answers 403 instead of 404.
 
 ## Workflow data reaches commands through `env`, not `${…}`
 
