@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.engine;
+package com.bytechef.platform.component.runner;
 
-import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,6 +29,7 @@ import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.polyglot.ScriptSandboxMode;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
@@ -49,6 +49,8 @@ import org.springframework.context.ApplicationContext;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Timeout(120)
 class PolyglotEngineTest {
+
+    private static final String INPUT = "input";
 
     private static final Map<String, ComponentConnection> COMPONENT_CONNECTIONS = Map.of(
         "my-connection",
@@ -80,7 +82,8 @@ class PolyglotEngineTest {
                 INPUT, Map.of(),
                 SCRIPT, "function perform(input, connection, context) {\n\treturn Object.keys(connection).length;\n}"));
 
-        Object result = polyglotEngine.execute("js", inputParameters, null, jobContextAware);
+        Object result =
+            polyglotEngine.execute(ScriptSandboxMode.STRICT, null, "js", inputParameters, null, jobContextAware);
 
         assertThat(result).isEqualTo(0);
     }
@@ -100,7 +103,8 @@ class PolyglotEngineTest {
                 INPUT, Map.of(),
                 SCRIPT, "function perform(input, connection, context) {\n\treturn Object.keys(connection).length;\n}"));
 
-        Object result = polyglotEngine.execute("js", inputParameters, COMPONENT_CONNECTIONS, false, jobContextAware);
+        Object result = polyglotEngine.execute(
+            ScriptSandboxMode.STRICT, null, "js", inputParameters, COMPONENT_CONNECTIONS, false, jobContextAware);
 
         assertThat(result).isEqualTo(0);
     }
@@ -110,9 +114,10 @@ class PolyglotEngineTest {
         Parameters inputParameters = ParametersFactory.create(Map.of(INPUT, Map.of(), SCRIPT, "var perform = {};"));
 
         assertThatThrownBy(
-            () -> polyglotEngine.execute("js", inputParameters, COMPONENT_CONNECTIONS, jobContextAware))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("perform");
+            () -> polyglotEngine.execute(
+                ScriptSandboxMode.STRICT, null, "js", inputParameters, COMPONENT_CONNECTIONS, jobContextAware))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("perform");
     }
 
     @Order(Integer.MAX_VALUE)
@@ -133,8 +138,9 @@ class PolyglotEngineTest {
         when(actionDefinition.getName()).thenReturn("get");
         when(componentDefinition.getActions()).thenReturn(List.of(actionDefinition));
 
-        assertThatThrownBy(() -> polyglotEngine.execute("js", inputParameters, null, jobContextAware))
-            .hasMessageContaining("Connection with name missing does not exist");
+        assertThatThrownBy(
+            () -> polyglotEngine.execute(ScriptSandboxMode.STRICT, null, "js", inputParameters, null, jobContextAware))
+                .hasMessageContaining("Connection with name missing does not exist");
     }
 
     @Test
@@ -168,6 +174,7 @@ class PolyglotEngineTest {
     private Object execute(String languageId, String script, Map<String, Object> input) {
         Parameters inputParameters = ParametersFactory.create(Map.of(INPUT, input, SCRIPT, script));
 
-        return polyglotEngine.execute(languageId, inputParameters, COMPONENT_CONNECTIONS, jobContextAware);
+        return polyglotEngine.execute(
+            ScriptSandboxMode.STRICT, null, languageId, inputParameters, COMPONENT_CONNECTIONS, jobContextAware);
     }
 }

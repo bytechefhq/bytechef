@@ -1,0 +1,13 @@
+---
+outputs:
+- name: "result"
+  value: "${script1}"
+tasks:
+- name: "script1"
+  type: "script/v1/javascript"
+  parameters:
+    taskRunner:
+      type: "graalvm"
+      mode: "strict"
+    script: "function perform(input, context) {\n  return Java.type('java.lang.System').getProperty('java.specification.version');\n\
+      }"

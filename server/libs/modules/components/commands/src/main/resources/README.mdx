@@ -1,0 +1,102 @@
+The Commands component runs a list of shell, Python or Node commands in an external task runner - a runner that
+executes outside this JVM, in its own process. It is the counterpart to the **Script** component's `graalvm` runner:
+where Script executes inline `perform(input, context)` source with access to `context.component.*`, Commands executes
+plain interpreter commands with none of that in-process access, and gets a plain process's environment, timeout and
+file handling in exchange.
+
+## Available actions
+
+The three actions - Shell, Python and Node - differ only in the interpreter they hand the commands to; their
+properties are identical. Each action's `commands` are lines fed to that action's own interpreter - a `Shell`
+action's commands are shell lines, a `Python` action's commands are Python statements, a `Node` action's commands are
+JavaScript statements. They are never mixed: a `Python` action does not accept shell syntax, and vice versa.
+
+**Properties (for all three actions):**
+- `commands` (array of strings, required): the lines handed to the interpreter, in order.
+- `taskRunner` (object, required if a runner is enabled): selects which task runner executes the commands. See
+  below.
+- `warnOnStdErr` (boolean, default `true`): logs a warning when the execution writes to standard error. It never
+  fails the task by itself - a non-zero exit code is what fails the task, and that happens regardless of this
+  setting.
+
+Depending on which task runner is selected, additional properties may appear: `env` (environment variables),
+`inputFiles`, `outputFiles` (glob patterns matched after the run), `timeout` (seconds), and the runner's own
+`interpreter` override.
+
+## Task runners
+
+Commands only offers runners that declare the **Commands** capability - that excludes GraalVM entirely, since
+GraalVM's in-process component bridge cannot run a list of shell commands. In a default deployment that leaves one
+built-in runner:
+
+| Runner | Type | What it does |
+| --- | --- | --- |
+| Process | `process` | Runs the commands in a child process on the same host, with the server's own environment cleared. |
+
+The runners available in a given deployment depend on what the operator has enabled with
+`bytechef.script.runners.<type>.enabled`, so this list may be shorter, or include a runner contributed by another
+module, in your installation. If no runner declaring the Commands capability is enabled at all, running any of these
+actions fails with a message naming the configuration key to set - `bytechef.script.runners.process.enabled=true` for
+the built-in runner above.
+
+Each action's default interpreter, when the runner's own `interpreter` property is left blank:
+
+| Action | Default interpreter |
+| --- | --- |
+| Shell | `/bin/sh` |
+| Python | `python3` |
+| Node | `node` |
+
+## Workflow data reaches commands through `env`, not `${…}`
+
+Commands are **not** evaluated as workflow expressions. POSIX shell parameter expansion is written `${VAR}`, which
+is character-for-character the workflow evaluator's own accessor syntax - if commands were evaluated the ordinary
+way, a line as unremarkable as `echo ${GREETING:-hi}` would fail the whole task with `Invalid expression`, naming
+neither this component nor the `commands` property, because a shell default is not a valid accessor. The same goes
+for `${#items[@]}` and every other expansion form that is not a bare name. A bare `${HOME}` fares worse rather than
+better: it *is* a valid accessor, so it would be resolved against the workflow context instead of the shell's
+environment. To avoid all of that, the `commands` property is held back from expression evaluation entirely.
+
+Workflow data reaches a command through the `env` property instead, whose values *are* evaluated normally:
+
+```yaml
+env:
+  GREETING_TARGET: ${trigger.name}
+commands:
+  - echo "Hello, $GREETING_TARGET"
+```
+
+Reference an `env` entry the normal way for the interpreter you selected - `$VAR` or `${VAR}` in shell, `os.environ`
+in Python, `process.env` in Node.
+
+## Result
+
+Every action returns:
+
+```json
+{
+  "exitCode": 0,
+  "stdout": "...",
+  "stderr": "",
+  "vars": {},
+  "outputFiles": {}
+}
+```
+
+`vars` carries whatever structured output the execution wrote, if any. Unlike the Script component's `graalvm`
+runner, Commands has no in-process runner to fall back to, so this five-key map is always the result shape - there
+is no bare-value variant.
+
+`stdout` and `stderr` are **truncated**: the first 32 KiB and the last 32 KiB of each stream are kept - 64 KiB in
+all - and anything between them is replaced by a `... N bytes elided ...` marker. Both ends are kept because the
+head carries what the run started doing and the tail carries how it ended. An execution that writes less than that
+is stored whole.
+
+## Log volume
+
+The child's standard output and standard error are also written to the **server log** in full, line by line, as
+they arrive - stdout at INFO, stderr at WARN. That is deliberate: it is the only place the elided middle of a long
+stream still exists. It also means log volume is proportional to how much your commands print, without a ceiling of
+its own. A command that emits megabytes per run emits megabytes into the server log on every run, so keep chatty
+output (progress bars, per-row tracing, `set -x`) out of production commands or redirect it to a file the run
+discards.
