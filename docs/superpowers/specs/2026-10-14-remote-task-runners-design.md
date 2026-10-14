@@ -384,10 +384,14 @@ applied in `server/build.gradle.kts`, which is past the 2.25 release that introd
 
 ### 7.2 Staging
 
-- Prefix: `s3://<bucket>/bytechef/<jobId>/<key>/`.
+- Prefix: `s3://<bucket>/bytechef/<jobId or none>/<name value>-<8 random hex>/`, where the name value is the key
+  (see 7.3). The random suffix is per run, so a redelivered task never reuses a prefix; the prefix is recorded in the
+  job's `bytechef.io/prefix` tag.
 - Uploads `input.tar`.
 - Presigns a GET for `input.tar` and a PUT for `output.tar`. Both are valid for the completion deadline plus 10 min,
-  and are passed as the env variables `BYTECHEF_INPUT_URL` and `BYTECHEF_OUTPUT_URL`.
+  and are passed as the env variables `BYTECHEF_INPUT_URL` and `BYTECHEF_OUTPUT_URL`. They therefore live in the
+  job definition's environment, readable by anyone allowed `batch:DescribeJobDefinitions`; the definition is
+  deregistered after the run.
 - `validate` rejects a deadline the credentials can't cover (assumed-role sessions are limited to 12 h).
 
 ### 7.3 Job definition (registered per run, because Batch cannot override the image at submit time)
@@ -395,14 +399,16 @@ applied in `server/build.gradle.kts`, which is past the 2.25 release that introd
 ```
 type: container, platformCapabilities: [FARGATE|EC2], ecsProperties.taskProperties:
   volumes: work (ephemeral)
-  bytechef-init   (fileSidecarImage, essential=false)
-      sh -c 'curl -fsS "$BYTECHEF_INPUT_URL" | tar -xf - -C /bytechef/work'
+  bytechef-init   (fileSidecarImage, user=0, essential=false)
+      sh -c 'curl -fsS "$BYTECHEF_INPUT_URL" | tar -xf - -C /bytechef/work && mkdir -p /bytechef/work/output
+             && chmod 0777 /bytechef/work /bytechef/work/output'
   main            (image, essential=false)          dependsOn bytechef-init=SUCCESS
-      sh -c 'exec <interpreter> /bytechef/work/<source> 2>/bytechef/work/.stderr'
-  bytechef-output (fileSidecarImage, essential=true) dependsOn main=COMPLETE
+      sh -c 'cd /bytechef/work && exec <interpreter> /bytechef/work/<source> 2>/bytechef/work/.stderr'
+  bytechef-output (fileSidecarImage, user=0, essential=true) dependsOn main=COMPLETE
       sh -c 'cd /bytechef/work && tar -cf output.tar output .stderr && curl -fsS -T output.tar "$BYTECHEF_OUTPUT_URL"'
-  logConfiguration: awslogs; executionRoleArn / taskRoleArn from properties
-jobName = bytechef-<key>; tags = bytechef.io/managed-by, task-execution-id, job-id
+  no logConfiguration (Batch's default awslogs group /aws/batch/job); executionRoleArn / taskRoleArn from properties
+jobName = definition name = bytechef-<name value>; tags = bytechef.io/managed-by, key, job-id (when present), prefix
+attemptDurationSeconds = completion budget + 60 s
 ```
 
 Why the `essential` flags are set this way: when an ECS essential container stops, ECS stops every other container
@@ -412,12 +418,39 @@ when it finishes. Success is therefore **not** read from the Batch job status; i
 `DescribeJobs` (`ecsProperties.taskProperties[].containers[].exitCode`). If `bytechef-init` fails, `main` never
 starts, the essential container never starts, and the task fails with a `statusReason`, which `await` reports.
 
+If `main` exits 0 but the job is `FAILED` because `bytechef-output` exited non-zero or never exited, the upload
+failed: `await` reports the task as failed ("the output upload failed: <reason>") instead of a success with no
+outputs.
+
+The volume is created `root:root 0755`, and the default file sidecar image (`curlimages/curl`) runs as a non-root
+user, so both sidecars run as `user=0`. After extracting, `bytechef-init` makes `/bytechef/work` and `output/`
+writable by any uid, so a `main` image with a non-root `USER` can still write `output/` and `.stderr`. Batch has no
+working-directory setting, so `main`'s command `cd`s into `/bytechef/work` first, matching the Docker and Kubernetes
+runners, which start there; relative paths such as `input.json` and `output/` resolve against it.
+
+Logging relies on Batch's default: with no `logConfiguration`, every container logs to the awslogs group
+`/aws/batch/job`, which is where `await` reads `main`'s stream.
+
 `output.tar` is written to the volume before the upload because S3 rejects a presigned PUT without a
 `Content-Length` (a streamed `curl -T -` sends chunked encoding, which S3 answers with 501).
 
+Names: the name value is the key itself when it matches `[A-Za-z0-9_-]{1,119}` and starts alphanumeric; otherwise it is
+`k-` plus the first 16 hex characters of the key's SHA-256. The full key is in the `bytechef.io/key` tag.
+
+The job's attempt timeout is the completion budget plus one minute, so a job whose ByteChef worker died still stops.
+
+Private-registry credentials are not supported in v1.
+
+The adapter sets the Apache HTTP client explicitly on every AWS client, so the SDK never has to choose between HTTP
+implementations on the classpath.
+
 Fargate resources: `resources` is the task total. Each sidecar reserves 0.25 vCPU / 64 MiB, which is subtracted from
 `main`, so the total stays a valid Fargate CPU/memory combination. `validate` rejects totals that leave `main` with
-less than 0.25 vCPU / 128 MiB, or that aren't a valid Fargate combination.
+less than 0.25 vCPU / 128 MiB, or that aren't a valid Fargate combination. Because of the two sidecars, Fargate needs
+at least 1 vCPU. Defaults are 1 vCPU / 2048 MiB.
+
+Other properties: `assignPublicIp` (Fargate tasks in public subnets without a NAT gateway need it to pull images and
+reach S3) and `completionCheckInterval` (poll interval, default `PT5S`).
 
 ### 7.4 Flow
 
@@ -429,21 +462,36 @@ less than 0.25 vCPU / 128 MiB, or that aren't a valid Fargate combination.
     - `RUNNING` counts against the completion deadline.
   - Poll CloudWatch `GetLogEvents` for `main`'s log stream (using `nextForwardToken`) into stdout.
   - Terminal states: `SUCCEEDED` or `FAILED`. In both cases the result exit code is `main`'s container exit code; a
-    `FAILED` job whose `main` never ran reports the job's `statusReason`.
+    `FAILED` job whose `main` never ran reports the job's `statusReason`, and a `FAILED` job whose `main` exited 0
+    but whose `bytechef-output` did not fails with "the output upload failed".
+  - At a terminal state the log is drained until `nextForwardToken` stops moving, because CloudWatch can return an
+    empty page before the end of the stream.
 - **`collect`:** `GetObject output.tar`, capped at `max-transfer-bytes`, extracted into the local working directory.
   `.stderr` goes to stderr capture.
-- **`find`:** `ListJobs` on the queue with filter `JOB_NAME = bytechef-<key>`, returning the newest non-terminal
-  job. Inputs are uploaded before submit, so every job found is past the input stage.
+- **`find`:** `ListJobs` on the queue with filter `JOB_NAME = bytechef-<name value>`, returning the newest
+  non-terminal job whose `bytechef.io/key` tag equals the full key (hashed names can collide in theory, so the tag is
+  verified). Inputs are uploaded before submit, so every job found is past the input stage.
 - **`cleanup`:**
   - `DELETE`: `DeregisterJobDefinition`, then delete the S3 prefix.
   - `KILL_AND_DELETE`: `TerminateJob` first, then the same.
   - `DETACH`: no-op.
 
+### 7.4a Interrupts and errors
+
+- AWS SDK failures are wrapped as
+  `IllegalStateException("The aws-batch runner failed while <phase>: <error code> (HTTP <status>)")`, or
+  `…: no response from AWS`, with the SDK exception as the cause and never its message.
+- Error wrapping is interrupt-aware, following the Kubernetes backend: a cause chain containing
+  `InterruptedException`, a non-timeout `InterruptedIOException` or the SDK's `AbortedException`, or a set interrupt
+  flag, clears the flag and throws `InterruptedException` (in `find`: restores the flag and throws
+  `IllegalStateException`). `cleanup` and submit's failure cleanup clear the flag during their AWS calls and restore
+  it afterwards.
+
 ### 7.5 Required IAM for the connection's principal (documented)
 
 - `batch:RegisterJobDefinition`, `DeregisterJobDefinition`, `SubmitJob`, `DescribeJobs`, `ListJobs`,
   `TerminateJob`, `TagResource`
-- `s3:PutObject`, `GetObject`, `DeleteObject`, `ListBucket` on the bucket prefix
+- `s3:PutObject`, `GetObject`, `DeleteObject` on the bucket prefix, and `s3:ListBucket` on the bucket (condition `s3:prefix` = `bytechef/*`); without `ListBucket`, S3 answers 403 instead of 404 for a missing output object
 - `logs:GetLogEvents`
 - `iam:PassRole` for the execution and task roles
 
