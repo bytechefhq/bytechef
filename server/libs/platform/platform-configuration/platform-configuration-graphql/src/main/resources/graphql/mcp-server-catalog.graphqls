@@ -1,0 +1,32 @@
+extend type Query {
+    mcpServerCatalog: [McpServerCatalogEntry!]!
+}
+
+type McpServerCatalogEntry {
+    slug: String!
+    title: String!
+    description: String
+    url: String!
+    urlParameters: [String!]
+    transportType: String!
+    authentication: McpServerCatalogAuthentication!
+    websiteUrl: String
+    component: String
+}
+
+type McpServerCatalogAuthentication {
+    type: String!
+    dynamicClientRegistration: Boolean
+    clientIdMetadataDocument: Boolean
+    authorizationUrl: String
+    tokenUrl: String
+    pkce: Boolean
+    scopes: [String!]
+    headers: [McpServerCatalogHeader!]
+}
+
+type McpServerCatalogHeader {
+    name: String!
+    description: String
+    secret: Boolean
+}
