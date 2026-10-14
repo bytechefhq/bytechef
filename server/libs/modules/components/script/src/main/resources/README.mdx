@@ -75,7 +75,7 @@ Each action runs in the environment selected by its **Task Runner** property. Th
 | --- | --- | --- |
 | GraalVM | `graalvm` | Runs the script inside the server process, in a GraalVM polyglot context. The only runner where `context.component.*` is available. |
 | Process | `process` | Runs the script in a child process on the same host. The server's own environment is cleared before the script starts — only `PATH`, `HOME` and the runner's own `BYTECHEF_*` names are put back — so the script cannot read the server's credentials by name. Enable with `bytechef.script.runners.process.enabled=true`. |
-| Docker | `docker` | Runs the script in a single-use container, on the local daemon or on whichever daemon the operator's `host` names. Every container gets a CPU allowance, a memory allowance and a PID ceiling from the operator's settings, and a script that asks for more CPU or memory than the operator's maximum is refused rather than silently cut down. Enable with `bytechef.script.runners.docker.enabled=true`. This is the same runner the **Commands** component uses; its README documents the image allowlist, the network-mode allowlist and the resource ceilings in depth. |
+| Docker | `docker` | Runs the script in a single-use container, on the operator's daemon or — when the operator allows it — on the daemon the task names. The task chooses the image, CPU, memory and network; the operator caps only how long the server waits and how much it transfers. Enable with `bytechef.script.runners.docker.enabled=true`. This is the same runner the **Commands** component uses; its README documents every property. |
 
 The `Script Task Runners Demo` sample workflow (`demo/script-runners.json` in `automation-demo-config`, seeded into
 the Demo project on a `demo` profile install) shows this authoring shape as one `javascript` action: a workflow
@@ -116,7 +116,7 @@ Under **Process** or **Docker**, the action instead always returns this map:
 
 The Process and Docker runners can only start an interpreter for JavaScript, Python and shell. Ruby, Java and R remain GraalVM-only, and are rejected by the runner's own validation before anything starts — the failure names the language, for example *"Language 'ruby' cannot be executed by an external task runner."*
 
-That check is deliberately not enforced earlier, in the editor: the **Task Runner** select is built from what each enabled runner declares it can do, not from what languages it can run, so an action written in a GraalVM-only language still lists Process and Docker as choices alongside GraalVM. This is the same two-layer arrangement the Docker runner's image and network-mode allowlists use elsewhere in this feature — the editor's options are a convenience, and the boundary is enforced where the task actually runs, loudly and by name, rather than hidden from the picker.
+That check is deliberately not enforced earlier, in the editor: the **Task Runner** select is built from what each enabled runner declares it can do, not from what languages it can run, so an action written in a GraalVM-only language still lists Process and Docker as choices alongside GraalVM.
 
 In the current build this only matters for JavaScript and Python, the two languages this component ships — both resolve externally. The Ruby, Java and R actions exist in the codebase but are not registered on this component for reasons unrelated to task runners; the mismatch above becomes reachable once they are.
 
@@ -124,7 +124,7 @@ In the current build this only matters for JavaScript and Python, the two langua
 
 The Process runner clears the environment before the script starts and re-seeds only `PATH`, `HOME` and its own `BYTECHEF_*` names — the server process holds datasource passwords and cloud credentials, and a script must not be able to read them by name.
 
-A workflow author can ask for the server's full environment instead, through the runner's **Inherit Environment** option, but that option only exists once an operator has enabled it with `bytechef.script.runners.process.properties.inherit-environment-enabled=true`. Until then the option is not offered in the editor, and a hand-written workflow that sets it anyway is rejected.
+A workflow author can ask for the server's full environment instead, through the runner's **Inherit Environment** option. It is off by default; turning it on hands the child process everything the server process holds, including datasource passwords and cloud credentials, so use it only on a deployment where workflow authors are trusted with the server itself.
 
 ### Limitations
 

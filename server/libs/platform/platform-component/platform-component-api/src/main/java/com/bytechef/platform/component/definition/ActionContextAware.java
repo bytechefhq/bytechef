@@ -115,6 +115,15 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
     PlatformType getPlatformType();
 
     /**
+     * Retrieves the identifier of the task execution this action runs under.
+     *
+     * @return the task execution ID, or {@code null} when the action runs outside a task execution, such as the
+     *         editor's test run.
+     */
+    @Nullable
+    Long getTaskExecutionId();
+
+    /**
      * Get the public URL for webhook callbacks and external service integrations.
      *
      * @return the public URL, or null if not configured

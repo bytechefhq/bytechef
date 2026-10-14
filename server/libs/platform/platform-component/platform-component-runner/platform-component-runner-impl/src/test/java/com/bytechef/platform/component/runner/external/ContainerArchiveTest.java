@@ -576,4 +576,18 @@ class ContainerArchiveTest {
             return this;
         }
     }
+
+    static List<String> entryNames(InputStream inputStream) throws IOException {
+        List<String> names = new ArrayList<>();
+
+        try (TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(inputStream)) {
+            TarArchiveEntry entry;
+
+            while ((entry = tarArchiveInputStream.getNextEntry()) != null) {
+                names.add(entry.getName());
+            }
+        }
+
+        return names;
+    }
 }

@@ -19,8 +19,11 @@ package com.bytechef.platform.component.runner;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.GRAALVM;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.runner.external.RemoteTaskRunner;
+import com.bytechef.platform.component.runner.remote.RemoteTaskRunnerBackend;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +37,9 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@SuppressFBWarnings("EI")
+@SuppressFBWarnings({
+    "CT_CONSTRUCTOR_THROW", "EI"
+})
 public class TaskRunnerRegistryImpl implements TaskRunnerRegistry {
 
     private static final Logger log = LoggerFactory.getLogger(TaskRunnerRegistryImpl.class);
@@ -42,15 +47,28 @@ public class TaskRunnerRegistryImpl implements TaskRunnerRegistry {
     private final Map<String, TaskRunner> taskRunnerMap;
     private final ApplicationProperties applicationProperties;
 
-    public TaskRunnerRegistryImpl(List<TaskRunner> taskRunners, ApplicationProperties applicationProperties) {
+    public TaskRunnerRegistryImpl(
+        List<TaskRunner> taskRunners, List<RemoteTaskRunnerBackend> backends,
+        ApplicationProperties applicationProperties) {
+
+        List<TaskRunner> allTaskRunners = new ArrayList<>(taskRunners);
+
+        for (RemoteTaskRunnerBackend backend : backends) {
+            allTaskRunners.add(new RemoteTaskRunner(backend, applicationProperties));
+        }
+
         Map<String, TaskRunner> taskRunnersByType = new LinkedHashMap<>();
 
-        List<TaskRunner> sortedTaskRunners = taskRunners.stream()
+        List<TaskRunner> sortedTaskRunners = allTaskRunners.stream()
             .sorted(Comparator.comparing(TaskRunner::getType))
             .toList();
 
         for (TaskRunner taskRunner : sortedTaskRunners) {
-            taskRunnersByType.put(taskRunner.getType(), taskRunner);
+            String type = taskRunner.getType();
+
+            if (taskRunnersByType.putIfAbsent(type, taskRunner) != null) {
+                throw new IllegalStateException("More than one task runner has the type '%s'".formatted(type));
+            }
         }
 
         this.taskRunnerMap = taskRunnersByType;

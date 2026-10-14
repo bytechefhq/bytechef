@@ -101,7 +101,7 @@ public class ContextFactoryImpl implements ContextFactory {
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
             .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
             .publicUrl(publicUrl)
-            .taskExecutionId(taskExecutionId != null ? taskExecutionId : 0)
+            .taskExecutionId(taskExecutionId)
             .type(type)
             .tracer(tracer)
             .workflowId(workflowId)

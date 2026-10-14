@@ -19,6 +19,7 @@ package com.bytechef.atlas.configuration.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.workflow.preprocessor.WorkflowDefinitionPreprocessor;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
@@ -98,13 +99,39 @@ public class WorkflowServiceIntTest {
 
     @Test
     public void testUpdate() {
-        String definition = "{\"label\": \"Label\",\"tasks\": []}";
+        String definition = "{\"label\": \"LABEL\",\"tasks\": []}";
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
         Workflow updatedWorkflow = workflowService.update(
             Validate.notNull(workflow.getId(), "id"), definition, workflow.getVersion());
 
         Assertions.assertEquals(definition, updatedWorkflow.getDefinition());
+    }
+
+    @Test
+    public void testCreateRunsThePreprocessors() {
+        Workflow workflow = workflowService.create(
+            "{\"label\": \"lower\", \"tasks\": []}", Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        Assertions.assertEquals("LOWER", workflow.getLabel());
+    }
+
+    @Test
+    public void testUpdateRunsThePreprocessorsAndLeavesAnUnchangedDefinitionVerbatim() {
+        Workflow workflow = workflowCrudRepository.save(getWorkflow());
+
+        Workflow updatedWorkflow = workflowService.update(
+            Validate.notNull(workflow.getId(), "id"), "{\"label\": \"lower\",\"tasks\": []}",
+            workflow.getVersion());
+
+        Assertions.assertEquals("LOWER", updatedWorkflow.getLabel());
+
+        String verbatimDefinition = "{\"label\": \"ALREADY\",\"tasks\": []}";
+
+        Workflow untouchedWorkflow = workflowService.update(
+            Validate.notNull(workflow.getId(), "id"), verbatimDefinition, updatedWorkflow.getVersion());
+
+        Assertions.assertEquals(verbatimDefinition, untouchedWorkflow.getDefinition());
     }
 
     private static Workflow getWorkflow() {
@@ -125,11 +152,28 @@ public class WorkflowServiceIntTest {
         }
 
         @Bean
+        WorkflowDefinitionPreprocessor labelUpperCasingPreprocessor() {
+            return workflowDefinition -> {
+                Object label = workflowDefinition.get("label");
+
+                if (label instanceof String string && !string.equals(string.toUpperCase())) {
+                    workflowDefinition.put("label", string.toUpperCase());
+
+                    return true;
+                }
+
+                return false;
+            };
+        }
+
+        @Bean
         WorkflowService workflowService(
             CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
-            List<WorkflowRepository> workflowRepositories) {
+            List<WorkflowRepository> workflowRepositories,
+            WorkflowDefinitionPreprocessor labelUpperCasingPreprocessor) {
 
-            return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
+            return new WorkflowServiceImpl(
+                cacheManager, workflowCrudRepositories, workflowRepositories, List.of(labelUpperCasingPreprocessor));
         }
 
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

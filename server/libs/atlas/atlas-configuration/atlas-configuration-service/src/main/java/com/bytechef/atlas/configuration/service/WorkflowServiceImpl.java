@@ -22,12 +22,15 @@ import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.exception.WorkflowErrorType;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.workflow.mapper.WorkflowDefinitionCodec;
+import com.bytechef.atlas.configuration.workflow.preprocessor.WorkflowDefinitionPreprocessor;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,16 +57,26 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private final CacheManager cacheManager;
     private final List<WorkflowCrudRepository> workflowCrudRepositories;
+    private final List<WorkflowDefinitionPreprocessor> workflowDefinitionPreprocessors;
     private final List<WorkflowRepository> workflowRepositories;
 
-    @SuppressFBWarnings("EI2")
     public WorkflowServiceImpl(
         CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
         List<WorkflowRepository> workflowRepositories) {
 
+        this(cacheManager, workflowCrudRepositories, workflowRepositories, List.of());
+    }
+
+    @SuppressFBWarnings("EI2")
+    public WorkflowServiceImpl(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+        List<WorkflowRepository> workflowRepositories,
+        List<WorkflowDefinitionPreprocessor> workflowDefinitionPreprocessors) {
+
         this.cacheManager = cacheManager;
         this.workflowCrudRepositories = workflowCrudRepositories;
         this.workflowRepositories = workflowRepositories;
+        this.workflowDefinitionPreprocessors = workflowDefinitionPreprocessors;
     }
 
     @Override
@@ -72,9 +85,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         Assert.notNull(format, "'format' must not be null");
         Assert.notNull(sourceType, "'sourceType' must not be null");
 
-        // TODO Validate definition considering format value
-
-        final Workflow workflow = new Workflow(definition, format);
+        final Workflow workflow = new Workflow(preprocess(definition, format), format);
 
         workflow.setNew(true);
         workflow.setSourceType(sourceType);
@@ -305,11 +316,31 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         final Workflow workflow = getWorkflow(id);
 
+        String preprocessedDefinition = preprocess(definition, workflow.getFormat());
+
         return CollectionUtils.getFirstFilter(
             workflowCrudRepositories,
             workflowCrudRepository -> workflowCrudRepository.findById(id)
                 .isPresent(),
-            workflowCrudRepository -> update(definition, version, workflow, workflowCrudRepository));
+            workflowCrudRepository -> update(preprocessedDefinition, version, workflow, workflowCrudRepository));
+    }
+
+    private String preprocess(String definition, Format format) {
+        if (workflowDefinitionPreprocessors.isEmpty()) {
+            return definition;
+        }
+
+        Map<String, Object> definitionMap = WorkflowDefinitionCodec.read(definition, format);
+
+        boolean changed = false;
+
+        for (WorkflowDefinitionPreprocessor workflowDefinitionPreprocessor : workflowDefinitionPreprocessors) {
+            if (workflowDefinitionPreprocessor.process(definitionMap)) {
+                changed = true;
+            }
+        }
+
+        return changed ? WorkflowDefinitionCodec.write(definitionMap, format) : definition;
     }
 
     private static int compare(Workflow workflow1, Workflow workflow2) {

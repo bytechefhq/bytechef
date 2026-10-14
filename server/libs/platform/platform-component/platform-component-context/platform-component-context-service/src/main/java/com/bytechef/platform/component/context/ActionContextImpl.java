@@ -70,7 +70,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable ActionContextAware suspendTarget;
     private final @Nullable PlatformType type;
     private final @Nullable String publicUrl;
-    private final long taskExecutionId;
+    private final @Nullable Long taskExecutionId;
     private final TempFileStorage tempFileStorage;
     private final String tenantId;
     private final @Nullable Tracer tracer;
@@ -81,8 +81,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private ActionContextImpl(Builder builder) {
         super(
             builder.componentName, builder.componentVersion, builder.actionName, builder.componentConnection,
-            builder.jobId, builder.taskExecutionId, builder.editorEnvironment, builder.httpClientExecutor,
-            builder.tempFileStorage, builder.logFileStorageWriter, true, null);
+            builder.jobId, builder.taskExecutionId == null ? 0L : builder.taskExecutionId, builder.editorEnvironment,
+            builder.httpClientExecutor, builder.tempFileStorage, builder.logFileStorageWriter, true, null);
 
         this.actionName = builder.actionName;
         this.approvalTokens = builder.approvalTokens;
@@ -178,7 +178,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
         private @Nullable ActionContextAware suspendTarget;
-        private long taskExecutionId;
+        private @Nullable Long taskExecutionId;
         private @Nullable Tracer tracer;
         private final TempFileStorage tempFileStorage;
         private @Nullable PlatformType type;
@@ -256,7 +256,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             return this;
         }
 
-        Builder taskExecutionId(long taskExecutionId) {
+        Builder taskExecutionId(@Nullable Long taskExecutionId) {
             this.taskExecutionId = taskExecutionId;
 
             return this;
@@ -414,6 +414,11 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
+    public @Nullable Long getTaskExecutionId() {
+        return taskExecutionId;
+    }
+
+    @Override
     @Nullable
     public PlatformType getPlatformType() {
         return type;
@@ -460,7 +465,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             .logFileStorageWriter(logFileStorageWriter)
             .publicUrl(publicUrl)
             .suspendTarget(suspendTarget == null ? this : suspendTarget)
-            .taskExecutionId(taskExecutionId)
+            .taskExecutionId(taskExecutionId == null ? 0L : taskExecutionId)
             .type(type)
             .workflowId(workflowId)
             .build();
