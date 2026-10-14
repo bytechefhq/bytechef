@@ -17,13 +17,13 @@ This is the right approach for the majority of automations and builders. Visual 
 
 ### Low-code - the canvas plus a Script step
 
-When one step needs logic no component captures - reshaping a payload, computing a value, parsing an odd format - drop in the **[Script component](/reference/components/script_v1)** and write a bit of JavaScript, Python, or Ruby right inside the workflow. See [Scripting languages](/platform/automation/build/workflows/code-workflows#scripting-languages) for details. The Script step takes the previous steps' data as input and returns a value the next steps consume, exactly like any other component.
+When one step needs logic no component captures - reshaping a payload, computing a value, parsing an odd format - drop in the **[Script component](/reference/components/script_v1)** and write a bit of JavaScript or Python right inside the workflow. See [Scripting languages](/platform/automation/build/workflows/code-workflows#scripting-languages) for details. The Script step takes the previous steps' data as input and returns a value the next steps consume, exactly like any other component.
 
 The workflow stays visual; one node just happens to be code. Low-code done right is *visual with an escape hatch* - the escape hatch is a single step, not the whole workflow.
 
 ### Full-code - a Code Workflow
 
-For teams that want their automations in version control, reviewed in pull requests, and shipped through CI, define the entire workflow in code as a **[Code Workflow](/platform/automation/build/workflows/code-workflows)** - in Java, JavaScript, Python, or Ruby - and deploy the artifact through the API. It runs on the same engine as a canvas-built workflow, with the same components and triggers; only the authoring and lifecycle differ.
+For teams that want their automations in version control, reviewed in pull requests, and shipped through CI, define the entire workflow in code as a **[Code Workflow](/platform/automation/build/workflows/code-workflows)** - in Java, JavaScript or Python - and edit it in ByteChef or deploy it from CI through the API. It runs on the same engine as a canvas-built workflow, with the same components and triggers; only the authoring and lifecycle differ.
 
 If you want your own *authoring UI* rather than ByteChef's editor (for embedded scenarios), see also [Custom Components](/platform/settings/components/custom-components) and the [embedded Workflow Builder](/platform/embedded/build/automations/automation-workflows).
 
