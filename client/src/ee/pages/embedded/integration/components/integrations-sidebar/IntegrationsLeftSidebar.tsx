@@ -1,4 +1,6 @@
 import Button from '@/components/Button/Button';
+import {ButtonGroup} from '@/components/ui/button-group';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationSelect from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationSelect';
@@ -7,6 +9,7 @@ import IntegrationWorkflowsListItem from '@/ee/pages/embedded/integration/compon
 import IntegrationWorkflowsListSkeleton from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListSkeleton';
 import {useIntegrationsLeftSidebar} from '@/ee/pages/embedded/integration/components/integrations-sidebar/hooks/useIntegrationsLeftSidebar';
 import {useCreateIntegrationWorkflow} from '@/ee/pages/embedded/integration/hooks/useCreateIntegrationWorkflow';
+import {useImportIntegrationWorkflow} from '@/ee/pages/embedded/integration/hooks/useImportIntegrationWorkflow';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import {WorkflowApi} from '@/ee/shared/middleware/embedded/configuration';
 import {
@@ -18,7 +21,7 @@ import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.querie
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
 import {useQueries} from '@tanstack/react-query';
-import {PlusIcon} from 'lucide-react';
+import {ChevronDownIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 
@@ -83,6 +86,8 @@ const IntegrationsLeftSidebar = ({
         bottomResizablePanelRef,
         integrationId: targetIntegrationId,
     });
+
+    const {handleWorkflowFileChange, workflowFileInputRef} = useImportIntegrationWorkflow(targetIntegrationId);
 
     const findIntegrationIdByWorkflow = getWorkflowsIntegrationId(integrations || []);
 
@@ -162,13 +167,36 @@ const IntegrationsLeftSidebar = ({
                     sortBy={sortBy}
                 />
 
-                <Button
-                    className="w-full [&_svg]:size-5"
-                    icon={<PlusIcon />}
-                    label="Workflow"
-                    onClick={() => setShowWorkflowDialog(true)}
-                    variant="secondary"
-                />
+                <ButtonGroup className="w-full">
+                    <Button
+                        className="flex-1 [&_svg]:size-5"
+                        icon={<PlusIcon />}
+                        label="New Workflow"
+                        onClick={() => setShowWorkflowDialog(true)}
+                        variant="secondary"
+                    />
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="More workflow options"
+                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
+                                icon={<ChevronDownIcon />}
+                                size="icon"
+                                variant="secondary"
+                            />
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => workflowFileInputRef.current?.click()}
+                            >
+                                <UploadIcon /> Import Workflow
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </ButtonGroup>
             </div>
 
             <ScrollArea className="mb-3 min-h-0 w-full flex-1 [&_[data-radix-scroll-area-viewport]>div]:block!">
@@ -222,6 +250,14 @@ const IntegrationsLeftSidebar = ({
                     useGetWorkflowQuery={useGetWorkflowQuery}
                 />
             )}
+
+            <input
+                accept=".json,.yaml,.yml"
+                className="hidden"
+                onChange={handleWorkflowFileChange}
+                ref={workflowFileInputRef}
+                type="file"
+            />
         </aside>
     );
 };

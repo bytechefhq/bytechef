@@ -2,7 +2,7 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationsLeftSidebar from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsLeftSidebar';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
-import {ReactElement} from 'react';
+import {ReactElement, ReactNode} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
@@ -10,6 +10,7 @@ const hoisted = vi.hoisted(() => ({
     getIntegrationWorkflows: vi.fn(),
     getIntegrationWorkflowsQuery: vi.fn(),
     getIntegrationsQuery: vi.fn(),
+    handleWorkflowFileChange: vi.fn(),
 }));
 
 vi.mock('@/components/ui/scroll-area', () => ({
@@ -48,6 +49,24 @@ vi.mock(
 
 vi.mock('@/ee/pages/embedded/integration/hooks/useCreateIntegrationWorkflow', () => ({
     useCreateIntegrationWorkflow: (args: {integrationId: number}) => hoisted.createIntegrationWorkflow(args),
+}));
+
+vi.mock('@/ee/pages/embedded/integration/hooks/useImportIntegrationWorkflow', () => ({
+    useImportIntegrationWorkflow: () => ({
+        handleWorkflowFileChange: hoisted.handleWorkflowFileChange,
+        workflowFileInputRef: {current: null},
+    }),
+}));
+
+vi.mock('@/components/ui/dropdown-menu', () => ({
+    DropdownMenu: ({children}: {children: ReactNode}) => <div>{children}</div>,
+    DropdownMenuContent: ({children}: {children: ReactNode}) => <div>{children}</div>,
+    DropdownMenuItem: ({children, onClick}: {children: ReactNode; onClick: () => void}) => (
+        <div onClick={onClick} role="menuitem">
+            {children}
+        </div>
+    ),
+    DropdownMenuTrigger: ({children}: {children: ReactNode}) => <div>{children}</div>,
 }));
 
 vi.mock('@/ee/pages/embedded/integrations/components/IntegrationDialog', () => ({
@@ -199,7 +218,7 @@ describe('IntegrationsLeftSidebar', () => {
 
         expect(screen.getByLabelText('New integration')).toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole('button', {name: 'Workflow'}));
+        fireEvent.click(screen.getByRole('button', {name: 'New Workflow'}));
 
         expect(await screen.findByRole('dialog')).toHaveTextContent('WorkflowDialog:9');
         expect(hoisted.createIntegrationWorkflow).toHaveBeenCalledWith(expect.objectContaining({integrationId: 9}));
@@ -207,6 +226,23 @@ describe('IntegrationsLeftSidebar', () => {
         fireEvent.click(screen.getByText('Close dialog'));
 
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('opens the workflow file picker from Import Workflow and imports the selected file', () => {
+        setupQueries({});
+
+        renderWithProviders(<IntegrationsLeftSidebar {...baseProps} integrationId={9} />);
+
+        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+        const fileInputClick = vi.spyOn(fileInput, 'click');
+
+        fireEvent.click(screen.getByRole('menuitem', {name: 'Import Workflow'}));
+
+        expect(fileInputClick).toHaveBeenCalledTimes(1);
+
+        fireEvent.change(fileInput, {target: {files: [new File(['{}'], 'workflow.json')]}});
+
+        expect(hoisted.handleWorkflowFileChange).toHaveBeenCalled();
     });
 
     it('follows the integrationId prop when it changes', async () => {
