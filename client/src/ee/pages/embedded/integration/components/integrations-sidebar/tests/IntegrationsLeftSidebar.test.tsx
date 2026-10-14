@@ -1,11 +1,12 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationsLeftSidebar from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsLeftSidebar';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen, waitFor} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    createIntegrationWorkflow: vi.fn(),
     getIntegrationWorkflows: vi.fn(),
     getIntegrationWorkflowsQuery: vi.fn(),
     getIntegrationsQuery: vi.fn(),
@@ -44,6 +45,22 @@ vi.mock(
         default: () => <div data-testid="skeleton">Loading...</div>,
     })
 );
+
+vi.mock('@/ee/pages/embedded/integration/hooks/useCreateIntegrationWorkflow', () => ({
+    useCreateIntegrationWorkflow: (args: {integrationId: number}) => hoisted.createIntegrationWorkflow(args),
+}));
+
+vi.mock('@/ee/pages/embedded/integrations/components/IntegrationDialog', () => ({
+    default: ({triggerNode}: {triggerNode: ReactElement}) => triggerNode,
+}));
+
+vi.mock('@/shared/components/workflow/WorkflowDialog', () => ({
+    default: ({parentId}: {parentId: number}) => <div role="dialog">WorkflowDialog:{parentId}</div>,
+}));
+
+vi.mock('@/ee/shared/queries/embedded/workflows.queries', () => ({
+    useGetWorkflowQuery: vi.fn(),
+}));
 
 vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
     useGetIntegrationsQuery: () => hoisted.getIntegrationsQuery(),
@@ -169,15 +186,17 @@ describe('IntegrationsLeftSidebar', () => {
         await waitFor(() => expect(hoisted.getIntegrationWorkflows).toHaveBeenCalledWith({id: 11}));
     });
 
-    it('leaves integration and workflow creation to the settings menu and the Integrations page', async () => {
+    it('shows the New integration button and opens WorkflowDialog for the selected integration', async () => {
         setupQueries({});
 
         renderWithProviders(<IntegrationsLeftSidebar {...baseProps} integrationId={9} />);
 
-        await screen.findAllByTestId('workflow-item');
+        expect(screen.getByLabelText('New integration')).toBeInTheDocument();
 
-        expect(screen.queryByLabelText('New integration')).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Workflow'})).not.toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', {name: 'Workflow'}));
+
+        expect(await screen.findByRole('dialog')).toHaveTextContent('WorkflowDialog:9');
+        expect(hoisted.createIntegrationWorkflow).toHaveBeenCalledWith(expect.objectContaining({integrationId: 9}));
     });
 
     it('follows the integrationId prop when it changes', async () => {
