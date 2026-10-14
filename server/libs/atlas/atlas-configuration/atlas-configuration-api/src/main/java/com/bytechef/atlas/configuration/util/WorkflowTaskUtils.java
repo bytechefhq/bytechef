@@ -282,7 +282,7 @@ public class WorkflowTaskUtils {
         }
     }
 
-    private static boolean isWorkflowTaskMap(Map<?, ?> map) {
+    public static boolean isWorkflowTaskMap(Map<?, ?> map) {
         if (!map.containsKey(WorkflowConstants.NAME) || !map.containsKey(WorkflowConstants.TYPE)) {
             return false;
         }

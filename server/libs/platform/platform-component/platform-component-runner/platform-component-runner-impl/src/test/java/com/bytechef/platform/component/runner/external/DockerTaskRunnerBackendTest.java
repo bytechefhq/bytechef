@@ -28,14 +28,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Property.StringProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.runner.TaskRunnerCapability;
 import com.bytechef.platform.component.runner.TaskRunnerRequest;
 import com.bytechef.platform.component.runner.TaskRunnerResult;
+import com.bytechef.platform.component.runner.remote.CleanupMode;
+import com.bytechef.platform.component.runner.remote.RemoteJobContext;
+import com.bytechef.platform.component.runner.remote.RemoteJobHandle;
+import com.bytechef.platform.component.runner.remote.RemoteJobKey;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
@@ -45,12 +47,16 @@ import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectImageCmd;
 import com.github.dockerjava.api.command.InspectImageResponse;
+import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.command.LogContainerCmd;
 import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.command.RemoveContainerCmd;
 import com.github.dockerjava.api.command.StartContainerCmd;
+import com.github.dockerjava.api.command.StopContainerCmd;
 import com.github.dockerjava.api.command.WaitContainerCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.AuthConfig;
+import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PullResponseItem;
@@ -68,40 +74,45 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-class DockerTaskRunnerTest {
+class DockerTaskRunnerBackendTest {
 
-    private static final String ALLOWED_IMAGE = "python:3.12-slim";
     private static final String CONTAINER_ID = "container-42";
+    private static final String IMAGE = "python:3.12-slim";
+    private static final String SCRIPT = "def perform(input, context):\n    return 1\n";
     private static final Duration TEST_TIMEOUT = Duration.ofSeconds(30);
 
-    private final DockerTaskRunner dockerTaskRunner = new DockerTaskRunner(
-        applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE)));
+    private final DockerTaskRunnerBackend backend = new DockerTaskRunnerBackend();
 
     @Test
     void testGetTypeIsDocker() {
-        assertThat(dockerTaskRunner.getType()).isEqualTo("docker");
+        assertThat(backend.getType()).isEqualTo("docker");
     }
 
     @Test
     void testGetTitleIsDocker() {
-        assertThat(dockerTaskRunner.getTitle()).isEqualTo("Docker");
+        assertThat(backend.getTitle()).isEqualTo("Docker");
     }
 
     @Test
     void testCapabilitiesCoverEverythingButTheComponentBridge() {
-        Set<TaskRunnerCapability> capabilities = dockerTaskRunner.getCapabilities();
+        RemoteTaskRunner taskRunner = new RemoteTaskRunner(backend, applicationProperties(Map.of()));
+
+        Set<TaskRunnerCapability> capabilities = taskRunner.getCapabilities();
 
         assertThat(capabilities).containsExactlyInAnyOrder(
             TaskRunnerCapability.INLINE_SCRIPT, TaskRunnerCapability.COMMANDS, TaskRunnerCapability.INPUT_FILES,
@@ -110,20 +121,14 @@ class DockerTaskRunnerTest {
 
     @Test
     void testGetPropertiesOffersEveryDockerSetting() {
-        assertThat(propertyNames(dockerTaskRunner)).containsExactlyInAnyOrder(
-            "image", "pullPolicy", "entrypoint", "user", "cpu", "memory", "networkMode", "extraHosts");
-    }
-
-    @Test
-    void testTheImagePropertyIsOfferedEvenWhenTheAllowlistIsEmpty() {
-        DockerTaskRunner emptyAllowlistTaskRunner = new DockerTaskRunner(applicationProperties(Map.of()));
-
-        assertThat(propertyNames(emptyAllowlistTaskRunner)).contains("image");
+        assertThat(propertyNames(backend, Map.of())).containsExactlyInAnyOrder(
+            "image", "entrypoint", "user", "cpu", "memory", "networkMode", "extraHosts", "privileged", "credentials",
+            "killGracePeriod");
     }
 
     @Test
     void testTheImagePropertyIsOptionalBecauseTheLanguageSuppliesADefault() {
-        ValueProperty<?> imageProperty = dockerTaskRunner.getProperties()
+        ValueProperty<?> imageProperty = backend.getProperties(Map.of())
             .stream()
             .filter(property -> "image".equals(property.getName()))
             .findFirst()
@@ -133,68 +138,18 @@ class DockerTaskRunnerTest {
     }
 
     @Test
-    void testTheImagePropertyOffersTheAllowedImagesAsOptions() {
-        DockerTaskRunner twoImageTaskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE + ", node:22-alpine")));
-
-        assertThat(optionValues(twoImageTaskRunner, "image")).containsExactly(ALLOWED_IMAGE, "node:22-alpine");
-    }
-
-    @Test
-    void testTheNetworkModeSelectHidesHostUnlessTheOperatorAllowedIt() {
-        assertThat(optionValues(dockerTaskRunner, "networkMode")).doesNotContain("host");
-    }
-
-    @Test
-    void testTheNetworkModeSelectOffersHostWhenTheOperatorAllowedIt() {
-        DockerTaskRunner hostNetworkTaskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, "allow-host-network", "true")));
-
-        assertThat(optionValues(hostNetworkTaskRunner, "networkMode")).contains("host");
-    }
-
-    @Test
     void testGetPropertiesReturnsFreshInstances() {
-        assertThat(dockerTaskRunner.getProperties()
+        assertThat(backend.getProperties(Map.of())
             .getFirst())
                 .isNotSameAs(
-                    dockerTaskRunner.getProperties()
+                    backend.getProperties(Map.of())
                         .getFirst());
     }
 
     @Test
-    void testValidateAcceptsAnAllowedImage() {
-        dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE)));
-    }
-
-    @Test
-    void testValidateRejectsAnImageOutsideTheAllowlist() {
-        assertThatThrownBy(() -> dockerTaskRunner.validate(request(Map.of("image", "ubuntu:24.04"))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("ubuntu:24.04")
-            .hasMessageContaining("bytechef.script.runners.docker.properties.allowed-images");
-    }
-
-    @Test
-    void testValidateRejectsAPrefixOfAnAllowedImage() {
-        assertThatThrownBy(() -> dockerTaskRunner.validate(request(Map.of("image", "python:3.12"))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.allowed-images");
-    }
-
-    @Test
-    void testAnEmptyAllowlistPermitsNothing() {
-        DockerTaskRunner emptyAllowlistTaskRunner = new DockerTaskRunner(applicationProperties(Map.of()));
-
-        assertThatThrownBy(() -> emptyAllowlistTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.allowed-images");
-    }
-
-    @Test
     void testAMissingImageFallsBackToTheLanguagesDefaultImage() {
-        dockerTaskRunner.validate(request(Map.of()));
-        dockerTaskRunner.validate(request(Map.of("image", "   ")));
+        backend.validate(request(Map.of()), context(Map.of(), null));
+        backend.validate(request(Map.of("image", "   ")), context(Map.of(), null));
     }
 
     @Test
@@ -204,31 +159,18 @@ class DockerTaskRunnerTest {
             "node:22-alpine");
 
         for (Map.Entry<String, String> entry : defaultImagesByLanguageId.entrySet()) {
-            DockerTaskRunner taskRunner = new DockerTaskRunner(
-                applicationProperties(Map.of("allowed-images", entry.getValue())));
+            TestDaemon testDaemon = new TestDaemon();
 
-            taskRunner.validate(request(entry.getKey(), Map.of()));
+            TaskRunnerRequest request = new TaskRunnerRequest(
+                entry.getKey(), null, List.of("true"), Map.of(), Map.of(), Map.of(), List.of(),
+                ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of()), TEST_TIMEOUT, Map.of(),
+                mock(ActionContext.class));
+
+            testDaemon.newTaskRunner()
+                .run(request);
+
+            verify(testDaemon.dockerClient).createContainerCmd(entry.getValue());
         }
-    }
-
-    @Test
-    void testADefaultedImageStillHasToBeOnTheAllowlist() {
-        DockerTaskRunner otherImageTaskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", "ubuntu:24.04")));
-
-        assertThatThrownBy(() -> otherImageTaskRunner.validate(request(Map.of())))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining(ALLOWED_IMAGE)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.allowed-images");
-    }
-
-    @Test
-    void testAnEmptyAllowlistPermitsNotEvenTheDefaultImage() {
-        DockerTaskRunner emptyAllowlistTaskRunner = new DockerTaskRunner(applicationProperties(Map.of()));
-
-        assertThatThrownBy(() -> emptyAllowlistTaskRunner.validate(request(Map.of())))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.allowed-images");
     }
 
     @Test
@@ -236,120 +178,45 @@ class DockerTaskRunnerTest {
         TestDaemon testDaemon = new TestDaemon();
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", TEST_TIMEOUT, Map.of(), Map.of());
+            SCRIPT, TEST_TIMEOUT, Map.of(), Map.of());
 
         testDaemon.newTaskRunner()
             .run(request);
 
-        verify(testDaemon.dockerClient).createContainerCmd(ALLOWED_IMAGE);
-    }
-
-    @Test
-    void testValidateRejectsHostNetworkingUnlessTheOperatorEnabledIt() {
-        assertThatThrownBy(
-            () -> dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", "host"))))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("bytechef.script.runners.docker.properties.allow-host-network");
-    }
-
-    @Test
-    void testValidateAcceptsHostNetworkingWhenTheOperatorEnabledIt() {
-        DockerTaskRunner hostNetworkTaskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, "allow-host-network", "true")));
-
-        hostNetworkTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", "host")));
+        verify(testDaemon.dockerClient).createContainerCmd(IMAGE);
     }
 
     @Test
     void testValidateAcceptsANetworkModeThatIsNotHost() {
-        dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", "none")));
-        dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", "bridge")));
-    }
-
-    @Test
-    void testValidateRejectsANamedDockerNetwork() {
-        assertThatThrownBy(
-            () -> dockerTaskRunner.validate(
-                request(Map.of("image", ALLOWED_IMAGE, "networkMode", "bytechef_default"))))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("bytechef_default")
-                    .hasMessageContaining("bridge")
-                    .hasMessageContaining("none");
-    }
-
-    @Test
-    void testValidateRejectsJoiningAnotherContainersNetworkNamespace() {
-        assertThatThrownBy(
-            () -> dockerTaskRunner.validate(
-                request(Map.of("image", ALLOWED_IMAGE, "networkMode", "container:bytechef"))))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("container:bytechef");
-    }
-
-    @Test
-    void testValidateRejectsAContainerNamespaceThatCouldCarryHostNetworkingTransitively() {
-        DockerTaskRunner hostNetworkTaskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, "allow-host-network", "true")));
-
-        for (DockerTaskRunner taskRunner : List.of(dockerTaskRunner, hostNetworkTaskRunner)) {
-            assertThatThrownBy(
-                () -> taskRunner.validate(
-                    request(Map.of("image", ALLOWED_IMAGE, "networkMode", "container:9f3d163e"))))
-                        .isInstanceOf(IllegalArgumentException.class)
-                        .hasMessageContaining("container:9f3d163e");
-        }
-    }
-
-    @Test
-    void testTheAcceptedNetworkModesAreExactlyTheOnesTheSelectOffers() {
-        DockerTaskRunner hostNetworkTaskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, "allow-host-network", "true")));
-
-        assertThat(optionValues(dockerTaskRunner, "networkMode")).containsExactly("bridge", "none");
-        assertThat(optionValues(hostNetworkTaskRunner, "networkMode")).containsExactly("bridge", "none", "host");
-
-        for (DockerTaskRunner taskRunner : List.of(dockerTaskRunner, hostNetworkTaskRunner)) {
-            for (String networkMode : optionValues(taskRunner, "networkMode")) {
-                taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", networkMode)));
-            }
-        }
-
-        assertThatThrownBy(
-            () -> dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", "host"))))
-                .isInstanceOf(IllegalArgumentException.class);
+        backend.validate(request(Map.of("image", IMAGE, "networkMode", "none")), context(Map.of(), null));
+        backend.validate(request(Map.of("image", IMAGE, "networkMode", "bridge")), context(Map.of(), null));
     }
 
     @Test
     void testValidateRejectsALanguageTheBootstrapCannotExecute() {
         TaskRunnerRequest request = new TaskRunnerRequest(
             "ruby", "puts 1", List.of(), Map.of(), Map.of(), Map.of(), List.of(),
-            ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of("image", ALLOWED_IMAGE)),
+            ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of("image", IMAGE)),
             TEST_TIMEOUT, Map.of(), mock(ActionContext.class));
 
-        assertThatThrownBy(() -> dockerTaskRunner.validate(request))
+        RemoteTaskRunner taskRunner = new RemoteTaskRunner(backend, applicationProperties(Map.of()));
+
+        assertThatThrownBy(() -> taskRunner.validate(request))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("ruby");
     }
 
     @Test
-    void testValidateRejectsAnUnknownPullPolicy() {
-        assertThatThrownBy(
-            () -> dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "pullPolicy", "SOMETIMES"))))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("SOMETIMES");
-    }
-
-    @Test
     void testValidateRejectsAMalformedMemoryLimit() {
         assertThatThrownBy(
-            () -> dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "memory", "plenty"))))
+            () -> backend.validate(request(Map.of("image", IMAGE, "memory", "plenty")), context(Map.of(), null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("plenty");
     }
 
     @Test
     void testValidateRejectsANonPositiveCpuLimit() {
-        assertThatThrownBy(() -> dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "cpu", 0))))
+        assertThatThrownBy(() -> backend.validate(request(Map.of("image", IMAGE, "cpu", 0)), context(Map.of(), null)))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -360,7 +227,7 @@ class DockerTaskRunnerTest {
         testDaemon.stdout = "hello-from-container";
 
         TaskRunnerResult result = testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
+            .run(scriptRequest(SCRIPT));
 
         assertThat(result.exitCode()).isZero();
         assertThat(result.stdout()).contains("hello-from-container");
@@ -376,9 +243,9 @@ class DockerTaskRunnerTest {
         testDaemon.stdout = "out-before-failure";
         testDaemon.stderr = "boom";
 
-        DockerTaskRunner taskRunner = testDaemon.newTaskRunner();
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
 
-        assertThatThrownBy(() -> taskRunner.run(scriptRequest("def perform(input, context):\n    return 1\n")))
+        assertThatThrownBy(() -> taskRunner.run(scriptRequest(SCRIPT)))
             .isInstanceOf(RuntimeException.class)
             .hasMessageContaining("code 3")
             .hasMessageContaining("out-before-failure")
@@ -393,10 +260,10 @@ class DockerTaskRunnerTest {
 
         testDaemon.containerExits = false;
 
-        DockerTaskRunner taskRunner = testDaemon.newTaskRunner();
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", Duration.ofMillis(200));
+            SCRIPT, Duration.ofMillis(200));
 
         assertThatThrownBy(() -> taskRunner.run(request))
             .isInstanceOf(RuntimeException.class)
@@ -413,10 +280,10 @@ class DockerTaskRunnerTest {
         testDaemon.stdout = "out-before-timeout";
         testDaemon.stderr = "err-before-timeout";
 
-        DockerTaskRunner taskRunner = testDaemon.newTaskRunner();
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", Duration.ofMillis(200));
+            SCRIPT, Duration.ofMillis(200));
 
         assertThatThrownBy(() -> taskRunner.run(request))
             .isInstanceOf(RuntimeException.class)
@@ -431,13 +298,13 @@ class DockerTaskRunnerTest {
 
         testDaemon.containerExits = false;
 
-        DockerTaskRunner taskRunner = testDaemon.newTaskRunner();
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
 
         AtomicReference<RuntimeException> failure = new AtomicReference<>();
 
         Thread runnerThread = new Thread(() -> {
             try {
-                taskRunner.run(scriptRequest("def perform(input, context):\n    return 1\n", Duration.ofMinutes(5)));
+                taskRunner.run(scriptRequest(SCRIPT, Duration.ofMinutes(5)));
             } catch (RuntimeException exception) {
                 failure.set(exception);
             }
@@ -463,9 +330,9 @@ class DockerTaskRunnerTest {
         testDaemon.imagePresent = false;
         testDaemon.pullFails = true;
 
-        DockerTaskRunner taskRunner = testDaemon.newTaskRunner();
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
 
-        assertThatThrownBy(() -> taskRunner.run(scriptRequest("def perform(input, context):\n    return 1\n")))
+        assertThatThrownBy(() -> taskRunner.run(scriptRequest(SCRIPT)))
             .isInstanceOf(RuntimeException.class);
 
         verify(testDaemon.dockerClient, never()).createContainerCmd(anyString());
@@ -480,10 +347,10 @@ class DockerTaskRunnerTest {
         testDaemon.imagePresent = false;
         testDaemon.pullCompletes = false;
 
-        DockerTaskRunner taskRunner = testDaemon.newTaskRunner();
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", Duration.ofMillis(200));
+            SCRIPT, Duration.ofMillis(200));
 
         assertThatThrownBy(() -> taskRunner.run(request))
             .isInstanceOf(RuntimeException.class)
@@ -498,9 +365,9 @@ class DockerTaskRunnerTest {
 
         testDaemon.inputCopyFails = true;
 
-        DockerTaskRunner taskRunner = testDaemon.newTaskRunner();
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
 
-        assertThatThrownBy(() -> taskRunner.run(scriptRequest("def perform(input, context):\n    return 1\n")))
+        assertThatThrownBy(() -> taskRunner.run(scriptRequest(SCRIPT)))
             .isInstanceOf(RuntimeException.class);
 
         verify(testDaemon.dockerClient, never()).startContainerCmd(anyString());
@@ -514,9 +381,9 @@ class DockerTaskRunnerTest {
 
         testDaemon.logAttachFails = true;
 
-        DockerTaskRunner taskRunner = testDaemon.newTaskRunner();
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
 
-        assertThatThrownBy(() -> taskRunner.run(scriptRequest("def perform(input, context):\n    return 1\n")))
+        assertThatThrownBy(() -> taskRunner.run(scriptRequest(SCRIPT)))
             .isInstanceOf(RuntimeException.class);
 
         assertThat(testDaemon.removedContainerIds).containsExactly(CONTAINER_ID);
@@ -528,9 +395,9 @@ class DockerTaskRunnerTest {
 
         testDaemon.outputCopyFails = true;
 
-        DockerTaskRunner taskRunner = testDaemon.newTaskRunner();
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
 
-        assertThatThrownBy(() -> taskRunner.run(scriptRequest("def perform(input, context):\n    return 1\n")))
+        assertThatThrownBy(() -> taskRunner.run(scriptRequest(SCRIPT)))
             .isInstanceOf(RuntimeException.class);
 
         assertThat(testDaemon.removedContainerIds).containsExactly(CONTAINER_ID);
@@ -543,7 +410,7 @@ class DockerTaskRunnerTest {
         testDaemon.outputPresent = false;
 
         TaskRunnerResult result = testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
+            .run(scriptRequest(SCRIPT));
 
         assertThat(result.exitCode()).isZero();
         assertThat(result.output()).isNull();
@@ -555,7 +422,7 @@ class DockerTaskRunnerTest {
         TestDaemon testDaemon = new TestDaemon();
 
         testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
+            .run(scriptRequest(SCRIPT));
 
         verify(testDaemon.createContainerCmd).withEntrypoint(List.of("python3"));
         verify(testDaemon.createContainerCmd).withCmd("/tmp/script.py");
@@ -566,8 +433,8 @@ class DockerTaskRunnerTest {
         TestDaemon testDaemon = new TestDaemon();
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", TEST_TIMEOUT,
-            Map.of("image", ALLOWED_IMAGE, "entrypoint", List.of("python3", "-u")), Map.of());
+            SCRIPT, TEST_TIMEOUT,
+            Map.of("image", IMAGE, "entrypoint", List.of("python3", "-u")), Map.of());
 
         testDaemon.newTaskRunner()
             .run(request);
@@ -581,7 +448,7 @@ class DockerTaskRunnerTest {
         TestDaemon testDaemon = new TestDaemon();
 
         testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
+            .run(scriptRequest(SCRIPT));
 
         assertThat(testDaemon.environment).contains(
             "BYTECHEF_WORKING_DIR=/tmp", "BYTECHEF_INPUT_FILE=/tmp/input.json", "BYTECHEF_OUTPUT_DIR=/tmp/output");
@@ -592,7 +459,7 @@ class DockerTaskRunnerTest {
         TestDaemon testDaemon = new TestDaemon();
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", TEST_TIMEOUT, Map.of("image", ALLOWED_IMAGE),
+            SCRIPT, TEST_TIMEOUT, Map.of("image", IMAGE),
             Map.of("BYTECHEF_OUTPUT_DIR", "/nowhere", "GREETING", "hi"));
 
         testDaemon.newTaskRunner()
@@ -607,8 +474,8 @@ class DockerTaskRunnerTest {
         TestDaemon testDaemon = new TestDaemon();
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", TEST_TIMEOUT,
-            Map.of("image", ALLOWED_IMAGE, "cpu", 1.5, "memory", "512m", "networkMode", "none"), Map.of());
+            SCRIPT, TEST_TIMEOUT,
+            Map.of("image", IMAGE, "cpu", 1.5, "memory", "512m", "networkMode", "none"), Map.of());
 
         testDaemon.newTaskRunner()
             .run(request);
@@ -621,146 +488,11 @@ class DockerTaskRunnerTest {
     }
 
     @Test
-    void testAForkBombShapedRequestStillGetsABoundedContainer() {
-        TestDaemon testDaemon = new TestDaemon();
-
-        TaskRunnerRequest request = commandsRequest(List.of(":(){ :|:& };:"), Map.of("image", ALLOWED_IMAGE));
-
-        testDaemon.newTaskRunner()
-            .run(request);
-
-        HostConfig hostConfig = testDaemon.hostConfig;
-
-        assertThat(hostConfig.getPidsLimit()).isEqualTo(512L);
-        assertThat(hostConfig.getNanoCPUs()).isEqualTo(1_000_000_000L);
-        assertThat(hostConfig.getMemory()).isEqualTo(512L * 1024 * 1024);
-    }
-
-    @Test
-    void testThePidsLimitIsSetEvenWhenTheWorkflowNamedItsOwnLimits() {
-        TestDaemon testDaemon = new TestDaemon();
-
-        TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", TEST_TIMEOUT,
-            Map.of("image", ALLOWED_IMAGE, "cpu", 1.5, "memory", "512m"), Map.of());
-
-        testDaemon.newTaskRunner()
-            .run(request);
-
-        assertThat(testDaemon.hostConfig.getPidsLimit()).isEqualTo(512L);
-    }
-
-    @Test
-    void testTheOperatorsPidsLimitReachesTheHostConfig() {
-        TestDaemon testDaemon = new TestDaemon();
-
-        testDaemon.runnerProperties = Map.of("allowed-images", ALLOWED_IMAGE, "pids-limit", "64");
-
-        testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
-
-        assertThat(testDaemon.hostConfig.getPidsLimit()).isEqualTo(64L);
-    }
-
-    @Test
-    void testAnOperatorCannotAskForAnUnboundedPidsLimit() {
-        DockerTaskRunner taskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, "pids-limit", "-1")));
-
-        assertThatThrownBy(() -> taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.pids-limit");
-    }
-
-    @Test
-    void testAMalformedOperatorCeilingRefusesTheExecutionRatherThanBecomingUnlimited() {
-        Map<String, String> malformedCeilings = Map.of(
-            "max-memory", "plenty", "max-cpu", "lots", "pids-limit", "many");
-
-        for (Map.Entry<String, String> entry : malformedCeilings.entrySet()) {
-            DockerTaskRunner taskRunner = new DockerTaskRunner(
-                applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, entry.getKey(), entry.getValue())));
-
-            assertThatThrownBy(() -> taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE))))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("bytechef.script.runners.docker.properties." + entry.getKey());
-        }
-    }
-
-    @Test
-    void testTheOperatorsDefaultCpuAndMemoryReachAContainerThatAskedForNeither() {
-        TestDaemon testDaemon = new TestDaemon();
-
-        testDaemon.runnerProperties = Map.of(
-            "allowed-images", ALLOWED_IMAGE, "default-cpu", "0.5", "default-memory", "256m");
-
-        testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
-
-        HostConfig hostConfig = testDaemon.hostConfig;
-
-        assertThat(hostConfig.getNanoCPUs()).isEqualTo(500_000_000L);
-        assertThat(hostConfig.getMemory()).isEqualTo(256L * 1024 * 1024);
-    }
-
-    @Test
-    void testACpuRequestAboveTheOperatorsMaximumIsRejected() {
-        DockerTaskRunner taskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, "max-cpu", "2")));
-
-        assertThatThrownBy(() -> taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "cpu", 8))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.max-cpu");
-
-        taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "cpu", 2)));
-    }
-
-    @Test
-    void testAMemoryRequestAboveTheOperatorsMaximumIsRejected() {
-        DockerTaskRunner taskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, "max-memory", "1g")));
-
-        assertThatThrownBy(() -> taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "memory", "2g"))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.max-memory");
-
-        taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "memory", "1g")));
-    }
-
-    @Test
-    void testTheMaximumsApplyEvenWhenTheOperatorNamedNone() {
-        assertThatThrownBy(() -> dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "cpu", 64))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.max-cpu");
-
-        assertThatThrownBy(() -> dockerTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "memory", "64g"))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.max-memory");
-    }
-
-    @Test
-    void testAnOperatorDefaultAboveTheirOwnMaximumIsHeldToTheMaximum() {
-        TestDaemon testDaemon = new TestDaemon();
-
-        testDaemon.runnerProperties = Map.of(
-            "allowed-images", ALLOWED_IMAGE, "default-cpu", "8", "max-cpu", "2", "default-memory", "8g", "max-memory",
-            "1g");
-
-        testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
-
-        HostConfig hostConfig = testDaemon.hostConfig;
-
-        assertThat(hostConfig.getNanoCPUs()).isEqualTo(2_000_000_000L);
-        assertThat(hostConfig.getMemory()).isEqualTo(1024L * 1024 * 1024);
-    }
-
-    @Test
     void testTheContainersHomeIsItsWorkingDirectory() {
         TestDaemon testDaemon = new TestDaemon();
 
         testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
+            .run(scriptRequest(SCRIPT));
 
         assertThat(testDaemon.environment).contains("HOME=/tmp");
     }
@@ -770,7 +502,7 @@ class DockerTaskRunnerTest {
         TestDaemon testDaemon = new TestDaemon();
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", TEST_TIMEOUT, Map.of("image", ALLOWED_IMAGE),
+            SCRIPT, TEST_TIMEOUT, Map.of("image", IMAGE),
             Map.of("HOME", "/home/somebody"));
 
         testDaemon.newTaskRunner()
@@ -781,95 +513,11 @@ class DockerTaskRunnerTest {
     }
 
     @Test
-    void testAnUnsetNetworkModeStillResolvesToBridgeByDefault() {
-        TestDaemon testDaemon = new TestDaemon();
-
-        testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
-
-        assertThat(testDaemon.hostConfig.getNetworkMode()).isEqualTo("bridge");
-    }
-
-    @Test
-    void testAnOperatorAllowingOnlyNoneGetsNoneForAWorkflowThatNamedNoMode() {
-        TestDaemon testDaemon = new TestDaemon();
-
-        testDaemon.runnerProperties = Map.of(
-            "allowed-images", ALLOWED_IMAGE, "allowed-network-modes", "none");
-
-        testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
-
-        assertThat(testDaemon.hostConfig.getNetworkMode()).isEqualTo("none");
-    }
-
-    @Test
-    void testAnOperatorAllowingOnlyNoneRejectsARequestForBridge() {
-        DockerTaskRunner taskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, "allowed-network-modes", "none")));
-
-        assertThatThrownBy(
-            () -> taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", "bridge"))))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("bridge");
-
-        assertThat(optionValues(taskRunner, "networkMode")).containsExactly("none");
-
-        taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", "none")));
-    }
-
-    @Test
-    void testHostStillNeedsItsOwnFlagWhateverTheModeAllowlistSays() {
-        DockerTaskRunner listedButUnflaggedTaskRunner = new DockerTaskRunner(
-            applicationProperties(
-                Map.of("allowed-images", ALLOWED_IMAGE, "allowed-network-modes", "none,bridge,host")));
-
-        assertThatThrownBy(
-            () -> listedButUnflaggedTaskRunner.validate(
-                request(Map.of("image", ALLOWED_IMAGE, "networkMode", "host"))))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("bytechef.script.runners.docker.properties.allow-host-network");
-
-        assertThat(optionValues(listedButUnflaggedTaskRunner, "networkMode")).doesNotContain("host");
-
-        DockerTaskRunner flaggedTaskRunner = new DockerTaskRunner(
-            applicationProperties(Map.of("allowed-images", ALLOWED_IMAGE, "allow-host-network", "true")));
-
-        flaggedTaskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", "host")));
-    }
-
-    @Test
-    void testTheModeAllowlistCanTakeHostAwayFromAnOperatorWhoFlaggedIt() {
-        DockerTaskRunner taskRunner = new DockerTaskRunner(
-            applicationProperties(
-                Map.of(
-                    "allowed-images", ALLOWED_IMAGE, "allow-host-network", "true", "allowed-network-modes",
-                    "none,bridge")));
-
-        assertThat(optionValues(taskRunner, "networkMode")).containsExactly("bridge", "none");
-
-        assertThatThrownBy(() -> taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE, "networkMode", "host"))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("host");
-    }
-
-    @Test
-    void testAModeAllowlistNamingNothingKnownRefusesEveryExecution() {
-        DockerTaskRunner taskRunner = new DockerTaskRunner(
-            applicationProperties(
-                Map.of("allowed-images", ALLOWED_IMAGE, "allowed-network-modes", "bytechef_default")));
-
-        assertThatThrownBy(() -> taskRunner.validate(request(Map.of("image", ALLOWED_IMAGE))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.docker.properties.allowed-network-modes");
-    }
-
-    @Test
     void testTheContainerCarriesNoBindMounts() {
         TestDaemon testDaemon = new TestDaemon();
 
         testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
+            .run(scriptRequest(SCRIPT));
 
         HostConfig hostConfig = testDaemon.hostConfig;
 
@@ -883,7 +531,7 @@ class DockerTaskRunnerTest {
         testDaemon.imagePresent = true;
 
         testDaemon.newTaskRunner()
-            .run(scriptRequest("def perform(input, context):\n    return 1\n"));
+            .run(scriptRequest(SCRIPT));
 
         verify(testDaemon.dockerClient, never()).pullImageCmd(anyString());
     }
@@ -895,13 +543,13 @@ class DockerTaskRunnerTest {
         testDaemon.imagePresent = true;
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", TEST_TIMEOUT,
-            Map.of("image", ALLOWED_IMAGE, "pullPolicy", "ALWAYS"), Map.of());
+            SCRIPT, TEST_TIMEOUT,
+            Map.of("image", IMAGE, "pullPolicy", "ALWAYS"), Map.of());
 
         testDaemon.newTaskRunner()
             .run(request);
 
-        verify(testDaemon.dockerClient).pullImageCmd(ALLOWED_IMAGE);
+        verify(testDaemon.dockerClient).pullImageCmd(IMAGE);
     }
 
     @Test
@@ -911,14 +559,341 @@ class DockerTaskRunnerTest {
         testDaemon.imagePresent = false;
 
         TaskRunnerRequest request = scriptRequest(
-            "def perform(input, context):\n    return 1\n", TEST_TIMEOUT,
-            Map.of("image", ALLOWED_IMAGE, "pullPolicy", "NEVER"), Map.of());
+            SCRIPT, TEST_TIMEOUT,
+            Map.of("image", IMAGE, "pullPolicy", "NEVER"), Map.of());
 
         testDaemon.newTaskRunner()
             .run(request);
 
         verify(testDaemon.dockerClient, never()).pullImageCmd(anyString());
         verify(testDaemon.dockerClient, never()).inspectImageCmd(anyString());
+    }
+
+    @Test
+    void testAPerTaskHostIsRejectedUnlessTheOperatorAllowedIt() {
+        assertThatThrownBy(
+            () -> backend.validate(request(Map.of("host", "tcp://elsewhere:2375")), context(Map.of(), null)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("bytechef.script.runners.docker.properties.allow-task-host");
+
+        backend.validate(
+            request(Map.of("host", "tcp://elsewhere:2375")), context(Map.of("allow-task-host", "true"), null));
+    }
+
+    @Test
+    void testTheHostPropertyIsOfferedOnlyWhenTheOperatorAllowedIt() {
+        assertThat(propertyNames(backend, Map.of())).doesNotContain("host");
+        assertThat(propertyNames(backend, Map.of("allow-task-host", "true"))).contains("host");
+    }
+
+    @Test
+    void testAnAllowedPerTaskHostReachesTheClientFactory() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.runnerProperties = Map.of("allow-task-host", "true", "host", "unix:///operator.sock");
+
+        TaskRunnerRequest request = scriptRequest(
+            SCRIPT, TEST_TIMEOUT, Map.of("host", "tcp://elsewhere:2375"), Map.of());
+
+        testDaemon.newTaskRunner()
+            .run(request);
+
+        assertThat(testDaemon.hosts).isNotEmpty()
+            .allMatch("tcp://elsewhere:2375"::equals);
+    }
+
+    @Test
+    void testTheOperatorsHostIsUsedWhenTheTaskNamesNone() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.runnerProperties = Map.of("host", "unix:///operator.sock");
+
+        testDaemon.newTaskRunner()
+            .run(scriptRequest(SCRIPT));
+
+        assertThat(testDaemon.hosts).isNotEmpty()
+            .allMatch("unix:///operator.sock"::equals);
+    }
+
+    @Test
+    void testVolumesAreRejectedUnlessTheOperatorAllowedThem() {
+        assertThatThrownBy(
+            () -> backend.validate(request(Map.of("volumes", List.of("/data:/data:ro"))), context(Map.of(), null)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("bytechef.script.runners.docker.properties.allow-volume-mounts");
+
+        assertThat(propertyNames(backend, Map.of())).doesNotContain("volumes");
+        assertThat(propertyNames(backend, Map.of("allow-volume-mounts", "true"))).contains("volumes");
+    }
+
+    @Test
+    void testAnAllowedVolumeBecomesABind() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.runnerProperties = Map.of("allow-volume-mounts", "true");
+
+        TaskRunnerRequest request = scriptRequest(
+            SCRIPT, TEST_TIMEOUT, Map.of("volumes", List.of("/data:/data:ro")), Map.of());
+
+        testDaemon.newTaskRunner()
+            .run(request);
+
+        assertThat(testDaemon.hostConfig.getBinds()).hasSize(1);
+    }
+
+    @Test
+    void testPrivilegedReachesTheHostConfig() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.newTaskRunner()
+            .run(scriptRequest(SCRIPT, TEST_TIMEOUT, Map.of("privileged", true), Map.of()));
+
+        assertThat(testDaemon.hostConfig.getPrivileged()).isTrue();
+    }
+
+    @Test
+    void testANamedNetworkIsPassedThrough() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.newTaskRunner()
+            .run(scriptRequest(SCRIPT, TEST_TIMEOUT, Map.of("networkMode", "bytechef_default"), Map.of()));
+
+        assertThat(testDaemon.hostConfig.getNetworkMode()).isEqualTo("bytechef_default");
+    }
+
+    @Test
+    void testNoLimitsAreSetWhenTheWorkflowNamedNone() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.newTaskRunner()
+            .run(scriptRequest(SCRIPT));
+
+        assertThat(testDaemon.hostConfig.getNanoCPUs()).isNull();
+        assertThat(testDaemon.hostConfig.getMemory()).isNull();
+        assertThat(testDaemon.hostConfig.getPidsLimit()).isNull();
+    }
+
+    @Test
+    void testRegistryCredentialsReachThePull() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.imagePresent = false;
+
+        TaskRunnerRequest request = scriptRequest(
+            SCRIPT, TEST_TIMEOUT,
+            Map.of("credentials", Map.of("registry", "ghcr.io", "username", "u", "password", "p")), Map.of());
+
+        testDaemon.newTaskRunner()
+            .run(request);
+
+        ArgumentCaptor<AuthConfig> authConfigArgumentCaptor = ArgumentCaptor.forClass(AuthConfig.class);
+
+        verify(testDaemon.pullImageCmd).withAuthConfig(authConfigArgumentCaptor.capture());
+
+        AuthConfig authConfig = authConfigArgumentCaptor.getValue();
+
+        assertThat(authConfig.getRegistryAddress()).isEqualTo("ghcr.io");
+        assertThat(authConfig.getUsername()).isEqualTo("u");
+        assertThat(authConfig.getPassword()).isEqualTo("p");
+    }
+
+    @Test
+    void testTheContainerCarriesTheResumeLabels() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.newTaskRunner()
+            .run(scriptRequest(SCRIPT));
+
+        assertThat(testDaemon.labels)
+            .containsEntry("io.bytechef.managed-by", "bytechef")
+            .containsEntry("io.bytechef.task-execution-id", "test-key");
+    }
+
+    @Test
+    void testFindReturnsARunningContainerWithTheLabel() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        Container container = mock(Container.class);
+
+        when(container.getId()).thenReturn("c-9");
+        when(container.getState()).thenReturn("running");
+
+        testDaemon.existingContainers = List.of(container);
+
+        testDaemon.newTaskRunner();
+
+        Optional<RemoteJobHandle> handle = new DockerTaskRunnerBackend((host, timeout) -> testDaemon.dockerClient)
+            .find(new RemoteJobKey("7", null), context(Map.of(), null));
+
+        assertThat(handle).map(RemoteJobHandle::id)
+            .contains("c-9");
+
+        ListContainersCmd listContainersCmd = testDaemon.dockerClient.listContainersCmd();
+
+        verify(listContainersCmd).withShowAll(true);
+        verify(listContainersCmd).withLabelFilter(
+            Map.of("io.bytechef.task-execution-id", "7", "io.bytechef.managed-by", "bytechef"));
+    }
+
+    @Test
+    void testFindRemovesAContainerThatWasCreatedButNeverStarted() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.existingContainers = List.of(container("c-1", "created", Map.of()));
+
+        testDaemon.newTaskRunner();
+
+        Optional<RemoteJobHandle> handle = new DockerTaskRunnerBackend((host, timeout) -> testDaemon.dockerClient)
+            .find(new RemoteJobKey("7", null), context(Map.of(), null));
+
+        assertThat(handle).isEmpty();
+        assertThat(testDaemon.removedContainerIds).containsExactly("c-1");
+    }
+
+    @Test
+    void testFindPrefersARunningContainerOverAnExitedOne() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.existingContainers = List.of(
+            container("c-exited", "exited", Map.of()), container("c-running", "running", Map.of()));
+
+        testDaemon.newTaskRunner();
+
+        Optional<RemoteJobHandle> handle = new DockerTaskRunnerBackend((host, timeout) -> testDaemon.dockerClient)
+            .find(new RemoteJobKey("7", null), context(Map.of(), null));
+
+        assertThat(handle).map(RemoteJobHandle::id)
+            .contains("c-running");
+    }
+
+    @Test
+    void testFindIgnoresADeadContainer() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.existingContainers = List.of(container("c-dead", "dead", Map.of()));
+
+        testDaemon.newTaskRunner();
+
+        Optional<RemoteJobHandle> handle = new DockerTaskRunnerBackend((host, timeout) -> testDaemon.dockerClient)
+            .find(new RemoteJobKey("7", null), context(Map.of(), null));
+
+        assertThat(handle).isEmpty();
+        assertThat(testDaemon.removedContainerIds).isEmpty();
+    }
+
+    @Test
+    void testFindCarriesTheKillGracePeriodLabelOntoTheHandle() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.existingContainers = List.of(
+            container("c-9", "running", Map.of("io.bytechef.kill-grace-period", "PT7S")));
+
+        testDaemon.newTaskRunner();
+
+        Optional<RemoteJobHandle> handle = new DockerTaskRunnerBackend((host, timeout) -> testDaemon.dockerClient)
+            .find(new RemoteJobKey("7", null), context(Map.of(), null));
+
+        assertThat(handle).map(RemoteJobHandle::attributes)
+            .contains(Map.of("killGracePeriod", "PT7S"));
+    }
+
+    @Test
+    void testATimedOutContainerIsGivenItsKillGracePeriodBeforeItIsRemoved() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.containerExits = false;
+
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
+
+        TaskRunnerRequest request = scriptRequest(
+            SCRIPT, Duration.ofMillis(200), Map.of("image", IMAGE, "killGracePeriod", "PT5S"), Map.of());
+
+        assertThatThrownBy(() -> taskRunner.run(request))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("timed out");
+
+        verify(testDaemon.dockerClient).stopContainerCmd(CONTAINER_ID);
+        verify(testDaemon.stopContainerCmd).withTimeout(5);
+
+        assertThat(testDaemon.labels).containsEntry("io.bytechef.kill-grace-period", "PT5S");
+        assertThat(testDaemon.removedContainerIds).containsExactly(CONTAINER_ID);
+    }
+
+    @Test
+    void testATimedOutContainerWithoutAKillGracePeriodIsForcedAtOnce() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.containerExits = false;
+
+        RemoteTaskRunner taskRunner = testDaemon.newTaskRunner();
+
+        TaskRunnerRequest request = scriptRequest(SCRIPT, Duration.ofMillis(200));
+
+        assertThatThrownBy(() -> taskRunner.run(request))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("timed out");
+
+        verify(testDaemon.dockerClient, never()).stopContainerCmd(anyString());
+
+        assertThat(testDaemon.labels).doesNotContainKey("io.bytechef.kill-grace-period");
+        assertThat(testDaemon.removedContainerIds).containsExactly(CONTAINER_ID);
+    }
+
+    @Test
+    void testAFinishedContainerIsRemovedWithoutBeingStopped() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.newTaskRunner()
+            .run(scriptRequest(SCRIPT, TEST_TIMEOUT, Map.of("image", IMAGE, "killGracePeriod", "PT5S"), Map.of()));
+
+        verify(testDaemon.dockerClient, never()).stopContainerCmd(anyString());
+
+        assertThat(testDaemon.removedContainerIds).containsExactly(CONTAINER_ID);
+    }
+
+    @Test
+    void testAKillGracePeriodExtendsTheCleanupClientsResponseTimeout() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.newTaskRunner();
+
+        List<Duration> responseTimeouts = new ArrayList<>();
+
+        new DockerTaskRunnerBackend((host, timeout) -> {
+            responseTimeouts.add(timeout);
+
+            return testDaemon.dockerClient;
+        }).cleanup(
+            new RemoteJobHandle("c-9", Map.of("killGracePeriod", "PT60S")), CleanupMode.KILL_AND_DELETE,
+            context(Map.of(), null));
+
+        verify(testDaemon.stopContainerCmd).withTimeout(60);
+
+        assertThat(responseTimeouts).singleElement()
+            .satisfies(timeout -> assertThat(timeout).isGreaterThanOrEqualTo(Duration.ofSeconds(90)));
+        assertThat(testDaemon.removedContainerIds).containsExactly("c-9");
+    }
+
+    @Test
+    void testDetachLeavesTheContainerAlone() {
+        TestDaemon testDaemon = new TestDaemon();
+
+        testDaemon.newTaskRunner();
+
+        new DockerTaskRunnerBackend((host, timeout) -> testDaemon.dockerClient)
+            .cleanup(new RemoteJobHandle("c-9"), CleanupMode.DETACH, context(Map.of(), null));
+
+        assertThat(testDaemon.removedContainerIds).isEmpty();
+    }
+
+    private static Container container(String id, String state, Map<String, String> labels) {
+        Container container = mock(Container.class);
+
+        when(container.getId()).thenReturn(id);
+        when(container.getState()).thenReturn(state);
+        when(container.getLabels()).thenReturn(labels);
+
+        return container;
     }
 
     private static ApplicationProperties applicationProperties(Map<String, String> runnerProperties) {
@@ -940,25 +915,19 @@ class DockerTaskRunnerTest {
         return applicationProperties;
     }
 
-    private static List<String> optionValues(DockerTaskRunner taskRunner, String propertyName) {
-        StringProperty stringProperty = taskRunner.getProperties()
-            .stream()
-            .filter(property -> propertyName.equals(property.getName()))
-            .map(StringProperty.class::cast)
-            .findFirst()
-            .orElseThrow();
+    private static List<String> propertyNames(
+        DockerTaskRunnerBackend backend, Map<String, String> operatorProperties) {
 
-        return stringProperty.getOptions().orElseThrow()
-            .stream()
-            .map(Option::getValue)
-            .toList();
-    }
-
-    private static List<String> propertyNames(DockerTaskRunner taskRunner) {
-        return taskRunner.getProperties()
+        return backend.getProperties(operatorProperties)
             .stream()
             .map(ValueProperty::getName)
             .toList();
+    }
+
+    private static RemoteJobContext context(Map<String, String> operatorProperties, @Nullable String taskHost) {
+        return new RemoteJobContext(
+            null, operatorProperties, taskHost, ParametersFactory.create(Map.of()), 512L * 1024 * 1024,
+            Duration.ofHours(1));
     }
 
     private static TaskRunnerRequest request(Map<String, ?> runnerParameters) {
@@ -967,15 +936,9 @@ class DockerTaskRunnerTest {
 
     private static TaskRunnerRequest request(String languageId, Map<String, ?> runnerParameters) {
         return new TaskRunnerRequest(
-            languageId, "def perform(input, context):\n    return 1\n", List.of(), Map.of(), Map.of(), Map.of(),
+            languageId, SCRIPT, List.of(), Map.of(), Map.of(), Map.of(),
             List.of(), ParametersFactory.create(Map.of()), ParametersFactory.create(runnerParameters), TEST_TIMEOUT,
             Map.of(), mock(ActionContext.class));
-    }
-
-    private static TaskRunnerRequest commandsRequest(List<String> commands, Map<String, ?> runnerParameters) {
-        return new TaskRunnerRequest(
-            "shell", null, commands, Map.of(), Map.of(), Map.of(), List.of(), ParametersFactory.create(Map.of()),
-            ParametersFactory.create(runnerParameters), TEST_TIMEOUT, Map.of(), mock(ActionContext.class));
     }
 
     private static TaskRunnerRequest scriptRequest(String script) {
@@ -983,7 +946,7 @@ class DockerTaskRunnerTest {
     }
 
     private static TaskRunnerRequest scriptRequest(String script, Duration timeout) {
-        return scriptRequest(script, timeout, Map.of("image", ALLOWED_IMAGE), Map.of());
+        return scriptRequest(script, timeout, Map.of("image", IMAGE), Map.of());
     }
 
     private static TaskRunnerRequest scriptRequest(
@@ -1000,6 +963,7 @@ class DockerTaskRunnerTest {
         private final CreateContainerCmd createContainerCmd = mock(CreateContainerCmd.class, RETURNS_SELF);
         private final CountDownLatch waitReached = new CountDownLatch(1);
         private final List<String> removedContainerIds = new ArrayList<>();
+        private final List<String> hosts = new ArrayList<>();
 
         private int exitCode;
         private boolean containerExits = true;
@@ -1014,10 +978,14 @@ class DockerTaskRunnerTest {
         private String stderr = "";
 
         private List<String> environment = List.of();
+        private List<Container> existingContainers = List.of();
         private HostConfig hostConfig;
-        private Map<String, String> runnerProperties = Map.of("allowed-images", ALLOWED_IMAGE);
+        private Map<String, String> labels = Map.of();
+        private PullImageCmd pullImageCmd;
+        private StopContainerCmd stopContainerCmd;
+        private Map<String, String> runnerProperties = Map.of();
 
-        private DockerTaskRunner newTaskRunner() {
+        private RemoteTaskRunner newTaskRunner() {
             stubInspectImage();
             stubPullImage();
             stubCreateContainer();
@@ -1026,8 +994,24 @@ class DockerTaskRunnerTest {
             stubWait();
             stubCopyOut();
             stubRemoveContainer();
+            stubStopContainer();
+            stubListContainers();
 
-            return new DockerTaskRunner(applicationProperties(runnerProperties), (settings, timeout) -> dockerClient);
+            return new RemoteTaskRunner(
+                new DockerTaskRunnerBackend((host, timeout) -> {
+                    hosts.add(host);
+
+                    return dockerClient;
+                }),
+                applicationProperties(runnerProperties), () -> "test-key");
+        }
+
+        private void stubListContainers() {
+            ListContainersCmd listContainersCmd = mock(ListContainersCmd.class, RETURNS_SELF);
+
+            when(listContainersCmd.exec()).thenReturn(existingContainers);
+
+            when(dockerClient.listContainersCmd()).thenReturn(listContainersCmd);
         }
 
         private void stubInspectImage() {
@@ -1043,7 +1027,7 @@ class DockerTaskRunnerTest {
         }
 
         private void stubPullImage() {
-            PullImageCmd pullImageCmd = mock(PullImageCmd.class, RETURNS_SELF);
+            pullImageCmd = mock(PullImageCmd.class, RETURNS_SELF);
 
             when(pullImageCmd.exec(any())).thenAnswer(invocation -> {
                 ResultCallback<PullResponseItem> callback = invocation.getArgument(0);
@@ -1069,6 +1053,12 @@ class DockerTaskRunnerTest {
 
             when(createContainerCmd.withEnv(anyList())).thenAnswer(invocation -> {
                 environment = invocation.getArgument(0);
+
+                return createContainerCmd;
+            });
+
+            when(createContainerCmd.withLabels(any())).thenAnswer(invocation -> {
+                labels = invocation.getArgument(0);
 
                 return createContainerCmd;
             });
@@ -1166,15 +1156,25 @@ class DockerTaskRunnerTest {
         }
 
         private void stubRemoveContainer() {
-            RemoveContainerCmd removeContainerCmd = mock(RemoveContainerCmd.class, RETURNS_SELF);
+            when(dockerClient.removeContainerCmd(anyString())).thenAnswer(invocation -> {
+                String containerId = invocation.getArgument(0);
 
-            when(removeContainerCmd.exec()).thenAnswer(invocation -> {
-                removedContainerIds.add(CONTAINER_ID);
+                RemoveContainerCmd removeContainerCmd = mock(RemoveContainerCmd.class, RETURNS_SELF);
 
-                return null;
+                when(removeContainerCmd.exec()).thenAnswer(execInvocation -> {
+                    removedContainerIds.add(containerId);
+
+                    return null;
+                });
+
+                return removeContainerCmd;
             });
+        }
 
-            when(dockerClient.removeContainerCmd(anyString())).thenAnswer(invocation -> removeContainerCmd);
+        private void stubStopContainer() {
+            stopContainerCmd = mock(StopContainerCmd.class, RETURNS_SELF);
+
+            when(dockerClient.stopContainerCmd(anyString())).thenReturn(stopContainerCmd);
         }
 
         private InputStream outputArchive() throws IOException {

@@ -23,11 +23,9 @@ import static com.bytechef.platform.component.runner.TaskRunnerConstants.INTERPR
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.PROCESS;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.polyglot.GuestLoggingOutputStream;
 import com.bytechef.platform.component.runner.TaskRunner;
 import com.bytechef.platform.component.runner.TaskRunnerCapability;
-import com.bytechef.platform.component.runner.TaskRunnerOperatorFlag;
 import com.bytechef.platform.component.runner.TaskRunnerRequest;
 import com.bytechef.platform.component.runner.TaskRunnerResult;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -58,7 +56,6 @@ public class ProcessTaskRunner implements TaskRunner {
 
     private static final Duration DEFAULT_TIMEOUT = Duration.ofMinutes(5);
     private static final int DRAIN_BUFFER_SIZE = 8 * 1024;
-    private static final String INHERIT_ENVIRONMENT_ENABLED = "inherit-environment-enabled";
 
     private static final Duration DRAIN_GRACE = Duration.ofSeconds(5);
 
@@ -66,12 +63,6 @@ public class ProcessTaskRunner implements TaskRunner {
         ExternalLanguage.JAVASCRIPT, "node",
         ExternalLanguage.PYTHON, "python3",
         ExternalLanguage.SHELL, "/bin/sh");
-
-    private final ApplicationProperties applicationProperties;
-
-    public ProcessTaskRunner(ApplicationProperties applicationProperties) {
-        this.applicationProperties = applicationProperties;
-    }
 
     @Override
     public String getType() {
@@ -94,16 +85,14 @@ public class ProcessTaskRunner implements TaskRunner {
                     "The executable the source is handed to. Defaults to the interpreter for the action's language.")
                 .required(false));
 
-        if (isInheritEnvironmentEnabled()) {
-            properties.add(
-                bool(INHERIT_ENVIRONMENT)
-                    .label("Inherit Environment")
-                    .description(
-                        "Passes the server process's own environment to the execution. Off by default, because that " +
-                            "environment holds the server's credentials.")
-                    .defaultValue(false)
-                    .required(false));
-        }
+        properties.add(
+            bool(INHERIT_ENVIRONMENT)
+                .label("Inherit Environment")
+                .description(
+                    "Passes the server process's own environment to the execution. Off by default, because that " +
+                        "environment holds the server's credentials.")
+                .defaultValue(false)
+                .required(false));
 
         return properties;
     }
@@ -129,14 +118,6 @@ public class ProcessTaskRunner implements TaskRunner {
         if (!TaskRunnerBootstrap.isSupported(languageId)) {
             throw new IllegalArgumentException(
                 "Language '%s' cannot be executed by an external task runner".formatted(languageId));
-        }
-
-        if (isInheritEnvironmentRequested(request) && !isInheritEnvironmentEnabled()) {
-            throw new IllegalArgumentException(
-                "The process runner's '%s' option is not enabled. An operator must enable it with %s=true."
-                    .formatted(
-                        INHERIT_ENVIRONMENT,
-                        TaskRunnerOperatorFlag.getPropertyName(PROCESS, INHERIT_ENVIRONMENT_ENABLED)));
         }
 
         resolveInterpreter(request);
@@ -333,10 +314,6 @@ public class ProcessTaskRunner implements TaskRunner {
         }
 
         process.destroyForcibly();
-    }
-
-    private boolean isInheritEnvironmentEnabled() {
-        return TaskRunnerOperatorFlag.isEnabled(applicationProperties, PROCESS, INHERIT_ENVIRONMENT_ENABLED);
     }
 
     private static boolean isInheritEnvironmentRequested(TaskRunnerRequest request) {
