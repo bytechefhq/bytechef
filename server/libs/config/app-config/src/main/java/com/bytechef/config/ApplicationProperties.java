@@ -5027,6 +5027,8 @@ public class ApplicationProperties {
 
         private Sandbox sandbox = new Sandbox();
 
+        private boolean injectConnections;
+
         private RunnerLimits runnerLimits = new RunnerLimits();
 
         private Map<String, Runner> runners = new HashMap<>();
@@ -5041,6 +5043,14 @@ public class ApplicationProperties {
 
         public Sandbox getSandbox() {
             return sandbox;
+        }
+
+        public boolean isInjectConnections() {
+            return injectConnections;
+        }
+
+        public void setInjectConnections(boolean injectConnections) {
+            this.injectConnections = injectConnections;
         }
 
         public void setRunnerLimits(RunnerLimits runnerLimits) {

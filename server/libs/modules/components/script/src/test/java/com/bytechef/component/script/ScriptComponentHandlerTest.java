@@ -223,7 +223,7 @@ public class ScriptComponentHandlerTest {
         script.setRunners(runners);
 
         return new TaskRunnerRegistryImpl(
-            List.of(new GraalVmTaskRunner(null, applicationProperties), new ProcessTaskRunner()),
+            List.of(new GraalVmTaskRunner(null, applicationProperties), new ProcessTaskRunner(applicationProperties)),
             List.of(new DockerTaskRunnerBackend()), applicationProperties);
     }
 }
