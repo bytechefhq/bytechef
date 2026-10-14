@@ -5,7 +5,7 @@ import {
     AutomationWorkflowProject,
     AutomationWorkflowProjectWorkflowTemplate,
     ConnectedUserProjectWorkflow,
-} from '@/ee/shared/middleware/embedded/public';
+} from '@bytechef/embedded-api';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 

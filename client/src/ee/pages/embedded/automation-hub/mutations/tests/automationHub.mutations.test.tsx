@@ -35,7 +35,7 @@ const {connectedUserProjectWorkflowApiMock, connectionApiMock} = vi.hoisted(() =
     },
 }));
 
-vi.mock('@/ee/shared/middleware/embedded/public', () => ({
+vi.mock('@bytechef/embedded-api', () => ({
     ConnectedUserProjectWorkflowApi: class {
         constructor() {
             return connectedUserProjectWorkflowApiMock;

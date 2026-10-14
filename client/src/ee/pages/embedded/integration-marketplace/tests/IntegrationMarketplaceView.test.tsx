@@ -11,8 +11,8 @@ const {getEmbedParentOriginMock, getFrontendIntegrationsMock} = vi.hoisted(() =>
 
 vi.mock('@/ee/pages/embedded/shared/useEmbedHandshake', () => ({getEmbedParentOrigin: getEmbedParentOriginMock}));
 
-vi.mock('@/ee/shared/middleware/embedded/public', async (importOriginal) => ({
-    ...(await importOriginal<typeof import('@/ee/shared/middleware/embedded/public')>()),
+vi.mock('@bytechef/embedded-api', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@bytechef/embedded-api')>()),
     IntegrationApi: class {
         getFrontendIntegrations = getFrontendIntegrationsMock;
     },

@@ -28,6 +28,7 @@ jobs:
       pull-requests: read
     # Set job outputs to values from the filter step
     outputs:
+      api-sdk: ${{ steps.filter.outputs.api-sdk }}
       cli: ${{ steps.filter.outputs.cli }}
       client: ${{ steps.filter.outputs.client }}
       embedded-sdk: ${{ steps.filter.outputs.embedded-sdk }}
@@ -38,10 +39,13 @@ jobs:
         id: filter
         with:
           filters: |
+            api-sdk:
+              - 'sdks/api/typescript/**'
             cli:
             - 'cli/**'
             client:
               - 'client/**'
+              - 'sdks/api/typescript/**'
             embedded-sdk:
               - 'sdks/frontend/embedded/**'
             server:
@@ -110,6 +114,24 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           projectBaseDir: client/
+
+  api-sdk:
+    needs: changes
+    if: ${{ needs.changes.outputs.api-sdk == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: sdks/api/typescript/package-lock.json
+      - name: run npm commands
+        working-directory: sdks/api/typescript
+        run: |
+          npm ci
+          npm run build
 
   embedded-sdk:
     needs: changes
