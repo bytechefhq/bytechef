@@ -15,6 +15,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-workspace"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-polyglot"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-runner:platform-component-runner-impl"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 

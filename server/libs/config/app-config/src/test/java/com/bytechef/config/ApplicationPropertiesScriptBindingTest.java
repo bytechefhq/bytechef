@@ -19,9 +19,12 @@ package com.bytechef.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.core.env.StandardEnvironment;
+import org.springframework.core.env.SystemEnvironmentPropertySource;
 
 /**
  * @author Ivica Cardic
@@ -51,6 +54,75 @@ public class ApplicationPropertiesScriptBindingTest {
                 assertThat(sandbox.getMaxHeapMemory()
                     .toBytes()).isEqualTo(64L * 1024 * 1024);
                 assertThat(sandbox.getMaxConcurrentExecutions()).isEqualTo(4);
+            });
+    }
+
+    @Test
+    public void testRunnerPropertiesBind() {
+        applicationContextRunner
+            .withPropertyValues(
+                "bytechef.script.runners.graalvm.enabled=true",
+                "bytechef.script.runners.graalvm.properties.trusted-enabled=true",
+                "bytechef.script.runners.docker.enabled=false")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+
+                ApplicationProperties applicationProperties = context.getBean(ApplicationProperties.class);
+
+                assertThat(applicationProperties.getScript()
+                    .getRunners()).containsOnlyKeys("graalvm", "docker");
+                assertThat(applicationProperties.getScript()
+                    .getRunners()
+                    .get("graalvm")
+                    .isEnabled()).isTrue();
+                assertThat(applicationProperties.getScript()
+                    .getRunners()
+                    .get("graalvm")
+                    .getProperties()).containsEntry("trusted-enabled", "true");
+            });
+    }
+
+    @Test
+    public void testRunnerPropertiesBindFromEnvironmentVariables() {
+        applicationContextRunner
+            .withPropertyValues(
+                "bytechef.script.runners.aws-batch.enabled=false",
+                "bytechef.script.runners.aws-batch.properties.max-log-bytes=1MB",
+                "bytechef.script.runners.aws-batch.properties.max-wait=PT1H",
+                "bytechef.script.runners.kubernetes.enabled=true")
+            .withInitializer(applicationContext -> applicationContext.getEnvironment()
+                .getPropertySources()
+                .addFirst(new SystemEnvironmentPropertySource(
+                    StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+                    Map.of(
+                        "BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_ENABLED", "true",
+                        "BYTECHEF_SCRIPT_RUNNERS_KUBERNETES_PROPERTIES_MAXWAIT", "PT3H",
+                        "BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_PROPERTIES_MAXWAIT", "PT2H",
+                        "BYTECHEF_SCRIPT_RUNNERS_GRAALVM_PROPERTIES_TRUSTED_ENABLED", "true"))))
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+
+                ApplicationProperties applicationProperties = context.getBean(ApplicationProperties.class);
+                ApplicationProperties.Script script = applicationProperties.getScript();
+
+                ApplicationProperties.Script.Runner awsBatchRunner = script.findRunner("aws-batch");
+
+                assertThat(awsBatchRunner).isNotNull();
+                assertThat(awsBatchRunner.isEnabled()).isTrue();
+                assertThat(awsBatchRunner.propertiesByCanonicalName())
+                    .containsEntry("max-wait", "PT2H")
+                    .containsEntry("max-log-bytes", "1MB");
+
+                ApplicationProperties.Script.Runner kubernetesRunner = script.findRunner("kubernetes");
+
+                assertThat(kubernetesRunner).isNotNull();
+                assertThat(kubernetesRunner.isEnabled()).isTrue();
+                assertThat(kubernetesRunner.propertiesByCanonicalName()).containsEntry("max-wait", "PT3H");
+
+                ApplicationProperties.Script.Runner graalVmRunner = script.findRunner("graalvm");
+
+                assertThat(graalVmRunner).isNotNull();
+                assertThat(graalVmRunner.propertiesByCanonicalName()).containsEntry("trusted-enabled", "true");
             });
     }
 
