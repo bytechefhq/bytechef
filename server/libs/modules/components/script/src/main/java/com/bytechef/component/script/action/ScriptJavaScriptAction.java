@@ -62,8 +62,23 @@ public class ScriptJavaScriptAction {
                 .description("Add your JavaScript custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .languageId("javascript")
-                .defaultValue("function perform(input, context) {\n\treturn null;\n}")
-                .required(true));
+                .defaultValue(
+                    """
+                        function perform(input, connection, context) {
+                            // input holds the values defined in the Input panel (top right of this editor).
+                            //
+                            // connection holds the parameters of each connection defined in the
+                            // Connections panel (bottom right of this editor), keyed by its name:
+                            // const token = connection["my-connection"].token;
+                            //
+                            // Reach another component's action through the context:
+                            // const response = context.component.httpClient.get(
+                            //     {uri: "https://api.example.com/items"}, "my-connection");
+
+                            return null;
+                        }""")
+                .required(true)
+                .expressionEnabled(false));
         properties.add(
             TaskRunnerPropertyFactory.taskRunnerProperty(
                 taskRunnerRegistry, Set.of(TaskRunnerCapability.INLINE_SCRIPT)));
