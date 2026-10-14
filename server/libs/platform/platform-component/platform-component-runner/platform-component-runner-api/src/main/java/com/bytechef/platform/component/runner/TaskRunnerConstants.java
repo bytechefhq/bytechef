@@ -35,6 +35,15 @@ public class TaskRunnerConstants {
     public static final String INHERIT_ENVIRONMENT = "inheritEnvironment";
     public static final String INTERPRETER = "interpreter";
 
+    public static final String CPU = "cpu";
+    public static final String ENTRYPOINT = "entrypoint";
+    public static final String EXTRA_HOSTS = "extraHosts";
+    public static final String IMAGE = "image";
+    public static final String MEMORY = "memory";
+    public static final String NETWORK_MODE = "networkMode";
+    public static final String PULL_POLICY = "pullPolicy";
+    public static final String USER = "user";
+
     public static final String ENV = "env";
     public static final String INPUT_FILES = "inputFiles";
     public static final String OUTPUT_FILES = "outputFiles";
