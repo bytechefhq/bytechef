@@ -29,12 +29,16 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.File;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.runner.TaskRunnerRequest;
 import com.bytechef.platform.component.runner.TaskRunnerResult;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.command.PullImageResultCallback;
+import com.github.dockerjava.api.command.RemoveContainerCmd;
+import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
@@ -48,6 +52,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -59,7 +64,7 @@ import org.mockito.ArgumentCaptor;
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
 @Timeout(value = 10, unit = TimeUnit.MINUTES)
-class DockerTaskRunnerIntTest {
+class DockerTaskRunnerBackendIntTest {
 
     private static final String IMAGE = "python:3.12-slim";
 
@@ -85,7 +90,7 @@ class DockerTaskRunnerIntTest {
                 "echo collected"),
             Map.of("greeting.txt", "hello from the host"), List.of("*.txt"), Map.of("image", IMAGE), storedFiles);
 
-        TaskRunnerResult taskRunnerResult = taskRunner(IMAGE).run(request);
+        TaskRunnerResult taskRunnerResult = taskRunner().run(request);
 
         assertThat(taskRunnerResult.exitCode()).isZero();
         assertThat(taskRunnerResult.stdout()).contains("collected");
@@ -106,7 +111,7 @@ class DockerTaskRunnerIntTest {
                 "echo ignore me > \"$BYTECHEF_OUTPUT_DIR/notes.txt\""),
             Map.of(), List.of("*.csv"), Map.of("image", IMAGE), storedFiles);
 
-        TaskRunnerResult taskRunnerResult = taskRunner(IMAGE).run(request);
+        TaskRunnerResult taskRunnerResult = taskRunner().run(request);
 
         assertThat(taskRunnerResult.outputFiles()).containsOnlyKeys("report.csv");
         assertThat(storedFiles).containsOnlyKeys("report.csv");
@@ -118,25 +123,12 @@ class DockerTaskRunnerIntTest {
             List.of("echo 'the interpreter did not like that' >&2", "exit 7"), Map.of(), List.of(),
             Map.of("image", IMAGE), new LinkedHashMap<>());
 
-        DockerTaskRunner dockerTaskRunner = taskRunner(IMAGE);
+        RemoteTaskRunner remoteTaskRunner = taskRunner();
 
-        assertThatThrownBy(() -> dockerTaskRunner.run(request))
+        assertThatThrownBy(() -> remoteTaskRunner.run(request))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("code 7")
             .hasMessageContaining("the interpreter did not like that");
-    }
-
-    @Test
-    void testAnImageOutsideTheAllowlistIsRejected() {
-        TaskRunnerRequest request = commandsRequest(
-            List.of("echo hello"), Map.of(), List.of(), Map.of("image", "alpine:3.17"), new LinkedHashMap<>());
-
-        DockerTaskRunner dockerTaskRunner = taskRunner(IMAGE);
-
-        assertThatThrownBy(() -> dockerTaskRunner.run(request))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("alpine:3.17")
-            .hasMessageContaining("bytechef.script.runners.docker.properties.allowed-images");
     }
 
     @Test
@@ -148,7 +140,7 @@ class DockerTaskRunnerIntTest {
                 """,
             Map.of("value", 21), Map.of("image", IMAGE));
 
-        TaskRunnerResult taskRunnerResult = taskRunner(IMAGE).run(request);
+        TaskRunnerResult taskRunnerResult = taskRunner().run(request);
 
         assertThat(taskRunnerResult.exitCode()).isZero();
         assertThat(taskRunnerResult.output()).isEqualTo(Map.of("greeting", "hi", "doubled", 42));
@@ -163,7 +155,7 @@ class DockerTaskRunnerIntTest {
                 """,
             Map.of(), Map.of());
 
-        TaskRunnerResult taskRunnerResult = taskRunner(IMAGE).run(request);
+        TaskRunnerResult taskRunnerResult = taskRunner().run(request);
 
         assertThat(taskRunnerResult.exitCode()).isZero();
         assertThat(taskRunnerResult.output()).isEqualTo(Map.of("ran", true));
@@ -178,7 +170,7 @@ class DockerTaskRunnerIntTest {
                 """,
             Map.of(), Map.of("image", IMAGE, "user", "1000:1000"));
 
-        TaskRunnerResult taskRunnerResult = taskRunner(IMAGE).run(request);
+        TaskRunnerResult taskRunnerResult = taskRunner().run(request);
 
         assertThat(taskRunnerResult.exitCode()).isZero();
         assertThat(taskRunnerResult.output()).isEqualTo(Map.of("ran", true));
@@ -190,17 +182,81 @@ class DockerTaskRunnerIntTest {
             List.of("echo \"$HOME\"", "touch \"$HOME/cache-probe\""), Map.of(), List.of(),
             Map.of("image", IMAGE, "user", "1000:1000"), new LinkedHashMap<>());
 
-        TaskRunnerResult taskRunnerResult = taskRunner(IMAGE).run(request);
+        TaskRunnerResult taskRunnerResult = taskRunner().run(request);
 
         assertThat(taskRunnerResult.exitCode()).isZero();
         assertThat(taskRunnerResult.stdout()).contains("/tmp");
     }
 
-    private static ApplicationProperties applicationProperties(String allowedImages) {
+    @Test
+    void testAContainerLeftBehindIsReattachedByTheNextRunWithTheSameKey() {
+        RemoteTaskRunner first = new RemoteTaskRunner(
+            new DockerTaskRunnerBackend(), applicationProperties(), () -> "resume-key");
+
+        TaskRunnerRequest detached = commandsRequest(
+            List.of("sleep 2", "echo '{\"ok\": true}' > \"$BYTECHEF_OUTPUT_DIR/output.json\"", "echo done"),
+            Map.of(), List.of(), Map.of("image", IMAGE, "delete", false),
+            resumableActionContext(42L));
+
+        try {
+            TaskRunnerResult firstResult = first.run(detached);
+
+            assertThat(firstResult.exitCode()).isZero();
+
+            TaskRunnerRequest reattach = commandsRequest(
+                List.of("echo never-runs"), Map.of(), List.of(), Map.of("image", IMAGE),
+                resumableActionContext(42L));
+
+            RemoteTaskRunner second = new RemoteTaskRunner(
+                new DockerTaskRunnerBackend(), applicationProperties(), () -> "unused");
+
+            TaskRunnerResult secondResult = second.run(reattach);
+
+            assertThat(secondResult.stdout()).contains("done")
+                .doesNotContain("never-runs");
+            assertThat(secondResult.output()).isEqualTo(Map.of("ok", true));
+        } finally {
+            removeContainersLabelled("io.bytechef.task-execution-id", "public-none-42");
+        }
+    }
+
+    private static void removeContainersLabelled(String label, String value) {
+        try (DockerClient dockerClient = dockerClient(Duration.ofSeconds(30));
+            ListContainersCmd listContainersCmd = dockerClient.listContainersCmd()) {
+
+            listContainersCmd.withShowAll(true);
+            listContainersCmd.withLabelFilter(Map.of(label, value));
+
+            for (Container container : listContainersCmd.exec()) {
+                try (RemoveContainerCmd removeContainerCmd = dockerClient.removeContainerCmd(container.getId())) {
+                    removeContainerCmd.withForce(true);
+
+                    removeContainerCmd.exec();
+                }
+            }
+        } catch (IOException exception) {
+            throw new IllegalStateException("Could not remove the containers labelled " + label, exception);
+        }
+    }
+
+    private static DockerClient dockerClient(Duration responseTimeout) {
+        DefaultDockerClientConfig dockerClientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
+            .build();
+
+        DockerHttpClient dockerHttpClient = new ApacheDockerHttpClient.Builder()
+            .dockerHost(dockerClientConfig.getDockerHost())
+            .sslConfig(dockerClientConfig.getSSLConfig())
+            .responseTimeout(responseTimeout)
+            .build();
+
+        return DockerClientImpl.getInstance(dockerClientConfig, dockerHttpClient);
+    }
+
+    private static ApplicationProperties applicationProperties() {
         ApplicationProperties.Script.Runner runner = new ApplicationProperties.Script.Runner();
 
         runner.setEnabled(true);
-        runner.setProperties(Map.of("allowed-images", allowedImages));
+        runner.setProperties(Map.of());
 
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
@@ -219,10 +275,18 @@ class DockerTaskRunnerIntTest {
         List<String> commands, Map<String, ?> inputFiles, List<String> outputFilePatterns,
         Map<String, ?> runnerParameters, Map<String, byte[]> storedFiles) {
 
+        return commandsRequest(
+            commands, inputFiles, outputFilePatterns, runnerParameters, storingActionContext(storedFiles, null));
+    }
+
+    private static TaskRunnerRequest commandsRequest(
+        List<String> commands, Map<String, ?> inputFiles, List<String> outputFilePatterns,
+        Map<String, ?> runnerParameters, ActionContext actionContext) {
+
         return new TaskRunnerRequest(
             "shell", null, commands, Map.of(), Map.of(), inputFiles, outputFilePatterns,
             ParametersFactory.create(Map.of()), ParametersFactory.create(runnerParameters), TIMEOUT, Map.of(),
-            storingActionContext(storedFiles));
+            actionContext);
     }
 
     private static boolean isDaemonReachable() {
@@ -278,13 +342,22 @@ class DockerTaskRunnerIntTest {
         return new TaskRunnerRequest(
             "python", script, List.of(), input, Map.of(), Map.of(), List.of(), ParametersFactory.create(Map.of()),
             ParametersFactory.create(runnerParameters), TIMEOUT, Map.of(),
-            storingActionContext(new LinkedHashMap<>()));
+            storingActionContext(new LinkedHashMap<>(), null));
+    }
+
+    private static ActionContext resumableActionContext(long taskExecutionId) {
+        return storingActionContext(new LinkedHashMap<>(), taskExecutionId);
     }
 
     @SuppressWarnings("unchecked")
-    private static ActionContext storingActionContext(Map<String, byte[]> storedFiles) {
-        ActionContext actionContext = mock(ActionContext.class);
+    private static ActionContext storingActionContext(
+        Map<String, byte[]> storedFiles, @Nullable Long taskExecutionId) {
+
+        ActionContextAware actionContext = mock(ActionContextAware.class);
         File file = mock(File.class);
+
+        when(actionContext.getTaskExecutionId()).thenReturn(taskExecutionId);
+        when(actionContext.getJobId()).thenReturn(null);
 
         ArgumentCaptor<ContextFunction<File, ?>> fileFunctionArgumentCaptor =
             ArgumentCaptor.forClass(ContextFunction.class);
@@ -312,7 +385,7 @@ class DockerTaskRunnerIntTest {
         return actionContext;
     }
 
-    private static DockerTaskRunner taskRunner(String allowedImages) {
-        return new DockerTaskRunner(applicationProperties(allowedImages));
+    private static RemoteTaskRunner taskRunner() {
+        return new RemoteTaskRunner(new DockerTaskRunnerBackend(), applicationProperties(), () -> "int-test");
     }
 }

@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.script.action.ScriptJavaScriptAction;
 import com.bytechef.component.script.action.ScriptPythonAction;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.runner.TaskRunnerRegistry;
@@ -50,7 +49,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class ScriptActionDefinitionProcessRunnerTest {
 
     private final TaskRunnerRegistry taskRunnerRegistry = mock(TaskRunnerRegistry.class);
-    private final ProcessTaskRunner processTaskRunner = new ProcessTaskRunner(new ApplicationProperties());
+    private final ProcessTaskRunner processTaskRunner = new ProcessTaskRunner();
 
     @Test
     void testTheJavaScriptActionRunsThroughTheProcessRunner() throws Exception {
