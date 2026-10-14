@@ -1814,6 +1814,38 @@ export type McpServer = {
   version?: Maybe<Scalars['Int']['output']>;
 };
 
+export type McpServerCatalogAuthentication = {
+  __typename?: 'McpServerCatalogAuthentication';
+  authorizationUrl?: Maybe<Scalars['String']['output']>;
+  clientIdMetadataDocument?: Maybe<Scalars['Boolean']['output']>;
+  dynamicClientRegistration?: Maybe<Scalars['Boolean']['output']>;
+  headers?: Maybe<Array<McpServerCatalogHeader>>;
+  pkce?: Maybe<Scalars['Boolean']['output']>;
+  scopes?: Maybe<Array<Scalars['String']['output']>>;
+  tokenUrl?: Maybe<Scalars['String']['output']>;
+  type: Scalars['String']['output'];
+};
+
+export type McpServerCatalogEntry = {
+  __typename?: 'McpServerCatalogEntry';
+  authentication: McpServerCatalogAuthentication;
+  component?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  slug: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  transportType: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+  urlParameters?: Maybe<Array<Scalars['String']['output']>>;
+  websiteUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export type McpServerCatalogHeader = {
+  __typename?: 'McpServerCatalogHeader';
+  description?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  secret?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type McpServerUpdateInput = {
   authenticationRequired?: InputMaybe<Scalars['Boolean']['input']>;
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3494,6 +3526,7 @@ export type Query = {
   mcpProjects?: Maybe<Array<Maybe<McpProject>>>;
   mcpProjectsByServerId?: Maybe<Array<Maybe<McpProject>>>;
   mcpServer?: Maybe<McpServer>;
+  mcpServerCatalog: Array<McpServerCatalogEntry>;
   mcpTool?: Maybe<McpTool>;
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;

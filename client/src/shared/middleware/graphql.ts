@@ -2356,6 +2356,11 @@ export type EnableCustomComponentMutationVariables = Exact<{
 
 export type EnableCustomComponentMutation = { enableCustomComponent: boolean };
 
+export type McpServerCatalogQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type McpServerCatalogQuery = { mcpServerCatalog: Array<{ slug: string, title: string, description: string | null, url: string, urlParameters: Array<string> | null, transportType: string, websiteUrl: string | null, component: string | null, authentication: { type: string, dynamicClientRegistration: boolean | null, clientIdMetadataDocument: boolean | null, authorizationUrl: string | null, tokenUrl: string | null, pkce: boolean | null, scopes: Array<string> | null, headers: Array<{ name: string, description: string | null, secret: boolean | null }> | null } }> };
+
 export type DeleteRegisteredClientMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -11270,6 +11275,51 @@ export const useEnableCustomComponentMutation = <
       {
     mutationKey: ['enableCustomComponent'],
     mutationFn: (variables?: EnableCustomComponentMutationVariables) => fetcher<EnableCustomComponentMutation, EnableCustomComponentMutationVariables>(EnableCustomComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const McpServerCatalogDocument = new TypedDocumentString(`
+    query mcpServerCatalog {
+  mcpServerCatalog {
+    slug
+    title
+    description
+    url
+    urlParameters
+    transportType
+    authentication {
+      type
+      dynamicClientRegistration
+      clientIdMetadataDocument
+      authorizationUrl
+      tokenUrl
+      pkce
+      scopes
+      headers {
+        name
+        description
+        secret
+      }
+    }
+    websiteUrl
+    component
+  }
+}
+    `);
+
+export const useMcpServerCatalogQuery = <
+      TData = McpServerCatalogQuery,
+      TError = unknown
+    >(
+      variables?: McpServerCatalogQueryVariables,
+      options?: Omit<UseQueryOptions<McpServerCatalogQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServerCatalogQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpServerCatalogQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['mcpServerCatalog'] : ['mcpServerCatalog', variables],
+    queryFn: fetcher<McpServerCatalogQuery, McpServerCatalogQueryVariables>(McpServerCatalogDocument, variables),
     ...options
   }
     )};
