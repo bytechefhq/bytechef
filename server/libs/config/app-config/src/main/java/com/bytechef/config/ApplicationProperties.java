@@ -5030,6 +5030,8 @@ public class ApplicationProperties {
 
         private Sandbox sandbox = new Sandbox();
 
+        private RunnerLimits runnerLimits = new RunnerLimits();
+
         private Map<String, Runner> runners = new HashMap<>();
 
         /**
@@ -5071,12 +5073,20 @@ public class ApplicationProperties {
             return Runner.merge(configuredRunner, environmentRunner);
         }
 
+        public RunnerLimits getRunnerLimits() {
+            return runnerLimits;
+        }
+
         public Map<String, Runner> getRunners() {
             return runners;
         }
 
         public Sandbox getSandbox() {
             return sandbox;
+        }
+
+        public void setRunnerLimits(RunnerLimits runnerLimits) {
+            this.runnerLimits = runnerLimits;
         }
 
         public void setRunners(Map<String, Runner> runners) {
@@ -5210,6 +5220,39 @@ public class ApplicationProperties {
                 runner.properties = mergedProperties;
 
                 return runner;
+            }
+        }
+
+        public static class RunnerLimits {
+
+            private Duration maxWait;
+
+            private DataSize maxLogBytes;
+
+            private DataSize maxTransferBytes;
+
+            public DataSize getMaxLogBytes() {
+                return maxLogBytes;
+            }
+
+            public DataSize getMaxTransferBytes() {
+                return maxTransferBytes;
+            }
+
+            public Duration getMaxWait() {
+                return maxWait;
+            }
+
+            public void setMaxLogBytes(DataSize maxLogBytes) {
+                this.maxLogBytes = maxLogBytes;
+            }
+
+            public void setMaxTransferBytes(DataSize maxTransferBytes) {
+                this.maxTransferBytes = maxTransferBytes;
+            }
+
+            public void setMaxWait(Duration maxWait) {
+                this.maxWait = maxWait;
             }
         }
     }
