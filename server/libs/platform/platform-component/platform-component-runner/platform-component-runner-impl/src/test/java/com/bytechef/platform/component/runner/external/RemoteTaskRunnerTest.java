@@ -456,6 +456,85 @@ class RemoteTaskRunnerTest {
             .hasMessageContaining("END-OF-TRACEBACK");
     }
 
+    @Test
+    void testTheSpecCarriesTheConnectionVariablesBeforeTheAuthorsAndTheContractVariables() {
+        FakeBackend backend = new FakeBackend();
+
+        Map<String, ComponentConnection> connections = Map.of(
+            "slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null),
+            "taskRunner", new ComponentConnection("fake", 1, 2L, Map.of("secret", "runner-secret"), null));
+
+        injectingRunner(backend).run(request(Map.of(), 7L, connections));
+
+        Map<String, String> environment = backend.submittedSpec.environment();
+
+        assertThat(environment).containsEntry("BYTECHEF_CONNECTION_SLACK_TOKEN", "xoxb-123456")
+            .containsKey("BYTECHEF_CONNECTION_SLACK")
+            .doesNotContainKey("BYTECHEF_CONNECTION_TASKRUNNER")
+            .containsEntry("BYTECHEF_INPUT_FILE", "/work/input.json");
+    }
+
+    @Test
+    void testTheAuthorsEnvironmentOverridesAnInjectedVariableInTheSpec() {
+        FakeBackend backend = new FakeBackend();
+
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        when(actionContext.getTaskExecutionId()).thenReturn(7L);
+        when(actionContext.getJobId()).thenReturn(100L);
+
+        TaskRunnerRequest request = new TaskRunnerRequest(
+            "python", SCRIPT, List.of(), Map.of(), Map.of("BYTECHEF_CONNECTION_SLACK_TOKEN", "from-the-author"),
+            Map.of(), List.of(), ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of()), null,
+            Map.of("slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null)),
+            actionContext);
+
+        injectingRunner(backend).run(request);
+
+        assertThat(backend.submittedSpec.environment())
+            .containsEntry("BYTECHEF_CONNECTION_SLACK_TOKEN", "from-the-author");
+    }
+
+    @Test
+    void testTheJobsOutputIsMaskedInTheResult() {
+        FakeBackend backend = new FakeBackend();
+
+        backend.stdout = "token=xoxb-123456\n";
+        backend.stderr = "warn xoxb-123456\n";
+
+        TaskRunnerResult result = injectingRunner(backend).run(
+            request(Map.of(), 7L, Map.of(
+                "slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null))));
+
+        assertThat(result.stdout()).contains("token=******")
+            .doesNotContain("xoxb-123456");
+        assertThat(result.stderr()).contains("warn ******");
+    }
+
+    @Test
+    void testAFailedJobsMessageMasksTheConnectionValues() {
+        FakeBackend backend = new FakeBackend();
+
+        backend.stderr = "Traceback: bad token xoxb-123456\n";
+        backend.exit = RemoteJobExit.of(1);
+
+        assertThatThrownBy(() -> injectingRunner(backend).run(
+            request(Map.of(), 7L, Map.of(
+                "slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null)))))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("bad token ******")
+                    .hasMessageNotContaining("xoxb-123456");
+    }
+
+    private static RemoteTaskRunner injectingRunner(FakeBackend backend) {
+        ApplicationProperties applicationProperties = applicationProperties(Map.of());
+
+        applicationProperties.getScript()
+            .setInjectConnections(true);
+
+        return new RemoteTaskRunner(backend, applicationProperties, () -> "random");
+    }
+
     private static ApplicationProperties applicationProperties(Map<String, String> runnerProperties) {
         ApplicationProperties.Script.Runner runner = new ApplicationProperties.Script.Runner();
 

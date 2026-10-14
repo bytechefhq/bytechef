@@ -69,16 +69,14 @@ class ScriptExternalRunnerPropertiesTest {
     private static List<String> actionPropertyNames(TaskRunnerRegistry taskRunnerRegistry, String actionName) {
         ComponentDefinition componentDefinition = new ScriptComponentHandler(null, taskRunnerRegistry).getDefinition();
 
-        List<ActionDefinition> actionDefinitions = componentDefinition.getActions()
-            .orElseThrow();
+        List<ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
         ActionDefinition actionDefinition = actionDefinitions.stream()
             .filter(candidate -> actionName.equals(candidate.getName()))
             .findFirst()
             .orElseThrow();
 
-        List<? extends Property> properties = actionDefinition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = actionDefinition.getProperties();
 
         return properties.stream()
             .map(Property::getName)
@@ -103,7 +101,7 @@ class ScriptExternalRunnerPropertiesTest {
         script.setRunners(runners);
 
         return new TaskRunnerRegistryImpl(
-            List.of(new GraalVmTaskRunner(null, applicationProperties), new ProcessTaskRunner()),
+            List.of(new GraalVmTaskRunner(null, applicationProperties), new ProcessTaskRunner(applicationProperties)),
             List.of(), applicationProperties);
     }
 }

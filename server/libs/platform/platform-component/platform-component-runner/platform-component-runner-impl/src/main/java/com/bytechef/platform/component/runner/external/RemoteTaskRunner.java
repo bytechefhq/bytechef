@@ -157,10 +157,14 @@ public class RemoteTaskRunner implements TaskRunner {
     public TaskRunnerResult run(TaskRunnerRequest request) {
         validate(request);
 
-        try (TaskRunnerWorkingDirectory workingDirectory = TaskRunnerWorkingDirectory.create(request);
-            CapturingLogSink logSink = new CapturingLogSink(getType(), limits().getMaxLogBytes())) {
+        TaskRunnerConnectionEnvironment connectionEnvironment = TaskRunnerConnectionEnvironment.of(
+            request, applicationProperties);
 
-            return run(request, workingDirectory, logSink);
+        try (TaskRunnerWorkingDirectory workingDirectory = TaskRunnerWorkingDirectory.create(request);
+            CapturingLogSink logSink = new CapturingLogSink(
+                getType(), limits().getMaxLogBytes(), connectionEnvironment.secretMasker())) {
+
+            return run(request, workingDirectory, logSink, connectionEnvironment.variables());
         } catch (IOException exception) {
             throw new UncheckedIOException(exception);
         } catch (InterruptedException exception) {
@@ -173,8 +177,8 @@ public class RemoteTaskRunner implements TaskRunner {
     }
 
     private TaskRunnerResult run(
-        TaskRunnerRequest request, TaskRunnerWorkingDirectory workingDirectory, CapturingLogSink logSink)
-        throws IOException, InterruptedException {
+        TaskRunnerRequest request, TaskRunnerWorkingDirectory workingDirectory, CapturingLogSink logSink,
+        Map<String, String> connectionVariables) throws IOException, InterruptedException {
 
         String type = getType();
 
@@ -203,7 +207,8 @@ public class RemoteTaskRunner implements TaskRunner {
 
         RemoteJobSpec spec = new RemoteJobSpec(
             resolvedKey.key(), languageId, sourceFileName, resolveInterpreter(request),
-            environment(request, backend.getRemoteWorkingDirectory()), backend.getRemoteWorkingDirectory(),
+            environment(request, backend.getRemoteWorkingDirectory(), connectionVariables),
+            backend.getRemoteWorkingDirectory(),
             settings.pullPolicy(), request.runnerParameters());
 
         Optional<RemoteJobHandle> found = resume ? backend.find(resolvedKey.key(), context) : Optional.empty();
@@ -438,7 +443,9 @@ public class RemoteTaskRunner implements TaskRunner {
         }
     }
 
-    private static Map<String, String> environment(TaskRunnerRequest request, String remoteWorkingDirectory) {
+    private static Map<String, String> environment(
+        TaskRunnerRequest request, String remoteWorkingDirectory, Map<String, String> connectionVariables) {
+
         String directory = remoteWorkingDirectory.length() > 1 && remoteWorkingDirectory.endsWith("/")
             ? remoteWorkingDirectory.substring(0, remoteWorkingDirectory.length() - 1)
             : remoteWorkingDirectory;
@@ -446,6 +453,7 @@ public class RemoteTaskRunner implements TaskRunner {
         Map<String, String> environment = new LinkedHashMap<>();
 
         environment.put("HOME", directory);
+        environment.putAll(connectionVariables);
         environment.putAll(request.env());
         environment.put("BYTECHEF_WORKING_DIR", directory);
         environment.put("BYTECHEF_INPUT_FILE", directory + "/" + RemoteJobSpec.INPUT_FILE_NAME);
@@ -470,20 +478,23 @@ public class RemoteTaskRunner implements TaskRunner {
 
     static final class CapturingLogSink implements RemoteLogSink, Closeable {
 
+        private final SecretMasker secretMasker;
         private final BoundedOutputCapture stdout;
         private final BoundedOutputCapture stderr;
         private final GuestLoggingOutputStream stdoutLoggingOutputStream;
         private final GuestLoggingOutputStream stderrLoggingOutputStream;
 
-        CapturingLogSink(String type, long maxLogBytes) {
+        CapturingLogSink(String type, long maxLogBytes, SecretMasker secretMasker) {
+            this.secretMasker = secretMasker;
             this.stdout = new BoundedOutputCapture(maxLogBytes);
             this.stderr = new BoundedOutputCapture(maxLogBytes);
             this.stdoutLoggingOutputStream = new GuestLoggingOutputStream(line -> {
                 if (log.isInfoEnabled()) {
-                    log.info("[{}] {}", type, line);
+                    log.info("[{}] {}", type, secretMasker.mask(line));
                 }
             });
-            this.stderrLoggingOutputStream = new GuestLoggingOutputStream(line -> log.warn("[{}] {}", type, line));
+            this.stderrLoggingOutputStream =
+                new GuestLoggingOutputStream(line -> log.warn("[{}] {}", type, secretMasker.mask(line)));
         }
 
         @Override
@@ -506,11 +517,11 @@ public class RemoteTaskRunner implements TaskRunner {
         }
 
         String stdout() {
-            return stdout.get();
+            return secretMasker.mask(stdout.get());
         }
 
         String stderr() {
-            return stderr.get();
+            return secretMasker.mask(stderr.get());
         }
 
         private static void append(
