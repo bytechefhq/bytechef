@@ -14,13 +14,16 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCategoryDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowStateDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
+import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChangeSummary;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
@@ -30,11 +33,13 @@ import com.bytechef.platform.configuration.dto.WorkflowDefinitionValueChange;
 import com.bytechef.platform.configuration.dto.WorkflowNodeChangeKind;
 import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @version ee
@@ -96,13 +101,16 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
+    @MockitoBean
+    private AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+
     @Autowired
     private GraphQlTester graphQlTester;
 
     @Test
     void testAutomationWorkflowProjectsOfAnEnvironmentCountsItsConfigurations() {
         AutomationWorkflowProjectDTO project = new AutomationWorkflowProjectDTO(
-            1L, "Project One", null, null, List.of(), true, 2, 1, List.of(), null, true, 3, null);
+            1L, "Project One", null, null, List.of(), true, 2, 1, List.of(), null, false, true, 3, null);
 
         when(automationWorkflowProjectFacade.getProjects(1L)).thenReturn(List.of(project));
 
@@ -135,10 +143,11 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             DRAFT_WORKFLOW_ID);
 
         AutomationWorkflowProjectDTO projectOne = new AutomationWorkflowProjectDTO(
-            1L, "Project One", "First project", null, List.of(), true, 5, 2, List.of(workflowTemplateOne), null, true,
+            1L, "Project One", "First project", null, List.of(), true, 5, 2, List.of(workflowTemplateOne), null,
+            false, true,
             0, null);
         AutomationWorkflowProjectDTO projectTwo = new AutomationWorkflowProjectDTO(
-            2L, "Project Two", null, 10L, List.of(20L), false, 1, null, List.of(), null, true, 0, null);
+            2L, "Project Two", null, 10L, List.of(20L), false, 1, null, List.of(), null, false, true, 0, null);
 
         when(automationWorkflowProjectFacade.getProjects()).thenReturn(List.of(projectOne, projectTwo));
 
@@ -242,6 +251,44 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             .path("automationWorkflowProjects[1].workflowTemplates")
             .entityList(Object.class)
             .hasSize(0);
+    }
+
+    @Test
+    void testCodeProjectExposesItsLanguageAndWhetherTheDraftIsPublishable() {
+        AutomationWorkflowProjectDTO codeProject = new AutomationWorkflowProjectDTO(
+            3L, "Code Project", null, null, List.of(), true, 2, 1, List.of(), null, true, true, 0, null);
+
+        when(automationWorkflowProjectFacade.getProjects()).thenReturn(List.of(codeProject));
+        when(automationWorkflowProjectCodeWorkflowFacade.getCodeWorkflowState(3L))
+            .thenReturn(Optional.of(new AutomationWorkflowProjectCodeWorkflowStateDTO(Language.JAVA, false)));
+
+        this.graphQlTester
+            .document("query { automationWorkflowProjects { id codeWorkflowLanguage codeWorkflowDraftPublishable } }")
+            .execute()
+            .path("automationWorkflowProjects[0].codeWorkflowLanguage")
+            .entity(String.class)
+            .isEqualTo("JAVA")
+            .path("automationWorkflowProjects[0].codeWorkflowDraftPublishable")
+            .entity(Boolean.class)
+            .isEqualTo(false);
+    }
+
+    @Test
+    void testVisualProjectHasNoCodeWorkflowStateAndNeverHitsTheCodeFacade() {
+        AutomationWorkflowProjectDTO visualProject = new AutomationWorkflowProjectDTO(
+            4L, "Visual Project", null, null, List.of(), true, 2, 1, List.of(), null, false, true, 0, null);
+
+        when(automationWorkflowProjectFacade.getProjects()).thenReturn(List.of(visualProject));
+
+        this.graphQlTester
+            .document("query { automationWorkflowProjects { id codeWorkflowLanguage codeWorkflowDraftPublishable } }")
+            .execute()
+            .path("automationWorkflowProjects[0].codeWorkflowLanguage")
+            .valueIsNull()
+            .path("automationWorkflowProjects[0].codeWorkflowDraftPublishable")
+            .valueIsNull();
+
+        verifyNoInteractions(automationWorkflowProjectCodeWorkflowFacade);
     }
 
     @Test

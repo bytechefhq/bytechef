@@ -20,11 +20,13 @@ dependencies {
 
     implementation(project(":server:ee:libs:automation:automation-code-workflow-loader"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
     implementation(project(":server:ee:libs:platform:platform-resource-grant:platform-resource-grant-api"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.liquibase:liquibase-core")
+    testImplementation(rootProject.libs.org.graalvm.polyglot.polyglot)
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-crypto")

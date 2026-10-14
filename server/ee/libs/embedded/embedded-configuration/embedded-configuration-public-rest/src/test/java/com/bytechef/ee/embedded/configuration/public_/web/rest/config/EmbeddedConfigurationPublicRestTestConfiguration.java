@@ -7,7 +7,12 @@
 
 package com.bytechef.ee.embedded.configuration.public_.web.rest.config;
 
+import static org.mockito.Mockito.mock;
+
+import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationCodeWorkflowFacade;
 import com.bytechef.jackson.config.JacksonConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -26,4 +31,14 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import(JacksonConfiguration.class)
 public class EmbeddedConfigurationPublicRestTestConfiguration {
+
+    @Bean
+    AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade() {
+        return mock(AutomationWorkflowProjectCodeWorkflowFacade.class);
+    }
+
+    @Bean
+    IntegrationCodeWorkflowFacade integrationCodeWorkflowFacade() {
+        return mock(IntegrationCodeWorkflowFacade.class);
+    }
 }

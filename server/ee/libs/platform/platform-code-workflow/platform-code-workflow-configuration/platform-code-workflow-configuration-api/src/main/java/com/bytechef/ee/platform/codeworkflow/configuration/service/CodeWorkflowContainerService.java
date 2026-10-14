@@ -20,7 +20,9 @@ public interface CodeWorkflowContainerService {
 
     void delete(long id);
 
-    CodeWorkflowContainer getCodeWorkflowContainer(long id);
+    CodeWorkflowContainer getCodeWorkflowContainer(Long id);
 
     CodeWorkflowContainer getCodeWorkflowContainer(String codeWorkflowContainerUuid);
+
+    CodeWorkflowContainer update(CodeWorkflowContainer codeWorkflowContainer);
 }

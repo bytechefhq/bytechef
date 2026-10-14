@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProvisionIntegrationInstanceRequest", description = "The request to provision an integration instance.")
 @JsonTypeName("ProvisionIntegrationInstanceRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T02:20:55.684519+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T23:11:44.401718+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ProvisionIntegrationInstanceRequestModel {
 
   private Long integrationInstanceConfigurationId;
