@@ -63,7 +63,8 @@ public class ScriptJavaScriptAction {
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .languageId("javascript")
                 .defaultValue("function perform(input, context) {\n\treturn null;\n}")
-                .required(true));
+                .required(true)
+                .expressionEnabled(false));
         properties.add(
             TaskRunnerPropertyFactory.taskRunnerProperty(
                 taskRunnerRegistry, Set.of(TaskRunnerCapability.INLINE_SCRIPT)));

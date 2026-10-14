@@ -63,7 +63,8 @@ public class ScriptPythonAction {
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .languageId("python")
                 .defaultValue("def perform(input, context):\n\treturn None")
-                .required(true));
+                .required(true)
+                .expressionEnabled(false));
         properties.add(
             TaskRunnerPropertyFactory.taskRunnerProperty(
                 taskRunnerRegistry, Set.of(TaskRunnerCapability.INLINE_SCRIPT)));

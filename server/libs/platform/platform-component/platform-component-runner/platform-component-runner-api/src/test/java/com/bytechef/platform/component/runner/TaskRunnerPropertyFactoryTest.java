@@ -47,7 +47,8 @@ public class TaskRunnerPropertyFactoryTest {
         ModifiableObjectProperty objectProperty = TaskRunnerPropertyFactory.taskRunnerProperty(
             taskRunnerRegistry, INLINE_SCRIPT);
 
-        List<? extends ValueProperty<?>> properties = objectProperty.getProperties().orElseThrow();
+        List<? extends ValueProperty<?>> properties = objectProperty.getProperties()
+            .orElseThrow();
 
         ValueProperty<?> modeProperty = properties.stream()
             .filter(property -> "mode".equals(property.getName()))
@@ -68,13 +69,15 @@ public class TaskRunnerPropertyFactoryTest {
         ModifiableObjectProperty objectProperty = TaskRunnerPropertyFactory.taskRunnerProperty(
             taskRunnerRegistry, INLINE_SCRIPT);
 
-        List<? extends ValueProperty<?>> properties = objectProperty.getProperties().orElseThrow();
+        List<? extends ValueProperty<?>> properties = objectProperty.getProperties()
+            .orElseThrow();
 
         Property.StringProperty typeProperty = (Property.StringProperty) properties.get(0);
 
-        assertThat(typeProperty.getOptions().orElseThrow())
-            .extracting(Option::getValue)
-            .containsExactly("docker", "graalvm");
+        assertThat(typeProperty.getOptions()
+            .orElseThrow())
+                .extracting(Option::getValue)
+                .containsExactly("docker", "graalvm");
 
         assertThat(properties)
             .extracting(ValueProperty::getName)
@@ -113,7 +116,8 @@ public class TaskRunnerPropertyFactoryTest {
         Property.StringProperty typeProperty = getTypeProperty(taskRunnerRegistry);
 
         assertThat(typeProperty.getRequired()).isFalse();
-        assertThat(typeProperty.getOptions().orElseThrow()).isEmpty();
+        assertThat(typeProperty.getOptions()
+            .orElseThrow()).isEmpty();
         assertThat(typeProperty.getDefaultValue()).isEmpty();
     }
 
@@ -139,7 +143,7 @@ public class TaskRunnerPropertyFactoryTest {
     }
 
     @Test
-    public void testDefaultsToTheFirstEnabledRunnerWhenGraalVmIsNotEnabled() {
+    public void testPrefersProcessOverDockerWhenGraalVmIsNotEnabled() {
         TaskRunner dockerTaskRunner = newTaskRunner("docker", "Docker", "image");
         TaskRunner processTaskRunner = newTaskRunner("process", "Process", "commands");
 
@@ -147,14 +151,36 @@ public class TaskRunnerPropertyFactoryTest {
 
         Property.StringProperty typeProperty = getTypeProperty(taskRunnerRegistry);
 
-        assertThat(typeProperty.getDefaultValue()).contains("docker");
+        assertThat(typeProperty.getDefaultValue()).contains("process");
+    }
+
+    @Test
+    public void testTheDefaultIsThePreferenceOrderNotTheRegistrationOrder() {
+        TaskRunner dockerTaskRunner = newTaskRunner("docker", "Docker", "image");
+        TaskRunner processTaskRunner = newTaskRunner("process", "Process", "commands");
+
+        Property.StringProperty firstOrder = getTypeProperty(newRegistry(dockerTaskRunner, processTaskRunner));
+        Property.StringProperty reversedOrder = getTypeProperty(newRegistry(processTaskRunner, dockerTaskRunner));
+
+        assertThat(firstOrder.getDefaultValue()).contains("process");
+        assertThat(reversedOrder.getDefaultValue()).contains("process");
+    }
+
+    @Test
+    public void testARunnerOutsideThePreferenceOrderIsUsedWhenItIsTheOnlyOne() {
+        TaskRunner customTaskRunner = newTaskRunner("custom", "Custom", "setting");
+
+        Property.StringProperty typeProperty = getTypeProperty(newRegistry(customTaskRunner));
+
+        assertThat(typeProperty.getDefaultValue()).contains("custom");
     }
 
     private static Property.StringProperty getTypeProperty(TaskRunnerRegistry taskRunnerRegistry) {
         ModifiableObjectProperty objectProperty = TaskRunnerPropertyFactory.taskRunnerProperty(
             taskRunnerRegistry, INLINE_SCRIPT);
 
-        return (Property.StringProperty) objectProperty.getProperties().orElseThrow()
+        return (Property.StringProperty) objectProperty.getProperties()
+            .orElseThrow()
             .getFirst();
     }
 
