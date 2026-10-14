@@ -76,12 +76,25 @@ vi.mock('@/pages/automation/project/components/projects-sidebar/components/Workf
 }));
 
 vi.mock('@/pages/automation/projects/components/ProjectDialog', () => ({
-    default: () => <div role="dialog">ProjectDialog</div>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    default: ({onClose}: any) => (
+        <div role="dialog">
+            <span>ProjectDialog</span>
+
+            <button onClick={onClose}>Close dialog</button>
+        </div>
+    ),
 }));
 
 vi.mock('@/shared/components/workflow/WorkflowDialog', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    default: ({parentId}: any) => <div role="dialog">WorkflowDialog:{parentId}</div>,
+    default: ({onClose, parentId}: any) => (
+        <div role="dialog">
+            <span>WorkflowDialog:{parentId}</span>
+
+            <button onClick={onClose}>Close dialog</button>
+        </div>
+    ),
 }));
 
 // Hooks and stores
@@ -96,9 +109,20 @@ vi.mock('@/pages/automation/project/hooks/useImportProjectWorkflow', () => ({
     useImportProjectWorkflow: (projectId: number) => mockUseImportProjectWorkflow(projectId),
 }));
 
+const mockImportProjectMutate = vi.hoisted(() => vi.fn());
 vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
-    useImportProjectMutation: () => ({mutate: vi.fn()}),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    useImportProjectMutation: (options: any) => ({
+        mutate: (request: unknown) => {
+            mockImportProjectMutate(request);
+
+            options?.onSuccess?.();
+        },
+    }),
 }));
+
+const mockToast = vi.hoisted(() => vi.fn());
+vi.mock('sonner', () => ({toast: mockToast}));
 
 vi.mock('@/shared/queries/automation/workflows.queries', () => ({
     useGetWorkflowQuery: vi.fn(),
@@ -157,6 +181,9 @@ const setupImportProjectWorkflow = ({importN8nWorkflowDisabled = false} = {}) =>
         n8nWorkflowFileInputRef: {current: null},
         workflowFileInputRef: {current: null},
     });
+
+const fileInputByAccept = (accept: string) =>
+    document.querySelector(`input[type="file"][accept="${accept}"]`) as HTMLInputElement;
 
 // Helper to set default mocks per test scenario
 const setupQueries = ({
@@ -284,6 +311,53 @@ describe('ProjectsLeftSidebar', () => {
         );
 
         expect(acceptValues).toEqual(['.json,.yaml,.yml', '.json', '.zip']);
+    });
+
+    it('closes the WorkflowDialog and the ProjectDialog', async () => {
+        setupQueries({selectedProjectId: 9});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
+
+        fireEvent.click(screen.getByText('Workflow'));
+        fireEvent.click(await screen.findByText('Close dialog'));
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('From Scratch'));
+        fireEvent.click(await screen.findByText('Close dialog'));
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('opens the matching file picker from the import menu items', () => {
+        setupQueries({selectedProjectId: 9});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
+
+        const workflowInputClick = vi.spyOn(fileInputByAccept('.json,.yaml,.yml'), 'click');
+        const n8nWorkflowInputClick = vi.spyOn(fileInputByAccept('.json'), 'click');
+        const projectInputClick = vi.spyOn(fileInputByAccept('.zip'), 'click');
+
+        fireEvent.click(screen.getByText('Import Workflow'));
+        fireEvent.click(screen.getByText('Import n8n Workflow'));
+        fireEvent.click(screen.getByText('Import Project'));
+
+        expect(workflowInputClick).toHaveBeenCalledTimes(1);
+        expect(n8nWorkflowInputClick).toHaveBeenCalledTimes(1);
+        expect(projectInputClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('imports the selected project file into the current workspace', () => {
+        setupQueries({selectedProjectId: 9});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
+
+        const file = new File(['zip'], 'project.zip', {type: 'application/zip'});
+
+        fireEvent.change(fileInputByAccept('.zip'), {target: {files: [file]}});
+
+        expect(mockImportProjectMutate).toHaveBeenCalledWith({file, workspaceId: 10});
+        expect(mockToast).toHaveBeenCalledWith('Project is imported.');
     });
 
     it('disables the Import n8n Workflow item when no AI provider is enabled', async () => {
