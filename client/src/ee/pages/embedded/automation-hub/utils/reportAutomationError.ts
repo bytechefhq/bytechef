@@ -1,5 +1,5 @@
 import {describeWorkflowErrors} from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
-import {ResponseError} from '@/ee/shared/middleware/embedded/public';
+import {ResponseError} from '@bytechef/embedded-api';
 import {toast} from 'sonner';
 
 interface AutomationConflictBodyI {

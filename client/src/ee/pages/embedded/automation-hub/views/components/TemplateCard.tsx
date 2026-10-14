@@ -12,7 +12,7 @@ import AutomationInputsDialog from '@/ee/pages/embedded/automation-hub/views/com
 import AutomationStatusButton from '@/ee/pages/embedded/automation-hub/views/components/AutomationStatusButton';
 import AutomationVersion from '@/ee/pages/embedded/automation-hub/views/components/AutomationVersion';
 import ComponentIconStack from '@/ee/pages/embedded/automation-hub/views/components/ComponentIconStack';
-import {AutomationProjectWorkflowTemplate, ConnectedUserProjectWorkflow} from '@/ee/shared/middleware/embedded/public';
+import {AutomationProjectWorkflowTemplate, ConnectedUserProjectWorkflow} from '@bytechef/embedded-api';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';

@@ -20,8 +20,8 @@ import TemplateGridSection, {
     CatalogLayoutType,
 } from '@/ee/pages/embedded/automation-hub/views/components/TemplateGridSection';
 import {getEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
-import {AutomationProjectWorkflowTemplate, ConnectedUserProjectWorkflow} from '@/ee/shared/middleware/embedded/public';
 import {ActivationDialog} from '@bytechef/embedded';
+import {AutomationProjectWorkflowTemplate, ConnectedUserProjectWorkflow} from '@bytechef/embedded-api';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';

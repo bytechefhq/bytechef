@@ -1,5 +1,5 @@
 import {reportRemoveError, reportSetEnabledError} from '@/ee/pages/embedded/automation-hub/utils/reportAutomationError';
-import {ResponseError} from '@/ee/shared/middleware/embedded/public';
+import {ResponseError} from '@bytechef/embedded-api';
 import {toast} from 'sonner';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
