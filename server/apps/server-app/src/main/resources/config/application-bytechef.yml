@@ -233,6 +233,9 @@ bytechef:
       kubernetes:
         # Enterprise. Runs script and commands tasks as pods on the cluster the task's kubernetes connection names.
         enabled: false
+    # Gives script and commands tasks on the process, docker, kubernetes and aws-batch runners the parameters of the
+    # connections they declare, as BYTECHEF_CONNECTION_* environment variables, masked in the captured output.
+    inject-connections: true
     # Ceilings on what a remote task runner may cost this server: a held worker permit, captured log bytes, and
     # bytes moved in or out of the execution. A runner may override them under its own properties.
     runner-limits:
