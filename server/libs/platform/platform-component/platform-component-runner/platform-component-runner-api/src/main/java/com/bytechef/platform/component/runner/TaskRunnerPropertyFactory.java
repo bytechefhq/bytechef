@@ -22,10 +22,12 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.DOCKER;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.ENV;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.GRAALVM;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.INPUT_FILES;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.OUTPUT_FILES;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.PROCESS;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.TASK_RUNNER;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.TIMEOUT;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.TYPE;
@@ -42,6 +44,8 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 public class TaskRunnerPropertyFactory {
+
+    private static final List<String> PREFERRED_DEFAULT_TYPES = List.of(GRAALVM, PROCESS, DOCKER);
 
     private TaskRunnerPropertyFactory() {
     }
@@ -192,9 +196,11 @@ public class TaskRunnerPropertyFactory {
             return null;
         }
 
-        for (TaskRunner taskRunner : taskRunners) {
-            if (GRAALVM.equals(taskRunner.getType())) {
-                return GRAALVM;
+        for (String preferredType : PREFERRED_DEFAULT_TYPES) {
+            for (TaskRunner taskRunner : taskRunners) {
+                if (preferredType.equals(taskRunner.getType())) {
+                    return preferredType;
+                }
             }
         }
 
