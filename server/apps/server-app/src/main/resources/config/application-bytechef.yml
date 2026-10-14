@@ -225,6 +225,9 @@ bytechef:
     # Task runner allowlist. A runner absent from this map is disabled, which is the intended default for the
     # out-of-process runners but not for GraalVM, the in-process runner every script action falls back to.
     runners:
+      aws-batch:
+        # Enterprise. Runs script and commands tasks as AWS Batch jobs in the account the task's aws connection names.
+        enabled: false
       graalvm:
         enabled: true
       kubernetes:
