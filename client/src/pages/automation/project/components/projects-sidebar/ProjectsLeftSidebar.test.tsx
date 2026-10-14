@@ -289,12 +289,12 @@ describe('ProjectsLeftSidebar', () => {
         expect(await screen.findByRole('dialog')).toHaveTextContent('WorkflowDialog:0');
     });
 
-    it('opens the ProjectDialog from the New project menu', async () => {
+    it('opens the ProjectDialog from the New Project menu', async () => {
         setupQueries({selectedProjectId: 9});
 
         renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
 
-        expect(screen.getByLabelText('New project')).toBeInTheDocument();
+        expect(screen.getByLabelText('New Project')).toBeInTheDocument();
 
         fireEvent.click(screen.getByText('From Scratch'));
 
