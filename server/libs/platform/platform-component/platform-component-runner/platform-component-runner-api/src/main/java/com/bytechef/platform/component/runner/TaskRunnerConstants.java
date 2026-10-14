@@ -44,6 +44,20 @@ public class TaskRunnerConstants {
     public static final String PULL_POLICY = "pullPolicy";
     public static final String USER = "user";
 
+    public static final String CREDENTIALS = "credentials";
+    public static final String DELETE = "delete";
+    public static final String HOST = "host";
+    public static final String KILL_GRACE_PERIOD = "killGracePeriod";
+    public static final String PASSWORD = "password";
+    public static final String PRIVILEGED = "privileged";
+    public static final String REGISTRY = "registry";
+    public static final String REGISTRY_TOKEN = "registryToken";
+    public static final String RESUME = "resume";
+    public static final String USERNAME = "username";
+    public static final String VOLUMES = "volumes";
+    public static final String WAIT_UNTIL_COMPLETION = "waitUntilCompletion";
+    public static final String WAIT_UNTIL_RUNNING = "waitUntilRunning";
+
     public static final String ENV = "env";
     public static final String INPUT_FILES = "inputFiles";
     public static final String OUTPUT_FILES = "outputFiles";
