@@ -54,6 +54,31 @@ public class ApplicationPropertiesScriptBindingTest {
             });
     }
 
+    @Test
+    public void testRunnerPropertiesBind() {
+        applicationContextRunner
+            .withPropertyValues(
+                "bytechef.script.runners.graalvm.enabled=true",
+                "bytechef.script.runners.graalvm.properties.trusted-enabled=true",
+                "bytechef.script.runners.docker.enabled=false")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+
+                ApplicationProperties applicationProperties = context.getBean(ApplicationProperties.class);
+
+                assertThat(applicationProperties.getScript()
+                    .getRunners()).containsOnlyKeys("graalvm", "docker");
+                assertThat(applicationProperties.getScript()
+                    .getRunners()
+                    .get("graalvm")
+                    .isEnabled()).isTrue();
+                assertThat(applicationProperties.getScript()
+                    .getRunners()
+                    .get("graalvm")
+                    .getProperties()).containsEntry("trusted-enabled", "true");
+            });
+    }
+
     @EnableConfigurationProperties(ApplicationProperties.class)
     static class TestConfiguration {
     }
