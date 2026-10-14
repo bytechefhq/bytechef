@@ -363,7 +363,7 @@ does not support.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `GITHUB_PROXY_BASE_URL` | Base URL of the ByteChef GitHub proxy used to fetch pre-built workflow templates. Point it at a private mirror when the instance cannot reach the public proxy. Note: this property is top-level (`github-proxy.baseUrl`), not under the `bytechef.*` prefix. | `https://github-proxy.bytechef.io/` |
+| `GITHUB_PROXY_BASE_URL` | Base URL of the ByteChef GitHub proxy used to fetch pre-built workflow templates and the MCP server catalog. Point it at a private mirror when the instance cannot reach the public proxy. Note: this property is top-level (`github-proxy.baseUrl`), not under the `bytechef.*` prefix. | `https://github-proxy.bytechef.io/` |
 
 ## Help Hub Configuration
 
