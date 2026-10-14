@@ -17,8 +17,10 @@
 package com.bytechef.platform.githubproxy.client.config;
 
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
+import com.bytechef.platform.githubproxy.client.McpServerCatalogProxyClient;
 import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
 import com.bytechef.platform.githubproxy.client.internal.RestGitHubProxyClient;
+import com.bytechef.platform.githubproxy.client.internal.RestMcpServerCatalogProxyClient;
 import com.bytechef.platform.githubproxy.client.internal.RestWorkflowTemplateProxyClient;
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -42,6 +44,25 @@ class GitHubProxyClientConfiguration {
         RestClient restClient = getRestClient(properties, httpClient);
 
         return new RestGitHubProxyClient(restClient);
+    }
+
+    @Bean
+    McpServerCatalogProxyClient mcpServerCatalogProxyClient(GitHubProxyClientProperties properties) {
+        HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(5))
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
+
+        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+
+        requestFactory.setReadTimeout(Duration.ofSeconds(10));
+
+        RestClient restClient = RestClient.builder()
+            .baseUrl(properties.getBaseUrl())
+            .requestFactory(requestFactory)
+            .build();
+
+        return new RestMcpServerCatalogProxyClient(restClient);
     }
 
     @Bean
