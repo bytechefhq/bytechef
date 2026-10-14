@@ -1,0 +1,46 @@
+{
+    "name": "@bytechef/embedded-api",
+    "version": "0.1.0",
+    "description": "TypeScript client for the ByteChef Embedded public API.",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/configuration/index.d.ts",
+            "import": "./dist/configuration/index.js"
+        },
+        "./execution": {
+            "types": "./dist/execution/index.d.ts",
+            "import": "./dist/execution/index.js"
+        },
+        "./webhook": {
+            "types": "./dist/webhook/index.d.ts",
+            "import": "./dist/webhook/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "typecheck": "tsc -p tsconfig.json --noEmit"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bytechefhq/bytechef.git",
+        "directory": "sdks/api/typescript"
+    },
+    "keywords": [
+        "bytechef",
+        "embedded",
+        "api",
+        "client",
+        "sdk"
+    ],
+    "devDependencies": {
+        "typescript": "^5.9.3"
+    }
+}

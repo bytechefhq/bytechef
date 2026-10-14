@@ -1,9 +1,5 @@
 import {useAutomationHubStore} from '@/ee/pages/embedded/automation-hub/stores/useAutomationHubStore';
-import {
-    AutomationWorkflowProject,
-    ConnectedUserProjectWorkflow,
-    ResponseError,
-} from '@/ee/shared/middleware/embedded/public';
+import {AutomationWorkflowProject, ConnectedUserProjectWorkflow, ResponseError} from '@bytechef/embedded-api';
 import {render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';

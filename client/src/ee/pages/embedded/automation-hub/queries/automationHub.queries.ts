@@ -7,7 +7,7 @@ import {
     ConnectionApi,
     IntegrationApi,
     IntegrationBasic,
-} from '@/ee/shared/middleware/embedded/public';
+} from '@bytechef/embedded-api';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useCallback} from 'react';
 
