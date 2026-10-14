@@ -243,6 +243,27 @@ it('creates workflows in the current project', () => {
     );
 });
 
+it('shows the project Duplicate action for a visual project', async () => {
+    renderAutomationWorkflowEditorHeader();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+    await userEvent.click(screen.getByLabelText('Project tab'));
+
+    expect(screen.getByRole('menuitem', {name: 'Duplicate'})).toBeInTheDocument();
+});
+
+it('hides the project Duplicate action for a code project', async () => {
+    hoisted.project.current = {...mockProject, codeWorkflowProject: true};
+
+    renderAutomationWorkflowEditorHeader();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+    await userEvent.click(screen.getByLabelText('Project tab'));
+
+    expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', {name: 'Duplicate'})).not.toBeInTheDocument();
+});
+
 it('creates a workflow from the New Workflow dialog opened from the settings menu', async () => {
     renderAutomationWorkflowEditorHeader();
 

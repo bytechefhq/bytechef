@@ -210,6 +210,41 @@ describe('Projects Import Functionality', () => {
     });
 });
 
+describe('Projects create menu', () => {
+    const openCreateMenu = async () => {
+        const buttons = screen.getAllByRole('button');
+        const chevronButton = buttons.find((button) => !/create project/i.test(button.textContent || ''))!;
+
+        await userEvent.click(chevronButton);
+    };
+
+    it('lists New Project first, followed by the other create actions', async () => {
+        renderProjects();
+
+        await openCreateMenu();
+
+        const menuItems = await screen.findAllByRole('menuitem');
+
+        expect(menuItems.map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'New Project',
+            'From Template',
+            'Import Project',
+            'New Code Project',
+            'Import Code Project',
+        ]);
+    });
+
+    it('opens the project dialog from the New Project menu item', async () => {
+        renderProjects();
+
+        await openCreateMenu();
+
+        await userEvent.click(await screen.findByRole('menuitem', {name: 'New Project'}));
+
+        expect(await screen.findByPlaceholderText('My CRM Project')).toBeInTheDocument();
+    });
+});
+
 describe('Projects empty states', () => {
     it('explains what a project is and links to the docs', () => {
         renderProjects();

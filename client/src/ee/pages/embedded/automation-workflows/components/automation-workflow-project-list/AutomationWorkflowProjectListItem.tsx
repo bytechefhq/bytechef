@@ -14,14 +14,19 @@ import TagList from '@/shared/components/TagList';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {
     ChevronDownIcon,
+    CodeIcon,
     EditIcon,
     EllipsisVerticalIcon,
+    LinkIcon,
     PlusIcon,
     SendIcon,
     Trash2Icon,
     UploadIcon,
 } from 'lucide-react';
 import {MouseEvent, useCallback, useMemo, useRef, useState} from 'react';
+
+import isEditableCodeLanguage from '../../utils/isEditableCodeLanguage';
+import CodeWorkflowReferencesDialog from '../CodeWorkflowReferencesDialog';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 type EmbeddedTagType = AutomationWorkflowProjectTagsQuery['automationWorkflowProjectTags'][number];
@@ -30,6 +35,7 @@ interface AutomationWorkflowProjectListItemProps {
     onCreateWorkflow: (projectId: string) => void;
     onDeleteProject: (projectId: string) => void;
     onEditProject: (project: AutomationWorkflowProjectType) => void;
+    onEditProjectSource: (projectId: string) => void;
     onImportWorkflow: (projectId: string) => void;
     onPublishProject: (projectId: string) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
@@ -42,6 +48,7 @@ const AutomationWorkflowProjectListItem = ({
     onCreateWorkflow,
     onDeleteProject,
     onEditProject,
+    onEditProjectSource,
     onImportWorkflow,
     onPublishProject,
     onSelectWorkflow,
@@ -50,6 +57,7 @@ const AutomationWorkflowProjectListItem = ({
     tags,
 }: AutomationWorkflowProjectListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showReferencesDialog, setShowReferencesDialog] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -156,6 +164,8 @@ const AutomationWorkflowProjectListItem = ({
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
                             <div className="flex min-h-8 items-center space-x-2">
+                                {project.codeWorkflowProject && <Badge label="Reference" styleType="secondary-outline" />}
+
                                 {project.published ? (
                                     <Badge
                                         className="flex space-x-1 border-transparent"
@@ -202,26 +212,51 @@ const AutomationWorkflowProjectListItem = ({
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem
                                     aria-label="Publish Project"
+                                    disabled={project.codeWorkflowProject && !project.codeWorkflowDraftPublishable}
                                     icon={<SendIcon />}
                                     label="Publish"
                                     onClick={() => onPublishProject(project.id)}
                                 />
 
+                                {project.codeWorkflowProject && (
+                                    <>
+                                        {isEditableCodeLanguage(project.codeWorkflowLanguage) && (
+                                            <DropdownMenuItem
+                                                aria-label="Edit Source"
+                                                icon={<CodeIcon />}
+                                                label="Edit Source"
+                                                onClick={() => onEditProjectSource(project.id)}
+                                            />
+                                        )}
+
+                                        <DropdownMenuItem
+                                            aria-label="View References"
+                                            icon={<LinkIcon />}
+                                            label="View References"
+                                            onClick={() => setShowReferencesDialog(true)}
+                                        />
+                                    </>
+                                )}
+
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    aria-label="New Workflow"
-                                    icon={<PlusIcon />}
-                                    label="New Workflow"
-                                    onClick={() => onCreateWorkflow(project.id)}
-                                />
+                                {!project.codeWorkflowProject && (
+                                    <>
+                                        <DropdownMenuItem
+                                            aria-label="New Workflow"
+                                            icon={<PlusIcon />}
+                                            label="New Workflow"
+                                            onClick={() => onCreateWorkflow(project.id)}
+                                        />
 
-                                <DropdownMenuItem
-                                    aria-label="Import Workflow"
-                                    icon={<UploadIcon />}
-                                    label="Import Workflow"
-                                    onClick={() => onImportWorkflow(project.id)}
-                                />
+                                        <DropdownMenuItem
+                                            aria-label="Import Workflow"
+                                            icon={<UploadIcon />}
+                                            label="Import Workflow"
+                                            onClick={() => onImportWorkflow(project.id)}
+                                        />
+                                    </>
+                                )}
 
                                 <DropdownMenuItem
                                     aria-label="Edit Project"
@@ -258,6 +293,14 @@ const AutomationWorkflowProjectListItem = ({
                 }}
                 open={showDeleteDialog}
             />
+
+            {showReferencesDialog && (
+                <CodeWorkflowReferencesDialog
+                    onClose={() => setShowReferencesDialog(false)}
+                    projectName={project.name}
+                    workflowTemplates={project.workflowTemplates}
+                />
+            )}
         </>
     );
 };

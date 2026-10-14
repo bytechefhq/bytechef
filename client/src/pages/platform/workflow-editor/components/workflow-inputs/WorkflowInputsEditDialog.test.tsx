@@ -14,6 +14,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowInputsEditDialog from './WorkflowInputsEditDialog';
 
+const {useWorkflowEditorMock} = vi.hoisted(() => ({
+    useWorkflowEditorMock: vi.fn(() => ({codeWorkflow: false})),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
+    useWorkflowEditor: useWorkflowEditorMock,
+}));
+
 interface EditDialogHarnessProps {
     currentInputIndex?: number;
     defaultValues: WorkflowInputType;
@@ -85,6 +93,8 @@ beforeEach(() => {
 
 afterEach(() => {
     resetAll();
+
+    useWorkflowEditorMock.mockImplementation(() => ({codeWorkflow: false}));
 });
 
 describe('WorkflowInputsEditDialog', () => {
@@ -101,6 +111,29 @@ describe('WorkflowInputsEditDialog', () => {
 
         expect(screen.getByText('Create a new Input')).toBeInTheDocument();
         expect(screen.getByText('Add a new workflow input definition.')).toBeInTheDocument();
+    });
+
+    it('should lock the declaration but not the test value for a code workflow', async () => {
+        useWorkflowEditorMock.mockImplementation(() => ({codeWorkflow: true}));
+
+        render(
+            <EditDialogHarness
+                defaultValues={{
+                    label: 'Channel',
+                    name: 'channel',
+                    required: false,
+                    testValue: '#alerts',
+                    type: 'string',
+                }}
+            />
+        );
+
+        expect(await screen.findByPlaceholderText('Input label')).toHaveAttribute('readonly');
+        expect(screen.getByLabelText('Test Value')).not.toHaveAttribute('readonly');
+
+        for (const combobox of screen.getAllByRole('combobox')) {
+            expect(combobox).toBeDisabled();
+        }
     });
 
     it('should keep the existing test value when an input is opened for editing', async () => {

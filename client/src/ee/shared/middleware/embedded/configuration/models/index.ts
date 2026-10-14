@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './AppEvent';
 export * from './AuthorizationType';
+export * from './AutomationProjectCodeWorkflowDeployResult';
 export * from './Category';
 export * from './ComponentCategory';
 export * from './ComponentConnection';

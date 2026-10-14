@@ -37,6 +37,10 @@ vi.mock('./WorkflowInputsEditDialog', () => ({
     default: () => null,
 }));
 
+vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
+    useWorkflowEditor: () => ({codeWorkflow: false}),
+}));
+
 vi.mock('@/components/ui/sheet', () => ({
     SheetCloseButton: () => null,
 }));
