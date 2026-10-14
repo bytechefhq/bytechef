@@ -91,7 +91,7 @@ import tools.jackson.databind.node.ObjectNode;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
-public class ProjectWorkflowFacadeIntTest {
+class ProjectWorkflowFacadeIntTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -129,7 +129,7 @@ public class ProjectWorkflowFacadeIntTest {
     private WorkspaceRepository workspaceRepository;
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         projectWorkflowRepository.deleteAll();
         projectRepository.deleteAll();
 
@@ -148,12 +148,12 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         workspace = workspaceRepository.save(new Workspace("test"));
     }
 
     @Test
-    public void testDuplicateWorkflowCopiesWorkflowTestConfigurationInputs() {
+    void testDuplicateWorkflowCopiesWorkflowTestConfigurationInputs() {
         Project project = new Project();
 
         project.setName("Test Duplicate Project");
@@ -177,7 +177,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testExportSharedWorkflow() {
+    void testExportSharedWorkflow() {
         Project project = new Project();
 
         project.setName("Test Export Project");
@@ -204,7 +204,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testGetSharedWorkflow() {
+    void testGetSharedWorkflow() {
         byte[] workflowZip;
 
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -251,7 +251,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testGetSharedWorkflowWithoutTemplate() {
+    void testGetSharedWorkflowWithoutTemplate() {
         UUID uuid = UUID.randomUUID();
 
         String workflowUuid = uuid.toString();
@@ -269,7 +269,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testGetSharedWorkflowNotFound() {
+    void testGetSharedWorkflowNotFound() {
         UUID uuid = UUID.randomUUID();
 
         String workflowUuid = uuid.toString();
@@ -284,7 +284,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testGetWorkflowTemplatePreBuilt() {
+    void testGetWorkflowTemplatePreBuilt() {
         ObjectNode workflowDefinition = JsonMapper.builder()
             .build()
             .createObjectNode();
@@ -314,7 +314,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testGetWorkflowTemplateShared() {
+    void testGetWorkflowTemplateShared() {
         byte[] workflowZip;
 
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -370,7 +370,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testGetPreBuiltWorkflowTemplates() {
+    void testGetPreBuiltWorkflowTemplates() {
         WorkflowTemplateSummary workflowTemplateSummary = new WorkflowTemplateSummary(
             "pb-workflow-slug", "PB Label", "PB Template", "ai", List.of(), null, null);
 
@@ -398,7 +398,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testImportWorkflowTemplatePreBuilt() {
+    void testImportWorkflowTemplatePreBuilt() {
         Project project = new Project();
 
         project.setName("Test Project PB");
@@ -430,7 +430,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testImportWorkflowTemplateShared() {
+    void testImportWorkflowTemplateShared() {
         Project project = new Project();
 
         project.setName("Test Project");
@@ -493,7 +493,7 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testGetWorkflowTemplateSharedFlattensTaskDispatcherChildTasks() {
+    void testGetWorkflowTemplateSharedFlattensTaskDispatcherChildTasks() {
         byte[] workflowZip;
 
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
