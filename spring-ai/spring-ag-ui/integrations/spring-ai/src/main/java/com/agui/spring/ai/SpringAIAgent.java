@@ -212,6 +212,16 @@ public class SpringAIAgent extends LocalAgent {
     }
 
     /**
+     * Hook for subclasses to choose the chat memory conversation id. Default returns the run's thread id.
+     *
+     * @param input the current run input
+     * @return the conversation id chat memory is keyed by
+     */
+    protected String conversationId(RunAgentInput input) {
+        return input.threadId();
+    }
+
+    /**
      * Hook for subclasses to contribute per-invocation values into Spring AI's
      * {@link org.springframework.ai.chat.model.ToolContext}. The returned map is merged into the request via
      * {@code ChatClient.ChatClientRequestSpec.toolContext(Map)} and reaches every {@link ToolCallback#call(String,
@@ -434,7 +444,7 @@ public class SpringAIAgent extends LocalAgent {
                     MessageChatMemoryAdvisor.builder(chatMemory).build()
                 );
 
-                chatRequest.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, input.threadId()));
+                chatRequest.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, this.conversationId(input)));
             } catch (RuntimeException e) {
                 throw new AGUIException("Could not add chat memory", e);
             }

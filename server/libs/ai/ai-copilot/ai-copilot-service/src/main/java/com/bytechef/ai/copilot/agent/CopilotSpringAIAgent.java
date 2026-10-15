@@ -124,6 +124,20 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
     }
 
     @Override
+    protected String conversationId(RunAgentInput input) {
+        State state = input.state();
+
+        String conversationScope = state == null
+            ? null : StringUtils.asString(state.get(CopilotConstants.STATE_CONVERSATION_SCOPE));
+
+        if (conversationScope == null || conversationScope.isBlank()) {
+            return super.conversationId(input);
+        }
+
+        return conversationScope + ":" + input.threadId();
+    }
+
+    @Override
     protected String runErrorMessage(RunAgentInput input, Throwable throwable) {
         State state = input.state();
 

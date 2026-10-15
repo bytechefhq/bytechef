@@ -150,6 +150,63 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatDropsClientSuppliedAuthenticatedUserId() throws Exception {
+        Map<String, Object> stateMap = runWithClientState(
+            "{\"" + CopilotConstants.STATE_AUTHENTICATED_USER_ID + "\":999}", Set.of("slack"));
+
+        assertThat(stateMap).doesNotContainKey(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatDropsClientSuppliedWorkspaceId() throws Exception {
+        Map<String, Object> stateMap = runWithClientState(
+            "{\"" + CopilotConstants.STATE_WORKSPACE_ID + "\":999}", Set.of("slack"));
+
+        assertThat(stateMap).doesNotContainKey(CopilotConstants.STATE_WORKSPACE_ID);
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatDropsClientSuppliedAllowedComponentNames() throws Exception {
+        Map<String, Object> stateMap = runWithClientState(
+            "{\"" + TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY + "\":[\"salesforce\"]}", Set.of());
+
+        assertThat(stateMap).doesNotContainKey(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY);
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatScopesTheConversationToTheConnectedUserAndWorkflow() throws Exception {
+        Map<String, Object> stateMap = runWithClientState(
+            "{\"" + CopilotConstants.STATE_CONVERSATION_SCOPE + "\":\"embedded:000001:victim:workflow\"}",
+            Set.of("slack"));
+
+        assertThat(stateMap.get(CopilotConstants.STATE_CONVERSATION_SCOPE))
+            .asString()
+            .startsWith("embedded:")
+            .contains(":ext-user-1:")
+            .doesNotContain("victim");
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatKeepsOnlyServerDerivedStateAndThePrompt() throws Exception {
+        Map<String, Object> stateMap = runWithClientState(
+            "{\"" + CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER + "\":\"openai\",\"" +
+                CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT + "\":\"Prefer Slack.\",\"anything\":true}",
+            Set.of("slack"));
+
+        assertThat(stateMap.keySet()).containsExactlyInAnyOrder(
+            "workflowId", "mode", "autonomous", CopilotConstants.STATE_TENANT_ID,
+            CopilotConstants.STATE_CONVERSATION_SCOPE, CopilotConstants.STATE_ENVIRONMENT_ID,
+            CopilotConstants.STATE_SCOPED_PROJECT_ID,
+            CopilotConstants.STATE_AUTHENTICATION, CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT,
+            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY);
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
     public void testCopilotChatScopesTheRunToTheConnectedUsersProjectRegardlessOfClientState() throws Exception {
         when(connectedUserProjectFacade.prepareCopilotChat(
             eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
@@ -307,6 +364,33 @@ public class ConnectedUserCopilotApiControllerIntTest {
         assertThat(exceptionThrown).isTrue();
 
         verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    private Map<String, Object> runWithClientState(String clientStateJson, Set<String> allowedComponentNames)
+        throws Exception {
+
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", 1114L, allowedComponentNames));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(new SseEmitter());
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"threadId\":\"thread-1\",\"state\":" + clientStateJson + "}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+
+        verify(agUiService).runAgent(any(LocalAgent.class), parametersCaptor.capture());
+
+        return parametersCaptor.getValue()
+            .getState()
+            .getState();
     }
 
     @Configuration
