@@ -107,12 +107,10 @@ describe('useFetchInterceptor (embedded)', () => {
 
             const result = hoisted.registeredHandlers!.request('/internal/test', {headers: {}});
 
-            expect((result as [string, Record<string, unknown>])[1].headers).toEqual(
-                expect.objectContaining({
-                    Authorization: 'Bearer test-jwt',
-                    'X-ENVIRONMENT': 'PRODUCTION',
-                })
-            );
+            const sentHeaders = (result as [string, RequestInit])[1].headers as Headers;
+
+            expect(sentHeaders.get('Authorization')).toBe('Bearer test-jwt');
+            expect(sentHeaders.get('X-ENVIRONMENT')).toBe('PRODUCTION');
         });
 
         it('adds Authorization and X-ENVIRONMENT headers for embedded public API URLs', () => {
@@ -122,12 +120,10 @@ describe('useFetchInterceptor (embedded)', () => {
 
             const result = hoisted.registeredHandlers!.request('/api/embedded/v1/connections', {headers: {}});
 
-            expect((result as [string, Record<string, unknown>])[1].headers).toEqual(
-                expect.objectContaining({
-                    Authorization: 'Bearer test-jwt',
-                    'X-ENVIRONMENT': 'PRODUCTION',
-                })
-            );
+            const sentHeaders = (result as [string, RequestInit])[1].headers as Headers;
+
+            expect(sentHeaders.get('Authorization')).toBe('Bearer test-jwt');
+            expect(sentHeaders.get('X-ENVIRONMENT')).toBe('PRODUCTION');
         });
 
         it('ignores credentials that another embedded frame of the same origin left in sessionStorage', () => {
@@ -140,12 +136,10 @@ describe('useFetchInterceptor (embedded)', () => {
 
             const result = hoisted.registeredHandlers!.request('/api/embedded/v1/connections', {headers: {}});
 
-            expect((result as [string, Record<string, unknown>])[1].headers).toEqual(
-                expect.objectContaining({
-                    Authorization: 'Bearer own-frame-jwt',
-                    'X-ENVIRONMENT': 'PRODUCTION',
-                })
-            );
+            const sentHeaders = (result as [string, RequestInit])[1].headers as Headers;
+
+            expect(sentHeaders.get('Authorization')).toBe('Bearer own-frame-jwt');
+            expect(sentHeaders.get('X-ENVIRONMENT')).toBe('PRODUCTION');
         });
 
         it('sends an empty bearer token before the embedding page has sent EMBED_INIT', () => {
@@ -153,12 +147,30 @@ describe('useFetchInterceptor (embedded)', () => {
 
             const result = hoisted.registeredHandlers!.request('/graphql', {headers: {}});
 
-            expect((result as [string, Record<string, unknown>])[1].headers).toEqual(
-                expect.objectContaining({
-                    Authorization: 'Bearer ',
-                    'X-ENVIRONMENT': '',
-                })
-            );
+            const sentHeaders = (result as [string, RequestInit])[1].headers as Headers;
+
+            expect(sentHeaders.get('Authorization')).toBe('Bearer');
+            expect(sentHeaders.get('X-ENVIRONMENT')).toBe('');
+        });
+
+        it('replaces, not duplicates, an environment and authorization header the caller already set', async () => {
+            setEmbedCredentials({environment: 'production', jwtToken: 'embed-jwt'});
+
+            renderHook(() => useFetchInterceptor());
+
+            const [url, config] = hoisted.registeredHandlers!.request('/api/embedded/v1/automation/workflows', {
+                headers: {
+                    Authorization: 'Bearer old',
+                    'Content-Type': 'application/json',
+                    'X-Environment': 'PRODUCTION',
+                },
+            }) as [string, RequestInit];
+
+            const sentHeaders = new Request(`http://localhost${url}`, config).headers;
+
+            expect(sentHeaders.get('x-environment')).toBe('PRODUCTION');
+            expect(sentHeaders.get('authorization')).toBe('Bearer embed-jwt');
+            expect(sentHeaders.get('content-type')).toBe('application/json');
         });
 
         it('does not add auth headers for non-internal URLs', () => {
