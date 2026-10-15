@@ -100,6 +100,7 @@ class IntegrationTriggerDispatcherPreSendProcessorIntTest {
         WorkflowTrigger workflowTrigger = mock(WorkflowTrigger.class);
 
         when(workflowTrigger.getName()).thenReturn(TRIGGER_NAME);
+        when(workflowTrigger.getType()).thenReturn("slack/v1/newMessage");
 
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .workflowExecutionId(
@@ -118,5 +119,68 @@ class IntegrationTriggerDispatcherPreSendProcessorIntTest {
 
         assertThat(result.getMetadata()
             .get(MetadataConstants.CONNECTION_IDS)).isEqualTo(Map.of("slack", CONFIGURATION_CONNECTION_ID));
+    }
+
+    @Test
+    void processResolvesIntegrationComponentTriggerToIntegrationInstanceConnection() {
+        Integration integration = embeddedIntegrationFixtures.createIntegration("googleMail");
+
+        embeddedIntegrationFixtures.createIntegrationWorkflow(integration, WORKFLOW_ID, WORKFLOW_UUID);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration =
+            embeddedIntegrationFixtures.createIntegrationInstanceConfiguration(integration, "configuration");
+
+        embeddedIntegrationFixtures.createIntegrationInstanceConfigurationWorkflow(
+            integrationInstanceConfiguration, WORKFLOW_ID, List.of());
+
+        IntegrationInstance integrationInstance = embeddedIntegrationFixtures.createIntegrationInstance(
+            integrationInstanceConfiguration, CONNECTED_USER_ID, CONNECTED_USER_CONNECTION_ID);
+
+        TriggerExecution result = processor.process(
+            createTriggerExecution(integrationInstance.getId(), "newEmail", "googleMail/v1/newEmailPolling"));
+
+        assertThat(result.getMetadata()
+            .get(MetadataConstants.CONNECTION_IDS)).isEqualTo(Map.of("newEmail", CONNECTED_USER_CONNECTION_ID));
+    }
+
+    @Test
+    void processLeavesOtherComponentTriggerWithoutIntegrationInstanceConnection() {
+        Integration integration = embeddedIntegrationFixtures.createIntegration("googleMail");
+
+        embeddedIntegrationFixtures.createIntegrationWorkflow(integration, WORKFLOW_ID, WORKFLOW_UUID);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration =
+            embeddedIntegrationFixtures.createIntegrationInstanceConfiguration(integration, "configuration");
+
+        embeddedIntegrationFixtures.createIntegrationInstanceConfigurationWorkflow(
+            integrationInstanceConfiguration, WORKFLOW_ID, List.of());
+
+        IntegrationInstance integrationInstance = embeddedIntegrationFixtures.createIntegrationInstance(
+            integrationInstanceConfiguration, CONNECTED_USER_ID, CONNECTED_USER_CONNECTION_ID);
+
+        TriggerExecution result = processor.process(
+            createTriggerExecution(integrationInstance.getId(), TRIGGER_NAME, "slack/v1/newMessage"));
+
+        assertThat(result.getMetadata()).doesNotContainKey(MetadataConstants.CONNECTION_IDS);
+    }
+
+    private TriggerExecution createTriggerExecution(long integrationInstanceId, String triggerName, String type) {
+        WorkflowTrigger workflowTrigger = mock(WorkflowTrigger.class);
+
+        when(workflowTrigger.getName()).thenReturn(triggerName);
+        when(workflowTrigger.getType()).thenReturn(type);
+
+        JobPrincipalAccessor jobPrincipalAccessor = mock(JobPrincipalAccessor.class);
+
+        when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(PlatformType.EMBEDDED))
+            .thenReturn(jobPrincipalAccessor);
+        when(jobPrincipalAccessor.getEnvironmentId(integrationInstanceId)).thenReturn(1L);
+
+        return TriggerExecution.builder()
+            .workflowExecutionId(
+                WorkflowExecutionId.of(
+                    PlatformType.EMBEDDED, integrationInstanceId, WORKFLOW_UUID.toString(), triggerName))
+            .workflowTrigger(workflowTrigger)
+            .build();
     }
 }
