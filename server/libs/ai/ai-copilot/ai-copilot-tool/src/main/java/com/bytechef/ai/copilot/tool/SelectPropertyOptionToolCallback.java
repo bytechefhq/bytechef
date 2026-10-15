@@ -204,6 +204,7 @@ public class SelectPropertyOptionToolCallback implements ToolCallback {
         marker.put("propertyName", propertyName);
         marker.put("options", optionRows);
         marker.put("truncated", truncated);
+        marker.put("awaitingAnswer", !options.isEmpty());
 
         try {
             return JsonUtils.write(marker);

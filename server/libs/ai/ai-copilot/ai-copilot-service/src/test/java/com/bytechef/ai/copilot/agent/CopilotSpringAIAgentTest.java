@@ -26,6 +26,7 @@ import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +35,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.model.ChatModel;
 
 /**
@@ -140,6 +143,36 @@ class CopilotSpringAIAgentTest {
 
             assertThat(capturedEnvironment.get()).isNull();
             assertThat(EnvironmentContext.fetchCurrentEnvironment()).isNull();
+        }
+    }
+
+    @Nested
+    @ExtendWith(ObjectMapperSetupExtension.class)
+    class EndsTurnTest {
+
+        @Test
+        void testEndsTurnForAResultThatAwaitsTheUser() throws AGUIException {
+            assertThat(newAgent().endsTurn(newToolResponse("{\"kind\":\"select-connection\",\"awaitingAnswer\":true}")))
+                .isTrue();
+        }
+
+        @Test
+        void testKeepsTheTurnForAResultThatDoesNotAwaitTheUser() throws AGUIException {
+            assertThat(
+                newAgent().endsTurn(newToolResponse("{\"kind\":\"select-property-option\",\"awaitingAnswer\":false}")))
+                    .isFalse();
+            assertThat(newAgent().endsTurn(newToolResponse("{\"error\":\"componentName is required\"}")))
+                .isFalse();
+        }
+
+        @Test
+        void testKeepsTheTurnForAResultThatIsNotJsonButMentionsTheKey() throws AGUIException {
+            assertThat(newAgent().endsTurn(newToolResponse("awaitingAnswer")))
+                .isFalse();
+        }
+
+        private static ToolResponseMessage.ToolResponse newToolResponse(String responseData) {
+            return new ToolResponseMessage.ToolResponse("call-1", "selectConnection", responseData);
         }
     }
 

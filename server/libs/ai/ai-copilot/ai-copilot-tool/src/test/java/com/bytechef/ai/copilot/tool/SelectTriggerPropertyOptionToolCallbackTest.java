@@ -140,6 +140,8 @@ class SelectTriggerPropertyOptionToolCallbackTest {
             .asString()).isEqualTo("channel");
         assertThat(node.get("options")
             .size()).isEqualTo(2);
+        assertThat(node.get("awaitingAnswer")
+            .asBoolean()).isTrue();
         assertThat(node.get("options")
             .get(0)
             .get("label")

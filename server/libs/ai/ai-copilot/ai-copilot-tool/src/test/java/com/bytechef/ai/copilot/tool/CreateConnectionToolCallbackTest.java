@@ -78,6 +78,8 @@ class CreateConnectionToolCallbackTest {
         assertThat(node.get("componentLabel")
             .asText()).isEqualTo("Slack");
         assertThat(node.has("suggestedName")).isFalse();
+        assertThat(node.get("awaitingAnswer")
+            .asBoolean()).isTrue();
     }
 
     @Test
