@@ -162,6 +162,7 @@ dependencies {
     implementation(project(":server:libs:core:evaluator:evaluator-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 
+    testImplementation("org.springframework.ai:spring-ai-model")
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-tool"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
     testImplementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
