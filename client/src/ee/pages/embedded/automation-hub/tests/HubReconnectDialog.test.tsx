@@ -2,6 +2,7 @@ import {useAutomationHubStore} from '@/ee/pages/embedded/automation-hub/stores/u
 import HubReconnectDialog from '@/ee/pages/embedded/automation-hub/views/components/HubReconnectDialog';
 import {setEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
 import {render} from '@testing-library/react';
+import {StrictMode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const {closeDialogMock, openDialogMock, useConnectDialogMock} = vi.hoisted(() => ({
@@ -16,13 +17,15 @@ vi.mock('@bytechef/embedded', () => ({
 
 describe('HubReconnectDialog', () => {
     beforeEach(() => {
+        closeDialogMock.mockReset();
+        openDialogMock.mockReset();
         useConnectDialogMock.mockReset();
         useConnectDialogMock.mockReturnValue({closeDialog: closeDialogMock, openDialog: openDialogMock});
         setEmbedCredentials({environment: 'STAGING', jwtToken: 'jwt-1'});
         useAutomationHubStore.setState({theme: {mode: 'dark'}});
     });
 
-    it('opens the connect dialog in reauthorize mode for the integration on mount and closes it on unmount', () => {
+    it('opens the connect dialog in reauthorize mode for the integration on mount', () => {
         const onDone = vi.fn();
         const onReauthorized = vi.fn();
 
@@ -45,6 +48,21 @@ describe('HubReconnectDialog', () => {
 
         unmount();
 
-        expect(closeDialogMock).toHaveBeenCalledTimes(1);
+        expect(closeDialogMock).not.toHaveBeenCalled();
+        expect(onDone).not.toHaveBeenCalled();
+    });
+
+    it('opens once and keeps the dialog open under StrictMode', () => {
+        const onDone = vi.fn();
+
+        render(
+            <StrictMode>
+                <HubReconnectDialog connectionId={2} integrationId={5} onDone={onDone} onReauthorized={vi.fn()} />
+            </StrictMode>
+        );
+
+        expect(openDialogMock).toHaveBeenCalledTimes(1);
+        expect(closeDialogMock).not.toHaveBeenCalled();
+        expect(onDone).not.toHaveBeenCalled();
     });
 });
