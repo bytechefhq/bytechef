@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -35,6 +36,8 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.model.ToolContext;
@@ -344,5 +347,26 @@ class LookupActionPropertyOptionsToolCallbackTest {
             .forEach(name -> validNames.add(name.asText()));
 
         assertThat(validNames).contains("channel");
+    }
+
+    @Test
+    void testRejectsAComponentOutsideTheAllowListBeforeAnyLookup() {
+        ActionDefinitionService service = mock(ActionDefinitionService.class);
+        ActionDefinitionFacade facade = mock(ActionDefinitionFacade.class);
+
+        LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class), mock(ScopedConnectionGuard.class));
+
+        Map<String, Object> context = new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext();
+
+        context.put(AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack"));
+
+        String result = callback.call(
+            "{\"componentName\":\"hubspot\",\"actionName\":\"createContact\",\"propertyName\":\"owner\"}",
+            new ToolContext(context));
+
+        assertThat(result).contains("This chat can't use hubspot");
+
+        verifyNoInteractions(service, facade);
     }
 }

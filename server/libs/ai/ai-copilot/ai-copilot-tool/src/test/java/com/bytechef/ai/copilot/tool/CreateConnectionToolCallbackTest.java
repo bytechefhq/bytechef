@@ -22,14 +22,19 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -159,5 +164,19 @@ class CreateConnectionToolCallbackTest {
         JsonNode node = jsonMapper.readTree(result);
 
         assertThat(node.has("error")).isTrue();
+    }
+
+    @Test
+    void testRejectsAComponentOutsideTheAllowList() {
+        when(componentDefinitionService.fetchComponentDefinition(eq("hubspot"), any()))
+            .thenReturn(Optional.of(mock(ComponentDefinition.class)));
+
+        Map<String, Object> context = new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext();
+
+        context.put(AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack"));
+
+        String result = callback.call("{\"componentName\":\"hubspot\"}", new ToolContext(context));
+
+        assertThat(result).contains("This chat can't use hubspot");
     }
 }

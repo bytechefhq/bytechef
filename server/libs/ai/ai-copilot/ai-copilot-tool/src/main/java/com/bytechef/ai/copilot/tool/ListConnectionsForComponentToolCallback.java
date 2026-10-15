@@ -23,6 +23,7 @@ import com.bytechef.ai.copilot.connection.CopilotConnectionLister.CopilotConnect
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.util.ComponentSlugUtils;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -142,6 +143,10 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
 
                 resolvedFromComponentName = componentName;
                 componentName = resolvedComponentName;
+            }
+
+            if (!AllowedComponentNamesUtils.isAllowed(componentName, toolContext)) {
+                return toolError(AllowedComponentNamesUtils.getNotAllowedMessage(List.of(componentName)));
             }
 
             Integer inputComponentVersion = input.componentVersion();

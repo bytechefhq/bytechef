@@ -19,10 +19,12 @@ package com.bytechef.ai.copilot.tool;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.util.ComponentSlugUtils;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -131,6 +133,10 @@ public class SelectConnectionToolCallback implements ToolCallback {
                     return toolError(
                         ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
                 }
+            }
+
+            if (!AllowedComponentNamesUtils.isAllowed(componentName, toolContext)) {
+                return toolError(AllowedComponentNamesUtils.getNotAllowedMessage(List.of(componentName)));
             }
 
             String componentLabel = resolveComponentLabel(componentDefinition.get(), componentName);
