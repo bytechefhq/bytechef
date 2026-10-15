@@ -83,6 +83,7 @@ No database to set up. ByteChef stores everything in an embedded H2 file under `
 ```bash
 docker run --name bytechef -it -p 8080:8080 \
     --env BYTECHEF_DATABASE=h2 \
+    --env BYTECHEF_AI_MEMORY_PROVIDER=in_memory \
     -v ~/.bytechef:/root/.bytechef \
     docker.bytechef.io/bytechef/bytechef:latest
 ```
