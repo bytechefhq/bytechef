@@ -31,17 +31,29 @@ import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embed
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {AuthorizationType} from '@/shared/middleware/platform/configuration';
+import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
-import {useForm} from 'react-hook-form';
+import {useForm, useWatch} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import IntegrationInstanceConfigurationDialogBasicStep from './IntegrationInstanceConfigurationDialogBasicStep';
 import IntegrationInstanceConfigurationDialogWorkflowsStep from './IntegrationInstanceConfigurationDialogWorkflowsStep';
+
+const OAUTH2_AUTHORIZATION_TYPES: string[] = [
+    AuthorizationType.Oauth2AuthorizationCode,
+    AuthorizationType.Oauth2AuthorizationCodePkce,
+    AuthorizationType.Oauth2ImplicitCode,
+];
+
+const getDefaultAuthorizationType = (authorizations?: Authorization[]) =>
+    (
+        authorizations?.find((authorization) => OAUTH2_AUTHORIZATION_TYPES.includes(authorization.type!)) ??
+        authorizations?.[0]
+    )?.type as IntegrationInstanceConfiguration['authorizationType'];
 
 interface IntegrationInstanceConfigurationDialogProps {
     excludeWorkflowIds?: Set<string>;
@@ -68,6 +80,7 @@ const IntegrationInstanceConfigurationDialog = ({
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
+    const defaultedAuthorizationsRef = useRef<Authorization[]>(undefined);
     const initializedConfigKeyRef = useRef<string>('');
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -79,6 +92,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const form = useForm<IntegrationInstanceConfiguration>({
         defaultValues: {
+            authorizationType: integrationInstanceConfiguration?.authorizationType,
             description: integrationInstanceConfiguration?.description || undefined,
             enabled: integrationInstanceConfiguration?.enabled || false,
             integrationId: integrationInstanceConfiguration?.integrationId || undefined,
@@ -132,12 +146,21 @@ const IntegrationInstanceConfigurationDialog = ({
         componentName: integration?.componentName as string,
     });
 
-    const oAuth2Authorization = connectionDefinition?.authorizations?.find(
-        (authorization) =>
-            authorization.type === AuthorizationType.Oauth2AuthorizationCode ||
-            authorization.type === AuthorizationType.Oauth2AuthorizationCodePkce ||
-            authorization.type === AuthorizationType.Oauth2ImplicitCode
+    const authorizations = connectionDefinition?.authorizations;
+
+    const selectedAuthorizationType = useWatch({control, name: 'authorizationType'});
+
+    const selectedAuthorization = authorizations?.find(
+        (authorization) => authorization.type === selectedAuthorizationType
     );
+
+    const oAuth2Authorization =
+        selectedAuthorization && OAUTH2_AUTHORIZATION_TYPES.includes(selectedAuthorization.type!)
+            ? selectedAuthorization
+            : undefined;
+
+    const authorizationTypePending =
+        !integrationInstanceConfiguration?.id && !!curIntegrationId && !selectedAuthorizationType;
 
     const queryClient = useQueryClient();
 
@@ -172,6 +195,7 @@ const IntegrationInstanceConfigurationDialog = ({
         {
             content: (
                 <IntegrationInstanceConfigurationDialogBasicStep
+                    authorizations={authorizations}
                     control={control}
                     curIntegrationId={curIntegrationId}
                     curIntegrationVersion={curIntegrationVersion}
@@ -275,7 +299,7 @@ const IntegrationInstanceConfigurationDialog = ({
         } else {
             createIntegrationInstanceConfigurationMutation.mutate({
                 ...formData,
-                authorizationType: oAuth2Authorization?.type || connectionDefinition?.authorizations?.[0].type,
+                authorizationType: formData.authorizationType || getDefaultAuthorizationType(authorizations),
                 environmentId: currentEnvironmentId,
                 integrationInstanceConfigurationWorkflows: formData.integrationInstanceConfigurationWorkflows?.map(
                     (integrationInstanceConfigurationWorkflow) => {
@@ -297,6 +321,21 @@ const IntegrationInstanceConfigurationDialog = ({
     const isSaving =
         !!createIntegrationInstanceConfigurationMutation.isPending ||
         !!updateIntegrationInstanceConfigurationMutation.isPending;
+
+    useEffect(() => {
+        if (integrationInstanceConfiguration?.id || !authorizations?.length) {
+            return;
+        }
+
+        if (
+            defaultedAuthorizationsRef.current !== authorizations ||
+            !authorizations.some((authorization) => authorization.type === selectedAuthorizationType)
+        ) {
+            defaultedAuthorizationsRef.current = authorizations;
+
+            setValue('authorizationType', getDefaultAuthorizationType(authorizations));
+        }
+    }, [authorizations, integrationInstanceConfiguration?.id, selectedAuthorizationType, setValue]);
 
     useEffect(() => {
         if (!workflows?.length) {
@@ -463,7 +502,11 @@ const IntegrationInstanceConfigurationDialog = ({
                                             oAuth2Authorization ||
                                             workflows === undefined ||
                                             (workflows && workflows.length > 0)) && (
-                                            <Button label="Next" onClick={handleSubmit(handleNextClick)} />
+                                            <Button
+                                                disabled={authorizationTypePending}
+                                                label="Next"
+                                                onClick={handleSubmit(handleNextClick)}
+                                            />
                                         )}
 
                                     {((!updateIntegrationVersion && integrationInstanceConfiguration?.id) ||
@@ -474,7 +517,7 @@ const IntegrationInstanceConfigurationDialog = ({
                                             workflows !== undefined &&
                                             workflows.length === 0)) && (
                                         <Button
-                                            disabled={isSaving}
+                                            disabled={isSaving || authorizationTypePending}
                                             icon={isSaving ? <LoadingIcon /> : undefined}
                                             label="Save"
                                             onClick={handleSubmit(handleSaveClick)}
