@@ -14,6 +14,7 @@ import TagList from '@/shared/components/TagList';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
+import getCodeWorkflowLanguageLabel from '@/shared/util/codeWorkflowLanguage-utils';
 import {
     ChevronDownIcon,
     CodeIcon,
@@ -133,6 +134,17 @@ const AutomationWorkflowProjectListItem = ({
                             >
                                 {project.name}
                             </button>
+
+                            {project.codeWorkflowProject && (
+                                <Badge
+                                    label={
+                                        getCodeWorkflowLanguageLabel(project.codeWorkflowLanguage ?? undefined) ??
+                                        'Code'
+                                    }
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
+                            )}
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
