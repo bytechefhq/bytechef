@@ -17,7 +17,7 @@ describe('useActivationDialog', () => {
             useActivationDialog({baseUrl: 'https://api.example.com', jwtToken: 'ey', workflowTemplateId: 'wf-1'})
         );
 
-        expect(document.getElementById('activation-dialog-portal')).not.toBeNull();
+        expect(document.querySelectorAll('[data-bytechef-activation-dialog]')).toHaveLength(1);
 
         await act(async () => result.current.openDialog());
 
@@ -27,5 +27,38 @@ describe('useActivationDialog', () => {
         await act(async () => result.current.closeDialog());
 
         expect(renderMock.mock.calls[renderMock.mock.calls.length - 1][0]).toBeNull();
+    });
+
+    it('gives each hook instance its own container and removes it on unmount', async () => {
+        const renderMocks = [vi.fn(), vi.fn()];
+        const containers: unknown[] = [];
+
+        vi.mocked(createRoot).mockImplementation((container) => {
+            containers.push(container);
+
+            return {render: renderMocks[containers.length - 1], unmount: vi.fn()};
+        });
+
+        const first = renderHook(() => useActivationDialog({jwtToken: 'ey', workflowTemplateId: 'wf-1'}));
+        const second = renderHook(() => useActivationDialog({jwtToken: 'ey', workflowTemplateId: 'wf-2'}));
+
+        expect(document.querySelectorAll('[data-bytechef-activation-dialog]')).toHaveLength(2);
+
+        await act(async () => first.result.current.openDialog());
+        await act(async () => second.result.current.openDialog());
+
+        expect(containers).toHaveLength(2);
+        expect(containers[0]).not.toBe(containers[1]);
+        expect(renderMocks[0].mock.calls[0][0]).not.toBeNull();
+        expect(renderMocks[1].mock.calls[0][0]).not.toBeNull();
+
+        first.unmount();
+        second.unmount();
+
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        expect(document.querySelectorAll('[data-bytechef-activation-dialog]')).toHaveLength(0);
     });
 });

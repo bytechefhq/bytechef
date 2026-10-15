@@ -9,15 +9,13 @@ interface ActivationDialogHookReturnType {
     openDialog: () => void;
 }
 
-const PORTAL_ID = 'activation-dialog-portal';
-
 export default function useActivationDialog({
     onClose,
     ...dialogProps
 }: UseActivationDialogProps): ActivationDialogHookReturnType {
     const [isOpen, setIsOpen] = useState(false);
 
-    const portalContainerRef = useRef<HTMLElement | null>(null);
+    const portalContainerRef = useRef<HTMLDivElement | null>(null);
     const rootRef = useRef<ReturnType<typeof createRoot> | null>(null);
 
     const openDialog = useCallback(() => setIsOpen(true), []);
@@ -29,15 +27,11 @@ export default function useActivationDialog({
     }, [onClose]);
 
     useEffect(() => {
-        let container = document.getElementById(PORTAL_ID);
+        const container = document.createElement('div');
 
-        if (!container) {
-            container = document.createElement('div');
+        container.setAttribute('data-bytechef-activation-dialog', '');
 
-            container.id = PORTAL_ID;
-
-            document.body.appendChild(container);
-        }
+        document.body.appendChild(container);
 
         portalContainerRef.current = container;
 
@@ -45,14 +39,13 @@ export default function useActivationDialog({
             const root = rootRef.current;
 
             rootRef.current = null;
+            portalContainerRef.current = null;
 
-            if (root) {
-                queueMicrotask(() => root.unmount());
-            }
+            queueMicrotask(() => {
+                root?.unmount();
 
-            if (container && container.parentNode && container.childNodes.length === 0) {
-                container.parentNode.removeChild(container);
-            }
+                container.remove();
+            });
         };
     }, []);
 

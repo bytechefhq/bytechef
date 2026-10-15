@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useReducer, useState} from 'react';
+import {MutableRefObject, useCallback, useEffect, useMemo, useReducer, useRef, useState} from 'react';
 import {ApiResponseError, createApiClient} from '../shared/apiClient';
 import dialogStyles from '../shared/dialog.module.css';
 import XIcon from '../connect-dialog/assets/x.svg';
@@ -148,6 +148,7 @@ const ConnectRow = ({
 };
 
 interface ActivationBodyProps {
+    connectOpenRef: MutableRefObject<boolean>;
     baseUrl: string;
     connectionCreationAllowed: boolean;
     environment: string;
@@ -161,6 +162,7 @@ interface ActivationBodyProps {
 }
 
 const ActivationBody = ({
+    connectOpenRef,
     baseUrl,
     connectionCreationAllowed,
     environment,
@@ -325,7 +327,11 @@ const ActivationBody = ({
                                 connections={connectionsByComponent[component.name] ?? []}
                                 highlighted={state.highlightedComponent === component.name}
                                 key={component.name}
-                                onConnect={() => setConnectingComponent(component)}
+                                onConnect={() => {
+                                    connectOpenRef.current = true;
+
+                                    setConnectingComponent(component);
+                                }}
                                 onSelect={(connectionId) =>
                                     dispatch({componentName: component.name, connectionId, type: 'SELECT_CONNECTION'})
                                 }
@@ -432,7 +438,11 @@ const ActivationBody = ({
                     key={connectingComponent.name}
                     mode={mode}
                     onConnected={(connectionId) => handleConnected(connectingComponent.name, connectionId)}
-                    onDone={() => setConnectingComponent(undefined)}
+                    onDone={() => {
+                        connectOpenRef.current = false;
+
+                        setConnectingComponent(undefined);
+                    }}
                 />
             )}
         </>
@@ -451,6 +461,8 @@ const ActivationDialog = ({
     workflowTemplateId,
 }: ActivationDialogProps) => {
     const [loadResult, setLoadResult] = useState<LoadResultType>();
+
+    const connectOpenRef = useRef(false);
 
     const {fetch} = useMemo(() => createApiClient(baseUrl, environment, jwtToken), [baseUrl, environment, jwtToken]);
 
@@ -485,7 +497,7 @@ const ActivationDialog = ({
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
+            if (event.key === 'Escape' && !connectOpenRef.current) {
                 onClose();
             }
         };
@@ -527,6 +539,7 @@ const ActivationDialog = ({
                     </main>
                 ) : template ? (
                     <ActivationBody
+                        connectOpenRef={connectOpenRef}
                         baseUrl={baseUrl}
                         connectionCreationAllowed={connectionCreationAllowed}
                         environment={environment}
