@@ -51,6 +51,9 @@ const AiAgentTestingPanel = lazy(
     () =>
         import('@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel')
 );
+const AutomationWorkflowProjectCodeWorkflowDetail = lazy(
+    () => import('@/pages/platform/code-workflow/AutomationWorkflowProjectCodeWorkflowDetail')
+);
 const IntegrationCodeWorkflowDetail = lazy(
     () => import('@/pages/platform/code-workflow/IntegrationCodeWorkflowDetail')
 );
@@ -151,7 +154,13 @@ const WorkflowEditorLayout = ({
 
     const issues = useWorkflowIssues();
 
-    const {codeWorkflow, codeWorkflowLanguage, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {
+        automationWorkflowProjectId,
+        codeWorkflow,
+        codeWorkflowLanguage,
+        invalidateWorkflowQueries,
+        updateWorkflowMutation,
+    } = useWorkflowEditor();
     const readOnly = useWorkflowEditorReadOnly();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
@@ -251,6 +260,17 @@ const WorkflowEditorLayout = ({
                                 source to edit here — rebuild the JAR and deploy it again to change them.
                             </div>
                         </div>
+                    ) : isCodeWorkflow && codeWorkflowLanguage && automationWorkflowProjectId ? (
+                        <Suspense>
+                            <AutomationWorkflowProjectCodeWorkflowDetail
+                                automationWorkflowProjectId={automationWorkflowProjectId}
+                                headerless
+                                invalidateWorkflowQueries={invalidateWorkflowQueries}
+                                language={codeWorkflowLanguage}
+                                onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
+                                testConfigurationDisabled={testConfigurationDisabled}
+                            />
+                        </Suspense>
                     ) : isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
                         <Suspense>
                             <IntegrationCodeWorkflowDetail

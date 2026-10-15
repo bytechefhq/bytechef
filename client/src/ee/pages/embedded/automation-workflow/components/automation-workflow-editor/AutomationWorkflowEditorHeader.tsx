@@ -17,6 +17,10 @@ import AutomationWorkflowProjectDialog, {
 import {useEmbeddedWorkflowViewOnlyNotice} from '@/ee/pages/embedded/shared/hooks/useEmbeddedWorkflowViewOnlyNotice';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
+import CodeWorkflowHeaderActions, {
+    CodeWorkflowSaveButton,
+} from '@/pages/platform/code-workflow/components/CodeWorkflowHeaderActions';
+import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
 import WorkflowViewOnlyBadge from '@/pages/platform/workflow-editor/components/WorkflowViewOnlyBadge';
 import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
@@ -86,6 +90,12 @@ const AutomationWorkflowEditorHeader = ({
         }))
     );
     const workflow = useWorkflowDataStore((state) => state.workflow);
+    const {codeWorkflowDirty, codeWorkflowSaving} = useCodeWorkflowHeaderStore(
+        useShallow((state) => ({
+            codeWorkflowDirty: state.dirty,
+            codeWorkflowSaving: state.saving,
+        }))
+    );
 
     const copilotLayoutShifted = useCopilotLayoutShifted();
 
@@ -352,8 +362,11 @@ const AutomationWorkflowEditorHeader = ({
             </div>
 
             <div className="flex items-center gap-1">
+                {project.codeWorkflowProject && <CodeWorkflowHeaderActions />}
+
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
+                    leadingAction={project.codeWorkflowProject ? <CodeWorkflowSaveButton /> : undefined}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
                     readOnly={readOnly}
@@ -363,6 +376,10 @@ const AutomationWorkflowEditorHeader = ({
 
                 {canEditWorkflowOnUnion && canPublishScope && (
                     <PublishPopover
+                        disabled={
+                            project.codeWorkflowProject &&
+                            (codeWorkflowDirty || codeWorkflowSaving || !project.codeWorkflowDraftPublishable)
+                        }
                         isPending={publishProjectMutationIsPending}
                         onPublishProjectSubmit={handlePublishProjectSubmit}
                     />

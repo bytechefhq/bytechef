@@ -60,6 +60,92 @@ const AutomationWorkflowEditorSettingsMenu = ({
     const canEditWorkflow = useHasEmbeddedScope('WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
     const canManageProjectSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
 
+    const projectMenuItems = (
+        <>
+            {canManageProjectSettings && (
+                <DropdownMenuItem
+                    icon={<EditIcon />}
+                    label="Edit"
+                    onClick={() => {
+                        setOpen(false);
+                        onEditProjectClick();
+                    }}
+                />
+            )}
+
+            {canCreateProject && !codeWorkflowProject && (
+                <DropdownMenuItem
+                    icon={<CopyIcon />}
+                    label="Duplicate"
+                    onClick={() => {
+                        setOpen(false);
+                        onDuplicateProjectClick();
+                    }}
+                />
+            )}
+
+            <DropdownMenuItem
+                icon={<DownloadIcon />}
+                label="Export"
+                onClick={() => {
+                    setOpen(false);
+                    onExportProjectClick();
+                }}
+            />
+
+            <DropdownMenuSeparator />
+
+            {canCreateWorkflow && !codeWorkflowProject && (
+                <>
+                    <DropdownMenuItem
+                        icon={<PlusIcon />}
+                        label="New Workflow"
+                        onClick={() => {
+                            setOpen(false);
+                            onNewWorkflowClick();
+                        }}
+                    />
+
+                    <DropdownMenuItem
+                        icon={<UploadIcon />}
+                        label="Import Workflow"
+                        onClick={() => {
+                            setOpen(false);
+                            onImportWorkflowClick();
+                        }}
+                    />
+
+                    <DropdownMenuSeparator />
+                </>
+            )}
+
+            <DropdownMenuItem
+                icon={<HistoryIcon />}
+                label="Project History"
+                onClick={() => {
+                    setOpen(false);
+                    onProjectHistoryClick();
+                }}
+            />
+
+            {canDeleteProject && (
+                <>
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onClick={() => {
+                            setOpen(false);
+                            onDeleteProjectClick();
+                        }}
+                        variant="destructive"
+                    />
+                </>
+            )}
+        </>
+    );
+
     return (
         <DropdownMenu onOpenChange={setOpen} open={open}>
             <Tooltip>
@@ -72,162 +158,88 @@ const AutomationWorkflowEditorSettingsMenu = ({
                     </TooltipTrigger>
                 </DropdownMenuTrigger>
 
-                <TooltipContent>Project and workflow settings</TooltipContent>
+                <TooltipContent>
+                    {codeWorkflowProject ? 'Project settings' : 'Project and workflow settings'}
+                </TooltipContent>
             </Tooltip>
 
             <DropdownMenuContent align="end">
-                <Tabs aria-label="Settings menu" defaultValue="workflow">
-                    <TabsList className="rounded-none">
-                        <TabsTrigger
-                            aria-label="Workflow tab"
-                            className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
-                            value="workflow"
-                        >
-                            Workflow
-                        </TabsTrigger>
+                {codeWorkflowProject ? (
+                    projectMenuItems
+                ) : (
+                    <Tabs aria-label="Settings menu" defaultValue="workflow">
+                        <TabsList className="rounded-none">
+                            <TabsTrigger
+                                aria-label="Workflow tab"
+                                className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
+                                value="workflow"
+                            >
+                                Workflow
+                            </TabsTrigger>
 
-                        <TabsTrigger
-                            aria-label="Project tab"
-                            className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
-                            value="project"
-                        >
-                            Project
-                        </TabsTrigger>
-                    </TabsList>
+                            <TabsTrigger
+                                aria-label="Project tab"
+                                className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
+                                value="project"
+                            >
+                                Project
+                            </TabsTrigger>
+                        </TabsList>
 
-                    <TabsContent className="mt-0" value="workflow">
-                        {canEditWorkflow && (
-                            <DropdownMenuItem
-                                icon={<EditIcon />}
-                                label="Edit"
-                                onClick={() => {
-                                    setOpen(false);
-                                    onEditWorkflowClick();
-                                }}
-                            />
-                        )}
-
-                        {canCreateWorkflow && (
-                            <DropdownMenuItem
-                                icon={<CopyIcon />}
-                                label="Duplicate"
-                                onClick={() => {
-                                    setOpen(false);
-                                    onDuplicateWorkflowClick();
-                                }}
-                            />
-                        )}
-
-                        <DropdownMenuItem
-                            icon={<DownloadIcon />}
-                            label="Export"
-                            onClick={() => {
-                                setOpen(false);
-                                onExportWorkflowClick();
-                            }}
-                        />
-
-                        {canDeleteWorkflow && (
-                            <>
-                                <DropdownMenuSeparator />
-
+                        <TabsContent className="mt-0" value="workflow">
+                            {canEditWorkflow && (
                                 <DropdownMenuItem
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
+                                    icon={<EditIcon />}
+                                    label="Edit"
                                     onClick={() => {
                                         setOpen(false);
-                                        onDeleteWorkflowClick();
+                                        onEditWorkflowClick();
                                     }}
-                                    variant="destructive"
                                 />
-                            </>
-                        )}
-                    </TabsContent>
+                            )}
 
-                    <TabsContent className="mt-0" value="project">
-                        {canManageProjectSettings && (
+                            {canCreateWorkflow && (
+                                <DropdownMenuItem
+                                    icon={<CopyIcon />}
+                                    label="Duplicate"
+                                    onClick={() => {
+                                        setOpen(false);
+                                        onDuplicateWorkflowClick();
+                                    }}
+                                />
+                            )}
+
                             <DropdownMenuItem
-                                icon={<EditIcon />}
-                                label="Edit"
+                                icon={<DownloadIcon />}
+                                label="Export"
                                 onClick={() => {
                                     setOpen(false);
-                                    onEditProjectClick();
+                                    onExportWorkflowClick();
                                 }}
                             />
-                        )}
 
-                        {canCreateProject && !codeWorkflowProject && (
-                            <DropdownMenuItem
-                                icon={<CopyIcon />}
-                                label="Duplicate"
-                                onClick={() => {
-                                    setOpen(false);
-                                    onDuplicateProjectClick();
-                                }}
-                            />
-                        )}
+                            {canDeleteWorkflow && (
+                                <>
+                                    <DropdownMenuSeparator />
 
-                        <DropdownMenuItem
-                            icon={<DownloadIcon />}
-                            label="Export"
-                            onClick={() => {
-                                setOpen(false);
-                                onExportProjectClick();
-                            }}
-                        />
+                                    <DropdownMenuItem
+                                        icon={<Trash2Icon />}
+                                        label="Delete"
+                                        onClick={() => {
+                                            setOpen(false);
+                                            onDeleteWorkflowClick();
+                                        }}
+                                        variant="destructive"
+                                    />
+                                </>
+                            )}
+                        </TabsContent>
 
-                        <DropdownMenuSeparator />
-
-                        {canCreateWorkflow && (
-                            <>
-                                <DropdownMenuItem
-                                    icon={<PlusIcon />}
-                                    label="New Workflow"
-                                    onClick={() => {
-                                        setOpen(false);
-                                        onNewWorkflowClick();
-                                    }}
-                                />
-
-                                <DropdownMenuItem
-                                    icon={<UploadIcon />}
-                                    label="Import Workflow"
-                                    onClick={() => {
-                                        setOpen(false);
-                                        onImportWorkflowClick();
-                                    }}
-                                />
-
-                                <DropdownMenuSeparator />
-                            </>
-                        )}
-
-                        <DropdownMenuItem
-                            icon={<HistoryIcon />}
-                            label="Project History"
-                            onClick={() => {
-                                setOpen(false);
-                                onProjectHistoryClick();
-                            }}
-                        />
-
-                        {canDeleteProject && (
-                            <>
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuItem
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={() => {
-                                        setOpen(false);
-                                        onDeleteProjectClick();
-                                    }}
-                                    variant="destructive"
-                                />
-                            </>
-                        )}
-                    </TabsContent>
-                </Tabs>
+                        <TabsContent className="mt-0" value="project">
+                            {projectMenuItems}
+                        </TabsContent>
+                    </Tabs>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
