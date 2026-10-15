@@ -159,7 +159,25 @@ export default function useClusterElementNodes(clusterRootIds: string[]): UseClu
 
         return parameters;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [clusterRootComponentDefinitions, clusterRootIdsKey, failedDefinitionKeys, workflowDefinitionTasks]);
+    }, [clusterElementsSignature, clusterRootComponentDefinitions, clusterRootIdsKey, failedDefinitionKeys]);
+
+    const missingNestedQueryParameters = useMemo(() => {
+        const missingParametersByComponentName = new Map<string, {componentName: string; componentVersion: number}>();
+
+        for (const parameter of clusterRootQueryParameters) {
+            if (
+                missingParametersByComponentName.has(parameter.componentName) ||
+                nestedClusterRootsComponentDefinitions?.[parameter.componentName] !== undefined ||
+                failedDefinitionKeys[nestedFailureKey(parameter.componentName)]
+            ) {
+                continue;
+            }
+
+            missingParametersByComponentName.set(parameter.componentName, parameter);
+        }
+
+        return Array.from(missingParametersByComponentName.values());
+    }, [clusterRootQueryParameters, failedDefinitionKeys, nestedClusterRootsComponentDefinitions]);
 
     const getClusterRootDefinitionQuery = useCallback(
         (roots: Array<{componentName: string; componentVersion: number}>) =>
@@ -272,30 +290,20 @@ export default function useClusterElementNodes(clusterRootIds: string[]): UseClu
 
     useEffect(() => {
         const processClusterElementsRequirementsMet =
-            !!workflow.definition && (clusterRootQueryParameters.length > 0 || rootComponentQueryParameters.length > 0);
+            missingNestedQueryParameters.length > 0 || rootComponentQueryParameters.length > 0;
 
         if (!processClusterElementsRequirementsMet) {
             return;
         }
 
         const getClusterRootComponentDefinitions = async () => {
-            const clusterRootDefinitionQueries = getClusterRootDefinitionQuery(clusterRootQueryParameters);
-            const uniqueNestedQueriesByComponentName = new Map<string, (typeof clusterRootDefinitionQueries)[number]>();
-
-            for (const query of clusterRootDefinitionQueries) {
-                if (
-                    !uniqueNestedQueriesByComponentName.has(query.componentName) &&
-                    !failedDefinitionKeys[nestedFailureKey(query.componentName)]
-                ) {
-                    uniqueNestedQueriesByComponentName.set(query.componentName, query);
-                }
-            }
+            const missingNestedQueries = getClusterRootDefinitionQuery(missingNestedQueryParameters);
 
             const resolvedNestedDefinitions: Record<string, NestedClusterRootComponentDefinitionType> = {};
             const newlyFailedComponentNames: string[] = [];
 
             await Promise.all(
-                Array.from(uniqueNestedQueriesByComponentName.entries()).map(async ([componentName, query]) => {
+                missingNestedQueries.map(async ({componentName, ...query}) => {
                     try {
                         const definition = await queryClient.fetchQuery({
                             queryFn: query.queryFn,
@@ -386,12 +394,11 @@ export default function useClusterElementNodes(clusterRootIds: string[]): UseClu
         };
 
         void getClusterRootComponentDefinitions();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        workflow.definition,
-        clusterRootQueryParameters,
+        missingNestedQueryParameters,
         rootComponentQueryParameters,
         getClusterRootDefinitionQuery,
+        queryClient,
         setClusterRootComponentDefinition,
         setNestedClusterRootsComponentDefinitions,
     ]);
