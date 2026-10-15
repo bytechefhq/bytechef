@@ -66,7 +66,7 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
         }
     }
 
-    public void awaitTermination(long jobId, @Nullable Duration timeout) throws InterruptedException {
+    public Job.@Nullable Status awaitTermination(long jobId, @Nullable Duration timeout) throws InterruptedException {
         long deadline = timeout == null ? 0 : System.currentTimeMillis() + timeout.toMillis();
 
         Job.Status status;
@@ -86,7 +86,7 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
 
                     exitCode.set(EXIT_CODE_FAILURE);
 
-                    return;
+                    return null;
                 }
 
                 monitor.wait(remaining);
@@ -96,6 +96,8 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
         }
 
         exitCode.set(status == Job.Status.COMPLETED ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
+
+        return status;
     }
 
     @Override

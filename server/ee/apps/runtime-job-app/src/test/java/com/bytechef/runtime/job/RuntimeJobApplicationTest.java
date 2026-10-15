@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,10 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.runtime.job.executor.JobRunner;
 import com.bytechef.runtime.job.listener.JobStatusApplicationEventListener;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -31,6 +36,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.ApplicationArguments;
 
 /**
@@ -38,6 +45,7 @@ import org.springframework.boot.ApplicationArguments;
  *
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class RuntimeJobApplicationTest {
 
     private ApplicationArguments applicationArguments;
@@ -62,7 +70,7 @@ class RuntimeJobApplicationTest {
      * makes every remaining {@code @Async} hop fail with "SimpleAsyncTaskExecutor is not active".
      */
     @Test
-    void testRunBlocksUntilJobReachesTerminalStatus() throws InterruptedException {
+    void testRunBlocksUntilJobReachesTerminalStatus() throws InterruptedException, IOException {
         AtomicReference<Throwable> failure = new AtomicReference<>();
         CountDownLatch jobSubmitted = new CountDownLatch(1);
         CountDownLatch runReturned = new CountDownLatch(1);
@@ -100,7 +108,7 @@ class RuntimeJobApplicationTest {
     }
 
     @Test
-    void testRunGivesUpOnceTheTimeoutElapses() throws InterruptedException {
+    void testRunGivesUpOnceTheTimeoutElapses() throws InterruptedException, IOException {
         when(applicationArguments.getOptionValues("timeout")).thenReturn(List.of("100ms"));
 
         runtimeJobApplication.run(applicationArguments);
@@ -126,7 +134,7 @@ class RuntimeJobApplicationTest {
      * {@code --parameters}, so the runner must not blindly take the first element.
      */
     @Test
-    void testRunAcceptsOptionsPassedWithoutAValue() throws InterruptedException {
+    void testRunAcceptsOptionsPassedWithoutAValue() throws InterruptedException, IOException {
         when(applicationArguments.getOptionValues("parameters")).thenReturn(List.of());
         when(applicationArguments.getOptionValues("connections")).thenReturn(List.of());
         when(jobRunner.run(anyString(), any())).thenReturn(1L);
@@ -136,5 +144,39 @@ class RuntimeJobApplicationTest {
         runtimeJobApplication.run(applicationArguments);
 
         verify(jobRunner).run("/workflows/workflow1.json", Map.of());
+    }
+
+    @Test
+    void testRunWritesTheOutputsOfACompletedJobToTheOutputsFile(@TempDir Path tempDir)
+        throws InterruptedException, IOException {
+
+        Path outputsFile = tempDir.resolve("outputs.json");
+
+        when(applicationArguments.getOptionValues("outputs-file")).thenReturn(List.of(outputsFile.toString()));
+        when(jobRunner.run(anyString(), any())).thenReturn(1L);
+        doAnswer(invocation -> Map.of("answer", 42)).when(jobRunner)
+            .getOutputs(1L);
+
+        jobStatusApplicationEventListener.onApplicationEvent(new JobStatusApplicationEvent(1L, Job.Status.COMPLETED));
+
+        runtimeJobApplication.run(applicationArguments);
+
+        assertEquals("{\"answer\":42}", Files.readString(outputsFile));
+    }
+
+    @Test
+    void testRunDoesNotReadOutputsOfAFailedJob(@TempDir Path tempDir) throws InterruptedException, IOException {
+        Path outputsFile = tempDir.resolve("outputs.json");
+
+        when(applicationArguments.getOptionValues("outputs-file")).thenReturn(List.of(outputsFile.toString()));
+        when(jobRunner.run(anyString(), any())).thenReturn(1L);
+
+        jobStatusApplicationEventListener.onApplicationEvent(new JobStatusApplicationEvent(1L, Job.Status.FAILED));
+
+        runtimeJobApplication.run(applicationArguments);
+
+        verify(jobRunner, never()).getOutputs(1L);
+        assertFalse(Files.exists(outputsFile));
+        assertEquals(1, jobStatusApplicationEventListener.getExitCode());
     }
 }
