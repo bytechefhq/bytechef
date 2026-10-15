@@ -40,6 +40,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,6 +86,7 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
         @AuditData(key = "knowledgeBaseId", value = "#knowledgeBaseId"),
         @AuditData(key = "filename", value = "#filename")
     })
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
     public KnowledgeBaseDocument createKnowledgeBaseDocument(
         Long knowledgeBaseId, String filename, String contentType, InputStream inputStream) {
 
