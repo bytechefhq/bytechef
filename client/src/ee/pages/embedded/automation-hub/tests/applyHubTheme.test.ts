@@ -132,7 +132,16 @@ describe('applyHubTheme', () => {
         expect(root.style.getPropertyValue('--bytechef-dialog-hover')).toBe('#eeeeee');
         expect(root.style.getPropertyValue('--bytechef-dialog-border')).toBe('#abcdef');
         expect(root.style.getPropertyValue('--bytechef-dialog-primary')).toBe('#ff0000');
-        expect(root.style.getPropertyValue('--bytechef-dialog-primary-hover')).toBe('#ff0000');
+        expect(root.style.getPropertyValue('--bytechef-dialog-primary-hover')).toBe(
+            'color-mix(in srgb, #ff0000 85%, black)'
+        );
+        expect(root.style.getPropertyValue('--bytechef-dialog-primary-foreground')).toBe('#ffffff');
+    });
+
+    it('gives the SDK dialog primary button dark text on a light brand colour', () => {
+        applyHubTheme({primaryColor: '#ffd400'}, root);
+
+        expect(root.style.getPropertyValue('--bytechef-dialog-primary-foreground')).toBe('#111111');
     });
 
     it('gives the SDK dialogs a text colour that reads on the card colour', () => {
