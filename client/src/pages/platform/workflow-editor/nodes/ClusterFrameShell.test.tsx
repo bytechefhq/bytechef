@@ -7,10 +7,12 @@ import {act, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+import {useAiAgentTestingChatStore, useTestingModeStore} from '../../cluster-element-editor/ai-agent-editor/stores';
 import {useClusterElementsCanvasDialogStore} from '../components/stores/useClusterElementsCanvasDialogStore';
 import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import ClusterFrameShell from './ClusterFrameShell';
 
 vi.mock('@xyflow/react', () => ({
@@ -239,6 +241,79 @@ describe('ClusterFrameShell', () => {
         expect(useClusterElementsCanvasDialogStore.getState().testingPanelOpen).toBe(true);
         expect(useWorkflowEditorStore.getState().clusterElementsCanvasOpen).toBe(false);
         expect(useWorkflowEditorStore.getState().rootClusterElementNodeData?.workflowNodeName).toBe('aiAgent_1');
+    });
+
+    it('starts a fresh conversation when the playground moves to another agent', async () => {
+        const user = userEvent.setup();
+
+        useWorkflowEditorStore.setState({
+            rootClusterElementNodeData: {
+                componentName: 'aiAgent',
+                name: 'aiAgent_2',
+                workflowNodeName: 'aiAgent_2',
+            } as NodeDataType,
+        });
+        useTestingModeStore.setState({isTestingAgent: true});
+        useAiAgentTestingChatStore.setState({
+            conversationId: 'previous-conversation',
+            messages: [{content: 'hello', role: 'user'}],
+        });
+
+        render(
+            <TooltipProvider>
+                <ClusterFrameShell data={AI_AGENT_ROOT_DATA} nodeId="aiAgent_1">
+                    <div>root card</div>
+                </ClusterFrameShell>
+            </TooltipProvider>
+        );
+
+        await user.click(screen.getByLabelText('Test agent'));
+
+        expect(useTestingModeStore.getState().isTestingAgent).toBe(false);
+        expect(useAiAgentTestingChatStore.getState().messages).toEqual([]);
+        expect(useAiAgentTestingChatStore.getState().conversationId).not.toBe('previous-conversation');
+    });
+
+    it('keeps the conversation when the playground reopens on the same agent', async () => {
+        const user = userEvent.setup();
+
+        useWorkflowEditorStore.setState({rootClusterElementNodeData: AI_AGENT_ROOT_DATA});
+        useTestingModeStore.setState({isTestingAgent: true});
+        useAiAgentTestingChatStore.setState({
+            conversationId: 'previous-conversation',
+            messages: [{content: 'hello', role: 'user'}],
+        });
+
+        render(
+            <TooltipProvider>
+                <ClusterFrameShell data={AI_AGENT_ROOT_DATA} nodeId="aiAgent_1">
+                    <div>root card</div>
+                </ClusterFrameShell>
+            </TooltipProvider>
+        );
+
+        await user.click(screen.getByLabelText('Test agent'));
+
+        expect(useTestingModeStore.getState().isTestingAgent).toBe(true);
+        expect(useAiAgentTestingChatStore.getState().conversationId).toBe('previous-conversation');
+    });
+
+    it('closes the node details panel when the playground opens', async () => {
+        const user = userEvent.setup();
+
+        useWorkflowNodeDetailsPanelStore.setState({workflowNodeDetailsPanelOpen: true});
+
+        render(
+            <TooltipProvider>
+                <ClusterFrameShell data={AI_AGENT_ROOT_DATA} nodeId="aiAgent_1">
+                    <div>root card</div>
+                </ClusterFrameShell>
+            </TooltipProvider>
+        );
+
+        await user.click(screen.getByLabelText('Test agent'));
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(false);
     });
 
     it('opens Copilot through the fresh-context contract, tagging the agent this button was clicked on', async () => {
