@@ -111,6 +111,11 @@ export function CopilotRuntimeProvider({
 
         const toolCallNamesById = new Map<string, string>();
 
+        // The copilot ends its text message at each tool call and starts a new one for the text after it, so each
+        // text message gets its own bubble. The bubble is created with the message's first text, so a message
+        // without text (a turn that only calls tools, or fails right away) leaves no empty bubble behind.
+        let textMessageHasBubble = false;
+
         const subscriber: AgentSubscriber = {
             onRunErrorEvent: ({event}) => {
                 const rawMessage = typeof event?.message === 'string' ? event.message.trim() : '';
@@ -122,10 +127,23 @@ export function CopilotRuntimeProvider({
                 addMessage({content: [{data: {message}, type: 'data-run-error'}], role: 'assistant'});
             },
             onTextMessageContentEvent: ({event, textMessageBuffer}) => {
-                appendToLastAssistantMessage(textMessageBuffer + event.delta);
+                const text = textMessageBuffer + event.delta;
+
+                if (textMessageHasBubble) {
+                    appendToLastAssistantMessage(text);
+                } else {
+                    textMessageHasBubble = true;
+
+                    addMessage({content: text, role: 'assistant'});
+                }
             },
             onTextMessageEndEvent: ({textMessageBuffer}) => {
-                appendToLastAssistantMessage(textMessageBuffer);
+                if (textMessageHasBubble) {
+                    appendToLastAssistantMessage(textMessageBuffer);
+                }
+            },
+            onTextMessageStartEvent: () => {
+                textMessageHasBubble = false;
             },
             onToolCallResultEvent: ({event}) => {
                 const toolCallName = toolCallNamesById.get(event.toolCallId);

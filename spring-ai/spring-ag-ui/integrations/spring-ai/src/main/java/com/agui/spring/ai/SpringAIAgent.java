@@ -26,6 +26,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.agui.server.EventFactory.*;
@@ -169,17 +170,22 @@ public class SpringAIAgent extends LocalAgent {
 
         final List<BaseEvent> deferredEvents = new ArrayList<>();
 
+        var textMessageStream = new TextMessageStream(messageId, subscriber);
+
+        Consumer<BaseEvent> toolEventConsumer =
+            this.splitsTextAtToolCalls() ? textMessageStream::emitToolEvent : deferredEvents::add;
+
         var assistantMessage = new AssistantMessage();
         assistantMessage.setId(messageId);
         assistantMessage.setName(this.agentId);
 
         try {
-            getChatRequest(input, content, messageId, deferredEvents, this.createSystemMessage(state, input.context()), subscriber)
+            getChatRequest(input, content, textMessageStream, toolEventConsumer, this.createSystemMessage(state, input.context()), subscriber)
                 .stream()
                 .chatResponse()
                 .contextCapture()
                 .subscribe(
-                    evt -> onEvent(subscriber, evt, assistantMessage, messageId, deferredEvents),
+                    evt -> onEvent(subscriber, evt, assistantMessage, textMessageStream),
                     err -> {
                         log.error(
                             "Agent '{}' chat stream failed for threadId={} runId={}: {}",
@@ -187,7 +193,7 @@ public class SpringAIAgent extends LocalAgent {
 
                         this.onError(input, err, subscriber);
                     },
-                    () -> onComplete(input, assistantMessage, subscriber, messageId, deferredEvents)
+                    () -> onComplete(input, assistantMessage, subscriber, textMessageStream, deferredEvents)
                 );
         } catch (AGUIException | RuntimeException e) {
             log.error("Agent '{}' failed to start chat stream for threadId={} runId={}", this.agentId, threadId, runId, e);
@@ -227,6 +233,18 @@ public class SpringAIAgent extends LocalAgent {
     }
 
     protected boolean endsTurn(ToolResponseMessage.ToolResponse toolResponse) {
+        return false;
+    }
+
+    /**
+     * Hook for subclasses to stream tool call events as each tool runs instead of after the whole run. When it
+     * returns {@code true}, the open text message is ended before a tool's events are emitted, and text the model
+     * writes after the tool call starts a new text message, so a client can show text and tool calls in the order
+     * they happened. Default returns {@code false}: one text message for the run, followed by every tool call event.
+     *
+     * @return whether text messages are split at tool calls
+     */
+    protected boolean splitsTextAtToolCalls() {
         return false;
     }
 
@@ -272,10 +290,9 @@ public class SpringAIAgent extends LocalAgent {
      *
      * @param subscriber the event subscriber to notify
      * @param evt the chat response event from Spring AI
-     * @param messageId the unique identifier for the current message
-     * @param deferredEvents Events that will be deferred and emitted later
+     * @param textMessageStream the run's text message stream the content is emitted to
      */
-    private void onEvent(AgentSubscriber subscriber, ChatResponse evt, AssistantMessage assistantMessage, String messageId, List<BaseEvent> deferredEvents) {
+    private void onEvent(AgentSubscriber subscriber, ChatResponse evt, AssistantMessage assistantMessage, TextMessageStream textMessageStream) {
         if (evt.getResult() == null) {
             return;
         }
@@ -299,10 +316,7 @@ public class SpringAIAgent extends LocalAgent {
         var content = evt.getResult().getOutput().getText();
 
         if (content != null && !content.isEmpty()) {
-            this.emitEvent(
-                textMessageContentEvent(messageId, content),
-                subscriber
-            );
+            textMessageStream.emitContent(content);
 
             assistantMessage.setContent(
                 assistantMessage.getContent() + content
@@ -322,11 +336,11 @@ public class SpringAIAgent extends LocalAgent {
      *
      * @param input the original run input parameters
      * @param subscriber the event subscriber to notify
-     * @param messageId the unique identifier for the current message
+     * @param textMessageStream the run's text message stream, ended here if it is still open
      * @param deferredEvents list of tool call events to process after message completion
      */
-    private void onComplete(RunAgentInput input, AssistantMessage assistantMessage, AgentSubscriber subscriber, String messageId, List<BaseEvent> deferredEvents) {
-        this.emitEvent(textMessageEndEvent(messageId), subscriber);
+    private void onComplete(RunAgentInput input, AssistantMessage assistantMessage, AgentSubscriber subscriber, TextMessageStream textMessageStream, List<BaseEvent> deferredEvents) {
+        textMessageStream.end();
 
         deferredEvents.forEach(deferredEvent -> {
             this.emitEvent(deferredEvent, subscriber);
@@ -371,12 +385,12 @@ public class SpringAIAgent extends LocalAgent {
      *
      * @param input the run input containing messages, tools, and context
      * @param content the user message content to send
-     * @param messageId unique identifier for the current message
-     * @param deferredEvents list to collect events for later processing
+     * @param textMessageStream the run's text message stream, whose current message parents the tool call events
+     * @param toolEventConsumer receives the tool call events, either deferred or emitted as each tool runs
      * @param systemMessage the formatted system message including state and context
      * @return configured ChatClient request specification ready for execution
      */
-    private ChatClient.ChatClientRequestSpec getChatRequest(RunAgentInput input, String content, String messageId, List<BaseEvent> deferredEvents, SystemMessage systemMessage, AgentSubscriber subscriber) throws AGUIException {
+    private ChatClient.ChatClientRequestSpec getChatRequest(RunAgentInput input, String content, TextMessageStream textMessageStream, Consumer<BaseEvent> toolEventConsumer, SystemMessage systemMessage, AgentSubscriber subscriber) throws AGUIException {
         ChatClient.ChatClientRequestSpec chatRequest = resolveChatClient(input).prompt(
             Prompt
                 .builder()
@@ -401,8 +415,8 @@ public class SpringAIAgent extends LocalAgent {
                         .stream()
                         .map((tool) -> this.toolMapper.toSpringTool(
                             tool,
-                            messageId,
-                            deferredEvents::add
+                            textMessageStream.messageId(),
+                            toolEventConsumer
                         )).toList()
                 );
             } catch (RuntimeException e) {
@@ -423,11 +437,11 @@ public class SpringAIAgent extends LocalAgent {
                         .stream()
                         .map(toolCallback -> new AgUiFunctionToolCallback(toolCallback, (AgUiToolCallbackParams params) -> {
                             var toolCallId = UUID.randomUUID().toString();
-                            deferredEvents.add(toolCallStartEvent(messageId, toolCallback.getToolDefinition().name(), toolCallId));
-                            deferredEvents.add(toolCallArgsEvent(params.arguments(), toolCallId));
-                            deferredEvents.add(toolCallEndEvent(toolCallId));
-                            deferredEvents.add(toolCallResultEvent(toolCallId, params.result(), messageId, Role.tool));
-
+                            var parentMessageId = textMessageStream.messageId();
+                            toolEventConsumer.accept(toolCallStartEvent(parentMessageId, toolCallback.getToolDefinition().name(), toolCallId));
+                            toolEventConsumer.accept(toolCallArgsEvent(params.arguments(), toolCallId));
+                            toolEventConsumer.accept(toolCallEndEvent(toolCallId));
+                            toolEventConsumer.accept(toolCallResultEvent(toolCallId, params.result(), parentMessageId, Role.tool));
 
                         }))
                         .collect(toList())
@@ -500,6 +514,55 @@ public class SpringAIAgent extends LocalAgent {
                 new TurnEndingToolCallingManager(ToolCallingManager.builder().build(), this::endsTurn))
             .conversationHistoryEnabled(!hasDownstreamMemoryAdvisor)
             .build();
+    }
+
+    /**
+     * The run's assistant text, as a sequence of AG-UI text messages.
+     *
+     * The first message starts with the run. Tool call events routed through {@link #emitToolEvent(BaseEvent)} end
+     * the open message first, and the next content after them starts a new message with a new ID. Without tool events
+     * routed here the run keeps a single message, ended by {@link #end()}. Tool execution and response streaming run
+     * on different threads but one after the other, so the methods are synchronized for visibility, not contention.
+     */
+    private final class TextMessageStream {
+
+        private final AgentSubscriber subscriber;
+        private String messageId;
+        private boolean open = true;
+
+        private TextMessageStream(String messageId, AgentSubscriber subscriber) {
+            this.messageId = messageId;
+            this.subscriber = subscriber;
+        }
+
+        private synchronized String messageId() {
+            return messageId;
+        }
+
+        private synchronized void emitContent(String content) {
+            if (!open) {
+                messageId = UUID.randomUUID().toString();
+                open = true;
+
+                emitEvent(textMessageStartEvent(messageId, "assistant"), subscriber);
+            }
+
+            emitEvent(textMessageContentEvent(messageId, content), subscriber);
+        }
+
+        private synchronized void emitToolEvent(BaseEvent toolEvent) {
+            end();
+
+            emitEvent(toolEvent, subscriber);
+        }
+
+        private synchronized void end() {
+            if (open) {
+                open = false;
+
+                emitEvent(textMessageEndEvent(messageId), subscriber);
+            }
+        }
     }
 
     /**
