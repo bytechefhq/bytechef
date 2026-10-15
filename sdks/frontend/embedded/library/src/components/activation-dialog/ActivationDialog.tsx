@@ -1,4 +1,4 @@
-import {MutableRefObject, useCallback, useEffect, useMemo, useReducer, useRef, useState} from 'react';
+import {RefObject, useCallback, useEffect, useMemo, useReducer, useRef, useState} from 'react';
 import {ApiResponseError, createApiClient} from '../shared/apiClient';
 import dialogStyles from '../shared/dialog.module.css';
 import XIcon from '../connect-dialog/assets/x.svg';
@@ -196,7 +196,7 @@ const ConnectRow = ({
 };
 
 interface ActivationBodyProps {
-    connectOpenRef: MutableRefObject<boolean>;
+    connectOpenRef: RefObject<boolean>;
     baseUrl: string;
     connectionCreationAllowed: boolean;
     environment: string;
