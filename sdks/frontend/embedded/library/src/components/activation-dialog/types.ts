@@ -1,7 +1,7 @@
-// sdks/frontend/embedded/library/src/components/activation-dialog/types.ts
 export interface TemplateComponentType {
     connectionRequired?: boolean;
     icon?: string;
+    /** Absent when the component needs a connection but no integration is set up for it. */
     integrationId?: number | null;
     name: string;
     title?: string;

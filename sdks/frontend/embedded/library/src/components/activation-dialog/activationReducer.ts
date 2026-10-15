@@ -1,4 +1,3 @@
-// sdks/frontend/embedded/library/src/components/activation-dialog/activationReducer.ts
 import {TemplateComponentType, TemplateInputType} from './types';
 
 export type ActivationStepType = 'activate' | 'configure' | 'connect' | 'done';
@@ -21,7 +20,7 @@ export type ActivationActionType =
     | {type: 'NEXT'}
     | {type: 'BACK'}
     | {componentName: string; type: 'MISSING_CONNECTION'}
-    | {type: 'ACTIVATED'; workflowUuid?: string}
+    | {type: 'ACTIVATED'; workflowUuid: string}
     | {error: string; type: 'FAILED'};
 
 export function toInputValueText(value: unknown): string {
@@ -123,6 +122,10 @@ function getPreviousState(state: ActivationStateI): ActivationStateI {
 export function activationReducer(state: ActivationStateI, action: ActivationActionType): ActivationStateI {
     switch (action.type) {
         case 'SELECT_CONNECTION': {
+            if (!state.requiredComponents.includes(action.componentName)) {
+                return state;
+            }
+
             const highlightedComponent =
                 state.highlightedComponent === action.componentName ? undefined : state.highlightedComponent;
 
@@ -139,6 +142,10 @@ export function activationReducer(state: ActivationStateI, action: ActivationAct
         case 'SET_INPUT_VALUE':
             return {...state, inputValues: {...state.inputValues, [action.name]: action.value}};
         case 'MISSING_CONNECTION':
+            if (state.step === 'done') {
+                return state;
+            }
+
             if (!state.requiredComponents.includes(action.componentName)) {
                 return {
                     ...state,
@@ -151,6 +158,10 @@ export function activationReducer(state: ActivationStateI, action: ActivationAct
         case 'ACTIVATED':
             return {...state, error: undefined, step: 'done', workflowUuid: action.workflowUuid};
         case 'FAILED':
+            if (state.step === 'done') {
+                return state;
+            }
+
             return {...state, error: action.error};
     }
 }
