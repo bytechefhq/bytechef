@@ -63,17 +63,12 @@ export default function useFetchInterceptor() {
                 if (url.includes('/internal/') || url.includes('/graphql') || url.includes('/api/embedded/v1/')) {
                     const {environment, jwtToken} = getEmbedCredentials();
 
-                    return [
-                        url,
-                        {
-                            ...config,
-                            headers: {
-                                ...config.headers,
-                                Authorization: `Bearer ${jwtToken || ''}`,
-                                'X-ENVIRONMENT': environment?.toUpperCase() || '',
-                            },
-                        },
-                    ];
+                    const headers = new Headers(config?.headers);
+
+                    headers.set('Authorization', `Bearer ${jwtToken || ''}`);
+                    headers.set('X-ENVIRONMENT', environment?.toUpperCase() || '');
+
+                    return [url, {...config, headers}];
                 } else {
                     return [url, config];
                 }
