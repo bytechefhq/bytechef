@@ -372,7 +372,7 @@ const useWorkflowEditorCanvas = ({
                             },
                         });
 
-                        saveWorkflowDefinition({
+                        void saveWorkflowDefinition({
                             nodeData: {
                                 ...clusterRootTask,
                                 clusterElements: updatedClusterElements,

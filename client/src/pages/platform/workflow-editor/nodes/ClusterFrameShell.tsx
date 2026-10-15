@@ -101,7 +101,7 @@ const ClusterFrameShell = ({children, data, nodeId, nodeMenu}: ClusterFrameShell
 
         const clearedClusterElements = clearClusterElementPositions(clusterRootTask.clusterElements);
 
-        saveWorkflowDefinition({
+        void saveWorkflowDefinition({
             nodeData: {
                 ...clusterRootTask,
                 clusterElements: clearedClusterElements,
