@@ -7,10 +7,13 @@
 
 package com.bytechef.ee.embedded.configuration.dto;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-public record AutomationWorkflowProjectVersionDTO(int version, String status, String publishedDate) {
+public record AutomationWorkflowProjectVersionDTO(
+    int version, String status, @Nullable String publishedDate, @Nullable String description) {
 }

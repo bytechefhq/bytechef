@@ -426,7 +426,23 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(automationWorkflowProjectFacade).publishProject(8L);
+        verify(automationWorkflowProjectFacade).publishProject(8L, null);
+    }
+
+    @Test
+    void testPublishAutomationWorkflowProjectPassesTheDescription() {
+        this.graphQlTester
+            .document("""
+                mutation {
+                    publishAutomationWorkflowProject(id: "8", description: "Adds greeting")
+                }
+                """)
+            .execute()
+            .path("publishAutomationWorkflowProject")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(automationWorkflowProjectFacade).publishProject(8L, "Adds greeting");
     }
 
     @Test
@@ -500,8 +516,9 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
     @Test
     void testAutomationWorkflowProjectVersionsReturnsVersionsFromFacade() {
         AutomationWorkflowProjectVersionDTO versionOne = new AutomationWorkflowProjectVersionDTO(
-            1, "PUBLISHED", "2026-01-01T10:00:00Z");
-        AutomationWorkflowProjectVersionDTO versionTwo = new AutomationWorkflowProjectVersionDTO(2, "DRAFT", null);
+            1, "PUBLISHED", "2026-01-01T10:00:00Z", "First release");
+        AutomationWorkflowProjectVersionDTO versionTwo = new AutomationWorkflowProjectVersionDTO(
+            2, "DRAFT", null, null);
 
         when(automationWorkflowProjectFacade.getProjectVersions(5L)).thenReturn(List.of(versionOne, versionTwo));
 
@@ -512,6 +529,7 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
                         version
                         status
                         publishedDate
+                        description
                     }
                 }
                 """)
@@ -519,6 +537,9 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             .path("automationWorkflowProjectVersions")
             .entityList(Object.class)
             .hasSize(2)
+            .path("automationWorkflowProjectVersions[0].description")
+            .entity(String.class)
+            .isEqualTo("First release")
             .path("automationWorkflowProjectVersions[0].version")
             .entity(Integer.class)
             .isEqualTo(1)
