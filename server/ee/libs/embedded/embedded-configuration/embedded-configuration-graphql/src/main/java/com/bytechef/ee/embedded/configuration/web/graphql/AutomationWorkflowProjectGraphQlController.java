@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectAd
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -88,8 +89,8 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @MutationMapping
-    public boolean publishAutomationWorkflowProject(@Argument String id) {
-        automationWorkflowProjectFacade.publishProject(Long.parseLong(id));
+    public boolean publishAutomationWorkflowProject(@Argument String id, @Argument @Nullable String description) {
+        automationWorkflowProjectFacade.publishProject(Long.parseLong(id), description);
 
         return true;
     }

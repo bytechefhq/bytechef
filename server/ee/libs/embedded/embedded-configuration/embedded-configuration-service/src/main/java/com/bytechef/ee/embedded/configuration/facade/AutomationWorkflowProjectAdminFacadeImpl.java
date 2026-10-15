@@ -88,8 +88,8 @@ public class AutomationWorkflowProjectAdminFacadeImpl implements AutomationWorkf
     }
 
     @Override
-    public void publishProject(long projectId) {
-        automationWorkflowProjectFacade.publishProject(projectId);
+    public void publishProject(long projectId, @Nullable String description) {
+        automationWorkflowProjectFacade.publishProject(projectId, description);
     }
 
     @Override
