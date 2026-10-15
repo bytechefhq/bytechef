@@ -67,7 +67,7 @@ const config: NextConfig = {
       {
         source: '/',
         destination: '/platform',
-        permanent: false,
+        permanent: true,
       },
       {
         source: '/introduction',
