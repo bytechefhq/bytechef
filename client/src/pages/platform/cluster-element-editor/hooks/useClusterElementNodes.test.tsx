@@ -9,7 +9,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useClusterElementNodes from './useClusterElementNodes';
 
-const {AI_AGENT_DEFINITION} = vi.hoisted(() => {
+const {AI_AGENT_DEFINITION, getComponentDefinitionCallsMock} = vi.hoisted(() => {
     const AI_AGENT_DEFINITION: ComponentDefinition = {
         clusterElement: false,
         clusterElementTypes: [
@@ -22,13 +22,15 @@ const {AI_AGENT_DEFINITION} = vi.hoisted(() => {
         version: 1,
     };
 
-    return {AI_AGENT_DEFINITION};
+    return {AI_AGENT_DEFINITION, getComponentDefinitionCallsMock: vi.fn()};
 });
 
 vi.mock('@/shared/middleware/platform/configuration', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/platform/configuration')>()),
     ComponentDefinitionApi: class {
         getComponentDefinition({componentName}: {componentName: string}) {
+            getComponentDefinitionCallsMock(componentName);
+
             if (componentName === 'openai' || componentName === 'anthropic') {
                 return Promise.resolve({clusterElementTypes: [], name: componentName, version: 1});
             }
@@ -120,6 +122,8 @@ describe('useClusterElementNodes', () => {
 
     beforeEach(() => {
         queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+
+        getComponentDefinitionCallsMock.mockClear();
 
         useWorkflowDataStore.setState({
             workflow: {definition: WORKFLOW_DEFINITION, id: 'workflow_1'},
@@ -309,5 +313,46 @@ describe('useClusterElementNodes', () => {
 
         expect(useWorkflowEditorStore.getState().nestedClusterRootsComponentDefinitions.brokenModel).toBeUndefined();
         expect(result.current.nodesByRootId.aiAgent_2.map((node) => node.id)).toContain('model_2');
+    });
+
+    it('neither refetches definitions nor rebuilds nodes when only a parameter changes', async () => {
+        const {result} = renderHook(() => useClusterElementNodes(CLUSTER_ROOT_IDS), {wrapper});
+
+        await waitFor(() => {
+            expect(result.current.definitionsReady).toBe(true);
+        });
+
+        const nodesByRootIdBeforeSave = result.current.nodesByRootId;
+        const definitionFetchCountBeforeSave = getComponentDefinitionCallsMock.mock.calls.length;
+
+        await act(async () => {
+            useWorkflowDataStore.setState({
+                workflow: {
+                    definition: JSON.stringify({
+                        tasks: [
+                            {
+                                clusterElements: {
+                                    model: {
+                                        label: 'GPT',
+                                        name: 'model_1',
+                                        parameters: {temperature: 1},
+                                        type: 'openai/v1/model',
+                                    },
+                                },
+                                label: 'AI Agent',
+                                name: 'aiAgent_1',
+                                type: 'aiAgent/v1/chat',
+                            },
+                        ],
+                    }),
+                    id: 'workflow_1',
+                },
+            } as Parameters<typeof useWorkflowDataStore.setState>[0]);
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+        });
+
+        expect(getComponentDefinitionCallsMock.mock.calls.length).toBe(definitionFetchCountBeforeSave);
+        expect(result.current.nodesByRootId).toBe(nodesByRootIdBeforeSave);
     });
 });
