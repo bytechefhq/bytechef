@@ -27,7 +27,6 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -102,7 +101,6 @@ public class WorkspaceUserGraphQlController {
      * anything precede the service call asks for.
      */
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
     public Set<String> myWorkspaceScopes(@Argument long workspaceId, @Argument @Nullable Environment environment) {
         if (environment == null) {
             return permissionService.getMyWorkspaceScopes(workspaceId);
@@ -116,7 +114,6 @@ public class WorkspaceUserGraphQlController {
      * requirement as {@link #myWorkspaceScopes(long, Environment)}.
      */
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
     public String myWorkspaceRole(@Argument long workspaceId) {
         return permissionService.getMyWorkspaceRole(workspaceId);
     }

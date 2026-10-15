@@ -230,6 +230,13 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public Workflow exportWorkflow(String workflowId) {
+        return workflowService.getWorkflow(workflowId);
+    }
+
+    @Override
     @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
     public void exportSharedWorkflow(String workflowId, String description) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

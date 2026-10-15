@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
@@ -669,6 +670,9 @@ class ProjectWorkflowFacadeIntTest {
         @MockitoBean
         private WorkflowFacade workflowFacade;
 
+        @MockitoBean
+        private WorkflowService workflowService;
+
         @BeforeEach
         void authenticateAsNonAdmin() {
             SecurityContextHolder.getContext()
@@ -688,6 +692,8 @@ class ProjectWorkflowFacadeIntTest {
             when(preBuiltTemplateService.getWorkflowTemplate(anyString()))
                 .thenThrow(new IllegalStateException(BODY_REACHED));
 
+            when(workflowService.getWorkflow(anyString())).thenThrow(new IllegalStateException(BODY_REACHED));
+
             doThrow(new IllegalStateException(BODY_REACHED)).when(workflowFacade)
                 .update(anyString(), anyString(), anyInt());
         }
@@ -695,6 +701,20 @@ class ProjectWorkflowFacadeIntTest {
         @AfterEach
         void clearSecurityContext() {
             SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testExportWorkflowDeniesWhenTheWorkflowViewScopeIsRefused() {
+            assertDenied(() -> projectWorkflowFacade.exportWorkflow(WORKFLOW_ID));
+
+            verify(permissionService).hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW");
+        }
+
+        @Test
+        void testExportWorkflowAllowsWhenTheWorkflowViewScopeIsGranted() {
+            when(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).thenReturn(true);
+
+            assertBodyReached(() -> projectWorkflowFacade.exportWorkflow(WORKFLOW_ID));
         }
 
         @Test
