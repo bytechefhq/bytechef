@@ -153,7 +153,7 @@ describe('useFetchInterceptor (embedded)', () => {
             expect(sentHeaders.get('X-ENVIRONMENT')).toBe('');
         });
 
-        it('replaces, not duplicates, an environment and authorization header the caller already set', async () => {
+        it('replaces, not duplicates, an environment and authorization header the caller already set', () => {
             setEmbedCredentials({environment: 'production', jwtToken: 'embed-jwt'});
 
             renderHook(() => useFetchInterceptor());
@@ -162,7 +162,7 @@ describe('useFetchInterceptor (embedded)', () => {
                 headers: {
                     Authorization: 'Bearer old',
                     'Content-Type': 'application/json',
-                    'X-Environment': 'PRODUCTION',
+                    'X-Environment': 'STAGING',
                 },
             }) as [string, RequestInit];
 
