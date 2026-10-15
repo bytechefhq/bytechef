@@ -19,6 +19,8 @@ package com.bytechef.ai.copilot.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 
 /**
  * @author Ivica Cardic
@@ -68,6 +70,35 @@ class CopilotRunFailuresTest {
             new IllegalStateException("relation \"workflow\" does not exist at character 4290")))
                 .isNull();
         assertThat(CopilotRunFailures.describe(new NullPointerException())).isNull();
+    }
+
+    @Test
+    void testLeavesASignedOutCallerUndescribed() {
+        assertThat(CopilotRunFailures.describe(
+            new AuthenticationCredentialsNotFoundException("An Authentication object was not found"))).isNull();
+        assertThat(CopilotRunFailures.describe(
+            new IllegalStateException("Chat stream failed", new InsufficientAuthenticationException("401")))).isNull();
+    }
+
+    @Test
+    void testLeavesAMissingApiKeyUndescribed() {
+        assertThat(CopilotRunFailures.describe(new IllegalStateException("No API key configured for OpenAI")))
+            .isNull();
+        assertThat(CopilotRunFailures.describe(new IllegalArgumentException("Anthropic API key must be set")))
+            .isNull();
+    }
+
+    @Test
+    void testLeavesStatusLikeNumbersOutsideAnHttpStatusUndescribed() {
+        assertThat(CopilotRunFailures.describe(new IllegalStateException("Workflow 401 has 429 tasks"))).isNull();
+    }
+
+    @Test
+    void testDescribesStatusCodesInTheirUsualPositions() {
+        assertThat(CopilotRunFailures.describe(new RuntimeException("429 Too Many Requests from POST https://x")))
+            .isEqualTo(CopilotRunFailures.RATE_LIMITED);
+        assertThat(CopilotRunFailures.describe(new RuntimeException("Request failed with status code: 401")))
+            .isEqualTo(CopilotRunFailures.API_KEY_REJECTED);
     }
 
     @Test
