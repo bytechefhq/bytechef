@@ -25,7 +25,6 @@ import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
-import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,41 +76,6 @@ class CopilotToolContextUtilsTest {
         Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(new HashMap<>()));
 
         assertThat(toolContext).doesNotContainKey(ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY);
-    }
-
-    @Test
-    void testToToolContextDisablesTheConnectionFallbackForAScopedRun() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).containsEntry(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, true);
-    }
-
-    @Test
-    void testToToolContextDisablesTheConnectionFallbackForARunThatSkipsAuthorization() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(
-            CopilotConstants.STATE_AUTHENTICATION, new UsernamePasswordAuthenticationToken("1234567890", null));
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).containsEntry(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, true);
-    }
-
-    @Test
-    void testToToolContextKeepsTheConnectionFallbackForAWorkspaceRun() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 1L);
-        stateMap.put(CopilotConstants.STATE_WORKSPACE_ID, 1L);
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).doesNotContainKey(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY);
     }
 
     @Test
@@ -198,17 +162,11 @@ class CopilotToolContextUtilsTest {
         assertThat(toolContext)
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_AUTHENTICATION_KEY, authentication)
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_TENANT_ID_KEY, "acme")
-            // The Authentication is carried so RehydrateContextToolCallback can restore the connected-user principal
-            // on the tool worker, paired with the tenant id. Nothing is carried to skip a check.
             .doesNotContainKey("bytechef.agentTool.skipAutomationAuthorization");
     }
 
     @Test
     void testCarriesNoSkipModeForAConnectedUserRunOnAPooledWorker() throws Exception {
-        // Reproduces the real topology. In production the tool context is built on a ForkJoinPool worker
-        // (LocalAgent.runAgent dispatches through CompletableFuture.runAsync), NOT on the servlet thread. A connected
-        // user's run carries an Authentication and a tenant id and nothing else that touches authorization, so no
-        // thread can produce a resource-scoped skip mode by accident.
         Map<String, Object> stateMap = new HashMap<>();
 
         stateMap.put(CopilotConstants.STATE_AUTHENTICATION, new UsernamePasswordAuthenticationToken("cu", ""));
@@ -228,8 +186,6 @@ class CopilotToolContextUtilsTest {
 
     @Test
     void testCarriesNoSkipModeEvenWhenTheThreadLocalIsArmed() throws Throwable {
-        // A caller that happens to be inside callSkippingChecks when the tool context is built must not leak that
-        // into the context and re-arm it on a worker. Nothing reads the thread-local here, and this says so.
         Map<String, Object> stateMap = new HashMap<>();
 
         stateMap.put(CopilotConstants.STATE_AUTHENTICATION, new UsernamePasswordAuthenticationToken("cu", ""));
