@@ -55,7 +55,8 @@ public class LookupComponentPropertyOptionsToolCallback implements ToolCallback 
         connection. Returns componentName, the operation name, propertyName, an options array of {label, value}, and a
         truncated flag (true when the list was capped). Error envelopes: action_not_found / trigger_not_found (with the
         valid names — retry with one of those), property_not_found, no_options_for_property, dependency_missing,
-        connection_required.""";
+        connection_required. In an embedded chat, a connectionId the user is not entitled to use is rejected; ask the
+        user to pick one of their own connections instead of retrying.""";
 
     private static final String INPUT_SCHEMA = """
         {
@@ -79,12 +80,14 @@ public class LookupComponentPropertyOptionsToolCallback implements ToolCallback 
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final PropertyOptionsResolver resolver;
     private final ToolStateVisibilityMetrics metrics;
+    private final ScopedConnectionGuard scopedConnectionGuard;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public LookupComponentPropertyOptionsToolCallback(
         ActionDefinitionService actionDefinitionService, ActionDefinitionFacade actionDefinitionFacade,
         TriggerDefinitionService triggerDefinitionService, TriggerDefinitionFacade triggerDefinitionFacade,
-        PropertyOptionsResolver resolver, ToolStateVisibilityMetrics metrics) {
+        PropertyOptionsResolver resolver, ToolStateVisibilityMetrics metrics,
+        ScopedConnectionGuard scopedConnectionGuard) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
@@ -92,6 +95,7 @@ public class LookupComponentPropertyOptionsToolCallback implements ToolCallback 
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.resolver = resolver;
         this.metrics = metrics;
+        this.scopedConnectionGuard = scopedConnectionGuard;
     }
 
     @Override
@@ -116,6 +120,14 @@ public class LookupComponentPropertyOptionsToolCallback implements ToolCallback 
 
             String kind = input.kind();
             String componentName = input.componentName();
+
+            String notEntitledError = scopedConnectionGuard.toolErrorIfNotEntitled(
+                componentName, input.connectionId(), toolContext);
+
+            if (notEntitledError != null) {
+                return notEntitledError;
+            }
+
             String operationName = input.operationName();
             String propertyName = input.propertyName();
 

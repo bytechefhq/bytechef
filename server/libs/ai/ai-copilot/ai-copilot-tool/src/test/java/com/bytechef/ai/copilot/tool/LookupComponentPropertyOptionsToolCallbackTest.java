@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
@@ -40,9 +41,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.model.ToolContext;
 
 /**
- * Covers the kind-keyed dispatch of the unified lookup tool: ACTION routes to the action resolver path, TRIGGER to the
- * trigger path, and an invalid kind is rejected before any resolution happens.
- *
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
@@ -66,13 +64,33 @@ class LookupComponentPropertyOptionsToolCallbackTest {
         metrics = mock(ToolStateVisibilityMetrics.class);
         toolCallback = new LookupComponentPropertyOptionsToolCallback(
             actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
-            resolver, metrics);
+            resolver, metrics, mock(ScopedConnectionGuard.class));
     }
 
     @Test
     void testToolDefinitionName() {
         assertThat(toolCallback.getToolDefinition()
             .name()).isEqualTo("lookupPropertyOptions");
+    }
+
+    @Test
+    void testRejectsAConnectionTheScopedCallerDoesNotOwnBeforeAnyLookup() {
+        LookupComponentPropertyOptionsToolCallback scopedToolCallback = new LookupComponentPropertyOptionsToolCallback(
+            actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+            resolver, metrics, ScopedConnectionTestFixtures.newGuardEntitledTo(List.of(42L)));
+
+        for (String kind : List.of("ACTION", "TRIGGER")) {
+            String result = scopedToolCallback.call(
+                "{\"kind\": \"" + kind + "\", \"componentName\": \"slack\", \"operationName\": \"send\", "
+                    + "\"propertyName\": \"channel\", \"connectionId\": 900}",
+                ScopedConnectionTestFixtures.scopedToolContext());
+
+            assertThat(result).contains(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+        }
+
+        verifyNoInteractions(
+            actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+            resolver);
     }
 
     @Test

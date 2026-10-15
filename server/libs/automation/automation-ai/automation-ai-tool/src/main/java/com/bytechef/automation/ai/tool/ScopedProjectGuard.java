@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.ai.tool;
 
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -40,16 +41,23 @@ public class ScopedProjectGuard {
     static final String OUT_OF_SCOPE_MESSAGE = "This chat can only work with the workflows of its own project.";
 
     private final @Nullable ProjectWorkflowService projectWorkflowService;
+    private final ScopedConnectionGuard scopedConnectionGuard;
 
     @Autowired
     @SuppressFBWarnings("EI")
-    public ScopedProjectGuard(ObjectProvider<ProjectWorkflowService> projectWorkflowServiceProvider) {
-        this(projectWorkflowServiceProvider.getIfAvailable());
+    public ScopedProjectGuard(
+        ObjectProvider<ProjectWorkflowService> projectWorkflowServiceProvider,
+        ScopedConnectionGuard scopedConnectionGuard) {
+
+        this(projectWorkflowServiceProvider.getIfAvailable(), scopedConnectionGuard);
     }
 
     @SuppressFBWarnings("EI")
-    public ScopedProjectGuard(@Nullable ProjectWorkflowService projectWorkflowService) {
+    public ScopedProjectGuard(
+        @Nullable ProjectWorkflowService projectWorkflowService, ScopedConnectionGuard scopedConnectionGuard) {
+
         this.projectWorkflowService = projectWorkflowService;
+        this.scopedConnectionGuard = scopedConnectionGuard;
     }
 
     public void checkWorkflow(String workflowId, @Nullable ToolContext toolContext, ErrorType errorType) {
@@ -81,6 +89,12 @@ public class ScopedProjectGuard {
 
         if (scopedProjectId != null && scopedProjectId != projectId) {
             throw new ExecutionException(OUT_OF_SCOPE_MESSAGE, errorType);
+        }
+    }
+
+    public void checkConnection(long connectionId, @Nullable ToolContext toolContext, ErrorType errorType) {
+        if (!scopedConnectionGuard.isEntitled(null, connectionId, toolContext)) {
+            throw new ExecutionException(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE, errorType);
         }
     }
 

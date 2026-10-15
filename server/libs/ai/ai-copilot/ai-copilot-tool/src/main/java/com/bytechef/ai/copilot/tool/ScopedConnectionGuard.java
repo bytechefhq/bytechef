@@ -34,8 +34,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
- * Limits a confined run (one that carries a scoped project or skips automation authorization) to the connections its
- * caller is entitled to use.
+ * Limits a run confined to a scoped project to the connections its caller is entitled to use.
  *
  * @author Ivica Cardic
  */
@@ -74,15 +73,6 @@ public class ScopedConnectionGuard {
 
         if (connectionId == null || !ScopedProjectToolContext.isConfined(toolContext)) {
             return null;
-        }
-
-        if (ScopedProjectToolContext.fetchScopedProjectId(toolContext) == null) {
-            log.warn(
-                "Rejected connection {} for component {}: the run skips automation authorization but carries no "
-                    + "scoped project",
-                connectionId, componentName);
-
-            return NOT_ENTITLED_MESSAGE;
         }
 
         AgentToolInvocationContext invocationContext = AgentToolInvocationContext.fromToolContext(toolContext);
