@@ -5,6 +5,8 @@ import {
     ConnectedUserProjectWorkflowApi,
     Connection,
     ConnectionApi,
+    IntegrationApi,
+    IntegrationBasic,
 } from '@/ee/shared/middleware/embedded/public';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useCallback} from 'react';
@@ -13,6 +15,7 @@ export const AutomationHubKeys = {
     automations: ['automationHub', 'automations'] as const,
     connections: ['automationHub', 'connections'] as const,
     connectionsByComponent: (componentName: string) => ['automationHub', 'connections', componentName] as const,
+    integrations: ['automationHub', 'integrations'] as const,
     templates: ['automationHub', 'templates'] as const,
     workflow: (workflowUuid: string) => ['automationHub', 'workflow', workflowUuid] as const,
 };
@@ -41,6 +44,12 @@ export const useGetComponentConnectionsQuery = (componentName: string, enabled =
         enabled,
         queryFn: () => new ConnectionApi().getFrontendConnections({componentName}),
         queryKey: AutomationHubKeys.connectionsByComponent(componentName),
+    });
+
+export const useGetIntegrationsQuery = () =>
+    useQuery<IntegrationBasic[]>({
+        queryFn: () => new IntegrationApi().getFrontendIntegrations({}),
+        queryKey: AutomationHubKeys.integrations,
     });
 
 export const useGetWorkflowQuery = (workflowUuid?: string) =>
