@@ -103,7 +103,7 @@ export default async function addClusterElementToClusterRoot({
         workflowNodeName: clusterRootId,
     };
 
-    saveWorkflowDefinition({
+    void saveWorkflowDefinition({
         nodeData: clusterRootNodeData,
         onSuccess: () => handleComponentAddedSuccess({nodeData: clusterRootNodeData, queryClient, workflow}),
         updateWorkflowMutation,
