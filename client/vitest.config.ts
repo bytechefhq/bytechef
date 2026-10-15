@@ -5,6 +5,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
+            '@bytechef/embedded': path.resolve(__dirname, '../sdks/frontend/embedded/library/src/main.ts'),
             'monaco-editor/esm/vs/editor/editor.worker.js': path.resolve(
                 __dirname,
                 'node_modules/monaco-editor/esm/vs/editor/editor.worker.js'
