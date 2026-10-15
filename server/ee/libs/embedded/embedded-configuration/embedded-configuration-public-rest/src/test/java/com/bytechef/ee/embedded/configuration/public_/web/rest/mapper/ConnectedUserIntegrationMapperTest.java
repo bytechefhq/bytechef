@@ -15,6 +15,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Property.Type;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
@@ -30,7 +32,10 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Integration
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpIntegrationInstanceToolModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpToolModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OAuth2Model;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel;
+import com.bytechef.platform.component.domain.IntegerProperty;
 import com.bytechef.platform.component.domain.OptionsDataSource;
+import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
@@ -171,6 +176,54 @@ class ConnectedUserIntegrationMapperTest {
     }
 
     @Test
+    void testConnectionInputMapsDefaultValueAndStaticOptions() {
+        StringProperty addToProperty = new StringProperty(
+            ComponentDsl.string("addTo")
+                .label("Add to")
+                .required(true)
+                .defaultValue("HEADER")
+                .options(
+                    ComponentDsl.option("Header", "HEADER"),
+                    ComponentDsl.option("QueryParams", "QUERY_PARAMETERS")));
+
+        InputModel inputModel = mapConnectionInput(addToProperty);
+
+        assertEquals("addTo", inputModel.getName());
+        assertEquals("HEADER", inputModel.getDefaultValue());
+        assertEquals(
+            List.of(new OptionModel("Header", "HEADER"), new OptionModel("QueryParams", "QUERY_PARAMETERS")),
+            inputModel.getOptions());
+    }
+
+    @Test
+    void testConnectionInputConvertsNonStringDefaultValueAndOptionsToStrings() {
+        IntegerProperty portProperty = new IntegerProperty(
+            ComponentDsl.integer("port")
+                .label("Port")
+                .defaultValue(443)
+                .options(ComponentDsl.option("HTTPS", 443), ComponentDsl.option("Alternative", 8443)));
+
+        InputModel inputModel = mapConnectionInput(portProperty);
+
+        assertEquals(InputTypeModel.INTEGER, inputModel.getType());
+        assertEquals("443", inputModel.getDefaultValue());
+        assertEquals(
+            List.of(new OptionModel("HTTPS", "443"), new OptionModel("Alternative", "8443")),
+            inputModel.getOptions());
+    }
+
+    @Test
+    void testConnectionInputWithoutDefaultValueOrOptions() {
+        StringProperty keyProperty = new StringProperty(ComponentDsl.string("key")
+            .label("Key"));
+
+        InputModel inputModel = mapConnectionInput(keyProperty);
+
+        assertNull(inputModel.getDefaultValue());
+        assertEquals(List.of(), inputModel.getOptions());
+    }
+
+    @Test
     void testPropertyGroupMapsToResolvedGroupWithDynamicOptions() {
         StringProperty channelProperty = mock(StringProperty.class);
 
@@ -204,5 +257,16 @@ class ConnectedUserIntegrationMapperTest {
         assertEquals(InputTypeModel.STRING, propertyModel.getType());
         assertEquals(Boolean.TRUE, propertyModel.getRequired());
         assertTrue(propertyModel.getDynamicOptions());
+    }
+
+    private static InputModel mapConnectionInput(Property property) {
+        ConnectedUserIntegrationDTO.ConnectionConfig connectionConfig =
+            new ConnectedUserIntegrationDTO.ConnectionConfig(AuthorizationType.API_KEY, null, List.of(property));
+
+        ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationMapper generatedMapper =
+            new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationMapperImpl();
+
+        return generatedMapper.map(connectionConfig.inputs()
+            .getFirst());
     }
 }

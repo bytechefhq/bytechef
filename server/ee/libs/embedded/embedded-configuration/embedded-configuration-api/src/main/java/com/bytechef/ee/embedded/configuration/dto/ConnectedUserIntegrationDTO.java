@@ -10,9 +10,19 @@ package com.bytechef.ee.embedded.configuration.dto;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.Authorization;
+import com.bytechef.platform.component.domain.BooleanProperty;
+import com.bytechef.platform.component.domain.DateProperty;
+import com.bytechef.platform.component.domain.DateTimeProperty;
+import com.bytechef.platform.component.domain.IntegerProperty;
+import com.bytechef.platform.component.domain.NumberProperty;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
+import com.bytechef.platform.component.domain.ObjectProperty;
+import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.domain.StringProperty;
+import com.bytechef.platform.component.domain.TimeProperty;
 import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.connection.domain.Connection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -114,7 +124,8 @@ public record ConnectedUserIntegrationDTO(
         }
     }
 
-    public record Input(String name, String label, Type type, boolean required) {
+    public record Input(
+        String name, String label, Type type, boolean required, @Nullable String defaultValue, List<Option> options) {
 
         public enum Type {
             BOOLEAN,
@@ -149,11 +160,35 @@ public record ConnectedUserIntegrationDTO(
         }
 
         return properties.stream()
-            .map(property -> new Input(
-                property.getName(), ((ValueProperty<?>) property).getLabel(),
-                Input.Type.valueOf(StringUtils.upperCase(String.valueOf(property.getType()))),
-                property.getRequired()))
+            .map(property -> {
+                ValueProperty<?> valueProperty = (ValueProperty<?>) property;
+
+                Object defaultValue = valueProperty.getDefaultValue();
+
+                return new Input(
+                    property.getName(), valueProperty.getLabel(),
+                    Input.Type.valueOf(StringUtils.upperCase(String.valueOf(property.getType()))),
+                    property.getRequired(), defaultValue == null ? null : String.valueOf(defaultValue),
+                    getStaticOptions(property));
+            })
             .toList();
+    }
+
+    public static List<Option> getStaticOptions(Property property) {
+        List<Option> options = switch (property) {
+            case StringProperty stringProperty -> stringProperty.getOptions();
+            case IntegerProperty integerProperty -> integerProperty.getOptions();
+            case NumberProperty numberProperty -> numberProperty.getOptions();
+            case BooleanProperty booleanProperty -> booleanProperty.getOptions();
+            case DateProperty dateProperty -> dateProperty.getOptions();
+            case DateTimeProperty dateTimeProperty -> dateTimeProperty.getOptions();
+            case TimeProperty timeProperty -> timeProperty.getOptions();
+            case ObjectProperty objectProperty -> objectProperty.getOptions();
+            case ArrayProperty arrayProperty -> arrayProperty.getOptions();
+            default -> List.of();
+        };
+
+        return options == null ? List.of() : options;
     }
 
     private static Connection getConnection(List<Connection> connections, IntegrationInstance integrationInstance) {
