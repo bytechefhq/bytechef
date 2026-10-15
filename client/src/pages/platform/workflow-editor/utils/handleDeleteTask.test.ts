@@ -560,7 +560,11 @@ describe('handleDeleteTask', () => {
             data: {componentName: 'loop', name: 'loop_1'} as NodeDataType,
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
-            rootClusterElementNodeData: {componentName: 'aiAgent', name: 'aiAgent_1'} as NodeDataType,
+            rootClusterElementNodeData: {
+                componentName: 'aiAgent',
+                name: 'aiAgent_1',
+                workflowNodeName: 'aiAgent_1',
+            } as NodeDataType,
             updateWorkflowMutation: mutation,
             workflow,
         });
