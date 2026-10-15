@@ -199,6 +199,7 @@ interface ActivationBodyProps {
     connectOpenRef: RefObject<boolean>;
     baseUrl: string;
     connectionCreationAllowed: boolean;
+    editable: boolean;
     environment: string;
     fetch: ReturnType<typeof createApiClient>['fetch'];
     jwtToken: string;
@@ -207,13 +208,13 @@ interface ActivationBodyProps {
     onClose: () => void;
     onEditWorkflow?: (workflowUuid: string) => void;
     template: AutomationTemplateType;
-    editable: boolean;
 }
 
 const ActivationBody = ({
     connectOpenRef,
     baseUrl,
     connectionCreationAllowed,
+    editable,
     environment,
     fetch,
     jwtToken,
@@ -222,7 +223,6 @@ const ActivationBody = ({
     onClose,
     onEditWorkflow,
     template,
-    editable,
 }: ActivationBodyProps) => {
     const [busy, setBusy] = useState(false);
     const [connectingComponent, setConnectingComponent] = useState<TemplateComponentType>();
@@ -719,6 +719,7 @@ const ActivationDialog = ({
                         connectOpenRef={connectOpenRef}
                         baseUrl={baseUrl}
                         connectionCreationAllowed={connectionCreationAllowed}
+                        editable={loadResult?.kind !== 'REFERENCE'}
                         environment={environment}
                         fetch={fetch}
                         jwtToken={jwtToken}
@@ -726,7 +727,6 @@ const ActivationDialog = ({
                         onActivated={onActivated}
                         onClose={onClose}
                         onEditWorkflow={onEditWorkflow}
-                        editable={loadResult?.kind !== 'REFERENCE'}
                         key={template.id}
                         template={template}
                     />
