@@ -88,21 +88,24 @@ public class ProjectDeploymentRepositoryIntTest {
         }
 
         @Test
-        public void testEmbeddedProjectPrefixIsMatchedLiterally() {
-            Project embeddedProject = projectRepository.save(getProject("__EMBEDDED__project"));
-            Project lookalikeProject = projectRepository.save(getProject("xxEMBEDDEDyyproject"));
+        public void testEmbeddedDeploymentPrefixIsMatchedLiterally() {
+            Project catalogProject = projectRepository.save(getProject("__EMBEDDED_AUTOMATION__Catalog"));
+            Project connectedUserProject = projectRepository.save(getProject("__EMBEDDED__ext"));
+            Project project = projectRepository.save(getProject("project"));
 
-            saveProjectDeployment("embedded", embeddedProject);
-            saveProjectDeployment("lookalike", lookalikeProject);
+            saveProjectDeployment("__EMBEDDED__ext__DEVELOPMENT", catalogProject);
+            saveProjectDeployment("__EMBEDDED__ext", connectedUserProject);
+            saveProjectDeployment("deployment", project);
+            saveProjectDeployment("xxEMBEDDEDyyext", project);
 
             assertThat(
                 projectDeploymentRepository.findAllProjectDeployments(true, null, null, null, workspace.getId()))
                     .extracting(ProjectDeployment::getName)
-                    .containsExactly("embedded");
+                    .containsExactly("__EMBEDDED__ext", "__EMBEDDED__ext__DEVELOPMENT");
             assertThat(
                 projectDeploymentRepository.findAllProjectDeployments(false, null, null, null, workspace.getId()))
                     .extracting(ProjectDeployment::getName)
-                    .containsExactly("lookalike");
+                    .containsExactly("deployment", "xxEMBEDDEDyyext");
         }
     }
 
