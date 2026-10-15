@@ -91,6 +91,7 @@ class ConnectedUserReferenceRolloutManagerTest {
         when(connectedUserReferenceDeploymentManager.getLastPublishedVersion(AUTOMATION_WORKFLOW_PROJECT_ID))
             .thenReturn(2);
         when(connectedUserReferenceDeploymentManager.fetchRow(anyLong(), anyString())).thenReturn(Optional.empty());
+        when(connectedUserReferenceDeploymentManager.isReferenceDeployment(anyLong())).thenReturn(true);
         when(connectedUserReferenceDeploymentManager.getWorkflowId(eq(AUTOMATION_WORKFLOW_PROJECT_ID), eq(2),
             anyString()))
                 .thenAnswer(invocation -> "workflow-" + invocation.getArgument(2));
@@ -148,6 +149,19 @@ class ConnectedUserReferenceRolloutManagerTest {
         verify(connectedUserReferenceDeploymentManager, never()).putWorkflows(eq(901L), anyInt(), anyMap());
         verify(connectedUserReferenceDeploymentManager).deleteDeployment(901L);
         verify(connectedUserReferenceDeploymentManager).putWorkflows(eq(902L), eq(2), anyMap());
+    }
+
+    @Test
+    void testRollOutSkipsADeploymentWithoutAConnectedUserReferenceDeploymentRelation() {
+        when(projectDeploymentService.getAllProjectDeployments(AUTOMATION_WORKFLOW_PROJECT_ID))
+            .thenReturn(List.of(projectDeployment(901L)));
+        when(connectedUserReferenceDeploymentManager.isReferenceDeployment(901L)).thenReturn(false);
+
+        connectedUserReferenceRolloutManager.rollOut(AUTOMATION_WORKFLOW_PROJECT_ID);
+
+        verify(connectedUserProjectWorkflowRepository, never()).findAllByProjectDeploymentId(anyLong());
+        verify(connectedUserReferenceDeploymentManager, never()).deleteDeployment(anyLong());
+        verify(connectedUserReferenceDeploymentManager, never()).putWorkflows(anyLong(), anyInt(), anyMap());
     }
 
     @Test

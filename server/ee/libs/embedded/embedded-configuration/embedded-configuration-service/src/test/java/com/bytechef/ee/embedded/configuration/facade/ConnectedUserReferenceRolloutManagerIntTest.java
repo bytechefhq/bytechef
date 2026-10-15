@@ -924,8 +924,12 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
+        String emptyExternalUserId = "rollout-empty-user-" + UUID.randomUUID();
+
+        connectedUserService.createConnectedUser(emptyExternalUserId, Environment.PRODUCTION);
+
         long emptyProjectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, "rollout-empty-user-" + UUID.randomUUID(), Environment.PRODUCTION);
+            automationWorkflowProjectId, emptyExternalUserId, Environment.PRODUCTION);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
@@ -979,8 +983,12 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
+        String emptyExternalUserId = "rollout-lazy-empty-user-" + UUID.randomUUID();
+
+        connectedUserService.createConnectedUser(emptyExternalUserId, Environment.PRODUCTION);
+
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, "rollout-lazy-empty-user-" + UUID.randomUUID(), Environment.PRODUCTION);
+            automationWorkflowProjectId, emptyExternalUserId, Environment.PRODUCTION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 

@@ -82,7 +82,7 @@ public class ConnectedUserReferenceRolloutManager {
         for (ProjectDeployment projectDeployment : projectDeploymentService.getAllProjectDeployments(
             automationWorkflowProjectId)) {
 
-            if (!ConnectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment)) {
+            if (!connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment.getId())) {
                 continue;
             }
 
@@ -179,7 +179,7 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     private void rollOutDeploymentWithReferences(ProjectDeployment projectDeployment, int lastPublishedVersion) {
-        if (!ConnectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment)) {
+        if (!connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment.getId())) {
             return;
         }
 
