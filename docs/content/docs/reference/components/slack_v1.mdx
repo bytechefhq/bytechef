@@ -436,20 +436,20 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 
 <hr />
 
-# Additional Instructions
+## Additional Instructions
 
-### How to find the Channel ID
+#### How to find the Channel ID
 
 Open Slack and then channel (or person you want to send direct message to) you want fo find ID of. When you click on channel name you will see Channel details, and in **About** tab the lowest written value is the **Channel ID**.
 
-### How to find the Timestamp
+#### How to find the Timestamp
 
 There is no other way to find the timestamp of a message than to use Slack API. So the best way to find timestamp is to use output of one of Bytechef's Slack actions.
 In the output of the Slack actions you will find `ts` property, that is timestamp that you need.
 
-## Trigger Setup
+### Trigger Setup
 
-### Enable Event Subscription
+#### Enable Event Subscription
 
 1. Create workflow with Slack trigger.
 2. Publish the workflow.
@@ -480,7 +480,7 @@ In the output of the Slack actions you will find `ts` property, that is timestam
     <iframe src="https://www.guidejar.com/embed/c766204a-48a4-4793-b433-7bf10e703b03?type=1&controls=on " width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
 
-### Add Integration To Desired Channel
+#### Add Integration To Desired Channel
 
 For a workflow to be triggered by channel events, the integration or bot must first be added as a member of that channel. Slack only dispatches events to applications that are active participants in the channel - if the bot is not a member, no events from that channel will be received, and the workflow will not trigger.
 

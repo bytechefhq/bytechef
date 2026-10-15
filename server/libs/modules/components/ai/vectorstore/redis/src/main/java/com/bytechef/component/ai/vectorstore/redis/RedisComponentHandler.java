@@ -44,7 +44,7 @@ public class RedisComponentHandler implements ComponentHandler {
 
     public RedisComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new RedisComponentDefinitionImpl(component(REDIS_VECTOR_STORE)
-            .title("Redis")
+            .title("Redis Vector Store")
             .description(
                 "Redis is an open-source, in-memory data structure store used as a database, cache, and message " +
                     "broker, known for its high performance and support for various data structures like strings, " +

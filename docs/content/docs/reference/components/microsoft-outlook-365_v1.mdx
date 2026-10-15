@@ -641,15 +641,15 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 
 <hr />
 
-# Additional Instructions
+## Additional Instructions
 
-### Triggers: New Email vs New Email Batch
+#### Triggers: New Email vs New Email Batch
 
 The Microsoft Outlook 365 component provides two **polling** triggers for new emails: **New Email** and **New Email Batch**.
 
 Both triggers periodically poll your mailbox for new messages, but they differ in how they start workflows and what they output.
 
-#### New Email
+##### New Email
 
 - Periodically polls your Inbox for messages received after the last check.
 - For each new email found, **starts a separate workflow run**.
@@ -658,7 +658,7 @@ Both triggers periodically poll your mailbox for new messages, but they differ i
 
 In other words, **one email = one workflow execution**.
 
-#### New Email Batch
+##### New Email Batch
 
 - Periodically polls your Inbox for messages received after the last check.
 - **Starts a single workflow run per poll**, regardless of how many new emails are found.
