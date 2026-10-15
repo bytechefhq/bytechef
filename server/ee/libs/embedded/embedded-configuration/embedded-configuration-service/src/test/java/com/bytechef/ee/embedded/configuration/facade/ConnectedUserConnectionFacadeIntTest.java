@@ -355,13 +355,15 @@ class ConnectedUserConnectionFacadeIntTest {
         assertThat(connectedUserConnectionFacade.getOwnedConnectionIds(connectedUserId))
             .containsExactly(82450L, 82451L);
 
+        Map<String, Object> parameters = Map.of("apiKey", "new");
+
         assertThrows(
             NoSuchElementException.class,
             () -> connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, 82452L));
         assertThrows(
             NoSuchElementException.class,
             () -> connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
-                connectedUserId, 82452L, Map.of("apiKey", "new")));
+                connectedUserId, 82452L, parameters));
 
         verify(connectionFacade, never()).delete(any());
         verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
