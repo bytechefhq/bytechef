@@ -47,13 +47,16 @@ public class ClusterElementTools {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
+    private final ScopedProjectGuard scopedProjectGuard;
 
     @SuppressFBWarnings("EI")
     public ClusterElementTools(
-        ComponentDefinitionService componentDefinitionService, ProjectWorkflowFacade projectWorkflowFacade) {
+        ComponentDefinitionService componentDefinitionService, ProjectWorkflowFacade projectWorkflowFacade,
+        ScopedProjectGuard scopedProjectGuard) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.projectWorkflowFacade = projectWorkflowFacade;
+        this.scopedProjectGuard = scopedProjectGuard;
     }
 
     @Tool(
@@ -67,6 +70,9 @@ public class ClusterElementTools {
                 "{\"label\": \"My Workflow\", \"description\": \"Does X\"}") String rootPropertiesDefinition,
         ToolContext toolContext) {
 
+        scopedProjectGuard.checkWorkflow(workflowId, ScopedProjectGuard.WORKFLOW_EDIT, toolContext,
+            ProjectWorkflowErrorType.UPDATE_WORKFLOW_ROOT);
+
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
 
@@ -77,7 +83,8 @@ public class ClusterElementTools {
 
             String updatedWorkflowDefinition = JsonUtils.writeWithDefaultPrettyPrinter(rootNode);
 
-            checkAllowedComponents(updatedWorkflowDefinition, toolContext, ScriptToolErrorType.UPDATE_WORKFLOW_ROOT);
+            checkAllowedComponents(updatedWorkflowDefinition, toolContext,
+                ProjectWorkflowErrorType.UPDATE_WORKFLOW_ROOT);
 
             projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());
@@ -113,6 +120,9 @@ public class ClusterElementTools {
         @ToolParam(description = "The cluster elements definition as a JSON string") String clusterElementsDefinition,
         ToolContext toolContext) {
 
+        scopedProjectGuard.checkWorkflow(workflowId, ScopedProjectGuard.WORKFLOW_EDIT, toolContext,
+            ProjectWorkflowErrorType.UPDATE_SCRIPT);
+
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
 
@@ -145,7 +155,7 @@ public class ClusterElementTools {
 
             String updatedWorkflowDefinition = JsonUtils.writeWithDefaultPrettyPrinter(rootNode);
 
-            checkAllowedComponents(updatedWorkflowDefinition, toolContext, ScriptToolErrorType.UPDATE_SCRIPT);
+            checkAllowedComponents(updatedWorkflowDefinition, toolContext, ProjectWorkflowErrorType.UPDATE_SCRIPT);
 
             projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());

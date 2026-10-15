@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 
 /**
- * The single project an agent run is confined to. Workflow tools reject any workflow or project outside it.
+ * The single project an agent run is confined to; a run is confined exactly when one is set.
  *
  * @author Ivica Cardic
  */
