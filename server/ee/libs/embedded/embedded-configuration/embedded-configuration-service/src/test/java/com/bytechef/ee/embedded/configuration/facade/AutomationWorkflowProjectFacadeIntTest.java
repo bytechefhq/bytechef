@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -839,6 +840,61 @@ class AutomationWorkflowProjectFacadeIntTest {
         assertThat(getPublishedSlackComponent(workflowUuid).integrationId()).isEqualTo(firstIntegrationId);
     }
 
+    @Test
+    void testAnIntegrationHiddenFromTheConnectedUserIsSkippedForTheComponent() {
+        stubSlackComponentDefinition();
+
+        when(embeddedPermissionEvaluator.evaluate(eq("hidden-from-connected-user"), any()))
+            .thenReturn(false);
+
+        long hiddenIntegrationId = createIntegrationWithConfiguration(
+            "slack", Environment.PRODUCTION, true, "hidden-from-connected-user");
+        long visibleIntegrationId = createIntegrationWithConfiguration("slack", Environment.PRODUCTION, true);
+
+        assertThat(hiddenIntegrationId).isLessThan(visibleIntegrationId);
+
+        String workflowUuid = createPublishedSlackTemplate();
+
+        assertThat(getPublishedSlackComponent(workflowUuid).integrationId()).isEqualTo(visibleIntegrationId);
+    }
+
+    @Test
+    void testPublishedTemplateTriggerCarriesTheIntegrationEnabledInTheEnvironment() {
+        when(componentDefinitionService.fetchComponentDefinition("hubspot", 1))
+            .thenReturn(Optional.of(new ComponentDefinition(
+                ComponentDsl.component("hubspot")
+                    .title("HubSpot")
+                    .connection(ComponentDsl.connection()))));
+
+        long integrationId = createIntegrationWithConfiguration("hubspot", Environment.PRODUCTION, true);
+
+        long projectId = automationWorkflowProjectFacade.createProject(
+            "HubSpot contacts", "", null, List.of(), null, null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            projectId,
+            "{\"label\":\"HubSpot contacts\",\"triggers\":[{\"name\":\"trigger_1\"," +
+                "\"type\":\"hubspot/v1/newContact\",\"parameters\":{}}],\"tasks\":[]}",
+            null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        ConnectedUserWorkflowTemplateDTO.Component hubspotTrigger = automationWorkflowProjectFacade
+            .getPublishedProjects(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION)
+            .stream()
+            .flatMap(project -> project.workflowTemplates()
+                .stream())
+            .filter(template -> workflowUuid.equals(template.workflowUuid()))
+            .flatMap(template -> template.triggers()
+                .stream())
+            .filter(trigger -> "hubspot".equals(trigger.name()))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(hubspotTrigger.connectionRequired()).isTrue();
+        assertThat(hubspotTrigger.integrationId()).isEqualTo(integrationId);
+    }
+
     private void stubSlackComponentDefinition() {
         when(componentDefinitionService.fetchComponentDefinition("slack", 1))
             .thenReturn(Optional.of(new ComponentDefinition(
@@ -848,10 +904,17 @@ class AutomationWorkflowProjectFacadeIntTest {
     }
 
     private long createIntegrationWithConfiguration(String componentName, Environment environment, boolean enabled) {
+        return createIntegrationWithConfiguration(componentName, environment, enabled, null);
+    }
+
+    private long createIntegrationWithConfiguration(
+        String componentName, Environment environment, boolean enabled, String permissionExpression) {
+
         Integration integration = new Integration();
 
         integration.setComponentName(componentName);
         integration.setName(componentName + "-" + UUID.randomUUID());
+        integration.setPermissionExpression(permissionExpression);
 
         integration = integrationService.create(integration);
 
