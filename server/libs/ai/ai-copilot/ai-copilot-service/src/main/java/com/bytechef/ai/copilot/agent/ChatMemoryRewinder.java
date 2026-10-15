@@ -19,6 +19,8 @@ package com.bytechef.ai.copilot.agent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -27,6 +29,8 @@ import org.springframework.ai.chat.messages.UserMessage;
  * @author Ivica Cardic
  */
 final class ChatMemoryRewinder {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatMemoryRewinder.class);
 
     private ChatMemoryRewinder() {
     }
@@ -54,7 +58,16 @@ final class ChatMemoryRewinder {
 
         int keptUserMessageCount = findKeptUserMessageCount(messages, userMessageIndexes, previousUserTexts);
 
-        if (keptUserMessageCount <= 0 || keptUserMessageCount == userMessageIndexes.size()) {
+        if (keptUserMessageCount == 0) {
+            log.warn(
+                "Chat memory of conversation {} matches none of the {} user turns the client shows; keeping its {} " +
+                    "user turns",
+                conversationId, previousUserTexts.size(), userMessageIndexes.size());
+
+            return;
+        }
+
+        if (keptUserMessageCount == userMessageIndexes.size()) {
             return;
         }
 
@@ -69,12 +82,12 @@ final class ChatMemoryRewinder {
     private static int findKeptUserMessageCount(
         List<Message> messages, List<Integer> userMessageIndexes, List<String> previousUserTexts) {
 
-        for (int keptCount = userMessageIndexes.size(); keptCount > 0; keptCount--) {
-            int comparedCount = Math.min(keptCount, previousUserTexts.size());
+        int maxKeptCount = Math.min(userMessageIndexes.size(), previousUserTexts.size());
 
+        for (int keptCount = maxKeptCount; keptCount > 0; keptCount--) {
             boolean matches = true;
 
-            for (int offset = 1; offset <= comparedCount; offset++) {
+            for (int offset = 1; offset <= keptCount; offset++) {
                 Message message = messages.get(userMessageIndexes.get(keptCount - offset));
 
                 if (!Objects.equals(message.getText(), previousUserTexts.get(previousUserTexts.size() - offset))) {
