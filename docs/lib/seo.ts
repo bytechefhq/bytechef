@@ -3,6 +3,8 @@ export const MAX_TITLE_LENGTH = 70;
 export const MAX_DESCRIPTION_LENGTH = 170;
 export const MIN_DESCRIPTION_LENGTH = 120;
 
+const MIN_TITLE_ROOM = 20;
+
 const VERSION_SUFFIX = /_v(\d+)$/;
 
 export type ReferenceKindType = 'Component' | 'Flow Control';
@@ -95,6 +97,10 @@ function fitTitle(title: string, labels: string[], protectedCount: number): stri
 
   const suffix = fittedLabels.length > 0 ? ` - ${fittedLabels.join(', ')}` : '';
 
+  if (MAX_TITLE_LENGTH - suffix.length < MIN_TITLE_ROOM) {
+    return truncateAtWord(fittedLabels.join(', '), MAX_TITLE_LENGTH);
+  }
+
   return `${truncateAtWord(title, MAX_TITLE_LENGTH - suffix.length)}${suffix}`;
 }
 
@@ -126,10 +132,12 @@ export function getDistinguishingSlugs(slugs: string[], sameTitleSlugs: string[]
 function truncateAtWord(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
 
-  const cut = text.slice(0, maxLength - 1);
+  const cut = text.slice(0, maxLength - 1).replace(/[\uD800-\uDBFF]$/, '');
   const lastSpace = cut.lastIndexOf(' ');
 
-  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.-]+$/, '')}…`;
+  const end = lastSpace > cut.length / 2 ? lastSpace : cut.length;
+
+  return `${cut.slice(0, end).replace(/[\s,;:.-]+$/, '')}…`;
 }
 
 function shortenToSentences(text: string): string {
@@ -163,7 +171,9 @@ export function fitDescription(description: string | undefined, fillers: string[
 
   if (normalized.length >= MIN_DESCRIPTION_LENGTH) return normalized;
 
-  const candidates = fillers.map((filler) => `${normalized} ${filler}`.trim());
+  const sentence = normalized && !/[.!?]$/.test(normalized) ? `${normalized}.` : normalized;
+
+  const candidates = fillers.map((filler) => `${sentence} ${filler}`.trim());
 
   const fitting = candidates.find(
     (candidate) =>
@@ -184,9 +194,7 @@ export function fitDescription(description: string | undefined, fillers: string[
 }
 
 /**
- * Filler sentences per page kind for descriptions that are missing or too short, longest first. Consecutive
- * fillers differ by under 50 characters, the width of the 120-170 target range, so whatever the length of the
- * original description, one of them lands it inside the range.
+ * Filler sentences per page kind for descriptions that are missing or too short, longest first.
  */
 export function getDescriptionFillers(slugs: string[], title: string): string[] {
   const kind = getReferenceKind(slugs);
