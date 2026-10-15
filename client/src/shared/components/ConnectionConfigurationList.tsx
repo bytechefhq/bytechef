@@ -251,7 +251,7 @@ const InheritedSubflowConnectionStub = ({stub, subflowLabelMap}: InheritedSubflo
 
 interface SubflowConnectionGroupProps {
     connectionDialogAllowed: boolean;
-    connections?: ConnectionI[];
+    connections: ConnectionI[];
     connectionsGrouped: boolean;
     control: Control<FieldValues>;
     fieldNamePrefix: string;
@@ -304,7 +304,7 @@ const SubflowConnectionGroup = ({
                     <ConnectionConfigurationListFormField
                         componentConnection={connectionItem.connection}
                         connectionDialogAllowed={connectionDialogAllowed}
-                        connections={connections!}
+                        connections={connections}
                         control={control}
                         currentConnectionId={getCurrentConnectionId?.(connectionItem.index)}
                         fieldNamePrefix={fieldNamePrefix}
@@ -363,7 +363,7 @@ interface ConnectionConfigurationListProps {
 const ConnectionConfigurationList = ({
     componentConnections,
     connectionDialogAllowed = false,
-    connections,
+    connections = [],
     connectionsGrouped = false,
     control,
     duplicateSubflowStubs,
@@ -522,7 +522,7 @@ const ConnectionConfigurationList = ({
                 <ConnectionConfigurationListFormField
                     componentConnection={connection}
                     connectionDialogAllowed={connectionDialogAllowed}
-                    connections={connections!}
+                    connections={connections}
                     control={control}
                     currentConnectionId={getCurrentConnectionId?.(index)}
                     fieldNamePrefix={fieldNamePrefix}
