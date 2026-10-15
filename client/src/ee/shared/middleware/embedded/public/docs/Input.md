@@ -6,10 +6,12 @@
 
 Name | Type
 ------------ | -------------
+`defaultValue` | string
 `internalOnly` | boolean
 `label` | string
 `name` | string
 `objectName` | string
+`options` | [Array&lt;Option&gt;](Option.md)
 `required` | boolean
 `type` | [InputType](InputType.md)
 `componentReference` | [ComponentInputReference](ComponentInputReference.md)
@@ -21,10 +23,12 @@ import type { Input } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "defaultValue": null,
   "internalOnly": null,
   "label": null,
   "name": null,
   "objectName": null,
+  "options": null,
   "required": null,
   "type": null,
   "componentReference": null,

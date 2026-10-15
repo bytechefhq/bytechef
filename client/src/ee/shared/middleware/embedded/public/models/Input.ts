@@ -20,6 +20,13 @@ import {
     InputTypeToJSON,
     InputTypeToJSONTyped,
 } from './InputType';
+import type { Option } from './Option';
+import {
+    OptionFromJSON,
+    OptionFromJSONTyped,
+    OptionToJSON,
+    OptionToJSONTyped,
+} from './Option';
 import type { ComponentInputReference } from './ComponentInputReference';
 import {
     ComponentInputReferenceFromJSON,
@@ -34,6 +41,10 @@ import {
  * @interface Input
  */
 export interface Input {
+    /**
+     * The default value of an input
+     */
+    defaultValue?: string;
     /**
      * If true, the input is configured in the admin IntegrationInstanceConfigurationDialog; if false (default), it is rendered in the end-user ConnectDialog.
      * @type {boolean}
@@ -58,6 +69,10 @@ export interface Input {
      * @memberof Input
      */
     objectName?: string;
+    /**
+     * The static options an input value is chosen from
+     */
+    options?: Array<Option>;
     /**
      * If an input is required, or not
      * @type {boolean}
@@ -99,10 +114,12 @@ export function InputFromJSONTyped(json: any, ignoreDiscriminator: boolean): Inp
     }
     return {
         
+        'defaultValue': json['defaultValue'] == null ? undefined : json['defaultValue'],
         'internalOnly': json['internalOnly'] == null ? undefined : json['internalOnly'],
         'label': json['label'] == null ? undefined : json['label'],
         'name': json['name'],
         'objectName': json['objectName'] == null ? undefined : json['objectName'],
+        'options': json['options'] == null ? undefined : ((json['options'] as Array<any>).map(OptionFromJSON)),
         'required': json['required'] == null ? undefined : json['required'],
         'type': InputTypeFromJSON(json['type']),
         'componentReference': json['componentReference'] == null ? undefined : ComponentInputReferenceFromJSON(json['componentReference']),
@@ -120,10 +137,12 @@ export function InputToJSONTyped(value?: Input | null, ignoreDiscriminator: bool
 
     return {
         
+        'defaultValue': value['defaultValue'],
         'internalOnly': value['internalOnly'],
         'label': value['label'],
         'name': value['name'],
         'objectName': value['objectName'],
+        'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionToJSON)),
         'required': value['required'],
         'type': InputTypeToJSON(value['type']),
         'componentReference': ComponentInputReferenceToJSON(value['componentReference']),
