@@ -4,7 +4,17 @@ export class ApiResponseError extends Error {
         readonly body: unknown
     ) {
         super(`Response status: ${status}`);
+
+        this.name = 'ApiResponseError';
     }
+}
+
+async function readResponseBody<T>(response: Response, method: string): Promise<T> {
+    if (method !== 'GET' && (response.status === 204 || response.headers?.get('content-length') === '0')) {
+        return undefined as T;
+    }
+
+    return (await response.json()) as T;
 }
 
 export function createApiClient(baseUrl: string, environment: string, jwtToken: string) {
@@ -15,6 +25,10 @@ export function createApiClient(baseUrl: string, environment: string, jwtToken: 
     };
 
     return {
+        /**
+         * Resolves with the parsed JSON body, or `undefined` when a non-GET response has no body. Rejects with an
+         * {@link ApiResponseError} for a non-2xx status and with a `SyntaxError` for a body that is not JSON.
+         */
         async fetch<T>(
             endpoint: string,
             options: {
@@ -34,23 +48,12 @@ export function createApiClient(baseUrl: string, environment: string, jwtToken: 
                 });
 
                 if (!response.ok) {
-                    const errorBody = await response.json().catch(() => undefined);
+                    const errorBody = await readResponseBody<unknown>(response, method).catch(() => undefined);
 
                     throw new ApiResponseError(response.status, errorBody);
                 }
 
-                // Only try to parse JSON if we expect a response body
-                if (method === 'GET' || response.headers.get('content-length') !== '0') {
-                    try {
-                        return await response.json();
-                    } catch (error: unknown) {
-                        console.warn('Empty or non-JSON response : ', (error as Error).message);
-
-                        return {} as T;
-                    }
-                }
-
-                return {} as T;
+                return await readResponseBody<T>(response, method);
             } catch (error: unknown) {
                 console.error(`API Error (${endpoint}):`, (error as Error).message);
 
