@@ -22,8 +22,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
@@ -38,6 +41,9 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
@@ -46,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,6 +81,9 @@ class ProjectWorkflowToolsTest {
     private static final long FOREIGN_WORKSPACE_ID = 2L;
     private static final String NOT_IN_PROJECT_MESSAGE = "was not found in this chat's project";
     private static final long WORKSPACE_ID = 1L;
+
+    @Mock
+    private ComponentDefinitionService componentDefinitionService;
 
     @Mock
     private ProjectService projectService;
@@ -471,6 +481,215 @@ class ProjectWorkflowToolsTest {
     }
 
     @Nested
+    class AllowedComponentNamesTest {
+
+        private static final long OWN_PROJECT_ID = 1114L;
+        private static final String OWN_WORKFLOW_ID = "own-workflow";
+
+        @Test
+        void testUpdateWorkflowRejectsATaskOfAComponentOutsideTheAllowList() {
+            stubOwnWorkflowProject();
+            stubComponentDefinitions(Map.of("salesforce", true));
+
+            String definition = """
+                {
+                    "label": "Flow",
+                    "triggers": [{"name": "trigger_1", "type": "manual/v1/manual"}],
+                    "tasks": [
+                        {"name": "slack_1", "type": "slack/v1/sendMessage", "parameters": {}},
+                        {"name": "salesforce_1", "type": "salesforce/v1/createRecord", "parameters": {}}
+                    ]
+                }""";
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(() -> tools.updateWorkflow(OWN_WORKFLOW_ID, definition, null, allowListToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage("This chat can't use salesforce: it isn't one of the integrations available to this user.");
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(any(), any(), anyInt());
+        }
+
+        @Test
+        void testUpdateWorkflowRejectsATaskNestedInATaskDispatcher() {
+            stubOwnWorkflowProject();
+            stubComponentDefinitions(Map.of("salesforce", true));
+
+            String definition = """
+                {
+                    "label": "Flow",
+                    "tasks": [
+                        {
+                            "name": "condition_1",
+                            "type": "condition/v1",
+                            "parameters": {
+                                "caseTrue": [
+                                    {
+                                        "name": "loop_1",
+                                        "type": "loop/v1",
+                                        "parameters": {
+                                            "iteratee": [
+                                                {"name": "salesforce_1", "type": "salesforce/v1/createRecord"}
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "caseFalse": []
+                            }
+                        }
+                    ]
+                }""";
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(() -> tools.updateWorkflow(OWN_WORKFLOW_ID, definition, null, allowListToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("This chat can't use salesforce");
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(any(), any(), anyInt());
+        }
+
+        @Test
+        void testUpdateWorkflowRejectsAClusterElementOutsideTheAllowList() {
+            stubOwnWorkflowProject();
+            stubComponentDefinitions(Map.of("aiAgent", false, "openAi", true, "hubspot", true));
+
+            String definition = """
+                {
+                    "label": "Flow",
+                    "tasks": [
+                        {
+                            "name": "aiAgent_1",
+                            "type": "aiAgent/v1/chat",
+                            "clusterElements": {
+                                "model": {"name": "openAi_1", "type": "openAi/v1/model"},
+                                "tools": [{"name": "hubspot_1", "type": "hubspot/v1/createContact"}]
+                            }
+                        }
+                    ]
+                }""";
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(() -> tools.updateWorkflow(OWN_WORKFLOW_ID, definition, null, allowListToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(
+                    "This chat can't use openAi, hubspot: they aren't among the integrations available to this user.");
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(any(), any(), anyInt());
+        }
+
+        @Test
+        void testUpdateWorkflowAcceptsTaskDispatchersAndConnectionFreeComponents() {
+            stubOwnWorkflowProject();
+            stubComponentDefinitions(Map.of("logger", false));
+
+            when(projectWorkflowFacade.getProjectWorkflow(OWN_WORKFLOW_ID))
+                .thenReturn(buildDto(OWN_WORKFLOW_ID, 1L, 1));
+
+            String definition = """
+                {
+                    "label": "Flow",
+                    "tasks": [
+                        {
+                            "name": "condition_1",
+                            "type": "condition/v1",
+                            "parameters": {
+                                "caseTrue": [
+                                    {"name": "slack_1", "type": "slack/v1/sendMessage"},
+                                    {"name": "logger_1", "type": "logger/v1/info"}
+                                ]
+                            }
+                        },
+                        {"name": "loop_1", "type": "loop/v1", "parameters": {"iteratee": []}}
+                    ]
+                }""";
+
+            newTools().updateWorkflow(OWN_WORKFLOW_ID, definition, null, allowListToolContext());
+
+            verify(projectWorkflowFacade).updateWorkflow(OWN_WORKFLOW_ID, definition, 1);
+        }
+
+        @Test
+        void testUpdateWorkflowWithoutTheAllowListIsUnaffected() {
+            stubOwnWorkflowProject();
+
+            when(projectWorkflowFacade.getProjectWorkflow(OWN_WORKFLOW_ID))
+                .thenReturn(buildDto(OWN_WORKFLOW_ID, 1L, 1));
+
+            String definition = """
+                {"label": "Flow", "tasks": [{"name": "salesforce_1", "type": "salesforce/v1/createRecord"}]}""";
+
+            newTools().updateWorkflow(OWN_WORKFLOW_ID, definition, null, scopedToolContext(null));
+
+            verify(projectWorkflowFacade).updateWorkflow(OWN_WORKFLOW_ID, definition, 1);
+            verifyNoInteractions(componentDefinitionService);
+        }
+
+        @Test
+        void testCreateProjectWorkflowRejectsAComponentOutsideTheAllowList() {
+            stubComponentDefinitions(Map.of("salesforce", true));
+
+            String definition = """
+                {"label": "Flow", "tasks": [{"name": "salesforce_1", "type": "salesforce/v1/createRecord"}]}""";
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(
+                () -> tools.createProjectWorkflow(OWN_PROJECT_ID, definition, null, allowListToolContext()))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessageContaining("This chat can't use salesforce");
+
+            verify(projectWorkflowFacade, never()).addWorkflow(anyLong(), anyString());
+        }
+
+        private ToolContext allowListToolContext() {
+            return scopedToolContext(Set.of("slack"));
+        }
+
+        private ToolContext scopedToolContext(Set<String> allowedComponentNames) {
+            Map<String, Object> context = new HashMap<>(
+                AgentToolInvocationContext.builder()
+                    .environmentId(0L)
+                    .tenantId("000001")
+                    .authentication(new UsernamePasswordAuthenticationToken("1234567890", null, List.of()))
+                    .build()
+                    .toToolContext());
+
+            context.put(ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID);
+
+            if (allowedComponentNames != null) {
+                context.put(
+                    AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);
+            }
+
+            return new ToolContext(context);
+        }
+
+        private void stubComponentDefinitions(Map<String, Boolean> connectionRequiredByComponentName) {
+            when(componentDefinitionService.fetchComponentDefinition(anyString(), isNull()))
+                .thenAnswer(invocation -> {
+                    Boolean connectionRequired = connectionRequiredByComponentName.get(invocation.getArgument(0));
+
+                    if (connectionRequired == null) {
+                        return Optional.empty();
+                    }
+
+                    ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+                    when(componentDefinition.isConnectionRequired()).thenReturn(connectionRequired);
+
+                    return Optional.of(componentDefinition);
+                });
+        }
+
+        private void stubOwnWorkflowProject() {
+            when(projectWorkflowService.getWorkflowProjectWorkflow(OWN_WORKFLOW_ID))
+                .thenReturn(buildProjectWorkflow(1L, OWN_PROJECT_ID, OWN_WORKFLOW_ID));
+        }
+    }
+
+    @Nested
     class WorkspaceScopeTest {
 
         @Test
@@ -620,7 +839,7 @@ class ProjectWorkflowToolsTest {
 
     private ProjectWorkflowTools newTools() {
         return new ProjectWorkflowTools(
-            projectWorkflowFacade, projectWorkflowService,
+            componentDefinitionService, projectWorkflowFacade, projectWorkflowService,
             new ScopedProjectGuard(
                 projectService, projectWorkflowService, scopedConnectionGuard, workspaceScopeResolver),
             testConfigurationFacadeProvider);

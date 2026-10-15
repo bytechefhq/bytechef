@@ -19,11 +19,15 @@ package com.bytechef.platform.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.ComponentTools.ActionMinimalInfo;
 import com.bytechef.platform.ai.tool.ComponentTools.TriggerMinimalInfo;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools.TaskDispatcherMinimalInfo;
@@ -131,10 +135,10 @@ class TaskToolsTest {
 
     @Test
     void testListTasksFiltersDisallowedComponentsButKeepsTaskDispatchers() {
-        when(componentTools.listActions()).thenReturn(List.of(
+        when(componentTools.listActions(any())).thenReturn(List.of(
             new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
             new ActionMinimalInfo("createRow", "Create a row", "googleSheets")));
-        when(componentTools.listTriggers()).thenReturn(List.of(
+        when(componentTools.listTriggers(any())).thenReturn(List.of(
             new TriggerMinimalInfo("newMessage", "New message", "slack")));
         when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of(
             new TaskDispatcherMinimalInfo("condition", "Branch on a condition", 1)));
@@ -151,10 +155,10 @@ class TaskToolsTest {
 
     @Test
     void testListTasksWithoutToolContextReturnsEverything() {
-        when(componentTools.listActions()).thenReturn(List.of(
+        when(componentTools.listActions(any())).thenReturn(List.of(
             new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
             new ActionMinimalInfo("createRow", "Create a row", "googleSheets")));
-        when(componentTools.listTriggers()).thenReturn(List.of());
+        when(componentTools.listTriggers(any())).thenReturn(List.of());
         when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
 
         List<TaskMinimalInfo> result = taskTools.listTasks(null, null, null);
@@ -166,10 +170,10 @@ class TaskToolsTest {
 
     @Test
     void testSearchTasksFiltersDisallowedComponentsButKeepsTaskDispatchers() {
-        when(componentTools.searchActions("row")).thenReturn(List.of(
+        when(componentTools.searchActions(eq("row"), any())).thenReturn(List.of(
             new ActionMinimalInfo("createRow", "Create a row", "googleSheets"),
             new ActionMinimalInfo("addRow", "Add a row", "airtable")));
-        when(componentTools.searchTriggers("row")).thenReturn(List.of());
+        when(componentTools.searchTriggers(eq("row"), any())).thenReturn(List.of());
         when(taskDispatcherTools.searchTaskDispatchers("row")).thenReturn(List.of(
             new TaskDispatcherMinimalInfo("loop", "Loop over rows", 1)));
 
@@ -185,12 +189,12 @@ class TaskToolsTest {
 
     @Test
     void testListTasksAppliesAllowListFilterBeforeLimit() {
-        when(componentTools.listActions()).thenReturn(List.of(
+        when(componentTools.listActions(any())).thenReturn(List.of(
             new ActionMinimalInfo("createRow", "Create a row", "googleSheets"),
             new ActionMinimalInfo("addRow", "Add a row", "googleSheets"),
             new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
             new ActionMinimalInfo("updateMessage", "Update a message", "slack")));
-        when(componentTools.listTriggers()).thenReturn(List.of());
+        when(componentTools.listTriggers(any())).thenReturn(List.of());
         when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
 
         ToolContext toolContext = new ToolContext(Map.of(
@@ -207,10 +211,10 @@ class TaskToolsTest {
 
     @Test
     void testListTasksWithEmptyAllowListReturnsEverything() {
-        when(componentTools.listActions()).thenReturn(List.of(
+        when(componentTools.listActions(any())).thenReturn(List.of(
             new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
             new ActionMinimalInfo("createRow", "Create a row", "googleSheets")));
-        when(componentTools.listTriggers()).thenReturn(List.of());
+        when(componentTools.listTriggers(any())).thenReturn(List.of());
         when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
 
         ToolContext toolContext = new ToolContext(Map.of(
@@ -225,10 +229,10 @@ class TaskToolsTest {
 
     @Test
     void testListTasksWithNonSetAllowListValueReturnsEverything() {
-        when(componentTools.listActions()).thenReturn(List.of(
+        when(componentTools.listActions(any())).thenReturn(List.of(
             new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
             new ActionMinimalInfo("createRow", "Create a row", "googleSheets")));
-        when(componentTools.listTriggers()).thenReturn(List.of());
+        when(componentTools.listTriggers(any())).thenReturn(List.of());
         when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
 
         ToolContext toolContext = new ToolContext(Map.of(
@@ -239,5 +243,31 @@ class TaskToolsTest {
         assertThat(result)
             .extracting(TaskMinimalInfo::componentName)
             .containsExactlyInAnyOrder("slack", "googleSheets");
+    }
+
+    @Test
+    void testGetTaskRejectsAComponentOutsideTheAllowList() {
+        ToolContext toolContext = new ToolContext(Map.of(
+            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
+
+        ExecutionException executionException = assertThrows(
+            ExecutionException.class,
+            () -> taskTools.getTask("action", "createRecord", "salesforce", null, toolContext));
+
+        assertThat(executionException.getMessage())
+            .isEqualTo("This chat can't use salesforce: it isn't one of the integrations available to this user.");
+        verify(componentTools, never()).getAction(anyString(), anyString(), any(), any());
+    }
+
+    @Test
+    void testGetTaskDefinitionOfATaskDispatcherIgnoresTheAllowList() {
+        when(taskDispatcherTools.getTaskDispatcherDefinition("condition", null)).thenReturn("{}");
+
+        ToolContext toolContext = new ToolContext(Map.of(
+            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
+
+        String result = taskTools.getTaskDefinition("taskDispatcher", "condition", null, null, toolContext);
+
+        assertThat(result).isEqualTo("{}");
     }
 }

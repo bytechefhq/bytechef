@@ -20,6 +20,7 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.exception.ComponentToolErrorType;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
@@ -124,7 +125,10 @@ public class ComponentTools {
         description = "Get comprehensive information about a specific component. Returns detailed project information including: name, description, triggers and actions")
     public ComponentInfo getComponent(
         @ToolParam(description = "The name of the component to retrieve in camel case") String componentName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_COMPONENT);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -187,7 +191,10 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the trigger in camel case") String componentName,
         @ToolParam(description = "The name of the trigger to retrieve in camel case") String triggerName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_TRIGGER);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -231,7 +238,10 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the trigger in camel case") String componentName,
         @ToolParam(description = "The name of the trigger to generate definition for in camel case") String triggerName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GENERATE_TRIGGER_DEFINITION);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -278,9 +288,9 @@ public class ComponentTools {
 
     @Tool(
         description = "List all actions from all components. Returns a list of actions with their basic information including name, description and component")
-    public List<ActionMinimalInfo> listActions() {
+    public List<ActionMinimalInfo> listActions(@Nullable ToolContext toolContext) {
         try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+            List<ComponentDefinition> componentDefinitions = getAllowedComponentDefinitions(toolContext);
 
             List<ActionMinimalInfo> actions = componentDefinitions.stream()
                 .flatMap(component -> component.getActions()
@@ -303,9 +313,9 @@ public class ComponentTools {
 
     @Tool(
         description = "List all components in a project. Returns a list of components with their basic information including name and description")
-    public List<ComponentMinimalInfo> listComponents() {
+    public List<ComponentMinimalInfo> listComponents(@Nullable ToolContext toolContext) {
         try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+            List<ComponentDefinition> componentDefinitions = getAllowedComponentDefinitions(toolContext);
 
             if (log.isDebugEnabled()) {
                 log.debug("listComponents(): Found {} components", componentDefinitions.size());
@@ -324,9 +334,9 @@ public class ComponentTools {
 
     @Tool(
         description = "List all triggers from all components. Returns a list of triggers with their basic information including name, description, component, and type")
-    public List<TriggerMinimalInfo> listTriggers() {
+    public List<TriggerMinimalInfo> listTriggers(@Nullable ToolContext toolContext) {
         try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+            List<ComponentDefinition> componentDefinitions = getAllowedComponentDefinitions(toolContext);
 
             List<TriggerMinimalInfo> triggers = componentDefinitions.stream()
                 .flatMap(component -> component.getTriggers()
@@ -350,10 +360,11 @@ public class ComponentTools {
     @Tool(
         description = "Full-text search across components. Returns a list of components matching the search query in name or description.")
     public List<ComponentMinimalInfo> searchComponents(
-        @ToolParam(description = "The search query to match against component names and descriptions") String query) {
+        @ToolParam(description = "The search query to match against component names and descriptions") String query,
+        @Nullable ToolContext toolContext) {
 
         try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+            List<ComponentDefinition> componentDefinitions = getAllowedComponentDefinitions(toolContext);
             String lowerQuery = query.toLowerCase()
                 .trim();
 
@@ -384,10 +395,11 @@ public class ComponentTools {
     @Tool(
         description = "Search triggers across all components. Returns a list of triggers matching the search query in name or description")
     public List<TriggerMinimalInfo> searchTriggers(
-        @ToolParam(description = "The search query to match against trigger names and descriptions") String query) {
+        @ToolParam(description = "The search query to match against trigger names and descriptions") String query,
+        @Nullable ToolContext toolContext) {
 
         try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+            List<ComponentDefinition> componentDefinitions = getAllowedComponentDefinitions(toolContext);
 
             String lowerQuery = query.toLowerCase()
                 .trim();
@@ -424,7 +436,10 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the action in camel case") String componentName,
         @ToolParam(description = "The name of the action to retrieve in camel case") String actionName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_ACTION);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -483,10 +498,11 @@ public class ComponentTools {
             description = "The cluster element type key to search for in snake_case") String clusterElementType,
         @ToolParam(
             required = false,
-            description = "Filter results by the name of the component. Default is null") String componentName) {
+            description = "Filter results by the name of the component. Default is null") String componentName,
+        @Nullable ToolContext toolContext) {
 
         try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+            List<ComponentDefinition> componentDefinitions = getAllowedComponentDefinitions(toolContext);
 
             List<ComponentInfo> matchingComponents = componentDefinitions.stream()
                 .filter(component -> !component.getClusterElements()
@@ -543,7 +559,10 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the cluster element in camel case") String componentName,
         @ToolParam(description = "The name of the cluster element to retrieve in camel case") String clusterElementName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_ACTION);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -600,10 +619,11 @@ public class ComponentTools {
     @Tool(
         description = "Search actions across all components. Returns a list of actions matching the search query in name or description")
     public List<ActionMinimalInfo> searchActions(
-        @ToolParam(description = "The search query to match against action names and descriptions") String query) {
+        @ToolParam(description = "The search query to match against action names and descriptions") String query,
+        @Nullable ToolContext toolContext) {
 
         try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+            List<ComponentDefinition> componentDefinitions = getAllowedComponentDefinitions(toolContext);
 
             String lowerQuery = StringUtils.trim(query.toLowerCase());
 
@@ -639,7 +659,10 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the action in camel case") String componentName,
         @ToolParam(description = "The name of the action to generate definition for in camel case") String actionName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GENERATE_ACTION_DEFINITION);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -689,6 +712,8 @@ public class ComponentTools {
             description = "The name of the trigger, action or cluster element to retrieve output properties for in camel case") String operationName,
         @ToolParam(required = false, description = "The version of the component") Integer version,
         @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_OUTPUT_PROPERTIES);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -822,7 +847,10 @@ public class ComponentTools {
             description = "The name of the component that contains the trigger, action or cluster element in camel case") String componentName,
         @ToolParam(
             description = "The name of the trigger, action or cluster element to retrieve properties for in camel case") String operationName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(componentName, toolContext, ComponentToolErrorType.GET_PROPERTIES);
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -891,6 +919,20 @@ public class ComponentTools {
 
             throw new ExecutionException(FAILED_TO_GET_PROPERTIES, e, ComponentToolErrorType.GET_PROPERTIES);
         }
+    }
+
+    private static void checkAllowedComponent(
+        String componentName, @Nullable ToolContext toolContext, ComponentToolErrorType componentToolErrorType) {
+
+        if (!AllowedComponentNamesUtils.isAllowed(componentName, toolContext)) {
+            throw new ExecutionException(
+                AllowedComponentNamesUtils.getNotAllowedMessage(List.of(componentName)), componentToolErrorType);
+        }
+    }
+
+    private List<ComponentDefinition> getAllowedComponentDefinitions(@Nullable ToolContext toolContext) {
+        return AllowedComponentNamesUtils.filter(
+            componentDefinitionService.getComponentDefinitions(), ComponentDefinition::getName, toolContext);
     }
 
     /**
