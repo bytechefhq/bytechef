@@ -19,9 +19,13 @@ package com.bytechef.ai.copilot.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.ai.chat.model.ToolContext;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -83,6 +87,40 @@ class AskUserQuestionToolCallbackTest {
             .get(0)
             .get("label")
             .asString()).isEqualTo("slack");
+    }
+
+    @Test
+    void testRejectsAQuestionForAnUnresolvedLookupProperty() throws Exception {
+        AskUserQuestionToolCallback callback =
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
+
+        ToolContext toolContext = newToolContextWithSlackChannelLookup();
+
+        String result = callback.call(newChannelQuestionInput(), toolContext);
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        assertThat(node.has("error")).isTrue();
+        assertThat(node.get("error")
+            .asString()).contains("'channel'", "selectPropertyOption");
+    }
+
+    @Test
+    void testAllowsTheQuestionOnceThePickerResolvedTheProperty() throws Exception {
+        AskUserQuestionToolCallback callback =
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
+
+        ToolContext toolContext = newToolContextWithSlackChannelLookup();
+
+        LookupPropertyTracker.record(
+            toolContext, "selectPropertyOption", "{\"propertyName\":\"channel\"}", "{}");
+
+        String result = callback.call(newChannelQuestionInput(), toolContext);
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        assertThat(node.get("kind")
+            .asString()).isEqualTo("ask-user-question");
     }
 
     @Test
@@ -269,5 +307,36 @@ class AskUserQuestionToolCallbackTest {
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
             .asString()).contains("1-4");
+    }
+
+    private static ToolContext newToolContextWithSlackChannelLookup() {
+        Map<String, Object> context = new HashMap<>();
+
+        LookupPropertyTracker.install(context);
+
+        ToolContext toolContext = new ToolContext(context);
+
+        LookupPropertyTracker.record(
+            toolContext, "getTaskProperties", "{}",
+            "{\"channel\": { \"value\": \"string (required)\", \"lookupRequired\": true, \"lookupDependsOn\": [] }}");
+
+        return toolContext;
+    }
+
+    private static String newChannelQuestionInput() {
+        return """
+            {
+                "questions": [
+                    {
+                        "question": "Which Slack channel should the standup reminder be posted to?",
+                        "header": "Channel",
+                        "multiSelect": false,
+                        "options": [
+                            {"label": "#standup", "description": "Standup channel"},
+                            {"label": "#general", "description": "General channel"}
+                        ]
+                    }
+                ]
+            }""";
     }
 }

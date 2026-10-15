@@ -17,6 +17,7 @@
 package com.bytechef.ai.copilot.tool;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -73,15 +74,23 @@ public final class RehydrateContextToolCallback implements ToolCallback {
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         AgentToolInvocationContext invocationContext = AgentToolInvocationContext.fromToolContext(toolContext);
 
+        String toolResult;
+
         if (invocationContext == null) {
-            return delegate.call(toolInput, toolContext);
+            toolResult = delegate.call(toolInput, toolContext);
+        } else {
+            toolResult = withEnvironment(
+                invocationContext.environmentId(),
+                () -> withTenant(
+                    invocationContext.tenantId(),
+                    () -> withSecurityContext(invocationContext, () -> delegate.call(toolInput, toolContext))));
         }
 
-        return withEnvironment(
-            invocationContext.environmentId(),
-            () -> withTenant(
-                invocationContext.tenantId(),
-                () -> withSecurityContext(invocationContext, () -> delegate.call(toolInput, toolContext))));
+        ToolDefinition toolDefinition = delegate.getToolDefinition();
+
+        LookupPropertyTracker.record(toolContext, toolDefinition.name(), toolInput, toolResult);
+
+        return toolResult;
     }
 
     private static String withEnvironment(@Nullable Long environmentId, Supplier<String> action) {

@@ -26,6 +26,7 @@ import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
@@ -147,6 +148,17 @@ class CopilotToolContextUtilsTest {
 
         assertThat(toolContext)
             .containsEntry(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack", "logger"));
+    }
+
+    @Test
+    void testToToolContextInstallsALookupPropertyTrackerForARun() {
+        Map<String, Object> stateMap = new HashMap<>();
+
+        stateMap.put(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
+
+        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
+
+        assertThat(toolContext).containsKey(LookupPropertyTracker.TOOL_CONTEXT_LOOKUP_PROPERTY_TRACKER_KEY);
     }
 
     @Test
