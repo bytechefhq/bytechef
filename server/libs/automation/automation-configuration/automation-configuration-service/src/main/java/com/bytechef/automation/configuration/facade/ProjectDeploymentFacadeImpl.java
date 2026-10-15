@@ -73,6 +73,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -329,6 +330,15 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(projectId, environment);
 
         enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, enable);
+    }
+
+    @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironment(#workspaceId, 'DEPLOYMENT_VIEW', #environment)")
+    @Transactional(readOnly = true)
+    public List<ProjectDeployment> getProjectDeployments(
+        long workspaceId, Environment environment, @Nullable Long projectId, @Nullable Long tagId) {
+
+        return projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, workspaceId);
     }
 
     @Override

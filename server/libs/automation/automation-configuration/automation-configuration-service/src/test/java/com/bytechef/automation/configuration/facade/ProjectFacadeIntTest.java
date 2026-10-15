@@ -1230,9 +1230,9 @@ public class ProjectFacadeIntTest {
         private static final String BODY_REACHED = "body reached";
         private static final Set<String> GUARDED_METHOD_NAMES = Set.of(
             "createProject", "deleteProject", "deleteProjectVersion", "deleteSharedProject", "duplicateProject",
-            "exportProject", "exportSharedProject", "getProject", "getProjects", "getWorkspaceProjectWorkflows",
-            "getWorkspaceProjects", "importProject", "importProjectTemplate", "publishProject", "restoreProjectVersion",
-            "updateProject");
+            "exportProject", "exportSharedProject", "getNonSystemProjects", "getProject", "getProjectEntity",
+            "getProjects", "getWorkspaceProjectWorkflows", "getWorkspaceProjects", "importProject",
+            "importProjectTemplate", "publishProject", "restoreProjectVersion", "updateProject");
         private static final String PROJECT_CREATE = "PROJECT_CREATE";
         private static final String PROJECT_DELETE = "PROJECT_DELETE";
         private static final long PROJECT_ID = 42L;
@@ -1266,6 +1266,7 @@ public class ProjectFacadeIntTest {
                 .thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.create(any(Project.class))).thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.getProject(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.getProjects()).thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.getProjects(any(), any(), any(), any(), any(), any()))
                 .thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.getWorkspaceProjectIds(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
@@ -1450,6 +1451,36 @@ public class ProjectFacadeIntTest {
             grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
 
             assertBodyReached(() -> projectFacade.getProject(PROJECT_ID));
+        }
+
+        @Test
+        void testGetProjectEntityDeniesWithoutTheViewScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertDenied(() -> projectFacade.getProjectEntity(PROJECT_ID));
+        }
+
+        @Test
+        void testGetProjectEntityAllowsWithTheViewScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertBodyReached(() -> projectFacade.getProjectEntity(PROJECT_ID));
+        }
+
+        @Test
+        void testGetNonSystemProjectsDeniesANonAdminHoldingEveryResourceScope() {
+            when(permissionService.hasResourceScope(any(), anyString(), anyString())).thenReturn(true);
+
+            assertDenied(() -> projectFacade.getNonSystemProjects());
+
+            verify(permissionService).isTenantAdmin();
+        }
+
+        @Test
+        void testGetNonSystemProjectsAllowsATenantAdmin() {
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+
+            assertBodyReached(() -> projectFacade.getNonSystemProjects());
         }
 
         @Test

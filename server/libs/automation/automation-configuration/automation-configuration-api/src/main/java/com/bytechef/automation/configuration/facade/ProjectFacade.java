@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
@@ -47,10 +48,20 @@ public interface ProjectFacade {
 
     ProjectDTO getProject(long id);
 
+    /**
+     * Returns the stored project, without the versions, workflows and categories {@link #getProject} assembles.
+     */
+    Project getProjectEntity(long id);
+
     List<ProjectTemplateDTO> getPreBuiltProjectTemplates(String query, String category);
 
     List<ProjectDTO> getProjects(
         @Nullable Long categoryId, @Nullable Boolean projectDeployments, @Nullable Long tagId, @Nullable Status status);
+
+    /**
+     * Returns every project in the tenant except the system projects, as stored.
+     */
+    List<Project> getNonSystemProjects();
 
     SharedProjectDTO getSharedProject(String projectUuid);
 

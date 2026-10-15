@@ -285,6 +285,23 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public Project getProjectEntity(long id) {
+        return projectService.getProject(id);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public List<Project> getNonSystemProjects() {
+        return projectService.getProjects()
+            .stream()
+            .filter(project -> !SystemProjects.isSystemProject(project))
+            .toList();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProjectTemplateDTO getProjectTemplate(String id, boolean sharedProject) {
         byte[] data;
