@@ -27,6 +27,8 @@ import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,7 +136,11 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
             return super.conversationId(input);
         }
 
-        return conversationScope + ":" + input.threadId();
+        String scopedConversationId = conversationScope + ":" + input.threadId();
+
+        UUID uuid = UUID.nameUUIDFromBytes(scopedConversationId.getBytes(StandardCharsets.UTF_8));
+
+        return uuid.toString();
     }
 
     @Override
