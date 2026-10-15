@@ -192,6 +192,19 @@ class CopilotSpringAIAgentTest {
         }
 
         @Test
+        void testRunErrorMessageDescribesAKnownFailureToAScopedRun() throws AGUIException {
+            State state = new State();
+
+            state.set(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
+
+            String message = newAgent().runErrorMessage(
+                newInput(state), new RuntimeException("HTTP 429: rate_limit_error for key sk-ant-1234"));
+
+            assertThat(message).isEqualTo(CopilotRunFailures.RATE_LIMITED + " Reference: run")
+                .doesNotContain("sk-ant");
+        }
+
+        @Test
         void testRunErrorMessageKeepsTheCauseForAnUnscopedRun() throws AGUIException {
             String message = newAgent().runErrorMessage(
                 newInput(new State()), new IllegalStateException("No API key configured"));

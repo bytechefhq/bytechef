@@ -1,0 +1,100 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.ai.copilot.agent;
+
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * @author Ivica Cardic
+ */
+final class CopilotRunFailures {
+
+    static final String NO_PROVIDER = "No AI provider is set up for this environment, so the chat can't answer.";
+    static final String RATE_LIMITED = "The AI provider is rate limiting requests right now. Try again in a minute.";
+    static final String OVERLOADED = "The AI provider is overloaded right now. Try again in a minute.";
+    static final String API_KEY_REJECTED = "The AI provider rejected its API key. Ask an administrator to check it.";
+    static final String CONVERSATION_TOO_LONG = "This conversation is too long for the AI model. Start a new chat.";
+
+    private static final Pattern RATE_LIMIT_STATUS = Pattern.compile("\\b429\\b");
+    private static final Pattern OVERLOADED_STATUS = Pattern.compile("\\b529\\b");
+    private static final Pattern UNAUTHORIZED_STATUS = Pattern.compile("\\b401\\b");
+
+    private CopilotRunFailures() {
+    }
+
+    static @Nullable String describe(Throwable throwable) {
+        Set<Throwable> visited = new HashSet<>();
+
+        for (Throwable current = throwable; current != null && visited.add(current); current = current.getCause()) {
+            String description = describeOne(current);
+
+            if (description != null) {
+                return description;
+            }
+        }
+
+        return null;
+    }
+
+    private static @Nullable String describeOne(Throwable throwable) {
+        Class<? extends Throwable> throwableClass = throwable.getClass();
+
+        String className = throwableClass.getSimpleName()
+            .toLowerCase(Locale.ROOT);
+        String message = throwable.getMessage() == null ? "" : throwable.getMessage();
+
+        String lowerCaseMessage = message.toLowerCase(Locale.ROOT);
+
+        if (lowerCaseMessage.startsWith("no chat provider is activated")) {
+            return NO_PROVIDER;
+        }
+
+        if (className.contains("ratelimit") || lowerCaseMessage.contains("rate limit")
+            || lowerCaseMessage.contains("rate_limit") || RATE_LIMIT_STATUS.matcher(message)
+                .find()) {
+
+            return RATE_LIMITED;
+        }
+
+        if (className.contains("overloaded") || lowerCaseMessage.contains("overloaded")
+            || OVERLOADED_STATUS.matcher(message)
+                .find()) {
+
+            return OVERLOADED;
+        }
+
+        if (className.contains("unauthorized") || className.contains("authentication")
+            || lowerCaseMessage.contains("api key") || lowerCaseMessage.contains("api_key")
+            || lowerCaseMessage.contains("x-api-key") || UNAUTHORIZED_STATUS.matcher(message)
+                .find()) {
+
+            return API_KEY_REJECTED;
+        }
+
+        if (lowerCaseMessage.contains("context_length") || lowerCaseMessage.contains("context length")
+            || lowerCaseMessage.contains("prompt is too long") || lowerCaseMessage.contains("too many tokens")) {
+
+            return CONVERSATION_TOO_LONG;
+        }
+
+        return null;
+    }
+}

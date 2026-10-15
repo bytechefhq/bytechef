@@ -169,6 +169,12 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         State state = input.state();
 
         if (state != null && state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID) != null) {
+            String description = CopilotRunFailures.describe(throwable);
+
+            if (description != null) {
+                return description + " Reference: " + input.runId();
+            }
+
             return "The copilot run failed. Reference: " + input.runId();
         }
 
