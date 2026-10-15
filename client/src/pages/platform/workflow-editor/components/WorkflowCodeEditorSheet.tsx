@@ -5,6 +5,7 @@ import {ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import RunDisabledReasons from '@/pages/platform/workflow-editor/components/RunDisabledReasons';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/workflow-test-configuration/WorkflowTestConfigurationDialog';
 import useWorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/hooks/useWorkflowCodeEditorSheet';
@@ -168,9 +169,7 @@ const WorkflowCodeEditorSheet = ({
                                         </TooltipTrigger>
 
                                         <TooltipContent>
-                                            {runDisabled
-                                                ? `The workflow cannot be executed. Please set all required workflow input parameters, connections and component properties.`
-                                                : `Run the current workflow`}
+                                            {runDisabled ? <RunDisabledReasons /> : 'Run the current workflow'}
                                         </TooltipContent>
                                     </Tooltip>
                                 )}

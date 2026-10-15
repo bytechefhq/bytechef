@@ -145,7 +145,7 @@ vi.mock('@/shared/mutations/platform/workflows.mutations', () => ({
 }));
 
 vi.mock('@/pages/platform/workflow-editor/hooks/useRun', () => ({
-    useRun: () => ({runDisabled: false}),
+    useRun: () => ({runDisabled: false, runDisabledReasons: []}),
 }));
 
 vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({

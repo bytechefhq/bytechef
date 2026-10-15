@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import RunDisabledReasons from '@/pages/platform/workflow-editor/components/RunDisabledReasons';
 import {MessageCircleMoreIcon, PlayIcon, SquareIcon} from 'lucide-react';
 
 interface ProjectHeaderWorkflowActionsButtonProps {
@@ -50,7 +51,7 @@ const WorkflowActionsButton = ({
                     {!workflowIsRunning && !chatTrigger && 'Run the current workflow'}
                 </>
             ) : (
-                'The workflow cannot be executed. Please set all required workflow input parameters, connections and component properties.'
+                <RunDisabledReasons />
             )}
         </TooltipContent>
     </Tooltip>
