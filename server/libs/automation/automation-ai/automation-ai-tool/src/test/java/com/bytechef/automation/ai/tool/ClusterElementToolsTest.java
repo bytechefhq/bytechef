@@ -163,7 +163,40 @@ class ClusterElementToolsTest {
                     null, allowListToolContext))
                         .isInstanceOf(ExecutionException.class)
                         .hasMessageContaining(
-                            "This chat can't use openAi: it isn't one of the integrations available to this user.");
+                            "This chat can't use openAi: it isn't one of the integrations available to this user.")
+                        .hasMessageNotContaining("Failed to update");
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
+        }
+
+        @Test
+        void testUpdateWorkflowRootPropertiesRejectsATaskOutsideTheAllowList() {
+            when(projectWorkflowService.getWorkflowProjectWorkflow("wf-uuid-1"))
+                .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-uuid-1"));
+
+            mockProjectWorkflow();
+
+            ComponentDefinition openAiComponentDefinition = mock(ComponentDefinition.class);
+
+            when(openAiComponentDefinition.isConnectionRequired()).thenReturn(true);
+            when(componentDefinitionService.fetchComponentDefinition("openAi", null))
+                .thenReturn(Optional.of(openAiComponentDefinition));
+
+            ClusterElementTools clusterElementTools = newTools();
+
+            ToolContext allowListToolContext = new ToolContext(
+                Map.of(
+                    ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID,
+                    AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("aiAgent")));
+
+            assertThatCode(
+                () -> clusterElementTools.updateWorkflowRootProperties(
+                    "wf-uuid-1", "{\"tasks\": [{\"name\": \"ask_1\", \"type\": \"openAi/v1/ask\"}]}", null,
+                    allowListToolContext))
+                        .isInstanceOf(ExecutionException.class)
+                        .hasMessageContaining(
+                            "This chat can't use openAi: it isn't one of the integrations available to this user.")
+                        .hasMessageNotContaining("Failed to update");
 
             verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
         }
