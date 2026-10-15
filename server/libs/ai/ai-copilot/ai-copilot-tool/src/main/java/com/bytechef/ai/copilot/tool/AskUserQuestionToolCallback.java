@@ -17,6 +17,7 @@
 package com.bytechef.ai.copilot.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -115,6 +116,22 @@ public final class AskUserQuestionToolCallback implements ToolCallback {
             return toolError(validationError);
         }
 
+        String lookupPropertyName = LookupPropertyTracker.fetchUnresolvedPropertyMentionedIn(
+            toolContext, readQuestionTexts(toolInput));
+
+        if (lookupPropertyName != null) {
+            metrics.recordAskUserQuestion("error");
+
+            log.warn("askUserQuestion rejected: it asks for lookup property '{}' instead of using its picker",
+                lookupPropertyName);
+
+            return toolError(
+                ("Do not ask for '%s' with askUserQuestion: its valid values come from the component, and a "
+                    + "question can show only a few of them. Call selectPropertyOption (or "
+                    + "selectTriggerPropertyOption) for it so the user picks from all the real values. Ask only the "
+                    + "other questions with askUserQuestion.").formatted(lookupPropertyName));
+        }
+
         try {
             delegate.call(toolInput, toolContext);
 
@@ -208,6 +225,28 @@ public final class AskUserQuestionToolCallback implements ToolCallback {
      * <li>Each option's {@code label} and {@code description} must be present and non-blank.</li>
      * </ul>
      */
+    private static List<String> readQuestionTexts(String toolInput) {
+        List<String> texts = new ArrayList<>();
+
+        JsonNode questionsJsonNode = JsonUtils.readTree(toolInput)
+            .get("questions");
+
+        for (JsonNode questionJsonNode : questionsJsonNode) {
+            JsonNode headerJsonNode = questionJsonNode.get("header");
+            JsonNode questionTextJsonNode = questionJsonNode.get("question");
+
+            if (headerJsonNode != null) {
+                texts.add(headerJsonNode.asString());
+            }
+
+            if (questionTextJsonNode != null) {
+                texts.add(questionTextJsonNode.asString());
+            }
+        }
+
+        return texts;
+    }
+
     private @Nullable String validateInputShape(@Nullable String toolInput) {
         if (toolInput == null || toolInput.isBlank()) {
             return "askUserQuestion input is empty";
