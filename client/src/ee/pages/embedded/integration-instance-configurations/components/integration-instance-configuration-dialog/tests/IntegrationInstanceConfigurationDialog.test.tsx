@@ -4,8 +4,11 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import IntegrationInstanceConfigurationDialog from '../IntegrationInstanceConfigurationDialog';
 
 const hoisted = vi.hoisted(() => ({
+    connectionDefinition: undefined as {authorizations: {title: string; type: string}[]} | undefined,
     createMutate: vi.fn(),
+    integration: undefined as {componentName: string} | undefined,
     updateMutate: vi.fn(),
+    workflows: [] as {id: string; workflowUuid: string}[],
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
@@ -22,16 +25,16 @@ vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queri
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
-    useGetIntegrationVersionWorkflowsQuery: () => ({data: [], isPending: false}),
+    useGetIntegrationVersionWorkflowsQuery: () => ({data: hoisted.workflows, isPending: false}),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
     IntegrationKeys: {integrations: ['integrations']},
-    useGetIntegrationQuery: () => ({data: undefined}),
+    useGetIntegrationQuery: () => ({data: hoisted.integration}),
 }));
 
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
-    useGetConnectionDefinitionQuery: () => ({data: undefined}),
+    useGetConnectionDefinitionQuery: () => ({data: hoisted.connectionDefinition}),
 }));
 
 vi.mock('@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore', () => ({
@@ -52,7 +55,41 @@ vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () 
 }));
 
 vi.mock('../IntegrationInstanceConfigurationDialogBasicStep', () => ({
-    default: () => <div data-testid="basic-step" />,
+    default: ({
+        authorizations,
+        setCurIntegrationId,
+        setCurIntegrationVersion,
+        setValue,
+    }: {
+        authorizations?: {type: string}[];
+        setCurIntegrationId: (integrationId: number) => void;
+        setCurIntegrationVersion: (integrationVersion: number) => void;
+        setValue: (name: string, value: unknown) => void;
+    }) => (
+        <div data-testid="basic-step">
+            <span data-testid="basic-step-authorizations">
+                {authorizations?.map((authorization) => authorization.type).join(',')}
+            </span>
+
+            <button onClick={() => setValue('authorizationType', 'API_KEY')} type="button">
+                Use API Key
+            </button>
+
+            <button
+                onClick={() => {
+                    setCurIntegrationId(2);
+                    setCurIntegrationVersion(1);
+                }}
+                type="button"
+            >
+                Pick Integration
+            </button>
+        </div>
+    ),
+}));
+
+vi.mock('../IntegrationInstanceConfigurationDialogOauth2Step', () => ({
+    default: () => <div data-testid="oauth2-step" />,
 }));
 
 vi.mock('../IntegrationInstanceConfigurationDialogWorkflowsStep', () => ({
@@ -72,6 +109,10 @@ beforeEach(() => {
 afterEach(() => {
     resetAll();
     vi.clearAllMocks();
+
+    hoisted.connectionDefinition = undefined;
+    hoisted.integration = undefined;
+    hoisted.workflows = [];
 });
 
 describe('IntegrationInstanceConfigurationDialog', () => {
@@ -90,6 +131,118 @@ describe('IntegrationInstanceConfigurationDialog', () => {
         });
     });
 
+    describe('authorization', () => {
+        beforeEach(() => {
+            hoisted.connectionDefinition = {
+                authorizations: [
+                    {title: 'API Key', type: 'API_KEY'},
+                    {title: 'OAuth2', type: 'OAUTH2_AUTHORIZATION_CODE'},
+                ],
+            };
+            hoisted.integration = {componentName: 'httpClient'};
+        });
+
+        it('should pass the connection authorizations to the basic step', () => {
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            expect(screen.getByTestId('basic-step-authorizations')).toHaveTextContent(
+                'API_KEY,OAUTH2_AUTHORIZATION_CODE'
+            );
+        });
+
+        it('should default to the OAuth2 authorization and offer the OAuth2 step', async () => {
+            const user = userEvent.setup();
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            expect(await screen.findByTestId('oauth2-step')).toBeInTheDocument();
+        });
+
+        it('should fall back to the first authorization when the connection has no OAuth2 authorization', async () => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {
+                authorizations: [
+                    {title: 'Basic Auth', type: 'BASIC_AUTH'},
+                    {title: 'API Key', type: 'API_KEY'},
+                ],
+            };
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await user.click(await screen.findByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.createMutate).toHaveBeenCalledWith(
+                    expect.objectContaining({authorizationType: 'BASIC_AUTH'})
+                )
+            );
+        });
+
+        it('should re-apply the default authorization when the integration changes', async () => {
+            const user = userEvent.setup();
+
+            const {rerender} = render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await user.click(screen.getByRole('button', {name: 'Use API Key'}));
+
+            expect(await screen.findByRole('button', {name: 'Save'})).toBeInTheDocument();
+
+            hoisted.connectionDefinition = {
+                authorizations: [
+                    {title: 'API Key', type: 'API_KEY'},
+                    {title: 'OAuth2', type: 'OAUTH2_AUTHORIZATION_CODE'},
+                ],
+            };
+            hoisted.integration = {componentName: 'slack'};
+
+            rerender(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await waitFor(() => expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument());
+
+            expect(screen.getByRole('button', {name: 'Next'})).toBeInTheDocument();
+        });
+
+        it('should keep Next disabled until the connection authorizations are loaded', async () => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = undefined;
+            hoisted.workflows = [{id: 'workflow-1', workflowUuid: 'workflow-uuid-1'}];
+
+            const {rerender} = render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await user.click(screen.getByRole('button', {name: 'Pick Integration'}));
+
+            expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+
+            rerender(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await waitFor(() => expect(screen.getByRole('button', {name: 'Next'})).toBeEnabled());
+        });
+
+        it('should save the authorization selected in the basic step', async () => {
+            const user = userEvent.setup();
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await user.click(screen.getByRole('button', {name: 'Use API Key'}));
+
+            await user.click(await screen.findByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.createMutate).toHaveBeenCalledWith(
+                    expect.objectContaining({authorizationType: 'API_KEY'})
+                )
+            );
+        });
+    });
+
     describe('edit mode', () => {
         it('should title the dialog for an existing configuration', () => {
             render(
@@ -105,6 +258,42 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
 
             expect(screen.getByRole('heading', {name: /Edit Instance Configuration/})).toBeInTheDocument();
+        });
+
+        it('should keep the stored authorization type when saving', async () => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {
+                authorizations: [
+                    {title: 'API Key', type: 'API_KEY'},
+                    {title: 'OAuth2', type: 'OAUTH2_AUTHORIZATION_CODE'},
+                ],
+            };
+            hoisted.integration = {componentName: 'httpClient'};
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{
+                        authorizationType: 'API_KEY',
+                        id: 1,
+                        integrationId: 2,
+                        integrationVersion: 1,
+                        name: 'Existing',
+                    }}
+                    onClose={onClose}
+                />
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.updateMutate).toHaveBeenCalledWith(
+                    expect.objectContaining({authorizationType: 'API_KEY'})
+                )
+            );
+
+            expect(hoisted.createMutate).not.toHaveBeenCalled();
+            expect(screen.queryByTestId('oauth2-step')).not.toBeInTheDocument();
         });
     });
 
