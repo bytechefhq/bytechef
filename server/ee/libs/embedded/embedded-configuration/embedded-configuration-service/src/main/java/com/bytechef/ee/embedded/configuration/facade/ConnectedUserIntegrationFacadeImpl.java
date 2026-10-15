@@ -250,7 +250,12 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .filter(curAuthorization -> curAuthorization.getType() == integrationInstanceConfigurationDTO
                 .authorizationType())
             .findFirst()
-            .orElseThrow();
+            .orElseThrow(() -> new IllegalStateException(
+                ("Integration instance configuration id=%s has authorization type %s, which the %s connection " +
+                    "does not define").formatted(
+                        integrationInstanceConfigurationDTO.id(),
+                        integrationInstanceConfigurationDTO.authorizationType(),
+                        integrationDTO.componentName())));
 
         List<Connection> connections = connectionService.getConnections(
             integrationInstances.stream()

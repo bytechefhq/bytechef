@@ -29,20 +29,11 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpIntegrat
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpToolModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OAuth2Model;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel;
-import com.bytechef.platform.component.domain.ArrayProperty;
-import com.bytechef.platform.component.domain.BooleanProperty;
-import com.bytechef.platform.component.domain.DateProperty;
-import com.bytechef.platform.component.domain.DateTimeProperty;
-import com.bytechef.platform.component.domain.IntegerProperty;
-import com.bytechef.platform.component.domain.NumberProperty;
-import com.bytechef.platform.component.domain.ObjectProperty;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.OptionsDataSource;
 import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.PropertyGroup;
-import com.bytechef.platform.component.domain.StringProperty;
-import com.bytechef.platform.component.domain.TimeProperty;
 import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
 import java.util.List;
@@ -212,6 +203,10 @@ public interface ConnectedUserIntegrationMapper {
                 .type(InputTypeModel.valueOf(StringUtils.upperCase(input.type())));
         }
 
+        default OptionModel map(Option option) {
+            return new OptionModel(option.getLabel(), String.valueOf(option.getValue()));
+        }
+
         default ComponentPropertyGroupModel map(PropertyGroup propertyGroup) {
             ComponentPropertyGroupModel componentPropertyGroupModel =
                 new ComponentPropertyGroupModel(propertyGroup.getName())
@@ -239,9 +234,8 @@ public interface ConnectedUserIntegrationMapper {
                 }
             }
 
-            for (Option option : getStaticOptions(property)) {
-                componentPropertyModel.addOptionsItem(
-                    new OptionModel(option.getLabel(), String.valueOf(option.getValue())));
+            for (Option option : ConnectedUserIntegrationDTO.getStaticOptions(property)) {
+                componentPropertyModel.addOptionsItem(map(option));
             }
 
             if (property instanceof OptionsDataSourceAware optionsDataSourceAware) {
@@ -269,23 +263,6 @@ public interface ConnectedUserIntegrationMapper {
                 case TIME -> InputTypeModel.TIME;
                 default -> InputTypeModel.STRING;
             };
-        }
-
-        private static List<Option> getStaticOptions(Property property) {
-            List<Option> options = switch (property) {
-                case StringProperty stringProperty -> stringProperty.getOptions();
-                case IntegerProperty integerProperty -> integerProperty.getOptions();
-                case NumberProperty numberProperty -> numberProperty.getOptions();
-                case BooleanProperty booleanProperty -> booleanProperty.getOptions();
-                case DateProperty dateProperty -> dateProperty.getOptions();
-                case DateTimeProperty dateTimeProperty -> dateTimeProperty.getOptions();
-                case TimeProperty timeProperty -> timeProperty.getOptions();
-                case ObjectProperty objectProperty -> objectProperty.getOptions();
-                case ArrayProperty arrayProperty -> arrayProperty.getOptions();
-                default -> List.of();
-            };
-
-            return options == null ? List.of() : options;
         }
     }
 }
