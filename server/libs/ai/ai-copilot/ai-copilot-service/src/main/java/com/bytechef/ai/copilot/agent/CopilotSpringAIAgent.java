@@ -173,6 +173,11 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
     }
 
     @Override
+    protected boolean splitsTextAtToolCalls() {
+        return true;
+    }
+
+    @Override
     protected void prepareChatMemory(RunAgentInput input, ChatMemory chatMemory, String conversationId) {
         State state = input.state();
 

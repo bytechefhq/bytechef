@@ -120,6 +120,15 @@ public class ConverterSpringAIAgent extends CopilotSpringAIAgent {
         super.run(input, new JsonExtractingSubscriber(subscriber));
     }
 
+    /**
+     * The converter's reply is one JSON document, extracted from the whole text when its message ends, so the text must
+     * stay a single message.
+     */
+    @Override
+    protected boolean splitsTextAtToolCalls() {
+        return false;
+    }
+
     @Override
     protected Map<String, Object> toolContext(RunAgentInput input) {
         return CopilotToolContextUtils.toToolContext(input.state());
