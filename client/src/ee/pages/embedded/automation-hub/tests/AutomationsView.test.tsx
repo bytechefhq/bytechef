@@ -15,6 +15,7 @@ const {
     createBlankMutateMock,
     deleteAutomationMutateMock,
     deprovisionMutateMock,
+    invalidateQueriesMock,
     navigateMock,
     setEnabledMutateMock,
     toastErrorMock,
@@ -25,6 +26,7 @@ const {
     createBlankMutateMock: vi.fn(),
     deleteAutomationMutateMock: vi.fn(),
     deprovisionMutateMock: vi.fn(),
+    invalidateQueriesMock: vi.fn(),
     navigateMock: vi.fn(),
     setEnabledMutateMock: vi.fn(),
     toastErrorMock: vi.fn(),
@@ -40,6 +42,11 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('@/ee/pages/embedded/automation-hub/queries/automationHub.queries', () => ({
+    AutomationHubKeys: {
+        automations: ['automationHub', 'automations'],
+        connections: ['automationHub', 'connections'],
+        integrations: ['automationHub', 'integrations'],
+    },
     useGetAutomationsQuery: useGetAutomationsQueryMock,
     useGetTemplateProjectsQuery: useGetTemplateProjectsQueryMock,
 }));
@@ -55,15 +62,29 @@ vi.mock('@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations', 
 vi.mock('@bytechef/embedded', () => ({
     ActivationDialog: ({
         connectionCreationAllowed,
+        onActivated,
         onEditWorkflow,
         workflowTemplateId,
     }: {
         connectionCreationAllowed?: boolean;
+        onActivated?: (workflowUuid: string) => void;
         onEditWorkflow?: (workflowUuid: string) => void;
         workflowTemplateId: string;
     }) => (
         <div data-testid="activation-dialog">
-            {workflowTemplateId}:{String(connectionCreationAllowed)}:{onEditWorkflow ? 'edit' : 'noedit'}
+            <span>
+                {workflowTemplateId}:{String(connectionCreationAllowed)}:{onEditWorkflow ? 'edit' : 'noedit'}
+            </span>
+
+            <button onClick={() => onActivated?.(workflowTemplateId)} type="button">
+                Simulate activated
+            </button>
+
+            {onEditWorkflow && (
+                <button onClick={() => onEditWorkflow('wf-copy')} type="button">
+                    Simulate edit workflow
+                </button>
+            )}
         </div>
     ),
 }));
@@ -71,7 +92,7 @@ vi.mock('@bytechef/embedded', () => ({
 vi.mock('@tanstack/react-query', async () => {
     const actual = await vi.importActual<typeof import('@tanstack/react-query')>('@tanstack/react-query');
 
-    return {...actual, useQueryClient: () => ({invalidateQueries: vi.fn()})};
+    return {...actual, useQueryClient: () => ({invalidateQueries: invalidateQueriesMock})};
 });
 
 vi.mock('sonner', () => ({
@@ -922,5 +943,41 @@ describe('AutomationsView', () => {
         await user.click(within(templateCard('Slack sync')).getByRole('button', {name: 'Use'}));
 
         expect(screen.getByTestId('activation-dialog')).toHaveTextContent('wf-2:false:noedit');
+    });
+
+    it('refreshes the automations, connections and integrations once the dialog activates a template', async () => {
+        const user = userEvent.setup();
+
+        invalidateQueriesMock.mockClear();
+
+        render(
+            <MemoryRouter>
+                <AutomationsView />
+            </MemoryRouter>
+        );
+
+        await user.click(within(templateCard('Slack sync')).getByRole('button', {name: 'Use'}));
+        await user.click(screen.getByRole('button', {name: 'Simulate activated'}));
+
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({queryKey: ['automationHub', 'automations']});
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({queryKey: ['automationHub', 'connections']});
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({queryKey: ['automationHub', 'integrations']});
+    });
+
+    it('opens the builder for the copy the dialog hands over on Edit workflow', async () => {
+        const user = userEvent.setup();
+
+        useAutomationHubStore.setState({editWorkflowAllowed: true});
+
+        render(
+            <MemoryRouter>
+                <AutomationsView />
+            </MemoryRouter>
+        );
+
+        await user.click(within(templateCard('Slack sync')).getByRole('button', {name: 'Use'}));
+        await user.click(screen.getByRole('button', {name: 'Simulate edit workflow'}));
+
+        expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/wf-copy');
     });
 });
