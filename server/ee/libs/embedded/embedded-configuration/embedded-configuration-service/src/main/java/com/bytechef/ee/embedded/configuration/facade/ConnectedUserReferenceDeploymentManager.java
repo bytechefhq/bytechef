@@ -21,7 +21,11 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,6 +39,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @version ee
@@ -48,6 +53,8 @@ class ConnectedUserReferenceDeploymentManager {
 
     private static final String MARKER = "__EMBEDDED__";
 
+    private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
+    private final ConnectedUserService connectedUserService;
     private final ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
@@ -58,11 +65,15 @@ class ConnectedUserReferenceDeploymentManager {
 
     @SuppressFBWarnings("EI")
     public ConnectedUserReferenceDeploymentManager(
+        ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
+        ConnectedUserService connectedUserService,
         ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
+        this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
+        this.connectedUserService = connectedUserService;
         this.connectedUserWorkflowConnectionResolver = connectedUserWorkflowConnectionResolver;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
@@ -112,10 +123,6 @@ class ConnectedUserReferenceDeploymentManager {
         return projectDeploymentService.getProjectDeployment(projectDeploymentId);
     }
 
-    public String getDeploymentName(String externalUserId, Environment environment) {
-        return MARKER + externalUserId + "__" + environment.name();
-    }
-
     public Map<String, ?> getInputs(long projectDeploymentId, String automationWorkflowUuid) {
         return fetchRow(projectDeploymentId, automationWorkflowUuid)
             .<Map<String, ?>>map(ProjectDeploymentWorkflow::getInputs)
@@ -135,34 +142,19 @@ class ConnectedUserReferenceDeploymentManager {
         return lastPublishedProjectVersion.getVersion();
     }
 
+    @Transactional
     public long
         getOrCreateDeployment(long automationWorkflowProjectId, String externalUserId, Environment environment) {
-        String name = getDeploymentName(externalUserId, environment);
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
-        return projectDeploymentService.fetchProjectDeploymentByName(automationWorkflowProjectId, name)
-            .map(ProjectDeployment::getId)
-            .orElseGet(() -> {
-                ProjectDeployment projectDeployment = new ProjectDeployment();
-
-                projectDeployment.setEnabled(true);
-                projectDeployment.setEnvironment(environment);
-                projectDeployment.setName(name);
-                projectDeployment.setProjectId(automationWorkflowProjectId);
-                projectDeployment.setProjectVersion(getLastPublishedVersion(automationWorkflowProjectId));
-
-                long projectDeploymentId = projectDeploymentFacade.createProjectDeployment(
-                    projectDeployment, List.of(), List.of());
-
-                projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
-
-                return projectDeploymentId;
-            });
+        return connectedUserReferenceDeploymentService
+            .fetchConnectedUserReferenceDeployment(connectedUser.getId(), automationWorkflowProjectId)
+            .map(ConnectedUserReferenceDeployment::getProjectDeploymentId)
+            .orElseGet(() -> createDeployment(automationWorkflowProjectId, connectedUser));
     }
 
-    public static boolean isReferenceDeployment(ProjectDeployment projectDeployment) {
-        String name = projectDeployment.getName();
-
-        return name != null && name.startsWith(MARKER);
+    public boolean isReferenceDeployment(long projectDeploymentId) {
+        return connectedUserReferenceDeploymentService.isReferenceDeployment(projectDeploymentId);
     }
 
     public Optional<String>
@@ -285,6 +277,28 @@ class ConnectedUserReferenceDeploymentManager {
         putWorkflow(projectDeployment, automationWorkflowUuid, rowSpec);
     }
 
+    private long createDeployment(long automationWorkflowProjectId, ConnectedUser connectedUser) {
+        Environment environment = connectedUser.getEnvironment();
+
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnabled(true);
+        projectDeployment.setEnvironment(environment);
+        projectDeployment.setName(getDeploymentName(connectedUser.getExternalId(), environment));
+        projectDeployment.setProjectId(automationWorkflowProjectId);
+        projectDeployment.setProjectVersion(getLastPublishedVersion(automationWorkflowProjectId));
+
+        long projectDeploymentId = projectDeploymentFacade.createProjectDeployment(
+            projectDeployment, List.of(), List.of());
+
+        connectedUserReferenceDeploymentService.create(
+            connectedUser.getId(), automationWorkflowProjectId, projectDeploymentId);
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+        return projectDeploymentId;
+    }
+
     private Optional<ProjectDeploymentWorkflow> fetchRowAtCurrentVersion(
         ProjectDeployment projectDeployment, String automationWorkflowUuid) {
         return projectWorkflowService
@@ -292,6 +306,10 @@ class ConnectedUserReferenceDeploymentManager {
                 projectDeployment.getProjectId(), projectDeployment.getProjectVersion(), automationWorkflowUuid)
             .flatMap(projectWorkflow -> projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(
                 projectDeployment.getId(), projectWorkflow.getWorkflowId()));
+    }
+
+    private static String getDeploymentName(String externalUserId, Environment environment) {
+        return MARKER + externalUserId + "__" + environment.name();
     }
 
     private Map<String, ProjectDeploymentWorkflow> getRowsByAutomationWorkflowUuid(long projectDeploymentId) {

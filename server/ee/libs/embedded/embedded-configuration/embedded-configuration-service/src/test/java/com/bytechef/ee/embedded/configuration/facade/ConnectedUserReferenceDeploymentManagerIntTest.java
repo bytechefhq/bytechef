@@ -44,11 +44,13 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -195,6 +197,9 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
 
     @Autowired
+    private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
+
+    @Autowired
     private ConnectedUserService connectedUserService;
 
     @Autowired
@@ -329,12 +334,15 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     }
 
     @Test
-    void testGetDeploymentNameIsDistinctPerEnvironment() {
+    void testGetOrCreateDeploymentKeepsDevelopmentAndProductionConnectedUsersApart() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Deployment Name");
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        ConnectedUser developmentConnectedUser = connectedUserService.createConnectedUser(
+            externalUserId, Environment.DEVELOPMENT);
 
         long productionDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
             automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
@@ -352,8 +360,113 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
                 assertThat(projectDeployment.getName()).isEqualTo("__EMBEDDED__" + externalUserId + "__DEVELOPMENT");
                 assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.DEVELOPMENT);
             });
-        assertThat(connectedUserReferenceDeploymentManager.getDeploymentName(externalUserId, Environment.PRODUCTION))
-            .isEqualTo("__EMBEDDED__" + externalUserId + "__PRODUCTION");
+        assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            connectedUserId, automationWorkflowProjectId))
+                .map(ConnectedUserReferenceDeployment::getProjectDeploymentId)
+                .contains(productionDeploymentId);
+        assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            developmentConnectedUser.getId(), automationWorkflowProjectId))
+                .map(ConnectedUserReferenceDeployment::getProjectDeploymentId)
+                .contains(developmentDeploymentId);
+    }
+
+    @Test
+    void testGetOrCreateDeploymentRecordsTheConnectedUserReferenceDeploymentOnce() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Record Relation");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+
+        ConnectedUserReferenceDeployment connectedUserReferenceDeployment = connectedUserReferenceDeploymentService
+            .fetchConnectedUserReferenceDeployment(connectedUserId, automationWorkflowProjectId)
+            .orElseThrow();
+
+        assertThat(connectedUserReferenceDeployment.getProjectDeploymentId()).isEqualTo(projectDeploymentId);
+        assertThat(connectedUserReferenceDeployment.getProjectId()).isEqualTo(automationWorkflowProjectId);
+        assertThat(connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeploymentId)).isTrue();
+
+        assertThat(connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION)).isEqualTo(projectDeploymentId);
+        assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            connectedUserId, automationWorkflowProjectId))
+                .map(ConnectedUserReferenceDeployment::getId)
+                .contains(connectedUserReferenceDeployment.getId());
+    }
+
+    @Test
+    void testGetOrCreateDeploymentFindsTheDeploymentByItsRelationAfterARename() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Renamed Deployment");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
+
+        projectDeployment.setName("__EMBEDDED__renamed");
+
+        projectDeploymentService.update(projectDeployment);
+
+        assertThat(connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION)).isEqualTo(projectDeploymentId);
+        assertThat(projectDeploymentService.getAllProjectDeployments(automationWorkflowProjectId))
+            .singleElement()
+            .extracting(ProjectDeployment::getId)
+            .isEqualTo(projectDeploymentId);
+    }
+
+    @Test
+    void testGetOrCreateDeploymentDoesNotAdoptADeploymentThatOnlyMatchesByName() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Name Only Deployment");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        ProjectDeployment nameOnlyProjectDeployment = new ProjectDeployment();
+
+        nameOnlyProjectDeployment.setEnabled(false);
+        nameOnlyProjectDeployment.setEnvironment(Environment.PRODUCTION);
+        nameOnlyProjectDeployment.setName("__EMBEDDED__" + externalUserId + "__PRODUCTION");
+        nameOnlyProjectDeployment.setProjectId(automationWorkflowProjectId);
+        nameOnlyProjectDeployment.setProjectVersion(1);
+
+        long nameOnlyProjectDeploymentId = projectDeploymentService.create(nameOnlyProjectDeployment)
+            .getId();
+
+        long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+
+        assertThat(projectDeploymentId).isNotEqualTo(nameOnlyProjectDeploymentId);
+        assertThat(connectedUserReferenceDeploymentManager.isReferenceDeployment(nameOnlyProjectDeploymentId))
+            .isFalse();
+        assertThat(connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeploymentId)).isTrue();
+    }
+
+    @Test
+    void testDeleteDeploymentRemovesTheConnectedUserReferenceDeployment() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Relation");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+
+        connectedUserReferenceDeploymentManager.deleteDeployment(projectDeploymentId);
+
+        assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            connectedUserId, automationWorkflowProjectId)).isEmpty();
+        assertThat(connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION)).isNotEqualTo(projectDeploymentId);
     }
 
     @Test
