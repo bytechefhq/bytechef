@@ -153,6 +153,12 @@ class ConnectedUserReferenceDeploymentManager {
             .orElseGet(() -> createDeployment(automationWorkflowProjectId, connectedUser));
     }
 
+    public boolean isLegacyReferenceDeployment(ProjectDeployment projectDeployment) {
+        String name = projectDeployment.getName();
+
+        return name != null && name.startsWith(MARKER) && !isReferenceDeployment(projectDeployment.getId());
+    }
+
     public boolean isReferenceDeployment(long projectDeploymentId) {
         return connectedUserReferenceDeploymentService.isReferenceDeployment(projectDeploymentId);
     }

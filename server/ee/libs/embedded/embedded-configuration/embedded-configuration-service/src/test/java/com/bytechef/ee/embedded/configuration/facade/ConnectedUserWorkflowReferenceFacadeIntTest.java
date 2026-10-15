@@ -55,6 +55,7 @@ import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepos
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
@@ -193,6 +194,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Autowired
     private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
+
+    @Autowired
+    private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
 
     @MockitoSpyBean
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
@@ -983,8 +987,8 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         verifyNoInteractions(connectedUserReferenceDeploymentManager);
 
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
-        assertThat(projectDeploymentService.fetchProjectDeploymentByName(
-            automationWorkflowProjectId, "__EMBEDDED__" + connectedUser.getExternalId() + "__PRODUCTION")).isEmpty();
+        assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
     }
 
     @Test
