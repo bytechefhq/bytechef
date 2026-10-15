@@ -223,24 +223,6 @@ describe('ClusterFrameShell', () => {
         expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
     });
 
-    it('opens the AI Agent editor preset, not the canvas view', async () => {
-        const user = userEvent.setup();
-
-        render(
-            <TooltipProvider>
-                <ClusterFrameShell data={AI_AGENT_ROOT_DATA} nodeId="aiAgent_1">
-                    <div>root card</div>
-                </ClusterFrameShell>
-            </TooltipProvider>
-        );
-
-        await user.click(screen.getByLabelText('Switch to AI Agent editor'));
-
-        expect(useClusterElementsCanvasDialogStore.getState().showAiAgentEditor).toBe(true);
-        expect(useWorkflowEditorStore.getState().clusterElementsCanvasOpen).toBe(true);
-        expect(useWorkflowEditorStore.getState().rootClusterElementNodeData?.workflowNodeName).toBe('aiAgent_1');
-    });
-
     it('opens the playground without opening the dialog', async () => {
         const user = userEvent.setup();
 

@@ -15,10 +15,9 @@ import {
     LockOpenIcon,
     PlayIcon,
     SparklesIcon,
-    TextInitialIcon,
     ZapIcon,
 } from 'lucide-react';
-import {ReactNode, memo, useCallback, useMemo} from 'react';
+import {ReactNode, memo, useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {useClusterElementsCanvasDialogStore} from '../components/stores/useClusterElementsCanvasDialogStore';
@@ -35,7 +34,6 @@ import {
 } from '../utils/clusterFrame/clusterFrameGeometry';
 import {mapHandlePosition} from '../utils/directionUtils';
 import {getTask} from '../utils/getTask';
-import {isDataStreamSimpleModeAvailable as computeIsDataStreamSimpleModeAvailable} from '../utils/isDataStreamSimpleModeAvailable';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import styles from './NodeTypes.module.css';
 
@@ -46,19 +44,17 @@ interface ClusterFrameShellProps {
     children: ReactNode;
     data: NodeDataType;
     nodeId: string;
+    nodeMenu?: ReactNode;
 }
 
-const ClusterFrameShell = ({children, data, nodeId}: ClusterFrameShellProps) => {
+const ClusterFrameShell = ({children, data, nodeId, nodeMenu}: ClusterFrameShellProps) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const locked = useWorkflowEditorStore((state) => state.clusterFrameLockedByRootId?.[nodeId] !== false);
     const setClusterFrameLocked = useWorkflowEditorStore((state) => state.setClusterFrameLocked);
     const setClusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.setClusterElementsCanvasOpen);
     const setRootClusterElementNodeData = useWorkflowEditorStore((state) => state.setRootClusterElementNodeData);
-    const workflowDefinition = useWorkflowDataStore((state) => state.workflow.definition);
     const workflowId = useWorkflowDataStore((state) => state.workflow.id);
     const setClusterFrameCollapsed = useClusterFrameCollapsedStore((state) => state.setClusterFrameCollapsed);
-    const setShowAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.setShowAiAgentEditor);
-    const setShowDataStreamEditor = useClusterElementsCanvasDialogStore((state) => state.setShowDataStreamEditor);
     const setTestingPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setTestingPanelOpen);
     const setEvalsPanelOpen = useAiAgentEvalsStore((state) => state.setEvalsPanelOpen);
     const setContext = useCopilotStore((state) => state.setContext);
@@ -72,16 +68,7 @@ const ClusterFrameShell = ({children, data, nodeId}: ClusterFrameShellProps) => 
 
     const clusterFrame = data.clusterFrame;
     const isAiAgentClusterRoot = data.componentName === 'aiAgent';
-    const isDataStreamClusterRoot = data.componentName === 'dataStream';
     const copilotEnabled = ff_4070 && ai.copilot.enabled && ff_1570;
-
-    const isDataStreamSimpleModeAvailable = useMemo(() => {
-        if (!isDataStreamClusterRoot) {
-            return true;
-        }
-
-        return computeIsDataStreamSimpleModeAvailable(workflowDefinition, nodeId);
-    }, [isDataStreamClusterRoot, nodeId, workflowDefinition]);
 
     const handleToggleLock = useCallback(() => {
         setClusterFrameLocked(nodeId, !locked);
@@ -125,18 +112,6 @@ const ClusterFrameShell = ({children, data, nodeId}: ClusterFrameShellProps) => 
         });
     }, [nodeId, updateWorkflowMutation]);
 
-    const handleOpenAiAgentEditor = useCallback(() => {
-        setRootClusterElementNodeData(data);
-        setShowAiAgentEditor(true);
-        setClusterElementsCanvasOpen(true);
-    }, [data, setClusterElementsCanvasOpen, setRootClusterElementNodeData, setShowAiAgentEditor]);
-
-    const handleOpenDataStreamEditor = useCallback(() => {
-        setRootClusterElementNodeData(data);
-        setShowDataStreamEditor(true);
-        setClusterElementsCanvasOpen(true);
-    }, [data, setClusterElementsCanvasOpen, setRootClusterElementNodeData, setShowDataStreamEditor]);
-
     const handleOpenEvals = useCallback(() => {
         setRootClusterElementNodeData(data);
         setEvalsPanelOpen(true);
@@ -174,50 +149,25 @@ const ClusterFrameShell = ({children, data, nodeId}: ClusterFrameShellProps) => 
 
     return (
         <div
-            className="rounded-lg border-2 border-dashed border-stroke-neutral-secondary bg-surface-neutral-secondary/40"
+            className="group relative rounded-lg border-2 border-dashed border-stroke-neutral-secondary bg-surface-neutral-secondary/40"
             data-nodetype="clusterFrame"
             data-testid="cluster-frame-shell"
             style={{height: clusterFrame.height, width: clusterFrame.width}}
         >
+            {nodeMenu && (
+                <div
+                    className="nodrag invisible absolute top-2 -left-8 z-10 group-hover:visible focus-within:visible"
+                    onMouseDown={(event) => event.stopPropagation()}
+                >
+                    {nodeMenu}
+                </div>
+            )}
+
             <div className="flex items-center justify-between px-3" style={{height: CLUSTER_FRAME_HEADER_HEIGHT}}>
                 <span className="text-sm font-semibold text-content-neutral-secondary">{data.label}</span>
 
                 {updateWorkflowMutation && (
                     <div className="flex items-center gap-1">
-                        {isAiAgentClusterRoot && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        aria-label="Switch to AI Agent editor"
-                                        className={HEADER_BUTTON_CLASSNAME}
-                                        onClick={handleOpenAiAgentEditor}
-                                        type="button"
-                                    >
-                                        <TextInitialIcon className="size-3.5" />
-                                    </button>
-                                </TooltipTrigger>
-
-                                <TooltipContent>Switch to AI Agent editor</TooltipContent>
-                            </Tooltip>
-                        )}
-
-                        {isDataStreamClusterRoot && isDataStreamSimpleModeAvailable && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        aria-label="Switch to DataStream editor"
-                                        className={HEADER_BUTTON_CLASSNAME}
-                                        onClick={handleOpenDataStreamEditor}
-                                        type="button"
-                                    >
-                                        <TextInitialIcon className="size-3.5" />
-                                    </button>
-                                </TooltipTrigger>
-
-                                <TooltipContent>Switch to DataStream editor</TooltipContent>
-                            </Tooltip>
-                        )}
-
                         {isAiAgentClusterRoot && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
