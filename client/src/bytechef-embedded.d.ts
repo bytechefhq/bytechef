@@ -1,19 +1,39 @@
 declare module '@bytechef/embedded' {
-    interface UseConnectDialogProps {
+    interface UseConnectDialogBaseProps {
         baseUrl?: string;
-        connectionOnly?: boolean;
         environment?: string;
         integrationId: string;
         integrationInstanceId?: string;
         jwtToken: string;
         mode?: 'dark' | 'light';
         onClose?: () => void;
-        onConnected?: (integrationInstanceId: number, connectionId: number | undefined) => void;
-        onReauthorized?: (connectionId: number) => void;
-        reauthorizeConnectionId?: number;
     }
 
-    interface ConnectionDialogHookReturnI {
+    interface FullModePropsI {
+        connectionOnly?: false;
+        onConnected?: never;
+        onReauthorized?: never;
+        reauthorizeConnectionId?: never;
+    }
+
+    interface ConnectionOnlyModePropsI {
+        connectionOnly: true;
+        onConnected?: (integrationInstanceId: number, connectionId: number | undefined) => void;
+        onReauthorized?: never;
+        reauthorizeConnectionId?: never;
+    }
+
+    interface ReauthorizeModePropsI {
+        connectionOnly?: false;
+        onConnected?: never;
+        onReauthorized?: (connectionId: number) => void;
+        reauthorizeConnectionId: number;
+    }
+
+    type UseConnectDialogPropsType = UseConnectDialogBaseProps &
+        (FullModePropsI | ConnectionOnlyModePropsI | ReauthorizeModePropsI);
+
+    interface DialogHookReturnI {
         closeDialog: () => void;
         openDialog: () => void;
     }
@@ -30,7 +50,11 @@ declare module '@bytechef/embedded' {
         workflowTemplateId: string;
     }
 
-    export function ActivationDialog(props: ActivationDialogProps): JSX.Element;
+    type UseActivationDialogPropsType = Omit<ActivationDialogProps, 'onClose'> & {onClose?: () => void};
 
-    export function useConnectDialog(props: UseConnectDialogProps): ConnectionDialogHookReturnI;
+    export function ActivationDialog(props: ActivationDialogProps): import('react').JSX.Element;
+
+    export function useActivationDialog(props: UseActivationDialogPropsType): DialogHookReturnI;
+
+    export function useConnectDialog(props: UseConnectDialogPropsType): DialogHookReturnI;
 }
