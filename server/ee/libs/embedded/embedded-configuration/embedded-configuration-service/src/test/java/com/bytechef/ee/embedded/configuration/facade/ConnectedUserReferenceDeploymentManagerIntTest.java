@@ -49,6 +49,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
+import com.bytechef.ee.embedded.configuration.repository.ConnectedUserReferenceDeploymentRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -195,6 +196,9 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Autowired
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
+
+    @Autowired
+    private ConnectedUserReferenceDeploymentRepository connectedUserReferenceDeploymentRepository;
 
     @Autowired
     private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
@@ -448,6 +452,31 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         assertThat(connectedUserReferenceDeploymentManager.isReferenceDeployment(nameOnlyProjectDeploymentId))
             .isFalse();
         assertThat(connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeploymentId)).isTrue();
+    }
+
+    @Test
+    void testGetOrCreateDeploymentAdoptsALegacyDeploymentTheConnectedUsersReferencesPointAt() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Legacy Deployment");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        long legacyProjectDeploymentId = provision(workflowUuid).getProjectDeploymentId();
+
+        ConnectedUserReferenceDeployment connectedUserReferenceDeployment = connectedUserReferenceDeploymentService
+            .fetchConnectedUserReferenceDeployment(connectedUserId, automationWorkflowProjectId)
+            .orElseThrow();
+
+        connectedUserReferenceDeploymentRepository.delete(connectedUserReferenceDeployment);
+
+        assertThat(connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION)).isEqualTo(legacyProjectDeploymentId);
+        assertThat(connectedUserReferenceDeploymentManager.isReferenceDeployment(legacyProjectDeploymentId)).isTrue();
+        assertThat(projectDeploymentService.getAllProjectDeployments(automationWorkflowProjectId))
+            .singleElement()
+            .extracting(ProjectDeployment::getId)
+            .isEqualTo(legacyProjectDeploymentId);
     }
 
     @Test
