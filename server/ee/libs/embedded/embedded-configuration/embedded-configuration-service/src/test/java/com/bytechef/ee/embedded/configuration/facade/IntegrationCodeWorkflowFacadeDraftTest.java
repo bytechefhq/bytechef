@@ -39,9 +39,14 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.workflow.definition.CompositeTaskDefinition;
+import com.bytechef.workflow.definition.ConnectionRequirement;
+import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
+import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -516,6 +521,201 @@ class IntegrationCodeWorkflowFacadeDraftTest {
 
         verify(integrationCodeWorkflowService).create(newCodeWorkflowContainer, createdIntegration);
         verify(integrationService, never()).publishIntegration(anyLong(), any());
+    }
+
+    @Test
+    void testEditorSaveAddsTheIntegrationOwnConnectionToATaskThatDeclaresNone() {
+        Map<String, List<ConnectionRequirement>> taskConnections = editorSaveTaskConnections(
+            "{name: \"undeclared\", perform: function() { return 1; }}");
+
+        List<ConnectionRequirement> connectionRequirements = taskConnections.get("undeclared");
+
+        assertThat(connectionRequirements).hasSize(1);
+
+        ConnectionRequirement connectionRequirement = connectionRequirements.getFirst();
+
+        assertThat(connectionRequirement.getName()).isEqualTo("googleMail");
+        assertThat(connectionRequirement.getComponentName()).isEqualTo("googleMail");
+        assertThat(connectionRequirement.getComponentVersion()).isEmpty();
+    }
+
+    @Test
+    void testEditorSaveAddsNoSecondOwnConnectionToATaskThatDeclaresOneUnderAnyName() {
+        Map<String, List<ConnectionRequirement>> taskConnections = editorSaveTaskConnections(
+            "{name: \"declaresOwn\", connections: [{componentName: \"googleMail\", name: \"gmail\"}], "
+                + "perform: function() { return 1; }}");
+
+        assertThat(connectionNameComponentNames(taskConnections.get("declaresOwn")))
+            .isEqualTo(Map.of("gmail", "googleMail"));
+    }
+
+    @Test
+    void testEditorSaveKeepsAnotherComponentConnectionAndAddsTheOwnOne() {
+        Map<String, List<ConnectionRequirement>> taskConnections = editorSaveTaskConnections(
+            "{name: \"declaresOther\", connections: [{componentName: \"slack\", name: \"slack-prod\"}], "
+                + "perform: function() { return 1; }}");
+
+        assertThat(connectionNameComponentNames(taskConnections.get("declaresOther")))
+            .isEqualTo(Map.of("slack-prod", "slack", "googleMail", "googleMail"));
+    }
+
+    @Test
+    void testEditorSaveLeavesAConnectionNamedAfterTheComponentButPointingElsewhereAlone() {
+        Map<String, List<ConnectionRequirement>> taskConnections = editorSaveTaskConnections(
+            "{name: \"nameTaken\", connections: [{componentName: \"slack\", name: \"googleMail\"}], "
+                + "perform: function() { return 1; }}");
+
+        assertThat(connectionNameComponentNames(taskConnections.get("nameTaken")))
+            .isEqualTo(Map.of("googleMail", "slack"));
+    }
+
+    @Test
+    void testEditorSaveAddsTheOwnConnectionToTasksInsideAGroup() {
+        Map<String, List<ConnectionRequirement>> taskConnections = editorSaveTaskConnections(
+            "{name: \"fan-out\", type: \"parallel\", tasks: [{name: \"inParallel\", perform: function() "
+                + "{ return 1; }}]}, {name: \"fork\", type: \"forkJoin\", branches: [[{name: \"inBranch\", "
+                + "perform: function() { return 1; }}]]}");
+
+        assertThat(connectionNameComponentNames(taskConnections.get("inParallel")))
+            .isEqualTo(Map.of("googleMail", "googleMail"));
+        assertThat(connectionNameComponentNames(taskConnections.get("inBranch")))
+            .isEqualTo(Map.of("googleMail", "googleMail"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUploadAddsTheIntegrationOwnConnectionToATaskThatDeclaresNone() {
+        CodeWorkflowContainerFacade codeWorkflowContainerFacade = reconcilingCodeWorkflowContainerFacade();
+
+        IntegrationService integrationService = mock(IntegrationService.class);
+
+        Integration createdIntegration = new Integration();
+
+        createdIntegration.setId(9L);
+        createdIntegration.setComponentName("my-integration");
+        createdIntegration.setName("my-integration");
+
+        when(integrationService.create(any())).thenReturn(createdIntegration);
+
+        IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
+            integrationService, mock(IntegrationWorkflowService.class), codeWorkflowContainerFacade,
+            mock(IntegrationCodeWorkflowService.class), mock(CodeWorkflowContainerService.class),
+            mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
+
+        integrationCodeWorkflowFacade.save(
+            integrationScript("my-integration").getBytes(StandardCharsets.UTF_8), Language.JAVASCRIPT);
+
+        ArgumentCaptor<List<WorkflowDefinition>> workflowDefinitionsCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(codeWorkflowContainerFacade).create(
+            eq("my-integration"), any(), workflowDefinitionsCaptor.capture(), eq(Language.JAVASCRIPT), any(),
+            eq(PlatformType.EMBEDDED), any());
+
+        Map<String, List<ConnectionRequirement>> taskConnections = taskConnections(
+            workflowDefinitionsCaptor.getValue());
+
+        assertThat(connectionNameComponentNames(taskConnections.get("my-task")))
+            .isEqualTo(Map.of("my-integration", "my-integration"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, List<ConnectionRequirement>> editorSaveTaskConnections(String tasks) {
+        Integration integration = new Integration();
+
+        integration.setId(1L);
+        integration.setComponentName("googleMail");
+        integration.setName("googleMail");
+        integration.setIntegrationVersions(List.of(new IntegrationVersion(3)));
+
+        IntegrationCodeWorkflow latestIntegrationCodeWorkflow = mock(IntegrationCodeWorkflow.class);
+
+        when(latestIntegrationCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(5L);
+        when(latestIntegrationCodeWorkflow.getIntegrationVersion()).thenReturn(3);
+
+        CodeWorkflowContainer draftCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
+
+        when(draftCodeWorkflowContainer.getLanguage()).thenReturn(Language.JAVASCRIPT);
+
+        IntegrationCodeWorkflowService integrationCodeWorkflowService = mock(IntegrationCodeWorkflowService.class);
+
+        when(integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(1L))
+            .thenReturn(Optional.of(latestIntegrationCodeWorkflow));
+
+        CodeWorkflowContainerService codeWorkflowContainerService = mock(CodeWorkflowContainerService.class);
+
+        when(codeWorkflowContainerService.getCodeWorkflowContainer(5L)).thenReturn(draftCodeWorkflowContainer);
+
+        IntegrationService integrationService = mock(IntegrationService.class);
+
+        when(integrationService.getIntegration(1L)).thenReturn(integration);
+
+        CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
+
+        when(codeWorkflowContainerFacade.update(any(), any(), any(), any(), any()))
+            .thenReturn(new CodeWorkflowReconciliation(mock(CodeWorkflowContainer.class), Map.of(), Map.of()));
+
+        IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
+            integrationService, mock(IntegrationWorkflowService.class), codeWorkflowContainerFacade,
+            integrationCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
+
+        integrationCodeWorkflowFacade.updateCodeWorkflowSource(
+            1L,
+            "({componentName: \"googleMail\", componentVersion: 1, workflows: [{name: \"my-workflow\", label: "
+                + "\"My Workflow\", tasks: [" + tasks + "]}]})");
+
+        ArgumentCaptor<List<WorkflowDefinition>> workflowDefinitionsCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(codeWorkflowContainerFacade).update(
+            eq(draftCodeWorkflowContainer), any(), workflowDefinitionsCaptor.capture(), any(),
+            eq(PlatformType.EMBEDDED));
+
+        return taskConnections(workflowDefinitionsCaptor.getValue());
+    }
+
+    private static Map<String, List<ConnectionRequirement>> taskConnections(
+        List<WorkflowDefinition> workflowDefinitions) {
+
+        Map<String, List<ConnectionRequirement>> taskConnections = new HashMap<>();
+
+        for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
+            List<? extends WorkflowTaskDefinition> workflowTaskDefinitions = workflowDefinition.getTasks()
+                .orElseGet(List::of);
+
+            for (WorkflowTaskDefinition workflowTaskDefinition : workflowTaskDefinitions) {
+                if (workflowTaskDefinition instanceof CompositeTaskDefinition compositeTaskDefinition) {
+                    for (TaskDefinition taskDefinition : compositeTaskDefinition.getTasks()) {
+                        putTaskConnections(taskConnections, taskDefinition);
+                    }
+
+                    for (List<? extends TaskDefinition> branch : compositeTaskDefinition.getBranches()) {
+                        for (TaskDefinition taskDefinition : branch) {
+                            putTaskConnections(taskConnections, taskDefinition);
+                        }
+                    }
+                } else {
+                    putTaskConnections(taskConnections, (TaskDefinition) workflowTaskDefinition);
+                }
+            }
+        }
+
+        return taskConnections;
+    }
+
+    private static void putTaskConnections(
+        Map<String, List<ConnectionRequirement>> taskConnections, TaskDefinition taskDefinition) {
+
+        List<? extends ConnectionRequirement> connectionRequirements = taskDefinition.getConnections()
+            .orElseGet(List::of);
+
+        taskConnections.put(taskDefinition.getName(), List.copyOf(connectionRequirements));
+    }
+
+    private static Map<String, String> connectionNameComponentNames(
+        List<ConnectionRequirement> connectionRequirements) {
+
+        return connectionRequirements.stream()
+            .collect(Collectors.toMap(ConnectionRequirement::getName, ConnectionRequirement::getComponentName));
     }
 
     private static IntegrationCodeWorkflowFacadeImpl newUploadFacade(
