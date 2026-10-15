@@ -76,6 +76,7 @@ class PermissionScopeTypeTest {
     private static final Set<String> KNOWN_GATE_FUNCTIONS = Set.of(
         "@aiAgentEvalWorkflowResolver.getEnvironmentId",
         "@aiAgentEvalWorkflowResolver.getWorkflowId",
+        "@approvalTaskJobResolver.getJobId",
         "@permissionService.hasResourceRole",
         "@permissionService.isResourceOwner",
         "hasAuthority",
