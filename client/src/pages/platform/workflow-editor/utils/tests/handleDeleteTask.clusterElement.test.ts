@@ -7,6 +7,8 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import handleDeleteTask from '../handleDeleteTask';
 import {clearAllWorkflowMutations} from '../workflowMutationGuard';
 
+const {resetDetailsPanelMock} = vi.hoisted(() => ({resetDetailsPanelMock: vi.fn()}));
+
 let mockWorkflowState: Record<string, unknown> = {};
 const mockSetWorkflow = vi.fn((newWorkflow) => {
     mockWorkflowState = newWorkflow;
@@ -26,7 +28,7 @@ vi.mock('../../stores/useWorkflowNodeDetailsPanelStore', () => ({
     default: {
         getState: () => ({
             removePendingSaveNodeName: vi.fn(),
-            reset: vi.fn(),
+            reset: resetDetailsPanelMock,
             setWorkflowNodeDetailsPanelOpen: vi.fn(),
         }),
     },
@@ -228,5 +230,107 @@ describe('handleDeleteTask cluster-element routing', () => {
         const updatedTasks = getUpdatedTasks(mutation);
 
         expect(updatedTasks.map((task: WorkflowTask) => task.name)).toEqual(['task_2']);
+    });
+});
+
+describe('handleDeleteTask cluster-element panel state', () => {
+    const AI_AGENT_1_TASK = {
+        clusterElements: {
+            tools: [
+                {name: 'tool_1', type: 'tool/v1/action1'},
+                {name: 'tool_2', type: 'tool/v1/action2'},
+            ],
+        },
+        clusterRoot: true,
+        name: 'aiAgent_1',
+        type: 'aiAgent/v1/AGENT',
+    } as unknown as WorkflowTask;
+
+    const TOOL_1_DATA = {
+        clusterElementType: 'tools',
+        componentName: 'tool',
+        name: 'tool_1',
+        parentClusterRootId: 'aiAgent_1',
+        topLevelClusterRootId: 'aiAgent_1',
+        workflowNodeName: 'tool_1',
+    } as NodeDataType;
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockWorkflowState = {};
+    });
+
+    afterEach(() => {
+        clearAllWorkflowMutations();
+    });
+
+    it('leaves the stored root of another agent untouched', () => {
+        const setCurrentNode = vi.fn();
+        const setRootClusterElementNodeData = vi.fn();
+
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            currentNode: {clusterRoot: true, name: 'aiAgent_2', workflowNodeName: 'aiAgent_2'} as NodeDataType,
+            data: TOOL_1_DATA,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            rootClusterElementNodeData: {
+                clusterElements: {tools: []},
+                clusterRoot: true,
+                name: 'aiAgent_2',
+                workflowNodeName: 'aiAgent_2',
+            } as unknown as NodeDataType,
+            setCurrentNode,
+            setRootClusterElementNodeData,
+            updateWorkflowMutation: makeMockMutation(),
+            workflow: makeWorkflow([AI_AGENT_1_TASK]),
+        });
+
+        expect(setRootClusterElementNodeData).not.toHaveBeenCalled();
+        expect(setCurrentNode).not.toHaveBeenCalled();
+    });
+
+    it('closes the details panel when the open inline element is deleted', () => {
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            currentNode: TOOL_1_DATA,
+            data: TOOL_1_DATA,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            setCurrentNode: vi.fn(),
+            setRootClusterElementNodeData: vi.fn(),
+            updateWorkflowMutation: makeMockMutation(),
+            workflow: makeWorkflow([AI_AGENT_1_TASK]),
+        });
+
+        expect(resetDetailsPanelMock).toHaveBeenCalledOnce();
+    });
+
+    it('moves the panel to the stored root when its open element is deleted in the dialog', () => {
+        const setCurrentNode = vi.fn();
+        const setRootClusterElementNodeData = vi.fn();
+        const rootClusterElementNodeData = {
+            clusterElements: AI_AGENT_1_TASK.clusterElements,
+            clusterRoot: true,
+            name: 'aiAgent_1',
+            workflowNodeName: 'aiAgent_1',
+        } as unknown as NodeDataType;
+
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            currentNode: TOOL_1_DATA,
+            data: TOOL_1_DATA,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            rootClusterElementNodeData,
+            setCurrentNode,
+            setRootClusterElementNodeData,
+            updateWorkflowMutation: makeMockMutation(),
+            workflow: makeWorkflow([AI_AGENT_1_TASK]),
+        });
+
+        expect(setRootClusterElementNodeData).toHaveBeenCalledWith(expect.objectContaining({name: 'aiAgent_1'}));
+        expect(setCurrentNode).toHaveBeenLastCalledWith(expect.objectContaining({name: 'aiAgent_1'}));
+        expect(resetDetailsPanelMock).not.toHaveBeenCalled();
     });
 });

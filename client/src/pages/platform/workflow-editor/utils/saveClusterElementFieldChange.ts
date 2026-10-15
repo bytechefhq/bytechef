@@ -152,7 +152,7 @@ export default function saveClusterElementFieldChange({
                 ...commonUpdates,
             });
 
-            if (rootClusterElementNodeData) {
+            if (rootClusterElementNodeData?.workflowNodeName === mainClusterRootName) {
                 if (currentNode.clusterRoot && !currentNode.isNestedClusterRoot) {
                     setRootClusterElementNodeData({
                         ...rootClusterElementNodeData,
