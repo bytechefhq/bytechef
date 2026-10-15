@@ -102,3 +102,9 @@
     justify-content: flex-end;
     width: 100%;
 }
+
+.retryRow {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+}

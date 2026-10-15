@@ -49,6 +49,9 @@ const respond = (status: number, body: unknown) => ({
 });
 
 let connections: Array<{componentName: string; id: number; name: string}> = [];
+let connectionsStatus = 200;
+let deprovisionStatus = 200;
+let provisionGate: Promise<void> | undefined;
 let enableResponse: {body: unknown; status: number} = {body: {}, status: 200};
 let provisionResponse: {body: unknown; status: number} = {body: {}, status: 200};
 let workflowsResponse: {body: unknown; status: number} = {body: [], status: 200};
@@ -64,7 +67,7 @@ const installFetch = () => {
         }
 
         if (url.includes('/components/slack/connections')) {
-            return respond(200, connections);
+            return respond(connectionsStatus, connections);
         }
 
         if (url.endsWith('/automation/workflows') && method === 'GET') {
@@ -72,7 +75,13 @@ const installFetch = () => {
         }
 
         if (url.endsWith('/provision') && method === 'POST') {
+            await provisionGate;
+
             return respond(provisionResponse.status, provisionResponse.body);
+        }
+
+        if (url.endsWith('/provision') && method === 'DELETE') {
+            return respond(deprovisionStatus, {});
         }
 
         if (url.endsWith('/enable') && method === 'POST') {
@@ -103,6 +112,9 @@ describe('ActivationDialog', () => {
     beforeEach(() => {
         calls.length = 0;
         connections = [];
+        connectionsStatus = 200;
+        deprovisionStatus = 200;
+        provisionGate = undefined;
         enableResponse = {body: {}, status: 200};
         provisionResponse = {body: {}, status: 200};
         workflowsResponse = {body: [], status: 200};
@@ -270,16 +282,133 @@ describe('ActivationDialog', () => {
         await waitFor(() => expect(calls.some(isDeprovision)).toBe(true));
     });
 
-    it('never removes the automation when it cannot tell whether it existed before', async () => {
+    it('removes a first activation when only another template was activated before', async () => {
         enableResponse = {body: {}, status: 500};
+        workflowsResponse = {
+            body: [{automationWorkflowUuid: 'wf-other', kind: 'REFERENCE', name: 'Other', tasks: []}],
+            status: 200,
+        };
+
+        renderDialog({workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
+
+        await waitFor(() => expect(calls.some(isDeprovision)).toBe(true));
+    });
+
+    it('does not provision when it cannot tell whether the automation existed before', async () => {
         workflowsResponse = {body: {}, status: 500};
 
         renderDialog({workflowTemplateId: 'wf-plain'});
 
         await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
 
-        expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+        expect(await screen.findByText('Could not check your automations. Please try again.')).toBeInTheDocument();
+        expect(calls.some((call) => call.url.endsWith('/provision'))).toBe(false);
+    });
+
+    it('says so when a failed first activation could not be undone', async () => {
+        enableResponse = {body: {}, status: 500};
+        deprovisionStatus = 500;
+
+        renderDialog({workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
+
+        expect(await screen.findByText(/could not be fully undone/)).toBeInTheDocument();
+    });
+
+    it('says the settings were saved when re-activating an existing automation fails to enable', async () => {
+        enableResponse = {body: {}, status: 500};
+        workflowsResponse = {
+            body: [{automationWorkflowUuid: 'wf-plain', kind: 'REFERENCE', name: 'Plain', tasks: []}],
+            status: 200,
+        };
+
+        renderDialog({workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
+
+        expect(
+            await screen.findByText(/settings were saved, but the automation could not be switched on/)
+        ).toBeInTheDocument();
         expect(calls.some(isDeprovision)).toBe(false);
+    });
+
+    it('keeps the automation on when the host onActivated callback throws', async () => {
+        const onActivated = vi.fn(() => {
+            throw new Error('host bug');
+        });
+
+        renderDialog({onActivated, workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
+
+        expect(await screen.findByRole('button', {name: 'Done'})).toBeInTheDocument();
+        expect(onActivated).toHaveBeenCalledWith('wf-plain');
+        expect(calls.some(isDeprovision)).toBe(false);
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('refuses a second Activate click while activating', async () => {
+        let releaseProvision: () => void = () => {};
+
+        provisionGate = new Promise((resolve) => {
+            releaseProvision = resolve;
+        });
+
+        renderDialog({workflowTemplateId: 'wf-plain'});
+
+        const activateButton = await screen.findByRole('button', {name: 'Activate'});
+
+        await userEvent.click(activateButton);
+
+        await waitFor(() => expect(activateButton).toBeDisabled());
+
+        await userEvent.click(activateButton);
+
+        await act(async () => releaseProvision());
+
+        expect(await screen.findByRole('button', {name: 'Done'})).toBeInTheDocument();
+        expect(calls.filter((call) => call.url.endsWith('/provision') && call.method === 'POST')).toHaveLength(1);
+    });
+
+    it('asks the user to reload when the session has expired', async () => {
+        provisionResponse = {body: {}, status: 401};
+
+        renderDialog({workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
+
+        expect(await screen.findByText(/session has expired/)).toBeInTheDocument();
+    });
+
+    it('shows when the accounts could not be loaded and loads them again on Retry', async () => {
+        connectionsStatus = 500;
+
+        renderDialog();
+
+        const row = await screen.findByTestId('connect-row-slack');
+
+        expect(await within(row).findByText("Couldn't load your Slack accounts.")).toBeInTheDocument();
+
+        connectionsStatus = 200;
+        connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
+
+        await userEvent.click(within(row).getByRole('button', {name: 'Retry'}));
+
+        expect(await within(row).findByRole('option', {name: 'Team Slack'})).toBeInTheDocument();
+        expect(within(row).queryByText("Couldn't load your Slack accounts.")).not.toBeInTheDocument();
+    });
+
+    it('is a labelled modal dialog', async () => {
+        renderDialog({workflowTemplateId: 'wf-plain'});
+
+        await screen.findByRole('button', {name: 'Activate'});
+
+        const dialog = screen.getByRole('dialog', {name: 'Plain'});
+
+        expect(dialog).toHaveAttribute('aria-modal', 'true');
     });
 
     it('shows a generic error on any other failure', async () => {
@@ -333,7 +462,10 @@ describe('ActivationDialog', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it('stays open on Escape whichever window listener runs first', async () => {
+    it.each([
+        ['after', false],
+        ['before', true],
+    ])('stays open on Escape when the connect dialog listener runs %s it', async (_order, capture) => {
         const onClose = vi.fn();
         const {rerender} = renderDialog({onClose});
 
@@ -349,7 +481,7 @@ describe('ActivationDialog', () => {
             }
         };
 
-        window.addEventListener('keydown', simulateConnectDialogEscape);
+        window.addEventListener('keydown', simulateConnectDialogEscape, {capture});
 
         const inlineOnClose = vi.fn();
 
@@ -365,7 +497,7 @@ describe('ActivationDialog', () => {
 
         await userEvent.keyboard('{Escape}');
 
-        window.removeEventListener('keydown', simulateConnectDialogEscape);
+        window.removeEventListener('keydown', simulateConnectDialogEscape, {capture});
 
         expect(onClose).not.toHaveBeenCalled();
         expect(inlineOnClose).not.toHaveBeenCalled();
