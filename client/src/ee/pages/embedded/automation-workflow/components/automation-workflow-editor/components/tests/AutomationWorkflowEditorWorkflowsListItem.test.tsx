@@ -131,4 +131,32 @@ describe('AutomationWorkflowEditorWorkflowsListItem', () => {
 
         expect(onWorkflowClick).toHaveBeenCalledWith('wf-1');
     });
+
+    it('offers the workflow actions menu for a visual project only', () => {
+        const renderListItem = (listItemProject: typeof project) =>
+            render(
+                <MemoryRouter>
+                    <TooltipProvider>
+                        <ul>
+                            <AutomationWorkflowEditorWorkflowsListItem
+                                currentWorkflowId="wf-other"
+                                onWorkflowClick={vi.fn()}
+                                project={listItemProject}
+                                workflow={workflow}
+                            />
+                        </ul>
+                    </TooltipProvider>
+                </MemoryRouter>
+            );
+
+        const {unmount} = renderListItem(project);
+
+        expect(screen.getByRole('button', {name: 'Workflow actions for Mailer'})).toBeInTheDocument();
+
+        unmount();
+
+        renderListItem({...project, codeWorkflowProject: true});
+
+        expect(screen.queryByRole('button', {name: 'Workflow actions for Mailer'})).not.toBeInTheDocument();
+    });
 });
