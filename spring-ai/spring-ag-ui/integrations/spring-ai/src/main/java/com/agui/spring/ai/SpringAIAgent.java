@@ -18,6 +18,8 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.tool.ToolCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.function.Function;
 
@@ -47,6 +49,8 @@ import static java.util.stream.Collectors.toList;
  * @since 1.0
  */
 public class SpringAIAgent extends LocalAgent {
+
+    private static final Logger log = LoggerFactory.getLogger(SpringAIAgent.class);
 
     /**
      * The Spring AI ChatClient used for processing chat requests and responses.
@@ -140,7 +144,11 @@ public class SpringAIAgent extends LocalAgent {
             var userMessage = this.getLatestUserMessage(messages);
             content = userMessage.getContent();
         } catch (AGUIException e) {
-            this.emitEvent(runErrorEvent(e.getMessage()), subscriber);
+            log.error("Agent '{}' could not resolve the latest user message for threadId={} runId={}",
+                this.agentId, threadId, runId, e);
+
+            this.emitEvent(runStartedEvent(threadId, runId), subscriber);
+            this.onError(input, e, subscriber);
             return;
         }
 
@@ -164,14 +172,43 @@ public class SpringAIAgent extends LocalAgent {
             getChatRequest(input, content, messageId, deferredEvents, this.createSystemMessage(state, input.context()), subscriber)
                 .stream()
                 .chatResponse()
+                .contextCapture()
                 .subscribe(
                     evt -> onEvent(subscriber, evt, assistantMessage, messageId, deferredEvents),
-                    err -> this.emitEvent(runErrorEvent(err.getMessage()), subscriber),
+                    err -> {
+                        log.error(
+                            "Agent '{}' chat stream failed for threadId={} runId={}: {}",
+                            this.agentId, threadId, runId, err.toString(), err);
+
+                        this.onError(input, err, subscriber);
+                    },
                     () -> onComplete(input, assistantMessage, subscriber, messageId, deferredEvents)
                 );
-        } catch (AGUIException e) {
-            this.emitEvent(runErrorEvent(e.getMessage()), subscriber);
+        } catch (AGUIException | RuntimeException e) {
+            log.error("Agent '{}' failed to start chat stream for threadId={} runId={}", this.agentId, threadId, runId, e);
+
+            this.onError(input, e, subscriber);
         }
+    }
+
+    private void onError(RunAgentInput input, Throwable throwable, AgentSubscriber subscriber) {
+        try {
+            this.emitEvent(runErrorEvent(this.runErrorMessage(input, throwable)), subscriber);
+        } finally {
+            subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), state, this, input));
+        }
+    }
+
+    /**
+     * Hook for subclasses to choose the message a RUN_ERROR event carries to the client. Default returns the
+     * throwable's message.
+     *
+     * @param input     the current run input
+     * @param throwable the failure that ended the run
+     * @return the message sent to the client
+     */
+    protected String runErrorMessage(RunAgentInput input, Throwable throwable) {
+        return throwable.getMessage();
     }
 
     /**

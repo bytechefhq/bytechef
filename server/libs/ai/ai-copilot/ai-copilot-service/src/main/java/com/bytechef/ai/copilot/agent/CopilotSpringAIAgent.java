@@ -23,8 +23,10 @@ import com.agui.core.state.State;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.commons.util.NumberUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.tenant.TenantContext;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +52,32 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
 
     @Override
     protected void run(RunAgentInput input, AgentSubscriber subscriber) {
-        runWithEnvironment(input, () -> super.run(input, subscriber));
+        runWithTenant(input, () -> runWithEnvironment(input, () -> super.run(input, subscriber)));
+    }
+
+    void runWithTenant(RunAgentInput input, Runnable action) {
+        String tenantId = getTenantId(input);
+
+        if (tenantId == null) {
+            log.warn(
+                "{}: run state carries no '{}'; leaving the agent thread on the ambient tenant '{}'. Every entry point "
+                    + "must capture the tenant id on the request thread.",
+                getClass().getSimpleName(), CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+
+            action.run();
+
+            return;
+        }
+
+        String previousTenantId = TenantContext.getCurrentTenantId();
+
+        TenantContext.setCurrentTenantId(tenantId);
+
+        try {
+            action.run();
+        } finally {
+            TenantContext.setCurrentTenantId(previousTenantId);
+        }
     }
 
     void runWithEnvironment(RunAgentInput input, Runnable action) {
@@ -110,5 +137,21 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         }
 
         return environmentId.intValue();
+    }
+
+    private static @Nullable String getTenantId(RunAgentInput input) {
+        State state = input.state();
+
+        if (state == null) {
+            return null;
+        }
+
+        String tenantId = StringUtils.asString(state.get(CopilotConstants.STATE_TENANT_ID));
+
+        if (tenantId == null || tenantId.isBlank()) {
+            return null;
+        }
+
+        return tenantId;
     }
 }

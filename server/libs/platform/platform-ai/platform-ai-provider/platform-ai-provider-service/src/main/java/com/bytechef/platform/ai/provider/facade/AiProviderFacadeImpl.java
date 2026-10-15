@@ -148,7 +148,6 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional(readOnly = true)
     public AiDefaultModelWithApiKeyDTO getAiDefaultChatModelApiKey(int environmentId) {
         return resolveWithApiKey(getAiDefaultChatModel(environmentId), environmentId);
