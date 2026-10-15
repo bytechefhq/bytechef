@@ -87,7 +87,7 @@ A connected user can use the connections they own plus the shared connections in
 
 The connection list endpoints return only these connections. They take an optional `connectionIds` query parameter that narrows the result to those ids; ids the user is not entitled to are left out.
 
-A connection created from the Connect dialog, including from the [activation dialog](/platform/embedded/build/activation-dialog), belongs to an integration instance. It is available to both the user's integrations and automations. Reconnecting it keeps the integration's OAuth2 app credentials.
+A connection created from the Connect dialog, including from the [activation dialog](/platform/embedded/build/activation-dialog), belongs to an integration instance. It is available to both the user's integrations and automations. When a connection backed by an integration instance is reconnected, the authorization parameters of the integration's configuration, such as an OAuth2 app's client id and secret, are restored unless the form supplies them.
 
 Assigning a connection the user is not entitled to - for example when a catalog workflow is set up for the user - fails with `400 Bad Request`.
 

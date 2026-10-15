@@ -87,7 +87,7 @@ A template the user has not activated shows **Use**, which opens the activation 
 
 The activation dialog has up to three steps. It is the same dialog you can open from your own page - see [Activate templates from your app](/platform/embedded/build/activation-dialog).
 
-1. **Connect** - one row per component that needs a connection. **Connect** opens the Connect dialog for the integration behind that component, unless `connectionDialogAllowed` is `false`. The new connection is an integration instance connection that the user's integrations share. If the component's integration has no enabled configuration in the environment, the row shows `<App> isn't set up yet — ask your administrator` and activation cannot continue. Skipped when the template needs no connections.
+1. **Connect** - one row per component that needs a connection. **Connect** reuses the user's existing connection for that integration without showing a form when its credentials are valid; otherwise it opens the Connect dialog for the integration behind that component (an existing connection with invalid credentials is reconnected in the form), unless `connectionDialogAllowed` is `false`. The new connection is an integration instance connection that the user's integrations share. If the component's integration has no enabled configuration in the environment, the row shows `<App> isn't set up yet — ask your administrator` and activation cannot continue. Skipped when the template needs no connections.
 2. **Configure** - one field per workflow input. Required inputs must be filled. Skipped when the template has no inputs.
 3. **Activate** - the hub gives the user a reference to the template with the chosen connections and inputs, and turns it on. If this fails, the reference is removed so the user can try again.
 
@@ -103,7 +103,7 @@ The builder opens only what a user may edit: a copy of a template needs `editWor
 
 The **Connections** tab lists the user's connections with their name, app, creation date, and a **Shared** badge on the connections you share with every connected user. Users can **Reconnect** or **Delete** their own connections; shared connections are read-only. A connection that an enabled automation still uses cannot be deleted.
 
-**Reconnect** opens the Connect dialog in reconnect mode, with the same credentials form as the first connect. It is offered only for connections that belong to an integration instance, and it keeps the integration's OAuth2 app credentials.
+**Reconnect** opens the Connect dialog in reconnect mode, with the same credentials form as the first connect. It is offered on connections the user can edit when an integration can be resolved for them: the integration whose instance owns the connection, or otherwise an integration for the same component. For a connection backed by an integration instance, reconnecting restores the authorization parameters of the integration's configuration, such as an OAuth2 app's client id and secret, unless the form supplies them.
 
 New connections are created from the activation dialog or the builder, not from this tab. See [Connections](/platform/embedded/build/connections).
 
