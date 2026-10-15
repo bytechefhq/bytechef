@@ -385,7 +385,7 @@ export default function useClusterElementNodes(clusterRootIds: string[]): UseClu
             }
         };
 
-        getClusterRootComponentDefinitions();
+        void getClusterRootComponentDefinitions();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         workflow.definition,
