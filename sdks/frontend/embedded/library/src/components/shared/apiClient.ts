@@ -1,3 +1,12 @@
+export class ApiResponseError extends Error {
+    constructor(
+        readonly status: number,
+        readonly body: unknown
+    ) {
+        super(`Response status: ${status}`);
+    }
+}
+
 export function createApiClient(baseUrl: string, environment: string, jwtToken: string) {
     const defaultHeaders = {
         Authorization: `Bearer ${jwtToken}`,
@@ -25,7 +34,9 @@ export function createApiClient(baseUrl: string, environment: string, jwtToken: 
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
+                    const errorBody = await response.json().catch(() => undefined);
+
+                    throw new ApiResponseError(response.status, errorBody);
                 }
 
                 // Only try to parse JSON if we expect a response body

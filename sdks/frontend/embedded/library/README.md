@@ -47,6 +47,41 @@ Embeds the end-user Automation Hub in an iframe: an Automations tab (the publish
 
 When `jwtToken` or any other prop changes after the iframe has loaded, the component sends the new values to the iframe, so a refreshed token takes effect without reloading it. The same applies to `EmbeddedWorkflowBuilder` and `IntegrationMarketplace`.
 
+### useActivationDialog / ActivationDialog
+
+Activates one published automation template for the connected user without the Automation Hub iframe: connect the
+accounts the template needs (through `ConnectDialog`, against the integration that backs each component), fill the
+template's inputs, activate. The template id comes from `GET /api/embedded/v1/automation/projects`.
+
+```tsx
+const {openDialog} = useActivationDialog({
+    baseUrl: 'https://app.bytechef.io',
+    environment: 'PRODUCTION',
+    jwtToken,
+    onActivated: (workflowUuid) => refreshAutomations(),
+    onEditWorkflow: (workflowUuid) => openBuilder(workflowUuid), // omit to hide "Edit workflow"
+    workflowTemplateId: template.id,
+});
+```
+
+`<ActivationDialog …/>` is the same flow as a component for apps that render it themselves. A component whose
+integration has no enabled instance configuration in the environment shows "isn't set up yet — ask your administrator";
+set the integration up first.
+
+### Connection-only and reauthorize modes of `useConnectDialog`
+
+- `connectionOnly: true` + `onConnected(integrationInstanceId, connectionId)`: closes once the integration instance
+  exists (or hands back the existing one) instead of continuing to the workflows view.
+- `reauthorizeConnectionId` + `onReauthorized(connectionId)`: shows the connection form for an existing connection
+  and posts to `/connections/{id}/reauthorize`.
+
+### Theming the dialogs
+
+Both dialogs read their colors from `--bytechef-dialog-surface`, `--bytechef-dialog-surface-raised`,
+`--bytechef-dialog-border`, `--bytechef-dialog-text`, `--bytechef-dialog-text-muted`, `--bytechef-dialog-hover`,
+`--bytechef-dialog-primary` and `--bytechef-dialog-primary-hover`; set them on `:root` (or any ancestor) to restyle.
+`mode: 'dark'` switches the fallbacks.
+
 ## Upgrading to 0.4.0
 
 - `sharedConnectionIds` is removed from `AutomationHub` and `EmbeddedWorkflowBuilder`. It had no effect: the server never added the connections it named. Connected users now see their own connections plus the ones a tenant admin marks as shared. Delete the prop from your code.
