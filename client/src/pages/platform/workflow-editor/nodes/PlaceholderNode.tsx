@@ -4,7 +4,7 @@ import {FINAL_PLACEHOLDER_NODE_ID} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
 import {ClipboardPlusIcon, PlusIcon} from 'lucide-react';
-import {memo, useCallback, useMemo, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -22,6 +22,7 @@ import styles from './NodeTypes.module.css';
 
 const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [menuReady, setMenuReady] = useState(false);
+    const [popoverMenuOpen, setPopoverMenuOpen] = useState(false);
 
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
@@ -32,12 +33,16 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         }))
     );
 
-    const {copiedNode, copiedWorkflowId} = useWorkflowEditorStore(
-        useShallow((state) => ({
-            copiedNode: state.copiedNode,
-            copiedWorkflowId: state.copiedWorkflowId,
-        }))
-    );
+    const {copiedNode, copiedWorkflowId, pendingClusterElementDrop, setPendingClusterElementDrop} =
+        useWorkflowEditorStore(
+            useShallow((state) => ({
+                copiedNode: state.copiedNode,
+                copiedWorkflowId: state.copiedWorkflowId,
+                pendingClusterElementDrop:
+                    state.pendingClusterElementDrop?.placeholderId === id ? state.pendingClusterElementDrop : undefined,
+                setPendingClusterElementDrop: state.setPendingClusterElementDrop,
+            }))
+        );
 
     const {updateWorkflowMutation} = useWorkflowEditor();
 
@@ -76,6 +81,17 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         pasteNode({nodeIndex, taskDispatcherContext, updateWorkflowMutation});
     }, [id, nodeIndex, nodes, updateWorkflowMutation]);
 
+    const handlePopoverMenuOpenChange = useCallback(
+        (open: boolean) => {
+            setPopoverMenuOpen(open);
+
+            if (!open && pendingClusterElementDrop) {
+                setPendingClusterElementDrop(undefined);
+            }
+        },
+        [pendingClusterElementDrop, setPendingClusterElementDrop]
+    );
+
     const handleOpenChange = (open: boolean) => {
         if (open) {
             setMenuReady(false);
@@ -84,6 +100,12 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
             setMenuReady(false);
         }
     };
+
+    useEffect(() => {
+        if (pendingClusterElementDrop) {
+            setPopoverMenuOpen(true);
+        }
+    }, [pendingClusterElementDrop]);
 
     return (
         <ContextMenu onOpenChange={handleOpenChange}>
@@ -95,9 +117,12 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         hideClusterElementComponents={!data.clusterElementType}
                         hideTaskDispatchers={!!data.clusterElementType}
                         hideTriggerComponents
+                        initialComponentDefinition={pendingClusterElementDrop?.componentDefinition}
                         key={`${id}-${nodeIndex}`}
                         multipleClusterElementsNode={data.multipleClusterElementsNode}
                         nodeIndex={nodeIndex}
+                        onOpenChange={handlePopoverMenuOpenChange}
+                        open={popoverMenuOpen}
                         showPaste={canPaste}
                         sourceNodeId={data.clusterElementType ? rootClusterElementId : id}
                     >
