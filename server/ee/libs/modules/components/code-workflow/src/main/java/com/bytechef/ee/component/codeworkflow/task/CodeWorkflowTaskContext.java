@@ -86,10 +86,19 @@ public class CodeWorkflowTaskContext implements TaskContext, ComponentActionInvo
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             componentName, null);
 
-        ComponentConnection componentConnection = resolveComponentConnection(connectionName);
+        boolean unnamedConnection = connectionName == null || connectionName.isBlank();
+
+        ComponentConnection componentConnection = unnamedConnection
+            ? componentConnections.get(componentName) : resolveComponentConnection(connectionName);
 
         if (componentConnection == null && actionDefinitionService.actionDefinesConnection(
             componentDefinition.getName(), componentDefinition.getVersion(), actionName)) {
+
+            if (unnamedConnection) {
+                throw new IllegalArgumentException(
+                    "No connection is declared for component %s; declare one or pass its name".formatted(
+                        componentName));
+            }
 
             throw new IllegalArgumentException(
                 "Connection with name %s does not exist".formatted(connectionName));
