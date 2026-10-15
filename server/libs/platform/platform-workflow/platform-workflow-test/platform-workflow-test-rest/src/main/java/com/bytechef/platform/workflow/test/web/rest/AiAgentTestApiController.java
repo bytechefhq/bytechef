@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -75,8 +75,6 @@ class AiAgentTestApiController {
         value = "/ai-agent-tests",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#aiAgentTestRequest.workflowId(), 'WORKFLOW_EDIT', "
-        + "#aiAgentTestRequest.environmentId())")
     public SseEmitter testAiAgent(@RequestBody AiAgentTestRequest aiAgentTestRequest) {
         SseEmitter sseEmitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 
@@ -88,7 +86,8 @@ class AiAgentTestApiController {
         sseEmitter.onTimeout(() -> activeTests.invalidate(testId));
         sseEmitter.onError(throwable -> activeTests.invalidate(testId));
 
-        CompletableFuture.runAsync(() -> {
+        // Run with the caller's SecurityContext, so the guard on the facade sees who asked for the test.
+        CompletableFuture.runAsync(new DelegatingSecurityContextRunnable(() -> {
             long environmentId = aiAgentTestRequest.environmentId();
 
             Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
@@ -147,7 +146,7 @@ class AiAgentTestApiController {
                     }
                 }
             }
-        }, executor);
+        }), executor);
 
         return sseEmitter;
     }

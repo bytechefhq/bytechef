@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.apiconnector.configuration.facade;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
+import com.bytechef.ee.platform.apiconnector.configuration.dto.GenerateSpecificationRequestDTO;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,8 @@ public interface ApiConnectorFacade {
     Optional<ApiConnectorGenerationJob> fetchGenerationJob(String jobId);
 
     ApiConnector generateFromDocumentation(String componentName, String documentationUrl);
+
+    String generateSpecification(GenerateSpecificationRequestDTO generateSpecificationRequestDTO);
 
     ApiConnector getApiConnector(long id);
 
