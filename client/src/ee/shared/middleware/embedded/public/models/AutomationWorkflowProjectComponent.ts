@@ -37,6 +37,18 @@ export interface AutomationWorkflowProjectComponent {
      * @memberof AutomationWorkflowProjectComponent
      */
     icon?: string;
+    /**
+     * Whether the component needs a connection before the workflow can run.
+     * @type {boolean}
+     * @memberof AutomationWorkflowProjectComponent
+     */
+    connectionRequired?: boolean;
+    /**
+     * The id of the integration that backs this component in the current environment, or null when no enabled integration configuration exists for it; present only when connectionRequired is true.
+     * @type {number}
+     * @memberof AutomationWorkflowProjectComponent
+     */
+    integrationId?: number;
 }
 
 /**
@@ -59,6 +71,8 @@ export function AutomationWorkflowProjectComponentFromJSONTyped(json: any, ignor
         'name': json['name'] == null ? undefined : json['name'],
         'title': json['title'] == null ? undefined : json['title'],
         'icon': json['icon'] == null ? undefined : json['icon'],
+        'connectionRequired': json['connectionRequired'] == null ? undefined : json['connectionRequired'],
+        'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
     };
 }
 
@@ -76,6 +90,8 @@ export function AutomationWorkflowProjectComponentToJSONTyped(value?: Automation
         'name': value['name'],
         'title': value['title'],
         'icon': value['icon'],
+        'connectionRequired': value['connectionRequired'],
+        'integrationId': value['integrationId'],
     };
 }
 
