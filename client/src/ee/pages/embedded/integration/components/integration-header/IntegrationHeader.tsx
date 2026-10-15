@@ -88,8 +88,6 @@ const IntegrationHeader = ({
         <LoadingIndicator isFetching={isSaving} isOnline={isOnline} showLabel />
     );
 
-    const settingsMenuVisible = !integration?.codeWorkflow;
-
     if (!integration) {
         return <IntegrationSkeleton />;
     }
@@ -148,14 +146,12 @@ const IntegrationHeader = ({
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                {settingsMenuVisible && (
-                    <SettingsMenu
-                        bottomResizablePanelRef={bottomResizablePanelRef}
-                        integration={integration}
-                        updateWorkflowMutation={updateWorkflowMutation}
-                        workflow={workflow as Workflow}
-                    />
-                )}
+                <SettingsMenu
+                    bottomResizablePanelRef={bottomResizablePanelRef}
+                    integration={integration}
+                    updateWorkflowMutation={updateWorkflowMutation}
+                    workflow={workflow as Workflow}
+                />
             </div>
         </header>
     );
