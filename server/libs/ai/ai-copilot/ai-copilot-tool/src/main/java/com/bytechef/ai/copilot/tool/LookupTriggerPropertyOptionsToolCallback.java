@@ -19,6 +19,7 @@ package com.bytechef.ai.copilot.tool;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -131,6 +132,10 @@ public class LookupTriggerPropertyOptionsToolCallback implements ToolCallback {
 
             if (componentName == null || componentName.isBlank()) {
                 return toolError("componentName is required and must not be blank");
+            }
+
+            if (!AllowedComponentNamesUtils.isAllowed(componentName, toolContext)) {
+                return toolError(AllowedComponentNamesUtils.getNotAllowedMessage(List.of(componentName)));
             }
 
             if (triggerName == null || triggerName.isBlank()) {
