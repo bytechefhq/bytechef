@@ -72,6 +72,7 @@ interface DialogProps {
     closeDialog: () => void;
     mode?: 'dark' | 'light';
     executeAction?: ExecuteActionFunction;
+    title?: string;
     workflowsView?: boolean;
     form?: FormType;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -121,6 +122,7 @@ const ConnectDialog = ({
     mergedWorkflows,
     properties,
     registerFormSubmit,
+    title,
 }: DialogProps) => {
     // Option reset on integration switch is handled inside useWorkflowInputOptions (keyed on integrationInstanceId),
     // which resets during render — before the new fields load — instead of in an effect that would race the fetch.
@@ -156,7 +158,7 @@ const ConnectDialog = ({
                 className={mode === 'dark' ? `${styles.dialogContainer} ${styles.dark}` : styles.dialogContainer}
                 onClick={(event) => event.stopPropagation()}
             >
-                <DialogHeader closeDialog={closeDialog} integration={integration} />
+                <DialogHeader closeDialog={closeDialog} integration={integration} title={title} />
 
                 {loading ? (
                     <main className={styles.dialogContentFallback}>
@@ -210,16 +212,17 @@ const ConnectDialog = ({
 interface DialogHeaderProps {
     closeDialog: () => void;
     integration?: IntegrationType;
+    title?: string;
 }
 
-const DialogHeader = ({closeDialog, integration}: DialogHeaderProps) => (
+const DialogHeader = ({closeDialog, integration, title}: DialogHeaderProps) => (
     <header className={styles.dialogHeader}>
         <div>
             {integration && integration.icon && (
                 <div className={styles.integrationIcon} dangerouslySetInnerHTML={{__html: integration.icon}} />
             )}
 
-            <h2>{integration?.name}</h2>
+            <h2>{title ?? integration?.name}</h2>
         </div>
 
         <button aria-label="Close Dialog" className={styles.closeButton} onClick={closeDialog}>

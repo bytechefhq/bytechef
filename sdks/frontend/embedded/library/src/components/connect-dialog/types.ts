@@ -38,6 +38,7 @@ export interface MergedWorkflowType {
 
 export interface IntegrationInstanceType {
     id: number;
+    connectionId?: number;
     enabled: boolean;
     credentialStatus: string;
     mcpTools?: McpIntegrationInstanceToolType[];
