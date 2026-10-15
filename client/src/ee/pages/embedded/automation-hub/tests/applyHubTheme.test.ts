@@ -134,4 +134,22 @@ describe('applyHubTheme', () => {
         expect(root.style.getPropertyValue('--bytechef-dialog-primary')).toBe('#ff0000');
         expect(root.style.getPropertyValue('--bytechef-dialog-primary-hover')).toBe('#ff0000');
     });
+
+    it('gives the SDK dialogs a text colour that reads on the card colour', () => {
+        applyHubTheme({cardColor: '#1f2937'}, root);
+
+        expect(root.style.getPropertyValue('--bytechef-dialog-text')).toBe('#ffffff');
+
+        const lightRoot = document.createElement('div');
+
+        applyHubTheme({cardColor: '#fafafa'}, lightRoot);
+
+        expect(lightRoot.style.getPropertyValue('--bytechef-dialog-text')).toBe('#111111');
+    });
+
+    it('leaves the SDK dialog text colour alone when no card colour is set', () => {
+        applyHubTheme({surfaceColor: '#000000'}, root);
+
+        expect(root.style.getPropertyValue('--bytechef-dialog-text')).toBe('');
+    });
 });

@@ -8,7 +8,7 @@ declare module '@bytechef/embedded' {
         jwtToken: string;
         mode?: 'dark' | 'light';
         onClose?: () => void;
-        onConnected?: (connectionId: number) => void;
+        onConnected?: (integrationInstanceId: number, connectionId: number | undefined) => void;
         onReauthorized?: (connectionId: number) => void;
         reauthorizeConnectionId?: number;
     }
@@ -30,7 +30,7 @@ declare module '@bytechef/embedded' {
         workflowTemplateId: string;
     }
 
-    export function ActivationDialog(props: ActivationDialogProps): JSX.Element | null;
+    export function ActivationDialog(props: ActivationDialogProps): JSX.Element;
 
     export function useConnectDialog(props: UseConnectDialogProps): ConnectionDialogHookReturnI;
 }

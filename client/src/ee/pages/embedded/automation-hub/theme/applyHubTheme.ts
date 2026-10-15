@@ -91,7 +91,7 @@ function toHslTriplet(color: string): string | undefined {
     return `${Math.round(hue)} ${Math.round(saturation * 100)}% ${Math.round(lightness * 100)}%`;
 }
 
-function contrastForeground(color: string): string | undefined {
+function contrastColor(color: string): string | undefined {
     const rgb = toRgb(color);
 
     if (!rgb) {
@@ -101,7 +101,13 @@ function contrastForeground(color: string): string | undefined {
     const [red, green, blue] = rgb.map((channel) => channel / 255);
     const luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
 
-    return toHslTriplet(luminance > 0.5 ? '#111111' : '#ffffff');
+    return luminance > 0.5 ? '#111111' : '#ffffff';
+}
+
+function contrastForeground(color: string): string | undefined {
+    const foregroundColor = contrastColor(color);
+
+    return foregroundColor ? toHslTriplet(foregroundColor) : undefined;
 }
 
 const BUILDER_VARIABLES: Record<string, string[]> = {
@@ -140,6 +146,14 @@ function applySurfaceColor(themeKey: string, variable: string, value: string, ro
 
     for (const dialogVariable of DIALOG_VARIABLES[themeKey] ?? []) {
         root.style.setProperty(dialogVariable, value);
+    }
+
+    if (themeKey === 'cardColor') {
+        const dialogTextColor = contrastColor(value);
+
+        if (dialogTextColor) {
+            root.style.setProperty('--bytechef-dialog-text', dialogTextColor);
+        }
     }
 
     const triplet = toHslTriplet(value);
