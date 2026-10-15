@@ -100,6 +100,8 @@ public class ClusterElementTools {
                 projectWorkflowDTO.getVersion(),
                 projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
                 projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
+        } catch (ExecutionException executionException) {
+            throw executionException;
         } catch (Exception e) {
             log.error("updateWorkflowRootProperties({}): Failed to update root properties in workflow {}",
                 workflowId, workflowId, e);
@@ -171,6 +173,8 @@ public class ClusterElementTools {
                 projectWorkflowDTO.getVersion(),
                 projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
                 projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
+        } catch (ExecutionException executionException) {
+            throw executionException;
         } catch (Exception e) {
             log.error(
                 "updateClusterElementTask({}, {}): Failed to update clusterElements for task '{}' in workflow {}",
