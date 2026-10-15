@@ -141,8 +141,44 @@ public class ConnectedUserCopilotApiControllerIntTest {
         assertThat(stateMap).containsEntry("autonomous", false);
         assertThat(stateMap).containsKey(CopilotConstants.STATE_TENANT_ID);
         assertThat(stateMap).containsKey(CopilotConstants.STATE_AUTHENTICATION);
+        assertThat(stateMap).containsEntry(
+            CopilotConstants.STATE_ENVIRONMENT_ID, (long) Environment.PRODUCTION.ordinal());
         assertThat(stateMap.get(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY))
             .isEqualTo(Set.of("slack"));
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatCarriesRequestEnvironmentIntoAgentState() throws Exception {
+        when(environmentService.getEnvironment("DEVELOPMENT"))
+            .thenReturn(Environment.DEVELOPMENT);
+
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.DEVELOPMENT)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of()));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(new SseEmitter());
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .header("X-Environment", "DEVELOPMENT")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"threadId\":\"thread-1\",\"state\":{\"state\":{}}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+
+        verify(agUiService).runAgent(any(LocalAgent.class), parametersCaptor.capture());
+
+        Map<String, Object> stateMap = parametersCaptor.getValue()
+            .getState()
+            .getState();
+
+        assertThat(stateMap).containsEntry(
+            CopilotConstants.STATE_ENVIRONMENT_ID, (long) Environment.DEVELOPMENT.ordinal());
     }
 
     @Test

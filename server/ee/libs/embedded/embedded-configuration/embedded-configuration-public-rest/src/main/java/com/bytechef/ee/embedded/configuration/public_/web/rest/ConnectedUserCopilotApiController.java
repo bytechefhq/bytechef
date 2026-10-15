@@ -96,6 +96,7 @@ public class ConnectedUserCopilotApiController {
         stateMap.put("mode", Mode.BUILD.name());
         stateMap.put("autonomous", false);
         stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+        stateMap.put(CopilotConstants.STATE_ENVIRONMENT_ID, (long) environment.ordinal());
 
         Authentication authentication = SecurityContextHolder.getContext()
             .getAuthentication();

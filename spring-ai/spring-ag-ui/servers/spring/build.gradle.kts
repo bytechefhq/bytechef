@@ -7,6 +7,7 @@ dependencies {
     api(project(":spring-ai:spring-ag-ui:packages:server"))
 
     implementation(project(":spring-ai:spring-ag-ui:utils:json"))
+    implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
