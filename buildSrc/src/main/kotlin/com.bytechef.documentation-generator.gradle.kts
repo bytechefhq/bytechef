@@ -788,8 +788,8 @@ ${getCustomActionString()}
                     mdFile.writeText(json)
 
                     if (readmeFile.exists()) {
-                        mdFile.appendText("<hr />\n\n# Additional Instructions\n\n")
-                        mdFile.appendText(readmeFile.readText())
+                        mdFile.appendText("<hr />\n\n## Additional Instructions\n\n")
+                        mdFile.appendText(demoteHeadings(readmeFile.readText()))
                     }
                 }
 
@@ -821,6 +821,20 @@ ${getCustomActionString()}
                     }
                 }
             }
+        }
+    }
+
+    // The docs page renders the component title as its only H1, so README headings appended under
+    // "Additional Instructions" move one level down; lines inside fenced code blocks are left alone.
+    private fun demoteHeadings(markdown: String): String {
+        var insideFence = false
+
+        return markdown.lines().joinToString("\n") { line ->
+            if (line.trimStart().startsWith("```")) {
+                insideFence = !insideFence
+            }
+
+            if (!insideFence && Regex("^#{1,5} ").containsMatchIn(line)) "#$line" else line
         }
     }
 

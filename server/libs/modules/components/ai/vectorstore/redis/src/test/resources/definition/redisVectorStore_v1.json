@@ -1262,7 +1262,7 @@
   "name": "redisVectorStore",
   "resources": null,
   "tags": null,
-  "title": "Redis",
+  "title": "Redis Vector Store",
   "triggers": null,
   "unifiedApi": null,
   "version": 1

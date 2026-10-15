@@ -399,9 +399,9 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 
 <hr />
 
-# Additional Instructions
+## Additional Instructions
 
-### How to find your Record ID
+#### How to find your Record ID
 
 Many Attio API endpoints require a `record_id`, but in most integrations you only have another unique identifier (such as an email, company domain, or external ID).
 
@@ -412,7 +412,7 @@ The recommended approach is:
 3. Use that `record_id` in subsequent API requests.
 
 
-#### Query Records
+##### Query Records
 
 **Endpoint**
 
@@ -427,7 +427,7 @@ Replace `{object}` with your object slug, for example:
 - `deals`
 - your custom object slug
 
-#### Example
+##### Example
 
 ```bash
 curl --request POST \
@@ -442,7 +442,7 @@ curl --request POST \
   }'
 ```
 
-#### Response
+##### Response
 
 ```json
 {
@@ -472,9 +472,9 @@ Example:
 bf071e1f-6035-429d-b874-d83ea64ea13b
 ```
 
-#### Common Lookup Examples
+##### Common Lookup Examples
 
-#### Find a person by email
+##### Find a person by email
 
 ```json
 {
@@ -485,7 +485,7 @@ bf071e1f-6035-429d-b874-d83ea64ea13b
 }
 ```
 
-#### Find a company by domain
+##### Find a company by domain
 
 ```json
 {
@@ -496,7 +496,7 @@ bf071e1f-6035-429d-b874-d83ea64ea13b
 }
 ```
 
-#### References
+##### References
 
 - [Attio REST API - List Records](https://docs.attio.com/rest-api/endpoint-reference/records/list-records)
 - [Attio REST API - Get a Record](https://docs.attio.com/rest-api/endpoint-reference/records/get-a-record)
