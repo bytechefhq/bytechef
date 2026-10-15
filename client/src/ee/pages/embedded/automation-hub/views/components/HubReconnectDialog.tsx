@@ -1,7 +1,7 @@
 import {useAutomationHubStore} from '@/ee/pages/embedded/automation-hub/stores/useAutomationHubStore';
 import {getEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
 import {useConnectDialog} from '@bytechef/embedded';
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 
 interface HubReconnectDialogProps {
     connectionId: number;
@@ -15,11 +15,13 @@ interface HubReconnectDialogProps {
  * the SDK dialog renders into a single shared portal container, so a second instance would never appear.
  */
 const HubReconnectDialog = ({connectionId, integrationId, onDone, onReauthorized}: HubReconnectDialogProps) => {
+    const openedRef = useRef(false);
+
     const themeMode = useAutomationHubStore((state) => state.theme.mode);
 
     const {environment, jwtToken} = getEmbedCredentials();
 
-    const {closeDialog, openDialog} = useConnectDialog({
+    const {openDialog} = useConnectDialog({
         baseUrl: import.meta.env.VITE_API_BASE_PATH || '',
         environment: environment || 'PRODUCTION',
         integrationId: String(integrationId),
@@ -31,9 +33,13 @@ const HubReconnectDialog = ({connectionId, integrationId, onDone, onReauthorized
     });
 
     useEffect(() => {
-        openDialog();
+        if (openedRef.current) {
+            return;
+        }
 
-        return () => closeDialog();
+        openedRef.current = true;
+
+        openDialog();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
