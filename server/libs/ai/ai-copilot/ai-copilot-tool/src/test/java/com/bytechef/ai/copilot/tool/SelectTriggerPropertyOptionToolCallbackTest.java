@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
@@ -81,6 +82,25 @@ class SelectTriggerPropertyOptionToolCallbackTest {
     }
 
     @Test
+    void testRejectsAConnectionTheScopedCallerDoesNotOwnBeforeAnyLookup() throws Exception {
+        TriggerDefinitionService service = mock(TriggerDefinitionService.class);
+        TriggerDefinitionFacade facade = mock(TriggerDefinitionFacade.class);
+
+        SelectTriggerPropertyOptionToolCallback callback = new SelectTriggerPropertyOptionToolCallback(
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class),
+            ScopedConnectionTestFixtures.newGuardEntitledTo(List.of(42L)));
+
+        String result = callback.call(
+            "{\"componentName\":\"slack\",\"triggerName\":\"newMessage\",\"propertyName\":\"channel\"," +
+                "\"connectionId\":900}",
+            ScopedConnectionTestFixtures.scopedToolContext());
+
+        assertThat(result).contains(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+        verifyNoInteractions(service, facade);
+    }
+
+    @Test
     void testReturnsSelectMarkerWithAllOptionsOnSuccess() throws Exception {
         TriggerDefinitionService service = mock(TriggerDefinitionService.class);
         TriggerDefinitionFacade facade = mock(TriggerDefinitionFacade.class);
@@ -103,7 +123,7 @@ class SelectTriggerPropertyOptionToolCallbackTest {
             any(), eq(7L))).thenReturn(List.of(general, random));
 
         SelectTriggerPropertyOptionToolCallback callback = new SelectTriggerPropertyOptionToolCallback(
-            service, facade, resolver, mock(ToolStateVisibilityMetrics.class));
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class), mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"triggerName\":\"newMessage\",\"propertyName\":\"channel\","
@@ -139,7 +159,8 @@ class SelectTriggerPropertyOptionToolCallbackTest {
         stubValidTrigger(service, "slack", 1, "newMessage", "channel", "text");
 
         SelectTriggerPropertyOptionToolCallback callback = new SelectTriggerPropertyOptionToolCallback(
-            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"triggerName\":\"newMessage\",\"propertyName\":\"channelId\"}",
@@ -155,7 +176,7 @@ class SelectTriggerPropertyOptionToolCallbackTest {
     void testRejectsBlankPropertyName() throws Exception {
         SelectTriggerPropertyOptionToolCallback callback = new SelectTriggerPropertyOptionToolCallback(
             mock(TriggerDefinitionService.class), mock(TriggerDefinitionFacade.class), resolver,
-            mock(ToolStateVisibilityMetrics.class));
+            mock(ToolStateVisibilityMetrics.class), mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"triggerName\":\"newMessage\",\"propertyName\":\"\"}", toolContext());

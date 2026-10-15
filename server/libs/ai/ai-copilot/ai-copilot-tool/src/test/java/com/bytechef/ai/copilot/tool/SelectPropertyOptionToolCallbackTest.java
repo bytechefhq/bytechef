@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
@@ -81,6 +82,25 @@ class SelectPropertyOptionToolCallbackTest {
     }
 
     @Test
+    void testRejectsAConnectionTheScopedCallerDoesNotOwnBeforeAnyLookup() throws Exception {
+        ActionDefinitionService service = mock(ActionDefinitionService.class);
+        ActionDefinitionFacade facade = mock(ActionDefinitionFacade.class);
+
+        SelectPropertyOptionToolCallback callback = new SelectPropertyOptionToolCallback(
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class),
+            ScopedConnectionTestFixtures.newGuardEntitledTo(List.of(42L)));
+
+        String result = callback.call(
+            "{\"componentName\":\"slack\",\"actionName\":\"sendChannelMessage\",\"propertyName\":\"channel\"," +
+                "\"connectionId\":900}",
+            ScopedConnectionTestFixtures.scopedToolContext());
+
+        assertThat(result).contains(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+        verifyNoInteractions(service, facade);
+    }
+
+    @Test
     void testReturnsSelectMarkerWithAllOptionsOnSuccess() throws Exception {
         ActionDefinitionService service = mock(ActionDefinitionService.class);
         ActionDefinitionFacade facade = mock(ActionDefinitionFacade.class);
@@ -103,7 +123,7 @@ class SelectPropertyOptionToolCallbackTest {
             any(), eq(7L))).thenReturn(List.of(general, random));
 
         SelectPropertyOptionToolCallback callback = new SelectPropertyOptionToolCallback(
-            service, facade, resolver, mock(ToolStateVisibilityMetrics.class));
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class), mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"actionName\":\"sendChannelMessage\",\"propertyName\":\"channel\","
@@ -139,7 +159,8 @@ class SelectPropertyOptionToolCallbackTest {
         stubValidAction(service, "slack", 1, "sendChannelMessage", "channel", "text");
 
         SelectPropertyOptionToolCallback callback = new SelectPropertyOptionToolCallback(
-            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"actionName\":\"sendChannelMessage\",\"propertyName\":\"channelId\"}",
@@ -155,7 +176,7 @@ class SelectPropertyOptionToolCallbackTest {
     void testRejectsBlankPropertyName() throws Exception {
         SelectPropertyOptionToolCallback callback = new SelectPropertyOptionToolCallback(
             mock(ActionDefinitionService.class), mock(ActionDefinitionFacade.class), resolver,
-            mock(ToolStateVisibilityMetrics.class));
+            mock(ToolStateVisibilityMetrics.class), mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"actionName\":\"sendChannelMessage\",\"propertyName\":\"\"}", toolContext());

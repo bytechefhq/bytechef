@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.copilot.tool.context;
 
+import com.bytechef.ai.copilot.connection.CopilotConnectionLister.CopilotConnectionRequest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
@@ -119,6 +120,14 @@ public record AgentToolInvocationContext(
 
     public int resolveEnvironmentOrDefault() {
         return environmentId == null ? 0 : environmentId.intValue();
+    }
+
+    public CopilotConnectionRequest toConnectionRequest(
+        @Nullable String componentName, @Nullable Integer connectionVersion) {
+
+        return new CopilotConnectionRequest(
+            workspaceId, userId, authentication == null ? null : authentication.getName(),
+            resolveEnvironmentOrDefault(), componentName, connectionVersion);
     }
 
     public Map<String, Object> toToolContext() {

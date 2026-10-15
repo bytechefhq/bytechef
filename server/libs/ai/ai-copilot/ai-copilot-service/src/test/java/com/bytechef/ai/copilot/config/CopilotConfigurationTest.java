@@ -24,6 +24,7 @@ import com.bytechef.ai.copilot.agent.McpServerSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
@@ -57,7 +58,7 @@ class CopilotConfigurationTest {
         mock(WorkspaceConnectionFacade.class), mock(ComponentDefinitionService.class),
         mock(ActionDefinitionService.class), mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
         mock(TriggerDefinitionFacade.class), mock(PropertyOptionsResolver.class),
-        CopilotConfigurationTest.<CopilotConnectionLister>emptyProvider());
+        CopilotConfigurationTest.<CopilotConnectionLister>emptyProvider(), mock(ScopedConnectionGuard.class));
 
     @Test
     void testMcpServerBuildAgentIsRegisteredUnderTheMcpServerSourceId() throws AGUIException {

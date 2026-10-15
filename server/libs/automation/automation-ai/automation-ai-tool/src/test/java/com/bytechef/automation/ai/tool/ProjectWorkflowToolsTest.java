@@ -26,6 +26,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -71,6 +72,7 @@ class ProjectWorkflowToolsTest {
         {"label": "My Flow", "tasks": []}""";
 
     private static final long FOREIGN_WORKSPACE_ID = 2L;
+    private static final String NOT_IN_PROJECT_MESSAGE = "was not found in this chat's project";
     private static final long WORKSPACE_ID = 1L;
 
     @Mock
@@ -93,6 +95,9 @@ class ProjectWorkflowToolsTest {
 
     @Mock
     private WorkspaceScopeResolver workspaceScopeResolver;
+
+    @Mock
+    private ScopedConnectionGuard scopedConnectionGuard;
 
     @Nested
     class PersistedWorkflowCaptureTest {
@@ -311,7 +316,7 @@ class ProjectWorkflowToolsTest {
 
             assertThatCode(() -> tools.updateWorkflow(VENDOR_WORKFLOW_ID, DEFINITION, null, scopedToolContext()))
                 .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                .hasMessageContaining(NOT_IN_PROJECT_MESSAGE);
 
             verify(projectWorkflowFacade, never()).getProjectWorkflow(VENDOR_WORKFLOW_ID);
             verify(projectWorkflowFacade, never()).updateWorkflow(any(), any(), anyInt());
@@ -339,15 +344,15 @@ class ProjectWorkflowToolsTest {
 
             assertThatCode(() -> tools.getWorkflow(VENDOR_WORKFLOW_ID, null, scopedToolContext()))
                 .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                .hasMessageContaining(NOT_IN_PROJECT_MESSAGE);
             assertThatCode(() -> tools.deleteWorkflow(VENDOR_WORKFLOW_ID, null, scopedToolContext()))
                 .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                .hasMessageContaining(NOT_IN_PROJECT_MESSAGE);
             assertThatCode(
                 () -> tools.saveWorkflowTestConnection(
                     VENDOR_WORKFLOW_ID, "slack_1", "slack", 1L, null, scopedToolContext()))
                         .isInstanceOf(ExecutionException.class)
-                        .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                        .hasMessageContaining(NOT_IN_PROJECT_MESSAGE);
 
             verify(projectWorkflowFacade, never()).getProjectWorkflow(VENDOR_WORKFLOW_ID);
             verify(projectWorkflowFacade, never()).deleteWorkflow(any());
@@ -369,6 +374,26 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
+        void testScopedRunCannotBindAConnectionTheUserIsNotEntitledTo() {
+            stubWorkflowProject(OWN_WORKFLOW_ID, OWN_PROJECT_ID);
+
+            ToolContext toolContext = scopedToolContext();
+
+            when(scopedConnectionGuard.fetchDenialMessage(null, 900L, toolContext))
+                .thenReturn(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(
+                () -> tools.saveWorkflowTestConnection(OWN_WORKFLOW_ID, "slack_1", "slack", 900L, null, toolContext))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+            verify(workflowTestConfigurationFacade, never()).saveWorkflowTestConfigurationConnection(
+                any(), any(), any(), anyLong(), anyLong());
+        }
+
+        @Test
         void testScopedRunSearchesOnlyItsOwnProject() {
             when(projectWorkflowFacade.getProjectWorkflows(OWN_PROJECT_ID)).thenReturn(List.of());
 
@@ -384,7 +409,45 @@ class ProjectWorkflowToolsTest {
 
             assertThatCode(() -> tools.searchWorkflows("standup", VENDOR_PROJECT_ID, null, scopedToolContext()))
                 .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                .hasMessageContaining("not accessible");
+
+            verify(projectWorkflowFacade, never()).getProjectWorkflows(VENDOR_PROJECT_ID);
+        }
+
+        @Test
+        void testScopedRunReportsAnUnknownWorkflowAsNotFoundInItsProject() {
+            when(projectWorkflowService.getWorkflowProjectWorkflow("missing-workflow"))
+                .thenThrow(new IllegalArgumentException("ProjectWorkflow not found"));
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(() -> tools.getWorkflow("missing-workflow", null, scopedToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining(NOT_IN_PROJECT_MESSAGE);
+
+            verify(projectWorkflowFacade, never()).getProjectWorkflow("missing-workflow");
+        }
+
+        @Test
+        void testRunThatSkipsAuthorizationWithoutAScopedProjectIsRejected() {
+            ToolContext toolContext = new ToolContext(
+                AgentToolInvocationContext.builder()
+                    .authentication(new UsernamePasswordAuthenticationToken("1234567890", null, List.of()))
+                    .skipAutomationAuthorization(true)
+                    .build()
+                    .toToolContext());
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(() -> tools.updateWorkflow(OWN_WORKFLOW_ID, DEFINITION, null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.UNSCOPED_MESSAGE);
+            assertThatCode(() -> tools.searchWorkflows("standup", null, null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.UNSCOPED_MESSAGE);
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(any(), any(), anyInt());
+            verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
         }
 
         private ToolContext scopedToolContext() {
@@ -557,9 +620,10 @@ class ProjectWorkflowToolsTest {
 
     private ProjectWorkflowTools newTools() {
         return new ProjectWorkflowTools(
-            projectService, projectWorkflowFacade, projectWorkflowService,
-            new ScopedProjectGuard(projectWorkflowService),
-            testConfigurationFacadeProvider, workspaceScopeResolver);
+            projectWorkflowFacade, projectWorkflowService,
+            new ScopedProjectGuard(
+                projectService, projectWorkflowService, scopedConnectionGuard, workspaceScopeResolver),
+            testConfigurationFacadeProvider);
     }
 
     private static ProjectWorkflow buildProjectWorkflow(long id, long projectId, String workflowId) {
