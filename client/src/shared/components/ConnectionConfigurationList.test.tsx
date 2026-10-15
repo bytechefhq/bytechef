@@ -33,7 +33,7 @@ const connection: ConnectionI = {
 };
 
 interface ConnectionConfigurationListHarnessProps {
-    connections: ConnectionI[];
+    connections?: ConnectionI[];
     handleConnectionIdChange: (index: number, connectionId: number | undefined) => void;
 }
 
@@ -103,5 +103,11 @@ describe('ConnectionConfigurationList', () => {
         fireEvent.click(screen.getByRole('option', {name: 'Select a connection...'}));
 
         expect(handleConnectionIdChange).toHaveBeenCalledWith(0, undefined);
+    });
+
+    it('should render while the connections are still loading', () => {
+        render(<ConnectionConfigurationListHarness handleConnectionIdChange={vi.fn()} />);
+
+        expect(screen.getByRole('combobox')).toBeInTheDocument();
     });
 });
