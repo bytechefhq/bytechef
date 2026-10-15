@@ -1,4 +1,5 @@
 import {Input} from '@/components/Input/Input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect';
@@ -7,12 +8,14 @@ import IntegrationInstanceConfigurationDialogBasicStepTagsSelect from '@/ee/page
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import {Authorization} from '@/shared/middleware/platform/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Dispatch, SetStateAction} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface IntegrationInstanceConfigurationDialogBasicStepProps {
+    authorizations?: Authorization[];
     control: Control<IntegrationInstanceConfiguration>;
     curIntegrationId?: number;
     curIntegrationVersion?: number;
@@ -25,6 +28,7 @@ interface IntegrationInstanceConfigurationDialogBasicStepProps {
 }
 
 const IntegrationInstanceConfigurationDialogBasicStep = ({
+    authorizations,
     control,
     curIntegrationId,
     curIntegrationVersion,
@@ -115,6 +119,42 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                                     }}
                                 />
                             </FormControl>
+
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                    rules={{required: true}}
+                    shouldUnregister={false}
+                />
+            )}
+
+            {curIntegrationId && authorizations && authorizations.length > 1 && (
+                <FormField
+                    control={control}
+                    name="authorizationType"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Authorization</FormLabel>
+
+                            <Select
+                                disabled={!!integrationInstanceConfiguration?.id}
+                                onValueChange={field.onChange}
+                                value={field.value}
+                            >
+                                <FormControl>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select authorization" />
+                                    </SelectTrigger>
+                                </FormControl>
+
+                                <SelectContent>
+                                    {authorizations.map((authorization) => (
+                                        <SelectItem key={authorization.type} value={authorization.type!}>
+                                            {authorization.title || authorization.type}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
 
                             <FormMessage />
                         </FormItem>
