@@ -68,6 +68,7 @@ public interface ConnectedUserIntegrationMapper {
         IntegrationBasicModel convert(ConnectedUserIntegrationDTO connectedUserIntegrationDTO);
 
         @Mapping(target = "enabled", source = "integrationInstance.enabled")
+        @Mapping(target = "connectionId", source = "integrationInstance.connectionId")
         @Mapping(target = "credentialStatus", source = "connection.credentialStatus")
         @Mapping(target = "id", source = "integrationInstance.id")
         @Mapping(target = "mcpTools", source = "mcpTools")
@@ -142,6 +143,7 @@ public interface ConnectedUserIntegrationMapper {
         McpIntegrationInstanceToolModel map(ConnectedUserIntegrationDTO.McpInstanceToolInfo mcpInstanceToolInfo);
 
         @Mapping(target = "enabled", source = "integrationInstance.enabled")
+        @Mapping(target = "connectionId", source = "integrationInstance.connectionId")
         @Mapping(target = "credentialStatus", source = "connection.credentialStatus")
         @Mapping(target = "id", source = "integrationInstance.id")
         @Mapping(target = "mcpTools", source = "mcpTools")
