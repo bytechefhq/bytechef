@@ -33,7 +33,6 @@ import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,10 +89,9 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @GetMapping("/workflows/{id}/export")
-    @PreAuthorize("hasWorkflowScope(#id, 'WORKFLOW_VIEW')")
     @ResponseBody
     public ResponseEntity<Resource> exportWorkflow(@PathVariable("id") String id) {
-        return doExportWorkflow(id);
+        return doExportWorkflow(projectWorkflowFacade.exportWorkflow(id));
     }
 
     @Override

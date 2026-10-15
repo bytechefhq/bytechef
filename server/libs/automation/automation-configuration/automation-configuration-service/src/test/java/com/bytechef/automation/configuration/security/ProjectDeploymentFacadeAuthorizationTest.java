@@ -69,6 +69,16 @@ class ProjectDeploymentFacadeAuthorizationTest {
     }
 
     @Test
+    void testGetProjectDeploymentsDeniesWhenTheDeploymentViewScopeIsRefused() throws Exception {
+        assertGetProjectDeploymentsGuard(false);
+    }
+
+    @Test
+    void testGetProjectDeploymentsAllowsWhenTheDeploymentViewScopeIsGranted() throws Exception {
+        assertGetProjectDeploymentsGuard(true);
+    }
+
+    @Test
     void testGetProjectDeploymentWorkflowDeniesWhenTheDeploymentViewScopeIsRefused() throws Exception {
         assertGetProjectDeploymentWorkflowGuard(false);
     }
@@ -110,6 +120,24 @@ class ProjectDeploymentFacadeAuthorizationTest {
             .isEqualTo(granted);
 
         verify(permissionService).hasResourceScope(PROJECT_DEPLOYMENT_ID, "ProjectDeployment", "DEPLOYMENT_VIEW");
+        verifyNoMoreInteractions(permissionService);
+    }
+
+    private void assertGetProjectDeploymentsGuard(boolean granted) throws Exception {
+        PermissionService permissionService = mock(PermissionService.class);
+        Environment environment = Environment.values()[(int) ENVIRONMENT_ID];
+
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", environment)).thenReturn(granted);
+
+        Method method = ProjectDeploymentFacadeImpl.class.getMethod(
+            "getProjectDeployments", long.class, Environment.class, Long.class, Long.class);
+
+        assertThat(evaluateGuard(permissionService, method, new Object[] {
+            WORKSPACE_ID, environment, null, null
+        }))
+            .isEqualTo(granted);
+
+        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", environment);
         verifyNoMoreInteractions(permissionService);
     }
 

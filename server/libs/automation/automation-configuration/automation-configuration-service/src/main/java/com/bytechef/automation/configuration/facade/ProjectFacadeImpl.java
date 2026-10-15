@@ -293,6 +293,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public Project getProjectEntity(long id) {
+        return projectService.getProject(id);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public List<Project> getNonSystemProjects() {
+        return projectService.getProjects(null, null, null, null, null, null);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners) {
         return projectOwnershipService.getOwnedProjectIds(projectIds, projectOwners);

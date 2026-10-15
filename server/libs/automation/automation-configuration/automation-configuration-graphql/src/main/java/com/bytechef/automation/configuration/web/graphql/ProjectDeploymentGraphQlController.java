@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -46,17 +45,17 @@ import org.springframework.stereotype.Controller;
 public class ProjectDeploymentGraphQlController {
 
     private final EnvironmentService environmentService;
-    private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectService projectService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentGraphQlController(
-        EnvironmentService environmentService, ProjectDeploymentService projectDeploymentService,
+        EnvironmentService environmentService, ProjectDeploymentFacade projectDeploymentFacade,
         ProjectService projectService, TagService tagService) {
 
         this.environmentService = environmentService;
-        this.projectDeploymentService = projectDeploymentService;
+        this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectService = projectService;
         this.tagService = tagService;
     }
@@ -110,13 +109,12 @@ public class ProjectDeploymentGraphQlController {
     }
 
     @QueryMapping(name = "workspaceProjectDeployments")
-    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'DEPLOYMENT_VIEW', #environmentId)")
     public List<ProjectDeployment> workspaceProjectDeployments(
         @Argument Long workspaceId, @Argument Long environmentId, @Argument Long projectId, @Argument Long tagId) {
 
         Environment environment = environmentService.getEnvironment(environmentId);
 
-        return projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, workspaceId);
+        return projectDeploymentFacade.getProjectDeployments(workspaceId, environment, projectId, tagId);
     }
 
     public record EnvironmentDTO(long id, String name) {
