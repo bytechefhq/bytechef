@@ -126,7 +126,7 @@ const WorkflowNodeDetailsPanel = ({
     return (
         <div
             className={twMerge(
-                'absolute top-[9px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
+                'absolute top-[15px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
                 copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]',
                 !className && !panelOpenedFromIssuesSidebar && 'animate-[slideInFromRight_300ms_ease-out]',
                 className

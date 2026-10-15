@@ -79,7 +79,7 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
     const sharedClasses =
         'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background';
     const defaultPositionClasses = twMerge(
-        'absolute top-[9px] bottom-6 animate-[slideInFromRight_300ms_ease-out] rounded-md',
+        'absolute top-[15px] bottom-6 animate-[slideInFromRight_300ms_ease-out] rounded-md',
         copilotLayoutShifted ? 'right-[524px]' : 'right-[536px]'
     );
 
