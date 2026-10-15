@@ -237,3 +237,19 @@ describe('WorkflowEditorToolbar - cluster elements view mode button', () => {
         expect(useClusterElementsViewModeStore.getState().clusterElementsViewMode).toBe('dialog');
     });
 });
+
+describe('WorkflowEditorToolbar - reset layout button', () => {
+    beforeEach(() => {
+        useWorkflowDataStore.setState({edges: [], nodes: []});
+    });
+
+    it('labels the reset button and describes it as resetting the layout', async () => {
+        const user = userEvent.setup();
+
+        renderToolbar(false);
+
+        await user.hover(screen.getByLabelText('Reset layout'));
+
+        expect(await screen.findByRole('tooltip')).toHaveTextContent('Reset layout');
+    });
+});

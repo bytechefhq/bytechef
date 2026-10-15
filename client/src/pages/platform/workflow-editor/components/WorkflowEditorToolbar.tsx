@@ -273,6 +273,7 @@ const WorkflowEditorToolbar = ({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    aria-label="Reset layout"
                                     disabled={readOnly}
                                     icon={<BrushCleaningIcon />}
                                     onClick={handleClear}
@@ -285,7 +286,7 @@ const WorkflowEditorToolbar = ({
                                 className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
                                 side="top"
                             >
-                                Number of tasks executed per workflow run.
+                                Reset layout
                             </TooltipContent>
                         </Tooltip>
 
