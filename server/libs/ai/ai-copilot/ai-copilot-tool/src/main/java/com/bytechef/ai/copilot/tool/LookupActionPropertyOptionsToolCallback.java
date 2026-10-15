@@ -86,16 +86,19 @@ public class LookupActionPropertyOptionsToolCallback implements ToolCallback {
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final PropertyOptionsResolver resolver;
     private final ToolStateVisibilityMetrics metrics;
+    private final ScopedConnectionGuard scopedConnectionGuard;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public LookupActionPropertyOptionsToolCallback(
         ActionDefinitionService actionDefinitionService, ActionDefinitionFacade actionDefinitionFacade,
-        PropertyOptionsResolver resolver, ToolStateVisibilityMetrics metrics) {
+        PropertyOptionsResolver resolver, ToolStateVisibilityMetrics metrics,
+        ScopedConnectionGuard scopedConnectionGuard) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.resolver = resolver;
         this.metrics = metrics;
+        this.scopedConnectionGuard = scopedConnectionGuard;
     }
 
     @Override
@@ -118,6 +121,14 @@ public class LookupActionPropertyOptionsToolCallback implements ToolCallback {
             LookupActionPropertyOptionsInput input = JsonUtils.read(toolInput, LookupActionPropertyOptionsInput.class);
 
             String componentName = input.componentName();
+
+            String notEntitledError = scopedConnectionGuard.toolErrorIfNotEntitled(
+                componentName, input.connectionId(), toolContext);
+
+            if (notEntitledError != null) {
+                return notEntitledError;
+            }
+
             String actionName = input.actionName();
             String propertyName = input.propertyName();
 

@@ -82,16 +82,19 @@ public class LookupTriggerPropertyOptionsToolCallback implements ToolCallback {
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final PropertyOptionsResolver resolver;
     private final ToolStateVisibilityMetrics metrics;
+    private final ScopedConnectionGuard scopedConnectionGuard;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public LookupTriggerPropertyOptionsToolCallback(
         TriggerDefinitionService triggerDefinitionService, TriggerDefinitionFacade triggerDefinitionFacade,
-        PropertyOptionsResolver resolver, ToolStateVisibilityMetrics metrics) {
+        PropertyOptionsResolver resolver, ToolStateVisibilityMetrics metrics,
+        ScopedConnectionGuard scopedConnectionGuard) {
 
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.resolver = resolver;
         this.metrics = metrics;
+        this.scopedConnectionGuard = scopedConnectionGuard;
     }
 
     @Override
@@ -115,6 +118,14 @@ public class LookupTriggerPropertyOptionsToolCallback implements ToolCallback {
                 toolInput, LookupTriggerPropertyOptionsInput.class);
 
             String componentName = input.componentName();
+
+            String notEntitledError = scopedConnectionGuard.toolErrorIfNotEntitled(
+                componentName, input.connectionId(), toolContext);
+
+            if (notEntitledError != null) {
+                return notEntitledError;
+            }
+
             String triggerName = input.triggerName();
             String propertyName = input.propertyName();
 

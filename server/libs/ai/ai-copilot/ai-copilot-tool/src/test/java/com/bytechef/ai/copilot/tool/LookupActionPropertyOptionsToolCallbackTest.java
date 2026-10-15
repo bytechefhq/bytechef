@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
@@ -81,6 +82,48 @@ class LookupActionPropertyOptionsToolCallbackTest {
     }
 
     @Test
+    void testRejectsAConnectionTheScopedCallerDoesNotOwnBeforeAnyLookup() throws Exception {
+        ActionDefinitionService service = mock(ActionDefinitionService.class);
+        ActionDefinitionFacade facade = mock(ActionDefinitionFacade.class);
+
+        LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class),
+            ScopedConnectionTestFixtures.newGuardEntitledTo(List.of(42L)));
+
+        String result = callback.call(
+            "{\"componentName\":\"slack\",\"actionName\":\"sendMessage\",\"propertyName\":\"channel\"," +
+                "\"connectionId\":900}",
+            ScopedConnectionTestFixtures.scopedToolContext());
+
+        assertThat(result).contains(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+        verifyNoInteractions(service, facade);
+    }
+
+    @Test
+    void testRejectsAConnectionTheCallerIsNotEntitledToBeforeAnyLookup() throws Exception {
+        ActionDefinitionService service = mock(ActionDefinitionService.class);
+        ScopedConnectionGuard scopedConnectionGuard = mock(ScopedConnectionGuard.class);
+        ToolContext toolContext = toolContext();
+
+        when(scopedConnectionGuard.toolErrorIfNotEntitled("slack", 900L, toolContext))
+            .thenReturn("{\"error\":\"" + ScopedConnectionGuard.NOT_ENTITLED_MESSAGE + "\"}");
+
+        LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
+            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            scopedConnectionGuard);
+
+        String result = callback.call(
+            "{\"componentName\":\"slack\",\"actionName\":\"sendMessage\",\"propertyName\":\"channel\"," +
+                "\"connectionId\":900}",
+            toolContext);
+
+        assertThat(result).contains(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
     void testReturnsNoOptionsWhenPropertyHasNoDataSource() throws Exception {
         ActionDefinitionService service = mock(ActionDefinitionService.class);
 
@@ -88,7 +131,8 @@ class LookupActionPropertyOptionsToolCallbackTest {
         when(service.propertyHasOptionsDataSource("slack", 1, "sendMessage", "text")).thenReturn(false);
 
         LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
-            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"actionName\":\"sendMessage\",\"propertyName\":\"text\"}", toolContext());
@@ -109,7 +153,8 @@ class LookupActionPropertyOptionsToolCallbackTest {
             .thenReturn(List.of("spreadsheetId"));
 
         LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
-            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"googleSheets\",\"actionName\":\"appendRow\",\"propertyName\":\"sheetName\"}",
@@ -134,7 +179,8 @@ class LookupActionPropertyOptionsToolCallbackTest {
         when(service.actionDefinesConnection("slack", 1, "sendMessage")).thenReturn(true);
 
         LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
-            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"actionName\":\"sendMessage\",\"propertyName\":\"channel\"}",
@@ -172,7 +218,7 @@ class LookupActionPropertyOptionsToolCallbackTest {
                 .thenReturn(options);
 
         LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
-            service, facade, resolver, mock(ToolStateVisibilityMetrics.class));
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class), mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"actionName\":\"sendMessage\",\"propertyName\":\"channel\","
@@ -216,7 +262,7 @@ class LookupActionPropertyOptionsToolCallbackTest {
                 .thenReturn(List.of(option));
 
         LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
-            service, facade, resolver, mock(ToolStateVisibilityMetrics.class));
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class), mock(ScopedConnectionGuard.class));
 
         // The dependsOn path is dotted ("properties.pipeline") but the value is supplied under its last segment
         // ("pipeline") — the gate must treat the dependency as satisfied rather than emitting dependency_missing.
@@ -236,7 +282,7 @@ class LookupActionPropertyOptionsToolCallbackTest {
     void testRejectsBlankPropertyName() throws Exception {
         LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
             mock(ActionDefinitionService.class), mock(ActionDefinitionFacade.class), resolver,
-            mock(ToolStateVisibilityMetrics.class));
+            mock(ToolStateVisibilityMetrics.class), mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"actionName\":\"sendMessage\",\"propertyName\":\"\"}", toolContext());
@@ -257,7 +303,8 @@ class LookupActionPropertyOptionsToolCallbackTest {
         when(service.getActionDefinitions("slack", 1)).thenReturn(List.of(real));
 
         LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
-            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"actionName\":\"sendMessage\",\"propertyName\":\"channel\"}",
@@ -279,7 +326,8 @@ class LookupActionPropertyOptionsToolCallbackTest {
         stubValidAction(service, "slack", 1, "sendChannelMessage", "channel", "post_at", "text");
 
         LookupActionPropertyOptionsToolCallback callback = new LookupActionPropertyOptionsToolCallback(
-            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(ActionDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"actionName\":\"sendChannelMessage\",\"propertyName\":\"channelId\"}",

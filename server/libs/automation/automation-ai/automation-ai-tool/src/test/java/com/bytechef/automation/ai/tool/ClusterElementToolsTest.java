@@ -18,12 +18,15 @@ package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
+import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.domain.Project;
@@ -34,6 +37,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -50,6 +54,8 @@ import org.springframework.ai.chat.model.ToolContext;
 })
 class ClusterElementToolsTest {
 
+    private static final long FOREIGN_PROJECT_ID = 9L;
+    private static final long OWN_PROJECT_ID = 7L;
     private static final long WORKSPACE_ID = 1L;
 
     @Mock
@@ -62,10 +68,67 @@ class ClusterElementToolsTest {
     private ProjectWorkflowService projectWorkflowService;
 
     @Mock
+    private ScopedConnectionGuard scopedConnectionGuard;
+
+    @Mock
     private ToolContext toolContext;
 
     @Mock
     private WorkspaceScopeResolver workspaceScopeResolver;
+
+    @Nested
+    class ScopedProjectTest {
+
+        @Test
+        void testUpdateWorkflowRootPropertiesRejectsAWorkflowOfAnotherProject() {
+            when(projectWorkflowService.getWorkflowProjectWorkflow("wf-uuid-1"))
+                .thenReturn(new ProjectWorkflow(FOREIGN_PROJECT_ID, 1, "wf-uuid-1"));
+
+            ClusterElementTools clusterElementTools = newTools();
+
+            assertThatCode(
+                () -> clusterElementTools.updateWorkflowRootProperties(
+                    "wf-uuid-1", "{\"label\": \"label\"}", null, scopedToolContext()))
+                        .isInstanceOf(ExecutionException.class)
+                        .hasMessageContaining("was not found in this chat's project");
+
+            verify(projectWorkflowFacade, never()).getProjectWorkflow(anyString());
+            verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
+            verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
+        }
+
+        @Test
+        void testUpdateClusterElementTaskRejectsAWorkflowOfAnotherProject() {
+            when(projectWorkflowService.getWorkflowProjectWorkflow("wf-uuid-1"))
+                .thenReturn(new ProjectWorkflow(FOREIGN_PROJECT_ID, 1, "wf-uuid-1"));
+
+            ClusterElementTools clusterElementTools = newTools();
+
+            assertThatCode(
+                () -> clusterElementTools.updateClusterElementTask(
+                    "wf-uuid-1", "agent_1", "{}", null, scopedToolContext()))
+                        .isInstanceOf(ExecutionException.class)
+                        .hasMessageContaining("was not found in this chat's project");
+
+            verify(projectWorkflowFacade, never()).getProjectWorkflow(anyString());
+            verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
+        }
+
+        @Test
+        void testUpdateClusterElementTaskUpdatesAWorkflowOfItsOwnProject() {
+            when(projectWorkflowService.getWorkflowProjectWorkflow("wf-uuid-1"))
+                .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-uuid-1"));
+
+            mockProjectWorkflow();
+
+            WorkflowInfo workflowInfo = newTools().updateClusterElementTask(
+                "wf-uuid-1", "agent_1", "{}", null, scopedToolContext());
+
+            assertThat(workflowInfo).isNotNull();
+            verify(projectWorkflowFacade).updateWorkflow(anyString(), anyString(), anyInt());
+            verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
+        }
+    }
 
     @Nested
     class WorkspaceScopeTest {
@@ -136,6 +199,10 @@ class ClusterElementToolsTest {
             .thenReturn(new ProjectWorkflowDTO(workflow, new ProjectWorkflow(55L), false));
     }
 
+    private static ToolContext scopedToolContext() {
+        return new ToolContext(Map.of(ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID));
+    }
+
     private void mockWorkflowInWorkspace(long workspaceId) {
         when(workspaceScopeResolver.resolveWorkspace(null, toolContext))
             .thenReturn(new WorkspaceScopeResolver.Resolved(WORKSPACE_ID, 0L));
@@ -152,7 +219,8 @@ class ClusterElementToolsTest {
 
     private ClusterElementTools newTools() {
         return new ClusterElementTools(
-            projectService, projectWorkflowFacade, projectWorkflowService,
-            new ScopedProjectGuard(projectWorkflowService), workspaceScopeResolver);
+            projectWorkflowFacade,
+            new ScopedProjectGuard(
+                projectService, projectWorkflowService, scopedConnectionGuard, workspaceScopeResolver));
     }
 }

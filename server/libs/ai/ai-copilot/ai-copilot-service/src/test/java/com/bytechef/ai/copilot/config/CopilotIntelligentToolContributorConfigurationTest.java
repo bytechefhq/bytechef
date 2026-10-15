@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
@@ -301,7 +302,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             promptResource, promptResource, promptResource, promptResource, workflowValidatorTools,
             workflowInstructionTools, connectionDefinitionService, workspaceConnectionFacade,
             componentDefinitionService, actionDefinitionService, actionDefinitionFacade, triggerDefinitionService,
-            triggerDefinitionFacade, propertyOptionsResolver, connectionListerProvider);
+            triggerDefinitionFacade, propertyOptionsResolver, connectionListerProvider,
+            new ScopedConnectionGuard(connectionListerProvider));
     }
 
     private static IntelligentToolDefinition definitionNamed(
