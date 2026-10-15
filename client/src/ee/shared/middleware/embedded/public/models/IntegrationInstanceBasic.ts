@@ -34,6 +34,12 @@ export interface IntegrationInstanceBasic {
      */
     id?: number;
     /**
+     * The id of the connection this integration instance uses.
+     * @type {number}
+     * @memberof IntegrationInstanceBasic
+     */
+    readonly connectionId?: number;
+    /**
      * 
      * @type {CredentialStatus}
      * @memberof IntegrationInstanceBasic
@@ -68,6 +74,7 @@ export function IntegrationInstanceBasicFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'id': json['id'] == null ? undefined : json['id'],
+        'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
         'enabled': json['enabled'],
     };
@@ -77,7 +84,7 @@ export function IntegrationInstanceBasicToJSON(json: any): IntegrationInstanceBa
     return IntegrationInstanceBasicToJSONTyped(json, false);
 }
 
-export function IntegrationInstanceBasicToJSONTyped(value?: IntegrationInstanceBasic | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceBasicToJSONTyped(value?: Omit<IntegrationInstanceBasic, 'connectionId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
