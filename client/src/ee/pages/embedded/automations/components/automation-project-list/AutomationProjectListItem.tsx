@@ -14,6 +14,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import {AutomationProjectTagsQuery, AutomationProjectsQuery} from '@/shared/middleware/graphql';
+import getCodeWorkflowLanguageLabel from '@/shared/util/codeWorkflowLanguage-utils';
 import {
     ChevronDownIcon,
     CodeIcon,
@@ -158,6 +159,17 @@ const AutomationProjectListItem = ({
                                 >
                                     {project.name}
                                 </button>
+                            )}
+
+                            {project.codeWorkflowProject && (
+                                <Badge
+                                    label={
+                                        getCodeWorkflowLanguageLabel(project.codeWorkflowLanguage ?? undefined) ??
+                                        'Code'
+                                    }
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
                             )}
                         </div>
 
