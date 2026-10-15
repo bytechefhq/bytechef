@@ -125,7 +125,13 @@ const BRAND_VARIABLES = [
 
 function applyBrandColor(primaryColor: string, root: HTMLElement) {
     root.style.setProperty('--bytechef-dialog-primary', primaryColor);
-    root.style.setProperty('--bytechef-dialog-primary-hover', primaryColor);
+    root.style.setProperty('--bytechef-dialog-primary-hover', `color-mix(in srgb, ${primaryColor} 85%, black)`);
+
+    const dialogForegroundColor = contrastColor(primaryColor);
+
+    if (dialogForegroundColor) {
+        root.style.setProperty('--bytechef-dialog-primary-foreground', dialogForegroundColor);
+    }
 
     const brandTriplet = toHslTriplet(primaryColor);
     const foregroundTriplet = contrastForeground(primaryColor);
