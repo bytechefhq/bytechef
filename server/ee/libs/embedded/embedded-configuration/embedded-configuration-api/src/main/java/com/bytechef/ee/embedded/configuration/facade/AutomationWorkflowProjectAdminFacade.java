@@ -42,7 +42,7 @@ public interface AutomationWorkflowProjectAdminFacade {
 
     List<AutomationWorkflowProjectTagDTO> getTags();
 
-    void publishProject(long projectId);
+    void publishProject(long projectId, @Nullable String description);
 
     void updateProject(
         long projectId, String name, String description, String category, List<String> tags,

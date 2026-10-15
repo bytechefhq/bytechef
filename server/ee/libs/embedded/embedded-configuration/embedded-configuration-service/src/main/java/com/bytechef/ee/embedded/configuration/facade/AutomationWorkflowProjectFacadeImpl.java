@@ -282,10 +282,12 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         return project.getProjectVersions()
             .stream()
+            .sorted(Comparator.comparingInt(ProjectVersion::getVersion)
+                .reversed())
             .map(projectVersion -> new AutomationWorkflowProjectVersionDTO(
                 projectVersion.getVersion(),
                 projectVersion.getStatus() == ProjectVersion.Status.PUBLISHED ? "PUBLISHED" : "DRAFT",
-                Objects.toString(projectVersion.getPublishedDate(), null)))
+                Objects.toString(projectVersion.getPublishedDate(), null), projectVersion.getDescription()))
             .toList();
     }
 
@@ -327,7 +329,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    public void publishProject(long projectId) {
+    public void publishProject(long projectId, @Nullable String description) {
         Project project = getMarkedProject(projectId);
 
         int oldProjectVersion = project.getLastProjectVersion();
@@ -335,7 +337,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         List<ProjectWorkflow> oldProjectWorkflows = projectWorkflowService.getProjectWorkflows(
             project.getId(), oldProjectVersion);
 
-        int newProjectVersion = projectService.publishProject(project.getId(), null, false);
+        int newProjectVersion = projectService.publishProject(project.getId(), description, false);
 
         for (ProjectWorkflow oldProjectWorkflow : oldProjectWorkflows) {
             String oldWorkflowId = oldProjectWorkflow.getWorkflowId();
