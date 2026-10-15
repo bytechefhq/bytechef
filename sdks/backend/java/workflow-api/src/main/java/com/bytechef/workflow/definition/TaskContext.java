@@ -24,6 +24,14 @@ import java.util.Map;
  */
 public interface TaskContext {
 
+    /**
+     * Calls an action without naming a connection. In an integration code workflow it runs on the integration's own
+     * connection when the action belongs to the integration's component.
+     */
+    default Object component(String componentName, String actionName, Map<String, ?> input) throws Exception {
+        return component(componentName, actionName, input, null);
+    }
+
     default Object component(String componentName, String actionName, Map<String, ?> input, String connectionName)
         throws Exception {
 
