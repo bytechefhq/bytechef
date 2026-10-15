@@ -377,14 +377,13 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 'nodrag invisible absolute -left-8 z-10 group-hover:visible focus-within:visible',
                                 suppressHover ? 'top-0' : 'top-8'
                             )}
-                            onMouseDown={(event) => event.stopPropagation()}
-                            role="presentation"
                         >
                             <Button
                                 aria-label="Expand cluster elements"
                                 className="size-6 rounded-md border border-stroke-neutral-tertiary bg-surface-neutral-primary p-1 shadow-sm [&_svg]:size-4"
                                 icon={<ChevronsUpDownIcon />}
                                 onClick={handleExpand}
+                                onMouseDown={(event) => event.stopPropagation()}
                                 size="iconXs"
                                 title="Expand cluster elements"
                                 variant="ghost"
