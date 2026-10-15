@@ -110,8 +110,6 @@ const ProjectHeader = ({
         <LoadingIndicator className="shrink-0" isFetching={isSaving} isOnline={isOnline} showLabel />
     );
 
-    const settingsMenuVisible = !codeWorkflow;
-
     if (!project) {
         return <ProjectSkeleton />;
     }
@@ -179,14 +177,12 @@ const ProjectHeader = ({
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                {settingsMenuVisible && (
-                    <SettingsMenu
-                        bottomResizablePanelRef={bottomResizablePanelRef}
-                        project={project}
-                        updateWorkflowMutation={updateWorkflowMutation}
-                        workflow={workflow}
-                    />
-                )}
+                <SettingsMenu
+                    bottomResizablePanelRef={bottomResizablePanelRef}
+                    project={project}
+                    updateWorkflowMutation={updateWorkflowMutation}
+                    workflow={workflow}
+                />
             </div>
 
             {projectDeploymentsSheetState && (

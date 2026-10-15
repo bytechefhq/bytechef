@@ -56,3 +56,19 @@ it('asks for a workflow file and closes the menu when Import Workflow is selecte
     expect(mockProps.onImportWorkflowClick).toHaveBeenCalled();
     expect(onOpenChange).toHaveBeenCalledWith(false);
 });
+
+it('keeps only the integration actions for a code workflow', () => {
+    render(
+        <DropdownMenu onOpenChange={onOpenChange} open>
+            <DropdownMenuContent>
+                <IntegrationTabButtons {...mockProps} codeWorkflow />
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+
+    expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual([
+        'Edit',
+        'Integration History',
+        'Delete',
+    ]);
+});
