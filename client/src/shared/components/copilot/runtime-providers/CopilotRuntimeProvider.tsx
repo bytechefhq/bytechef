@@ -111,9 +111,6 @@ export function CopilotRuntimeProvider({
 
         const toolCallNamesById = new Map<string, string>();
 
-        // The copilot ends its text message at each tool call and starts a new one for the text after it, so each
-        // text message gets its own bubble. The bubble is created with the message's first text, so a message
-        // without text (a turn that only calls tools, or fails right away) leaves no empty bubble behind.
         let textMessageHasBubble = false;
 
         const subscriber: AgentSubscriber = {

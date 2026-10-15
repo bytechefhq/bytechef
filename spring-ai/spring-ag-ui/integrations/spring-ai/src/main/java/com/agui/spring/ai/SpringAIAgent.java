@@ -236,14 +236,6 @@ public class SpringAIAgent extends LocalAgent {
         return false;
     }
 
-    /**
-     * Hook for subclasses to stream tool call events as each tool runs instead of after the whole run. When it
-     * returns {@code true}, the open text message is ended before a tool's events are emitted, and text the model
-     * writes after the tool call starts a new text message, so a client can show text and tool calls in the order
-     * they happened. Default returns {@code false}: one text message for the run, followed by every tool call event.
-     *
-     * @return whether text messages are split at tool calls
-     */
     protected boolean splitsTextAtToolCalls() {
         return false;
     }
@@ -516,14 +508,6 @@ public class SpringAIAgent extends LocalAgent {
             .build();
     }
 
-    /**
-     * The run's assistant text, as a sequence of AG-UI text messages.
-     *
-     * The first message starts with the run. Tool call events routed through {@link #emitToolEvent(BaseEvent)} end
-     * the open message first, and the next content after them starts a new message with a new ID. Without tool events
-     * routed here the run keeps a single message, ended by {@link #end()}. Tool execution and response streaming run
-     * on different threads but one after the other, so the methods are synchronized for visibility, not contention.
-     */
     private final class TextMessageStream {
 
         private final AgentSubscriber subscriber;
