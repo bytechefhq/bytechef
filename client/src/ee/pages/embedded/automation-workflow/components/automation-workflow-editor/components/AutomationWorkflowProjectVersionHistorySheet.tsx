@@ -67,7 +67,17 @@ const AutomationWorkflowProjectVersionHistorySheet = ({
                                     </div>
                                 </AccordionTrigger>
 
-                                <AccordionContent className="text-muted-foreground">No description.</AccordionContent>
+                                <AccordionContent className="text-muted-foreground">
+                                    {projectVersion.description
+                                        ? projectVersion.description.split('\n').map((line, index) => (
+                                              <span key={index}>
+                                                  {line}
+
+                                                  <br />
+                                              </span>
+                                          ))
+                                        : 'No description.'}
+                                </AccordionContent>
                             </AccordionItem>
                         ))}
                     </Accordion>
