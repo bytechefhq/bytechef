@@ -55,7 +55,8 @@ public class ScriptTools {
         @ToolParam(description = "The new code") String code,
         @ToolParam(description = "The name of the script node") String scriptName, ToolContext toolContext) {
 
-        scopedProjectGuard.checkWorkflow(workflowId, toolContext, ProjectWorkflowErrorType.UPDATE_SCRIPT);
+        scopedProjectGuard.checkWorkflow(workflowId, ScopedProjectGuard.WORKFLOW_EDIT, toolContext,
+            ProjectWorkflowErrorType.UPDATE_SCRIPT);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
