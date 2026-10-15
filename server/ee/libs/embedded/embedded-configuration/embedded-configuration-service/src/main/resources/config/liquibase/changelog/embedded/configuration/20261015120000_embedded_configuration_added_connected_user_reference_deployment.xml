@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261015120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="connected_user_reference_deployment"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="connected_user_reference_deployment">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connected_user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_deployment_id" type="bigint">
+                <constraints nullable="false" unique="true"
+                             uniqueConstraintName="uk_connected_user_reference_deployment_project_deployment_id"/>
+            </column>
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="version" type="integer" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addUniqueConstraint tableName="connected_user_reference_deployment"
+                             columnNames="connected_user_id,project_id"
+                             constraintName="uk_connected_user_reference_deployment_connected_user_id_project_id"/>
+
+        <addForeignKeyConstraint baseTableName="connected_user_reference_deployment" baseColumnNames="project_id"
+                                 constraintName="fk_connected_user_reference_deployment_project"
+                                 referencedTableName="project" referencedColumnNames="id" onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="connected_user_reference_deployment"
+                                 baseColumnNames="project_deployment_id"
+                                 constraintName="fk_connected_user_reference_deployment_project_deployment"
+                                 referencedTableName="project_deployment" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <rollback>
+            <dropTable tableName="connected_user_reference_deployment"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261015120000-2" author="Ivica Cardic" contextFilter="mono">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="connected_user_reference_deployment"
+                                            foreignKeyName="fk_connected_user_reference_deployment_connected_user"/>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="connected_user_reference_deployment"
+                                 baseColumnNames="connected_user_id"
+                                 constraintName="fk_connected_user_reference_deployment_connected_user"
+                                 referencedTableName="connected_user" referencedColumnNames="id" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20261015120000-3" author="Ivica Cardic" contextFilter="mono or multitenant">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="connected_user"/>
+        </preConditions>
+
+        <sql>
+            INSERT INTO connected_user_reference_deployment
+                (connected_user_id, project_id, project_deployment_id, created_date, last_modified_date, version)
+            SELECT candidate.connected_user_id, candidate.project_id, MIN(candidate.project_deployment_id),
+                CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0
+            FROM (
+                SELECT project_deployment.id AS project_deployment_id, project_deployment.project_id AS project_id,
+                    MIN(connected_user.id) AS connected_user_id
+                FROM project_deployment
+                JOIN project ON project.id = project_deployment.project_id
+                JOIN connected_user ON connected_user.environment = project_deployment.environment
+                    AND project_deployment.name = '__EMBEDDED__' || connected_user.external_id || '__' ||
+                        CASE connected_user.environment
+                            WHEN 0 THEN 'DEVELOPMENT'
+                            WHEN 1 THEN 'STAGING'
+                            WHEN 2 THEN 'PRODUCTION'
+                        END
+                WHERE project.name LIKE '!_!_EMBEDDED!_AUTOMATION!_!_%' ESCAPE '!'
+                GROUP BY project_deployment.id, project_deployment.project_id
+            ) candidate
+            WHERE NOT EXISTS (
+                    SELECT 1 FROM connected_user_reference_deployment existing_reference_deployment
+                    WHERE existing_reference_deployment.connected_user_id = candidate.connected_user_id
+                        AND existing_reference_deployment.project_id = candidate.project_id)
+                AND NOT EXISTS (
+                    SELECT 1 FROM connected_user_reference_deployment existing_reference_deployment
+                    WHERE existing_reference_deployment.project_deployment_id = candidate.project_deployment_id)
+            GROUP BY candidate.connected_user_id, candidate.project_id
+        </sql>
+
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
