@@ -61,6 +61,7 @@ let provisionGate: Promise<void> | undefined;
 let enableResponse: {body: unknown; status: number} = {body: {}, status: 200};
 let provisionResponse: {body: unknown; status: number} = {body: {}, status: 200};
 let workflowsResponse: {body: unknown; status: number} = {body: [], status: 200};
+let copyResponse: {body: unknown; status: number} = {body: 'wf-copy', status: 200};
 
 const installFetch = () => {
     global.fetch = vi.fn(async (url: string, init?: RequestInit) => {
@@ -95,7 +96,7 @@ const installFetch = () => {
         }
 
         if (url.endsWith('/copy') && method === 'POST') {
-            return respond(200, 'wf-copy');
+            return respond(copyResponse.status, copyResponse.body);
         }
 
         return respond(200, {});
@@ -124,6 +125,7 @@ describe('ActivationDialog', () => {
         enableResponse = {body: {}, status: 200};
         provisionResponse = {body: {}, status: 200};
         workflowsResponse = {body: [], status: 200};
+        copyResponse = {body: 'wf-copy', status: 200};
         installFetch();
         useConnectDialogMock.mockReturnValue({closeDialog: vi.fn(), openDialog: openConnectDialogMock});
         vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -456,6 +458,42 @@ describe('ActivationDialog', () => {
 
         await waitFor(() => expect(onEditWorkflow).toHaveBeenCalledWith('wf-copy'));
         expect(onClose).toHaveBeenCalled();
+    });
+
+    const alreadyCopiedBody = {
+        detail: 'Automation workflow template wf-plain is already copied',
+        entityClass: 'ConnectedUserProjectWorkflow',
+        errorKey: 100,
+        inputParameters: {copiedWorkflowUuid: 'wf-existing'},
+        status: 400,
+    };
+
+    it('opens the existing copy when the template was already copied', async () => {
+        copyResponse = {body: alreadyCopiedBody, status: 400};
+
+        const onEditWorkflow = vi.fn();
+        const onClose = vi.fn();
+
+        renderDialog({onClose, onEditWorkflow, workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Edit workflow'}));
+
+        await waitFor(() => expect(onEditWorkflow).toHaveBeenCalledWith('wf-existing'));
+        expect(onClose).toHaveBeenCalled();
+        expect(screen.queryByText('Something went wrong. Please try again.')).not.toBeInTheDocument();
+    });
+
+    it('shows the generic error for a different 400 on copy', async () => {
+        copyResponse = {body: {...alreadyCopiedBody, errorKey: 101}, status: 400};
+
+        const onEditWorkflow = vi.fn();
+
+        renderDialog({onEditWorkflow, workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Edit workflow'}));
+
+        expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+        expect(onEditWorkflow).not.toHaveBeenCalled();
     });
 
     it('closes on Escape, but not while the connect form is open', async () => {
