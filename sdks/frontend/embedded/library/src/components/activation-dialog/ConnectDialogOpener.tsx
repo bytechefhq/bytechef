@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import useConnectDialog from '../connect-dialog/index';
 
 interface ConnectDialogOpenerProps {
@@ -24,7 +24,9 @@ const ConnectDialogOpener = ({
     onConnected,
     onDone,
 }: ConnectDialogOpenerProps) => {
-    const {closeDialog, openDialog} = useConnectDialog({
+    const openedRef = useRef(false);
+
+    const {openDialog} = useConnectDialog({
         baseUrl,
         connectionOnly: true,
         environment,
@@ -36,10 +38,14 @@ const ConnectDialogOpener = ({
     });
 
     useEffect(() => {
-        void openDialog();
+        if (openedRef.current) {
+            return;
+        }
 
-        return () => closeDialog();
-        // The opener's whole life is one open/close; its identity is the `key` its parent gives it.
+        openedRef.current = true;
+
+        void openDialog();
+        // The opener's whole life is one open; the hook removes its portal on unmount.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
