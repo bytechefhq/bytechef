@@ -5,6 +5,7 @@ import {CanvasDragKindType} from './canvasDragData';
 
 export type CanvasDropTargetType =
     | {edge: Edge; type: 'edge'}
+    | {node: Node; type: 'clusterElementPlaceholder'}
     | {node: Node; type: 'placeholder'}
     | {node: Node; type: 'trigger'}
     | {type: 'triggerPlaceholder'};
@@ -15,6 +16,8 @@ interface ResolveCanvasDropTargetProps {
     nodes: Node[];
     target: EventTarget | null;
 }
+
+const CLUSTER_ELEMENTS_EDGE_TYPE = 'labeledClusterElementsEdge';
 
 const EDGE_ID_PATTERN = /^.+=>.+$/;
 
@@ -65,12 +68,24 @@ export default function resolveCanvasDropTarget({
     if (targetNode) {
         const isLaidOut = targetNode.position.x !== 0 || targetNode.position.y !== 0;
 
-        return targetNode.type === 'placeholder' && isLaidOut ? {node: targetNode, type: 'placeholder'} : undefined;
+        if (targetNode.type !== 'placeholder' || !isLaidOut) {
+            return undefined;
+        }
+
+        if ((targetNode.data as NodeDataType).clusterElementType) {
+            return {node: targetNode, type: 'clusterElementPlaceholder'};
+        }
+
+        return {node: targetNode, type: 'placeholder'};
     }
 
     const edgeElement = findClosestEdgeElement(target);
 
     const targetEdge = edgeElement ? edges.find((edge) => edge.id === edgeElement.id) : undefined;
 
-    return targetEdge ? {edge: targetEdge, type: 'edge'} : undefined;
+    if (!targetEdge || targetEdge.type === CLUSTER_ELEMENTS_EDGE_TYPE) {
+        return undefined;
+    }
+
+    return {edge: targetEdge, type: 'edge'};
 }

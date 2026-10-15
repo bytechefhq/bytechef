@@ -119,3 +119,50 @@ describe('resolveCanvasDropTarget', () => {
         }
     });
 });
+
+describe('resolveCanvasDropTarget inside an inline cluster frame', () => {
+    const clusterElementPlaceholderNode: Node = {
+        data: {clusterElementLabel: 'Model', clusterElementType: 'model', label: '+'},
+        id: 'aiAgent_1-model-placeholder-0',
+        parentId: 'aiAgent_1',
+        position: {x: 120, y: 140},
+        type: 'placeholder',
+    };
+
+    const clusterElementEdge: Edge = {
+        id: 'aiAgent_1=>aiAgent_1-model-placeholder-0',
+        source: 'aiAgent_1',
+        target: 'aiAgent_1-model-placeholder-0',
+        type: 'labeledClusterElementsEdge',
+    };
+
+    afterEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    it('resolves a task dropped on a cluster element placeholder to that cluster element slot', () => {
+        const nodeElement = renderNode(clusterElementPlaceholderNode.id, '<div><svg><path></path></svg></div>');
+
+        expect(
+            resolveCanvasDropTarget({
+                dragKind: 'task',
+                edges,
+                nodes: [...nodes, clusterElementPlaceholderNode],
+                target: nodeElement.querySelector('path'),
+            })
+        ).toEqual({node: clusterElementPlaceholderNode, type: 'clusterElementPlaceholder'});
+    });
+
+    it('resolves nothing for a task dropped on an edge between a cluster root and its elements', () => {
+        const edgeElement = renderEdgeDropzone(clusterElementEdge.id);
+
+        expect(
+            resolveCanvasDropTarget({
+                dragKind: 'task',
+                edges: [...edges, clusterElementEdge],
+                nodes,
+                target: edgeElement.querySelector('path'),
+            })
+        ).toBeUndefined();
+    });
+});
