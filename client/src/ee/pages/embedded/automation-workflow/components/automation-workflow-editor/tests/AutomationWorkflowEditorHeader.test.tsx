@@ -1,12 +1,13 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationWorkflowEditorHeader from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/AutomationWorkflowEditorHeader';
 import {useAutomationWorkflowEditorSidebarStore} from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/stores/useAutomationWorkflowEditorSidebarStore';
+import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {act, render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
 import {onlineManager} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
-import {afterEach, beforeEach, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     createWorkflow: vi.fn(),
@@ -86,7 +87,7 @@ vi.mock('@/pages/platform/workflow-editor/components/WorkflowActionsButton', () 
 vi.mock(
     '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/PublishPopover',
     () => ({
-        default: () => <button>Publish</button>,
+        default: ({disabled}: {disabled?: boolean}) => <button disabled={disabled}>Publish</button>,
     })
 );
 
@@ -258,8 +259,8 @@ it('hides the project Duplicate action for a code project', async () => {
     renderAutomationWorkflowEditorHeader();
 
     await userEvent.click(screen.getByLabelText('Settings'));
-    await userEvent.click(screen.getByLabelText('Project tab'));
 
+    expect(screen.queryByLabelText('Project tab')).not.toBeInTheDocument();
     expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', {name: 'Duplicate'})).not.toBeInTheDocument();
 });
@@ -351,4 +352,36 @@ it("prefills and saves the current workflow's permission expression from the Edi
         expect.objectContaining({id: 'draft-1', workflow: expect.objectContaining({version: 1})}),
         expect.anything()
     );
+});
+
+describe('code workflow project', () => {
+    const codeProject = {...mockProject, codeWorkflowDraftPublishable: true, codeWorkflowProject: true};
+
+    beforeEach(() => {
+        hoisted.project.current = codeProject as typeof mockProject;
+
+        useCodeWorkflowHeaderStore.getState().reset();
+    });
+
+    it('enables Publish when the draft is publishable and saved', () => {
+        renderAutomationWorkflowEditorHeader();
+
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeEnabled();
+    });
+
+    it('disables Publish while the source has unsaved edits', () => {
+        useCodeWorkflowHeaderStore.setState({dirty: true});
+
+        renderAutomationWorkflowEditorHeader();
+
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
+    });
+
+    it('disables Publish when the draft has no source of its own to publish', () => {
+        hoisted.project.current = {...codeProject, codeWorkflowDraftPublishable: false} as typeof mockProject;
+
+        renderAutomationWorkflowEditorHeader();
+
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
+    });
 });
