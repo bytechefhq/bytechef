@@ -36,5 +36,7 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
     implementation(project(":server:libs:modules:task-dispatchers:terminate"))
 
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:test:test-support"))
 }
