@@ -12,7 +12,7 @@ import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.exception.CustomRoleErrorType;
-import com.bytechef.ee.automation.configuration.service.CustomRoleService;
+import com.bytechef.ee.automation.configuration.facade.CustomRoleFacade;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,12 +27,13 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller for custom-role management. Authorization is enforced at the service layer and pinned by
- * {@code PreAuthorizeAnnotationTest}: creating, updating and deleting a custom role is reserved for tenant admins,
- * listing custom roles is also open to a member holding {@code WORKSPACE_MEMBER_MANAGE} on the named workspace, and the
- * built-in roles and the scope catalogue are open to any authenticated user. Do NOT add caching or transform logic to
- * controller methods that could precede the service call without also adding a matching {@code @PreAuthorize} here — an
- * unguarded cache lookup would serve previously-authorized data across security boundaries.
+ * GraphQL controller for custom-role management. Authorization is enforced by {@link CustomRoleFacade}, whose methods
+ * are pinned by {@code PreAuthorizeAnnotationTest}: creating, updating and deleting a custom role is reserved for
+ * tenant admins, listing custom roles is also open to a member holding {@code WORKSPACE_MEMBER_MANAGE} on the named
+ * workspace, and the built-in roles and the scope catalogue are open to any authenticated user. Do NOT add caching or
+ * transform logic to controller methods that could precede the facade call without also adding a matching
+ * {@code @PreAuthorize} here — an unguarded cache lookup would serve previously-authorized data across security
+ * boundaries.
  *
  * @version ee
  *
@@ -44,10 +45,10 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI2")
 public class CustomRoleGraphQlController {
 
-    private final CustomRoleService customRoleService;
+    private final CustomRoleFacade customRoleFacade;
 
-    public CustomRoleGraphQlController(CustomRoleService customRoleService) {
-        this.customRoleService = customRoleService;
+    public CustomRoleGraphQlController(CustomRoleFacade customRoleFacade) {
+        this.customRoleFacade = customRoleFacade;
     }
 
     /**
@@ -57,12 +58,12 @@ public class CustomRoleGraphQlController {
      */
     @QueryMapping
     public List<BuiltInRoleDTO> builtInRoles() {
-        return customRoleService.getBuiltInRoles();
+        return customRoleFacade.getBuiltInRoles();
     }
 
     @QueryMapping
     public List<CustomRole> customRoles(@Argument Long workspaceId) {
-        return customRoleService.getCustomRoles(workspaceId);
+        return customRoleFacade.getCustomRoles(workspaceId);
     }
 
     /**
@@ -73,7 +74,7 @@ public class CustomRoleGraphQlController {
      */
     @QueryMapping
     public List<PermissionScopeGroupDTO> permissionScopeGroups() {
-        return customRoleService.getPermissionScopeGroups();
+        return customRoleFacade.getPermissionScopeGroups();
     }
 
     /**
@@ -84,7 +85,7 @@ public class CustomRoleGraphQlController {
      */
     @SchemaMapping(typeName = "CustomRole", field = "scopes")
     public Set<String> scopes(CustomRole customRole) {
-        Set<String> registeredScopeNames = customRoleService.getPermissionScopeGroups()
+        Set<String> registeredScopeNames = customRoleFacade.getPermissionScopeGroups()
             .stream()
             .flatMap(permissionScopeGroup -> permissionScopeGroup.scopes()
                 .stream())
@@ -100,7 +101,7 @@ public class CustomRoleGraphQlController {
     public CustomRole createCustomRole(@Argument Map<String, Object> input) {
         Set<String> scopeNames = toScopeNames(input);
 
-        return customRoleService.createCustomRole(
+        return customRoleFacade.createCustomRole(
             (String) input.get("name"), (String) input.get("description"), scopeNames);
     }
 
@@ -108,13 +109,13 @@ public class CustomRoleGraphQlController {
     public CustomRole updateCustomRole(@Argument long id, @Argument Map<String, Object> input) {
         Set<String> scopeNames = toScopeNames(input);
 
-        return customRoleService.updateCustomRole(
+        return customRoleFacade.updateCustomRole(
             id, (String) input.get("name"), (String) input.get("description"), scopeNames);
     }
 
     @MutationMapping
     public boolean deleteCustomRole(@Argument long id) {
-        customRoleService.deleteCustomRole(id);
+        customRoleFacade.deleteCustomRole(id);
 
         return true;
     }

@@ -27,6 +27,8 @@ import com.bytechef.ee.automation.configuration.audit.CustomRoleAuditMapper;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
+import com.bytechef.ee.automation.configuration.facade.CustomRoleFacade;
+import com.bytechef.ee.automation.configuration.facade.CustomRoleFacadeImpl;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -65,7 +67,8 @@ import org.springframework.test.context.NestedTestConfiguration;
 
 /**
  * The same proxy enforcement as {@link PreAuthorizeProxyEnforcementIntTest}, but with no synthetic stand-ins: the
- * production {@code CustomRoleServiceImpl} is the bean under test, so a guard deleted from it fails here.
+ * production {@code CustomRoleFacadeImpl}, over the production {@code CustomRoleServiceImpl}, is the bean under test,
+ * so a guard deleted from it fails here.
  * <p>
  * Each guard is asserted in both directions and the exact {@link PermissionService} call is verified. A deny-only
  * assertion against an unstubbed mock cannot tell "the named check refused" from "no gate named that check": Mockito
@@ -97,7 +100,7 @@ class CustomRoleServiceIntTest {
     private WorkspaceUserRepository workspaceUserRepository;
 
     @Autowired
-    private CustomRoleService customRoleService;
+    private CustomRoleFacade customRoleFacade;
 
     @BeforeEach
     void authenticateAsNonAdmin() {
@@ -125,9 +128,9 @@ class CustomRoleServiceIntTest {
     }
 
     @Test
-    void testRealCustomRoleServiceImplEnforcesCreateCustomRole() {
+    void testCustomRoleFacadeEnforcesCreateCustomRole() {
         assertThatThrownBy(
-            () -> customRoleService.createCustomRole("r", "d", Set.of("WORKFLOW_VIEW")))
+            () -> customRoleFacade.createCustomRole("r", "d", Set.of("WORKFLOW_VIEW")))
                 .isInstanceOf(AccessDeniedException.class);
 
         verify(permissionService).isTenantAdmin();
@@ -135,21 +138,21 @@ class CustomRoleServiceIntTest {
     }
 
     @Test
-    void testRealCustomRoleServiceImplAllowsCreateCustomRoleForATenantAdmin() {
+    void testCustomRoleFacadeAllowsCreateCustomRoleForATenantAdmin() {
         when(permissionService.isTenantAdmin()).thenReturn(true);
 
         // Reaching validateScopeNames — which rejects the name against an empty registry — is what proves the tenant
         // admin got past the gate.
         assertThatThrownBy(
-            () -> customRoleService.createCustomRole("r", "d", Set.of("WORKFLOW_VIEW")))
+            () -> customRoleFacade.createCustomRole("r", "d", Set.of("WORKFLOW_VIEW")))
                 .isNotInstanceOf(AccessDeniedException.class);
 
         verify(permissionService).isTenantAdmin();
     }
 
     @Test
-    void testRealCustomRoleServiceImplEnforcesDeleteCustomRole() {
-        assertThatThrownBy(() -> customRoleService.deleteCustomRole(1L))
+    void testCustomRoleFacadeEnforcesDeleteCustomRole() {
+        assertThatThrownBy(() -> customRoleFacade.deleteCustomRole(1L))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(permissionService).isTenantAdmin();
@@ -157,8 +160,8 @@ class CustomRoleServiceIntTest {
     }
 
     @Test
-    void testRealCustomRoleServiceImplEnforcesGetCustomRoles() {
-        assertThatThrownBy(() -> customRoleService.getCustomRoles(null))
+    void testCustomRoleFacadeEnforcesGetCustomRoles() {
+        assertThatThrownBy(() -> customRoleFacade.getCustomRoles(null))
             .isInstanceOf(AccessDeniedException.class);
 
         // The null-workspaceId tier is tenant-admin-only, and SpEL short-circuits the second disjunct because
@@ -168,10 +171,10 @@ class CustomRoleServiceIntTest {
     }
 
     @Test
-    void testRealCustomRoleServiceImplAllowsGetCustomRolesForATenantAdmin() {
+    void testCustomRoleFacadeAllowsGetCustomRolesForATenantAdmin() {
         when(permissionService.isTenantAdmin()).thenReturn(true);
 
-        assertThat(customRoleService.getCustomRoles(null)).isEmpty();
+        assertThat(customRoleFacade.getCustomRoles(null)).isEmpty();
 
         verify(permissionService).isTenantAdmin();
         verifyNoMoreInteractions(permissionService);
@@ -183,8 +186,8 @@ class CustomRoleServiceIntTest {
      * for exactly the people who need it.
      */
     @Test
-    void testRealCustomRoleServiceImplEnforcesGetCustomRolesForAWorkspace() {
-        assertThatThrownBy(() -> customRoleService.getCustomRoles(WORKSPACE_ID))
+    void testCustomRoleFacadeEnforcesGetCustomRolesForAWorkspace() {
+        assertThatThrownBy(() -> customRoleFacade.getCustomRoles(WORKSPACE_ID))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(permissionService).hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE);
@@ -192,21 +195,21 @@ class CustomRoleServiceIntTest {
     }
 
     @Test
-    void testRealCustomRoleServiceImplAllowsGetCustomRolesForAWorkspaceMemberManager() {
+    void testCustomRoleFacadeAllowsGetCustomRolesForAWorkspaceMemberManager() {
         when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE)).thenReturn(true);
 
-        assertThat(customRoleService.getCustomRoles(WORKSPACE_ID)).isEmpty();
+        assertThat(customRoleFacade.getCustomRoles(WORKSPACE_ID)).isEmpty();
 
         verify(permissionService).hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE);
         verifyNoMoreInteractions(permissionService);
     }
 
     @Test
-    void testRealCustomRoleServiceImplAllowsDeleteCustomRoleForATenantAdmin() {
+    void testCustomRoleFacadeAllowsDeleteCustomRoleForATenantAdmin() {
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(customRoleRepository.existsById(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
 
-        assertThatThrownBy(() -> customRoleService.deleteCustomRole(1L))
+        assertThatThrownBy(() -> customRoleFacade.deleteCustomRole(1L))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage(BODY_REACHED);
 
@@ -214,8 +217,8 @@ class CustomRoleServiceIntTest {
     }
 
     @Test
-    void testRealCustomRoleServiceImplEnforcesUpdateCustomRole() {
-        assertThatThrownBy(() -> customRoleService.updateCustomRole(1L, "r", "d", Set.of("WORKFLOW_VIEW")))
+    void testCustomRoleFacadeEnforcesUpdateCustomRole() {
+        assertThatThrownBy(() -> customRoleFacade.updateCustomRole(1L, "r", "d", Set.of("WORKFLOW_VIEW")))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(permissionService).isTenantAdmin();
@@ -224,11 +227,11 @@ class CustomRoleServiceIntTest {
     }
 
     @Test
-    void testRealCustomRoleServiceImplAllowsUpdateCustomRoleForATenantAdmin() {
+    void testCustomRoleFacadeAllowsUpdateCustomRoleForATenantAdmin() {
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(customRoleRepository.findById(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
 
-        assertThatThrownBy(() -> customRoleService.updateCustomRole(1L, "r", "d", Set.of("WORKFLOW_VIEW")))
+        assertThatThrownBy(() -> customRoleFacade.updateCustomRole(1L, "r", "d", Set.of("WORKFLOW_VIEW")))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage(BODY_REACHED);
 
@@ -236,28 +239,28 @@ class CustomRoleServiceIntTest {
     }
 
     @Test
-    void testRealCustomRoleServiceImplEnforcesGetBuiltInRolesForAnAnonymousCaller(
+    void testCustomRoleFacadeEnforcesGetBuiltInRolesForAnAnonymousCaller(
         @Autowired PermissionScopeRegistry permissionScopeRegistry) {
 
         reset(permissionScopeRegistry);
 
         authenticateAsAnonymous();
 
-        assertThatThrownBy(() -> customRoleService.getBuiltInRoles())
+        assertThatThrownBy(() -> customRoleFacade.getBuiltInRoles())
             .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(permissionScopeRegistry, permissionService);
     }
 
     @Test
-    void testRealCustomRoleServiceImplAllowsGetBuiltInRolesForAnyAuthenticatedCaller(
+    void testCustomRoleFacadeAllowsGetBuiltInRolesForAnyAuthenticatedCaller(
         @Autowired PermissionScopeRegistry permissionScopeRegistry) {
 
         reset(permissionScopeRegistry);
 
         when(permissionScopeRegistry.getBuiltInRoles()).thenThrow(new IllegalStateException(BODY_REACHED));
 
-        assertThatThrownBy(() -> customRoleService.getBuiltInRoles())
+        assertThatThrownBy(() -> customRoleFacade.getBuiltInRoles())
             .isInstanceOf(IllegalStateException.class)
             .hasMessage(BODY_REACHED);
 
@@ -265,28 +268,28 @@ class CustomRoleServiceIntTest {
     }
 
     @Test
-    void testRealCustomRoleServiceImplEnforcesGetPermissionScopeGroupsForAnAnonymousCaller(
+    void testCustomRoleFacadeEnforcesGetPermissionScopeGroupsForAnAnonymousCaller(
         @Autowired PermissionScopeRegistry permissionScopeRegistry) {
 
         reset(permissionScopeRegistry);
 
         authenticateAsAnonymous();
 
-        assertThatThrownBy(() -> customRoleService.getPermissionScopeGroups())
+        assertThatThrownBy(() -> customRoleFacade.getPermissionScopeGroups())
             .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(permissionScopeRegistry, permissionService);
     }
 
     @Test
-    void testRealCustomRoleServiceImplAllowsGetPermissionScopeGroupsForAnyAuthenticatedCaller(
+    void testCustomRoleFacadeAllowsGetPermissionScopeGroupsForAnyAuthenticatedCaller(
         @Autowired PermissionScopeRegistry permissionScopeRegistry) {
 
         reset(permissionScopeRegistry);
 
         when(permissionScopeRegistry.getScopeGroups()).thenThrow(new IllegalStateException(BODY_REACHED));
 
-        assertThatThrownBy(() -> customRoleService.getPermissionScopeGroups())
+        assertThatThrownBy(() -> customRoleFacade.getPermissionScopeGroups())
             .isInstanceOf(IllegalStateException.class)
             .hasMessage(BODY_REACHED);
 
@@ -308,7 +311,7 @@ class CustomRoleServiceIntTest {
     @EnableMethodSecurity
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        WorkspaceUserServiceImpl.class, CustomRoleServiceImpl.class
+        CustomRoleFacadeImpl.class, CustomRoleServiceImpl.class, WorkspaceUserServiceImpl.class
     })
     static class Config {
 
@@ -451,8 +454,8 @@ class CustomRoleServiceIntTest {
         @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
         @Import({
             AuditAspect.class, AuditCaptureAspect.class, AuditedMethodValidator.class, AuditMapperResolver.class,
-            CustomRoleAuditMapper.class, CustomRoleServiceImpl.class, WorkspaceUserAuditMapper.class,
-            WorkspaceUserServiceImpl.class
+            CustomRoleAuditMapper.class, CustomRoleFacadeImpl.class, CustomRoleServiceImpl.class,
+            WorkspaceUserAuditMapper.class, WorkspaceUserServiceImpl.class
         })
         static class Config {
 
