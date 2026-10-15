@@ -29,6 +29,8 @@ public class IntegrationInstanceBasicModel {
 
   private @Nullable Long id;
 
+  private @Nullable Long connectionId;
+
   private @Nullable CredentialStatusModel credentialStatus;
 
   private Boolean enabled;
@@ -63,6 +65,27 @@ public class IntegrationInstanceBasicModel {
   @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
+  }
+
+  public IntegrationInstanceBasicModel connectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
+    return this;
+  }
+
+  /**
+   * The id of the connection this integration instance uses.
+   * @return connectionId
+   */
+  
+  @Schema(name = "connectionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the connection this integration instance uses.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionId")
+  public @Nullable Long getConnectionId() {
+    return connectionId;
+  }
+
+  @JsonProperty("connectionId")
+  public void setConnectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
   }
 
   public IntegrationInstanceBasicModel credentialStatus(@Nullable CredentialStatusModel credentialStatus) {
@@ -117,13 +140,14 @@ public class IntegrationInstanceBasicModel {
     }
     IntegrationInstanceBasicModel integrationInstanceBasic = (IntegrationInstanceBasicModel) o;
     return Objects.equals(this.id, integrationInstanceBasic.id) &&
+        Objects.equals(this.connectionId, integrationInstanceBasic.connectionId) &&
         Objects.equals(this.credentialStatus, integrationInstanceBasic.credentialStatus) &&
         Objects.equals(this.enabled, integrationInstanceBasic.enabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, credentialStatus, enabled);
+    return Objects.hash(id, connectionId, credentialStatus, enabled);
   }
 
   @Override
@@ -131,6 +155,7 @@ public class IntegrationInstanceBasicModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationInstanceBasicModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("}");

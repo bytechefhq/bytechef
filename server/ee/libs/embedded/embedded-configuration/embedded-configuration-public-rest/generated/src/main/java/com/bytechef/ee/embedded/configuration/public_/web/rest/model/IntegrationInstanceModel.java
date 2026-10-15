@@ -34,6 +34,8 @@ public class IntegrationInstanceModel {
 
   private @Nullable Long id;
 
+  private @Nullable Long connectionId;
+
   private @Nullable CredentialStatusModel credentialStatus;
 
   private Boolean enabled;
@@ -77,6 +79,27 @@ public class IntegrationInstanceModel {
   @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
+  }
+
+  public IntegrationInstanceModel connectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
+    return this;
+  }
+
+  /**
+   * The id of the connection this integration instance uses.
+   * @return connectionId
+   */
+  
+  @Schema(name = "connectionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the connection this integration instance uses.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionId")
+  public @Nullable Long getConnectionId() {
+    return connectionId;
+  }
+
+  @JsonProperty("connectionId")
+  public void setConnectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
   }
 
   public IntegrationInstanceModel credentialStatus(@Nullable CredentialStatusModel credentialStatus) {
@@ -218,6 +241,7 @@ public class IntegrationInstanceModel {
     }
     IntegrationInstanceModel integrationInstance = (IntegrationInstanceModel) o;
     return Objects.equals(this.id, integrationInstance.id) &&
+        Objects.equals(this.connectionId, integrationInstance.connectionId) &&
         Objects.equals(this.credentialStatus, integrationInstance.credentialStatus) &&
         Objects.equals(this.enabled, integrationInstance.enabled) &&
         Objects.equals(this.mcpTools, integrationInstance.mcpTools) &&
@@ -227,7 +251,7 @@ public class IntegrationInstanceModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, credentialStatus, enabled, mcpTools, mcpWorkflows, workflows);
+    return Objects.hash(id, connectionId, credentialStatus, enabled, mcpTools, mcpWorkflows, workflows);
   }
 
   @Override
@@ -235,6 +259,7 @@ public class IntegrationInstanceModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationInstanceModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    mcpTools: ").append(toIndentedString(mcpTools)).append("\n");
