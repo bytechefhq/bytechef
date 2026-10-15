@@ -11,7 +11,6 @@ import {
   getDistinguishingSlugs,
   getReferenceBaseName,
   getSeoTitle,
-  humanizeSlug,
   MAX_TITLE_LENGTH,
 } from '@/lib/seo';
 import { source } from '@/lib/source';
@@ -84,7 +83,7 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(getStructuredData(page, lastModified)),
+          __html: JSON.stringify(getStructuredData(page, lastModified)).replace(/</g, '\\u003c'),
         }}
       />
       {(page.data.ee || page.data.comingSoon) && (
@@ -261,17 +260,15 @@ function getPageSeoDescription(page: DocsPageType): string {
 function getStructuredData(page: DocsPageType, lastModified?: Date) {
   const pageUrl = new URL(page.url, baseUrl).toString();
 
-  const breadcrumbs = page.slugs.map((_, index) => {
-    const slugs = page.slugs.slice(0, index + 1);
-    const crumbPage = source.getPage(slugs);
-
-    return {
+  const breadcrumbs = page.slugs
+    .map((_, index) => source.getPage(page.slugs.slice(0, index + 1)))
+    .filter((crumbPage) => crumbPage !== undefined)
+    .map((crumbPage, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      name: crumbPage?.data.title ?? humanizeSlug(slugs[index]),
-      item: new URL(`/${slugs.join('/')}`, baseUrl).toString(),
-    };
-  });
+      name: crumbPage.data.title,
+      item: new URL(crumbPage.url, baseUrl).toString(),
+    }));
 
   return [
     {
