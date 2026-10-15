@@ -397,7 +397,12 @@ public class ProjectWorkflowTools {
                     ProjectWorkflowErrorType.SAVE_TEST_CONNECTION);
             }
 
-            checkConnectionAccessible(connectionId, getWorkflowWorkspaceId(workflowId), environmentId);
+            if (scopedProjectGuard.fetchScopedProjectId(toolContext) == null) {
+                checkConnectionAccessible(connectionId, getWorkflowWorkspaceId(workflowId), environmentId);
+            } else {
+                scopedProjectGuard.checkConnection(
+                    connectionId, toolContext, ProjectWorkflowErrorType.SAVE_TEST_CONNECTION);
+            }
 
             projectWorkflowFacade.saveWorkflowTestConnection(
                 workflowId, workflowNodeName, connectionKey, connectionId, environmentId);

@@ -42,8 +42,8 @@ import com.bytechef.ai.copilot.tool.LookupComponentPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.LookupTriggerPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
-import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SampleOutputTools;
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.SelectConnectionToolCallback;
 import com.bytechef.ai.copilot.tool.SelectPropertyOptionToolCallback;
@@ -843,7 +843,7 @@ public class CopilotConfiguration {
             .defaultToolCallbacks(
                 new LookupComponentPropertyOptionsToolCallback(
                     actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
-                    propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP))
+                    propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard))
             .build();
     }
 

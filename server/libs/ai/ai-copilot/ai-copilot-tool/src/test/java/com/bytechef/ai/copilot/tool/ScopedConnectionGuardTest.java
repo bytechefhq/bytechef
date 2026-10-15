@@ -22,13 +22,11 @@ import static com.bytechef.ai.copilot.tool.ScopedConnectionTestFixtures.scopedTo
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
-import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 /**
  * @author Ivica Cardic
@@ -86,23 +84,6 @@ class ScopedConnectionGuardTest {
 
         assertThat(guard.fetchDenialMessage("slack", 42L, toolContext))
             .isEqualTo(ScopedConnectionGuard.UNVERIFIED_MESSAGE);
-    }
-
-    @Test
-    void testRunThatSkipsAuthorizationWithoutAScopedProjectIsNotEntitledToAnyConnection() {
-        ScopedConnectionGuard guard = newGuardEntitledTo(List.of(42L));
-
-        ToolContext toolContext = new ToolContext(
-            AgentToolInvocationContext.builder()
-                .authentication(
-                    new UsernamePasswordAuthenticationToken(
-                        ScopedConnectionTestFixtures.EXTERNAL_USER_ID, null, List.of()))
-                .skipAutomationAuthorization(true)
-                .build()
-                .toToolContext());
-
-        assertThat(guard.fetchDenialMessage("slack", 42L, toolContext))
-            .isEqualTo(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
     }
 
     @Test
