@@ -2,6 +2,7 @@ import {NodeDataType} from '@/shared/types';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it} from 'vitest';
 
+import useClusterElementsViewModeStore from '../../stores/useClusterElementsViewModeStore';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import useWorkflowIssuesStore from '../../stores/useWorkflowIssuesStore';
@@ -17,6 +18,8 @@ const agentNodeData = {
 
 describe('WorkflowIssuesSidebar with the real stores', () => {
     beforeEach(() => {
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
+
         useWorkflowIssuesStore.getState().reset();
         useWorkflowEditorStore.setState({clusterElementsCanvasOpen: false});
         useWorkflowNodeDetailsPanelStore.setState({currentNode: undefined, workflowNodeDetailsPanelOpen: false});
