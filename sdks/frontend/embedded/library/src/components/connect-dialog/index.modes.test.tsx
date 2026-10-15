@@ -18,14 +18,14 @@ const jsonResponse = (body: unknown) => ({
     json: vi.fn().mockResolvedValue(body),
 });
 
-const slackIntegration = (instances: Array<{id: number; connectionId?: number}>) => ({
+const slackIntegration = (instances: Array<{connectionId?: number; credentialStatus?: string; id: number}>) => ({
     connectionConfig: {authorizationType: 'OAUTH2_AUTHORIZATION_CODE', inputs: []},
     id: 12,
     integrationInstances: instances.map((instance) => ({
-        ...instance,
-        enabled: true,
         credentialStatus: 'VALID',
+        enabled: true,
         workflows: [],
+        ...instance,
     })),
     name: 'Slack',
     workflows: [],
@@ -34,11 +34,14 @@ const slackIntegration = (instances: Array<{id: number; connectionId?: number}>)
 const lastRenderedProps = (renderMock: ReturnType<typeof vi.fn>) =>
     renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
 
-const triggerOAuth2Code = (code: string) => {
+const latestOAuth2Options = () => {
     const calls = vi.mocked(useOAuth2).mock.calls;
-    const options = calls[calls.length - 1][0];
 
-    options.onCodeSuccess?.({code});
+    return calls[calls.length - 1][0];
+};
+
+const triggerOAuth2Code = (code: string) => {
+    latestOAuth2Options().onCodeSuccess?.({code});
 };
 
 describe('useConnectDialog connection-only mode', () => {
@@ -111,6 +114,174 @@ describe('useConnectDialog connection-only mode', () => {
         expect(fetchMock.mock.calls[1][0]).toBe('https://api.example.com/api/embedded/v1/integrations/12/instances');
         expect(onConnected).toHaveBeenCalledWith(42, 420);
         expect(lastRenderedProps(renderMock).isOpen).toBe(false);
+    });
+
+    it('reports the instance it created, not the first one listed', async () => {
+        const fetchMock = vi
+            .fn()
+            .mockResolvedValueOnce(jsonResponse(slackIntegration([])))
+            .mockResolvedValueOnce(jsonResponse(42))
+            .mockResolvedValueOnce(
+                jsonResponse(
+                    slackIntegration([
+                        {connectionId: 80, id: 8},
+                        {connectionId: 420, id: 42},
+                    ])
+                )
+            );
+
+        global.fetch = fetchMock;
+
+        const onConnected = vi.fn();
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                connectionOnly: true,
+                integrationId: '12',
+                jwtToken: 'ey',
+                onConnected,
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+        await act(async () => triggerOAuth2Code('abc'));
+
+        expect(onConnected).toHaveBeenCalledWith(42, 420);
+    });
+
+    it('closes without a save error when the host onConnected callback throws', async () => {
+        global.fetch = vi
+            .fn()
+            .mockResolvedValueOnce(jsonResponse(slackIntegration([])))
+            .mockResolvedValueOnce(jsonResponse(42))
+            .mockResolvedValueOnce(jsonResponse(slackIntegration([{connectionId: 420, id: 42}])));
+
+        const onClose = vi.fn();
+        const onConnected = vi.fn(() => {
+            throw new Error('host bug');
+        });
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                connectionOnly: true,
+                integrationId: '12',
+                jwtToken: 'ey',
+                onClose,
+                onConnected,
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+        await act(async () => triggerOAuth2Code('abc'));
+
+        expect(onConnected).toHaveBeenCalledWith(42, 420);
+        expect(onClose).toHaveBeenCalled();
+        expect(lastRenderedProps(renderMock).saveError).toBeUndefined();
+        expect(lastRenderedProps(renderMock).isOpen).toBe(false);
+    });
+
+    it('says the connection was saved when reloading the integration fails, without offering a retry save', async () => {
+        const fetchMock = vi
+            .fn()
+            .mockResolvedValueOnce(jsonResponse(slackIntegration([])))
+            .mockResolvedValueOnce(jsonResponse(42))
+            .mockResolvedValueOnce({...jsonResponse({}), ok: false, status: 500});
+
+        global.fetch = fetchMock;
+
+        const onConnected = vi.fn();
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                connectionOnly: true,
+                integrationId: '12',
+                jwtToken: 'ey',
+                onConnected,
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+        await act(async () => triggerOAuth2Code('abc'));
+
+        expect(onConnected).not.toHaveBeenCalled();
+        expect(lastRenderedProps(renderMock).saveError).toMatch(/was saved, but it could not be loaded/);
+    });
+
+    it('reconnects an existing instance whose credentials are invalid and hands it back', async () => {
+        const fetchMock = vi
+            .fn()
+            .mockResolvedValueOnce(
+                jsonResponse(slackIntegration([{connectionId: 70, credentialStatus: 'INVALID', id: 7}]))
+            )
+            .mockResolvedValueOnce(jsonResponse({}));
+
+        global.fetch = fetchMock;
+
+        const onConnected = vi.fn();
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                connectionOnly: true,
+                integrationId: '12',
+                jwtToken: 'ey',
+                onConnected,
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        expect(onConnected).not.toHaveBeenCalled();
+        expect(lastRenderedProps(renderMock).isOpen).toBe(true);
+        expect(lastRenderedProps(renderMock).title).toBe('Reconnect Slack');
+
+        await act(async () => triggerOAuth2Code('fresh'));
+
+        expect(fetchMock.mock.calls[1][0]).toBe('https://api.example.com/api/embedded/v1/connections/70/reauthorize');
+        expect(onConnected).toHaveBeenCalledWith(7, 70);
+    });
+
+    it('shows the form when the existing instance has no connection', async () => {
+        global.fetch = vi.fn().mockResolvedValue(jsonResponse(slackIntegration([{id: 7}])));
+
+        const onConnected = vi.fn();
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                connectionOnly: true,
+                integrationId: '12',
+                jwtToken: 'ey',
+                onConnected,
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        expect(onConnected).not.toHaveBeenCalled();
+        expect(lastRenderedProps(renderMock).isOpen).toBe(true);
+        expect(lastRenderedProps(renderMock).title).toBeUndefined();
+    });
+
+    it('shows an error in the dialog when OAuth2 authorization fails', async () => {
+        global.fetch = vi.fn().mockResolvedValue(jsonResponse(slackIntegration([])));
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                connectionOnly: true,
+                integrationId: '12',
+                jwtToken: 'ey',
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+        await act(async () => latestOAuth2Options().onError?.('access_denied'));
+
+        expect(lastRenderedProps(renderMock).saveError).toBe('Could not authorize the connection. Please try again.');
     });
 });
 
@@ -200,5 +371,71 @@ describe('useConnectDialog reauthorize mode', () => {
 
         expect(onReauthorized).toHaveBeenCalledWith(70);
         expect(lastRenderedProps(renderMock).saveError).toBeUndefined();
+    });
+
+    it('closes without a save error when the host onReauthorized callback throws', async () => {
+        global.fetch = vi
+            .fn()
+            .mockResolvedValueOnce(jsonResponse(slackIntegration([{connectionId: 70, id: 7}])))
+            .mockResolvedValueOnce(jsonResponse({}));
+
+        const onReauthorized = vi.fn(() => {
+            throw new Error('host bug');
+        });
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                integrationId: '12',
+                jwtToken: 'ey',
+                onReauthorized,
+                reauthorizeConnectionId: 70,
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+        await act(async () => triggerOAuth2Code('fresh'));
+
+        expect(onReauthorized).toHaveBeenCalledWith(70);
+        expect(lastRenderedProps(renderMock).saveError).toBeUndefined();
+        expect(lastRenderedProps(renderMock).isOpen).toBe(false);
+    });
+
+    it('reauthorizes through the non-OAuth2 form too', async () => {
+        const fetchMock = vi
+            .fn()
+            .mockResolvedValueOnce(
+                jsonResponse({
+                    ...slackIntegration([{connectionId: 70, id: 7}]),
+                    connectionConfig: {authorizationType: 'API_KEY', inputs: [{label: 'Key', name: 'key'}]},
+                })
+            )
+            .mockResolvedValueOnce(jsonResponse({}));
+
+        global.fetch = fetchMock;
+
+        const onReauthorized = vi.fn();
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                integrationId: '12',
+                jwtToken: 'ey',
+                onReauthorized,
+                reauthorizeConnectionId: 70,
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        const props = lastRenderedProps(renderMock);
+
+        props.registerFormSubmit((callback: (data: Record<string, string>) => void) => () => callback({key: 'secret'}));
+
+        await act(async () => props.handleClick({target: {name: 'connectButton'}}));
+
+        expect(fetchMock.mock.calls[1][0]).toBe('https://api.example.com/api/embedded/v1/connections/70/reauthorize');
+        expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({parameters: {key: 'secret'}});
+        expect(onReauthorized).toHaveBeenCalledWith(70);
     });
 });

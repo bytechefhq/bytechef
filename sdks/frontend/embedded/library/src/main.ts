@@ -14,6 +14,7 @@ export {useConnectDialog};
 export type {ActivationDialogProps} from './components/activation-dialog/ActivationDialog';
 export type {UseActivationDialogProps} from './components/activation-dialog';
 export type {AutomationHubTabsConfig, AutomationHubTheme} from './components/automation-hub';
+export type {UseConnectDialogProps} from './components/connect-dialog';
 export type {
     FieldMappingConfigType,
     FieldMappingValueType,

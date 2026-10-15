@@ -27,6 +27,9 @@ import useExecuteAction from './useExecuteAction';
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
 
 const SAVE_ERROR_MESSAGE = 'Could not save the connection. Please try again.';
+const SAVED_NOT_LOADED_MESSAGE =
+    'The connection was saved, but it could not be loaded. Close this dialog and reopen it.';
+const OAUTH2_ERROR_MESSAGE = 'Could not authorize the connection. Please try again.';
 
 interface ValidationRuleType {
     required: boolean;
@@ -54,9 +57,8 @@ function debounce<T extends (...args: unknown[]) => unknown>(fn: T, delay: numbe
     };
 }
 
-interface UseConnectDialogProps {
+interface UseConnectDialogBaseProps {
     baseUrl?: string;
-    connectionOnly?: boolean;
     environment?: string;
     integrationId: string;
     integrationInstanceId?: string;
@@ -64,10 +66,31 @@ interface UseConnectDialogProps {
     mapObjectFields?: MapObjectFieldsType;
     mode?: 'dark' | 'light';
     onClose?: () => void;
-    onConnected?: (integrationInstanceId: number, connectionId: number | undefined) => void;
-    onReauthorized?: (connectionId: number) => void;
-    reauthorizeConnectionId?: number;
 }
+
+interface FullModePropsI {
+    connectionOnly?: false;
+    onConnected?: never;
+    onReauthorized?: never;
+    reauthorizeConnectionId?: never;
+}
+
+interface ConnectionOnlyModePropsI {
+    connectionOnly: true;
+    onConnected?: (integrationInstanceId: number, connectionId: number | undefined) => void;
+    onReauthorized?: never;
+    reauthorizeConnectionId?: never;
+}
+
+interface ReauthorizeModePropsI {
+    connectionOnly?: false;
+    onConnected?: never;
+    onReauthorized?: (connectionId: number) => void;
+    reauthorizeConnectionId: number;
+}
+
+export type UseConnectDialogProps = UseConnectDialogBaseProps &
+    (FullModePropsI | ConnectionOnlyModePropsI | ReauthorizeModePropsI);
 
 export default function useConnectDialog({
     baseUrl = 'https://app.bytechef.io',
@@ -97,6 +120,7 @@ export default function useConnectDialog({
         {}
     );
     const [isLoading, setIsLoading] = useState(false);
+    const [reauthorizingInstance, setReauthorizingInstance] = useState<IntegrationInstanceType | undefined>(undefined);
     const [saveError, setSaveError] = useState<string | undefined>(undefined);
     const [workflowsView, setWorkflowsView] = useState(!!integrationInstanceId);
     const [currentIntegrationInstanceId, setCurrentIntegrationInstanceId] = useState<number | undefined>(
@@ -239,19 +263,33 @@ export default function useConnectDialog({
         onClose?.();
     }, [onClose]);
 
+    const reauthorizeTargetConnectionId = reauthorizeConnectionId ?? reauthorizingInstance?.connectionId;
+
+    /**
+     * Saves the connection and resolves with what to run once the save is done (host callbacks, closing the dialog), so
+     * a failing host callback is never reported as a failed save.
+     */
     const persistConnection = useCallback(
-        async (parameters: object) => {
-            if (reauthorizeConnectionId) {
-                await fetch(`/api/embedded/v1/connections/${reauthorizeConnectionId}/reauthorize`, {
+        async (parameters: object): Promise<(() => void) | undefined> => {
+            if (reauthorizeTargetConnectionId !== undefined) {
+                await fetch(`/api/embedded/v1/connections/${reauthorizeTargetConnectionId}/reauthorize`, {
                     method: 'POST',
                     body: {parameters},
                 });
 
-                onReauthorized?.(reauthorizeConnectionId);
-
-                finishAndClose();
-
-                return;
+                return () => {
+                    try {
+                        if (reauthorizingInstance) {
+                            onConnected?.(reauthorizingInstance.id, reauthorizeTargetConnectionId);
+                        } else {
+                            onReauthorized?.(reauthorizeTargetConnectionId);
+                        }
+                    } catch (error) {
+                        console.error('The connection callback failed:', error);
+                    } finally {
+                        finishAndClose();
+                    }
+                };
             }
 
             const newIntegrationInstanceId: number = await fetch(
@@ -266,20 +304,42 @@ export default function useConnectDialog({
                 }
             );
 
-            const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
+            let integrationData: IntegrationType;
 
-            const createdInstance =
-                integrationData.integrationInstances?.find((instance) => instance.id === newIntegrationInstanceId) ||
-                integrationData.integrationInstances?.[0];
+            try {
+                integrationData = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
+            } catch (error) {
+                console.error('Saved the connection but failed to reload the integration:', error);
+
+                setSaveError(SAVED_NOT_LOADED_MESSAGE);
+
+                return undefined;
+            }
+
+            let createdInstance = integrationData.integrationInstances?.find(
+                (instance) => instance.id === newIntegrationInstanceId
+            );
+
+            if (!createdInstance && integrationData.integrationInstances?.length) {
+                console.warn(
+                    `Integration instance ${newIntegrationInstanceId} was not returned; using the first instance instead.`
+                );
+
+                createdInstance = integrationData.integrationInstances[0];
+            }
 
             if (connectionOnly) {
-                if (createdInstance) {
-                    onConnected?.(createdInstance.id, createdInstance.connectionId);
-                }
-
-                finishAndClose();
-
-                return;
+                return () => {
+                    try {
+                        if (createdInstance) {
+                            onConnected?.(createdInstance.id, createdInstance.connectionId);
+                        }
+                    } catch (error) {
+                        console.error('The onConnected callback failed:', error);
+                    } finally {
+                        finishAndClose();
+                    }
+                };
             }
 
             if (createdInstance) {
@@ -288,38 +348,50 @@ export default function useConnectDialog({
 
             setIntegration(integrationData);
             setWorkflowsView(true);
+
+            return undefined;
         },
-        [connectionOnly, fetch, finishAndClose, integrationId, onConnected, onReauthorized, reauthorizeConnectionId]
+        [
+            connectionOnly,
+            fetch,
+            finishAndClose,
+            integrationId,
+            onConnected,
+            onReauthorized,
+            reauthorizeTargetConnectionId,
+            reauthorizingInstance,
+        ]
+    );
+
+    const saveConnection = useCallback(
+        async (parameters: object, failureLogMessage: string) => {
+            setSaveError(undefined);
+
+            let completeSave: (() => void) | undefined;
+
+            try {
+                completeSave = await persistConnection(parameters);
+            } catch (error) {
+                console.error(failureLogMessage, error);
+
+                setSaveError(SAVE_ERROR_MESSAGE);
+
+                return;
+            }
+
+            completeSave?.();
+        },
+        [persistConnection]
     );
 
     const saveOAuth2Connection = useCallback(
-        async (payload: CodePayloadI | TokenPayloadI) => {
-            setSaveError(undefined);
-
-            try {
-                await persistConnection(payload);
-            } catch (error) {
-                console.error('Failed to save OAuth2 connection:', error);
-
-                setSaveError(SAVE_ERROR_MESSAGE);
-            }
-        },
-        [persistConnection]
+        (payload: CodePayloadI | TokenPayloadI) => saveConnection(payload, 'Failed to save OAuth2 connection:'),
+        [saveConnection]
     );
 
     const saveNonOAuth2Connection = useCallback(
-        async (formData: Record<string, string>) => {
-            setSaveError(undefined);
-
-            try {
-                await persistConnection(formData);
-            } catch (error) {
-                console.error('Failed to save non-OAuth2 connection:', error);
-
-                setSaveError(SAVE_ERROR_MESSAGE);
-            }
-        },
-        [persistConnection]
+        (formData: Record<string, string>) => saveConnection(formData, 'Failed to save non-OAuth2 connection:'),
+        [saveConnection]
     );
 
     const handleSubmit = useCallback(() => {
@@ -479,7 +551,11 @@ export default function useConnectDialog({
         clientId: integration?.connectionConfig?.oauth2?.clientId || '',
         redirectUri: integration?.connectionConfig?.oauth2?.redirectUri || '',
         onCodeSuccess: handleOnCodeSuccess,
-        onError: (error: string) => console.error(error),
+        onError: (error: string) => {
+            console.error(error);
+
+            setSaveError(OAUTH2_ERROR_MESSAGE);
+        },
         onTokenSuccess: handleOnTokenSuccess,
         responseType: isOAuth2AuthorizationType ? 'code' : 'token',
         scope: oauth2Scope,
@@ -586,6 +662,7 @@ export default function useConnectDialog({
         setMcpToolEnabledOverrides({});
         setMcpWorkflowEnabledOverrides({});
         setMcpWorkflowInputOverrides({});
+        setReauthorizingInstance(undefined);
         setSaveError(undefined);
         setIsLoading(true);
         setIsOpen(true);
@@ -593,7 +670,7 @@ export default function useConnectDialog({
         try {
             const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
 
-            if (reauthorizeConnectionId) {
+            if (reauthorizeConnectionId !== undefined) {
                 setCurrentIntegrationInstanceId(undefined);
                 setWorkflowsView(false);
                 setIntegration(integrationData);
@@ -602,18 +679,25 @@ export default function useConnectDialog({
             }
 
             if (connectionOnly) {
-                const existingInstance = integrationData.integrationInstances?.[0];
+                const existingInstance = integrationData.integrationInstances?.find(
+                    (instance) => instance.connectionId !== undefined
+                );
 
-                if (existingInstance) {
-                    onConnected?.(existingInstance.id, existingInstance.connectionId);
-
+                if (existingInstance && existingInstance.credentialStatus !== 'INVALID') {
                     setIsOpen(false);
 
-                    onClose?.();
+                    try {
+                        onConnected?.(existingInstance.id, existingInstance.connectionId);
+                    } catch (error) {
+                        console.error('The onConnected callback failed:', error);
+                    } finally {
+                        onClose?.();
+                    }
 
                     return;
                 }
 
+                setReauthorizingInstance(existingInstance);
                 setCurrentIntegrationInstanceId(undefined);
                 setWorkflowsView(false);
                 setIntegration(integrationData);
@@ -981,7 +1065,11 @@ export default function useConnectDialog({
                 properties={integration?.connectionConfig?.inputs}
                 registerFormSubmit={registerFormSubmit}
                 saveError={saveError}
-                title={reauthorizeConnectionId ? `Reconnect ${integration?.name ?? ''}`.trim() : undefined}
+                title={
+                    reauthorizeTargetConnectionId !== undefined
+                        ? `Reconnect ${integration?.name ?? ''}`.trim()
+                        : undefined
+                }
                 workflowsView={workflowsView}
             />
         );
@@ -1009,7 +1097,7 @@ export default function useConnectDialog({
         mergedMcpWorkflows,
         mergedWorkflows,
         mode,
-        reauthorizeConnectionId,
+        reauthorizeTargetConnectionId,
         registerFormSubmit,
         saveError,
         workflowsView,
