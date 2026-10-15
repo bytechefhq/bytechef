@@ -49,7 +49,9 @@ public class MultiTenantInternalFilter implements Filter {
             (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))) {
 
             shouldRunAsTenantId = true;
-        } else if (requestURI.equals("/graphql")) {
+        } else if (requestURI.equals("/graphql") &&
+            (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))) {
+
             shouldRunAsTenantId = true;
         } else if (requestURI.contains("/api/account")) {
             shouldRunAsTenantId = true;
