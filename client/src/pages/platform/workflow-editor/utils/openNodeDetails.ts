@@ -4,6 +4,7 @@ import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {NodeDataType, TabNameType} from '@/shared/types';
 
+import {useClusterElementsCanvasDialogStore} from '../components/stores/useClusterElementsCanvasDialogStore';
 import {getClusterElementsViewMode} from '../hooks/useClusterElementsViewMode';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -29,6 +30,11 @@ export default function openNodeDetails(data: NodeDataType, activeTab: TabNameTy
     useRightSidebarStore.getState().setRightSidebarOpen(false);
     useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
     setIssuesSidebarOpen(false);
+
+    if (getClusterElementsViewMode() === 'box' && !clusterElementsCanvasOpen) {
+        useClusterElementsCanvasDialogStore.getState().setTestingPanelOpen(false);
+    }
+
     setActiveTab(activeTab);
 
     if (!isNodeAlreadyOpen) {

@@ -20,12 +20,14 @@ import {
 import {ReactNode, memo, useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import {useAiAgentTestingChatStore, useTestingModeStore} from '../../cluster-element-editor/ai-agent-editor/stores';
 import {useClusterElementsCanvasDialogStore} from '../components/stores/useClusterElementsCanvasDialogStore';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {clearClusterElementPositions} from '../utils/clearAllClusterElementPositions';
 import {
     CLUSTER_FRAME_BORDER_WIDTH,
@@ -119,6 +121,19 @@ const ClusterFrameShell = ({children, data, nodeId, nodeMenu}: ClusterFrameShell
     }, [data, setClusterElementsCanvasOpen, setEvalsPanelOpen, setRootClusterElementNodeData]);
 
     const handleOpenPlayground = useCallback(() => {
+        const previousRootName = useWorkflowEditorStore.getState().rootClusterElementNodeData?.workflowNodeName;
+
+        if (previousRootName !== data.workflowNodeName) {
+            const {generateConversationId, resetMessages} = useAiAgentTestingChatStore.getState();
+
+            resetMessages();
+            generateConversationId();
+
+            useTestingModeStore.getState().resetTestingMode();
+        }
+
+        useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(false);
+
         setRootClusterElementNodeData(data);
         setTestingPanelOpen(true);
     }, [data, setRootClusterElementNodeData, setTestingPanelOpen]);

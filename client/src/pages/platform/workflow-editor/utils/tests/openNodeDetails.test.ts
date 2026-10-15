@@ -1,3 +1,5 @@
+import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
+import useClusterElementsViewModeStore from '@/pages/platform/workflow-editor/stores/useClusterElementsViewModeStore';
 import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
 import {NodeDataType} from '@/shared/types';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -86,5 +88,14 @@ describe('openNodeDetails', () => {
         openNodeDetails({name: 'task_1', workflowNodeName: 'task_1'} as never, 'properties');
 
         expect(hoisted.setPanelOpenedFromIssuesSidebar).toHaveBeenCalledWith(false);
+    });
+
+    it('closes the inline agent playground so it cannot sit under the details panel', () => {
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'box'});
+        useClusterElementsCanvasDialogStore.setState({testingPanelOpen: true});
+
+        openNodeDetails(nodeData);
+
+        expect(useClusterElementsCanvasDialogStore.getState().testingPanelOpen).toBe(false);
     });
 });
