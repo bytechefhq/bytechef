@@ -116,7 +116,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
         byte[] bytes = "export function handler() {}".getBytes(StandardCharsets.UTF_8);
 
         when(automationWorkflowProjectCodeWorkflowFacade.save(bytes, Language.JAVASCRIPT))
-            .thenReturn(List.of("Workflow 'charge' declares neither a request trigger nor an app-event trigger"));
+            .thenReturn(List.of("Workflow 'charge' has no trigger that can start it"));
 
         webTestClient
             .post()
@@ -128,7 +128,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .isOk()
             .expectBody()
             .jsonPath("$.warnings[0]")
-            .isEqualTo("Workflow 'charge' declares neither a request trigger nor an app-event trigger");
+            .isEqualTo("Workflow 'charge' has no trigger that can start it");
 
         verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(bytes), eq(Language.JAVASCRIPT));
     }
