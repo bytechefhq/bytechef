@@ -55,6 +55,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingConnectionExcepti
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.repository.ConnectedUserReferenceDeploymentRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -197,6 +198,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     @Autowired
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
+
+    @Autowired
+    private ConnectedUserReferenceDeploymentRepository connectedUserReferenceDeploymentRepository;
 
     @Autowired
     private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
@@ -1036,6 +1040,176 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(projectDeploymentId)).isTrue();
         assertThat(projectDeploymentService.fetchProjectDeployment(projectDeploymentId)).isEmpty();
+    }
+
+    @Test
+    void testRollOutAdoptsALegacyDeploymentItsReferencesPointAtAndRollsItOut() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Legacy With References");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        long legacyProjectDeploymentId = reference.getProjectDeploymentId();
+
+        deleteReferenceDeployment(automationWorkflowProjectId);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+
+        assertThat(fetchReferenceDeployment(automationWorkflowProjectId))
+            .map(ConnectedUserReferenceDeployment::getProjectDeploymentId)
+            .contains(legacyProjectDeploymentId);
+        assertThat(projectDeploymentService.getProjectDeployment(legacyProjectDeploymentId)
+            .getProjectVersion()).isEqualTo(2);
+        assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(legacyProjectDeploymentId))
+            .singleElement()
+            .extracting(ProjectDeploymentWorkflow::getWorkflowId)
+            .isEqualTo(getWorkflowId(automationWorkflowProjectId, 2, workflowUuid));
+    }
+
+    @Test
+    void testEnableCatchesUpALegacyDeploymentLeftBehindByAdoptingIt() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Lazy Legacy");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        long legacyProjectDeploymentId = reference.getProjectDeploymentId();
+
+        deleteReferenceDeployment(automationWorkflowProjectId);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        connectedUserWorkflowReferenceFacade.enableReference(
+            EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION);
+
+        assertThat(projectDeploymentService.getProjectDeployment(legacyProjectDeploymentId)
+            .getProjectVersion()).isEqualTo(2);
+        assertThat(projectDeploymentService.getAllProjectDeployments(automationWorkflowProjectId))
+            .singleElement()
+            .extracting(ProjectDeployment::getId)
+            .isEqualTo(legacyProjectDeploymentId);
+    }
+
+    @Test
+    void testRollOutLeavesALegacyDeploymentAloneWhenItsConnectedUserAlreadyHasAReferenceDeployment() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Legacy Duplicate");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        long legacyProjectDeploymentId = reference.getProjectDeploymentId();
+
+        deleteReferenceDeployment(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(EXTERNAL_USER_ID, Environment.PRODUCTION);
+
+        long otherProjectDeploymentId = createProjectDeployment(
+            automationWorkflowProjectId, "__EMBEDDED__" + EXTERNAL_USER_ID + "__PRODUCTION");
+
+        connectedUserReferenceDeploymentService.create(
+            connectedUser.getId(), automationWorkflowProjectId, otherProjectDeploymentId);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
+
+        try {
+            assertThat(connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(legacyProjectDeploymentId))
+                .isFalse();
+
+            assertThat(appender.list)
+                .singleElement()
+                .satisfies(event -> {
+                    assertThat(event.getLevel()).isEqualTo(Level.WARN);
+                    assertThat(event.getFormattedMessage())
+                        .contains("legacy reference deployment id=" + legacyProjectDeploymentId);
+                });
+        } finally {
+            detachAppenderFromRolloutManagerLogger(appender);
+        }
+
+        assertThat(connectedUserReferenceDeploymentManager.isReferenceDeployment(legacyProjectDeploymentId))
+            .isFalse();
+        assertThat(projectDeploymentService.getProjectDeployment(legacyProjectDeploymentId)
+            .getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testRollOutDeploymentIfBehindReturnsFalseForAMarkerDeploymentWithoutReferences() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Lazy Marker");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        long markerProjectDeploymentId = createProjectDeployment(
+            automationWorkflowProjectId, "__EMBEDDED__" + EXTERNAL_USER_ID + "__PRODUCTION");
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        assertThat(connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(markerProjectDeploymentId))
+            .isFalse();
+        assertThat(projectDeploymentService.getProjectDeployment(markerProjectDeploymentId)
+            .getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testDeleteReferenceDeploymentsDeletesARenamedReferenceDeploymentAndDanglesItsReferences() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Renamed Reference Deployment");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        long projectDeploymentId = reference.getProjectDeploymentId();
+
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
+
+        projectDeployment.setName("Renamed reference deployment");
+
+        projectDeploymentService.update(projectDeployment);
+
+        connectedUserReferenceRolloutManager.deleteReferenceDeployments(automationWorkflowProjectId);
+
+        assertThat(projectDeploymentService.fetchProjectDeployment(projectDeploymentId)).isEmpty();
+        assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId()))
+            .get()
+            .satisfies(storedReference -> {
+                assertThat(storedReference.isDangling()).isTrue();
+                assertThat(storedReference.isEnabled()).isFalse();
+            });
+    }
+
+    private void deleteReferenceDeployment(long automationWorkflowProjectId) {
+        ConnectedUserReferenceDeployment connectedUserReferenceDeployment = fetchReferenceDeployment(
+            automationWorkflowProjectId).orElseThrow();
+
+        connectedUserReferenceDeploymentRepository.delete(connectedUserReferenceDeployment);
     }
 
     private long createProjectDeployment(long automationWorkflowProjectId, String name) {
