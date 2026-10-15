@@ -25,5 +25,6 @@ import org.jspecify.annotations.Nullable;
 public interface CopilotWorkflowGenerator {
 
     void generateWorkflow(
-        String workflowId, String prompt, @Nullable String systemPrompt, Set<String> allowedComponentNames);
+        String workflowId, long projectId, long environmentId, String prompt, @Nullable String systemPrompt,
+        Set<String> allowedComponentNames);
 }

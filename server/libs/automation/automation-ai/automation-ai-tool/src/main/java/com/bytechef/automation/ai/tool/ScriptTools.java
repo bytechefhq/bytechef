@@ -44,16 +44,19 @@ public class ScriptTools {
     private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
+    private final ScopedProjectGuard scopedProjectGuard;
     private final WorkspaceScopeResolver workspaceScopeResolver;
 
     @SuppressFBWarnings("EI")
     public ScriptTools(
         ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
-        ProjectWorkflowService projectWorkflowService, WorkspaceScopeResolver workspaceScopeResolver) {
+        ProjectWorkflowService projectWorkflowService, ScopedProjectGuard scopedProjectGuard,
+        WorkspaceScopeResolver workspaceScopeResolver) {
 
         this.projectService = projectService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
+        this.scopedProjectGuard = scopedProjectGuard;
         this.workspaceScopeResolver = workspaceScopeResolver;
     }
 
@@ -66,11 +69,15 @@ public class ScriptTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        ProjectWorkspaceScope.checkWorkspaceWorkflow(
-            projectService, projectWorkflowService, workflowId,
-            ProjectWorkspaceScope.resolveWorkspaceId(
-                workspaceScopeResolver, workspaceId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT),
-            ScriptToolErrorType.UPDATE_SCRIPT);
+        if (scopedProjectGuard.fetchScopedProjectId(toolContext) == null) {
+            ProjectWorkspaceScope.checkWorkspaceWorkflow(
+                projectService, projectWorkflowService, workflowId,
+                ProjectWorkspaceScope.resolveWorkspaceId(
+                    workspaceScopeResolver, workspaceId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT),
+                ScriptToolErrorType.UPDATE_SCRIPT);
+        } else {
+            scopedProjectGuard.checkWorkflow(workflowId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT);
+        }
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);

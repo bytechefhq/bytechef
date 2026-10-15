@@ -103,7 +103,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
         when(connectedUserProjectFacade.prepareCopilotChat(
             eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
-                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of("slack")));
+                .thenReturn(new CopilotChatContextDTO("wf-99", 1114L, Set.of("slack")));
 
         when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
             .thenReturn(completedEmitter);
@@ -143,8 +143,38 @@ public class ConnectedUserCopilotApiControllerIntTest {
         assertThat(stateMap).containsKey(CopilotConstants.STATE_AUTHENTICATION);
         assertThat(stateMap).containsEntry(
             CopilotConstants.STATE_ENVIRONMENT_ID, (long) Environment.PRODUCTION.ordinal());
+        assertThat(stateMap).containsEntry(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
         assertThat(stateMap.get(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY))
             .isEqualTo(Set.of("slack"));
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatScopesTheRunToTheConnectedUsersProjectRegardlessOfClientState() throws Exception {
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", 1114L, Set.of()));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(new SseEmitter());
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"threadId\":\"thread-1\",\"state\":{\"scopedProjectId\":7}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+
+        verify(agUiService).runAgent(any(LocalAgent.class), parametersCaptor.capture());
+
+        Map<String, Object> stateMap = parametersCaptor.getValue()
+            .getState()
+            .getState();
+
+        assertThat(stateMap).containsEntry(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
     }
 
     @Test
@@ -155,7 +185,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
         when(connectedUserProjectFacade.prepareCopilotChat(
             eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.DEVELOPMENT)))
-                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of()));
+                .thenReturn(new CopilotChatContextDTO("wf-99", 1114L, Set.of()));
 
         when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
             .thenReturn(new SseEmitter());
@@ -188,7 +218,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
         when(connectedUserProjectFacade.prepareCopilotChat(
             eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
-                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of("slack")));
+                .thenReturn(new CopilotChatContextDTO("wf-99", 1114L, Set.of("slack")));
 
         when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
             .thenReturn(completedEmitter);
@@ -221,7 +251,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
         when(connectedUserProjectFacade.prepareCopilotChat(
             eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
-                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of("slack")));
+                .thenReturn(new CopilotChatContextDTO("wf-99", 1114L, Set.of("slack")));
 
         when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
             .thenReturn(completedEmitter);

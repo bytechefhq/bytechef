@@ -17,6 +17,7 @@
 package com.bytechef.ai.copilot.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.when;
 import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.AgentSubscriberParams;
 import com.agui.core.agent.RunAgentParameters;
+import com.agui.core.event.RunErrorEvent;
 import com.agui.server.LocalAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.tenant.TenantContext;
@@ -48,7 +50,7 @@ class CopilotWorkflowGeneratorTest {
 
         CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(localAgent));
 
-        generator.generateWorkflow("wf-1", "Build it", "Prefer Slack.", Set.of("slack"));
+        generator.generateWorkflow("wf-1", 7L, 1L, "Build it", "Prefer Slack.", Set.of("slack"));
 
         Map<String, Object> stateMap = captureState(localAgent);
 
@@ -61,11 +63,52 @@ class CopilotWorkflowGeneratorTest {
 
         CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(localAgent));
 
-        generator.generateWorkflow("wf-1", "Build it", "   ", Set.of("slack"));
+        generator.generateWorkflow("wf-1", 7L, 1L, "Build it", "   ", Set.of("slack"));
 
         Map<String, Object> stateMap = captureState(localAgent);
 
         assertThat(stateMap).doesNotContainKey(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
+    }
+
+    @Test
+    void testGenerateWorkflowScopesTheRunToTheProjectAndEnvironment() {
+        LocalAgent localAgent = newCompletingAgent();
+
+        CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(localAgent));
+
+        generator.generateWorkflow("wf-1", 7L, 1L, "Build it", null, Set.of("slack"));
+
+        Map<String, Object> stateMap = captureState(localAgent);
+
+        assertThat(stateMap).containsEntry(CopilotConstants.STATE_SCOPED_PROJECT_ID, 7L)
+            .containsEntry(CopilotConstants.STATE_ENVIRONMENT_ID, 1L);
+    }
+
+    @Test
+    void testGenerateWorkflowFailsWhenTheRunEndsWithARunError() {
+        LocalAgent localAgent = mock(LocalAgent.class);
+
+        when(localAgent.getAgentId()).thenReturn("workflow_editor_build");
+
+        doAnswer(invocation -> {
+            AgentSubscriber subscriber = invocation.getArgument(1);
+
+            RunErrorEvent runErrorEvent = new RunErrorEvent();
+
+            runErrorEvent.setError("The copilot run failed. Reference: run-1");
+
+            subscriber.onRunErrorEvent(runErrorEvent);
+            subscriber.onRunFinalized(null);
+
+            return null;
+        }).when(localAgent)
+            .runAgent(any(RunAgentParameters.class), any(AgentSubscriber.class));
+
+        CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(localAgent));
+
+        assertThatThrownBy(() -> generator.generateWorkflow("wf-1", 7L, 1L, "Build it", null, Set.of()))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("The copilot run failed. Reference: run-1");
     }
 
     private static LocalAgent newCompletingAgent() {
@@ -111,7 +154,7 @@ class CopilotWorkflowGeneratorTest {
         CopilotWorkflowGeneratorImpl generator = new CopilotWorkflowGeneratorImpl(List.of(stubAgent));
 
         TenantContext.runWithTenantId("acme",
-            () -> generator.generateWorkflow("wf-1", "build a thing", null, Set.of()));
+            () -> generator.generateWorkflow("wf-1", 7L, 1L, "build a thing", null, Set.of()));
 
         assertThat(capturedState.get()).containsEntry(CopilotConstants.STATE_TENANT_ID, "acme");
     }

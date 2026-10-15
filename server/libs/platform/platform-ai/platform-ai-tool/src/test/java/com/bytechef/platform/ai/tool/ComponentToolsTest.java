@@ -50,6 +50,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.vectorstore.VectorStore;
 
 class ComponentToolsTest {
@@ -103,7 +104,7 @@ class ComponentToolsTest {
         when(componentDefinitionService.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
-        PropertyInfo result = componentTools.getOutputProperty(componentName, triggerName, version);
+        PropertyInfo result = componentTools.getOutputProperty(componentName, triggerName, version, null);
 
         assertNotNull(result);
         assertEquals("result", result.name());
@@ -141,7 +142,7 @@ class ComponentToolsTest {
             eq(componentName), eq(version), eq(triggerName), anyMap(), isNull()))
                 .thenReturn(outputResponse);
 
-        PropertyInfo result = componentTools.getOutputProperty(componentName, triggerName, version);
+        PropertyInfo result = componentTools.getOutputProperty(componentName, triggerName, version, null);
 
         assertNotNull(result);
         assertEquals("dynamicResult", result.name());
@@ -174,7 +175,7 @@ class ComponentToolsTest {
         when(componentDefinitionService.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
-        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
+        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
 
         assertNotNull(result);
         assertEquals("actionResult", result.name());
@@ -213,7 +214,7 @@ class ComponentToolsTest {
             eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
                 .thenReturn(outputResponse);
 
-        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
+        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
 
         assertNotNull(result);
         assertEquals("dynamicActionResult", result.name());
@@ -258,7 +259,7 @@ class ComponentToolsTest {
                     anyMap(), anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull(), isNull()))
                         .thenReturn(performResult);
 
-        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
+        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
 
         assertNotNull(result);
         verify(actionDefinitionFacade).executeOutput(eq(componentName), eq(version), eq(actionName), anyMap(),
@@ -296,10 +297,51 @@ class ComponentToolsTest {
             .thenThrow(new RuntimeException("Connection required"));
 
         RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> componentTools.getOutputProperty(componentName, actionName, version));
+            () -> componentTools.getOutputProperty(componentName, actionName, version, null));
 
         assertEquals("Failed to get output properties: Please make a " + componentName + " connection",
             exception.getMessage());
+    }
+
+    @Test
+    void testGetOutputPropertySkipsTheConnectionFallbackWhenTheToolContextDisablesIt() {
+        String componentName = "testComponent";
+        String actionName = "testAction";
+        Integer version = 1;
+
+        ActionDefinition action = mock(ActionDefinition.class);
+        when(action.getName()).thenReturn(actionName);
+        when(action.isOutputDefined()).thenReturn(true);
+        when(action.isOutputSchemaDefined()).thenReturn(false);
+        when(action.isOutputFunctionDefined()).thenReturn(true);
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+        when(componentDefinition.getName()).thenReturn(componentName);
+        when(componentDefinition.getVersion()).thenReturn(version);
+        when(componentDefinition.getTriggers()).thenReturn(List.of());
+        when(componentDefinition.getActions()).thenReturn(List.of(action));
+        when(componentDefinitionService.getComponentDefinition(componentName, version))
+            .thenReturn(componentDefinition);
+
+        when(actionDefinitionFacade.executeOutput(
+            eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
+                .thenThrow(new RuntimeException("Output function failed"));
+
+        ToolContext toolContext = new ToolContext(
+            Map.of(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, true));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> componentTools.getOutputProperty(componentName, actionName, version, toolContext));
+
+        assertEquals(
+            "Failed to get output properties: The output of " + componentName + " " + actionName +
+                " is only known after a test run",
+            exception.getMessage());
+
+        verify(connectionService, never()).getConnections(anyString(), anyInt(), any());
+        verify(actionDefinitionFacade, never()).executePerform(
+            anyString(), anyInt(), anyString(), any(), any(), any(), any(), any(), anyMap(), anyMap(), any(), any(),
+            any(), anyBoolean(), any(), any(), any());
     }
 
     @Test
@@ -318,7 +360,7 @@ class ComponentToolsTest {
             .thenReturn(componentDefinition);
 
         RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> componentTools.getOutputProperty(componentName, operationName, version));
+            () -> componentTools.getOutputProperty(componentName, operationName, version, null));
 
         assertEquals(
             "Operation '" + operationName + "' not found in component '" + componentName + "'",
@@ -364,7 +406,7 @@ class ComponentToolsTest {
         when(componentDefinitionService.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
-        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
+        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
 
         assertNotNull(result);
         assertEquals(List.of("label:'Active', value:'active'", "label:'Inactive', value:'inactive'"), result.options());
@@ -388,7 +430,7 @@ class ComponentToolsTest {
         when(componentDefinitionService.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
-        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
+        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
 
         assertNull(result);
     }
@@ -415,7 +457,7 @@ class ComponentToolsTest {
         when(componentDefinitionService.getComponentDefinition(componentName, version))
             .thenReturn(componentDefinition);
 
-        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
+        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version, null);
 
         assertNull(result);
     }
@@ -443,7 +485,7 @@ class ComponentToolsTest {
         when(componentDefinitionService.getComponentDefinition(componentName, null))
             .thenReturn(componentDefinition);
 
-        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, null);
+        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, null, null);
 
         assertNotNull(result);
         assertEquals("result", result.name());

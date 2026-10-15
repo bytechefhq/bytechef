@@ -79,19 +79,21 @@ public class ProjectWorkflowTools {
     private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
+    private final ScopedProjectGuard scopedProjectGuard;
     private final ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider;
     private final WorkspaceScopeResolver workspaceScopeResolver;
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowTools(
         ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
-        ProjectWorkflowService projectWorkflowService,
+        ProjectWorkflowService projectWorkflowService, ScopedProjectGuard scopedProjectGuard,
         ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider,
         WorkspaceScopeResolver workspaceScopeResolver) {
 
         this.projectService = projectService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
+        this.scopedProjectGuard = scopedProjectGuard;
         this.workflowTestConfigurationFacadeProvider = workflowTestConfigurationFacadeProvider;
         this.workspaceScopeResolver = workspaceScopeResolver;
     }
@@ -168,11 +170,21 @@ public class ProjectWorkflowTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        long resolvedWorkspaceId = ProjectWorkspaceScope.resolveWorkspaceId(
-            workspaceScopeResolver, workspaceId, toolContext, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
+        Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
+
+        if (scopedProjectId != null && projectId != null) {
+            scopedProjectGuard.checkProject(projectId, toolContext, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
+        }
+
+        long resolvedWorkspaceId = scopedProjectId == null
+            ? ProjectWorkspaceScope.resolveWorkspaceId(
+                workspaceScopeResolver, workspaceId, toolContext, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS)
+            : 0L;
 
         try {
-            Set<Long> accessibleProjectIds = Set.copyOf(projectService.getWorkspaceProjectIds(resolvedWorkspaceId));
+            Set<Long> accessibleProjectIds = scopedProjectId == null
+                ? Set.copyOf(projectService.getWorkspaceProjectIds(resolvedWorkspaceId))
+                : Set.of(scopedProjectId);
 
             List<ProjectWorkflowDTO> allWorkflows;
 
@@ -415,6 +427,12 @@ public class ProjectWorkflowTools {
         long projectId, @Nullable Long workspaceId, @Nullable ToolContext toolContext,
         ProjectWorkflowToolErrorType projectWorkflowToolErrorType) {
 
+        if (scopedProjectGuard.fetchScopedProjectId(toolContext) != null) {
+            scopedProjectGuard.checkProject(projectId, toolContext, projectWorkflowToolErrorType);
+
+            return;
+        }
+
         ProjectWorkspaceScope.getWorkspaceProject(
             projectService, projectId,
             ProjectWorkspaceScope.resolveWorkspaceId(
@@ -425,6 +443,12 @@ public class ProjectWorkflowTools {
     private void checkWorkspaceWorkflow(
         String workflowId, @Nullable Long workspaceId, @Nullable ToolContext toolContext,
         ProjectWorkflowToolErrorType projectWorkflowToolErrorType) {
+
+        if (scopedProjectGuard.fetchScopedProjectId(toolContext) != null) {
+            scopedProjectGuard.checkWorkflow(workflowId, toolContext, projectWorkflowToolErrorType);
+
+            return;
+        }
 
         ProjectWorkspaceScope.checkWorkspaceWorkflow(
             projectService, projectWorkflowService, workflowId,

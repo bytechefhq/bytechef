@@ -18,5 +18,5 @@ import java.util.Set;
 @SuppressFBWarnings({
     "EI", "EI2"
 })
-public record CopilotChatContextDTO(String workflowId, Set<String> allowedComponentNames) {
+public record CopilotChatContextDTO(String workflowId, long projectId, Set<String> allowedComponentNames) {
 }
