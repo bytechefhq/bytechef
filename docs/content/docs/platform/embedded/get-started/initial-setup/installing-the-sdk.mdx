@@ -11,16 +11,17 @@ The `@bytechef/embedded` SDK renders ByteChef's embedded surfaces - the [Connect
 npm install @bytechef/embedded
 ```
 
-The package (version `0.4.0`) exports four surfaces:
+The package (version `0.4.0`) exports these surfaces:
 
 - **`useConnectDialog`** - a React hook that opens the hosted [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) so an end user can authorize an integration.
-- **`AutomationHub`** - a React component that embeds the [Automation Hub](/platform/embedded/build/automation-hub), a catalog of automation templates the end user activates, with tabs, an activation wizard and a `theme` prop.
+- **`AutomationHub`** - a React component that embeds the [Automation Hub](/platform/embedded/build/automation-hub), a catalog of automation templates the end user activates, with tabs, an activation dialog and a `theme` prop.
+- **`useActivationDialog`** and **`ActivationDialog`** - a hook and a component that open the [activation dialog](/platform/embedded/build/activation-dialog) from your own page, so a connected user can connect accounts, fill in inputs and turn on a published template.
 - **`IntegrationMarketplace`** - a React component that embeds the [Integration Marketplace](/platform/embedded/build/integration-marketplace), an integration catalog that opens the Connect dialog in your page.
 - **`EmbeddedWorkflowBuilder`** - a React component that embeds the [workflow editor](/platform/embedded/build/automations/automation-workflows#the-embeddable-workflow-builder) so end users can build their own automations.
 
-The package also exports the `AutomationHubTabsConfig` and `AutomationHubTheme` types for the hub's `tabs` and `theme` props.
+The package also exports the `AutomationHubTabsConfig` and `AutomationHubTheme` types for the hub's `tabs` and `theme` props, and the `ActivationDialogProps` and `UseActivationDialogProps` types.
 
-All four are configured with the same three values: your ByteChef instance's `baseUrl`, an `environment` (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`), and a `jwtToken` identifying the current end user.
+The surfaces are configured with the same three values: your ByteChef instance's `baseUrl`, an `environment` (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`), and a `jwtToken` identifying the current end user.
 
 ### Upgrading to 0.4.0
 
