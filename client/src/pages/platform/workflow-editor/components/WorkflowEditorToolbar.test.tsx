@@ -153,19 +153,6 @@ describe('WorkflowEditorToolbar - layout engine button', () => {
             ],
         });
 
-describe('WorkflowEditorToolbar - cluster elements view mode button', () => {
-    beforeEach(() => {
-        useWorkflowDataStore.setState({edges: [], nodes: []});
-        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
-    });
-
-    it('offers the switch to inline box mode while the dialog is in force', () => {
-        renderToolbar(false);
-
-        expect(screen.getByLabelText('Show cluster elements inline')).toBeInTheDocument();
-    });
-
-    it('switches the stored mode to box and offers the way back', async () => {
         const user = userEvent.setup();
 
         renderToolbar(false);
@@ -212,6 +199,26 @@ describe('WorkflowEditorToolbar - cluster elements view mode button', () => {
         renderToolbar(false);
 
         expect(screen.getByLabelText('Switch to experimental layout engine')).toBeEnabled();
+    });
+});
+
+describe('WorkflowEditorToolbar - cluster elements view mode button', () => {
+    beforeEach(() => {
+        useWorkflowDataStore.setState({edges: [], nodes: []});
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
+    });
+
+    it('offers the switch to inline box mode while the dialog is in force', () => {
+        renderToolbar(false);
+
+        expect(screen.getByLabelText('Show cluster elements inline')).toBeInTheDocument();
+    });
+
+    it('switches the stored mode to box and offers the way back', async () => {
+        const user = userEvent.setup();
+
+        renderToolbar(false);
+
         await user.click(screen.getByLabelText('Show cluster elements inline'));
 
         expect(useClusterElementsViewModeStore.getState().clusterElementsViewMode).toBe('box');

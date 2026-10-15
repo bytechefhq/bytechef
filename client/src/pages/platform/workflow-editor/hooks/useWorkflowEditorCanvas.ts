@@ -48,12 +48,10 @@ import {
     buildDraggingPlaceholderState,
     computePlaceholderDragPosition,
 } from '../utils/dragTrailingPlaceholder';
-import getInitialViewportPosition from '../utils/getInitialViewportPosition';
 import {getTask} from '../utils/getTask';
 import {extractLayoutDirection} from '../utils/layoutDirectionDefinitionUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
 import {resolveClusterRootId} from '../utils/resolveClusterRootId';
-import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import saveWorkflowNodesPosition from '../utils/saveWorkflowNodesPosition';
 import {STICKY_NOTE_NODE_TYPE, compensateStickyNotePosition, updateStickyNote} from '../utils/stickyNoteUtils';
