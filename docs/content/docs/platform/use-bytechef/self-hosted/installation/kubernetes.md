@@ -3,8 +3,6 @@ title: Kubernetes
 description: Deploy ByteChef on Kubernetes
 ---
 
-# Kubernetes
-
 ByteChef ships a Helm chart for deploying the single-node application on a Kubernetes cluster. The chart lives in the repository at [`kubernetes/helm/bytechef`](https://github.com/bytechefhq/bytechef/tree/master/kubernetes/helm/bytechef).
 
 ## Prerequisites

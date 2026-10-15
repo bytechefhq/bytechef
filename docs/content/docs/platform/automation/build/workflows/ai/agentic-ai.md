@@ -4,8 +4,6 @@ description: Goal-oriented agent runs - describe the goal, and a planner picks w
 comingSoon: true
 ---
 
-# Agentic AI
-
 The **Agentic AI** component takes a different approach from the [AI Agent](/platform/automation/build/workflows/ai/agent): instead of a model free-running with a bag of tools, you give it a **goal** and a set of candidate **actions** (cluster elements), and a goal-oriented planner (built on the Embabel Agent framework's GOAP - goal-oriented action planning) decides which actions to run and in what order to reach the goal.
 
 ## How it differs from the AI Agent

@@ -3,8 +3,6 @@ title: Azure
 description: Learn how to deploy ByteChef on Microsoft Azure
 ---
 
-# Azure
-
 ByteChef runs on Azure as the container image `docker.bytechef.io/bytechef/bytechef:latest` on port `8080`. **Azure Container Apps** is the simplest managed target; the same image also runs on Azure Kubernetes Service (AKS) using the [Helm chart](/platform/use-bytechef/self-hosted/installation/kubernetes) or on a plain VM as in the [AWS EC2](/platform/use-bytechef/self-hosted/installation/aws-ec2) guide.
 
 ## Prerequisites

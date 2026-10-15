@@ -3,8 +3,6 @@ title: AWS EC2
 description: Learn how to deploy ByteChef on AWS EC2
 ---
 
-# AWS EC2
-
 ByteChef is distributed as a single container image, `docker.bytechef.io/bytechef/bytechef:latest`, listening on port `8080`. Running it on an EC2 instance is a matter of sizing the instance, installing Docker, provisioning a PostgreSQL database, and starting the container with the required configuration.
 
 ## Prerequisites
