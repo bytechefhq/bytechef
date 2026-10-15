@@ -19,6 +19,7 @@ package com.bytechef.ai.copilot.util;
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.commons.util.NumberUtils;
@@ -80,6 +81,10 @@ public final class CopilotToolContextUtils {
 
         if (ScopedProjectToolContext.isConfined(new ToolContext(toolContext))) {
             toolContext.put(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, Boolean.TRUE);
+        }
+
+        if (!toolContext.isEmpty()) {
+            LookupPropertyTracker.install(toolContext);
         }
 
         return toolContext;

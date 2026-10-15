@@ -21,10 +21,13 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -87,6 +90,38 @@ class RehydrateContextToolCallbackTest {
 
             return "ok";
         }
+    }
+
+    @Test
+    void testRecordsLookupPropertiesFromTheToolResult() {
+        ToolCallback lookupPropertyTool = new ToolCallback() {
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return ToolDefinition.builder()
+                    .name("getTaskProperties")
+                    .description("getTaskProperties")
+                    .inputSchema("{\"type\":\"object\"}")
+                    .build();
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return "{\"channel\": { \"value\": \"string\", \"lookupRequired\": true, \"lookupDependsOn\": [] }}";
+            }
+        };
+
+        Map<String, Object> context = new HashMap<>();
+
+        LookupPropertyTracker.install(context);
+
+        ToolContext toolContext = new ToolContext(context);
+
+        RehydrateContextToolCallback.wrap(lookupPropertyTool, new RecordingRehydrator())
+            .call("{}", toolContext);
+
+        assertThat(LookupPropertyTracker.fetchUnresolvedPropertyMentionedIn(
+            toolContext, List.of("Which Slack channel?"))).isEqualTo("channel");
     }
 
     @AfterEach
