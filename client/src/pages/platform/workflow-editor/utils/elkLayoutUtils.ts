@@ -783,6 +783,12 @@ function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {heigh
         return {height: READ_ONLY_PLACEHOLDER_RENDERED_SIZE, width: READ_ONLY_PLACEHOLDER_RENDERED_SIZE};
     }
 
+    const clusterFrame = (node.data as NodeDataType)?.clusterFrame;
+
+    if (clusterFrame) {
+        return {height: clusterFrame.height, width: clusterFrame.width};
+    }
+
     const isGhostNode = node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode';
     const isSmallNode = node.type === 'placeholder' || node.type === 'triggerPlaceholder';
 
