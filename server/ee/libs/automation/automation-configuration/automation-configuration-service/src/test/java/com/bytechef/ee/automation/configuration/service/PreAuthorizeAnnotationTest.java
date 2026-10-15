@@ -165,11 +165,33 @@ class PreAuthorizeAnnotationTest {
         assertEveryPublicOverloadIsGated(
             clazz, "getProject", "hasPermission(#id, 'Project', 'WORKFLOW_VIEW')");
         assertEveryPublicOverloadIsGated(
+            clazz, "getProjectEntity", "hasPermission(#id, 'Project', 'WORKFLOW_VIEW')");
+        assertEveryPublicOverloadIsGated(
             clazz, "getWorkspaceProjects", "hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')");
         assertEveryPublicOverloadIsGated(
             clazz, "getWorkspaceProjectWorkflows", "hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')");
         // Tenant-wide listing without a workspaceId is admin-only.
         assertEveryPublicOverloadIsGated(clazz, "getProjects", "isTenantAdmin()");
+        assertEveryPublicOverloadIsGated(clazz, "getNonSystemProjects", "isTenantAdmin()");
+    }
+
+    @Test
+    void testCeProjectWorkflowFacadeExportIsProtected() throws Exception {
+        Class<?> clazz = Class.forName(
+            "com.bytechef.automation.configuration.facade.ProjectWorkflowFacadeImpl");
+
+        // Downloading a workflow hands over its whole definition, so it needs the same view scope as reading it.
+        assertEveryPublicOverloadIsGated(clazz, "exportWorkflow", "hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')");
+    }
+
+    @Test
+    void testCeProjectDeploymentFacadeWorkspaceDeploymentsAreProtected() throws Exception {
+        Class<?> clazz = Class.forName(
+            "com.bytechef.automation.configuration.facade.ProjectDeploymentFacadeImpl");
+
+        assertEveryPublicOverloadIsGated(
+            clazz, "getProjectDeployments",
+            "hasWorkspaceScopeInEnvironment(#workspaceId, 'DEPLOYMENT_VIEW', #environment)");
     }
 
     /**
@@ -340,8 +362,8 @@ class PreAuthorizeAnnotationTest {
     }
 
     private void assertPreAuthorize(Method interfaceMethod, String expectedExpression) {
-        // The annotation lives on the implementation, not the interface, so resolve through the impl class: the class in
-        // the same package named after the interface with an Impl suffix.
+        // The annotation lives on the implementation, not the interface, so resolve through the impl class: the
+        // class in the same package named after the interface with an Impl suffix.
         Method implMethod = findImplMethod(interfaceMethod);
 
         PreAuthorize preAuthorize = implMethod.getAnnotation(PreAuthorize.class);
