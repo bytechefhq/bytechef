@@ -50,8 +50,20 @@ public record ConnectedUserWorkflowTemplateDTO(
             .toList();
     }
 
+    /**
+     * @param integrationId the id of the integration backing this component; null when the component needs a connection
+     *                      but no integration visible to the user is configured, and always null when the component
+     *                      needs no connection
+     */
     public record Component(
         String name, String title, String icon, boolean connectionRequired, @Nullable Long integrationId) {
+
+        public Component {
+            if (!connectionRequired && integrationId != null) {
+                throw new IllegalArgumentException(
+                    "Component %s needs no connection and cannot carry an integration id".formatted(name));
+            }
+        }
 
         public Component(String name, String title, String icon) {
             this(name, title, icon, false, null);
