@@ -137,7 +137,7 @@ public class SelectConnectionToolCallback implements ToolCallback {
 
             return JsonUtils.write(
                 new SelectConnectionOutput(
-                    "select-connection", componentName, componentLabel, resolvedFromComponentName));
+                    "select-connection", componentName, componentLabel, resolvedFromComponentName, true));
         } catch (JacksonException exception) {
             log.warn(
                 "selectConnection rejected malformed tool input: {} — first 200 chars of input: {}",
@@ -166,6 +166,6 @@ public class SelectConnectionToolCallback implements ToolCallback {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record SelectConnectionOutput(String kind, String componentName, String componentLabel,
-        @Nullable String resolvedFromComponentName) {
+        @Nullable String resolvedFromComponentName, boolean awaitingAnswer) {
     }
 }
