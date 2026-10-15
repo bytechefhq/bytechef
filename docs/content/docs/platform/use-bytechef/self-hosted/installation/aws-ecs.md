@@ -3,8 +3,6 @@ title: AWS ECS
 description: Learn how to deploy ByteChef on AWS ECS
 ---
 
-# AWS ECS
-
 Amazon ECS runs the ByteChef container image, `docker.bytechef.io/bytechef/bytechef:latest`, as a managed service - a good fit when you want AWS to handle scheduling, health, and rolling deployments rather than managing an EC2 host yourself. This guide targets **Fargate** (serverless), but the same task definition works on EC2-backed ECS.
 
 ## Prerequisites

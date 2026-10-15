@@ -3,8 +3,6 @@ title: Google Cloud
 description: Learn how to deploy ByteChef on Google Cloud Platform
 ---
 
-# Google Cloud
-
 ByteChef runs on Google Cloud as the container image `docker.bytechef.io/bytechef/bytechef:latest` on port `8080`. **Cloud Run** is the simplest managed target; the same image also runs on Google Kubernetes Engine (GKE) using the [Helm chart](/platform/use-bytechef/self-hosted/installation/kubernetes) or on a **Compute Engine** VM with Docker (see [Compute Engine](#compute-engine) below). Pair it with **Cloud SQL for PostgreSQL**.
 
 ## Prerequisites

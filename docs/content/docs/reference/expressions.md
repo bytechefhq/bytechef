@@ -2,8 +2,6 @@
 title: Expressions
 description: Expressions in ByteChef provide a powerful way to dynamically access, transform, and manipulate data within your workflows. They allow you to reference data from previous steps, perform calculations, implement conditional logic, and create dynamic configurations for your automation processes.
 ---
-# Expression Cheat Sheet
-
 ### Expressions and types
 
 Formula and text expressions used in ByteChef are primarily written using SpEL (Spring Expression language) with some constraints - simple, yet powerful expression language.
