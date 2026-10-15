@@ -61,4 +61,23 @@ describe('useActivationDialog', () => {
 
         expect(document.querySelectorAll('[data-bytechef-activation-dialog]')).toHaveLength(0);
     });
+
+    it('calls the host onClose and clears the dialog when the dialog closes itself', async () => {
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({render: renderMock, unmount: vi.fn()});
+
+        const onClose = vi.fn();
+
+        const {result} = renderHook(() => useActivationDialog({jwtToken: 'ey', onClose, workflowTemplateId: 'wf-1'}));
+
+        await act(async () => result.current.openDialog());
+
+        const dialogElement = renderMock.mock.calls[renderMock.mock.calls.length - 1][0];
+
+        await act(async () => dialogElement.props.onClose());
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(renderMock.mock.calls[renderMock.mock.calls.length - 1][0]).toBeNull();
+    });
 });

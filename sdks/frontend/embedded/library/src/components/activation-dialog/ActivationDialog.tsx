@@ -29,6 +29,12 @@ export interface ActivationDialogProps {
 
 const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again.';
 const TEMPLATE_NOT_FOUND_MESSAGE = 'This automation could not be found.';
+const SESSION_EXPIRED_MESSAGE = 'Your session has expired. Reload the page and try again.';
+const FORBIDDEN_MESSAGE = "You don't have permission to do this.";
+const STATUS_UNKNOWN_MESSAGE = 'Could not check your automations. Please try again.';
+const ROLLBACK_FAILED_MESSAGE =
+    'Activation failed and could not be fully undone. Check your automations before trying again.';
+const NOT_ENABLED_MESSAGE = 'Your settings were saved, but the automation could not be switched on. Please try again.';
 
 const INPUT_TYPE_ATTRIBUTES: Record<string, string> = {
     DATE: 'date',
@@ -38,6 +44,32 @@ const INPUT_TYPE_ATTRIBUTES: Record<string, string> = {
     NUMBER: 'number',
     TIME: 'time',
     URL: 'url',
+};
+
+const describeError = (error: unknown): string => {
+    if (error instanceof ApiResponseError) {
+        if (error.status === 401) {
+            return SESSION_EXPIRED_MESSAGE;
+        }
+
+        if (error.status === 403) {
+            return FORBIDDEN_MESSAGE;
+        }
+
+        if (error.status === 404) {
+            return TEMPLATE_NOT_FOUND_MESSAGE;
+        }
+    }
+
+    return GENERIC_ERROR_MESSAGE;
+};
+
+const runHostCallback = (name: string, callback: () => void) => {
+    try {
+        callback();
+    } catch (error) {
+        console.error(`The ${name} callback failed:`, error);
+    }
 };
 
 const readMissingConnectionComponentName = (error: unknown): string | undefined => {
@@ -84,7 +116,9 @@ interface ConnectRowProps {
     connectionCreationAllowed: boolean;
     connections: ConnectionType[];
     highlighted: boolean;
+    loadFailed: boolean;
     onConnect: () => void;
+    onRetry: () => void;
     onSelect: (connectionId: number) => void;
     selectedConnectionId?: number;
 }
@@ -94,7 +128,9 @@ const ConnectRow = ({
     connectionCreationAllowed,
     connections,
     highlighted,
+    loadFailed,
     onConnect,
+    onRetry,
     onSelect,
     selectedConnectionId,
 }: ConnectRowProps) => {
@@ -143,6 +179,16 @@ const ConnectRow = ({
                 <p className={styles.notice}>{title} isn't set up yet — ask your administrator.</p>
             )}
 
+            {available && loadFailed && (
+                <div className={styles.retryRow}>
+                    <p className={styles.warning}>Couldn't load your {title} accounts.</p>
+
+                    <button className={dialogStyles.buttonSecondary} onClick={onRetry} type="button">
+                        Retry
+                    </button>
+                </div>
+            )}
+
             {highlighted && <p className={styles.warning}>Connect {title} to continue</p>}
         </div>
     );
@@ -177,14 +223,15 @@ const ActivationBody = ({
 }: ActivationBodyProps) => {
     const [busy, setBusy] = useState(false);
     const [connectingComponent, setConnectingComponent] = useState<TemplateComponentType>();
+    const [connectionLoadFailures, setConnectionLoadFailures] = useState<Record<string, boolean>>({});
     const [connectionsByComponent, setConnectionsByComponent] = useState<Record<string, ConnectionType[]>>({});
+
+    const [state, dispatch] = useReducer(activationReducer, template, (initialTemplate) =>
+        initialActivationState(templateComponents(initialTemplate), templateInputs(initialTemplate))
+    );
 
     const components = useMemo(() => templateComponents(template), [template]);
     const inputs = useMemo(() => templateInputs(template), [template]);
-
-    const [state, dispatch] = useReducer(activationReducer, undefined, () =>
-        initialActivationState(components, inputs)
-    );
 
     const requiredComponents = useMemo(
         () => state.requiredComponents.map((name) => components.find((component) => component.name === name) ?? {name}),
@@ -192,19 +239,40 @@ const ActivationBody = ({
     );
 
     const loadConnections = useCallback(
-        async (componentName: string) => {
+        async (componentName: string): Promise<boolean> => {
             try {
                 const connections: ConnectionType[] = await fetch(
                     `/api/embedded/v1/components/${componentName}/connections`
                 );
 
-                setConnectionsByComponent((previous) => ({...previous, [componentName]: connections}));
+                setConnectionsByComponent((previous) => ({...previous, [componentName]: connections ?? []}));
+                setConnectionLoadFailures((previous) => ({...previous, [componentName]: false}));
+
+                return true;
             } catch (error) {
-                console.error('Failed to load connections:', error);
+                console.error(`Failed to load the ${componentName} connections:`, error);
+
+                setConnectionLoadFailures((previous) => ({...previous, [componentName]: true}));
+
+                return false;
             }
         },
         [fetch]
     );
+
+    const rollBackProvision = useCallback(async (): Promise<boolean> => {
+        try {
+            await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/provision`, {
+                method: 'DELETE',
+            });
+
+            return true;
+        } catch (error) {
+            console.error(`Failed to undo the provisioning of template ${template.id}:`, error);
+
+            return false;
+        }
+    }, [fetch, template.id]);
 
     const activate = useCallback(async () => {
         setBusy(true);
@@ -213,70 +281,95 @@ const ActivationBody = ({
             Object.entries(state.selections).filter((selection): selection is [string, number] => selection[1] != null)
         );
 
-        const activatedBefore = await fetch<ConnectedUserWorkflowType[]>('/api/embedded/v1/automation/workflows')
-            .then((workflows) =>
-                workflows.some(
-                    (workflow) => workflow.kind === 'REFERENCE' && workflow.automationWorkflowUuid === template.id
-                )
-            )
-            .catch(() => true);
+        let activatedBefore: boolean;
+
+        try {
+            const workflows = await fetch<ConnectedUserWorkflowType[]>('/api/embedded/v1/automation/workflows');
+
+            activatedBefore = (workflows ?? []).some(
+                (workflow) => workflow.kind === 'REFERENCE' && workflow.automationWorkflowUuid === template.id
+            );
+        } catch (error) {
+            console.error('Failed to check whether the automation is already active:', error);
+
+            dispatch({error: STATUS_UNKNOWN_MESSAGE, type: 'FAILED'});
+            setBusy(false);
+
+            return;
+        }
+
+        let provisioned = false;
 
         try {
             await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/provision`, {
                 body: {connections, inputs: inputs.length > 0 ? state.inputValues : undefined},
                 method: 'POST',
             });
+
+            provisioned = true;
+
             await fetch(`/api/embedded/v1/automation/workflows/${template.id}/enable`, {method: 'POST'});
-
-            dispatch({type: 'ACTIVATED', workflowUuid: template.id});
-
-            onActivated?.(template.id);
         } catch (error) {
-            if (!activatedBefore) {
-                await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/provision`, {
-                    method: 'DELETE',
-                }).catch(() => undefined);
-            }
+            console.error(`Failed to activate template ${template.id}:`, error);
+
+            const rolledBack = activatedBefore || (await rollBackProvision());
 
             const missingConnectionComponentName = readMissingConnectionComponentName(error);
 
-            if (missingConnectionComponentName) {
+            if (!rolledBack) {
+                dispatch({error: ROLLBACK_FAILED_MESSAGE, type: 'FAILED'});
+            } else if (missingConnectionComponentName) {
                 dispatch({componentName: missingConnectionComponentName, type: 'MISSING_CONNECTION'});
+            } else if (activatedBefore && provisioned) {
+                dispatch({error: NOT_ENABLED_MESSAGE, type: 'FAILED'});
             } else {
-                dispatch({error: GENERIC_ERROR_MESSAGE, type: 'FAILED'});
+                dispatch({error: describeError(error), type: 'FAILED'});
             }
-        } finally {
+
             setBusy(false);
+
+            return;
         }
-    }, [fetch, inputs.length, onActivated, state.inputValues, state.selections, template.id]);
+
+        dispatch({type: 'ACTIVATED', workflowUuid: template.id});
+        setBusy(false);
+
+        if (onActivated) {
+            runHostCallback('onActivated', () => onActivated(template.id));
+        }
+    }, [fetch, inputs.length, onActivated, rollBackProvision, state.inputValues, state.selections, template.id]);
 
     const editWorkflow = useCallback(async () => {
         setBusy(true);
 
+        let copiedWorkflowUuid: string;
+
         try {
-            const copiedWorkflowUuid: string = await fetch(
-                `/api/embedded/v1/automation/workflow-templates/${template.id}/copy`,
-                {
-                    method: 'POST',
-                }
-            );
-
-            onEditWorkflow?.(copiedWorkflowUuid);
-
-            onClose();
+            copiedWorkflowUuid = await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/copy`, {
+                method: 'POST',
+            });
         } catch (error) {
             console.error('Failed to copy the workflow template:', error);
 
-            dispatch({error: GENERIC_ERROR_MESSAGE, type: 'FAILED'});
-        } finally {
+            dispatch({error: describeError(error), type: 'FAILED'});
             setBusy(false);
+
+            return;
         }
+
+        setBusy(false);
+
+        if (onEditWorkflow) {
+            runHostCallback('onEditWorkflow', () => onEditWorkflow(copiedWorkflowUuid));
+        }
+
+        onClose();
     }, [fetch, onClose, onEditWorkflow, template.id]);
 
     const handleConnected = useCallback(
         (componentName: string, connectionId: number | undefined) => {
-            void loadConnections(componentName).then(() => {
-                if (connectionId !== undefined) {
+            void loadConnections(componentName).then((loaded) => {
+                if (loaded && connectionId !== undefined) {
                     dispatch({componentName, connectionId, type: 'SELECT_CONNECTION'});
                 }
             });
@@ -295,21 +388,31 @@ const ActivationBody = ({
         Promise.all(
             state.requiredComponents.map((componentName) =>
                 fetch<ConnectionType[]>(`/api/embedded/v1/components/${componentName}/connections`)
-                    .then((connections) => [componentName, connections] as const)
+                    .then((connections) => ({componentName, connections: connections ?? []}))
                     .catch((error: unknown) => {
-                        console.error('Failed to load connections:', error);
+                        console.error(`Failed to load the ${componentName} connections:`, error);
 
-                        return undefined;
+                        return {componentName, connections: undefined};
                     })
             )
-        ).then((entries) => {
+        ).then((results) => {
             if (cancelled) {
                 return;
             }
 
             setConnectionsByComponent((previous) => ({
                 ...previous,
-                ...Object.fromEntries(entries.filter((entry) => entry !== undefined)),
+                ...Object.fromEntries(
+                    results
+                        .filter((result) => result.connections !== undefined)
+                        .map((result) => [result.componentName, result.connections])
+                ),
+            }));
+            setConnectionLoadFailures((previous) => ({
+                ...previous,
+                ...Object.fromEntries(
+                    results.map((result) => [result.componentName, result.connections === undefined])
+                ),
             }));
         });
 
@@ -338,11 +441,13 @@ const ActivationBody = ({
                                 connections={connectionsByComponent[component.name] ?? []}
                                 highlighted={state.highlightedComponent === component.name}
                                 key={component.name}
+                                loadFailed={connectionLoadFailures[component.name] === true}
                                 onConnect={() => {
                                     connectOpenRef.current = true;
 
                                     setConnectingComponent(component);
                                 }}
+                                onRetry={() => void loadConnections(component.name)}
                                 onSelect={(connectionId) =>
                                     dispatch({componentName: component.name, connectionId, type: 'SELECT_CONNECTION'})
                                 }
@@ -462,6 +567,8 @@ const ActivationBody = ({
     );
 };
 
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]';
+
 const ActivationDialog = ({
     baseUrl = 'https://app.bytechef.io',
     connectionCreationAllowed = true,
@@ -476,6 +583,7 @@ const ActivationDialog = ({
     const [loadResult, setLoadResult] = useState<LoadResultType>();
 
     const connectOpenRef = useRef(false);
+    const containerRef = useRef<HTMLDivElement>(null);
     const onCloseRef = useRef(onClose);
 
     const {fetch} = useMemo(() => createApiClient(baseUrl, environment, jwtToken), [baseUrl, environment, jwtToken]);
@@ -497,7 +605,11 @@ const ActivationDialog = ({
                     ? {key: workflowTemplateId, template: foundTemplate}
                     : {error: TEMPLATE_NOT_FOUND_MESSAGE, key: workflowTemplateId};
             })
-            .catch(() => ({error: GENERIC_ERROR_MESSAGE, key: workflowTemplateId}))
+            .catch((error: unknown) => {
+                console.error('Failed to load the automation templates:', error);
+
+                return {error: describeError(error), key: workflowTemplateId};
+            })
             .then((result: LoadResultType) => {
                 if (!cancelled) {
                     setLoadResult(result);
@@ -514,9 +626,49 @@ const ActivationDialog = ({
     }, [onClose]);
 
     useEffect(() => {
+        containerRef.current?.focus();
+    }, []);
+
+    useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape' && !connectOpenRef.current) {
+            if (connectOpenRef.current) {
+                return;
+            }
+
+            if (event.key === 'Escape') {
                 onCloseRef.current();
+
+                return;
+            }
+
+            const container = containerRef.current;
+
+            if (event.key !== 'Tab' || !container) {
+                return;
+            }
+
+            const focusableElements = Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+                (element) => element.tabIndex >= 0
+            );
+
+            if (focusableElements.length === 0) {
+                event.preventDefault();
+
+                return;
+            }
+
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            const focusInside = container.contains(document.activeElement);
+
+            if (event.shiftKey && (!focusInside || document.activeElement === firstElement)) {
+                event.preventDefault();
+
+                lastElement.focus();
+            } else if (!event.shiftKey && (!focusInside || document.activeElement === lastElement)) {
+                event.preventDefault();
+
+                firstElement.focus();
             }
         };
 
@@ -532,13 +684,17 @@ const ActivationDialog = ({
             onClick={onClose}
         >
             <div
+                aria-labelledby="bytechef-activation-dialog-title"
+                aria-modal="true"
                 className={`${dialogStyles.dialogContainer}${darkClass}`}
                 onClick={(event) => event.stopPropagation()}
+                ref={containerRef}
                 role="dialog"
+                tabIndex={-1}
             >
                 <header className={dialogStyles.dialogHeader}>
                     <div>
-                        <h2>{template?.label ?? 'Activate automation'}</h2>
+                        <h2 id="bytechef-activation-dialog-title">{template?.label ?? 'Activate automation'}</h2>
                     </div>
 
                     <button
