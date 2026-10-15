@@ -169,6 +169,7 @@ const useWorkflowEditorCanvas = ({
         handleDropOnWorkflowEdge,
         handleDropOnTriggerNode,
         handleDropOnTriggerPlaceholder,
+        handleDropOnClusterElementPlaceholder,
     ] = useHandleDrop({
         taskDispatcherDefinitions,
     });
@@ -220,6 +221,8 @@ const useWorkflowEditorCanvas = ({
             edges,
             event,
             handlers: {
+                onDropOnClusterElementPlaceholder: (targetNode, droppedNode) =>
+                    void handleDropOnClusterElementPlaceholder(targetNode, droppedNode),
                 onDropOnPlaceholderNode: handleDropOnPlaceholderNode,
                 onDropOnTriggerNode: handleDropOnTriggerNode,
                 onDropOnTriggerPlaceholder: handleDropOnTriggerPlaceholder,

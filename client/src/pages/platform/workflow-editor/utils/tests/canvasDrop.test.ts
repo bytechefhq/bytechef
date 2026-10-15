@@ -48,6 +48,7 @@ const createDragEvent = (target: EventTarget, data: string, types: string[]) => 
 };
 
 const createHandlers = () => ({
+    onDropOnClusterElementPlaceholder: vi.fn(),
     onDropOnPlaceholderNode: vi.fn(),
     onDropOnTriggerNode: vi.fn(),
     onDropOnTriggerPlaceholder: vi.fn(),
@@ -174,5 +175,76 @@ describe('handleCanvasDrop', () => {
         });
 
         expect(handlers.onDropOnTriggerNode).not.toHaveBeenCalled();
+    });
+});
+
+describe('handleCanvasDrop inside an inline cluster frame', () => {
+    const clusterElementPlaceholderNode: Node = {
+        data: {clusterElementLabel: 'Model', clusterElementType: 'model', label: '+'},
+        id: 'aiAgent_1-model-placeholder-0',
+        parentId: 'aiAgent_1',
+        position: {x: 120, y: 140},
+        type: 'placeholder',
+    };
+
+    const clusterElementEdge: Edge = {
+        id: 'aiAgent_1=>aiAgent_1-model-placeholder-0',
+        source: 'aiAgent_1',
+        target: 'aiAgent_1-model-placeholder-0',
+        type: 'labeledClusterElementsEdge',
+    };
+
+    const clusterComponentDefinitions = [
+        {clusterElementsCount: {MODEL: 1}, name: 'openAi'},
+        {name: 'logger'},
+    ] as ComponentDefinitionBasic[];
+
+    const dropInFrame = (event: ReturnType<typeof createDragEvent>, handlers: ReturnType<typeof createHandlers>) =>
+        handleCanvasDrop({
+            componentDefinitions: clusterComponentDefinitions,
+            edges: [...edges, clusterElementEdge],
+            event,
+            handlers,
+            nodes: [...nodes, clusterElementPlaceholderNode],
+            taskDispatcherDefinitions,
+        });
+
+    afterEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    it('adds a component dropped on a cluster element placeholder to that cluster root, not to the main flow', () => {
+        const handlers = createHandlers();
+
+        dropInFrame(
+            createDragEvent(renderNode(clusterElementPlaceholderNode.id), 'openAi--task', [CANVAS_DRAG_DATA_TYPE]),
+            handlers
+        );
+
+        expect(handlers.onDropOnClusterElementPlaceholder).toHaveBeenCalledWith(
+            clusterElementPlaceholderNode,
+            expect.objectContaining({name: 'openAi'})
+        );
+        expect(handlers.onDropOnPlaceholderNode).not.toHaveBeenCalled();
+    });
+
+    it('ignores a component without an element of the placeholder type', () => {
+        const handlers = createHandlers();
+
+        dropInFrame(
+            createDragEvent(renderNode(clusterElementPlaceholderNode.id), 'logger--task', [CANVAS_DRAG_DATA_TYPE]),
+            handlers
+        );
+
+        expect(Object.values(handlers).every((handler) => handler.mock.calls.length === 0)).toBe(true);
+    });
+
+    it('refuses a drag over an edge between a cluster root and its elements', () => {
+        const event = createDragEvent(renderEdgeDropzone(clusterElementEdge.id), '', [CANVAS_DRAG_DATA_TYPE]);
+
+        handleCanvasDragOver(event, [...edges, clusterElementEdge], nodes);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(event.dataTransfer.dropEffect).toBe('none');
     });
 });
