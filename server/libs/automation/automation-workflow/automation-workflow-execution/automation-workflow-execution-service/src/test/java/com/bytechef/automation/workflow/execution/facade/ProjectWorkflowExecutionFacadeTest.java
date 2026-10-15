@@ -29,6 +29,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -253,6 +254,9 @@ public class ProjectWorkflowExecutionFacadeTest {
 
         private static final String CATALOG_WORKFLOW_ID = "catalog-workflow";
         private static final long CATALOG_PROJECT_ID = 7L;
+        private static final String OTHER_WORKSPACE_WORKFLOW_ID = "other-workspace-workflow";
+        private static final long OTHER_WORKSPACE_DEPLOYMENT_ID = 6L;
+        private static final long OTHER_WORKSPACE_PROJECT_ID = 8L;
         private static final long REFERENCE_DEPLOYMENT_ID = 5L;
         private static final long WORKSPACE_ID = 1L;
 
@@ -265,6 +269,13 @@ public class ProjectWorkflowExecutionFacadeTest {
             referenceProjectDeployment.setProjectId(CATALOG_PROJECT_ID);
             referenceProjectDeployment.setProjectVersion(1);
 
+            ProjectDeployment otherWorkspaceProjectDeployment = new ProjectDeployment();
+
+            otherWorkspaceProjectDeployment.setId(OTHER_WORKSPACE_DEPLOYMENT_ID);
+            otherWorkspaceProjectDeployment.setName("__EMBEDDED__other__DEVELOPMENT");
+            otherWorkspaceProjectDeployment.setProjectId(OTHER_WORKSPACE_PROJECT_ID);
+            otherWorkspaceProjectDeployment.setProjectVersion(1);
+
             lenient()
                 .when(projectFacade.getWorkspaceProjectWorkflows(WORKSPACE_ID))
                 .thenReturn(List.of());
@@ -273,11 +284,19 @@ public class ProjectWorkflowExecutionFacadeTest {
                 .thenReturn(List.of(referenceProjectDeployment));
             lenient()
                 .when(projectDeploymentService.getProjectDeployments(true, null, null, null, null))
-                .thenReturn(List.of(referenceProjectDeployment));
+                .thenReturn(List.of(referenceProjectDeployment, otherWorkspaceProjectDeployment));
             lenient()
                 .when(projectWorkflowService.getProjectWorkflows(List.of(CATALOG_PROJECT_ID)))
                 .thenReturn(
                     List.of(new ProjectWorkflow(CATALOG_PROJECT_ID, 1, CATALOG_WORKFLOW_ID, UUID.randomUUID())));
+            lenient()
+                .when(projectWorkflowService.getProjectWorkflows(
+                    List.of(CATALOG_PROJECT_ID, OTHER_WORKSPACE_PROJECT_ID)))
+                .thenReturn(
+                    List.of(
+                        new ProjectWorkflow(CATALOG_PROJECT_ID, 1, CATALOG_WORKFLOW_ID, UUID.randomUUID()),
+                        new ProjectWorkflow(
+                            OTHER_WORKSPACE_PROJECT_ID, 1, OTHER_WORKSPACE_WORKFLOW_ID, UUID.randomUUID())));
             lenient()
                 .when(workflowExecutionRowService.getWorkflowExecutionRows(
                     any(), any(), any(), anyList(), any(), anyList(), anyBoolean(), anyList(), anyInt()))
@@ -296,6 +315,9 @@ public class ProjectWorkflowExecutionFacadeTest {
                 workflowIdsArgumentCaptor.capture(), anyBoolean(), anyList(), anyInt());
 
             assertThat(workflowIdsArgumentCaptor.getValue()).containsExactly(CATALOG_WORKFLOW_ID);
+
+            verify(projectDeploymentService, times(1)).getProjectDeployments(
+                eq(true), any(), any(), any(), any());
         }
 
         @Test
