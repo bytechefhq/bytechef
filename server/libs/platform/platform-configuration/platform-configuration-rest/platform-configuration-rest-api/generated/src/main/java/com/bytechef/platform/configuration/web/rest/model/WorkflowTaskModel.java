@@ -39,6 +39,8 @@ public class WorkflowTaskModel {
 
   private @Nullable String description;
 
+  private @Nullable Boolean disabled;
+
   private List<@Valid WorkflowTaskModel> finalize = new ArrayList<>();
 
   private @Nullable String label;
@@ -171,6 +173,27 @@ public class WorkflowTaskModel {
   @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
+  }
+
+  public WorkflowTaskModel disabled(@Nullable Boolean disabled) {
+    this.disabled = disabled;
+    return this;
+  }
+
+  /**
+   * When true, the task is skipped during workflow execution.
+   * @return disabled
+   */
+  
+  @Schema(name = "disabled", description = "When true, the task is skipped during workflow execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("disabled")
+  public @Nullable Boolean getDisabled() {
+    return disabled;
+  }
+
+  @JsonProperty("disabled")
+  public void setDisabled(@Nullable Boolean disabled) {
+    this.disabled = disabled;
   }
 
   public WorkflowTaskModel finalize(List<@Valid WorkflowTaskModel> finalize) {
@@ -457,6 +480,7 @@ public class WorkflowTaskModel {
         Objects.equals(this.clusterElements, workflowTask.clusterElements) &&
         Objects.equals(this.connections, workflowTask.connections) &&
         Objects.equals(this.description, workflowTask.description) &&
+        Objects.equals(this.disabled, workflowTask.disabled) &&
         Objects.equals(this.finalize, workflowTask.finalize) &&
         Objects.equals(this.label, workflowTask.label) &&
         Objects.equals(this.maxRetries, workflowTask.maxRetries) &&
@@ -472,7 +496,7 @@ public class WorkflowTaskModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(clusterRoot, clusterElements, connections, description, finalize, label, maxRetries, metadata, name, node, parameters, post, pre, timeout, type);
+    return Objects.hash(clusterRoot, clusterElements, connections, description, disabled, finalize, label, maxRetries, metadata, name, node, parameters, post, pre, timeout, type);
   }
 
   @Override
@@ -483,6 +507,7 @@ public class WorkflowTaskModel {
     sb.append("    clusterElements: ").append(toIndentedString(clusterElements)).append("\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    disabled: ").append(toIndentedString(disabled)).append("\n");
     sb.append("    finalize: ").append(toIndentedString(finalize)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    maxRetries: ").append(toIndentedString(maxRetries)).append("\n");
