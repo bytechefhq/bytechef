@@ -18,7 +18,7 @@ vi.mock('@/ee/pages/embedded/workflow-builder/hooks/useWorkflowBuilder', () => (
 }));
 
 vi.mock('@/pages/platform/workflow-editor/hooks/useRun', () => ({
-    useRun: () => ({runDisabled: false}),
+    useRun: () => ({runDisabled: false, runDisabledReasons: []}),
 }));
 
 vi.mock('@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/WorkflowBuilderHeader', () => ({
