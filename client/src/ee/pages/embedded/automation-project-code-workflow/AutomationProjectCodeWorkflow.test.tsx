@@ -1,6 +1,5 @@
-import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
-import {createTestQueryClientWrapper, screen, userEvent} from '@/shared/util/test-utils';
-import {act, render} from '@testing-library/react';
+import {createTestQueryClientWrapper, screen} from '@/shared/util/test-utils';
+import {render} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -9,13 +8,6 @@ import AutomationProjectCodeWorkflow from './AutomationProjectCodeWorkflow';
 
 const hoisted = vi.hoisted(() => ({
     projects: [] as Array<Record<string, unknown>>,
-    publishMutate: vi.fn(),
-    sourceQuery: vi.fn(),
-    updateMutateAsync: vi.fn().mockResolvedValue({}),
-}));
-
-vi.mock('@/pages/platform/code-workflow/CodeWorkflowSourceEditor', () => ({
-    default: () => <div data-testid="code-workflow-source-editor" />,
 }));
 
 vi.mock('@/shared/middleware/graphql', async () => {
@@ -23,32 +15,18 @@ vi.mock('@/shared/middleware/graphql', async () => {
 
     return {
         ...actual,
-        useAutomationProjectCodeWorkflowSourceQuery: (...args: unknown[]) => {
-            hoisted.sourceQuery(...args);
-
-            return {
-                data: {automationProjectCodeWorkflowSource: {content: 'source', language: 'JAVASCRIPT'}},
-                error: null,
-                isLoading: false,
-            };
-        },
         useAutomationProjectsQuery: () => ({
             data: {automationProjects: hoisted.projects},
-        }),
-        usePublishAutomationProjectMutation: () => ({isPending: false, mutate: hoisted.publishMutate}),
-        useUpdateAutomationProjectCodeWorkflowSourceMutation: () => ({
-            isPending: false,
-            mutateAsync: hoisted.updateMutateAsync,
         }),
     };
 });
 
 const buildProject = (overrides: Record<string, unknown> = {}) => ({
-    codeWorkflowDraftPublishable: true,
     codeWorkflowLanguage: 'JAVASCRIPT',
     codeWorkflowProject: true,
     id: '7',
     name: 'orders',
+    workflowTemplates: [{workflowUuid: 'uuid-1'}, {workflowUuid: 'uuid-2'}],
     ...overrides,
 });
 
@@ -66,6 +44,11 @@ const renderPage = (projectId = '7') => {
                 />
 
                 <Route
+                    element={<div data-testid="automation-editor" />}
+                    path="/embedded/automations/:workflowUuid/editor"
+                />
+
+                <Route
                     element={<div data-testid="automations-page" />}
                     path="/embedded/automations"
                 />
@@ -78,17 +61,12 @@ const renderPage = (projectId = '7') => {
 describe('AutomationProjectCodeWorkflow', () => {
     beforeEach(() => {
         hoisted.projects = [buildProject()];
-        hoisted.publishMutate.mockReset();
-        hoisted.sourceQuery.mockReset();
-
-        useCodeWorkflowHeaderStore.getState().reset();
     });
 
-    it('renders the editor for a JavaScript code project', () => {
+    it('opens the first workflow of a JavaScript code project in the workflow editor', () => {
         renderPage();
 
-        expect(screen.getByTestId('code-workflow-source-editor')).toBeInTheDocument();
-        expect(screen.queryByTestId('automations-page')).not.toBeInTheDocument();
+        expect(screen.getByTestId('automation-editor')).toBeInTheDocument();
     });
 
     it('redirects to the automation workflows page for a Java code project', () => {
@@ -97,8 +75,6 @@ describe('AutomationProjectCodeWorkflow', () => {
         renderPage();
 
         expect(screen.getByTestId('automations-page')).toBeInTheDocument();
-        expect(screen.queryByTestId('code-workflow-source-editor')).not.toBeInTheDocument();
-        expect(hoisted.sourceQuery).toHaveBeenLastCalledWith(expect.anything(), {enabled: false});
     });
 
     it('redirects to the automation workflows page for a visual project', () => {
@@ -107,47 +83,19 @@ describe('AutomationProjectCodeWorkflow', () => {
         renderPage();
 
         expect(screen.getByTestId('automations-page')).toBeInTheDocument();
-        expect(screen.queryByTestId('code-workflow-source-editor')).not.toBeInTheDocument();
-        expect(hoisted.sourceQuery).toHaveBeenLastCalledWith(expect.anything(), {enabled: false});
+    });
+
+    it('redirects to the automation workflows page for a code project without workflows', () => {
+        hoisted.projects = [buildProject({workflowTemplates: []})];
+
+        renderPage();
+
+        expect(screen.getByTestId('automations-page')).toBeInTheDocument();
     });
 
     it('redirects to the automation workflows page for an unknown project id', () => {
         renderPage('999');
 
         expect(screen.getByTestId('automations-page')).toBeInTheDocument();
-        expect(screen.queryByTestId('code-workflow-source-editor')).not.toBeInTheDocument();
-        expect(hoisted.sourceQuery).toHaveBeenLastCalledWith(expect.anything(), {enabled: false});
-    });
-
-    it('shows the project name and publishes it', async () => {
-        renderPage();
-
-        expect(screen.getByText('orders')).toBeInTheDocument();
-
-        await userEvent.click(screen.getByRole('button', {name: 'Publish'}));
-
-        expect(hoisted.publishMutate).toHaveBeenCalledWith({id: '7'}, expect.anything());
-    });
-
-    it('disables Publish while there are unsaved edits', () => {
-        renderPage();
-
-        act(() => useCodeWorkflowHeaderStore.setState({dirty: true}));
-
-        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
-    });
-
-    it('disables Publish when the draft has no source of its own to publish', () => {
-        hoisted.projects = [buildProject({codeWorkflowDraftPublishable: false})];
-
-        renderPage();
-
-        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
-    });
-
-    it('enables Publish when the draft is publishable and there are no unsaved edits', () => {
-        renderPage();
-
-        expect(screen.getByRole('button', {name: 'Publish'})).toBeEnabled();
     });
 });

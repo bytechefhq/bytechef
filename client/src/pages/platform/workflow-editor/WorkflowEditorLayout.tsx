@@ -48,6 +48,9 @@ const AiAgentTestingPanel = lazy(
     () =>
         import('@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel')
 );
+const AutomationProjectCodeWorkflowDetail = lazy(
+    () => import('@/pages/platform/code-workflow/AutomationProjectCodeWorkflowDetail')
+);
 const IntegrationCodeWorkflowDetail = lazy(
     () => import('@/pages/platform/code-workflow/IntegrationCodeWorkflowDetail')
 );
@@ -147,7 +150,13 @@ const WorkflowEditorLayout = ({
 
     const issues = useWorkflowIssues();
 
-    const {codeWorkflow, codeWorkflowLanguage, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {
+        automationProjectId,
+        codeWorkflow,
+        codeWorkflowLanguage,
+        invalidateWorkflowQueries,
+        updateWorkflowMutation,
+    } = useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();
@@ -245,6 +254,17 @@ const WorkflowEditorLayout = ({
                             edit here — rebuild the JAR and deploy it again to change them.
                         </div>
                     </div>
+                ) : isCodeWorkflow && codeWorkflowLanguage && automationProjectId ? (
+                    <Suspense>
+                        <AutomationProjectCodeWorkflowDetail
+                            automationProjectId={automationProjectId}
+                            headerless
+                            invalidateWorkflowQueries={invalidateWorkflowQueries}
+                            language={codeWorkflowLanguage}
+                            onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
+                            testConfigurationDisabled={testConfigurationDisabled}
+                        />
+                    </Suspense>
                 ) : isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
                     <Suspense>
                         <IntegrationCodeWorkflowDetail
