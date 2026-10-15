@@ -291,6 +291,7 @@ public class SpringAIAgent extends LocalAgent {
                     subscriber.onNewToolCall(call);
                 });
         }
+
         if (ToolExecutionResult.FINISH_REASON.equals(evt.getResult().getMetadata().getFinishReason())) {
             return;
         }
