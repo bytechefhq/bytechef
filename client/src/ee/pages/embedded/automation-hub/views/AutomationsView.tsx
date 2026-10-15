@@ -7,6 +7,7 @@ import {
     useSetAutomationEnabledMutation,
 } from '@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations';
 import {
+    AutomationHubKeys,
     useGetAutomationsQuery,
     useGetTemplateProjectsQuery,
 } from '@/ee/pages/embedded/automation-hub/queries/automationHub.queries';
@@ -18,12 +19,14 @@ import TemplateGridSection, {
     CatalogFilterType,
     CatalogLayoutType,
 } from '@/ee/pages/embedded/automation-hub/views/components/TemplateGridSection';
-import ActivationWizard from '@/ee/pages/embedded/automation-hub/wizard/ActivationWizard';
+import {getEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
 import {
     AutomationWorkflowProjectWorkflowTemplate,
     ConnectedUserProjectWorkflow,
 } from '@/ee/shared/middleware/embedded/public';
-import {useMemo, useState} from 'react';
+import {ActivationDialog} from '@bytechef/embedded';
+import {useQueryClient} from '@tanstack/react-query';
+import {useCallback, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -48,15 +51,26 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
     const [filter, setFilter] = useState<CatalogFilterType>('all');
     const [search, setSearch] = useState('');
 
-    const {defaultLayout, layoutSwitcherAllowed, newWorkflowEnabled} = useAutomationHubStore(
+    const {
+        connectionDialogAllowed,
+        defaultLayout,
+        editWorkflowAllowed,
+        layoutSwitcherAllowed,
+        newWorkflowEnabled,
+        themeMode,
+    } = useAutomationHubStore(
         useShallow((state) => ({
+            connectionDialogAllowed: state.connectionDialogAllowed,
             defaultLayout: state.defaultLayout,
+            editWorkflowAllowed: state.editWorkflowAllowed,
             layoutSwitcherAllowed: state.layoutSwitcherAllowed,
             newWorkflowEnabled: state.tabs.newWorkflow,
+            themeMode: state.theme.mode,
         }))
     );
 
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const {data: projects, error: projectsError, isLoading: projectsLoading} = useGetTemplateProjectsQuery();
     const {data: automations, error: automationsError, isLoading: automationsLoading} = useGetAutomationsQuery();
@@ -65,6 +79,16 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
     const {mutateAsync: deleteAutomation} = useDeleteAutomationMutation();
     const {mutateAsync: deprovisionReference} = useDeprovisionReferenceMutation();
     const {mutateAsync: setEnabled} = useSetAutomationEnabledMutation();
+
+    const handleActivated = useCallback(() => {
+        void queryClient.invalidateQueries({queryKey: AutomationHubKeys.automations});
+        void queryClient.invalidateQueries({queryKey: AutomationHubKeys.connections});
+    }, [queryClient]);
+
+    const handleEditWorkflow = useCallback(
+        (workflowUuid: string) => void navigate(`/embedded/hub/builder/${workflowUuid}`),
+        [navigate]
+    );
 
     const {automationsByTemplateId, unmatchedAutomations} = useMemo(() => {
         const publishedTemplateIds = new Set(
@@ -175,8 +199,18 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
                 />
             )}
 
-            {activeTemplate && (
-                <ActivationWizard onClose={() => setActiveTemplate(undefined)} template={activeTemplate} />
+            {activeTemplate?.id && (
+                <ActivationDialog
+                    baseUrl={import.meta.env.VITE_API_BASE_PATH || ''}
+                    connectionCreationAllowed={connectionDialogAllowed}
+                    environment={getEmbedCredentials().environment || 'PRODUCTION'}
+                    jwtToken={getEmbedCredentials().jwtToken || ''}
+                    mode={themeMode}
+                    onActivated={handleActivated}
+                    onClose={() => setActiveTemplate(undefined)}
+                    onEditWorkflow={editWorkflowAllowed ? handleEditWorkflow : undefined}
+                    workflowTemplateId={activeTemplate.id}
+                />
             )}
         </div>
     );
