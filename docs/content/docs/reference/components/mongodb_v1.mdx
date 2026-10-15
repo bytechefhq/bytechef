@@ -552,9 +552,9 @@ Items Type: OBJECT
 
 <hr />
 
-# Additional Instructions
+## Additional Instructions
 
-### Filters, documents and pipelines
+#### Filters, documents and pipelines
 
 Properties such as **Filter**, **Update**, **Document** and the **Pipeline** stages are
 expressed as JSON objects that map directly to MongoDB's query language.
@@ -566,7 +566,7 @@ expressed as JSON objects that map directly to MongoDB's query language.
 - **Pipeline** is an ordered list of [aggregation stages](https://www.mongodb.com/docs/manual/reference/operator/aggregation-pipeline/),
   e.g. `[{"$match": {"active": true}}, {"$group": {"_id": "$country", "total": {"$sum": 1}}}]`.
 
-### New Document trigger
+#### New Document trigger
 
 The **New Document** trigger detects new documents by tracking the highest value seen for the
 configured **Order By Field**. Use a monotonically increasing field such as `_id` (the default)

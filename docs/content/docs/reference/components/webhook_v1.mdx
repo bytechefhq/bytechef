@@ -365,13 +365,13 @@ Content-Type: application/json
 
 <hr />
 
-# Additional Instructions
+## Additional Instructions
 
-## Testing Webhooks with Postman or Bruno
+### Testing Webhooks with Postman or Bruno
 
 Each Webhook trigger listens on a URL. You can use any HTTP client, such as [Postman](https://www.postman.com/), [Bruno](https://www.usebruno.com/) or `curl`, to send a request to it. This section describes what to send. See the section for each trigger above for the response that you get.
 
-### Which URL to Use
+#### Which URL to Use
 
 | URL | Where to find it | What it does |
 |:---|:---|:---|
@@ -384,7 +384,7 @@ The production URL has the form `https://<your-bytechef-host>/webhooks/<id>`. Th
 The test URL records a request only while the trigger waits for test data (after you click **Test**, before you click **Cancel**). Use the test URL first, so that the next steps of the workflow can use the fields of your sample request.
 </Callout>
 
-### HTTP Methods
+#### HTTP Methods
 
 | Method | Result |
 |:---|:---|
@@ -393,13 +393,13 @@ The test URL records a request only while the trigger waits for test data (after
 | `HEAD` | Does not run the workflow. Returns `200 OK`, except when the workflow is disabled and uses the **Await Workflow and Respond** trigger: then it returns `410 Gone`. |
 | `PUT`, `PATCH`, `DELETE` | Not supported. The server returns `405 Method Not Allowed`. |
 
-### Headers
+#### Headers
 
 - **Content-Type**: Tells ByteChef how to read the body. Postman and Bruno set it automatically when you select a body type.
 - **X-Csrf-Token**: Required for the **Validate and Respond** trigger and the **Await Workflow and Respond** trigger. The value must be the same as the value in the **CSRF Token** property of the trigger. The value is case-sensitive. The header name is not.
 - All other headers are sent to the workflow in the `headers` output.
 
-### Body Formats
+#### Body Formats
 
 The `Content-Type` header controls how ByteChef reads the body:
 
@@ -415,7 +415,7 @@ The `Content-Type` header controls how ByteChef reads the body:
 
 An empty JSON or XML body is treated as no body, so `body` is not included. A JSON or XML body that cannot be parsed returns `400 Bad Request`, and the `detail` field of the response describes the error.
 
-### Trigger Output
+#### Trigger Output
 
 All three triggers give the same output to the next steps of the workflow:
 
@@ -443,7 +443,7 @@ All three triggers give the same output to the next steps of the workflow:
 
 In the next steps, refer to these fields with expressions such as `${trigger_1.body.orderId}` or `${trigger_1.parameters.source}`.
 
-### Example Request
+#### Example Request
 
 Configure Postman or Bruno as follows:
 

@@ -406,9 +406,9 @@ This action does not produce any output.
 
 <hr />
 
-# Additional Instructions
+## Additional Instructions
 
-### Data Storage: Scopes, getValue behavior, defaults, and examples
+#### Data Storage: Scopes, getValue behavior, defaults, and examples
 
 This guide complements the component reference and answers common questions with concrete examples.
 
@@ -416,7 +416,7 @@ For the full property list of every action, see the reference page: `/docs/refer
 
 ---
 
-### Scopes explained with examples
+#### Scopes explained with examples
 
 Data Storage actions accept a `scope` that defines how broadly the value is visible and how long it lives.
 
@@ -447,7 +447,7 @@ Notes
 
 ---
 
-### Worked example: building and reading a list (heroes)
+#### Worked example: building and reading a list (heroes)
 
 Imagine a loop where you append three objects to a list under key `heroes`:
 
@@ -459,7 +459,7 @@ Append Value to List (scope: CURRENT_EXECUTION, key: heroes, type: OBJECT, value
 
 Next, add `Get Value` with `key: heroes`, `scope: CURRENT_EXECUTION`, `type: ARRAY`. Suppose the designer auto‑names this step `dataStorage_2`.
 
-#### What does `{dataStorage_2}` contain?
+##### What does `{dataStorage_2}` contain?
 
 It evaluates to the array of objects you stored. Using the example above:
 
@@ -476,7 +476,7 @@ Common projections you can use in expressions:
 - `{dataStorage_2[1].secondName}` → `Duck`
 - Iterate in a downstream loop over `{dataStorage_2}` to process each item.
 
-#### Can I rename `dataStorage_2` to `heroesArray`?
+##### Can I rename `dataStorage_2` to `heroesArray`?
 
 Yes. In the workflow designer, rename the step to a meaningful handle (e.g., `heroesArray`). Thereafter `{heroesArray}` refers to the same output. The handle must be unique within the workflow.
 
@@ -488,7 +488,7 @@ Auto‑naming currently uses the component name with an index (e.g., `dataStorag
 
 ---
 
-### getValue: type, validation and transformations
+#### getValue: type, validation and transformations
 
 `Get Value` retrieves what was previously stored under the given `key` and `scope`.
 
@@ -507,7 +507,7 @@ Important
 
 ---
 
-### Default Value: when and how to use it
+#### Default Value: when and how to use it
 
 `defaultValue` on `Get Value` is returned when the key does not exist in the chosen scope. Examples:
 
@@ -527,9 +527,9 @@ Why does the “Default Value” input sometimes disappear when I choose an expr
 
 ---
 
-### Recipes
+#### Recipes
 
-#### A) Export the list to CSV
+##### A) Export the list to CSV
 
 Goal: Save the `heroes` array as CSV text with two columns `name,secondName`.
 
@@ -554,7 +554,7 @@ Then send `output.csv` to your destination using the corresponding component. Ma
 Tips
 - If your workspace includes a dedicated CSV component, you can map the array of objects and headers directly instead of scripting.
 
-#### B) Append rows to Google Sheets
+##### B) Append rows to Google Sheets
 
 Goal: Append each hero as a new row in a Google Sheet with columns A: `name`, B: `secondName`.
 
@@ -576,7 +576,7 @@ Set the Google Sheets “values”/“rows” parameter to `{script.rows}` and c
 
 ---
 
-### FAQ
+#### FAQ
 
 Can I append a list as a single item?
 - Yes. In `Append Value to List`, set `appendListAsSingleItem: true` to push the entire list as one element instead of concatenating.

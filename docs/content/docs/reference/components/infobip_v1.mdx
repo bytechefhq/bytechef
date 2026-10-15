@@ -460,20 +460,20 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 
 <hr />
 
-# Additional Instructions
+## Additional Instructions
 
-### Keywords
+#### Keywords
 
 Infobip **keywords** are specific words or phrases associated with a number that Infobip uses to decide **how to route incoming messages** and which actions to trigger.
 In ByteChef, the `Keyword` field (used, for example, in the **New WhatsApp Message** trigger) lets you take advantage of this mechanism.
 
-#### How keywords work
+##### How keywords work
 
 - A keyword is typically a word or short code that appears in the incoming message (for example: `START`, `HELP`, `SALES`).
 - Infobip matches incoming messages against the configured keywords on a given number and can perform different actions based on which keyword was used.
 - ByteChef passes the configured keyword to Infobip when enabling the webhook, so only messages that match that keyword (according to Infobip’s rules and configuration) will be delivered to the webhook and can trigger your workflow.
 
-#### When to use a keyword
+##### When to use a keyword
 
 Use a keyword when you want to:
 
@@ -485,12 +485,12 @@ If you do **not** need keyword‑based routing and want to handle all incoming m
 
 For detailed information about how keywords work in Infobip, see the [official documentation](https://www.infobip.com/docs/numbers/keywords-and-actions#configure-keywords-keywords).
 
-### Voice Calls (Real-Time Media Streaming)
+#### Voice Calls (Real-Time Media Streaming)
 
 The **Make Outbound Call** action and the **Inbound Voice Call** trigger stream call audio to a real-time
 sub-workflow over a WebSocket bridge, enabling live audio processing and AI voice conversations.
 
-#### Operator setup
+##### Operator setup
 
 - **Enable media replacement.** Bidirectional audio (the sub-workflow both *receiving* caller audio and
   *sending* audio back into the call) requires **media replacement** to be enabled on the Infobip
