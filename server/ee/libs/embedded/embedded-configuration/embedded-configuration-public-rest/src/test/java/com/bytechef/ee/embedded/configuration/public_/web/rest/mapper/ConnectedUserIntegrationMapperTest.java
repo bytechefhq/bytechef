@@ -147,6 +147,26 @@ class ConnectedUserIntegrationMapperTest {
     }
 
     @Test
+    void testBasicMapperIntegrationInstanceMapsConnectionId() {
+        IntegrationInstance integrationInstance = new IntegrationInstance();
+
+        integrationInstance.setId(6L);
+        integrationInstance.setConnectionId(78L);
+        integrationInstance.setEnabled(true);
+
+        ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationBasicMapper generatedBasicMapper =
+            new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationBasicMapperImpl();
+
+        IntegrationInstanceModel integrationInstanceModel = generatedBasicMapper.map(
+            new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
+                new Connection(), integrationInstance, List.of(), List.of(), List.of()));
+
+        assertEquals(6L, integrationInstanceModel.getId());
+        assertEquals(78L, integrationInstanceModel.getConnectionId());
+        assertEquals(Boolean.TRUE, integrationInstanceModel.getEnabled());
+    }
+
+    @Test
     void testFieldMappingInputMapsTypeAndObjectName() {
         WorkflowInput input = new WorkflowInput(
             new Workflow.Input(
