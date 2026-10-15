@@ -22,22 +22,27 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 
 /**
  * @author Ivica Cardic
  */
 public abstract class CopilotSpringAIAgent extends SpringAIAgent {
+
+    private static final String AWAITING_ANSWER_KEY = "awaitingAnswer";
 
     private static final Logger log = LoggerFactory.getLogger(CopilotSpringAIAgent.class);
 
@@ -141,6 +146,22 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         UUID uuid = UUID.nameUUIDFromBytes(scopedConversationId.getBytes(StandardCharsets.UTF_8));
 
         return uuid.toString();
+    }
+
+    @Override
+    protected boolean endsTurn(ToolResponseMessage.ToolResponse toolResponse) {
+        String responseData = toolResponse.responseData();
+
+        if (responseData == null || !responseData.contains(AWAITING_ANSWER_KEY)) {
+            return false;
+        }
+
+        try {
+            return JsonUtils.read(responseData) instanceof Map<?, ?> response
+                && Boolean.TRUE.equals(response.get(AWAITING_ANSWER_KEY));
+        } catch (RuntimeException exception) {
+            return false;
+        }
     }
 
     @Override

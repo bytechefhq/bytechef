@@ -12,11 +12,16 @@ import com.agui.core.tool.ToolCall;
 import com.agui.server.LocalAgent;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
+import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.model.tool.ToolExecutionResult;
 import org.springframework.ai.tool.ToolCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -221,6 +226,10 @@ public class SpringAIAgent extends LocalAgent {
         return input.threadId();
     }
 
+    protected boolean endsTurn(ToolResponseMessage.ToolResponse toolResponse) {
+        return false;
+    }
+
     /**
      * Hook for subclasses to contribute per-invocation values into Spring AI's
      * {@link org.springframework.ai.chat.model.ToolContext}. The returned map is merged into the request via
@@ -279,6 +288,10 @@ public class SpringAIAgent extends LocalAgent {
                     subscriber.onNewToolCall(call);
                 });
         }
+        if (ToolExecutionResult.FINISH_REASON.equals(evt.getResult().getMetadata().getFinishReason())) {
+            return;
+        }
+
         var content = evt.getResult().getOutput().getText();
 
         if (content != null && !content.isEmpty()) {
@@ -438,6 +451,12 @@ public class SpringAIAgent extends LocalAgent {
             }
         }
 
+        try {
+            chatRequest = chatRequest.advisors(createToolCallingAdvisor());
+        } catch (RuntimeException e) {
+            throw new AGUIException("Could not add the tool calling advisor", e);
+        }
+
         if (Objects.nonNull(this.chatMemory)) {
             try {
                 chatRequest.advisors(
@@ -461,6 +480,20 @@ public class SpringAIAgent extends LocalAgent {
         }
 
         return chatRequest;
+    }
+
+    private ToolCallingAdvisor createToolCallingAdvisor() {
+        boolean hasDownstreamMemoryAdvisor = (Objects.nonNull(this.chatMemory)
+            && Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER > ToolCallingAdvisor.DEFAULT_ORDER)
+            || this.advisors.stream()
+                .anyMatch(advisor -> advisor instanceof MemoryAdvisor
+                    && advisor.getOrder() > ToolCallingAdvisor.DEFAULT_ORDER);
+
+        return ToolCallingAdvisor.builder()
+            .toolCallingManager(
+                new TurnEndingToolCallingManager(ToolCallingManager.builder().build(), this::endsTurn))
+            .conversationHistoryEnabled(!hasDownstreamMemoryAdvisor)
+            .build();
     }
 
     /**

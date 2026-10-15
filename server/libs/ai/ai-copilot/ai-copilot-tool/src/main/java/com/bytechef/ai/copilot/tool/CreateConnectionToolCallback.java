@@ -134,7 +134,7 @@ public class CreateConnectionToolCallback implements ToolCallback {
             return JsonUtils.write(
                 new CreateConnectionOutput(
                     "create-connection", componentName, componentLabel, resolvedFromComponentName,
-                    input.suggestedName()));
+                    input.suggestedName(), true));
         } catch (JacksonException exception) {
             log.warn(
                 "createConnection rejected malformed tool input: {} — first 200 chars of input: {}",
@@ -163,6 +163,6 @@ public class CreateConnectionToolCallback implements ToolCallback {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record CreateConnectionOutput(String kind, String componentName, String componentLabel,
-        @Nullable String resolvedFromComponentName, @Nullable String suggestedName) {
+        @Nullable String resolvedFromComponentName, @Nullable String suggestedName, boolean awaitingAnswer) {
     }
 }
