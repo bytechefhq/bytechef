@@ -31,11 +31,7 @@ const useWorkflowEditorLayout = () => {
                 setNestedClusterRootsComponentDefinitions({});
             }
         },
-        [
-            setClusterElementsCanvasOpen,
-            setNestedClusterRootsComponentDefinitions,
-            setRootClusterElementNodeData,
-        ]
+        [setClusterElementsCanvasOpen, setNestedClusterRootsComponentDefinitions, setRootClusterElementNodeData]
     );
 
     useEffect(() => {

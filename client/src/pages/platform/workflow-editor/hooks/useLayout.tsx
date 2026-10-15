@@ -22,8 +22,8 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 import {useStoreWithEqualityFn} from 'zustand/traditional';
 
-import {getNestedClusterElements, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useClusterElementNodes from '../../cluster-element-editor/hooks/useClusterElementNodes';
+import {getNestedClusterElements, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
@@ -88,8 +88,11 @@ function getClusterElementsFingerprint(clusterElements: unknown): string {
                 const nestedClusterElements = getNestedClusterElements(element);
                 const nestedFingerprint = getClusterElementsFingerprint(nestedClusterElements);
                 const nestedFingerprintPart = nestedFingerprint ? '{' + nestedFingerprint + '}' : '';
+                const nodePosition = (element as {metadata?: {ui?: {nodePosition?: {x: number; y: number}}}}).metadata
+                    ?.ui?.nodePosition;
+                const positionPart = nodePosition ? `@${nodePosition.x},${nodePosition.y}` : '';
 
-                return `${elementName}:${element.type}${nestedFingerprintPart}`;
+                return `${elementName}:${element.type}${positionPart}${nestedFingerprintPart}`;
             });
 
             return `${elementKey}[${elementFingerprints.join(';')}]`;
@@ -922,9 +925,12 @@ export default function useLayout({
         // deleted task dispatcher children disappear at the same time as the parent,
         // rather than lingering until the async layout calculation resolves.
         const newNodeIds = new Set(
-            [...layoutNodes, ...hiddenTrailingBranchPlaceholderNodes, ...stickyNoteNodes, ...Object.values(nodesByRootId).flat()].map(
-                (node) => node.id
-            )
+            [
+                ...layoutNodes,
+                ...hiddenTrailingBranchPlaceholderNodes,
+                ...stickyNoteNodes,
+                ...Object.values(nodesByRootId).flat(),
+            ].map((node) => node.id)
         );
         const prunedNodes = frozenNodes.filter((node) => newNodeIds.has(node.id));
 
@@ -1058,6 +1064,7 @@ export default function useLayout({
         nodesByRootId,
         clusterFrameLockedByRootId,
         clusterElementsViewMode,
+    ]);
 
     useEffect(() => {
         if (!isWorkflowLoaded && !readOnlyWorkflow) {
