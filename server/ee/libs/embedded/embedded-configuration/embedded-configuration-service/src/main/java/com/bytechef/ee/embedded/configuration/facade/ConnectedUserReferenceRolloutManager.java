@@ -82,7 +82,9 @@ public class ConnectedUserReferenceRolloutManager {
         for (ProjectDeployment projectDeployment : projectDeploymentService.getAllProjectDeployments(
             automationWorkflowProjectId)) {
 
-            if (!connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment.getId())) {
+            if (!connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment.getId()) &&
+                !connectedUserReferenceDeploymentManager.isLegacyReferenceDeployment(projectDeployment)) {
+
                 continue;
             }
 

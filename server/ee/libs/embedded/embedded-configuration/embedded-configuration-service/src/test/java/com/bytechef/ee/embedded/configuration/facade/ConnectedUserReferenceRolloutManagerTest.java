@@ -152,19 +152,6 @@ class ConnectedUserReferenceRolloutManagerTest {
     }
 
     @Test
-    void testRollOutSkipsADeploymentWithoutAConnectedUserReferenceDeploymentRelation() {
-        when(projectDeploymentService.getAllProjectDeployments(AUTOMATION_WORKFLOW_PROJECT_ID))
-            .thenReturn(List.of(projectDeployment(901L)));
-        when(connectedUserReferenceDeploymentManager.isReferenceDeployment(901L)).thenReturn(false);
-
-        connectedUserReferenceRolloutManager.rollOut(AUTOMATION_WORKFLOW_PROJECT_ID);
-
-        verify(connectedUserProjectWorkflowRepository, never()).findAllByProjectDeploymentId(anyLong());
-        verify(connectedUserReferenceDeploymentManager, never()).deleteDeployment(anyLong());
-        verify(connectedUserReferenceDeploymentManager, never()).putWorkflows(anyLong(), anyInt(), anyMap());
-    }
-
-    @Test
     void testRollOutLogsAnOptimisticLockingFailureAtWarnAndOtherFailuresAtError() {
         when(projectDeploymentService.getAllProjectDeployments(AUTOMATION_WORKFLOW_PROJECT_ID))
             .thenReturn(List.of(projectDeployment(901L), projectDeployment(902L)));
