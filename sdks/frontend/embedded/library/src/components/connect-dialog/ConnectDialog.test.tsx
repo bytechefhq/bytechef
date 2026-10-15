@@ -70,7 +70,7 @@ describe('ConnectDialog', () => {
     ) => ({
         register: (name?: string) => ({
             name: name || 'test-field',
-            defaultValue: '',
+            defaultValue: undefined,
             ref: () => {},
             onInput: () => {},
             onChange: () => {},
@@ -301,7 +301,11 @@ describe('ConnectDialog', () => {
                     {
                         name: 'country',
                         label: 'Country',
-                        options: ['USA', 'Canada', 'UK'],
+                        options: [
+                            {label: 'USA', value: 'US'},
+                            {label: 'Canada', value: 'CA'},
+                            {label: 'UK', value: 'GB'},
+                        ],
                     },
                 ] as PropertyType[],
                 form: createFormMock(),
@@ -316,6 +320,45 @@ describe('ConnectDialog', () => {
             expect(screen.getByText('Select Country')).toBeInTheDocument();
             expect(screen.getByText('USA')).toBeInTheDocument();
             expect(screen.getByText('Canada')).toBeInTheDocument();
+            expect(screen.getByRole('option', {name: 'USA'})).toHaveValue('US');
+        });
+
+        it('preselects the default value of a property', () => {
+            const props = {
+                ...createConnectionProps,
+                integration: {name: 'Test'} as IntegrationType,
+                properties: [
+                    {
+                        defaultValue: 'HEADER',
+                        label: 'Add to',
+                        name: 'addTo',
+                        options: [
+                            {label: 'Header', value: 'HEADER'},
+                            {label: 'QueryParams', value: 'QUERY_PARAMETERS'},
+                        ],
+                    },
+                    {defaultValue: 'token', label: 'Key', name: 'key'},
+                ] as PropertyType[],
+                form: createFormMock(),
+            };
+
+            render(<ConnectDialog {...props} />);
+
+            expect(screen.getByRole('combobox', {name: /add to/i})).toHaveValue('HEADER');
+            expect(screen.getByRole('textbox', {name: /key/i})).toHaveValue('token');
+        });
+
+        it('renders a text input when options are empty', () => {
+            const props = {
+                ...createConnectionProps,
+                integration: {name: 'Test'} as IntegrationType,
+                properties: [{label: 'Value', name: 'value', options: []}] as unknown as PropertyType[],
+                form: createFormMock(),
+            };
+
+            render(<ConnectDialog {...props} />);
+
+            expect(screen.getByRole('textbox', {name: /value/i})).toBeInTheDocument();
         });
 
         it('displays required field indicators for required fields', () => {
