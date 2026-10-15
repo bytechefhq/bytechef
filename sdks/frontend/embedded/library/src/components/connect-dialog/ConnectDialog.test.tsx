@@ -141,6 +141,8 @@ describe('ConnectDialog', () => {
             expect(screen.getByText('Close')).toBeInTheDocument();
 
             expect(screen.queryByText('Continue')).not.toBeInTheDocument();
+
+            expect(within(screen.getByRole('contentinfo')).getByText(/Powered by/)).toBeInTheDocument();
         });
 
         it('displays integration content when data is available', () => {
@@ -164,6 +166,11 @@ describe('ConnectDialog', () => {
 
             expect(primaryButton).toBeInTheDocument();
             expect(primaryButton).toBeEnabled();
+
+            const footer = screen.getByRole('contentinfo');
+
+            expect(within(footer).getByText(/Powered by/)).toBeInTheDocument();
+            expect(within(footer).getByRole('button', {name: /connect/i})).toBe(primaryButton);
         });
 
         it('shows a save error as an alert above the footer', () => {
