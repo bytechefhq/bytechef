@@ -2329,6 +2329,9 @@ components:
         - "value"
         - "type"
       properties:
+        defaultValue:
+          description: "The default value of an input"
+          type: "string"
         internalOnly:
           description: "If true, the input is configured in the admin IntegrationInstanceConfigurationDialog; if false (default), it is rendered in the end-user ConnectDialog."
           type: "boolean"
@@ -2342,6 +2345,11 @@ components:
         objectName:
           description: "For FIELD_MAPPING inputs, the object name used to match the SDK mapObjectFields config."
           type: "string"
+        options:
+          description: "The static options an input value is chosen from"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Option"
         required:
           description: "If an input is required, or not"
           type: "boolean"

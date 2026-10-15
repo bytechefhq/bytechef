@@ -4,10 +4,14 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputTypeModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -24,8 +28,10 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-15T12:50:13.838758+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class InputModel {
+
+  private @Nullable String defaultValue;
 
   private Boolean internalOnly = false;
 
@@ -34,6 +40,8 @@ public class InputModel {
   private String name;
 
   private @Nullable String objectName;
+
+  private List<@Valid OptionModel> options = new ArrayList<>();
 
   private Boolean required = false;
 
@@ -51,6 +59,27 @@ public class InputModel {
   public InputModel(String name, InputTypeModel type) {
     this.name = name;
     this.type = type;
+  }
+
+  public InputModel defaultValue(@Nullable String defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  /**
+   * The default value of an input
+   * @return defaultValue
+   */
+  
+  @Schema(name = "defaultValue", description = "The default value of an input", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
+  public @Nullable String getDefaultValue() {
+    return defaultValue;
+  }
+
+  @JsonProperty("defaultValue")
+  public void setDefaultValue(@Nullable String defaultValue) {
+    this.defaultValue = defaultValue;
   }
 
   public InputModel internalOnly(Boolean internalOnly) {
@@ -137,6 +166,35 @@ public class InputModel {
     this.objectName = objectName;
   }
 
+  public InputModel options(List<@Valid OptionModel> options) {
+    this.options = options;
+    return this;
+  }
+
+  public InputModel addOptionsItem(OptionModel optionsItem) {
+    if (this.options == null) {
+      this.options = new ArrayList<>();
+    }
+    this.options.add(optionsItem);
+    return this;
+  }
+
+  /**
+   * The static options an input value is chosen from
+   * @return options
+   */
+  
+  @Schema(name = "options", description = "The static options an input value is chosen from", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("options")
+  public List<@Valid OptionModel> getOptions() {
+    return options;
+  }
+
+  @JsonProperty("options")
+  public void setOptions(List<@Valid OptionModel> options) {
+    this.options = options;
+  }
+
   public InputModel required(Boolean required) {
     this.required = required;
     return this;
@@ -209,10 +267,12 @@ public class InputModel {
       return false;
     }
     InputModel input = (InputModel) o;
-    return Objects.equals(this.internalOnly, input.internalOnly) &&
+    return Objects.equals(this.defaultValue, input.defaultValue) &&
+        Objects.equals(this.internalOnly, input.internalOnly) &&
         Objects.equals(this.label, input.label) &&
         Objects.equals(this.name, input.name) &&
         Objects.equals(this.objectName, input.objectName) &&
+        Objects.equals(this.options, input.options) &&
         Objects.equals(this.required, input.required) &&
         Objects.equals(this.type, input.type) &&
         Objects.equals(this.componentReference, input.componentReference);
@@ -220,17 +280,19 @@ public class InputModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(internalOnly, label, name, objectName, required, type, componentReference);
+    return Objects.hash(defaultValue, internalOnly, label, name, objectName, options, required, type, componentReference);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class InputModel {\n");
+    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
     sb.append("    internalOnly: ").append(toIndentedString(internalOnly)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    objectName: ").append(toIndentedString(objectName)).append("\n");
+    sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    componentReference: ").append(toIndentedString(componentReference)).append("\n");
