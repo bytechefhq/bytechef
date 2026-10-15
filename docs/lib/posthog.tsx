@@ -3,9 +3,8 @@ import type {PostHog} from "posthog-js";
 import {Suspense, useEffect, type ReactNode} from "react";
 
 let postHogPromise: Promise<PostHog> | undefined
+let lastCapturedUrl: string | undefined
 
-// posthog-js is a quarter of a megabyte; fetching it once the browser is idle keeps it out of every page's
-// first-load JavaScript, which is what decides how soon the page can paint.
 function loadPostHog(): Promise<PostHog> {
   postHogPromise ??= import("posthog-js").then(({default: posthog}) => {
     posthog.init('phc_oZ9XWAVf8xf6sI7IYBAbGldSbiud07ioZItD1XvhJ7S', {
@@ -25,16 +24,12 @@ function loadPostHog(): Promise<PostHog> {
   return postHogPromise
 }
 
-function whenIdle(callback: () => void): () => void {
-  if (typeof window.requestIdleCallback === "function") {
-    const handle = window.requestIdleCallback(callback, {timeout: 4000})
-
-    return () => window.cancelIdleCallback(handle)
+function whenLoaded(callback: () => void): void {
+  if (document.readyState === "complete") {
+    callback()
+  } else {
+    window.addEventListener("load", callback, {once: true})
   }
-
-  const handle = window.setTimeout(callback, 1)
-
-  return () => window.clearTimeout(handle)
 }
 
 function PostHogPageView() : null {
@@ -52,7 +47,13 @@ function PostHogPageView() : null {
       url = url + `?${searchParams.toString()}`
     }
 
-    return whenIdle(() => {
+    if (url === lastCapturedUrl) {
+      return
+    }
+
+    lastCapturedUrl = url
+
+    whenLoaded(() => {
       loadPostHog()
         .then((posthog) => posthog.capture('$pageview', { '$current_url': url }))
         .catch((error: unknown) => console.warn('PostHog failed to load', error))
