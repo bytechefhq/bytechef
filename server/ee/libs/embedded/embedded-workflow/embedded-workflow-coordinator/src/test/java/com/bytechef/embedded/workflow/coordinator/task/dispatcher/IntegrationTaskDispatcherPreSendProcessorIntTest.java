@@ -8,6 +8,7 @@
 package com.bytechef.embedded.workflow.coordinator.task.dispatcher;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -132,11 +133,33 @@ class IntegrationTaskDispatcherPreSendProcessorIntTest {
             .get(MetadataConstants.CONNECTION_IDS)).isEqualTo(Map.of("hubspot_1", CONNECTED_USER_CONNECTION_ID));
     }
 
+    @Test
+    void processBindsConnectedUserConnectionToDeclaredIntegrationComponentConnection() {
+        TaskExecution taskExecution = stubEmbeddedJobTask(
+            "fetchContacts", "codeWorkflow/v1/perform",
+            Map.of(
+                "connections",
+                Map.of(
+                    "crm", Map.of("componentName", INTEGRATION_COMPONENT_NAME, "componentVersion", 1),
+                    "chat", Map.of("componentName", "slack", "componentVersion", 1))));
+
+        TaskExecution result = processor.process(taskExecution);
+
+        assertThat(result.getMetadata()
+            .get(MetadataConstants.CONNECTION_IDS)).isEqualTo(Map.of("crm", CONNECTED_USER_CONNECTION_ID));
+    }
+
     private TaskExecution stubEmbeddedJobTask(String taskName, String taskType) {
+        return stubEmbeddedJobTask(taskName, taskType, Map.of());
+    }
+
+    private TaskExecution stubEmbeddedJobTask(String taskName, String taskType, Map<String, ?> extensions) {
         WorkflowTask workflowTask = mock(WorkflowTask.class);
 
         when(workflowTask.getName()).thenReturn(taskName);
         when(workflowTask.getType()).thenReturn(taskType);
+        doReturn(extensions).when(workflowTask)
+            .getExtensions();
 
         Job job = mock(Job.class);
 
