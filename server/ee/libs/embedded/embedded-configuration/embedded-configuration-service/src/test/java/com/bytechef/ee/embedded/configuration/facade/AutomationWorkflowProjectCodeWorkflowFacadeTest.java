@@ -126,19 +126,29 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
     }
 
     @Test
-    void testSaveReturnsWarningForWorkflowWithNoPubliclyInvocableTrigger() {
-        when(automationWorkflowProjectFacade.fetchProjectIdByName("acme-billing")).thenReturn(Optional.of(100L));
-
-        Project project = new Project();
-
-        project.setId(100L);
-
-        when(projectService.getProject(100L)).thenReturn(project);
-
-        List<String> warnings = facade().save(jsProject("acme-billing"), Language.JAVASCRIPT);
+    void testSaveReturnsWarningForWorkflowWithNoTrigger() {
+        List<String> warnings = saveWithTriggers("");
 
         assertThat(warnings).hasSize(1);
-        assertThat(warnings.getFirst()).contains("will not be invocable");
+        assertThat(warnings.getFirst()).contains("has no trigger that can start it");
+    }
+
+    @Test
+    void testSaveReturnsWarningForWorkflowWithOnlyManualTrigger() {
+        List<String> warnings = saveWithTriggers("{name: 'manual', type: 'manual/v1/manual'}");
+
+        assertThat(warnings).hasSize(1);
+        assertThat(warnings.getFirst()).contains("has no trigger that can start it");
+    }
+
+    @Test
+    void testSaveReturnsNoWarningForWorkflowWithPollingTrigger() {
+        assertThat(saveWithTriggers("{name: 'newEmail', type: 'googleMail/v1/newEmailPolling'}")).isEmpty();
+    }
+
+    @Test
+    void testSaveReturnsNoWarningForWorkflowWithRequestTrigger() {
+        assertThat(saveWithTriggers("{name: 'request', type: 'request/v1/request'}")).isEmpty();
     }
 
     @Test
@@ -341,8 +351,24 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
             projectCodeWorkflowService, projectService);
     }
 
-    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private List<String> saveWithTriggers(String triggers) {
+        when(automationWorkflowProjectFacade.fetchProjectIdByName("acme-billing")).thenReturn(Optional.of(100L));
+
+        Project project = new Project();
+
+        project.setId(100L);
+
+        when(projectService.getProject(100L)).thenReturn(project);
+
+        return facade().save(jsProject("acme-billing", triggers), Language.JAVASCRIPT);
+    }
+
     private static byte[] jsProject(String name) {
+        return jsProject(name, "");
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private static byte[] jsProject(String name, String triggers) {
         String source = """
             ({
                 name: "%s",
@@ -352,6 +378,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
                     {
                         name: "charge",
                         label: "Charge",
+                        triggers: [%s],
                         tasks: [
                             {
                                 name: "my-task",
@@ -364,7 +391,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
                     }
                 ]
             })
-            """.formatted(name);
+            """.formatted(name, triggers);
 
         return source.getBytes(StandardCharsets.UTF_8);
     }
