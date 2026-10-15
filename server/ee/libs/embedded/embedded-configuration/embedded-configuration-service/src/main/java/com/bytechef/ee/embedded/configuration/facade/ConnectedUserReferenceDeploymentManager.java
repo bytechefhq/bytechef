@@ -21,8 +21,10 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
+import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -53,6 +55,7 @@ class ConnectedUserReferenceDeploymentManager {
 
     private static final String MARKER = "__EMBEDDED__";
 
+    private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
     private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserService connectedUserService;
     private final ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver;
@@ -65,6 +68,7 @@ class ConnectedUserReferenceDeploymentManager {
 
     @SuppressFBWarnings("EI")
     public ConnectedUserReferenceDeploymentManager(
+        ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
         ConnectedUserService connectedUserService,
         ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver,
@@ -72,6 +76,7 @@ class ConnectedUserReferenceDeploymentManager {
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
+        this.connectedUserProjectWorkflowRepository = connectedUserProjectWorkflowRepository;
         this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.connectedUserService = connectedUserService;
         this.connectedUserWorkflowConnectionResolver = connectedUserWorkflowConnectionResolver;
@@ -81,6 +86,23 @@ class ConnectedUserReferenceDeploymentManager {
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
+    }
+
+    public boolean adoptLegacyDeployment(ProjectDeployment projectDeployment, long connectedUserId) {
+        long automationWorkflowProjectId = projectDeployment.getProjectId();
+
+        if (!isLegacyReferenceDeployment(projectDeployment) ||
+            connectedUserReferenceDeploymentService
+                .fetchConnectedUserReferenceDeployment(connectedUserId, automationWorkflowProjectId)
+                .isPresent()) {
+
+            return false;
+        }
+
+        connectedUserReferenceDeploymentService.create(
+            connectedUserId, automationWorkflowProjectId, projectDeployment.getId());
+
+        return true;
     }
 
     public void deleteDeployment(long projectDeploymentId) {
@@ -150,6 +172,7 @@ class ConnectedUserReferenceDeploymentManager {
         return connectedUserReferenceDeploymentService
             .fetchConnectedUserReferenceDeployment(connectedUser.getId(), automationWorkflowProjectId)
             .map(ConnectedUserReferenceDeployment::getProjectDeploymentId)
+            .or(() -> adoptReferencedLegacyDeployment(automationWorkflowProjectId, connectedUser.getId()))
             .orElseGet(() -> createDeployment(automationWorkflowProjectId, connectedUser));
     }
 
@@ -281,6 +304,36 @@ class ConnectedUserReferenceDeploymentManager {
             new ResolvedWorkflowConnections(row.getConnections(), List.of()), row.isEnabled(), inputs);
 
         putWorkflow(projectDeployment, automationWorkflowUuid, rowSpec);
+    }
+
+    private Optional<Long> adoptReferencedLegacyDeployment(long automationWorkflowProjectId, long connectedUserId) {
+        List<Long> referencedProjectDeploymentIds = connectedUserProjectWorkflowRepository
+            .findAllByConnectedUserId(connectedUserId)
+            .stream()
+            .map(ConnectedUserProjectWorkflow::getProjectDeploymentId)
+            .filter(Objects::nonNull)
+            .distinct()
+            .sorted()
+            .toList();
+
+        for (long referencedProjectDeploymentId : referencedProjectDeploymentIds) {
+            Optional<ProjectDeployment> projectDeploymentOptional = projectDeploymentService.fetchProjectDeployment(
+                referencedProjectDeploymentId);
+
+            if (projectDeploymentOptional.isEmpty()) {
+                continue;
+            }
+
+            ProjectDeployment projectDeployment = projectDeploymentOptional.get();
+
+            if (projectDeployment.getProjectId() == automationWorkflowProjectId &&
+                adoptLegacyDeployment(projectDeployment, connectedUserId)) {
+
+                return Optional.of(referencedProjectDeploymentId);
+            }
+        }
+
+        return Optional.empty();
     }
 
     private long createDeployment(long automationWorkflowProjectId, ConnectedUser connectedUser) {
