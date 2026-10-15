@@ -63,31 +63,36 @@ public class ProjectTools {
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectFacade projectFacade;
     private final ProjectTagFacade projectTagFacade;
+    private final ScopedProjectGuard scopedProjectGuard;
     private final WorkspaceFacade workspaceFacade;
 
     @SuppressFBWarnings("EI")
     public ProjectTools(
         ProjectCategoryFacade projectCategoryFacade, ProjectDeploymentFacade projectDeploymentFacade,
-        ProjectFacade projectFacade, ProjectTagFacade projectTagFacade, WorkspaceFacade workspaceFacade) {
+        ProjectFacade projectFacade, ProjectTagFacade projectTagFacade, ScopedProjectGuard scopedProjectGuard,
+        WorkspaceFacade workspaceFacade) {
 
         this.projectCategoryFacade = projectCategoryFacade;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectFacade = projectFacade;
         this.projectTagFacade = projectTagFacade;
+        this.scopedProjectGuard = scopedProjectGuard;
         this.workspaceFacade = workspaceFacade;
     }
 
     @Tool(
-        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status.")
+        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
     public List<ProjectInfo> listProjects(
         @ToolParam(
             required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.LIST_PROJECTS);
+        Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
+        Long resolvedWorkspaceId = scopedProjectId == null
+            ? requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.LIST_PROJECTS) : null;
 
         try {
-            List<ProjectInfo> projectInfos = getWorkspaceProjects(resolvedWorkspaceId).stream()
+            List<ProjectInfo> projectInfos = getAccessibleProjects(scopedProjectId, resolvedWorkspaceId).stream()
                 .map(ProjectTools::getProjectInfo)
                 .toList();
 
@@ -107,7 +112,10 @@ public class ProjectTools {
     @Tool(
         description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
     public ProjectDetailInfo getProject(
-        @ToolParam(description = "The ID of the project to retrieve") long projectId) {
+        @ToolParam(description = "The ID of the project to retrieve") long projectId, ToolContext toolContext) {
+
+        scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_VIEW, toolContext,
+            ProjectErrorType.GET_PROJECT);
 
         try {
             ProjectDTO projectDTO = projectFacade.getProject(projectId);
@@ -145,20 +153,22 @@ public class ProjectTools {
     }
 
     @Tool(
-        description = "Full-text search across the projects of a workspace. Returns a list of projects matching the search query in name or description.")
+        description = "Full-text search across the projects of a workspace. Returns a list of projects matching the search query in name or description. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
     public List<ProjectInfo> searchProjects(
         @ToolParam(description = "The search query to match against project names and descriptions") String query,
         @ToolParam(
             required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.SEARCH_PROJECTS);
+        Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
+        Long resolvedWorkspaceId = scopedProjectId == null
+            ? requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.SEARCH_PROJECTS) : null;
 
         try {
             String lowerQuery = query.toLowerCase()
                 .trim();
 
-            List<ProjectInfo> matchingProjects = getWorkspaceProjects(resolvedWorkspaceId).stream()
+            List<ProjectInfo> matchingProjects = getAccessibleProjects(scopedProjectId, resolvedWorkspaceId).stream()
                 .filter(projectDTO -> contains(projectDTO.name(), lowerQuery) ||
                     contains(projectDTO.description(), lowerQuery))
                 .map(ProjectTools::getProjectInfo)
@@ -181,7 +191,10 @@ public class ProjectTools {
     @Tool(
         description = "Get project deployment and execution status. Returns detailed status information including deployment environments and their states.")
     public ProjectStatusInfo getProjectStatus(
-        @ToolParam(description = "The ID of the project to get status for") long projectId) {
+        @ToolParam(description = "The ID of the project to get status for") long projectId, ToolContext toolContext) {
+
+        scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_VIEW, toolContext,
+            ProjectErrorType.GET_PROJECT_STATUS);
 
         try {
             ProjectDTO projectDTO = projectFacade.getProject(projectId);
@@ -212,7 +225,7 @@ public class ProjectTools {
     }
 
     @Tool(
-        description = "Create a new project with workflows. Returns the created project information including id, name, description, and status.")
+        description = "Create a new project. Returns the created project information including id, name, description, and status. Not available in an embedded chat confined to one project.")
     public ProjectInfo createProject(
         @ToolParam(description = "The name of the new project") String name,
         @ToolParam(required = false, description = "The description of the new project") String description,
@@ -221,6 +234,8 @@ public class ProjectTools {
             required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         @ToolParam(required = false, description = "The tag IDs to associate with the project") List<Long> tagIds,
         ToolContext toolContext) {
+
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.CREATE_PROJECT);
 
         long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.CREATE_PROJECT);
 
@@ -257,13 +272,16 @@ public class ProjectTools {
     }
 
     @Tool(
-        description = "Update project settings and metadata. Returns the updated project information including id, name, description, and status.")
+        description = "Update project settings and metadata. Returns the updated project information including id, name, description, and status. Not available in an embedded chat confined to one project.")
     public ProjectInfo updateProject(
         @ToolParam(description = "The ID of the project to update") long projectId,
         @ToolParam(required = false, description = "The new name of the project") String name,
         @ToolParam(required = false, description = "The new description of the project") String description,
         @ToolParam(required = false, description = "The new category ID for the project") Long categoryId,
-        @ToolParam(required = false, description = "The new tag IDs to associate with the project") List<Long> tagIds) {
+        @ToolParam(required = false, description = "The new tag IDs to associate with the project") List<Long> tagIds,
+        ToolContext toolContext) {
+
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.UPDATE_PROJECT);
 
         try {
             ProjectDTO existingProjectDTO = projectFacade.getProject(projectId);
@@ -304,9 +322,11 @@ public class ProjectTools {
     }
 
     @Tool(
-        description = "Delete a project and all its workflows. Returns a confirmation message.")
+        description = "Delete a project and all its workflows. Returns a confirmation message. Not available in an embedded chat confined to one project.")
     public String deleteProject(
-        @ToolParam(description = "The ID of the project to delete") long projectId) {
+        @ToolParam(description = "The ID of the project to delete") long projectId, ToolContext toolContext) {
+
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.DELETE_PROJECT);
 
         try {
             ProjectDTO projectDTO = projectFacade.getProject(projectId);
@@ -330,10 +350,13 @@ public class ProjectTools {
     }
 
     @Tool(
-        description = "Publish a project version for deployment. Returns the published project version information.")
+        description = "Publish a project version for deployment. Returns the published project version information. Not available in an embedded chat confined to one project.")
     public ProjectPublishInfo publishProject(
         @ToolParam(description = "The ID of the project to publish") long projectId,
-        @ToolParam(required = false, description = "The description for this published version") String description) {
+        @ToolParam(required = false, description = "The description for this published version") String description,
+        ToolContext toolContext) {
+
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.PUBLISH_PROJECT);
 
         try {
             int publishedVersion = projectFacade.publishProject(projectId, description, false);
@@ -406,8 +429,13 @@ public class ProjectTools {
         return tags;
     }
 
-    private List<ProjectDTO> getWorkspaceProjects(long workspaceId) {
-        return projectFacade.getWorkspaceProjects(null, null, false, null, null, null, workspaceId);
+    private List<ProjectDTO> getAccessibleProjects(@Nullable Long scopedProjectId, @Nullable Long workspaceId) {
+        if (scopedProjectId != null) {
+            return List.of(projectFacade.getProject(scopedProjectId));
+        }
+
+        return projectFacade.getWorkspaceProjects(
+            null, null, false, null, null, null, Objects.requireNonNull(workspaceId));
     }
 
     private static boolean contains(@Nullable String value, String lowerQuery) {

@@ -42,7 +42,7 @@ public class ReadProjectTools {
     }
 
     @Tool(
-        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status.")
+        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
     public List<ProjectInfo> listProjects(
         @ToolParam(
             required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
@@ -54,12 +54,13 @@ public class ReadProjectTools {
     @Tool(
         description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
     public ProjectDetailInfo getProject(
-        @ToolParam(description = "The ID of the project to retrieve") long projectId) {
-        return delegate.getProject(projectId);
+        @ToolParam(description = "The ID of the project to retrieve") long projectId, ToolContext toolContext) {
+
+        return delegate.getProject(projectId, toolContext);
     }
 
     @Tool(
-        description = "Full-text search across the projects of a workspace. Returns a list of projects matching the search query in name or description.")
+        description = "Full-text search across the projects of a workspace. Returns a list of projects matching the search query in name or description. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
     public List<ProjectInfo> searchProjects(
         @ToolParam(description = "The search query to match against project names and descriptions") String query,
         @ToolParam(
@@ -72,7 +73,8 @@ public class ReadProjectTools {
     @Tool(
         description = "Get project deployment and execution status. Returns detailed status information including deployment environments and their states.")
     public ProjectStatusInfo getProjectStatus(
-        @ToolParam(description = "The ID of the project to get status for") long projectId) {
-        return delegate.getProjectStatus(projectId);
+        @ToolParam(description = "The ID of the project to get status for") long projectId, ToolContext toolContext) {
+
+        return delegate.getProjectStatus(projectId, toolContext);
     }
 }
