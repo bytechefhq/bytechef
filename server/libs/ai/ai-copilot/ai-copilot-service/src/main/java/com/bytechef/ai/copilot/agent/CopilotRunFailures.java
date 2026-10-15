@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * @author Ivica Cardic
@@ -33,9 +35,13 @@ final class CopilotRunFailures {
     static final String API_KEY_REJECTED = "The AI provider rejected its API key. Ask an administrator to check it.";
     static final String CONVERSATION_TOO_LONG = "This conversation is too long for the AI model. Start a new chat.";
 
-    private static final Pattern RATE_LIMIT_STATUS = Pattern.compile("\\b429\\b");
-    private static final Pattern OVERLOADED_STATUS = Pattern.compile("\\b529\\b");
-    private static final Pattern UNAUTHORIZED_STATUS = Pattern.compile("\\b401\\b");
+    private static final Pattern MISSING_API_KEY = Pattern.compile(
+        "\\b(?:no|missing)\\s+api[ _-]?key|api[ _-]?key\\b[^.]*\\b(?:not set|must be set|is required|not configured|" +
+            "is missing)",
+        Pattern.CASE_INSENSITIVE);
+    private static final Pattern RATE_LIMIT_STATUS = httpStatusPattern(429);
+    private static final Pattern OVERLOADED_STATUS = httpStatusPattern(529);
+    private static final Pattern UNAUTHORIZED_STATUS = httpStatusPattern(401);
 
     private CopilotRunFailures() {
     }
@@ -55,6 +61,10 @@ final class CopilotRunFailures {
     }
 
     private static @Nullable String describeOne(Throwable throwable) {
+        if (throwable instanceof AuthenticationException || throwable instanceof AccessDeniedException) {
+            return null;
+        }
+
         Class<? extends Throwable> throwableClass = throwable.getClass();
 
         String className = throwableClass.getSimpleName()
@@ -81,6 +91,12 @@ final class CopilotRunFailures {
             return OVERLOADED;
         }
 
+        if (MISSING_API_KEY.matcher(message)
+            .find()) {
+
+            return null;
+        }
+
         if (className.contains("unauthorized") || className.contains("authentication")
             || lowerCaseMessage.contains("api key") || lowerCaseMessage.contains("api_key")
             || lowerCaseMessage.contains("x-api-key") || UNAUTHORIZED_STATUS.matcher(message)
@@ -96,5 +112,11 @@ final class CopilotRunFailures {
         }
 
         return null;
+    }
+
+    private static Pattern httpStatusPattern(int statusCode) {
+        return Pattern.compile(
+            "(?:^|\\bHTTP(?:/[\\d.]+)?\\s*|\\bstatus(?:\\s+code)?\\s*[:=]?\\s*)" + statusCode + "\\b",
+            Pattern.CASE_INSENSITIVE);
     }
 }
