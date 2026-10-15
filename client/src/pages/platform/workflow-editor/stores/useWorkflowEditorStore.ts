@@ -5,6 +5,11 @@ import {NestedClusterRootComponentDefinitionType, NodeDataType} from '@/shared/t
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
+export interface PendingClusterElementDropI {
+    componentDefinition: ComponentDefinition;
+    placeholderId: string;
+}
+
 export interface WorkflowEditorI {
     clusterElementsCanvasOpen: boolean;
     setClusterElementsCanvasOpen: (clusterElementsCanvasOpen: boolean) => void;
@@ -23,6 +28,9 @@ export interface WorkflowEditorI {
 
     nodesLocked: boolean;
     setNodesLocked: (nodesLocked: boolean) => void;
+
+    pendingClusterElementDrop: PendingClusterElementDropI | undefined;
+    setPendingClusterElementDrop: (pendingClusterElementDrop: PendingClusterElementDropI | undefined) => void;
 
     nestedClusterRootsComponentDefinitions: Record<string, NestedClusterRootComponentDefinitionType>;
     setNestedClusterRootsComponentDefinitions: (
@@ -110,6 +118,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setNodesLocked: (nodesLocked) =>
                 set(() => ({
                     nodesLocked,
+                })),
+
+            pendingClusterElementDrop: undefined,
+            setPendingClusterElementDrop: (pendingClusterElementDrop) =>
+                set(() => ({
+                    pendingClusterElementDrop,
                 })),
 
             nestedClusterRootsComponentDefinitions: {},

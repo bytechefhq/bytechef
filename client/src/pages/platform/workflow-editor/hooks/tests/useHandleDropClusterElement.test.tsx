@@ -88,6 +88,7 @@ describe('useHandleDrop for a cluster element placeholder', () => {
                     name: 'aiAgent',
                 },
             },
+            pendingClusterElementDrop: undefined,
         } as unknown as Parameters<typeof useWorkflowEditorStore.setState>[0]);
     });
 
@@ -125,5 +126,28 @@ describe('useHandleDrop for a cluster element placeholder', () => {
         await result.current[4](MODEL_PLACEHOLDER_NODE, droppedOpenAi);
 
         expect(saveWorkflowDefinition).not.toHaveBeenCalled();
+        expect(useWorkflowEditorStore.getState().pendingClusterElementDrop).toBeUndefined();
+    });
+
+    it('asks which element to add when the dropped component has several of the placeholder type', async () => {
+        const componentDefinitionWithTwoModels = {
+            ...OPEN_AI_COMPONENT_DEFINITION,
+            clusterElements: [
+                ...OPEN_AI_COMPONENT_DEFINITION.clusterElements,
+                {componentName: 'openAi', componentVersion: 1, name: 'reasoningModel', type: 'MODEL'},
+            ],
+        };
+
+        hoisted.query.mockResolvedValue(componentDefinitionWithTwoModels);
+
+        const {result} = renderHook(() => useHandleDrop({taskDispatcherDefinitions: []}));
+
+        await result.current[4](MODEL_PLACEHOLDER_NODE, droppedOpenAi);
+
+        expect(saveWorkflowDefinition).not.toHaveBeenCalled();
+        expect(useWorkflowEditorStore.getState().pendingClusterElementDrop).toEqual({
+            componentDefinition: componentDefinitionWithTwoModels,
+            placeholderId: MODEL_PLACEHOLDER_NODE.id,
+        });
     });
 });
