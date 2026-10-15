@@ -123,6 +123,19 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         return super.resolveChatClient(input);
     }
 
+    @Override
+    protected String runErrorMessage(RunAgentInput input, Throwable throwable) {
+        State state = input.state();
+
+        if (state != null && state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID) != null) {
+            return "The copilot run failed. Reference: " + input.runId();
+        }
+
+        String message = throwable.getMessage();
+
+        return message == null ? "The copilot run failed. Reference: " + input.runId() : message;
+    }
+
     private static @Nullable Integer getEnvironmentId(RunAgentInput input) {
         State state = input.state();
 

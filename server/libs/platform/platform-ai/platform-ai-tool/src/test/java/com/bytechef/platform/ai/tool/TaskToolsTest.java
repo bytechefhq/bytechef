@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,7 +60,7 @@ class TaskToolsTest {
 
     @Test
     void getTaskOutputPropertyNoErrors() {
-        taskTools.getTaskOutputProperty("trigger", "trigger", "component", 1);
+        taskTools.getTaskOutputProperty("trigger", "trigger", "component", 1, null);
     }
 
     @Test
@@ -67,13 +68,13 @@ class TaskToolsTest {
         PropertyInfo mockPropertyInfo = new PropertyInfo(
             "output", "object", "Output description", false, false, null, null);
 
-        when(componentTools.getOutputProperty(eq("component"), eq("trigger"), eq(1)))
+        when(componentTools.getOutputProperty(eq("component"), eq("trigger"), eq(1), isNull()))
             .thenReturn(mockPropertyInfo);
 
-        PropertyInfo result = taskTools.getTaskOutputProperty("trigger", "trigger", "component", 1);
+        PropertyInfo result = taskTools.getTaskOutputProperty("trigger", "trigger", "component", 1, null);
 
         assertNotNull(result);
-        verify(componentTools).getOutputProperty("component", "trigger", 1);
+        verify(componentTools).getOutputProperty("component", "trigger", 1, null);
     }
 
     @Test
@@ -81,13 +82,13 @@ class TaskToolsTest {
         PropertyInfo mockPropertyInfo = new PropertyInfo(
             "output", "object", "Output description", false, false, null, null);
 
-        when(componentTools.getOutputProperty(eq("component"), eq("action"), eq(1)))
+        when(componentTools.getOutputProperty(eq("component"), eq("action"), eq(1), isNull()))
             .thenReturn(mockPropertyInfo);
 
-        PropertyInfo result = taskTools.getTaskOutputProperty("action", "action", "component", 1);
+        PropertyInfo result = taskTools.getTaskOutputProperty("action", "action", "component", 1, null);
 
         assertNotNull(result);
-        verify(componentTools).getOutputProperty("component", "action", 1);
+        verify(componentTools).getOutputProperty("component", "action", 1, null);
     }
 
     @Test
@@ -98,7 +99,7 @@ class TaskToolsTest {
         when(taskDispatcherTools.getTaskDispatcherOutput(eq("dispatcher"), eq(1)))
             .thenReturn(mockPropertyInfo);
 
-        PropertyInfo result = taskTools.getTaskOutputProperty("taskDispatcher", "dispatcher", "dispatcher", 1);
+        PropertyInfo result = taskTools.getTaskOutputProperty("taskDispatcher", "dispatcher", "dispatcher", 1, null);
 
         assertNotNull(result);
         verify(taskDispatcherTools).getTaskDispatcherOutput("dispatcher", 1);
@@ -106,12 +107,12 @@ class TaskToolsTest {
 
     @Test
     void getTaskOutputPropertyWithException() {
-        when(componentTools.getOutputProperty(eq("component"), eq("action"), eq(1)))
+        when(componentTools.getOutputProperty(eq("component"), eq("action"), eq(1), isNull()))
             .thenThrow(new RuntimeException("Task not found"));
 
         assertThrows(
             RuntimeException.class,
-            () -> taskTools.getTaskOutputProperty("action", "action", "component", 1));
+            () -> taskTools.getTaskOutputProperty("action", "action", "component", 1, null));
     }
 
     @Test
@@ -119,13 +120,13 @@ class TaskToolsTest {
         PropertyInfo mockPropertyInfo = new PropertyInfo(
             "output", "object", "Output description", false, false, null, null);
 
-        when(componentTools.getOutputProperty(eq("myComponent"), eq("customAction"), eq(5)))
+        when(componentTools.getOutputProperty(eq("myComponent"), eq("customAction"), eq(5), isNull()))
             .thenReturn(mockPropertyInfo);
 
-        PropertyInfo result = taskTools.getTaskOutputProperty("action", "customAction", "myComponent", 5);
+        PropertyInfo result = taskTools.getTaskOutputProperty("action", "customAction", "myComponent", 5, null);
 
         assertNotNull(result);
-        verify(componentTools).getOutputProperty("myComponent", "customAction", 5);
+        verify(componentTools).getOutputProperty("myComponent", "customAction", 5, null);
     }
 
     @Test

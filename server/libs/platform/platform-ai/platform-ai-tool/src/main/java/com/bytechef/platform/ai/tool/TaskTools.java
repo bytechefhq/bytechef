@@ -177,7 +177,8 @@ public class TaskTools {
         @ToolParam(
             required = false,
             description = "For actions/triggers/clusterElements: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
 
         try {
             return switch (StringUtils.trim(type.toLowerCase(Locale.ROOT))) {
@@ -185,7 +186,7 @@ public class TaskTools {
                     if (componentName == null || StringUtils.isBlank(componentName)) {
                         throw new IllegalArgumentException("componentName is required for " + type + " type");
                     }
-                    yield componentTools.getOutputProperty(componentName, name, version);
+                    yield componentTools.getOutputProperty(componentName, name, version, toolContext);
                 }
                 case "taskdispatcher" -> taskDispatcherTools.getTaskDispatcherOutput(name, version);
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);

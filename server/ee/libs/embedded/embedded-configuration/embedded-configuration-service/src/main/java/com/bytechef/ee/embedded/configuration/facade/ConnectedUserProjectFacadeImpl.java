@@ -243,10 +243,13 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             externalUserId, definition, environment);
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
 
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 
         copilotWorkflowGenerator.generateWorkflow(
-            workflowId, prompt, systemPrompt, allowedComponentNames);
+            workflowId, projectWorkflow.getProjectId(), environment.ordinal(), prompt, systemPrompt,
+            allowedComponentNames);
 
         return workflowUuid;
     }
@@ -479,13 +482,15 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Override
     public CopilotChatContextDTO prepareCopilotChat(
         String externalUserId, String workflowUuid, Environment environment) {
-        getConnectedUserProjectWorkflow(externalUserId, workflowUuid, (long) environment.ordinal());
+        ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO = getConnectedUserProjectWorkflow(
+            externalUserId, workflowUuid, (long) environment.ordinal());
 
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
 
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 
-        return new CopilotChatContextDTO(workflowId, allowedComponentNames);
+        return new CopilotChatContextDTO(
+            workflowId, connectedUserProjectWorkflowDTO.projectId(), allowedComponentNames);
     }
 
     @Override
@@ -621,7 +626,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 
         copilotWorkflowGenerator.generateWorkflow(
-            projectWorkflow.getWorkflowId(), prompt, null, allowedComponentNames);
+            projectWorkflow.getWorkflowId(), connectedUserProject.getProjectId(), environment.ordinal(), prompt, null,
+            allowedComponentNames);
 
         return workflowUuid;
     }
