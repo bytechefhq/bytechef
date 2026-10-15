@@ -16,7 +16,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import findAndRemoveClusterElement from './findAndRemoveClusterElement';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
-import {resolveClusterRootId} from './resolveClusterRootId';
+import {resolveClusterRootId, resolveMainClusterRootName} from './resolveClusterRootId';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 import {forEachNestedTaskGroup} from './taskTraversalUtils';
@@ -62,6 +62,7 @@ export default function handleDeleteTask({
     const clusterRootId = data.clusterElementType ? resolveClusterRootId(data) : undefined;
 
     let updatedTasks: Array<WorkflowTaskType>;
+    let currentNodeMovedToClusterRoot = false;
 
     if (data.conditionData) {
         const parentConditionTask = TASK_DISPATCHER_CONFIG.condition.getTask({
@@ -276,20 +277,31 @@ export default function handleDeleteTask({
         if (clusterElementRemovalResult.elementFound) {
             const updatedClusterElements = clusterElementRemovalResult.elements;
 
-            if (rootClusterElementNodeData && setRootClusterElementNodeData && setCurrentNode) {
-                if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
-                    setCurrentNode({
-                        ...currentNode,
-                        clusterElements: updatedClusterElements,
-                    });
-                }
+            if (
+                setCurrentNode &&
+                currentNode?.clusterRoot &&
+                !currentNode.isNestedClusterRoot &&
+                currentNode.workflowNodeName === clusterRootId
+            ) {
+                setCurrentNode({
+                    ...currentNode,
+                    clusterElements: updatedClusterElements,
+                });
+            }
 
+            if (
+                rootClusterElementNodeData?.workflowNodeName === clusterRootId &&
+                setRootClusterElementNodeData &&
+                setCurrentNode
+            ) {
                 setRootClusterElementNodeData({
                     ...rootClusterElementNodeData,
                     clusterElements: updatedClusterElements,
                 });
 
                 if (currentNode?.name === data.name) {
+                    currentNodeMovedToClusterRoot = true;
+
                     useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(true);
 
                     setCurrentNode({
@@ -341,7 +353,16 @@ export default function handleDeleteTask({
     const updatedTaskParametersByName = collectAllTaskParameters(updatedTasks);
 
     // Optimistic UI: close panel and update store immediately so layout recomputes once
-    if (currentNode && isCurrentNodeRemoved(currentNode, rootClusterElementNodeData, updatedTaskParametersByName)) {
+    if (
+        currentNode &&
+        isCurrentNodeRemoved({
+            currentNode,
+            currentNodeMovedToClusterRoot,
+            deletedNodeName: data.name,
+            rootClusterElementNodeData,
+            updatedTaskParametersByName,
+        })
+    ) {
         useWorkflowNodeDetailsPanelStore.getState().reset();
         useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
     }
@@ -421,16 +442,32 @@ function collectAllTaskParameters(
     return result;
 }
 
-function isCurrentNodeRemoved(
-    currentNode: NodeDataType,
-    rootClusterElementNodeData: NodeDataType | undefined,
-    updatedTaskParametersByName: Map<string, Record<string, object> | undefined>
-): boolean {
+interface IsCurrentNodeRemovedProps {
+    currentNode: NodeDataType;
+    currentNodeMovedToClusterRoot: boolean;
+    deletedNodeName: string;
+    rootClusterElementNodeData: NodeDataType | undefined;
+    updatedTaskParametersByName: Map<string, Record<string, object> | undefined>;
+}
+
+function isCurrentNodeRemoved({
+    currentNode,
+    currentNodeMovedToClusterRoot,
+    deletedNodeName,
+    rootClusterElementNodeData,
+    updatedTaskParametersByName,
+}: IsCurrentNodeRemovedProps): boolean {
     if (currentNode.trigger) {
         return false;
     }
 
-    const currentTaskName = currentNode.clusterElementType ? rootClusterElementNodeData?.name : currentNode.name;
+    if (currentNode.clusterElementType && currentNode.name === deletedNodeName && !currentNodeMovedToClusterRoot) {
+        return true;
+    }
+
+    const currentTaskName = currentNode.clusterElementType
+        ? resolveMainClusterRootName(currentNode, rootClusterElementNodeData)
+        : currentNode.name;
 
     return currentTaskName !== undefined && !updatedTaskParametersByName.has(currentTaskName);
 }
