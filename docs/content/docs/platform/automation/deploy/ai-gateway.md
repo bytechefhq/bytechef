@@ -5,8 +5,6 @@ ee: true
 comingSoon: true
 ---
 
-# AI Gateway
-
 
 The **AI Gateway** is an Enterprise Edition service that sits between your applications and LLM providers, giving platform teams one place to observe and govern model traffic:
 

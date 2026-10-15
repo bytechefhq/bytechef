@@ -5,8 +5,6 @@ ee: true
 comingSoon: true
 ---
 
-# Context Store
-
 
 The Context Store keeps a synced replica of records from external systems (CRMs, ticket systems, knowledge bases) inside ByteChef so AI agents and workflows can search and read them without round-tripping to the source on every call.
 
