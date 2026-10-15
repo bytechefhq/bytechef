@@ -346,6 +346,94 @@ describe('useConnectDialog - Form Validation', () => {
             document.createElement = originalCreateElement;
         }
     });
+
+    it('submits the displayed default values even when the user never edits them', async () => {
+        global.fetch = vi.fn().mockImplementation((_url: string, init?: RequestInit) =>
+            Promise.resolve({
+                ok: true,
+                json: vi.fn().mockResolvedValue(
+                    init?.method === 'POST'
+                        ? 7
+                        : {
+                              connectionConfig: {
+                                  authorizationType: 'API_KEY',
+                                  inputs: [
+                                      {defaultValue: 'HEADER', label: 'Add to', name: 'addTo', required: true},
+                                      {defaultValue: 'token', label: 'Key', name: 'key', required: true},
+                                      {label: 'Value', name: 'value', required: true},
+                                      {label: 'Note', name: 'note', required: false},
+                                  ],
+                              },
+                              integrationInstances: [],
+                          }
+                ),
+            })
+        );
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const {result} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
+
+        await act(async () => result.current.openDialog());
+
+        const props = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        const displayedValues: Record<string, string> = {addTo: 'HEADER', key: 'token', note: '', value: 'secret'};
+
+        Object.entries(displayedValues).forEach(([name, value]) =>
+            props.form.register(name).ref({value} as HTMLInputElement)
+        );
+
+        act(() => props.registerFormSubmit(props.form.handleSubmit));
+
+        await act(async () => props.handleClick({target: {name: 'connectButton'}}));
+
+        const postCall = vi
+            .mocked(global.fetch)
+            .mock.calls.find(([, init]) => (init as RequestInit | undefined)?.method === 'POST');
+
+        expect(JSON.parse((postCall?.[1] as RequestInit).body as string)).toEqual({
+            connection: {parameters: {addTo: 'HEADER', key: 'token', value: 'secret'}},
+        });
+    });
+
+    it('does not restore a property default into a field the user cleared', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                connectionConfig: {
+                    authorizationType: 'API_KEY',
+                    inputs: [{defaultValue: 'token', label: 'Key', name: 'key'}],
+                },
+            }),
+        });
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const {result} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
+
+        await act(async () => result.current.openDialog());
+
+        const initialProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        expect(initialProps.form.register('key').defaultValue).toBeUndefined();
+
+        act(() => initialProps.form.register('key').onInput({currentTarget: {value: ''}}));
+
+        const props = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        expect(props.form.register('key').defaultValue).toBe('');
+    });
 });
 
 describe('useConnectDialog - Nested root lifecycle', () => {

@@ -72,11 +72,12 @@ export interface IntegrationWorkflowType {
 }
 
 export interface PropertyType {
+    defaultValue?: string;
     name: string;
     label: string;
     type: 'string' | 'number' | 'boolean' | 'object' | 'array';
     required?: boolean;
-    options?: string[];
+    options?: OptionType[];
     placeholder?: string;
 }
 
@@ -135,7 +136,7 @@ export interface WorkflowInputType {
 export interface FormType {
     register: (name: string) => {
         name: string;
-        defaultValue: string;
+        defaultValue?: string;
         ref: (element: HTMLInputElement) => void;
         onInput: (event: React.FormEvent<HTMLInputElement | HTMLSelectElement>) => void;
     };

@@ -119,6 +119,56 @@ describe('ConnectDialog dynamic inputs', () => {
         );
     });
 
+    it('renders static group-member options with their labels and reports the selected value', () => {
+        const workflowUuid = 'wf-static';
+        const mergedWorkflows: MergedWorkflowType[] = [
+            {
+                enabled: true,
+                inputs: [
+                    {
+                        componentReference: {
+                            componentName: 'slack',
+                            componentVersion: 1,
+                            group: {
+                                label: 'Destination',
+                                name: 'destination',
+                                properties: [
+                                    {
+                                        label: 'Channel',
+                                        name: 'channel',
+                                        options: [
+                                            {label: 'General', value: 'C1'},
+                                            {label: 'Random', value: 'C2'},
+                                        ],
+                                    },
+                                ],
+                            },
+                            groupName: 'destination',
+                        },
+                        label: 'Destination',
+                        name: 'destination',
+                        type: 'object',
+                    },
+                ],
+                label: 'Workflow Static Group',
+                workflowUuid,
+            },
+        ];
+
+        render(<ConnectDialog {...baseProps} mergedWorkflows={mergedWorkflows} />);
+
+        expect(screen.getByRole('option', {name: 'General'})).toHaveProperty('value', 'C1');
+
+        fireEvent.change(screen.getByLabelText('Channel'), {target: {value: 'C1'}});
+
+        expect(baseProps.handleWorkflowGroupInputChange).toHaveBeenCalledWith(
+            workflowUuid,
+            'destination',
+            'channel',
+            'C1'
+        );
+    });
+
     it('disables a dependent member select and does not fetch until the dependency is present', () => {
         const apiFetch = vi.fn().mockResolvedValue([]);
         const mergedWorkflows: MergedWorkflowType[] = [

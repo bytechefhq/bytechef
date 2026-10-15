@@ -343,11 +343,17 @@ export default function useConnectDialog({
 
     const handleSubmit = useCallback(() => {
         if (formSubmitRef.current) {
-            const submitFunction = formSubmitRef.current(() => saveNonOAuth2Connection(formValues));
+            const submitFunction = formSubmitRef.current((validatedData) =>
+                saveNonOAuth2Connection(
+                    Object.fromEntries(
+                        Object.entries(validatedData as Record<string, string>).filter(([, value]) => value !== '')
+                    )
+                )
+            );
 
             submitFunction();
         }
-    }, [formValues, saveNonOAuth2Connection]);
+    }, [saveNonOAuth2Connection]);
 
     const handleWorkflowToggle = useCallback(
         async (workflowUuid: string, pressed: boolean) => {
@@ -546,7 +552,7 @@ export default function useConnectDialog({
         return {
             register: (name: string) => ({
                 name,
-                defaultValue: formValues?.[name] || '',
+                defaultValue: formValues?.[name],
                 ref: (element: HTMLInputElement) => {
                     if (element) {
                         inputRefs.current[name] = element;
