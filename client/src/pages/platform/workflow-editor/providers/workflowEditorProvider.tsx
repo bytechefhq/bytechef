@@ -92,6 +92,7 @@ export interface WorkflowReadOnlyStateI {
 
 export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     ConnectionKeys: ConnectionKeysI;
+    automationWorkflowProjectId?: string;
     cancelWorkflowQueries: () => void;
     codeWorkflow?: boolean;
     codeWorkflowLanguage?: string;

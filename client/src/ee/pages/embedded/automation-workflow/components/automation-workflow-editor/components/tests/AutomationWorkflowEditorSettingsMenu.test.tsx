@@ -152,3 +152,23 @@ it('calls the project handlers from the Project tab', async () => {
     expect(mockHandlers.onDeleteProjectClick).toHaveBeenCalledTimes(1);
     expect(mockHandlers.onDeleteWorkflowClick).not.toHaveBeenCalled();
 });
+
+it('shows only the project actions, without tabs, for a code workflow project', async () => {
+    render(
+        <TooltipProvider>
+            <AutomationWorkflowEditorSettingsMenu {...mockHandlers} codeWorkflowProject />
+        </TooltipProvider>
+    );
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    expect(screen.queryByLabelText('Workflow tab')).not.toBeInTheDocument();
+
+    for (const label of ['Edit', 'Export', 'Project History', 'Delete']) {
+        expect(screen.getByRole('menuitem', {name: label})).toBeInTheDocument();
+    }
+
+    for (const label of ['Duplicate', 'New Workflow', 'Import Workflow']) {
+        expect(screen.queryByRole('menuitem', {name: label})).not.toBeInTheDocument();
+    }
+});
