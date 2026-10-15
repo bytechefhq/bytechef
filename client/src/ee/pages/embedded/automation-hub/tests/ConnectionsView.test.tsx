@@ -5,16 +5,28 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ConnectionsView from '../views/ConnectionsView';
 
-const {deleteHubConnectionMutateMock, useGetComponentDefinitionsQueryMock, useGetConnectionsQueryMock} = vi.hoisted(
-    () => ({
-        deleteHubConnectionMutateMock: vi.fn(),
-        useGetComponentDefinitionsQueryMock: vi.fn(),
-        useGetConnectionsQueryMock: vi.fn(),
-    })
-);
+const {
+    deleteHubConnectionMutateMock,
+    useGetComponentDefinitionsQueryMock,
+    useGetConnectionsQueryMock,
+    useGetIntegrationsQueryMock,
+} = vi.hoisted(() => ({
+    deleteHubConnectionMutateMock: vi.fn(),
+    useGetComponentDefinitionsQueryMock: vi.fn(),
+    useGetConnectionsQueryMock: vi.fn(),
+    useGetIntegrationsQueryMock: vi.fn(),
+}));
+
+vi.mock('@tanstack/react-query', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@tanstack/react-query')>();
+
+    return {...actual, useQueryClient: () => ({invalidateQueries: vi.fn()})};
+});
 
 vi.mock('@/ee/pages/embedded/automation-hub/queries/automationHub.queries', () => ({
+    AutomationHubKeys: {connections: ['automationHub', 'connections']},
     useGetConnectionsQuery: useGetConnectionsQueryMock,
+    useGetIntegrationsQuery: useGetIntegrationsQueryMock,
 }));
 
 vi.mock('@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations', () => ({
@@ -25,18 +37,10 @@ vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
     useGetComponentDefinitionsQuery: useGetComponentDefinitionsQueryMock,
 }));
 
-vi.mock('@/ee/pages/embedded/automation-hub/views/components/HubConnectionDialog', () => ({
-    default: ({
-        componentName,
-        existingConnectionCredentialStatus,
-        existingConnectionId,
-    }: {
-        componentName: string;
-        existingConnectionCredentialStatus?: string;
-        existingConnectionId?: number;
-    }) => (
-        <div data-testid="hub-connection-dialog">
-            reconnect:{componentName}:{existingConnectionId}:{existingConnectionCredentialStatus ?? 'none'}
+vi.mock('@/ee/pages/embedded/automation-hub/views/components/HubReconnectDialog', () => ({
+    default: ({connectionId, integrationId}: {connectionId: number; integrationId: number}) => (
+        <div data-testid="hub-reconnect-dialog">
+            reconnect:{integrationId}:{connectionId}
         </div>
     ),
 }));
@@ -68,6 +72,16 @@ describe('ConnectionsView', () => {
         deleteHubConnectionMutateMock.mockReset();
         useGetComponentDefinitionsQueryMock.mockReset();
         useGetConnectionsQueryMock.mockReset();
+        useGetIntegrationsQueryMock.mockReset();
+
+        useGetIntegrationsQueryMock.mockReturnValue({
+            data: [
+                {componentName: 'hubspot', id: 5, integrationInstances: [{connectionId: 2, enabled: true, id: 10}]},
+                {componentName: 'slack', id: 6, integrationInstances: []},
+            ],
+            error: null,
+            isLoading: false,
+        });
 
         useGetConnectionsQueryMock.mockReturnValue({
             data: [slackConnection, hubspotConnection],
@@ -163,7 +177,7 @@ describe('ConnectionsView', () => {
         expect(screen.queryByText('This connection is still used by an enabled automation.')).not.toBeInTheDocument();
     });
 
-    it('opens HubConnectionDialog for the same component and connection id via Reconnect', async () => {
+    it('reconnects an instance-backed connection through the SDK connect dialog for its integration', async () => {
         const user = userEvent.setup();
 
         renderView();
@@ -173,12 +187,23 @@ describe('ConnectionsView', () => {
         );
         await user.click(screen.getByRole('menuitem', {name: /reconnect/i}));
 
-        expect(screen.getByTestId('hub-connection-dialog')).toHaveTextContent('reconnect:hubspot:2:none');
+        expect(screen.getByTestId('hub-reconnect-dialog')).toHaveTextContent('reconnect:5:2');
     });
 
-    it('flags a connection whose credentials were rejected and passes that status to the reconnect dialog', async () => {
+    it('offers no Reconnect for a connection that no integration instance owns', async () => {
         const user = userEvent.setup();
 
+        renderView();
+
+        await user.click(
+            within(screen.getByRole('row', {name: /My Slack/})).getByRole('button', {name: 'Connection actions'})
+        );
+
+        expect(screen.queryByRole('menuitem', {name: /reconnect/i})).not.toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: /delete/i})).toBeInTheDocument();
+    });
+
+    it('still flags a connection whose credentials were rejected', () => {
         useGetConnectionsQueryMock.mockReturnValue({
             data: [{...slackConnection, credentialStatus: 'INVALID', editable: true}, hubspotConnection],
             error: null,
@@ -189,13 +214,6 @@ describe('ConnectionsView', () => {
 
         expect(within(screen.getByRole('row', {name: /My Slack/})).getByText('Reconnect needed')).toBeInTheDocument();
         expect(within(screen.getByRole('row', {name: /My HubSpot/})).queryByText('Reconnect needed')).toBeNull();
-
-        await user.click(
-            within(screen.getByRole('row', {name: /My Slack/})).getByRole('button', {name: 'Connection actions'})
-        );
-        await user.click(screen.getByRole('menuitem', {name: /reconnect/i}));
-
-        expect(screen.getByTestId('hub-connection-dialog')).toHaveTextContent('reconnect:slack:1:INVALID');
     });
 
     it('marks an owned connection the admin also shared, and still lets its owner act on it', () => {
@@ -227,12 +245,18 @@ describe('ConnectionsView', () => {
 
         useGetConnectionsQueryMock.mockReturnValue({
             data: [
-                {componentName: 'slack', createdDate: new Date('2025-01-02'), editable: true, id: 1, name: 'My Slack'},
+                {
+                    componentName: 'hubspot',
+                    createdDate: new Date('2025-01-02'),
+                    editable: true,
+                    id: 2,
+                    name: 'My HubSpot',
+                },
                 {
                     componentName: 'slack',
                     createdDate: new Date('2025-01-02'),
                     editable: false,
-                    id: 2,
+                    id: 3,
                     name: 'Team Slack',
                     shared: true,
                 },
@@ -248,7 +272,7 @@ describe('ConnectionsView', () => {
         expect(within(sharedRow).queryByRole('button', {name: 'Connection actions'})).not.toBeInTheDocument();
         expect(within(sharedRow).getByText('Shared')).toBeInTheDocument();
 
-        const ownedRow = screen.getByRole('row', {name: /My Slack/});
+        const ownedRow = screen.getByRole('row', {name: /My HubSpot/});
 
         await user.click(within(ownedRow).getByRole('button', {name: 'Connection actions'}));
 
