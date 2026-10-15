@@ -19,6 +19,7 @@ package com.bytechef.ai.copilot.service;
 import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.AgentSubscriberParams;
 import com.agui.core.agent.RunAgentParameters;
+import com.agui.core.event.RunErrorEvent;
 import com.agui.core.message.BaseMessage;
 import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
@@ -70,7 +71,9 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
 
     @Override
     public void generateWorkflow(
-        String workflowId, String prompt, @Nullable String systemPrompt, Set<String> allowedComponentNames) {
+        String workflowId, long projectId, long environmentId, String prompt, @Nullable String systemPrompt,
+        Set<String> allowedComponentNames) {
+
         String agentId = (Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name()).toLowerCase();
 
         LocalAgent localAgent = localAgentMap.get(agentId);
@@ -86,6 +89,8 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
         stateMap.put("autonomous", true);
 
         stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+        stateMap.put(CopilotConstants.STATE_ENVIRONMENT_ID, environmentId);
+        stateMap.put(CopilotConstants.STATE_SCOPED_PROJECT_ID, projectId);
 
         Authentication authentication = SecurityContextHolder.getContext()
             .getAuthentication();
@@ -127,6 +132,11 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
             @Override
             public void onRunFinalized(AgentSubscriberParams params) {
                 latch.countDown();
+            }
+
+            @Override
+            public void onRunErrorEvent(RunErrorEvent runErrorEvent) {
+                errorRef.compareAndSet(null, new IllegalStateException(runErrorEvent.getError()));
             }
 
             @Override

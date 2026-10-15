@@ -112,6 +112,8 @@ class ScriptToolsTest {
     }
 
     private ScriptTools newTools() {
-        return new ScriptTools(projectService, projectWorkflowFacade, projectWorkflowService, workspaceScopeResolver);
+        return new ScriptTools(
+            projectService, projectWorkflowFacade, projectWorkflowService,
+            new ScopedProjectGuard(projectWorkflowService), workspaceScopeResolver);
     }
 }

@@ -26,6 +26,7 @@ public final class CopilotConstants {
     public static final String STATE_AUTHENTICATION = "authentication";
     public static final String STATE_ADDITIONAL_SYSTEM_PROMPT = "additionalSystemPrompt";
     public static final String STATE_ENVIRONMENT_ID = "environmentId";
+    public static final String STATE_SCOPED_PROJECT_ID = "scopedProjectId";
     public static final String STATE_TENANT_ID = "tenantId";
     public static final String STATE_USER_SELECTED_LLM_PROVIDER = "userSelectedLlmProvider";
     public static final String STATE_USER_SELECTED_LLM_MODEL = "userSelectedLlmModel";

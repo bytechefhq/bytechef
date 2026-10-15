@@ -19,13 +19,16 @@ package com.bytechef.ai.copilot.util;
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -71,6 +74,13 @@ public final class CopilotToolContextUtils {
 
         putIfNotNull(toolContext, AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, workspaceId);
         putIfNotNull(toolContext, AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, environmentId);
+        putIfNotNull(
+            toolContext, ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY,
+            NumberUtils.asLong(state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID)));
+
+        if (ScopedProjectToolContext.isConfined(new ToolContext(toolContext))) {
+            toolContext.put(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, Boolean.TRUE);
+        }
 
         return toolContext;
     }

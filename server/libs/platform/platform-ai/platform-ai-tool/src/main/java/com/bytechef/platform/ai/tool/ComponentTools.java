@@ -43,8 +43,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -60,6 +62,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ComponentTools {
+
+    public static final String TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY = "connectionFallbackDisabled";
 
     private static final Logger log = LoggerFactory.getLogger(ComponentTools.class);
 
@@ -683,7 +687,8 @@ public class ComponentTools {
             description = "The name of the component that contains the trigger, action or cluster element in camel case") String componentName,
         @ToolParam(
             description = "The name of the trigger, action or cluster element to retrieve output properties for in camel case") String operationName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -731,6 +736,13 @@ public class ComponentTools {
                                     componentDefinition.getName(), componentDefinition.getVersion(),
                                     actionDefinition.getName(), Map.of(), Map.of());
                             } catch (Exception e) {
+                                if (isConnectionFallbackDisabled(toolContext)) {
+                                    throw new Exception(
+                                        "The output of " + componentDefinition.getName() + " " +
+                                            actionDefinition.getName() + " is only known after a test run",
+                                        e);
+                                }
+
                                 try {
                                     List<Connection> connections =
                                         connectionService.getConnections(componentName, version,
@@ -957,5 +969,15 @@ public class ComponentTools {
         @JsonProperty("name") @JsonPropertyDescription("The name of the trigger") String name,
         @JsonProperty("description") @JsonPropertyDescription("The description of the trigger") String description,
         @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this trigger") String componentName) {
+    }
+
+    private static boolean isConnectionFallbackDisabled(@Nullable ToolContext toolContext) {
+        if (toolContext == null) {
+            return false;
+        }
+
+        Map<String, Object> context = toolContext.getContext();
+
+        return context != null && Boolean.TRUE.equals(context.get(TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY));
     }
 }

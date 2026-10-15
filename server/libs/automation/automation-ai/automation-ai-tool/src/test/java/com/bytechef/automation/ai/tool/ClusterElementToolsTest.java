@@ -152,6 +152,7 @@ class ClusterElementToolsTest {
 
     private ClusterElementTools newTools() {
         return new ClusterElementTools(
-            projectService, projectWorkflowFacade, projectWorkflowService, workspaceScopeResolver);
+            projectService, projectWorkflowFacade, projectWorkflowService,
+            new ScopedProjectGuard(projectWorkflowService), workspaceScopeResolver);
     }
 }

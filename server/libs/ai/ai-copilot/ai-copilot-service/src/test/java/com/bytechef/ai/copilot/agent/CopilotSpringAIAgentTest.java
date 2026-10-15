@@ -95,6 +95,37 @@ class CopilotSpringAIAgentTest {
     }
 
     @Nested
+    class RunErrorMessageTest {
+
+        @Test
+        void testRunErrorMessageHidesTheCauseFromAScopedRun() throws AGUIException {
+            State state = new State();
+
+            state.set(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
+
+            String message = newAgent().runErrorMessage(
+                newInput(state), new IllegalStateException("relation \"workflow\" does not exist"));
+
+            assertThat(message).isEqualTo("The copilot run failed. Reference: run");
+        }
+
+        @Test
+        void testRunErrorMessageKeepsTheCauseForAnUnscopedRun() throws AGUIException {
+            String message = newAgent().runErrorMessage(
+                newInput(new State()), new IllegalStateException("No API key configured"));
+
+            assertThat(message).isEqualTo("No API key configured");
+        }
+
+        @Test
+        void testRunErrorMessageNeverReturnsNull() throws AGUIException {
+            String message = newAgent().runErrorMessage(newInput(new State()), new NullPointerException());
+
+            assertThat(message).isEqualTo("The copilot run failed. Reference: run");
+        }
+    }
+
+    @Nested
     class TenantContextTest {
 
         private String defaultTenantId;
