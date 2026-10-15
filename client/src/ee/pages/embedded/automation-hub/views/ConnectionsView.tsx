@@ -55,19 +55,41 @@ const ConnectionsView = () => {
         return infoByName;
     }, [componentDefinitions]);
 
-    const integrationIdByConnectionId = useMemo(() => {
+    const {integrationIdByComponentName, integrationIdByConnectionId} = useMemo(() => {
+        const byComponentName = new Map<string, number>();
         const byConnectionId = new Map<number, number>();
 
         for (const integration of integrations || []) {
+            if (integration.id == null) {
+                continue;
+            }
+
+            if (integration.componentName && !byComponentName.has(integration.componentName)) {
+                byComponentName.set(integration.componentName, integration.id);
+            }
+
             for (const integrationInstance of integration.integrationInstances || []) {
-                if (integration.id != null && integrationInstance.connectionId != null) {
+                if (integrationInstance.connectionId != null) {
                     byConnectionId.set(integrationInstance.connectionId, integration.id);
                 }
             }
         }
 
-        return byConnectionId;
+        return {integrationIdByComponentName: byComponentName, integrationIdByConnectionId: byConnectionId};
     }, [integrations]);
+
+    const getReconnectIntegrationId = (connection: Connection): number | undefined =>
+        integrationIdByConnectionId.get(connection.id) ??
+        (connection.componentName ? integrationIdByComponentName.get(connection.componentName) : undefined);
+
+    const reconnectIntegrationId = reconnectingConnection
+        ? getReconnectIntegrationId(reconnectingConnection)
+        : undefined;
+
+    const handleReauthorized = () => {
+        void queryClient.invalidateQueries({queryKey: AutomationHubKeys.connections});
+        void queryClient.invalidateQueries({queryKey: AutomationHubKeys.integrations});
+    };
 
     const handleDeleteConfirm = () => {
         if (!deletingConnection) {
@@ -198,7 +220,7 @@ const ConnectionsView = () => {
                                                         </DropdownMenuTrigger>
 
                                                         <DropdownMenuContent align="end">
-                                                            {integrationIdByConnectionId.has(connection.id) && (
+                                                            {getReconnectIntegrationId(connection) !== undefined && (
                                                                 <DropdownMenuItem
                                                                     onClick={() =>
                                                                         setReconnectingConnection(connection)
@@ -250,13 +272,13 @@ const ConnectionsView = () => {
                 title="Remove connection?"
             />
 
-            {reconnectingConnection && integrationIdByConnectionId.has(reconnectingConnection.id) && (
+            {reconnectingConnection && reconnectIntegrationId !== undefined && (
                 <HubReconnectDialog
                     connectionId={reconnectingConnection.id}
-                    integrationId={integrationIdByConnectionId.get(reconnectingConnection.id)!}
+                    integrationId={reconnectIntegrationId}
                     key={reconnectingConnection.id}
                     onDone={() => setReconnectingConnection(undefined)}
-                    onReauthorized={() => void queryClient.invalidateQueries({queryKey: AutomationHubKeys.connections})}
+                    onReauthorized={handleReauthorized}
                 />
             )}
         </div>
