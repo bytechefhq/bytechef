@@ -7,20 +7,25 @@
 
 package com.bytechef.embedded.workflow.coordinator.trigger.dispatcher;
 
+import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -36,18 +41,21 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
     implements TriggerDispatcherPreSendProcessor {
 
     private final IntegrationInstanceService integrationInstanceService;
+    private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
 
     @SuppressFBWarnings("EI")
     public IntegrationTriggerDispatcherPreSendProcessor(
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationInstanceService integrationInstanceService, IntegrationWorkflowService integrationWorkflowService,
+        IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
+        IntegrationWorkflowService integrationWorkflowService,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
 
         super(integrationInstanceConfigurationWorkflowService);
 
         this.integrationInstanceService = integrationInstanceService;
+        this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
     }
@@ -66,6 +74,16 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
 
         Map<String, Long> connectionIdMap = getConnectionIdMap(
             integrationInstance.getIntegrationInstanceConfigurationId(), workflowId, triggerExecution.getName());
+
+        WorkflowTrigger workflowTrigger = triggerExecution.getWorkflowTrigger();
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+        Integration integration = integrationService.getIntegrationInstanceIntegration(integrationInstanceId);
+
+        if (Objects.equals(integration.getComponentName(), workflowNodeType.name())) {
+            connectionIdMap = Map.of(triggerExecution.getName(), integrationInstance.getConnectionId());
+        }
 
         if (!connectionIdMap.isEmpty()) {
             triggerExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
