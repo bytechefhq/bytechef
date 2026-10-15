@@ -100,6 +100,37 @@ class ChatMemoryRewinderTest {
         assertThat(texts()).hasSize(6);
     }
 
+    @Test
+    void testDropsARegeneratedTurnThatRepeatsAnEarlierText() {
+        chatMemory.clear(CONVERSATION_ID);
+
+        chatMemory.add(
+            CONVERSATION_ID,
+            List.of(
+                new UserMessage("yes"), new AssistantMessage("Which channel?"), new UserMessage("no"),
+                new AssistantMessage("Which team?"), new UserMessage("yes"), new AssistantMessage("Done.")));
+
+        ChatMemoryRewinder.rewind(chatMemory, CONVERSATION_ID, List.of("yes"));
+
+        assertThat(texts()).containsExactly("yes", "Which channel?");
+    }
+
+    @Test
+    void testRewindsAMemoryWhoseWindowDroppedTheFirstTurns() {
+        chatMemory.clear(CONVERSATION_ID);
+
+        chatMemory.add(
+            CONVERSATION_ID,
+            List.of(
+                new UserMessage("User picked: #general"), new AssistantMessage("Done, posting to #general."),
+                new UserMessage("Make it 10am"), new AssistantMessage("Moved it to 10am.")));
+
+        ChatMemoryRewinder.rewind(
+            chatMemory, CONVERSATION_ID, List.of("Post a standup reminder", "User picked: #general"));
+
+        assertThat(texts()).containsExactly("User picked: #general", "Done, posting to #general.");
+    }
+
     private List<String> texts() {
         return chatMemory.get(CONVERSATION_ID)
             .stream()
