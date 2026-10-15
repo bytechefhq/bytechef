@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +56,6 @@ public class CustomRoleServiceImpl implements CustomRoleService {
 
     @Override
     @Audited(event = CustomRoleAuditEvents.CUSTOM_ROLE_CREATED, mapper = CustomRoleAuditMapper.class)
-    @PreAuthorize("isTenantAdmin()")
     public CustomRole createCustomRole(String name, String description, Set<String> scopeNames) {
         validateScopeNames(scopeNames);
         validateNameIsAvailable(name, null);
@@ -73,7 +71,6 @@ public class CustomRoleServiceImpl implements CustomRoleService {
 
     @Override
     @Audited(event = CustomRoleAuditEvents.CUSTOM_ROLE_DELETED, mapper = CustomRoleAuditMapper.class)
-    @PreAuthorize("isTenantAdmin()")
     public void deleteCustomRole(long roleId) {
         // Checked, not assumed: deleteById on an unknown id is a silent no-op in Spring Data, so without this an
         // operator deleting a role twice — or acting on a stale list — got a success response for a deletion that
@@ -95,8 +92,6 @@ public class CustomRoleServiceImpl implements CustomRoleService {
     }
 
     @Override
-    @PreAuthorize("(#workspaceId == null and isTenantAdmin()) or " +
-        "(#workspaceId != null and hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE'))")
     @Transactional(readOnly = true)
     public List<CustomRole> getCustomRoles(Long workspaceId) {
         // The workspaceId is authorization context, not a filter: a workspace member manager reads the list to
@@ -106,7 +101,6 @@ public class CustomRoleServiceImpl implements CustomRoleService {
 
     @Override
     @Audited(event = CustomRoleAuditEvents.CUSTOM_ROLE_UPDATED, mapper = CustomRoleAuditMapper.class)
-    @PreAuthorize("isTenantAdmin()")
     public CustomRole updateCustomRole(long roleId, String name, String description, Set<String> scopeNames) {
         CustomRole customRole = customRoleRepository.findById(roleId)
             .orElseThrow(() -> new ConfigurationException(
@@ -156,7 +150,6 @@ public class CustomRoleServiceImpl implements CustomRoleService {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public List<BuiltInRoleDTO> getBuiltInRoles() {
         // Static metadata, identical for every tenant -- which tier the server grants which scope, not anyone's
@@ -165,7 +158,6 @@ public class CustomRoleServiceImpl implements CustomRoleService {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public List<PermissionScopeGroupDTO> getPermissionScopeGroups() {
         // Static metadata, identical for every tenant -- the set of scopes the server was built with, not anyone's
