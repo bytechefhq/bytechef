@@ -2,6 +2,7 @@
 .dialogContainer {
     --bytechef-blue: var(--bytechef-dialog-primary, #1071e5);
     --bytechef-blue-hover: var(--bytechef-dialog-primary-hover, #0b50a3);
+    --dialog-primary-foreground: var(--bytechef-dialog-primary-foreground, #fff);
     --gray-200: #f1f5f9;
     --gray-300: #e2e8f0;
     --gray-500: #6b7280;
@@ -62,7 +63,7 @@
     composes: button;
     background-color: var(--bytechef-blue);
     border-color: var(--bytechef-blue);
-    color: white;
+    color: var(--dialog-primary-foreground);
 }
 
 .buttonPrimary:hover {
