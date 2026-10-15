@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ee.automation.configuration.facade.CustomRoleFacade;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -32,6 +33,9 @@ class PreAuthorizeAnnotationTest {
             "com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl",
             "com.bytechef.automation.configuration.service.ProjectServiceImpl",
             "com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl",
+            "com.bytechef.ee.automation.configuration.service.CustomRoleServiceImpl",
+            "com.bytechef.ee.automation.configuration.service.ProjectGitConfigurationServiceImpl",
+            "com.bytechef.ee.automation.configuration.service.WorkspaceServiceImpl",
             "com.bytechef.ee.automation.configuration.service.WorkspaceUserServiceImpl"
         }) {
             Class<?> clazz = Class.forName(className);
@@ -286,7 +290,7 @@ class PreAuthorizeAnnotationTest {
     @Test
     void testPermissionScopeGroupsRequiresOnlyAuthentication() throws NoSuchMethodException {
         assertPreAuthorize(
-            CustomRoleService.class.getMethod("getPermissionScopeGroups"),
+            CustomRoleFacade.class.getMethod("getPermissionScopeGroups"),
             "isAuthenticated()");
     }
 
@@ -297,7 +301,7 @@ class PreAuthorizeAnnotationTest {
     @Test
     void testBuiltInRolesRequiresOnlyAuthentication() throws NoSuchMethodException {
         assertPreAuthorize(
-            CustomRoleService.class.getMethod("getBuiltInRoles"),
+            CustomRoleFacade.class.getMethod("getBuiltInRoles"),
             "isAuthenticated()");
     }
 
@@ -308,17 +312,17 @@ class PreAuthorizeAnnotationTest {
     @Test
     void testCustomRoleMutationsRequireTenantAdmin() throws NoSuchMethodException {
         assertPreAuthorize(
-            CustomRoleService.class.getMethod(
+            CustomRoleFacade.class.getMethod(
                 "createCustomRole", String.class, String.class, java.util.Set.class),
             "isTenantAdmin()");
 
         assertPreAuthorize(
-            CustomRoleService.class.getMethod(
+            CustomRoleFacade.class.getMethod(
                 "updateCustomRole", long.class, String.class, String.class, java.util.Set.class),
             "isTenantAdmin()");
 
         assertPreAuthorize(
-            CustomRoleService.class.getMethod("deleteCustomRole", long.class),
+            CustomRoleFacade.class.getMethod("deleteCustomRole", long.class),
             "isTenantAdmin()");
     }
 
@@ -330,14 +334,14 @@ class PreAuthorizeAnnotationTest {
     @Test
     void testGetCustomRolesIsTieredForAssignmentReads() throws NoSuchMethodException {
         assertPreAuthorize(
-            CustomRoleService.class.getMethod("getCustomRoles", Long.class),
+            CustomRoleFacade.class.getMethod("getCustomRoles", Long.class),
             "(#workspaceId == null and isTenantAdmin()) or " +
                 "(#workspaceId != null and hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE'))");
     }
 
     private void assertPreAuthorize(Method interfaceMethod, String expectedExpression) {
-        // The annotation lives on the implementation, not the interface, so resolve through the impl class. We
-        // accept any class in the same package whose name follows the conventional ServiceImpl pattern.
+        // The annotation lives on the implementation, not the interface, so resolve through the impl class: the class in
+        // the same package named after the interface with an Impl suffix.
         Method implMethod = findImplMethod(interfaceMethod);
 
         PreAuthorize preAuthorize = implMethod.getAnnotation(PreAuthorize.class);

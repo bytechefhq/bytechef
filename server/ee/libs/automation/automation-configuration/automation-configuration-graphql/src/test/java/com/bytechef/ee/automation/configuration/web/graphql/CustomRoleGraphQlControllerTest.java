@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.exception.CustomRoleErrorType;
-import com.bytechef.ee.automation.configuration.service.CustomRoleService;
+import com.bytechef.ee.automation.configuration.facade.CustomRoleFacade;
 import com.bytechef.exception.ConfigurationException;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +37,7 @@ import org.mockito.ArgumentCaptor;
  * Both matter for authorization. A role with zero scopes grants nothing and silently strips access from everyone
  * holding it, which is why absent and empty are refused identically and as a typed {@code SCOPES_REQUIRED} rather than
  * as a bare {@code IllegalArgumentException} that would reach the client as {@code INTERNAL_ERROR}. And the nullness of
- * {@code workspaceId} is what selects the authorization tier on {@code CustomRoleServiceImpl.getCustomRoles} — null
+ * {@code workspaceId} is what selects the authorization tier on {@code CustomRoleFacadeImpl.getCustomRoles} — null
  * means tenant-admin-only, non-null means the {@code 'Workspace'} scope check — so a controller that defaulted the
  * argument or dropped it would move every caller onto the wrong tier.
  *
@@ -47,35 +47,35 @@ import org.mockito.ArgumentCaptor;
  */
 class CustomRoleGraphQlControllerTest {
 
-    private final CustomRoleService customRoleService = mock(CustomRoleService.class);
-    private final CustomRoleGraphQlController controller = new CustomRoleGraphQlController(customRoleService);
+    private final CustomRoleFacade customRoleFacade = mock(CustomRoleFacade.class);
+    private final CustomRoleGraphQlController controller = new CustomRoleGraphQlController(customRoleFacade);
 
     @Test
     void testCreateCustomRoleRejectsAnAbsentScopesField() {
         assertScopesRequired(() -> controller.createCustomRole(inputWithoutScopes()));
 
-        verify(customRoleService, never()).createCustomRole(anyString(), anyString(), any());
+        verify(customRoleFacade, never()).createCustomRole(anyString(), anyString(), any());
     }
 
     @Test
     void testCreateCustomRoleRejectsAnEmptyScopesList() {
         assertScopesRequired(() -> controller.createCustomRole(input(List.of())));
 
-        verify(customRoleService, never()).createCustomRole(anyString(), anyString(), any());
+        verify(customRoleFacade, never()).createCustomRole(anyString(), anyString(), any());
     }
 
     @Test
     void testUpdateCustomRoleRejectsAnAbsentScopesField() {
         assertScopesRequired(() -> controller.updateCustomRole(1L, inputWithoutScopes()));
 
-        verify(customRoleService, never()).updateCustomRole(anyLong(), anyString(), anyString(), any());
+        verify(customRoleFacade, never()).updateCustomRole(anyLong(), anyString(), anyString(), any());
     }
 
     @Test
     void testUpdateCustomRoleRejectsAnEmptyScopesList() {
         assertScopesRequired(() -> controller.updateCustomRole(1L, input(List.of())));
 
-        verify(customRoleService, never()).updateCustomRole(anyLong(), anyString(), anyString(), any());
+        verify(customRoleFacade, never()).updateCustomRole(anyLong(), anyString(), anyString(), any());
     }
 
     @Test
@@ -85,7 +85,7 @@ class CustomRoleGraphQlControllerTest {
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Set<String>> scopeNamesArgumentCaptor = ArgumentCaptor.forClass(Set.class);
 
-        verify(customRoleService).createCustomRole(
+        verify(customRoleFacade).createCustomRole(
             eq("Auditor"), eq("Reads workflows"), scopeNamesArgumentCaptor.capture());
 
         // Membership validation is the service's job against the PermissionScopeRegistry; the controller must hand over
@@ -102,22 +102,22 @@ class CustomRoleGraphQlControllerTest {
      */
     @Test
     void testCustomRolesPassesANullWorkspaceIdThroughUntouched() {
-        when(customRoleService.getCustomRoles(null)).thenReturn(List.of());
+        when(customRoleFacade.getCustomRoles(null)).thenReturn(List.of());
 
         assertThat(controller.customRoles(null)).isEmpty();
 
-        verify(customRoleService).getCustomRoles(null);
+        verify(customRoleFacade).getCustomRoles(null);
     }
 
     @Test
     void testCustomRolesPassesAWorkspaceIdThroughUntouched() {
         CustomRole customRole = new CustomRole("Auditor", Set.of("WORKFLOW_VIEW"));
 
-        when(customRoleService.getCustomRoles(7L)).thenReturn(List.of(customRole));
+        when(customRoleFacade.getCustomRoles(7L)).thenReturn(List.of(customRole));
 
         assertThat(controller.customRoles(7L)).containsExactly(customRole);
 
-        verify(customRoleService).getCustomRoles(7L);
+        verify(customRoleFacade).getCustomRoles(7L);
     }
 
     @Test
@@ -141,7 +141,7 @@ class CustomRoleGraphQlControllerTest {
     }
 
     private void givenRegisteredScopes(String... scopeNames) {
-        when(customRoleService.getPermissionScopeGroups())
+        when(customRoleFacade.getPermissionScopeGroups())
             .thenReturn(List.of(new PermissionScopeGroupDTO("WORKFLOW", List.of(scopeNames))));
     }
 
