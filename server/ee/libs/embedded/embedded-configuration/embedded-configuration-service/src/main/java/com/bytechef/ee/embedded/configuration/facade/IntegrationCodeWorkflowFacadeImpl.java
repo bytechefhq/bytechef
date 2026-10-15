@@ -253,7 +253,7 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
         List<WorkflowDefinition> workflowDefinitions, byte[] bytes, Language language) {
 
         List<WorkflowDefinition> integrationWorkflowDefinitions = IntegrationImplicitConnections.addTo(
-            workflowDefinitions, integration.getComponentName());
+            workflowDefinitions, integration.getComponentName(), integration.getComponentVersion());
 
         long integrationId = Objects.requireNonNull(integration.getId());
         int draftIntegrationVersion = integration.getLastIntegrationVersion();
