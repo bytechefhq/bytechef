@@ -19,10 +19,12 @@ package com.bytechef.ai.copilot.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -35,8 +37,10 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.model.ToolContext;
@@ -362,5 +366,28 @@ class ListConnectionsForComponentToolCallbackTest {
         } catch (ReflectiveOperationException exception) {
             throw new AssertionError("Failed to build ConnectionDefinition fixture", exception);
         }
+    }
+
+    @Test
+    void testRejectsAComponentOutsideTheAllowListBeforeListingConnections() {
+        ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+        ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);
+
+        when(componentDefinitionService.fetchComponentDefinition("hubspot", null))
+            .thenReturn(Optional.of(mock(ComponentDefinition.class)));
+
+        ListConnectionsForComponentToolCallback callback = new ListConnectionsForComponentToolCallback(
+            componentDefinitionService, connectionDefinitionService, mock(ToolStateVisibilityMetrics.class),
+            List.of());
+
+        Map<String, Object> context = new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext();
+
+        context.put(AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack"));
+
+        String result = callback.call("{\"componentName\":\"hubspot\"}", new ToolContext(context));
+
+        assertThat(result).contains("This chat can't use hubspot");
+
+        verifyNoInteractions(connectionDefinitionService);
     }
 }
