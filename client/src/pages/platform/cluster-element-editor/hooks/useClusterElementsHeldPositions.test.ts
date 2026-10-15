@@ -2,6 +2,7 @@ import {act, renderHook} from '@testing-library/react';
 import {Node} from '@xyflow/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+import useClusterElementsViewModeStore from '../../workflow-editor/stores/useClusterElementsViewModeStore';
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore, {WorkflowEditorI} from '../../workflow-editor/stores/useWorkflowEditorStore';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
@@ -68,6 +69,8 @@ const handPlacedNodes = (): Array<Node> => [
 
 describe('useClusterElementsLayout', () => {
     beforeEach(() => {
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
+
         getClusterElementsLayoutElementsMock.mockReset();
         getClusterElementsLayoutElementsMock.mockImplementation(({nodes}: {nodes: Array<Node>}) => ({
             edges: [],
