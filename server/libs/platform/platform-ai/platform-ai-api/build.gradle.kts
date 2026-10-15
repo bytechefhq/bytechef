@@ -7,6 +7,7 @@ dependencies {
     api("org.springframework:spring-expression")
 
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.ai:spring-ai-model")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-api"))

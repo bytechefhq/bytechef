@@ -24,6 +24,7 @@ import com.bytechef.platform.ai.tool.ComponentTools.TriggerMinimalInfo;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools.TaskDispatcherInfo;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools.TaskDispatcherMinimalInfo;
 import com.bytechef.platform.ai.tool.exception.TaskToolErrorType;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.workflow.validator.WorkflowValidator;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
@@ -34,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -52,7 +52,8 @@ public class TaskTools {
 
     private static final Logger log = LoggerFactory.getLogger(TaskTools.class);
 
-    public static final String TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY = "allowedComponentNames";
+    public static final String TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY =
+        AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY;
 
     private static final String INVALID_TASK_TYPE =
         "Invalid task type. Must be 'action', 'trigger', 'taskDispatcher', or 'clusterElement'";
@@ -77,7 +78,10 @@ public class TaskTools {
         @ToolParam(description = "The name of the task to retrieve") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(type, componentName, toolContext, TaskToolErrorType.GET_TASK);
 
         try {
             return switch (StringUtils.trim(type.toLowerCase(Locale.ROOT))) {
@@ -86,7 +90,8 @@ public class TaskTools {
                         throw new IllegalArgumentException("componentName is required for action type");
                     }
 
-                    ActionDetailedInfo actionDetailedInfo = componentTools.getAction(componentName, name, version);
+                    ActionDetailedInfo actionDetailedInfo =
+                        componentTools.getAction(componentName, name, version, toolContext);
 
                     yield new TaskInfo(
                         actionDetailedInfo.name(), actionDetailedInfo.title(), actionDetailedInfo.description(),
@@ -99,7 +104,8 @@ public class TaskTools {
                         throw new IllegalArgumentException("componentName is required for trigger type");
                     }
 
-                    TriggerDetailedInfo triggerDetailedInfo = componentTools.getTrigger(componentName, name, version);
+                    TriggerDetailedInfo triggerDetailedInfo =
+                        componentTools.getTrigger(componentName, name, version, toolContext);
 
                     yield new TaskInfo(
                         triggerDetailedInfo.name(), triggerDetailedInfo.title(), triggerDetailedInfo.description(),
@@ -119,8 +125,8 @@ public class TaskTools {
                         throw new IllegalArgumentException("componentName is required for clusterElement type");
                     }
 
-                    ActionDetailedInfo clusterElementInfo = componentTools.getClusterElement(componentName, name,
-                        version);
+                    ActionDetailedInfo clusterElementInfo = componentTools.getClusterElement(
+                        componentName, name, version, toolContext);
 
                     yield new TaskInfo(
                         clusterElementInfo.name(), clusterElementInfo.title(), clusterElementInfo.description(),
@@ -146,7 +152,10 @@ public class TaskTools {
         @ToolParam(description = "The name of the task to retrieve properties for") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(type, componentName, toolContext, TaskToolErrorType.GET_TASK_PROPERTIES);
 
         try {
             return switch (StringUtils.trim(type.toLowerCase(Locale.ROOT))) {
@@ -154,7 +163,7 @@ public class TaskTools {
                     if (componentName == null || StringUtils.isBlank(componentName)) {
                         throw new IllegalArgumentException("componentName is required for " + type + " type");
                     }
-                    yield componentTools.getProperties(componentName, name, version);
+                    yield componentTools.getProperties(componentName, name, version, toolContext);
                 }
                 case "taskdispatcher" -> taskDispatcherTools.getTaskDispatcherProperties(name, version);
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
@@ -206,7 +215,10 @@ public class TaskTools {
         @ToolParam(description = "The name of the task to generate definition for") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(type, componentName, toolContext, TaskToolErrorType.GET_TASK_DEFINITION);
 
         try {
             return switch (StringUtils.trim(type.toLowerCase(Locale.ROOT))) {
@@ -214,13 +226,13 @@ public class TaskTools {
                     if (componentName == null || StringUtils.isBlank(componentName)) {
                         throw new IllegalArgumentException("componentName is required for action type");
                     }
-                    yield componentTools.getActionDefinition(componentName, name, version);
+                    yield componentTools.getActionDefinition(componentName, name, version, toolContext);
                 }
                 case "trigger" -> {
                     if (componentName == null || StringUtils.isBlank(componentName)) {
                         throw new IllegalArgumentException("componentName is required for trigger type");
                     }
-                    yield componentTools.getTriggerDefinition(componentName, name, version);
+                    yield componentTools.getTriggerDefinition(componentName, name, version, toolContext);
                 }
                 case "taskdispatcher" -> taskDispatcherTools.getTaskDispatcherDefinition(name, version);
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
@@ -276,7 +288,7 @@ public class TaskTools {
             int taskDispatchersCount = 0;
 
             if (includeActions) {
-                List<ActionMinimalInfo> actions = componentTools.listActions();
+                List<ActionMinimalInfo> actions = componentTools.listActions(toolContext);
 
                 actionsCount = actions.size();
 
@@ -287,7 +299,7 @@ public class TaskTools {
             }
 
             if (includeTriggers) {
-                List<TriggerMinimalInfo> triggers = componentTools.listTriggers();
+                List<TriggerMinimalInfo> triggers = componentTools.listTriggers(toolContext);
 
                 triggersCount = triggers.size();
 
@@ -309,7 +321,7 @@ public class TaskTools {
                 }
             }
 
-            allTasks = filterByAllowedComponentNames(allTasks, toolContext);
+            allTasks = AllowedComponentNamesUtils.filter(allTasks, TaskMinimalInfo::componentName, toolContext);
 
             if (limit != null && limit > 0 && allTasks.size() > limit) {
                 allTasks = allTasks.subList(0, limit);
@@ -358,7 +370,7 @@ public class TaskTools {
             int taskDispatchersCount = 0;
 
             if (includeActions) {
-                List<ActionMinimalInfo> matchingActions = componentTools.searchActions(query);
+                List<ActionMinimalInfo> matchingActions = componentTools.searchActions(query, toolContext);
 
                 actionsCount = matchingActions.size();
 
@@ -369,7 +381,7 @@ public class TaskTools {
             }
 
             if (includeTriggers) {
-                List<TriggerMinimalInfo> matchingTriggers = componentTools.searchTriggers(query);
+                List<TriggerMinimalInfo> matchingTriggers = componentTools.searchTriggers(query, toolContext);
 
                 triggersCount = matchingTriggers.size();
 
@@ -392,7 +404,8 @@ public class TaskTools {
                 }
             }
 
-            matchingTasks = filterByAllowedComponentNames(matchingTasks, toolContext);
+            matchingTasks =
+                AllowedComponentNamesUtils.filter(matchingTasks, TaskMinimalInfo::componentName, toolContext);
 
             if (normalizedType == null) {
                 matchingTasks.sort((task1, task2) -> ToolUtils.compareTasks(task1.name, task1.description,
@@ -431,7 +444,10 @@ public class TaskTools {
         @ToolParam(description = "The name of the task for validation") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(required = false, description = "The version of the component") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version,
+        @Nullable ToolContext toolContext) {
+
+        checkAllowedComponent(type, componentName, toolContext, TaskToolErrorType.VALIDATE_TASK);
 
         try {
             StringBuilder errors = new StringBuilder("[");
@@ -439,7 +455,7 @@ public class TaskTools {
 
             // Create a task definition provider that gets the task properties for validation
             WorkflowValidator.TaskDefinitionProvider taskDefProvider =
-                (taskType, kind) -> getTaskProperties(type, name, componentName, version);
+                (taskType, kind) -> getTaskProperties(type, name, componentName, version, toolContext);
 
             // Use the refactored WorkflowValidator for single task validation
             WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);
@@ -484,44 +500,18 @@ public class TaskTools {
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the task as JSON string") String outputProperties) {
     }
 
-    @SuppressWarnings("unchecked")
-    private static @Nullable Set<String> getAllowedComponentNames(@Nullable ToolContext toolContext) {
-        if (toolContext == null) {
-            return null;
+    private static void checkAllowedComponent(
+        String type, @Nullable String componentName, @Nullable ToolContext toolContext,
+        TaskToolErrorType taskToolErrorType) {
+
+        if (StringUtils.equalsIgnoreCase(StringUtils.trim(type), "taskDispatcher")) {
+            return;
         }
 
-        Object value = toolContext.getContext()
-            .get(TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY);
-
-        if (value instanceof Set<?> set) {
-            return (Set<String>) set;
+        if (componentName != null && !AllowedComponentNamesUtils.isAllowed(componentName, toolContext)) {
+            throw new ExecutionException(
+                AllowedComponentNamesUtils.getNotAllowedMessage(List.of(componentName)), taskToolErrorType);
         }
-
-        return null;
-    }
-
-    private static List<TaskMinimalInfo> filterByAllowedComponentNames(
-        List<TaskMinimalInfo> tasks, @Nullable ToolContext toolContext) {
-
-        Set<String> allowedComponentNames = getAllowedComponentNames(toolContext);
-
-        if (allowedComponentNames == null || allowedComponentNames.isEmpty()) {
-            if (log.isDebugEnabled()) {
-                log.debug("No allow-list present in tool context; returning all {} tasks unfiltered", tasks.size());
-            }
-
-            return tasks;
-        }
-
-        List<TaskMinimalInfo> filteredTasks = new ArrayList<>();
-
-        for (TaskMinimalInfo task : tasks) {
-            if (task.componentName() == null || allowedComponentNames.contains(task.componentName())) {
-                filteredTasks.add(task);
-            }
-        }
-
-        return filteredTasks;
     }
 
     /**

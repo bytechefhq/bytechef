@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.ai.tool;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -32,6 +33,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.ComponentTools.ActionMinimalInfo;
+import com.bytechef.platform.ai.tool.ComponentTools.ComponentInfo;
+import com.bytechef.platform.ai.tool.ComponentTools.ComponentMinimalInfo;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
@@ -46,6 +52,7 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -490,5 +497,102 @@ class ComponentToolsTest {
         assertNotNull(result);
         assertEquals("result", result.name());
         verify(componentDefinitionService).getComponentDefinition(componentName, null);
+    }
+
+    @Test
+    void testSearchComponentsReturnsOnlyAllowedComponentsWhenTheToolContextCarriesTheAllowList() {
+        mockComponentDefinitions();
+
+        List<ComponentMinimalInfo> result = componentTools.searchComponents("s", allowListToolContext("slack"));
+
+        assertThat(result)
+            .extracting(ComponentMinimalInfo::name)
+            .containsExactly("slack");
+    }
+
+    @Test
+    void testSearchActionsReturnsOnlyActionsOfAllowedComponents() {
+        mockComponentDefinitions();
+
+        List<ActionMinimalInfo> result = componentTools.searchActions("send", allowListToolContext("slack"));
+
+        assertThat(result)
+            .extracting(ActionMinimalInfo::componentName)
+            .containsExactly("slack");
+    }
+
+    @Test
+    void testListComponentsWithoutTheAllowListReturnsEverything() {
+        mockComponentDefinitions();
+
+        assertThat(componentTools.listComponents(null))
+            .extracting(ComponentMinimalInfo::name)
+            .containsExactlyInAnyOrder("slack", "salesforce");
+        assertThat(componentTools.listComponents(new ToolContext(Map.of("other", "value"))))
+            .extracting(ComponentMinimalInfo::name)
+            .containsExactlyInAnyOrder("slack", "salesforce");
+    }
+
+    @Test
+    void testGetComponentRejectsAComponentOutsideTheAllowList() {
+        ExecutionException executionException = assertThrows(
+            ExecutionException.class,
+            () -> componentTools.getComponent("salesforce", null, allowListToolContext("slack")));
+
+        assertEquals(
+            "This chat can't use salesforce: it isn't one of the integrations available to this user.",
+            executionException.getMessage());
+        verify(componentDefinitionService, never()).getComponentDefinition(anyString(), any());
+    }
+
+    @Test
+    void testGetActionRejectsAComponentOutsideTheAllowList() {
+        assertThrows(
+            ExecutionException.class,
+            () -> componentTools.getAction("salesforce", "createRecord", null, allowListToolContext("slack")));
+
+        verify(componentDefinitionService, never()).getComponentDefinition(anyString(), any());
+    }
+
+    @Test
+    void testGetComponentReturnsAnAllowedComponentAndIgnoresAMissingAllowList() {
+        ComponentDefinition slackComponentDefinition = mockComponentDefinition("slack", "sendMessage");
+
+        when(componentDefinitionService.getComponentDefinition("slack", null)).thenReturn(slackComponentDefinition);
+
+        ComponentInfo allowedComponentInfo = componentTools.getComponent("slack", null, allowListToolContext("slack"));
+        ComponentInfo unrestrictedComponentInfo = componentTools.getComponent("slack", null, null);
+
+        assertEquals("slack", allowedComponentInfo.name());
+        assertEquals("slack", unrestrictedComponentInfo.name());
+    }
+
+    private static ToolContext allowListToolContext(String... componentNames) {
+        return new ToolContext(
+            Map.of(AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of(componentNames)));
+    }
+
+    private void mockComponentDefinitions() {
+        ComponentDefinition slackComponentDefinition = mockComponentDefinition("slack", "sendMessage");
+        ComponentDefinition salesforceComponentDefinition = mockComponentDefinition("salesforce", "sendEmail");
+
+        when(componentDefinitionService.getComponentDefinitions())
+            .thenReturn(List.of(slackComponentDefinition, salesforceComponentDefinition));
+    }
+
+    private static ComponentDefinition mockComponentDefinition(String componentName, String actionName) {
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getName()).thenReturn(actionName);
+        when(actionDefinition.getDescription()).thenReturn(actionName + " description");
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinition.getName()).thenReturn(componentName);
+        when(componentDefinition.getDescription()).thenReturn(componentName + " component");
+        when(componentDefinition.getVersion()).thenReturn(1);
+        when(componentDefinition.getActions()).thenReturn(List.of(actionDefinition));
+
+        return componentDefinition;
     }
 }

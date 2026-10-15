@@ -18,13 +18,18 @@ package com.bytechef.platform.ai.tool;
 
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.exception.WorkflowValidatorToolErrorType;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -39,23 +44,35 @@ public class WorkflowValidatorTools {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowValidatorTools.class);
 
+    private final ComponentDefinitionService componentDefinitionService;
     private final WorkflowValidatorFacade workflowValidatorFacade;
 
     @SuppressFBWarnings("EI")
-    public WorkflowValidatorTools(WorkflowValidatorFacade workflowValidatorFacade) {
+    public WorkflowValidatorTools(
+        ComponentDefinitionService componentDefinitionService, WorkflowValidatorFacade workflowValidatorFacade) {
+
+        this.componentDefinitionService = componentDefinitionService;
         this.workflowValidatorFacade = workflowValidatorFacade;
     }
 
     @Tool(
         description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
     public WorkflowValidationResult validateWorkflow(
-        @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
+        @ToolParam(description = "The JSON string of the workflow to validate") String workflow,
+        @Nullable ToolContext toolContext) {
 
         try {
             WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
                 workflowValidatorFacade.validateWorkflow(workflow);
 
-            List<String> errors = workflowValidationResult.errors();
+            List<String> errors = new ArrayList<>(workflowValidationResult.errors());
+
+            List<String> disallowedComponentNames = AllowedComponentNamesUtils.getDisallowedComponentNames(
+                workflow, toolContext, componentDefinitionService);
+
+            if (!disallowedComponentNames.isEmpty()) {
+                errors.addFirst(AllowedComponentNamesUtils.getNotAllowedMessage(disallowedComponentNames));
+            }
 
             String errorMessages = errors.toString();
 
