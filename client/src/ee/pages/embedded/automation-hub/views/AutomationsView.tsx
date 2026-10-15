@@ -83,6 +83,7 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
     const handleActivated = useCallback(() => {
         void queryClient.invalidateQueries({queryKey: AutomationHubKeys.automations});
         void queryClient.invalidateQueries({queryKey: AutomationHubKeys.connections});
+        void queryClient.invalidateQueries({queryKey: AutomationHubKeys.integrations});
     }, [queryClient]);
 
     const handleEditWorkflow = useCallback(
