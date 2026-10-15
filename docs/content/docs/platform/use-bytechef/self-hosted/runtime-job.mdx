@@ -64,6 +64,7 @@ red - all driven by the exit code alone.
 | `--parameters=<json>` | No | JSON object of the workflow's input values, e.g. `'{"batchDate": "2026-07-09"}'`. |
 | `--connections=<json>` | No | JSON object mapping connection names to their parameters - see [Connections](#connections). |
 | `--timeout=<duration>` | No | Give up and exit `1` if the job has not finished within this duration, e.g. `30s`, `15m`, `1h`. Without it the app waits indefinitely, which for a wedged job means a pod that never terminates. |
+| `--outputs-file=<path>` | No | Write the workflow's `outputs` to this file as a JSON object once the job completes. The outputs of a completed job are also logged at `INFO`. A failed, stopped or timed-out job has no outputs, and the file is not written. |
 
 ```bash
 java -jar runtime-job-app.jar \
