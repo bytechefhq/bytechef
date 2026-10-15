@@ -26,7 +26,6 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
-import com.bytechef.platform.component.definition.AppEventComponentDefinition;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.workflow.definition.TriggerDefinition;
@@ -288,13 +287,13 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
         List<? extends TriggerDefinition> triggerDefinitions = workflowDefinition.getTriggers()
             .orElseGet(List::of);
 
-        boolean publiclyInvocable = triggerDefinitions.stream()
-            .anyMatch(AutomationWorkflowProjectCodeWorkflowFacadeImpl::isPubliclyInvocableTrigger);
+        boolean startable = triggerDefinitions.stream()
+            .anyMatch(AutomationWorkflowProjectCodeWorkflowFacadeImpl::isStartableTrigger);
 
-        if (!publiclyInvocable) {
-            String warning = ("Workflow '%s' in deployed automation code workflow project '%s' declares neither a "
-                + "request trigger nor an app-event trigger; it will not be invocable through the embedded public "
-                + "endpoints").formatted(workflowDefinition.getName(), projectName);
+        if (!startable) {
+            String warning = ("Workflow '%s' in deployed automation code workflow project '%s' has no trigger that "
+                + "can start it; add a request, app-event, or component trigger")
+                    .formatted(workflowDefinition.getName(), projectName);
 
             log.warn(warning);
 
@@ -302,15 +301,10 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
         }
     }
 
-    private static boolean isPubliclyInvocableTrigger(TriggerDefinition triggerDefinition) {
+    private static boolean isStartableTrigger(TriggerDefinition triggerDefinition) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(triggerDefinition.getType());
 
-        if (Objects.equals(workflowNodeType.name(), "request")) {
-            return true;
-        }
-
-        return Objects.equals(workflowNodeType.name(), AppEventComponentDefinition.APP_EVENT) &&
-            Objects.equals(workflowNodeType.operation(), AppEventComponentDefinition.NEW_EVENT);
+        return !Objects.equals(workflowNodeType.name(), "manual");
     }
 
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
