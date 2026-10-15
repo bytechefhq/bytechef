@@ -33,3 +33,13 @@ it('imports the selected workflow file', async () => {
 
     expect(mockProps.onImportWorkflow).toHaveBeenCalledWith('{"label": "Imported"}');
 });
+
+it('keeps only the integration actions for a code workflow', () => {
+    render(<IntegrationTabButtons {...mockProps} codeWorkflow />);
+
+    expect(screen.getByLabelText('Edit Integration Button')).toBeInTheDocument();
+    expect(screen.getByLabelText('Integration History')).toBeInTheDocument();
+    expect(screen.getByLabelText('Delete Integration')).toBeInTheDocument();
+    expect(screen.queryByLabelText('New Workflow')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Import Workflow Button')).not.toBeInTheDocument();
+});
