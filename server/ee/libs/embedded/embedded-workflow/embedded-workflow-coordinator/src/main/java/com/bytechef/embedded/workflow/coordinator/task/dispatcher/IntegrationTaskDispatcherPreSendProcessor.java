@@ -25,6 +25,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -33,9 +34,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @version ee
@@ -98,6 +101,12 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
         if (Objects.equals(integration.getComponentName(), workflowNodeType.name())) {
             connectionIdMap = MapUtils.concat(
                 connectionIdMap, Map.of(workflowTask.getName(), integrationInstance.getConnectionId()));
+        } else {
+            connectionIdMap = MapUtils.concat(
+                connectionIdMap,
+                getDeclaredIntegrationConnectionIdMap(
+                    workflowTask, integration.getComponentName(), integrationInstance.getConnectionId(),
+                    connectionIdMap));
         }
 
         if (!connectionIdMap.isEmpty()) {
@@ -135,6 +144,21 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
         taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
         return taskExecution;
+    }
+
+    private static Map<String, Long> getDeclaredIntegrationConnectionIdMap(
+        WorkflowTask workflowTask, String integrationComponentName, long integrationConnectionId,
+        Map<String, Long> connectionIdMap) {
+
+        Map<String, Map<String, ?>> declaredConnections = MapUtils.getMap(
+            workflowTask.getExtensions(), WorkflowExtConstants.CONNECTIONS, new TypeReference<>() {}, Map.of());
+
+        return declaredConnections.entrySet()
+            .stream()
+            .filter(entry -> !connectionIdMap.containsKey(entry.getKey()))
+            .filter(entry -> Objects.equals(
+                MapUtils.getString(entry.getValue(), WorkflowExtConstants.COMPONENT_NAME), integrationComponentName))
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> integrationConnectionId));
     }
 
     @Override
