@@ -106,6 +106,8 @@ const ProjectsLeftSidebar = ({
 
     const selectedProject = projects?.find((project) => project.id === selectedProjectId);
 
+    const targetProject = projects?.find((project) => project.id === targetProjectId);
+
     const filteredWorkflowsList = useMemo(
         () => getFilteredWorkflows(workflows, sortBy, searchValue),
         [workflows, sortBy, searchValue, getFilteredWorkflows]
@@ -211,67 +213,69 @@ const ProjectsLeftSidebar = ({
                     sortBy={sortBy}
                 />
 
-                <ButtonGroup className="w-full">
-                    <Button
-                        className="flex-1 [&_svg]:size-5"
-                        icon={<PlusIcon />}
-                        label="New Workflow"
-                        onClick={() => setShowWorkflowDialog(true)}
-                        variant="secondary"
-                    />
+                {!targetProject?.codeWorkflow && (
+                    <ButtonGroup className="w-full">
+                        <Button
+                            className="flex-1 [&_svg]:size-5"
+                            icon={<PlusIcon />}
+                            label="New Workflow"
+                            onClick={() => setShowWorkflowDialog(true)}
+                            variant="secondary"
+                        />
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                aria-label="More workflow options"
-                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
-                                icon={
-                                    isImportingN8nWorkflow ? (
-                                        <LoaderCircleIcon className="animate-spin text-primary" />
-                                    ) : (
-                                        <ChevronDownIcon />
-                                    )
-                                }
-                                size="icon"
-                                variant="secondary"
-                            />
-                        </DropdownMenuTrigger>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    aria-label="More workflow options"
+                                    className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
+                                    icon={
+                                        isImportingN8nWorkflow ? (
+                                            <LoaderCircleIcon className="animate-spin text-primary" />
+                                        ) : (
+                                            <ChevronDownIcon />
+                                        )
+                                    }
+                                    size="icon"
+                                    variant="secondary"
+                                />
+                            </DropdownMenuTrigger>
 
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() => navigate(`/automation/projects/${targetProjectId}/templates`)}
-                            >
-                                <LayoutTemplateIcon /> From Template
-                            </DropdownMenuItem>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => navigate(`/automation/projects/${targetProjectId}/templates`)}
+                                >
+                                    <LayoutTemplateIcon /> From Template
+                                </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() => workflowFileInputRef.current?.click()}
-                            >
-                                <UploadIcon /> Import Workflow
-                            </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => workflowFileInputRef.current?.click()}
+                                >
+                                    <UploadIcon /> Import Workflow
+                                </DropdownMenuItem>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span className="block">
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            disabled={importN8nWorkflowDisabled}
-                                            onClick={() => n8nWorkflowFileInputRef.current?.click()}
-                                        >
-                                            <UploadIcon /> Import n8n Workflow
-                                        </DropdownMenuItem>
-                                    </span>
-                                </TooltipTrigger>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span className="block">
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                disabled={importN8nWorkflowDisabled}
+                                                onClick={() => n8nWorkflowFileInputRef.current?.click()}
+                                            >
+                                                <UploadIcon /> Import n8n Workflow
+                                            </DropdownMenuItem>
+                                        </span>
+                                    </TooltipTrigger>
 
-                                {importN8nWorkflowDisabled && (
-                                    <TooltipContent>Enable an AI provider to import n8n workflows.</TooltipContent>
-                                )}
-                            </Tooltip>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </ButtonGroup>
+                                    {importN8nWorkflowDisabled && (
+                                        <TooltipContent>Enable an AI provider to import n8n workflows.</TooltipContent>
+                                    )}
+                                </Tooltip>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </ButtonGroup>
+                )}
             </div>
 
             <ScrollArea className="mb-3 min-h-0 w-full flex-1 [&_[data-radix-scroll-area-viewport]>div]:block!">
