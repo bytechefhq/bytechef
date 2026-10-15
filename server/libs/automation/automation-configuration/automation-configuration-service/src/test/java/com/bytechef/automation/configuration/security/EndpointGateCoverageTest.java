@@ -108,11 +108,6 @@ class EndpointGateCoverageTest {
         Map.entry("ConnectionTagApiController#updateConnectionTags", "WorkspaceConnectionFacadeImpl#updateTags"),
         Map.entry("CustomComponentApiController#deployCustomComponent", "CustomComponentFacadeImpl#save"),
         Map.entry("CustomComponentGraphQlController#deleteCustomComponent", "CustomComponentFacadeImpl#delete"),
-        Map.entry("CustomComponentGraphQlController#enableCustomComponent",
-            "CustomComponentServiceImpl#enableCustomComponent"),
-        Map.entry("CustomRoleGraphQlController#createCustomRole", "CustomRoleServiceImpl#createCustomRole"),
-        Map.entry("CustomRoleGraphQlController#deleteCustomRole", "CustomRoleServiceImpl#deleteCustomRole"),
-        Map.entry("CustomRoleGraphQlController#updateCustomRole", "CustomRoleServiceImpl#updateCustomRole"),
         Map.entry("GitConfigurationApiController#updateGitConfiguration", "GitConfigurationFacadeImpl#save"),
         Map.entry("IdentityProviderGraphQlController#createIdentityProvider", "IdentityProviderFacadeImpl#create"),
         Map.entry("IdentityProviderGraphQlController#deleteIdentityProvider", "IdentityProviderFacadeImpl#delete"),
@@ -137,7 +132,6 @@ class EndpointGateCoverageTest {
         Map.entry("McpServerGraphQlController#deleteMcpServer", "McpServerFacadeImpl#deleteMcpServer"),
         Map.entry("McpServerGraphQlController#updateMcpServer", "McpServerServiceImpl#update"),
         Map.entry("McpServerGraphQlController#updateMcpServerTags", "McpServerFacadeImpl#updateMcpServerTags"),
-        Map.entry("McpServerGraphQlController#updateMcpServerUrl", "McpServerServiceImpl#update"),
         Map.entry("McpToolGraphQlController#createMcpTool", "McpToolServiceImpl#create"),
         Map.entry("McpToolGraphQlController#deleteMcpTool", "McpToolServiceImpl#delete"),
         Map.entry("McpToolGraphQlController#updateMcpTool", "McpToolServiceImpl#update"),
@@ -165,7 +159,6 @@ class EndpointGateCoverageTest {
         Map.entry("ProjectDeploymentTagApiController#updateProjectDeploymentTags",
             "ProjectDeploymentFacadeImpl#updateProjectDeploymentTags"),
         Map.entry("ProjectGitApiController#pullProjectFromGit", "ProjectGitFacadeImpl#pullProjectFromGit"),
-        Map.entry("ProjectGitApiController#updateProjectGitConfiguration", "ProjectGitConfigurationServiceImpl#save"),
         Map.entry("ProjectGraphQlController#deleteSharedProject", "ProjectFacadeImpl#deleteSharedProject"),
         Map.entry("ProjectGraphQlController#exportSharedProject", "ProjectFacadeImpl#exportSharedProject"),
         Map.entry("ProjectGraphQlController#importProjectTemplate", "ProjectFacadeImpl#importProjectTemplate"),
@@ -226,17 +219,6 @@ class EndpointGateCoverageTest {
             "WorkspaceMcpServerFacadeImpl#createWorkspaceMcpServer"),
         Map.entry("WorkspaceMcpServerGraphQlController#deleteWorkspaceMcpServer",
             "WorkspaceMcpServerFacadeImpl#deleteWorkspaceMcpServer"),
-        Map.entry("WorkspaceUserGraphQlController#addWorkspaceUser", "WorkspaceUserServiceImpl#addWorkspaceUser"),
-        Map.entry("WorkspaceUserGraphQlController#assignWorkspaceUserCustomRole",
-            "WorkspaceUserServiceImpl#assignCustomRole"),
-        Map.entry("WorkspaceUserGraphQlController#inviteWorkspaceUser", "WorkspaceUserServiceImpl#inviteWorkspaceUser"),
-        Map.entry("WorkspaceUserGraphQlController#removeWorkspaceUser", "WorkspaceUserServiceImpl#removeWorkspaceUser"),
-        Map.entry("WorkspaceUserGraphQlController#removeWorkspaceUserEnvironmentRole",
-            "WorkspaceUserServiceImpl#removeEnvironmentRole"),
-        Map.entry("WorkspaceUserGraphQlController#setWorkspaceUserEnvironmentRole",
-            "WorkspaceUserServiceImpl#setEnvironmentRole"),
-        Map.entry("WorkspaceUserGraphQlController#updateWorkspaceUserRole",
-            "WorkspaceUserServiceImpl#updateWorkspaceUserRole"),
         Map.entry("embedded:ConnectionApiController#createConnection", "ConnectionAdminFacadeImpl#createConnection"),
         Map.entry("embedded:ConnectionApiController#deleteConnection", "ConnectionAdminFacadeImpl#deleteConnection"),
         Map.entry("embedded:ConnectionApiController#updateConnection", "ConnectionAdminFacadeImpl#updateConnection"),
@@ -245,6 +227,9 @@ class EndpointGateCoverageTest {
             "ConnectionAdminFacadeImpl#updateConnectionTags"));
 
     private static final Map<String, String> AUTHORIZED_OTHERWISE = Map.ofEntries(
+        Map.entry(
+            "A2AServerController#handleJsonRpc",
+            "permit-all agent endpoint addressed by the A2A server's secret key"),
         Map.entry("AccountController#changePassword", "acts on the signed-in account only"),
         Map.entry("AccountController#disableMfa", "acts on the signed-in account only"),
         Map.entry("AccountController#enableMfa", "acts on the signed-in account only"),
@@ -277,6 +262,9 @@ class EndpointGateCoverageTest {
         Map.entry("BillingWebhookApiController#handleWebhook", "Stripe webhook, verified by its signature"),
         Map.entry("CopilotApiController#chat", "checks the workflow scope in its body"),
         Map.entry("JobResumeController#resume", "permit-all inbound callback addressed by a resume id"),
+        Map.entry(
+            "JobResumeController#resumeStreaming",
+            "permit-all inbound callback addressed by a resume id, streaming its events"),
         Map.entry(
             "McpProjectGraphQlController#updateMcpProject",
             "McpProjectService and McpProjectWorkflowService gate MCP_VIEW and MCP_EDIT inside the transaction"),
@@ -311,6 +299,8 @@ class EndpointGateCoverageTest {
         Map.entry("embedded-v1:AccountingAccountApiController#listAccounts", EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry("embedded-v1:AccountingAccountApiController#updateAccount", EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry("embedded-v1:ActionApiController#executeAction", EMBEDDED_PATH_SCOPED),
+        Map.entry("embedded-v1:AppEventTriggerApiController#executeFrontendWorkflows", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:AppEventTriggerApiController#executeWorkflows", EMBEDDED_PATH_SCOPED),
         Map.entry("embedded-v1:ConnectedUserApiController#updateConnectedUser", EMBEDDED_PATH_SCOPED),
         Map.entry("embedded-v1:ConnectedUserApiController#updateFrontendConnectedUser", EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry("embedded-v1:ConnectedUserCopilotApiController#copilotChat", EMBEDDED_PRINCIPAL_SCOPED),
@@ -333,6 +323,12 @@ class EndpointGateCoverageTest {
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry("embedded-v1:ConnectedUserProjectWorkflowApiController#deleteProjectWorkflow", EMBEDDED_PATH_SCOPED),
         Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#deprovisionFrontendWorkflowReference",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#deprovisionWorkflowReference",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
             "embedded-v1:ConnectedUserProjectWorkflowApiController#disableFrontendProjectWorkflow",
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry(
@@ -345,6 +341,12 @@ class EndpointGateCoverageTest {
             "embedded-v1:ConnectedUserProjectWorkflowApiController#enableProjectWorkflow",
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#provisionFrontendWorkflowReference",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#provisionWorkflowReference",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
             "embedded-v1:ConnectedUserProjectWorkflowApiController#publishFrontendProjectWorkflow",
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry("embedded-v1:ConnectedUserProjectWorkflowApiController#publishProjectWorkflow", EMBEDDED_PATH_SCOPED),
@@ -355,11 +357,17 @@ class EndpointGateCoverageTest {
             "embedded-v1:ConnectedUserProjectWorkflowApiController#updateFrontendProjectWorkflowFromPrompt",
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#updateFrontendProjectWorkflowInputs",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
             "embedded-v1:ConnectedUserProjectWorkflowApiController#updateFrontendWorkflowConfigurationConnection",
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry("embedded-v1:ConnectedUserProjectWorkflowApiController#updateProjectWorkflow", EMBEDDED_PATH_SCOPED),
         Map.entry(
             "embedded-v1:ConnectedUserProjectWorkflowApiController#updateProjectWorkflowFromPrompt",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#updateProjectWorkflowInputs",
             EMBEDDED_PATH_SCOPED),
         Map.entry(
             "embedded-v1:ConnectedUserProjectWorkflowApiController#updateWorkflowConfigurationConnection",
@@ -427,7 +435,8 @@ class EndpointGateCoverageTest {
         Map.entry(
             "embedded-v1:McpIntegrationInstanceWorkflowApiController#updateFrontendMcpIntegrationInstanceWorkflow",
             EMBEDDED_PRINCIPAL_SCOPED),
-        Map.entry("embedded-v1:RequestTriggerApiController#executeWorkflow", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:RequestTriggerApiController#executeFrontendWorkflow", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:RequestTriggerApiController#executeWorkflow", EMBEDDED_PATH_SCOPED),
         Map.entry("embedded-v1:ToolApiController#executeTool", EMBEDDED_PATH_SCOPED),
         Map.entry(
             "embedded:ConnectedUserProjectWorkflowApiController#enableConnectedUserProjectWorkflow",
@@ -501,7 +510,7 @@ class EndpointGateCoverageTest {
 
             String typeName = fileName.substring(0, fileName.length() - ".java".length());
 
-            if (!source.contains("@PreAuthorize") && !isScannedController(serverRoot, sourceFile, source)) {
+            if (!isGatedSource(source) && !isScannedController(serverRoot, sourceFile, source)) {
                 continue;
             }
 
@@ -552,7 +561,7 @@ class EndpointGateCoverageTest {
                 KNOWN_UNGATED_WRITES.containsKey(key);
 
             for (Endpoint endpoint : entry.getValue()) {
-                if (!endpoint.gated() && !listed) {
+                if (!endpoint.gated() && !listed && !delegatesToGatedMethod(endpoint, false)) {
                     unlistedUngatedEndpoints.add(key + " (" + endpoint.kind() + ")");
                 }
             }
@@ -560,9 +569,10 @@ class EndpointGateCoverageTest {
 
         assertThat(unlistedUngatedEndpoints)
             .as(
-                "these write endpoints carry no @PreAuthorize of their own and are not listed: gate them, or add them "
-                    + "to GATED_DELEGATES with the gated bean method they call, to AUTHORIZED_OTHERWISE with how "
-                    + "it is authorized, or to KNOWN_UNGATED_WRITES")
+                "these write endpoints carry no @PreAuthorize of their own, call no @PreAuthorize-gated method of a "
+                    + "facade or service field, and are not listed: gate them, or add them to GATED_DELEGATES with the "
+                    + "gated bean method they call, to AUTHORIZED_OTHERWISE with how it is authorized, or to "
+                    + "KNOWN_UNGATED_WRITES")
             .isEmpty();
     }
 
@@ -577,7 +587,7 @@ class EndpointGateCoverageTest {
             controllerNamesWithReads.add(key.substring(0, key.indexOf('#')));
 
             for (Endpoint endpoint : entry.getValue()) {
-                if (!endpoint.gated()) {
+                if (!endpoint.gated() && !delegatesToGatedMethod(endpoint, true)) {
                     ungatedReadEndpoints.add(entry.getKey() + " (" + endpoint.kind() + ")");
                 }
             }
@@ -588,7 +598,9 @@ class EndpointGateCoverageTest {
             .isEqualTo(new TreeSet<>(READ_GATED_CONTROLLERS));
 
         assertThat(ungatedReadEndpoints)
-            .as("these read endpoints of a READ_GATED_CONTROLLERS controller carry no @PreAuthorize or @PostFilter")
+            .as(
+                "these read endpoints of a READ_GATED_CONTROLLERS controller carry no @PreAuthorize or @PostFilter, "
+                    + "and call no gated method of a facade or service field")
             .isEmpty();
     }
 
@@ -689,6 +701,68 @@ class EndpointGateCoverageTest {
         }
 
         return null;
+    }
+
+    /**
+     * Whether the endpoint calls, on one of its controller's fields, a method that a scanned implementation of the
+     * field's type gates. This is how most endpoints are authorized: the controller only translates, and the facade or
+     * service it calls carries the gate. A write counts only a {@code @PreAuthorize}, which refuses before the method
+     * runs; a read also counts a {@code @PostAuthorize} or {@code @PostFilter}, which withhold what it returns.
+     */
+    private static boolean delegatesToGatedMethod(Endpoint endpoint, boolean read) {
+        SourceType controller = endpoint.controller();
+
+        for (Map.Entry<String, String> field : controller.fieldTypeNamesByName()
+            .entrySet()) {
+
+            for (SourceType gatedType : findImplementations(field.getValue())) {
+                if (gatedType.classGated()) {
+                    Pattern anyCallPattern = Pattern.compile(
+                        "\\b" + Pattern.quote(field.getKey()) + "\\s*\\.\\s*\\w+\\s*\\(");
+
+                    if (anyCallPattern.matcher(endpoint.body())
+                        .find()) {
+
+                        return true;
+                    }
+
+                    continue;
+                }
+
+                Set<String> gatedMethodNames = read ? gatedType.readGatedMethodNames() : gatedType.gatedMethodNames();
+
+                for (String gatedMethodName : gatedMethodNames) {
+                    if (callsDelegate(endpoint, Set.of(field.getValue()), gatedMethodName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static List<SourceType> findImplementations(String typeName) {
+        List<SourceType> implementations = new ArrayList<>();
+
+        for (List<SourceType> sourceTypes : sourceTypesByName.values()) {
+            for (SourceType sourceType : sourceTypes) {
+                if (sourceType.name()
+                    .equals(typeName) ||
+                    sourceType.implementedTypeNames()
+                        .contains(typeName)) {
+
+                    implementations.add(sourceType);
+                }
+            }
+        }
+
+        return implementations;
+    }
+
+    private static boolean isGatedSource(String source) {
+        return source.contains("@PreAuthorize") || source.contains("@PostAuthorize") ||
+            source.contains("@PostFilter");
     }
 
     private static boolean callsDelegate(Endpoint endpoint, Set<String> receiverTypeNames, String methodName) {
@@ -1050,18 +1124,24 @@ class EndpointGateCoverageTest {
         }
 
         Set<String> gatedMethodNames = new TreeSet<>();
+        Set<String> readGatedMethodNames = new TreeSet<>();
 
         for (Member member : members) {
             Map<String, String> memberAnnotations = member.annotations();
 
             if (memberAnnotations.containsKey("PreAuthorize")) {
                 gatedMethodNames.add(member.name());
+                readGatedMethodNames.add(member.name());
+            }
+
+            if (memberAnnotations.containsKey("PostAuthorize") || memberAnnotations.containsKey("PostFilter")) {
+                readGatedMethodNames.add(member.name());
             }
         }
 
         return new SourceType(
             typeName, classAnnotations, classAnnotations.containsKey("PreAuthorize"), implementedTypeNames,
-            fieldTypeNamesByName, members, gatedMethodNames);
+            fieldTypeNamesByName, members, gatedMethodNames, readGatedMethodNames);
     }
 
     private static boolean isAnnotationStart(String source, int index) {
@@ -1199,6 +1279,7 @@ class EndpointGateCoverageTest {
 
     private record SourceType(
         String name, Map<String, String> classAnnotations, boolean classGated, Set<String> implementedTypeNames,
-        Map<String, String> fieldTypeNamesByName, List<Member> members, Set<String> gatedMethodNames) {
+        Map<String, String> fieldTypeNamesByName, List<Member> members, Set<String> gatedMethodNames,
+        Set<String> readGatedMethodNames) {
     }
 }
