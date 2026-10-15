@@ -8,6 +8,7 @@
     "workflows",
     "automations",
     "automation-hub",
+    "activation-dialog",
     "connections",
     "app-events",
     "request-triggers",

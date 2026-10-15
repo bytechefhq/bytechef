@@ -10,9 +10,29 @@ White-labelling has two halves. The **placement** half is available today: your 
 
 - **Where the surfaces sit.** The Connect dialog opens from your own UI, and the Automation Hub, Integration Marketplace and workflow builder render in an iframe you position and size. Your layout, your navigation, your typography around them.
 - **The look of the Automation Hub and Integration Marketplace.** Both components take a `theme` prop. It sets `mode` (`'dark'` or `'light'`), `primaryColor`, `fontFamily`, `borderRadius`, the surface colors (`surfaceColor`, `cardColor`, `activeBorderColor`, `enableColor`, `disableColor`, `onAccentColor`, `segmentColor`) and `cssVariables`, a map of any CSS custom properties starting with `--`. Colors that the browser does not recognize, and a `borderRadius` that is not a `px`, `rem`, `em` or `%` length, are ignored. The hub's theme also applies to the workflow builder the hub opens. See [Theming](/platform/embedded/build/automation-hub#theming) on the Automation Hub page.
-- **Light or dark Connect dialog.** `useConnectDialog` takes `mode: 'dark' | 'light'` (default `'light'`). The Integration Marketplace passes its `theme.mode` to the dialog it opens. See [Displaying the Connect Dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog).
+- **The Connect and activation dialogs.** `useConnectDialog` and `useActivationDialog` take `mode: 'dark' | 'light'` (default `'light'`) and read `--bytechef-dialog-*` CSS variables. See [Styling the dialogs](#styling-the-dialogs). The Integration Marketplace passes its `theme.mode` to the dialog it opens. See [Displaying the Connect Dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog).
 - **What is in the catalog.** `includeComponents` restricts the workflow builder, standalone or opened from the Automation Hub, to the components you choose, and [permission expressions](/platform/embedded/build/permission-expressions) narrow what each connected user is offered. Your customers do not see the full ByteChef catalog unless you want them to.
 - **Which workflows exist.** You author the templates; customers configure them rather than starting from a blank canvas.
+
+## Styling the dialogs
+
+The Connect dialog and the activation dialog render in your page, not in an iframe, and read these CSS variables. Set them on `:root` or any ancestor of the dialog.
+
+| Variable | Used for |
+|---|---|
+| `--bytechef-dialog-surface` | Dialog background. |
+| `--bytechef-dialog-surface-raised` | Raised areas inside the dialog. |
+| `--bytechef-dialog-border` | Borders. |
+| `--bytechef-dialog-text` | Text. |
+| `--bytechef-dialog-text-muted` | Secondary text. |
+| `--bytechef-dialog-hover` | Hover backgrounds. |
+| `--bytechef-dialog-primary` | Primary buttons and accents. |
+| `--bytechef-dialog-primary-hover` | Primary button hover. |
+| `--bytechef-dialog-primary-foreground` | Text on primary buttons. |
+
+A variable you do not set falls back to a built-in color. `mode: 'dark'` switches the surface, border, text and hover fallbacks to a dark palette.
+
+The Automation Hub maps its `theme` onto these variables, so the dialogs it opens match the hub.
 
 ## What is fixed
 
@@ -20,7 +40,7 @@ The standalone `EmbeddedWorkflowBuilder` component has no `theme` prop - it take
 
 | Surface | Status |
 |---|---|
-| **Colors, fonts, radius** | Configurable on the Automation Hub and Integration Marketplace through `theme`, and on the Connect dialog through `mode` only. Fixed on the standalone workflow builder. |
+| **Colors, fonts, radius** | Configurable on the Automation Hub and Integration Marketplace through `theme`, and on the Connect and activation dialogs through `mode` and the `--bytechef-dialog-*` variables. Fixed on the standalone workflow builder. |
 | **Language** | English only. No locale option, and no translation files to supply. |
 | **Copy and labels** | Fixed, including validation messages inside the Connect dialog. |
 | **Engine error messages** | Fixed and in English. Surfaced as-is in execution history. |

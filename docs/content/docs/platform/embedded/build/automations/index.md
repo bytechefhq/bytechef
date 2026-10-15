@@ -113,6 +113,7 @@ Projects are scoped to the current environment. Switch environments from the sel
 ## Related
 
 - [Automation Hub](/platform/embedded/build/automation-hub) - the embeddable catalog where connected users find published projects.
+- [Activate templates from your app](/platform/embedded/build/activation-dialog) - open the activation dialog for a published template from your own page.
 - [Permission Expressions](/platform/embedded/build/permission-expressions) - limit which connected users see a project or workflow.
 - [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows) - references, provisioning and dangling references.
 - [Request Triggers](/platform/embedded/build/request-triggers) - run a connected user's workflow and get its result in the response.
