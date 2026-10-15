@@ -1,0 +1,104 @@
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stepHint {
+    color: var(--dialog-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.componentRow {
+    border: 1px solid var(--dialog-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+}
+
+.componentRowHighlighted {
+    composes: componentRow;
+    border-color: var(--bytechef-red);
+}
+
+.componentTitle {
+    align-items: center;
+    display: flex;
+    font-size: 0.875rem;
+    font-weight: 500;
+    gap: 8px;
+}
+
+.componentIcon {
+    height: 16px;
+    width: 16px;
+}
+
+.componentIcon svg {
+    height: 100%;
+    width: 100%;
+}
+
+.controls {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+}
+
+.select,
+.input {
+    background-color: var(--dialog-surface);
+    border: 1px solid var(--dialog-border);
+    border-radius: 8px;
+    color: var(--dialog-text);
+    flex: 1;
+    font-size: 0.875rem;
+    padding: 8px 12px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.label {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.required {
+    color: var(--bytechef-red);
+    margin-left: 2px;
+}
+
+.notice {
+    color: var(--dialog-text-muted);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.warning {
+    color: var(--bytechef-red);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.alert {
+    border: 1px solid var(--bytechef-red);
+    border-radius: 8px;
+    color: var(--bytechef-red);
+    font-size: 0.875rem;
+    padding: 8px 12px;
+}
+
+.footerActions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 100%;
+}
