@@ -230,6 +230,9 @@ public class SpringAIAgent extends LocalAgent {
         return false;
     }
 
+    protected void prepareChatMemory(RunAgentInput input, ChatMemory chatMemory, String conversationId) {
+    }
+
     /**
      * Hook for subclasses to contribute per-invocation values into Spring AI's
      * {@link org.springframework.ai.chat.model.ToolContext}. The returned map is merged into the request via
@@ -459,6 +462,8 @@ public class SpringAIAgent extends LocalAgent {
 
         if (Objects.nonNull(this.chatMemory)) {
             try {
+                this.prepareChatMemory(input, this.chatMemory, this.conversationId(input));
+
                 chatRequest.advisors(
                     MessageChatMemoryAdvisor.builder(chatMemory).build()
                 );
