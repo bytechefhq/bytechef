@@ -27,7 +27,6 @@ import com.bytechef.ai.copilot.tool.context.ScopedToolContextKeys;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
-import com.bytechef.platform.component.tool.ComponentTools;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -103,29 +102,6 @@ class CopilotToolContextUtilsTest {
         Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(new HashMap<>()));
 
         assertThat(toolContext).doesNotContainKey(ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY);
-    }
-
-    @Test
-    void testToToolContextDisablesTheConnectionFallbackForAScopedRun() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).containsEntry(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, true);
-    }
-
-    @Test
-    void testToToolContextKeepsTheConnectionFallbackForAWorkspaceRun() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 1L);
-        stateMap.put(CopilotConstants.STATE_WORKSPACE_ID, 1L);
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).doesNotContainKey(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY);
     }
 
     @Test

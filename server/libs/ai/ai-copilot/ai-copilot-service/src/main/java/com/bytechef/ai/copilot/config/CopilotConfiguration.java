@@ -704,7 +704,7 @@ public class CopilotConfiguration {
             .defaultToolCallbacks(
                 new LookupComponentPropertyOptionsToolCallback(
                     actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
-                    propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP))
+                    propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard))
             .build();
     }
 
