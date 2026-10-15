@@ -109,6 +109,19 @@ describe('activationReducer', () => {
         expect(canProceed(state)).toBe(true);
     });
 
+    it('keeps the step and reports an error when the missing component has no row to connect', () => {
+        let state = initialActivationState([slack], []);
+
+        state = activationReducer(state, {componentName: 'slack', connectionId: 9, type: 'SELECT_CONNECTION'});
+        state = activationReducer(state, {type: 'NEXT'});
+        state = activationReducer(state, {componentName: 'openAi', type: 'MISSING_CONNECTION'});
+
+        expect(state.step).toBe('activate');
+        expect(state.highlightedComponent).toBeUndefined();
+        expect(state.error).toBe('openAi needs a connection your administrator must set up.');
+        expect(canProceed(state)).toBe(true);
+    });
+
     it('records failures and clears them on the next transition', () => {
         let state = initialActivationState([], []);
 

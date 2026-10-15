@@ -202,6 +202,15 @@
     width: 100%;
 }
 
+.saveError {
+    border: 1px solid var(--bytechef-red);
+    border-radius: 8px;
+    color: var(--bytechef-red);
+    font-size: 0.875rem;
+    margin: 0;
+    padding: 8px 12px;
+}
+
 .dialogContentFallback {
     display: flex;
     flex-direction: column;

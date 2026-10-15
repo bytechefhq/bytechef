@@ -94,6 +94,7 @@ interface DialogProps {
     mergedWorkflows: MergedWorkflowType[];
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
+    saveError?: string;
 }
 
 const ConnectDialog = ({
@@ -122,6 +123,7 @@ const ConnectDialog = ({
     mergedWorkflows,
     properties,
     registerFormSubmit,
+    saveError,
     title,
 }: DialogProps) => {
     // Option reset on integration switch is handled inside useWorkflowInputOptions (keyed on integrationInstanceId),
@@ -197,6 +199,12 @@ const ConnectDialog = ({
                             Close
                         </button>
                     </main>
+                )}
+
+                {integration && !loading && saveError && (
+                    <p className={styles.saveError} role="alert">
+                        {saveError}
+                    </p>
                 )}
 
                 {integration && !loading && (

@@ -164,4 +164,41 @@ describe('useConnectDialog reauthorize mode', () => {
         expect(onReauthorized).toHaveBeenCalledWith(70);
         expect(lastRenderedProps(renderMock).isOpen).toBe(false);
     });
+
+    it('shows a save error in the dialog when reauthorizing fails, and clears it on the next attempt', async () => {
+        const fetchMock = vi
+            .fn()
+            .mockResolvedValueOnce(jsonResponse(slackIntegration([{id: 7, connectionId: 70}])))
+            .mockResolvedValueOnce({...jsonResponse({}), ok: false, status: 500})
+            .mockResolvedValueOnce(jsonResponse({}));
+
+        global.fetch = fetchMock;
+
+        const onReauthorized = vi.fn();
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                integrationId: '12',
+                jwtToken: 'ey',
+                onReauthorized,
+                reauthorizeConnectionId: 70,
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        expect(lastRenderedProps(renderMock).saveError).toBeUndefined();
+
+        await act(async () => triggerOAuth2Code('fresh'));
+
+        expect(onReauthorized).not.toHaveBeenCalled();
+        expect(lastRenderedProps(renderMock).isOpen).toBe(true);
+        expect(lastRenderedProps(renderMock).saveError).toBe('Could not save the connection. Please try again.');
+
+        await act(async () => triggerOAuth2Code('fresh-again'));
+
+        expect(onReauthorized).toHaveBeenCalledWith(70);
+        expect(lastRenderedProps(renderMock).saveError).toBeUndefined();
+    });
 });

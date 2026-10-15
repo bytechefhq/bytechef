@@ -139,6 +139,14 @@ export function activationReducer(state: ActivationStateI, action: ActivationAct
         case 'SET_INPUT_VALUE':
             return {...state, inputValues: {...state.inputValues, [action.name]: action.value}};
         case 'MISSING_CONNECTION':
+            if (!state.requiredComponents.includes(action.componentName)) {
+                return {
+                    ...state,
+                    error: `${action.componentName} needs a connection your administrator must set up.`,
+                    highlightedComponent: undefined,
+                };
+            }
+
             return {...state, error: undefined, highlightedComponent: action.componentName, step: 'connect'};
         case 'ACTIVATED':
             return {...state, error: undefined, step: 'done', workflowUuid: action.workflowUuid};
