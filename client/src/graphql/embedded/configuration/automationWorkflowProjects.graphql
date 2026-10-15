@@ -59,6 +59,6 @@ mutation deleteAutomationWorkflowProjectWorkflow($workflowUuid: ID!) {
     deleteAutomationWorkflowProjectWorkflow(workflowUuid: $workflowUuid)
 }
 
-mutation publishAutomationWorkflowProject($id: ID!) {
-    publishAutomationWorkflowProject(id: $id)
+mutation publishAutomationWorkflowProject($id: ID!, $description: String) {
+    publishAutomationWorkflowProject(id: $id, description: $description)
 }
