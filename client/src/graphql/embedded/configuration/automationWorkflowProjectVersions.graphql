@@ -3,5 +3,6 @@ query automationWorkflowProjectVersions($id: ID!) {
         version
         status
         publishedDate
+        description
     }
 }
