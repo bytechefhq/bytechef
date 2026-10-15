@@ -21,7 +21,7 @@ export default function collectClusterElementsSignature(value: unknown): string 
     }
 
     return Object.keys(record)
-        .sort()
+        .sort((firstKey, secondKey) => firstKey.localeCompare(secondKey))
         .map((key) => `${key}=${collectClusterElementsSignature(record[key])}`)
         .join('|');
 }
