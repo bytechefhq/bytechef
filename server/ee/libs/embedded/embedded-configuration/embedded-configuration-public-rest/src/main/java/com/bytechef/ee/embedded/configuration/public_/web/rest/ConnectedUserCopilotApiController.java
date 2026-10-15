@@ -92,10 +92,18 @@ public class ConnectedUserCopilotApiController {
         State state = agUiParameters.getState();
         Map<String, Object> stateMap = state.getState();
 
+        String additionalSystemPrompt = sanitizeAdditionalSystemPrompt(
+            stateMap.get(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT));
+
+        stateMap.clear();
+
         stateMap.put("workflowId", context.workflowId());
         stateMap.put("mode", Mode.BUILD.name());
         stateMap.put("autonomous", false);
         stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+        stateMap.put(
+            CopilotConstants.STATE_CONVERSATION_SCOPE,
+            String.join(":", "embedded", TenantContext.getCurrentTenantId(), externalUserId, workflowUuid));
         stateMap.put(CopilotConstants.STATE_ENVIRONMENT_ID, (long) environment.ordinal());
         stateMap.put(CopilotConstants.STATE_SCOPED_PROJECT_ID, context.projectId());
 
@@ -106,16 +114,8 @@ public class ConnectedUserCopilotApiController {
             stateMap.put(CopilotConstants.STATE_AUTHENTICATION, authentication);
         }
 
-        Object additionalSystemPromptValue = stateMap.remove(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
-
-        if (additionalSystemPromptValue instanceof String additionalSystemPrompt && !additionalSystemPrompt.isBlank()) {
-            String trimmed = additionalSystemPrompt.strip();
-
-            if (trimmed.length() > CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH) {
-                trimmed = trimmed.substring(0, CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
-            }
-
-            stateMap.put(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, trimmed);
+        if (additionalSystemPrompt != null) {
+            stateMap.put(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, additionalSystemPrompt);
         }
 
         Set<String> allowedComponentNames = context.allowedComponentNames();
@@ -138,6 +138,22 @@ public class ConnectedUserCopilotApiController {
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
+    }
+
+    private static @Nullable String sanitizeAdditionalSystemPrompt(@Nullable Object additionalSystemPromptValue) {
+        if (!(additionalSystemPromptValue instanceof String additionalSystemPrompt)
+            || additionalSystemPrompt.isBlank()) {
+
+            return null;
+        }
+
+        String trimmed = additionalSystemPrompt.strip();
+
+        if (trimmed.length() > CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH) {
+            trimmed = trimmed.substring(0, CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
+        }
+
+        return trimmed;
     }
 
     private Environment getEnvironment(@Nullable EnvironmentModel xEnvironment) {
