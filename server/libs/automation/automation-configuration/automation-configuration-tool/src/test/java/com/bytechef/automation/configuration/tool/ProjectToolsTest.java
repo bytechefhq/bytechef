@@ -19,12 +19,16 @@ package com.bytechef.automation.configuration.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
+import com.bytechef.automation.ai.tool.GrantingPermissionService;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -34,15 +38,18 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectTagFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.tool.model.ProjectDetailInfo;
 import com.bytechef.automation.configuration.tool.model.ProjectInfo;
 import com.bytechef.automation.configuration.tool.model.ProjectStatusInfo;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.category.domain.Category;
+import com.bytechef.platform.component.tool.ScopedConnectionGuard;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -69,6 +76,12 @@ class ProjectToolsTest {
 
     @Mock
     private ProjectTagFacade projectTagFacade;
+
+    @Mock
+    private ProjectWorkflowService projectWorkflowService;
+
+    @Mock
+    private ScopedConnectionGuard scopedConnectionGuard;
 
     @Mock
     private ToolContext toolContext;
@@ -148,7 +161,7 @@ class ProjectToolsTest {
                 .workspaceId(WORKSPACE_ID)
                 .build());
 
-        ProjectDetailInfo projectDetailInfo = newTools().getProject(7L);
+        ProjectDetailInfo projectDetailInfo = newTools().getProject(7L, toolContext);
 
         assertThat(projectDetailInfo.id()).isEqualTo(7L);
         assertThat(projectDetailInfo.categoryId()).isEqualTo(3L);
@@ -162,7 +175,7 @@ class ProjectToolsTest {
 
         ProjectTools projectTools = newTools();
 
-        assertThatCode(() -> projectTools.getProject(7L))
+        assertThatCode(() -> projectTools.getProject(7L, toolContext))
             .isInstanceOf(ExecutionException.class)
             .hasMessageContaining("denied");
     }
@@ -182,7 +195,7 @@ class ProjectToolsTest {
         when(projectDeploymentFacade.getWorkspaceProjectDeployments(WORKSPACE_ID, null, 7L, null, false))
             .thenReturn(List.of(projectDeploymentDTO));
 
-        ProjectStatusInfo projectStatusInfo = newTools().getProjectStatus(7L);
+        ProjectStatusInfo projectStatusInfo = newTools().getProjectStatus(7L, toolContext);
 
         assertThat(projectStatusInfo.deployments()).hasSize(1);
         assertThat(projectStatusInfo.deployments()
@@ -272,7 +285,7 @@ class ProjectToolsTest {
                 .workspaceId(WORKSPACE_ID)
                 .build());
 
-        newTools().updateProject(7L, "Renamed", null, null, null);
+        newTools().updateProject(7L, "Renamed", null, null, null, toolContext);
 
         ArgumentCaptor<ProjectDTO> projectDTOArgumentCaptor = ArgumentCaptor.forClass(ProjectDTO.class);
 
@@ -290,7 +303,7 @@ class ProjectToolsTest {
     void testDeleteProjectDeletesThroughTheFacade() {
         when(projectFacade.getProject(7L)).thenReturn(projectDTO(7L, "Alpha"));
 
-        String result = newTools().deleteProject(7L);
+        String result = newTools().deleteProject(7L, toolContext);
 
         verify(projectFacade).deleteProject(7L);
 
@@ -302,8 +315,100 @@ class ProjectToolsTest {
         when(projectFacade.publishProject(7L, "v1", false)).thenReturn(2);
         when(projectFacade.getProject(7L)).thenReturn(projectDTO(7L, "Alpha"));
 
-        assertThat(newTools().publishProject(7L, "v1")
+        assertThat(newTools().publishProject(7L, "v1", toolContext)
             .publishedVersion()).isEqualTo(2);
+    }
+
+    @Nested
+    class ScopedProjectTest {
+
+        private static final long OWN_PROJECT_ID = 7L;
+        private static final long VENDOR_PROJECT_ID = 8L;
+
+        @Test
+        void testListProjectsListsOnlyTheScopedProject() {
+            when(projectFacade.getProject(OWN_PROJECT_ID)).thenReturn(projectDTO(OWN_PROJECT_ID, "Alpha"));
+
+            List<ProjectInfo> projectInfos = newTools().listProjects(WORKSPACE_ID, scopedToolContext());
+
+            assertThat(projectInfos).extracting(ProjectInfo::id)
+                .containsExactly(OWN_PROJECT_ID);
+
+            verify(projectFacade, never()).getWorkspaceProjects(any(), any(), anyBoolean(), any(), any(), any(),
+                anyLong());
+            verifyNoInteractions(workspaceFacade);
+        }
+
+        @Test
+        void testSearchProjectsSearchesOnlyTheScopedProject() {
+            when(projectFacade.getProject(OWN_PROJECT_ID)).thenReturn(projectDTO(OWN_PROJECT_ID, "Alpha"));
+
+            ProjectTools projectTools = newTools();
+
+            assertThat(projectTools.searchProjects("alp", null, scopedToolContext())).extracting(ProjectInfo::id)
+                .containsExactly(OWN_PROJECT_ID);
+            assertThat(projectTools.searchProjects("beta", null, scopedToolContext())).isEmpty();
+
+            verify(projectFacade, never()).getWorkspaceProjects(any(), any(), anyBoolean(), any(), any(), any(),
+                anyLong());
+            verifyNoInteractions(workspaceFacade);
+        }
+
+        @Test
+        void testGetProjectRejectsAnotherProject() {
+            ProjectTools projectTools = newTools();
+
+            assertThatCode(() -> projectTools.getProject(VENDOR_PROJECT_ID, scopedToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+            assertThatCode(() -> projectTools.getProjectStatus(VENDOR_PROJECT_ID, scopedToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+
+            verifyNoInteractions(projectFacade, projectDeploymentFacade);
+        }
+
+        @Test
+        void testGetProjectReadsTheScopedProject() {
+            when(projectFacade.getProject(OWN_PROJECT_ID)).thenReturn(
+                ProjectDTO.builder()
+                    .id(OWN_PROJECT_ID)
+                    .name("Alpha")
+                    .projectVersions(List.of())
+                    .workspaceId(WORKSPACE_ID)
+                    .build());
+
+            ProjectDetailInfo projectDetailInfo = newTools().getProject(OWN_PROJECT_ID, scopedToolContext());
+
+            assertThat(projectDetailInfo.id()).isEqualTo(OWN_PROJECT_ID);
+        }
+
+        @Test
+        void testConfinedRunCannotChangeProjects() {
+            ProjectTools projectTools = newTools();
+
+            assertThatCode(
+                () -> projectTools.createProject("Alpha", null, null, WORKSPACE_ID, null, scopedToolContext()))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
+            assertThatCode(
+                () -> projectTools.updateProject(OWN_PROJECT_ID, "Renamed", null, null, null, scopedToolContext()))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
+            assertThatCode(() -> projectTools.deleteProject(OWN_PROJECT_ID, scopedToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
+            assertThatCode(() -> projectTools.publishProject(OWN_PROJECT_ID, "v1", scopedToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
+
+            verifyNoInteractions(projectCategoryFacade, projectFacade, projectTagFacade, workspaceFacade);
+        }
+
+        private static ToolContext scopedToolContext() {
+            return new ToolContext(
+                Map.of(ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID));
+        }
     }
 
     private void givenTheCallerIsAWorkspaceMember() {
@@ -317,7 +422,9 @@ class ProjectToolsTest {
 
     private ProjectTools newTools() {
         return new ProjectTools(
-            projectCategoryFacade, projectDeploymentFacade, projectFacade, projectTagFacade, workspaceFacade);
+            projectCategoryFacade, projectDeploymentFacade, projectFacade, projectTagFacade,
+            new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService, scopedConnectionGuard),
+            workspaceFacade);
     }
 
     private static ProjectDTO projectDTO(long projectId, String name) {

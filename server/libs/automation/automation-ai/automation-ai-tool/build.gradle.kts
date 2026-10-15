@@ -1,3 +1,11 @@
+plugins {
+    `java-test-fixtures`
+}
+
+configurations.testFixturesImplementation {
+    extendsFrom(configurations.implementation.get())
+}
+
 dependencies {
     annotationProcessor(rootProject.libs.com.google.auto.service.auto.service)
 

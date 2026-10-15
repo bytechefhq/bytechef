@@ -29,6 +29,7 @@ import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
+import com.bytechef.automation.ai.tool.GrantingPermissionService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -211,7 +212,7 @@ class ProjectWorkflowToolsTest {
 
             assertThatCode(() -> tools.updateWorkflow(VENDOR_WORKFLOW_ID, DEFINITION, 1, scopedToolContext()))
                 .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                .hasMessageContaining("was not found in this chat's project");
 
             verify(projectWorkflowFacade, never()).getProjectWorkflow(VENDOR_WORKFLOW_ID);
             verify(projectWorkflowFacade, never()).updateWorkflow(any(), any(), anyInt());
@@ -239,21 +240,21 @@ class ProjectWorkflowToolsTest {
 
             assertThatCode(() -> tools.getWorkflow(VENDOR_WORKFLOW_ID, scopedToolContext()))
                 .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                .hasMessageContaining("was not found in this chat's project");
             assertThatCode(() -> tools.deleteWorkflow(VENDOR_WORKFLOW_ID, scopedToolContext()))
                 .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                .hasMessageContaining("was not found in this chat's project");
             assertThatCode(
                 () -> tools.saveWorkflowTestConnection(VENDOR_WORKFLOW_ID, "slack_1", "slack", 1L, scopedToolContext()))
                     .isInstanceOf(ExecutionException.class)
-                    .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                    .hasMessageContaining("was not found in this chat's project");
 
             verify(projectWorkflowFacade, never()).getProjectWorkflow(VENDOR_WORKFLOW_ID);
             verify(projectWorkflowFacade, never()).deleteWorkflow(any());
         }
 
         @Test
-        void testScopedRunTreatsAnUnknownWorkflowAsOutOfScope() {
+        void testScopedRunTreatsAnUnknownWorkflowAsNotFound() {
             when(projectWorkflowService.getWorkflowProjectWorkflow("missing"))
                 .thenThrow(new IllegalArgumentException("not found"));
 
@@ -261,7 +262,7 @@ class ProjectWorkflowToolsTest {
 
             assertThatCode(() -> tools.updateWorkflow("missing", DEFINITION, 1, scopedToolContext()))
                 .isInstanceOf(ExecutionException.class)
-                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+                .hasMessageContaining("was not found in this chat's project");
         }
 
         @Test
@@ -527,7 +528,8 @@ class ProjectWorkflowToolsTest {
 
     private ProjectWorkflowTools newTools() {
         return new ProjectWorkflowTools(
-            projectFacade, projectWorkflowFacade, new ScopedProjectGuard(projectWorkflowService, scopedConnectionGuard),
+            projectFacade, projectWorkflowFacade,
+            new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService, scopedConnectionGuard),
             workspaceConnectionFacade, workspaceFacade);
     }
 
