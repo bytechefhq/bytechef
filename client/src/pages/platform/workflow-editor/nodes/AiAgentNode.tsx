@@ -373,7 +373,10 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
                     {expandable && (
                         <div
-                            className={twMerge('nodrag absolute -left-8 z-10', suppressHover ? 'top-0' : 'top-8')}
+                            className={twMerge(
+                                'nodrag invisible absolute -left-8 z-10 group-hover:visible focus-within:visible',
+                                suppressHover ? 'top-0' : 'top-8'
+                            )}
                             onMouseDown={(event) => event.stopPropagation()}
                         >
                             <Button
