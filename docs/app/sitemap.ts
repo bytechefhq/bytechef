@@ -19,12 +19,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  return [
-    {
-      url: url('/'),
-      changeFrequency: 'monthly',
-      priority: 1,
-    },
-    ...items.filter((v) => v !== undefined),
-  ];
+  // `/` only redirects to /platform, so it is left out: a sitemap should list the final URLs.
+  return items.filter((v) => v !== undefined);
 }

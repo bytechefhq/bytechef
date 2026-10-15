@@ -4,7 +4,16 @@ import * as Twoslash from 'fumadocs-twoslash/ui';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
-import { createMetadata, getPageImage } from '@/lib/metadata';
+import { baseUrl, createMetadata, getPageImage } from '@/lib/metadata';
+import {
+  fitDescription,
+  getDescriptionFillers,
+  getDistinguishingSlugs,
+  getReferenceBaseName,
+  getSeoTitle,
+  humanizeSlug,
+  MAX_TITLE_LENGTH,
+} from '@/lib/seo';
 import { source } from '@/lib/source';
 import { Wrapper } from '@/components/preview/wrapper';
 import { Mermaid } from '@/components/mdx/mermaid';
@@ -72,6 +81,12 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
         style: 'clerk',
       }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getStructuredData(page, lastModified)),
+        }}
+      />
       {(page.data.ee || page.data.comingSoon) && (
         <div className="flex flex-row flex-wrap items-center gap-2 -mb-2">
           {page.data.ee && <EEBadge />}
@@ -174,8 +189,8 @@ export async function generateMetadata(
       title: 'Not Found',
     });
 
-  const description =
-    page.data.description ?? 'The platform for building ai-driven automations';
+  const title = getPageSeoTitle(page);
+  const description = getPageSeoDescription(page);
 
   const image = {
     url: getPageImage(page).url,
@@ -183,17 +198,101 @@ export async function generateMetadata(
     height: 630,
   };
 
+  // The layout template appends " | ByteChef"; skip it when it would push the title past ~70 characters.
+  const fitsSuffix = `${title} | ByteChef`.length <= MAX_TITLE_LENGTH;
+
   return createMetadata({
-    title: page.data.title,
+    title: fitsSuffix ? title : { absolute: title },
     description,
+    alternates: {
+      canonical: new URL(page.url, baseUrl).toString(),
+    },
     openGraph: {
-      url: `/${page.slugs.join('/')}`,
+      title,
+      type: 'article',
+      url: page.url,
       images: [image],
     },
     twitter: {
+      title,
       images: [image],
     },
   });
+}
+
+type DocsPageType = NonNullable<ReturnType<typeof source.getPage>>;
+
+function getPageSeoTitle(page: DocsPageType): string {
+  const pages = source.getPages();
+  const parentSlugs = page.slugs.slice(0, -1).join('/');
+  const baseName = getReferenceBaseName(page.slugs.at(-1) ?? '');
+
+  return getSeoTitle({
+    distinguishingSlugs: getDistinguishingSlugs(
+      page.slugs,
+      pages
+        .filter(
+          (candidate) =>
+            candidate.url !== page.url && candidate.data.title === page.data.title,
+        )
+        .map((candidate) => candidate.slugs),
+    ),
+    slugs: page.slugs,
+    title: page.data.title,
+    versionCount: pages.filter(
+      (candidate) =>
+        candidate.slugs.slice(0, -1).join('/') === parentSlugs &&
+        getReferenceBaseName(candidate.slugs.at(-1) ?? '') === baseName,
+    ).length,
+  });
+}
+
+function getPageSeoDescription(page: DocsPageType): string {
+  // OpenAPI fillers leave the title out, so a page without a description starts from its title instead.
+  const description =
+    page.data.description ||
+    (page.slugs[0] === 'openapi' ? `${page.data.title}.` : undefined);
+
+  return fitDescription(description, getDescriptionFillers(page.slugs, page.data.title));
+}
+
+function getStructuredData(page: DocsPageType, lastModified?: Date) {
+  const pageUrl = new URL(page.url, baseUrl).toString();
+
+  const breadcrumbs = page.slugs.map((_, index) => {
+    const slugs = page.slugs.slice(0, index + 1);
+    const crumbPage = source.getPage(slugs);
+
+    return {
+      '@type': 'ListItem',
+      position: index + 1,
+      name: crumbPage?.data.title ?? humanizeSlug(slugs[index]),
+      item: new URL(`/${slugs.join('/')}`, baseUrl).toString(),
+    };
+  });
+
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'TechArticle',
+      headline: page.data.title,
+      description: getPageSeoDescription(page),
+      url: pageUrl,
+      mainEntityOfPage: pageUrl,
+      ...(lastModified && { dateModified: new Date(lastModified).toISOString() }),
+      publisher: {
+        '@type': 'Organization',
+        name: 'ByteChef',
+        url: 'https://www.bytechef.io',
+        logo: new URL('/logo.svg', baseUrl).toString(),
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbs,
+    },
+  ];
 }
 
 export function generateStaticParams() {
