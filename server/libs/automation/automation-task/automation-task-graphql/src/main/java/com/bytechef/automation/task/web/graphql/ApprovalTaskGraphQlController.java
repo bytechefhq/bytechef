@@ -18,17 +18,15 @@ package com.bytechef.automation.task.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.task.domain.ApprovalTask;
-import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import com.bytechef.automation.task.domain.ApprovalTask.Priority;
 import com.bytechef.automation.task.domain.ApprovalTask.Status;
-import com.bytechef.automation.task.service.ApprovalTaskService;
+import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -39,20 +37,15 @@ import org.springframework.stereotype.Controller;
 public class ApprovalTaskGraphQlController {
 
     private final ApprovalTaskFacade approvalTaskFacade;
-    private final ApprovalTaskService approvalTaskService;
 
     @SuppressFBWarnings("EI")
-    public ApprovalTaskGraphQlController(
-        ApprovalTaskFacade approvalTaskFacade, ApprovalTaskService approvalTaskService) {
-
+    public ApprovalTaskGraphQlController(ApprovalTaskFacade approvalTaskFacade) {
         this.approvalTaskFacade = approvalTaskFacade;
-        this.approvalTaskService = approvalTaskService;
     }
 
     @MutationMapping
-    @PreAuthorize("isTenantAdmin()")
     public ApprovalTask createApprovalTask(@Argument ApprovalTaskInput approvalTask) {
-        return approvalTaskService.create(toApprovalTask(approvalTask));
+        return approvalTaskFacade.createApprovalTask(toApprovalTask(approvalTask));
     }
 
     @MutationMapping

@@ -31,9 +31,12 @@ import com.bytechef.automation.configuration.security.AutomationPermissionEvalua
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.task.domain.ApprovalTask;
+import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import com.bytechef.automation.task.facade.ApprovalTaskFacadeImpl;
+import com.bytechef.automation.task.security.ApprovalTaskJobResolver;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import com.bytechef.automation.task.web.graphql.ApprovalTaskGraphQlController.ApprovalTaskInput;
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,18 +62,19 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Calls the {@link ApprovalTaskGraphQlController} queries and mutations, and the {@link ApprovalTaskFacadeImpl} reads
- * they delegate to, through the real Spring method-security interceptor, backed by the real {@link AutomationMethodSecurityExpressionHandler} and
- * {@link AutomationPermissionEvaluator}, asserting each {@code @PreAuthorize} guard in both directions, each
- * {@code @PostFilter} on the tasks it keeps, and the exact checks that reach {@link PermissionService}. A task created
- * here is raised for no job and so belongs to no workspace, which leaves its creation to a tenant admin; a task is
- * changed or deleted by whoever may operate the deployment whose job raised it, and changed also by its assignee. A
- * task is read by whoever may view that deployment or by its assignee, and the tenant-wide listing shows a tenant admin
- * every task and anyone else only the tasks assigned to them.
+ * they delegate to, through the real Spring method-security interceptor, backed by the real
+ * {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}, asserting each
+ * {@code @PreAuthorize} guard in both directions, each {@code @PostFilter} on the tasks it keeps, and the exact checks
+ * that reach {@link PermissionService}. A task created here is raised for no job and so belongs to no workspace, which
+ * leaves its creation to a tenant admin, while the run that raises a task for a job creates it with DEPLOYMENT_EDIT on
+ * that job; a task is changed or deleted by whoever may operate the deployment whose job raised it, and changed also by
+ * its assignee. A task is read by whoever may view that deployment or by its assignee, and the tenant-wide listing
+ * shows a tenant admin every task and anyone else only the tasks assigned to them.
  *
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = {
-    ApprovalTaskFacadeImpl.class, ApprovalTaskGraphQlController.class,
+    ApprovalTaskFacadeImpl.class, ApprovalTaskGraphQlController.class, ApprovalTaskJobResolver.class,
     ApprovalTaskGraphQlControllerIntTest.MethodSecurityConfiguration.class
 })
 @GraphQlTest(
@@ -83,8 +87,12 @@ class ApprovalTaskGraphQlControllerIntTest {
 
     private static final long APPROVAL_TASK_ID = 3L;
     private static final String BODY_REACHED = "body reached";
+    private static final long JOB_ID = 9L;
     private static final long CURRENT_USER_ID = 7L;
     private static final long OTHER_USER_ID = 8L;
+
+    @Autowired
+    private ApprovalTaskFacade approvalTaskFacade;
 
     @Autowired
     private ApprovalTaskGraphQlController approvalTaskGraphQlController;
@@ -96,7 +104,6 @@ class ApprovalTaskGraphQlControllerIntTest {
     private PermissionService permissionService;
 
     @MockitoBean
-    @SuppressWarnings("unused")
     private PrincipalJobService principalJobService;
 
     @MockitoBean
@@ -133,6 +140,35 @@ class ApprovalTaskGraphQlControllerIntTest {
             () -> approvalTaskGraphQlController.createApprovalTask(approvalTaskInput(null)), tenantAdmin);
 
         verify(permissionService).isTenantAdmin();
+
+        if (!tenantAdmin) {
+            // Raised for no job, so the job check has nothing to grant on.
+            verify(permissionService).hasResourceScope(-1L, "Job", "DEPLOYMENT_EDIT");
+        }
+
+        verifyNoMoreInteractions(permissionService);
+    }
+
+    @ParameterizedTest(name = "granted={0}")
+    @ValueSource(booleans = {
+        false, true
+    })
+    void testCreateApprovalTaskForAJobRequiresDeploymentEditOnThatJob(boolean granted) {
+        // The run that raises the task creates it as the deployment's owner, who is not a tenant admin.
+        when(permissionService.hasResourceScope(JOB_ID, "Job", "DEPLOYMENT_EDIT")).thenReturn(granted);
+        when(principalJobService.getJobPrincipalId(anyLong(), any()))
+            .thenThrow(new IllegalStateException(BODY_REACHED));
+
+        ApprovalTask approvalTask = ApprovalTask.builder()
+            .name("Approve the invoice")
+            .jobResumeId(JobResumeId.of("public", JOB_ID)
+                .toString())
+            .build();
+
+        assertInvocationOutcome(() -> approvalTaskFacade.createApprovalTask(approvalTask), granted);
+
+        verify(permissionService).isTenantAdmin();
+        verify(permissionService).hasResourceScope(JOB_ID, "Job", "DEPLOYMENT_EDIT");
         verifyNoMoreInteractions(permissionService);
     }
 
