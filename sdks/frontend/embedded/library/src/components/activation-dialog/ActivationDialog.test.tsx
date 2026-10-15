@@ -272,4 +272,46 @@ describe('ActivationDialog', () => {
 
         expect(onClose).toHaveBeenCalledTimes(1);
     });
+
+    it('stays open on Escape whichever window listener runs first', async () => {
+        const onClose = vi.fn();
+        const {rerender} = renderDialog({onClose});
+
+        const row = await screen.findByTestId('connect-row-slack');
+
+        await userEvent.click(within(row).getByRole('button', {name: 'Connect'}));
+        await waitFor(() => expect(openConnectDialogMock).toHaveBeenCalled());
+
+        const connectProps = useConnectDialogMock.mock.calls[useConnectDialogMock.mock.calls.length - 1][0];
+        const simulateConnectDialogEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                connectProps.onClose();
+            }
+        };
+
+        window.addEventListener('keydown', simulateConnectDialogEscape);
+
+        const inlineOnClose = vi.fn();
+
+        rerender(
+            <ActivationDialog
+                baseUrl="https://api.example.com"
+                environment="PRODUCTION"
+                jwtToken="ey"
+                onClose={inlineOnClose}
+                workflowTemplateId="wf-slack"
+            />
+        );
+
+        await userEvent.keyboard('{Escape}');
+
+        window.removeEventListener('keydown', simulateConnectDialogEscape);
+
+        expect(onClose).not.toHaveBeenCalled();
+        expect(inlineOnClose).not.toHaveBeenCalled();
+
+        await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+    });
 });

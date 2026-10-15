@@ -439,7 +439,9 @@ const ActivationBody = ({
                     mode={mode}
                     onConnected={(connectionId) => handleConnected(connectingComponent.name, connectionId)}
                     onDone={() => {
-                        connectOpenRef.current = false;
+                        setTimeout(() => {
+                            connectOpenRef.current = false;
+                        }, 0);
 
                         setConnectingComponent(undefined);
                     }}
@@ -463,6 +465,7 @@ const ActivationDialog = ({
     const [loadResult, setLoadResult] = useState<LoadResultType>();
 
     const connectOpenRef = useRef(false);
+    const onCloseRef = useRef(onClose);
 
     const {fetch} = useMemo(() => createApiClient(baseUrl, environment, jwtToken), [baseUrl, environment, jwtToken]);
 
@@ -496,16 +499,20 @@ const ActivationDialog = ({
     }, [fetch, workflowTemplateId]);
 
     useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
+
+    useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape' && !connectOpenRef.current) {
-                onClose();
+                onCloseRef.current();
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
 
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [onClose]);
+    }, []);
 
     return (
         <div
