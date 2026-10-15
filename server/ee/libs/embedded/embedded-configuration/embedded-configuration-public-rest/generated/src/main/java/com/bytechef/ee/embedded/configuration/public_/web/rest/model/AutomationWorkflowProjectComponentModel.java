@@ -31,6 +31,10 @@ public class AutomationWorkflowProjectComponentModel {
 
   private @Nullable String icon;
 
+  private @Nullable Boolean connectionRequired;
+
+  private @Nullable Long integrationId;
+
   public AutomationWorkflowProjectComponentModel name(@Nullable String name) {
     this.name = name;
     return this;
@@ -94,6 +98,48 @@ public class AutomationWorkflowProjectComponentModel {
     this.icon = icon;
   }
 
+  public AutomationWorkflowProjectComponentModel connectionRequired(@Nullable Boolean connectionRequired) {
+    this.connectionRequired = connectionRequired;
+    return this;
+  }
+
+  /**
+   * Whether the component needs a connection before the workflow can run.
+   * @return connectionRequired
+   */
+  
+  @Schema(name = "connectionRequired", description = "Whether the component needs a connection before the workflow can run.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionRequired")
+  public @Nullable Boolean getConnectionRequired() {
+    return connectionRequired;
+  }
+
+  @JsonProperty("connectionRequired")
+  public void setConnectionRequired(@Nullable Boolean connectionRequired) {
+    this.connectionRequired = connectionRequired;
+  }
+
+  public AutomationWorkflowProjectComponentModel integrationId(@Nullable Long integrationId) {
+    this.integrationId = integrationId;
+    return this;
+  }
+
+  /**
+   * The id of the integration that backs this component in the current environment, or null when no enabled integration configuration exists for it; present only when connectionRequired is true.
+   * @return integrationId
+   */
+  
+  @Schema(name = "integrationId", description = "The id of the integration that backs this component in the current environment, or null when no enabled integration configuration exists for it; present only when connectionRequired is true.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationId")
+  public @Nullable Long getIntegrationId() {
+    return integrationId;
+  }
+
+  @JsonProperty("integrationId")
+  public void setIntegrationId(@Nullable Long integrationId) {
+    this.integrationId = integrationId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -105,12 +151,14 @@ public class AutomationWorkflowProjectComponentModel {
     AutomationWorkflowProjectComponentModel automationWorkflowProjectComponent = (AutomationWorkflowProjectComponentModel) o;
     return Objects.equals(this.name, automationWorkflowProjectComponent.name) &&
         Objects.equals(this.title, automationWorkflowProjectComponent.title) &&
-        Objects.equals(this.icon, automationWorkflowProjectComponent.icon);
+        Objects.equals(this.icon, automationWorkflowProjectComponent.icon) &&
+        Objects.equals(this.connectionRequired, automationWorkflowProjectComponent.connectionRequired) &&
+        Objects.equals(this.integrationId, automationWorkflowProjectComponent.integrationId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, title, icon);
+    return Objects.hash(name, title, icon, connectionRequired, integrationId);
   }
 
   @Override
@@ -120,6 +168,8 @@ public class AutomationWorkflowProjectComponentModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
+    sb.append("    connectionRequired: ").append(toIndentedString(connectionRequired)).append("\n");
+    sb.append("    integrationId: ").append(toIndentedString(integrationId)).append("\n");
     sb.append("}");
     return sb.toString();
   }
