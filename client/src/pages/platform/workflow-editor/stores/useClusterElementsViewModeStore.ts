@@ -12,7 +12,7 @@ const useClusterElementsViewModeStore = create<ClusterElementsViewModeStateI>()(
     devtools(
         persist(
             (set) => ({
-                clusterElementsViewMode: 'dialog' as ClusterElementsViewModeType,
+                clusterElementsViewMode: 'box' as ClusterElementsViewModeType,
 
                 setClusterElementsViewMode: (clusterElementsViewMode: ClusterElementsViewModeType) =>
                     set({clusterElementsViewMode}),
