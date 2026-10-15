@@ -7,6 +7,7 @@ import {EditIcon, HistoryIcon, PlusIcon, Trash2Icon, UploadIcon} from 'lucide-re
 import {ChangeEvent, MouseEvent, useRef} from 'react';
 
 const IntegrationTabButtons = ({
+    codeWorkflow = false,
     onCloseDropdownMenuClick,
     onDeleteIntegrationClick,
     onImportWorkflow,
@@ -14,6 +15,7 @@ const IntegrationTabButtons = ({
     onShowEditIntegrationDialogClick,
     onShowIntegrationVersionHistorySheet,
 }: {
+    codeWorkflow?: boolean;
     onCloseDropdownMenuClick: () => void;
     onDeleteIntegrationClick: () => void;
     onImportWorkflow: (workflowDefinition: string) => void;
@@ -61,7 +63,7 @@ const IntegrationTabButtons = ({
                     </>
                 )}
 
-                {canCreateWorkflow && (
+                {canCreateWorkflow && !codeWorkflow && (
                     <>
                         <Button
                             aria-label="New Workflow"

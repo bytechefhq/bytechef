@@ -425,3 +425,29 @@ describe('ProjectTabButtons Visibility Item', () => {
         expect(screen.queryByLabelText('Project Visibility Button')).not.toBeInTheDocument();
     });
 });
+
+describe('ProjectTabButtons Code Workflow', () => {
+    it('should keep only the project actions that support code workflows', () => {
+        renderProjectTabButtons({...mockProps, codeWorkflow: true} as typeof mockProps);
+
+        for (const label of [
+            'Edit Project Button',
+            'Share ProjectButton',
+            'Export Project',
+            'Project History',
+            'Delete Project',
+        ]) {
+            expect(screen.getByLabelText(label)).toBeInTheDocument();
+        }
+
+        for (const label of [
+            'Duplicate Project Button',
+            'New Workflow',
+            'New Workflow from Template',
+            'Import Workflow',
+            'Import n8n Workflow',
+        ]) {
+            expect(screen.queryByLabelText(label)).not.toBeInTheDocument();
+        }
+    });
+});

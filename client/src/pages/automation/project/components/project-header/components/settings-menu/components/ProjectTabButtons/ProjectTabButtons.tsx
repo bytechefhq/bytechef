@@ -26,6 +26,7 @@ import {MouseEvent} from 'react';
 
 const ProjectTabButtons = ({
     canManageVisibility,
+    codeWorkflow = false,
     importN8nWorkflowDisabled,
     onCloseDropdownMenuClick,
     onDeleteProjectClick,
@@ -44,6 +45,7 @@ const ProjectTabButtons = ({
     projectId,
 }: {
     canManageVisibility: boolean;
+    codeWorkflow?: boolean;
     importN8nWorkflowDisabled: boolean;
     onCloseDropdownMenuClick: () => void;
     onDeleteProjectClick: () => void;
@@ -114,7 +116,7 @@ const ProjectTabButtons = ({
                 />
             )}
 
-            {canCreateProject && (
+            {canCreateProject && !codeWorkflow && (
                 <Button
                     aria-label="Duplicate Project Button"
                     className="dropdown-menu-item"
@@ -147,7 +149,7 @@ const ProjectTabButtons = ({
                 />
             )}
 
-            {templatesSubmissionForm && (
+            {!codeWorkflow && templatesSubmissionForm && (
                 <Button
                     aria-label="Share Project with Community Button"
                     className="dropdown-menu-item"
@@ -169,7 +171,7 @@ const ProjectTabButtons = ({
 
             <Separator />
 
-            {canCreateWorkflow && (
+            {canCreateWorkflow && !codeWorkflow && (
                 <>
                     <Button
                         aria-label="New Workflow"
@@ -222,7 +224,7 @@ const ProjectTabButtons = ({
                 </>
             )}
 
-            {gitIntegrationEnabled && (
+            {gitIntegrationEnabled && !codeWorkflow && (
                 <EEVersion hidden={true}>
                     {canPullProjectFromGit && (
                         <Button
