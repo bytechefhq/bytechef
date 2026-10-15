@@ -81,10 +81,10 @@ export const useAutomationWorkflowEditorHeader = ({
         },
     });
 
-    const handlePublishProjectSubmit = ({onSuccess}: {description?: string; onSuccess: () => void}) => {
+    const handlePublishProjectSubmit = ({description, onSuccess}: {description?: string; onSuccess: () => void}) => {
         if (project) {
             publishProjectMutation.mutate(
-                {id: project.id},
+                {description, id: project.id},
                 {
                     onSuccess: onSuccess,
                 }
