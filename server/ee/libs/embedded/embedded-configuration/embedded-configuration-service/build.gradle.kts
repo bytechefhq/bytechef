@@ -34,6 +34,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
 
     testImplementation(rootProject.libs.org.graalvm.polyglot.polyglot)
+    testImplementation("org.liquibase:liquibase-core")
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-service"))
