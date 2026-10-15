@@ -166,6 +166,30 @@ describe('ConnectDialog', () => {
             expect(primaryButton).toBeEnabled();
         });
 
+        it('shows a save error as an alert above the footer', () => {
+            const integration = {connectionConfig: {authorizationType: '', inputs: []}, name: 'Test Integration'};
+
+            const {rerender} = render(<ConnectDialog {...createConnectionProps} integration={integration} />);
+
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+            rerender(
+                <ConnectDialog
+                    {...createConnectionProps}
+                    integration={integration}
+                    saveError="Could not save the connection. Please try again."
+                />
+            );
+
+            const alert = screen.getByRole('alert');
+
+            expect(alert).toHaveTextContent('Could not save the connection. Please try again.');
+            expect(
+                alert.compareDocumentPosition(screen.getByRole('button', {name: /connect/i})) &
+                    Node.DOCUMENT_POSITION_FOLLOWING
+            ).toBeTruthy();
+        });
+
         it('does not render when isOpen is false', () => {
             const closedProps = {
                 ...createConnectionProps,

@@ -68,6 +68,9 @@ const {openDialog} = useActivationDialog({
 integration has no enabled instance configuration in the environment shows "isn't set up yet — ask your administrator";
 set the integration up first.
 
+Only one connect dialog renders per page: don't keep a `useConnectDialog` instance mounted on the same page while the
+activation dialog's Connect is in use.
+
 ### Connection-only and reauthorize modes of `useConnectDialog`
 
 - `connectionOnly: true` + `onConnected(integrationInstanceId, connectionId)`: closes once the integration instance

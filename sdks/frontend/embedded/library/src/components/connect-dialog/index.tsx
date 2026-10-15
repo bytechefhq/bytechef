@@ -26,6 +26,8 @@ import useExecuteAction from './useExecuteAction';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
 
+const SAVE_ERROR_MESSAGE = 'Could not save the connection. Please try again.';
+
 interface ValidationRuleType {
     required: boolean;
     requiredMessage?: string;
@@ -95,6 +97,7 @@ export default function useConnectDialog({
         {}
     );
     const [isLoading, setIsLoading] = useState(false);
+    const [saveError, setSaveError] = useState<string | undefined>(undefined);
     const [workflowsView, setWorkflowsView] = useState(!!integrationInstanceId);
     const [currentIntegrationInstanceId, setCurrentIntegrationInstanceId] = useState<number | undefined>(
         integrationInstanceId ? Number(integrationInstanceId) : undefined
@@ -291,10 +294,14 @@ export default function useConnectDialog({
 
     const saveOAuth2Connection = useCallback(
         async (payload: CodePayloadI | TokenPayloadI) => {
+            setSaveError(undefined);
+
             try {
                 await persistConnection(payload);
             } catch (error) {
                 console.error('Failed to save OAuth2 connection:', error);
+
+                setSaveError(SAVE_ERROR_MESSAGE);
             }
         },
         [persistConnection]
@@ -302,10 +309,14 @@ export default function useConnectDialog({
 
     const saveNonOAuth2Connection = useCallback(
         async (formData: Record<string, string>) => {
+            setSaveError(undefined);
+
             try {
                 await persistConnection(formData);
             } catch (error) {
                 console.error('Failed to save non-OAuth2 connection:', error);
+
+                setSaveError(SAVE_ERROR_MESSAGE);
             }
         },
         [persistConnection]
@@ -575,6 +586,7 @@ export default function useConnectDialog({
         setMcpToolEnabledOverrides({});
         setMcpWorkflowEnabledOverrides({});
         setMcpWorkflowInputOverrides({});
+        setSaveError(undefined);
         setIsLoading(true);
         setIsOpen(true);
 
@@ -968,6 +980,7 @@ export default function useConnectDialog({
                 mode={mode}
                 properties={integration?.connectionConfig?.inputs}
                 registerFormSubmit={registerFormSubmit}
+                saveError={saveError}
                 title={reauthorizeConnectionId ? `Reconnect ${integration?.name ?? ''}`.trim() : undefined}
                 workflowsView={workflowsView}
             />
@@ -998,6 +1011,7 @@ export default function useConnectDialog({
         mode,
         reauthorizeConnectionId,
         registerFormSubmit,
+        saveError,
         workflowsView,
         currentIntegrationInstanceId,
     ]);
