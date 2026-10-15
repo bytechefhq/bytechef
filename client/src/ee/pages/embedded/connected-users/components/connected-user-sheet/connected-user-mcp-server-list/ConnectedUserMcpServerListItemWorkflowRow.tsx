@@ -45,7 +45,7 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
                         : 'No executions'}
                 </TooltipTrigger>
 
-                <TooltipContent>Last Execution Date</TooltipContent>
+                <TooltipContent side="left">Last Execution Date</TooltipContent>
             </Tooltip>
 
             <div className="relative mr-11 flex shrink-0 items-center">
