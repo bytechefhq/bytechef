@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,8 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
-import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -51,14 +50,11 @@ import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import com.github.benmanes.caffeine.cache.Cache;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentMap;
@@ -68,13 +64,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -82,13 +74,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.bean.override.mockito.MockReset;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -844,69 +829,14 @@ class WorkflowTestApiControllerIntTest {
         throw new AssertionError("Run key not available in time");
     }
 
-    @ContextConfiguration(classes = {
-        WorkflowTestApiControllerTestConfiguration.class, MethodSecurityEnforcement.MethodSecurityConfiguration.class
-    })
-    @Nested
-    class MethodSecurityEnforcement {
+    @Test
+    void testAttachWorkflowTestStopsWhenTheExecutorRefusesTheAttach() {
+        doThrow(new AccessDeniedException("Access Denied")).when(testWorkflowExecutor)
+            .attach(7L);
 
-        private static final long JOB_ID = 7L;
+        assertThatThrownBy(() -> controller.attachWorkflowTest(7L))
+            .isInstanceOf(AccessDeniedException.class);
 
-        @Autowired
-        private PermissionService permissionService;
-
-        @BeforeEach
-        void beforeEach() {
-            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-
-            securityContext.setAuthentication(
-                new UsernamePasswordAuthenticationToken("alice", "credentials", List.of()));
-
-            SecurityContextHolder.setContext(securityContext);
-        }
-
-        @AfterEach
-        void afterEach() {
-            SecurityContextHolder.clearContext();
-        }
-
-        @Test
-        void testAttachWorkflowTestDeniesWhenTheTestJobEditScopeIsRefused() {
-            assertThatThrownBy(() -> controller.attachWorkflowTest(JOB_ID))
-                .isInstanceOf(AccessDeniedException.class);
-
-            verify(permissionService).hasResourceScope(JOB_ID, "TestJob", "WORKFLOW_EDIT");
-        }
-
-        @Test
-        void testAttachWorkflowTestAllowsWhenTheTestJobEditScopeIsGranted() {
-            when(permissionService.hasResourceScope(JOB_ID, "TestJob", "WORKFLOW_EDIT")).thenReturn(true);
-
-            assertThat(controller.attachWorkflowTest(JOB_ID)).isNotNull();
-        }
-
-        @Test
-        void testEveryGuardedMethodHasAnEvaluatedCase() {
-            Set<String> guardedMethodNames = Arrays.stream(WorkflowTestApiController.class.getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(PreAuthorize.class))
-                .map(Method::getName)
-                .collect(Collectors.toSet());
-
-            // Starting and stopping a test are checked on TestWorkflowExecutor; attaching reads only this controller's
-            // own state, so its check stays here.
-            Set<String> coveredMethodNames = Set.of("attachWorkflowTest");
-
-            assertThat(coveredMethodNames).isEqualTo(guardedMethodNames);
-        }
-
-        @EnableMethodSecurity(proxyTargetClass = true)
-        @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
-        static class MethodSecurityConfiguration {
-
-            @Bean
-            PermissionService permissionService() {
-                return mock(PermissionService.class, MockReset.withSettings(MockReset.AFTER));
-            }
-        }
+        verify(testWorkflowExecutor).attach(7L);
     }
 }
