@@ -20,7 +20,7 @@ export default function AiAgentTestingPanel({
     headerClassName,
     onClose,
     skipIntro = false,
-}: AiAgentTestingPanelProps) {
+}: Readonly<AiAgentTestingPanelProps>) {
     const {conversationId, handleReset, handleTestAgent, isTestingAgent} = useAiAgentTestingPanel();
 
     useEffect(() => {

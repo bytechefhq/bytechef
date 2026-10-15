@@ -16,8 +16,9 @@ export default function collectClusterElementsSignature(value: unknown): string 
         const positionSignature = nodePosition ? `${nodePosition.x},${nodePosition.y}` : '';
         const nestedSignature = collectClusterElementsSignature(record.clusterElements);
         const labelSignature = typeof record.label === 'string' ? record.label : '';
+        const nestedPart = nestedSignature ? '[' + nestedSignature + ']' : '';
 
-        return `${record.name}:${record.type}:${labelSignature}@${positionSignature}${nestedSignature ? `[${nestedSignature}]` : ''}`;
+        return `${record.name}:${record.type}:${labelSignature}@${positionSignature}${nestedPart}`;
     }
 
     return Object.keys(record)

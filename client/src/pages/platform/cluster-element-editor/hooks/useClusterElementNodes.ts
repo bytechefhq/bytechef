@@ -220,8 +220,7 @@ export default function useClusterElementNodes(clusterRootIds: string[]): UseClu
 
             if (
                 clusterElementsViewMode === 'dialog' &&
-                rootClusterElementNodeData &&
-                rootClusterElementNodeData.workflowNodeName === clusterRootId
+                rootClusterElementNodeData?.workflowNodeName === clusterRootId
             ) {
                 const rootFilteredTypes = getFilteredClusterElementTypes({
                     clusterRootComponentDefinition: currentRootComponentDefinition,
@@ -305,7 +304,7 @@ export default function useClusterElementNodes(clusterRootIds: string[]): UseClu
             await Promise.all(
                 missingNestedQueries.map(async ({componentName, ...query}) => {
                     try {
-                        const definition = await queryClient.fetchQuery({
+                        const definition = await queryClient.query({
                             queryFn: query.queryFn,
                             queryKey: query.queryKey,
                         });
@@ -363,7 +362,7 @@ export default function useClusterElementNodes(clusterRootIds: string[]): UseClu
             await Promise.all(
                 rootDefinitionFetches.map(async (rootDefinitionFetch) => {
                     try {
-                        const definition = await queryClient.fetchQuery({
+                        const definition = await queryClient.query({
                             queryFn: rootDefinitionFetch.queryFn,
                             queryKey: rootDefinitionFetch.queryKey,
                         });

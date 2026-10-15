@@ -12,7 +12,7 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
-import {NodeDataType} from '@/shared/types';
+import {NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Node, NodeChange, XYPosition} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -66,6 +66,62 @@ interface UseWorkflowEditorCanvasParamsI {
     readOnlyLayoutDirection?: LayoutDirectionType;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
+}
+
+interface SaveDraggedClusterElementPositionProps {
+    draggedNode: Node;
+    parentClusterRootId: string;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
+}
+
+function saveDraggedClusterElementPosition({
+    draggedNode,
+    parentClusterRootId,
+    updateWorkflowMutation,
+}: SaveDraggedClusterElementPositionProps) {
+    const {nodes: currentNodes, workflow: currentWorkflow} = useWorkflowDataStore.getState();
+
+    const workflowDefinitionTasks = currentWorkflow.definition
+        ? (JSON.parse(currentWorkflow.definition).tasks ?? [])
+        : [];
+
+    const topLevelClusterRootId = resolveClusterRootId(draggedNode.data as NodeDataType) ?? parentClusterRootId;
+
+    const clusterRootTask = getTask({
+        tasks: workflowDefinitionTasks,
+        workflowNodeName: topLevelClusterRootId,
+    });
+
+    if (!clusterRootTask?.clusterElements) {
+        return;
+    }
+
+    const clusterFrameRootNode = currentNodes.find((node) => node.id === topLevelClusterRootId);
+
+    const clusterFrame = (clusterFrameRootNode?.data as NodeDataType | undefined)?.clusterFrame;
+
+    const draggedNodePosition =
+        draggedNode.parentId === topLevelClusterRootId
+            ? fromClusterFrameChildPosition(draggedNode.position, clusterFrame?.contentOrigin)
+            : draggedNode.position;
+
+    const updatedClusterElements = updateClusterElementsPositions({
+        clusterElements: clusterRootTask.clusterElements,
+        movedClusterElementId: draggedNode.id,
+        nodePositions: {
+            [draggedNode.id]: draggedNodePosition,
+        },
+    });
+
+    void saveWorkflowDefinition({
+        nodeData: {
+            ...clusterRootTask,
+            clusterElements: updatedClusterElements,
+            componentName: clusterRootTask.type.split('/')[0],
+            workflowNodeName: topLevelClusterRootId,
+        },
+        updateWorkflowMutation,
+    });
 }
 
 const useWorkflowEditorCanvas = ({
@@ -338,50 +394,7 @@ const useWorkflowEditorCanvas = ({
 
             if (parentClusterRootId) {
                 if (updateWorkflowMutation) {
-                    const {workflow: currentWorkflow} = useWorkflowDataStore.getState();
-
-                    const workflowDefinitionTasks = currentWorkflow.definition
-                        ? (JSON.parse(currentWorkflow.definition).tasks ?? [])
-                        : [];
-
-                    const topLevelClusterRootId =
-                        resolveClusterRootId(draggedNode.data as NodeDataType) ?? parentClusterRootId;
-
-                    const clusterRootTask = getTask({
-                        tasks: workflowDefinitionTasks,
-                        workflowNodeName: topLevelClusterRootId,
-                    });
-
-                    const clusterFrameRootNode = useWorkflowDataStore
-                        .getState()
-                        .nodes.find((node) => node.id === topLevelClusterRootId);
-
-                    const clusterFrame = (clusterFrameRootNode?.data as NodeDataType | undefined)?.clusterFrame;
-
-                    const draggedNodePosition =
-                        draggedNode.parentId === topLevelClusterRootId
-                            ? fromClusterFrameChildPosition(draggedNode.position, clusterFrame?.contentOrigin)
-                            : draggedNode.position;
-
-                    if (clusterRootTask?.clusterElements) {
-                        const updatedClusterElements = updateClusterElementsPositions({
-                            clusterElements: clusterRootTask.clusterElements,
-                            movedClusterElementId: draggedNode.id,
-                            nodePositions: {
-                                [draggedNode.id]: draggedNodePosition,
-                            },
-                        });
-
-                        void saveWorkflowDefinition({
-                            nodeData: {
-                                ...clusterRootTask,
-                                clusterElements: updatedClusterElements,
-                                componentName: clusterRootTask.type.split('/')[0],
-                                workflowNodeName: topLevelClusterRootId,
-                            },
-                            updateWorkflowMutation,
-                        });
-                    }
+                    saveDraggedClusterElementPosition({draggedNode, parentClusterRootId, updateWorkflowMutation});
                 }
 
                 resetDragTracking();
