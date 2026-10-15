@@ -25,6 +25,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -80,6 +81,9 @@ class ProjectWorkflowToolsTest {
 
     @Mock
     private ProjectWorkflowService projectWorkflowService;
+
+    @Mock
+    private ScopedConnectionGuard scopedConnectionGuard;
 
     @Mock
     private ToolContext toolContext;
@@ -294,6 +298,40 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
+        void testScopedRunCannotBindAConnectionTheUserIsNotEntitledTo() {
+            stubWorkflowProject(OWN_WORKFLOW_ID, OWN_PROJECT_ID);
+
+            ToolContext toolContext = scopedToolContext();
+
+            when(scopedConnectionGuard.isEntitled(null, 900L, toolContext)).thenReturn(false);
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(
+                () -> tools.saveWorkflowTestConnection(OWN_WORKFLOW_ID, "slack_1", "slack", 900L, toolContext))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+            verify(projectWorkflowFacade, never()).saveWorkflowTestConnection(any(), any(), any(), anyLong(),
+                anyLong());
+            verify(workspaceConnectionFacade, never()).getConnections(anyLong(), any(), any(), any(), any());
+        }
+
+        @Test
+        void testScopedRunBindsAConnectionTheUserIsEntitledToWithoutTheWorkspaceCheck() {
+            stubWorkflowProject(OWN_WORKFLOW_ID, OWN_PROJECT_ID);
+
+            ToolContext toolContext = scopedToolContext();
+
+            when(scopedConnectionGuard.isEntitled(null, 42L, toolContext)).thenReturn(true);
+
+            newTools().saveWorkflowTestConnection(OWN_WORKFLOW_ID, "slack_1", "slack", 42L, toolContext);
+
+            verify(projectWorkflowFacade).saveWorkflowTestConnection(OWN_WORKFLOW_ID, "slack_1", "slack", 42L, 0L);
+            verify(workspaceConnectionFacade, never()).getConnections(anyLong(), any(), any(), any(), any());
+        }
+
+        @Test
         void testUnscopedRunIsNotRestrictedByTheGuard() {
             when(projectWorkflowFacade.getProjectWorkflow(VENDOR_WORKFLOW_ID))
                 .thenReturn(buildDto(VENDOR_WORKFLOW_ID, 501L, 1));
@@ -488,7 +526,7 @@ class ProjectWorkflowToolsTest {
 
     private ProjectWorkflowTools newTools() {
         return new ProjectWorkflowTools(
-            projectFacade, projectWorkflowFacade, new ScopedProjectGuard(projectWorkflowService),
+            projectFacade, projectWorkflowFacade, new ScopedProjectGuard(projectWorkflowService, scopedConnectionGuard),
             workspaceConnectionFacade, workspaceFacade);
     }
 
