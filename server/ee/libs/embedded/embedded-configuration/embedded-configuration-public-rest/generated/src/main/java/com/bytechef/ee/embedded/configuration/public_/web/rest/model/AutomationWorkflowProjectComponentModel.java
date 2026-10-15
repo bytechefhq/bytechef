@@ -125,11 +125,11 @@ public class AutomationWorkflowProjectComponentModel {
   }
 
   /**
-   * The id of the integration that backs this component in the current environment, or null when no enabled integration configuration exists for it; present only when connectionRequired is true.
+   * The id of the integration that backs this component in the current environment, absent when no enabled integration configuration exists for it; present only when connectionRequired is true.
    * @return integrationId
    */
   
-  @Schema(name = "integrationId", description = "The id of the integration that backs this component in the current environment, or null when no enabled integration configuration exists for it; present only when connectionRequired is true.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "integrationId", description = "The id of the integration that backs this component in the current environment, absent when no enabled integration configuration exists for it; present only when connectionRequired is true.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationId")
   public @Nullable Long getIntegrationId() {
     return integrationId;
