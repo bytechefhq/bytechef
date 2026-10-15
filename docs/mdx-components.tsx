@@ -5,7 +5,7 @@ import * as TabsComponents from 'fumadocs-ui/components/tabs';
 import type { MDXComponents } from 'mdx/types';
 import type { ComponentProps, FC } from 'react';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
-import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
+import { ImageZoom } from '@/components/mdx/lazy';
 import * as icons from 'lucide-react';
 import { ComingSoonBadge } from '@/components/coming-soon-badge';
 import { EEBadge } from '@/components/ee-badge';
