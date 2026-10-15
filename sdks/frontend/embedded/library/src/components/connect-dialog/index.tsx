@@ -1,4 +1,5 @@
 import ConnectDialog from './ConnectDialog';
+import {createApiClient} from '../shared/apiClient';
 import {type FormEvent, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import useOAuth2 from './useOAuth2';
@@ -33,57 +34,6 @@ interface ValidationRuleType {
 interface ConnectionDialogHookReturnType {
     closeDialog: () => void;
     openDialog: () => void;
-}
-
-function createApiClient(baseUrl: string, environment: string, jwtToken: string) {
-    const defaultHeaders = {
-        Authorization: `Bearer ${jwtToken}`,
-        'X-Environment': environment,
-        'Content-Type': 'application/json',
-    };
-
-    return {
-        async fetch<T>(
-            endpoint: string,
-            options: {
-                method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-                body?: object;
-                headers?: Record<string, string>;
-            } = {}
-        ): Promise<T> {
-            const {method = 'GET', body, headers = {}} = options;
-            const url = `${baseUrl}${endpoint}`;
-
-            try {
-                const response = await fetch(url, {
-                    method,
-                    headers: {...defaultHeaders, ...headers},
-                    ...(body && {body: JSON.stringify(body)}),
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-
-                // Only try to parse JSON if we expect a response body
-                if (method === 'GET' || response.headers.get('content-length') !== '0') {
-                    try {
-                        return await response.json();
-                    } catch (error: unknown) {
-                        console.warn('Empty or non-JSON response : ', (error as Error).message);
-
-                        return {} as T;
-                    }
-                }
-
-                return {} as T;
-            } catch (error: unknown) {
-                console.error(`API Error (${endpoint}):`, (error as Error).message);
-
-                throw error;
-            }
-        },
-    };
 }
 
 function debounce<T extends (...args: unknown[]) => unknown>(fn: T, delay: number): (...args: Parameters<T>) => void {

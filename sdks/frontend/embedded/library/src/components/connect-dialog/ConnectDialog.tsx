@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import Logo from './assets/logo.svg';
 import XIcon from './assets/x.svg';
 import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
-import styles from './styles.module.css';
+import styles from '../shared/dialog.module.css';
 import {
     ApiFetch,
     BoundFieldMappingIntegrationFieldArgsType,
