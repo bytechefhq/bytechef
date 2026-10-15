@@ -1,4 +1,5 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {getConnectedUserExternalId} from '@/ee/pages/embedded/workflow-executions/utils/getConnectedUserExternalId';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {Job, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
@@ -37,9 +38,10 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
                 cell: (info) => info.getValue()?.label,
                 header: 'Workflow',
             }),
-            columnHelper.accessor('project', {
-                cell: (info) => info.getValue()?.name.replace('__EMBEDDED__', ''),
+            columnHelper.accessor((row) => row.projectDeployment, {
+                cell: (info) => getConnectedUserExternalId(info.getValue()?.name),
                 header: 'Connected user',
+                id: 'connectedUser',
             }),
             columnHelper.accessor((row) => row.job, {
                 cell: (info) => getDuration(info),
