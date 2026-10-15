@@ -512,6 +512,7 @@ export type AutomationWorkflowProjectTag = {
 
 export type AutomationWorkflowProjectVersion = {
   __typename?: 'AutomationWorkflowProjectVersion';
+  description?: Maybe<Scalars['String']['output']>;
   publishedDate?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
   version: Scalars['Int']['output'];
@@ -2294,6 +2295,7 @@ export type MutationInviteUserArgs = {
 
 
 export type MutationPublishAutomationWorkflowProjectArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
 };
 
