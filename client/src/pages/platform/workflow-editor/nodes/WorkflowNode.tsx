@@ -862,6 +862,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             aria-label={`${data.workflowNodeName} node actions`}
             className="nodrag size-6 rounded-md border border-stroke-neutral-tertiary bg-surface-neutral-primary p-1 shadow-sm [&_svg]:size-4"
             icon={<EllipsisVerticalIcon />}
+            onMouseDown={(event) => event.stopPropagation()}
             size="iconXs"
             title="Node actions"
             variant="ghost"
