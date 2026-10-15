@@ -84,6 +84,7 @@ const TRIGGER_PLACEHOLDER_GAP = 40;
 const TRIGGER_NODE_DAGRE_WIDTH = 160;
 
 const TRIGGER_NODE_BOX_SIZE = 72;
+const CONFIGURED_CLUSTER_ROOT_RENDERED_SIZE = 240;
 
 const TRIGGER_NODE_MENU_GUTTER = 96;
 
@@ -160,8 +161,14 @@ export const calculateNodeHeight = (node: Node) => {
  * top-left position that ReactFlow expects.
  */
 function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): number {
+    const clusterFrame = (node.data as NodeDataType)?.clusterFrame;
+
     if (direction !== 'LR') {
-        return 0;
+        return clusterFrame ? clusterFrame.height - NODE_HEIGHT : 0;
+    }
+
+    if (clusterFrame) {
+        return clusterFrame.width;
     }
 
     if (node.type === 'taskDispatcherLeftGhostNode') {
@@ -173,7 +180,7 @@ function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): nu
     }
 
     if (rendersClusterElements(node)) {
-        return 240;
+        return CONFIGURED_CLUSTER_ROOT_RENDERED_SIZE;
     }
 
     return 72;
@@ -1053,15 +1060,20 @@ export const getLayoutElements = async ({
         let crossAxisPosition = dagreNode[crossAxis] + canvasCenteringOffset;
 
         const hasValidClusterElements = hasConfiguredClusterElements(node);
+        const clusterFrame = (node.data as NodeDataType)?.clusterFrame;
 
-        if (hasValidClusterElements && node.data.clusterRoot && direction === 'TB') {
+        if (clusterFrame) {
+            const frameCrossSize = direction === 'TB' ? clusterFrame.width : clusterFrame.height;
+
+            crossAxisPosition -= (frameCrossSize - TRIGGER_NODE_BOX_SIZE) / 2;
+        } else if (hasValidClusterElements && node.data.clusterRoot && direction === 'TB') {
             crossAxisPosition -= 85;
         }
 
         const mainAxis = direction === 'TB' ? 'y' : 'x';
         const mainAxisPosition = dagreNode[mainAxis] - getRenderedMainAxisSize(node, direction) / 2;
 
-        if (hasValidClusterElements && node.data.clusterRoot && direction === 'LR') {
+        if (!clusterFrame && hasValidClusterElements && node.data.clusterRoot && direction === 'LR') {
             crossAxisPosition -= 23;
         }
 
