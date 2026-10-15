@@ -563,4 +563,12 @@ describe('ActivationDialog', () => {
             await new Promise((resolve) => setTimeout(resolve, 0));
         });
     });
+
+    it('renders Powered by ByteChef inside the footer', async () => {
+        renderDialog();
+
+        const footer = await screen.findByRole('contentinfo');
+
+        expect(within(footer).getByText(/Powered by/)).toBeInTheDocument();
+    });
 });
