@@ -46,7 +46,7 @@ public final class AllowedComponentNamesUtils {
 
     private static final Logger log = LoggerFactory.getLogger(AllowedComponentNamesUtils.class);
 
-    private static final Pattern NODE_TYPE_PATTERN = Pattern.compile("^([A-Za-z0-9_]+)/v\\d+(?:/.*)?$");
+    private static final Pattern NODE_TYPE_PATTERN = Pattern.compile("^([A-Za-z0-9_]+)/.+$");
 
     private AllowedComponentNamesUtils() {
     }
