@@ -19,12 +19,15 @@ package com.bytechef.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
+import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -33,6 +36,8 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.automation.ai.tool.model.WorkflowExecutionDetailInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowExecutionSummary;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.error.ExecutionError;
@@ -51,8 +56,13 @@ import org.springframework.data.domain.PageImpl;
 @ExtendWith(ObjectMapperSetupExtension.class)
 class WorkflowExecutionToolsTest {
 
+    private static final long OWN_PROJECT_ID = 7L;
+
     private final ProjectWorkflowExecutionFacade facade = mock(ProjectWorkflowExecutionFacade.class);
-    private final WorkflowExecutionTools workflowExecutionTools = new WorkflowExecutionTools(facade);
+    private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+    private final WorkflowExecutionTools workflowExecutionTools = new WorkflowExecutionTools(
+        facade, new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService,
+            mock(ScopedConnectionGuard.class)));
 
     @Test
     void testGetWorkflowExecutionMapsTaskFailure() {
@@ -190,5 +200,73 @@ class WorkflowExecutionToolsTest {
             .isInstanceOf(ExecutionException.class)
             .hasMessageContaining("FAILURE")
             .hasMessageContaining("FAILED");
+    }
+
+    @Test
+    void testScopedRunReadsAnExecutionOfItsOwnProjectWithoutAWorkspace() {
+        when(facade.getWorkflowExecution(7L)).thenReturn(newExecution(OWN_PROJECT_ID));
+
+        WorkflowExecutionDetailInfo result = workflowExecutionTools.getWorkflowExecution(7L, scopedToolContext());
+
+        assertThat(result.id()).isEqualTo(7L);
+    }
+
+    @Test
+    void testScopedRunCannotReadAnExecutionOfAnotherProject() {
+        when(facade.getWorkflowExecution(7L)).thenReturn(newExecution(9L));
+
+        ToolContext toolContext = new ToolContext(
+            Map.of(
+                ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID,
+                WorkflowExecutionToolContextKeys.WORKSPACE_ID, 42L));
+
+        assertThatThrownBy(() -> workflowExecutionTools.getWorkflowExecution(7L, toolContext))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("not found");
+    }
+
+    @Test
+    void testScopedRunListsOnlyTheExecutionsOfItsOwnProject() {
+        when(
+            facade.getWorkflowExecutions(
+                isNull(), isNull(), isNull(), isNull(), isNull(), eq(OWN_PROJECT_ID), isNull(), isNull(), isNull(),
+                anyLong(), anyInt()))
+                    .thenReturn(new PageImpl<>(List.of(newExecution(OWN_PROJECT_ID))));
+
+        List<WorkflowExecutionSummary> result =
+            workflowExecutionTools.listWorkflowExecutions(null, null, scopedToolContext());
+
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void testScopedRunCannotListTheExecutionsOfAWorkflowOfAnotherProject() {
+        when(projectWorkflowService.getWorkflowProjectWorkflow("wf-other"))
+            .thenReturn(new ProjectWorkflow(9L, 1, "wf-other"));
+
+        assertThatThrownBy(() -> workflowExecutionTools.listWorkflowExecutions(null, "wf-other", scopedToolContext()))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("was not found in this chat's project");
+
+        verifyNoInteractions(facade);
+    }
+
+    private static WorkflowExecutionDTO newExecution(long projectId) {
+        Job job = new Job();
+
+        job.setId(7L);
+        job.setStatus(Job.Status.COMPLETED);
+
+        Project project = new Project();
+
+        project.setId(projectId);
+        project.setName("Demo");
+
+        return new WorkflowExecutionDTO(
+            7L, project, null, null, new JobDTO(job, Map.of(), List.of()), null, null);
+    }
+
+    private static ToolContext scopedToolContext() {
+        return new ToolContext(Map.of(ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID));
     }
 }

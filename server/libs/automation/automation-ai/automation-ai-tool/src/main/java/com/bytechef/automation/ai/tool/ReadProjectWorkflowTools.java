@@ -41,7 +41,7 @@ public class ReadProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
+        description = "Get comprehensive information about a specific workflow. Returns detailed workflow information including id, name, description, version, definition, project workflow id, created date, last modified date.")
     public WorkflowInfo getWorkflow(
         @ToolParam(description = "The ID of the workflow to retrieve") String workflowId, ToolContext toolContext) {
         return delegate.getWorkflow(workflowId, toolContext);
@@ -55,7 +55,7 @@ public class ReadProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Full-text search across the workflows of a project, or of every project in a workspace. Returns a list of workflows matching the search query in name or description.")
+        description = "Full-text search across the workflows of a project, or of every project in a workspace. Returns a list of workflows matching the search query in name or description. In an embedded chat confined to one project, only that project is searched, workspaceId is ignored, and any other projectId is an error.")
     public List<WorkflowInfo> searchWorkflows(
         @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
         @ToolParam(required = false, description = "The ID of the project") Long projectId,

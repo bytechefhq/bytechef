@@ -106,7 +106,7 @@ public class ProjectWorkflowTools {
     public WorkflowInfo getWorkflow(
         @ToolParam(description = "The ID of the workflow to retrieve") String workflowId, ToolContext toolContext) {
 
-        scopedProjectGuard.checkWorkflow(workflowId, toolContext, GET_WORKFLOW);
+        scopedProjectGuard.checkWorkflow(workflowId, ScopedProjectGuard.WORKFLOW_VIEW, toolContext, GET_WORKFLOW);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
@@ -134,7 +134,8 @@ public class ProjectWorkflowTools {
     public List<WorkflowInfo> listWorkflows(
         @ToolParam(description = "The ID of the project") long projectId, ToolContext toolContext) {
 
-        scopedProjectGuard.checkProject(projectId, toolContext, ProjectWorkflowErrorType.LIST_WORKFLOWS);
+        scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_VIEW, toolContext,
+            ProjectWorkflowErrorType.LIST_WORKFLOWS);
 
         try {
             List<ProjectWorkflowDTO> workflows = projectWorkflowFacade.getProjectWorkflows(projectId);
@@ -170,13 +171,14 @@ public class ProjectWorkflowTools {
             required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
+        if (projectId != null) {
+            scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_VIEW, toolContext,
+                ProjectWorkflowErrorType.SEARCH_WORKFLOWS);
+        }
+
         Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
 
         if (scopedProjectId != null) {
-            if (projectId != null) {
-                scopedProjectGuard.checkProject(projectId, toolContext, ProjectWorkflowErrorType.SEARCH_WORKFLOWS);
-            }
-
             projectId = scopedProjectId;
             workspaceId = null;
         }
@@ -251,7 +253,8 @@ public class ProjectWorkflowTools {
                 DEFAULT_DEFINITION) String definition,
         ToolContext toolContext) {
 
-        scopedProjectGuard.checkProject(projectId, toolContext, ProjectWorkflowErrorType.CREATE_WORKFLOW);
+        scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_CREATE, toolContext,
+            ProjectWorkflowErrorType.CREATE_WORKFLOW);
         checkAllowedComponents(definition, toolContext, ProjectWorkflowErrorType.CREATE_WORKFLOW);
 
         try {
@@ -284,7 +287,8 @@ public class ProjectWorkflowTools {
     public String deleteWorkflow(
         @ToolParam(description = "The ID of the workflow to delete") String workflowId, ToolContext toolContext) {
 
-        scopedProjectGuard.checkWorkflow(workflowId, toolContext, ProjectWorkflowErrorType.DELETE_WORKFLOW);
+        scopedProjectGuard.checkWorkflow(workflowId, ScopedProjectGuard.WORKFLOW_DELETE, toolContext,
+            ProjectWorkflowErrorType.DELETE_WORKFLOW);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
@@ -319,7 +323,8 @@ public class ProjectWorkflowTools {
                 "based on") int version,
         ToolContext toolContext) {
 
-        scopedProjectGuard.checkWorkflow(workflowId, toolContext, ProjectWorkflowErrorType.UPDATE_WORKFLOW);
+        scopedProjectGuard.checkWorkflow(workflowId, ScopedProjectGuard.WORKFLOW_EDIT, toolContext,
+            ProjectWorkflowErrorType.UPDATE_WORKFLOW);
         checkAllowedComponents(definition, toolContext, ProjectWorkflowErrorType.UPDATE_WORKFLOW);
 
         try {
@@ -379,7 +384,8 @@ public class ProjectWorkflowTools {
         @ToolParam(description = "The id of the connection the user picked") long connectionId,
         ToolContext toolContext) {
 
-        scopedProjectGuard.checkWorkflow(workflowId, toolContext, ProjectWorkflowErrorType.SAVE_TEST_CONNECTION);
+        scopedProjectGuard.checkWorkflow(workflowId, ScopedProjectGuard.WORKFLOW_EDIT, toolContext,
+            ProjectWorkflowErrorType.SAVE_TEST_CONNECTION);
 
         try {
             Long environmentId = resolveEnvironmentId(toolContext);
