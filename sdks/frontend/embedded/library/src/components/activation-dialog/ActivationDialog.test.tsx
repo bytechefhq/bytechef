@@ -35,6 +35,12 @@ const projects = [
             {components: [], id: 'wf-plain', inputs: [], label: 'Plain'},
         ],
     },
+    {
+        id: 2,
+        kind: 'REFERENCE',
+        name: 'Code workflows',
+        workflowTemplates: [{components: [], id: 'wf-code', inputs: [], label: 'Code workflow'}],
+    },
 ];
 
 type FetchCall = {body?: string; method: string; url: string};
@@ -419,6 +425,13 @@ describe('ActivationDialog', () => {
         await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
 
         expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+    });
+
+    it('does not offer Edit workflow for a template from a code-workflow (REFERENCE) project', async () => {
+        renderDialog({onEditWorkflow: vi.fn(), workflowTemplateId: 'wf-code'});
+
+        expect(await screen.findByRole('button', {name: 'Activate'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Edit workflow'})).not.toBeInTheDocument();
     });
 
     it('offers Edit workflow only when a handler is given, copies the template and hands over the uuid', async () => {

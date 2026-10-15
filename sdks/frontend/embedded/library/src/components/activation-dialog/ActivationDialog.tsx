@@ -83,14 +83,14 @@ const readMissingConnectionComponentName = (error: unknown): string | undefined 
 const findTemplate = (
     projects: AutomationProjectType[],
     workflowTemplateId: string
-): AutomationTemplateType | undefined => {
+): {kind?: AutomationProjectType['kind']; template: AutomationTemplateType} | undefined => {
     for (const project of projects) {
         const template = project.workflowTemplates?.find(
             (workflowTemplate) => workflowTemplate.id === workflowTemplateId
         );
 
         if (template) {
-            return template;
+            return {kind: project.kind, template};
         }
     }
 
@@ -108,6 +108,7 @@ const templateInputs = (template: AutomationTemplateType): TemplateInputType[] =
 interface LoadResultType {
     error?: string;
     key: string;
+    kind?: AutomationProjectType['kind'];
     template?: AutomationTemplateType;
 }
 
@@ -206,6 +207,7 @@ interface ActivationBodyProps {
     onClose: () => void;
     onEditWorkflow?: (workflowUuid: string) => void;
     template: AutomationTemplateType;
+    editable: boolean;
 }
 
 const ActivationBody = ({
@@ -220,6 +222,7 @@ const ActivationBody = ({
     onClose,
     onEditWorkflow,
     template,
+    editable,
 }: ActivationBodyProps) => {
     const [busy, setBusy] = useState(false);
     const [connectingComponent, setConnectingComponent] = useState<TemplateComponentType>();
@@ -499,7 +502,7 @@ const ActivationBody = ({
                         </button>
                     ) : (
                         <>
-                            {onEditWorkflow && (
+                            {onEditWorkflow && editable && (
                                 <button
                                     className={dialogStyles.buttonSecondary}
                                     disabled={busy}
@@ -599,10 +602,10 @@ const ActivationDialog = ({
 
         fetch<AutomationProjectType[]>('/api/embedded/v1/automation/projects')
             .then((projects) => {
-                const foundTemplate = findTemplate(projects, workflowTemplateId);
+                const found = findTemplate(projects, workflowTemplateId);
 
-                return foundTemplate
-                    ? {key: workflowTemplateId, template: foundTemplate}
+                return found
+                    ? {key: workflowTemplateId, kind: found.kind, template: found.template}
                     : {error: TEMPLATE_NOT_FOUND_MESSAGE, key: workflowTemplateId};
             })
             .catch((error: unknown) => {
@@ -723,6 +726,7 @@ const ActivationDialog = ({
                         onActivated={onActivated}
                         onClose={onClose}
                         onEditWorkflow={onEditWorkflow}
+                        editable={loadResult?.kind !== 'REFERENCE'}
                         key={template.id}
                         template={template}
                     />
