@@ -252,6 +252,9 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
         Integration integration, IntegrationDefinition integrationDefinition,
         List<WorkflowDefinition> workflowDefinitions, byte[] bytes, Language language) {
 
+        List<WorkflowDefinition> integrationWorkflowDefinitions = IntegrationImplicitConnections.addTo(
+            workflowDefinitions, integration.getComponentName());
+
         long integrationId = Objects.requireNonNull(integration.getId());
         int draftIntegrationVersion = integration.getLastIntegrationVersion();
 
@@ -272,7 +275,7 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
             }
 
             reconciliation = codeWorkflowContainerFacade.update(
-                codeWorkflowContainer, integrationDefinition.getVersion(), workflowDefinitions, bytes,
+                codeWorkflowContainer, integrationDefinition.getVersion(), integrationWorkflowDefinitions, bytes,
                 PlatformType.EMBEDDED);
         } else {
             Map<String, String> reusableWorkflowNameIds = latestIntegrationCodeWorkflow == null
@@ -280,8 +283,8 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
                 : resolveDraftWorkflowNameIds(latestIntegrationCodeWorkflow, integrationId, draftIntegrationVersion);
 
             reconciliation = codeWorkflowContainerFacade.create(
-                integrationDefinition.getComponentName(), integrationDefinition.getVersion(), workflowDefinitions,
-                language, bytes, PlatformType.EMBEDDED, reusableWorkflowNameIds);
+                integrationDefinition.getComponentName(), integrationDefinition.getVersion(),
+                integrationWorkflowDefinitions, language, bytes, PlatformType.EMBEDDED, reusableWorkflowNameIds);
 
             integrationCodeWorkflowService.create(reconciliation.codeWorkflowContainer(), integration);
         }
