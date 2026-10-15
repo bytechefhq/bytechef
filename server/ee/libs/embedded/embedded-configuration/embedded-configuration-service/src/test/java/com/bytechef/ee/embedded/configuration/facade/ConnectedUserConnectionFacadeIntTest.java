@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,6 +29,8 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -42,6 +45,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -155,6 +159,9 @@ class ConnectedUserConnectionFacadeIntTest {
 
     @Autowired
     private ConnectedUserService connectedUserService;
+
+    @Autowired
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @Autowired
     private ConnectionFacade connectionFacade;
@@ -565,12 +572,47 @@ class ConnectedUserConnectionFacadeIntTest {
             connectedUserId, 83701L, Environment.PRODUCTION,
             Map.of("clientId", "app-id", "clientSecret", "app-secret"));
         stubOwnedConnectionDTOs(List.of(83701L));
+        stubOAuth2ConnectionDefinition();
 
         connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
             connectedUserId, 83701L, Map.of("code", "fresh-code"));
 
         verify(connectionFacade).replaceAuthorizationParameters(
             83701L, Map.of("clientId", "app-id", "clientSecret", "app-secret", "code", "fresh-code"));
+    }
+
+    @Test
+    void testReauthorizeLetsTheNewParametersWinOverTheIntegrationConfigurationCredentials() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createIntegrationInstance(
+            connectedUserId, 83711L, Environment.PRODUCTION,
+            Map.of("clientId", "app-id", "clientSecret", "app-secret"));
+        stubOwnedConnectionDTOs(List.of(83711L));
+        stubOAuth2ConnectionDefinition();
+
+        connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+            connectedUserId, 83711L, Map.of("clientSecret", "rotated-secret", "code", "fresh-code"));
+
+        verify(connectionFacade).replaceAuthorizationParameters(
+            83711L, Map.of("clientId", "app-id", "clientSecret", "rotated-secret", "code", "fresh-code"));
+    }
+
+    @Test
+    void testReauthorizeRestoresOnlyTheAuthorizationParametersOfTheIntegrationConfiguration() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createIntegrationInstance(
+            connectedUserId, 83721L, Environment.PRODUCTION,
+            Map.of("clientId", "app-id", "clientSecret", "app-secret", "region", "configuration-region"));
+        stubOwnedConnectionDTOs(List.of(83721L));
+        stubOAuth2ConnectionDefinition();
+
+        connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+            connectedUserId, 83721L, Map.of("code", "fresh-code"));
+
+        verify(connectionFacade).replaceAuthorizationParameters(
+            83721L, Map.of("clientId", "app-id", "clientSecret", "app-secret", "code", "fresh-code"));
     }
 
     @Test
@@ -710,6 +752,19 @@ class ConnectedUserConnectionFacadeIntTest {
             .toList();
 
         when(connectionFacade.getConnections(any(), eq(PlatformType.EMBEDDED))).thenReturn(ownedConnectionDTOs);
+    }
+
+    private void stubOAuth2ConnectionDefinition() {
+        ConnectionDefinition connectionDefinition = new ConnectionDefinition(
+            ComponentDsl.connection()
+                .authorizations(
+                    ComponentDsl.authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                        .properties(ComponentDsl.string("clientId"), ComponentDsl.string("clientSecret")))
+                .properties(ComponentDsl.string("region")),
+            "componentName", "Component", null);
+
+        when(connectionDefinitionService.getConnectionConnectionDefinition(any(), anyInt()))
+            .thenReturn(connectionDefinition);
     }
 
     private void stubSharedConnection(long connectionId) {
