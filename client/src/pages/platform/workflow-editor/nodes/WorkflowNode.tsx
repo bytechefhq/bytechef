@@ -676,17 +676,14 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const handleRemoveSavedClusterElementPosition = useCallback(
         (clickedNodeName: string) => {
-            if (!rootClusterElementNodeData) {
-                return;
-            }
-
             saveClusterElementNodesPosition({
                 clickedNodeName,
+                clusterRootName: resolveMainClusterRootName(data, rootClusterElementNodeData),
                 updateWorkflowMutation,
                 workflow,
             });
         },
-        [rootClusterElementNodeData, updateWorkflowMutation, workflow]
+        [data, rootClusterElementNodeData, updateWorkflowMutation, workflow]
     );
 
     const handleRemoveNodePosition = useCallback(
