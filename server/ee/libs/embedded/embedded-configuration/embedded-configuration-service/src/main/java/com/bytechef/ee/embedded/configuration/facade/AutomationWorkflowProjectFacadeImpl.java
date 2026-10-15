@@ -332,7 +332,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
-        Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment);
+        Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment, connectedUser);
 
         return getPublishedProjects().stream()
             .filter(project -> embeddedPermissionEvaluator.evaluate(project.permissionExpression(), connectedUser))
@@ -454,7 +454,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .toList();
     }
 
-    private Map<String, Long> getIntegrationIdsByComponentName(Environment environment) {
+    private Map<String, Long> getIntegrationIdsByComponentName(Environment environment, ConnectedUser connectedUser) {
         List<Long> integrationIds = integrationInstanceConfigurationService
             .getIntegrationInstanceConfigurations(environment, true)
             .stream()
@@ -469,6 +469,10 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         Map<String, Long> integrationIdsByComponentName = new HashMap<>();
 
         for (Integration integration : integrationService.getIntegrations(integrationIds)) {
+            if (!embeddedPermissionEvaluator.evaluate(integration.getPermissionExpression(), connectedUser)) {
+                continue;
+            }
+
             integrationIdsByComponentName.merge(integration.getComponentName(), integration.getId(), Math::min);
         }
 
