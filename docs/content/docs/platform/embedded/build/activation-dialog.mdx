@@ -9,7 +9,7 @@ The **activation dialog** is the same flow the [Automation Hub](/platform/embedd
 
 - A Signing Key and a backend that mints end-user JWTs - see [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk).
 - A **published** automation project with the template. See [Automations](/platform/embedded/build/automations#publishing).
-- For each component in the template that needs a connection, an integration that is set up and has an enabled configuration in the environment. See [Adding an Integration](/platform/embedded/get-started/initial-setup/adding-an-integration). A component without one shows `<App> isn't set up yet — ask your administrator`, and activation cannot continue.
+- For each component in the template that needs a connection, an integration that is set up, has an enabled configuration in the environment, and is visible to the connected user (its permission expression). See [Adding an Integration](/platform/embedded/get-started/initial-setup/adding-an-integration). A component without one shows `<App> isn't set up yet — ask your administrator`, and activation cannot continue.
 
 ## Open the dialog
 
@@ -51,7 +51,7 @@ export function ActivateButton({jwtToken, templateId}: {jwtToken: string; templa
 
 The dialog has up to three steps. A step with nothing to show is skipped.
 
-1. **Connect** - one row per component that needs a connection. **Connect** opens the [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) for the integration behind that component. The connection it creates belongs to an integration instance. Skipped when the template needs no connections.
+1. **Connect** - one row per component that needs a connection. **Connect** reuses the user's existing connection for that integration without showing a form when its credentials are valid. Otherwise it opens the [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) for the integration behind that component; if an existing connection's credentials are invalid, the form reconnects it. The connection it creates belongs to an integration instance. Skipped when the template needs no connections.
 2. **Configure** - one field per workflow input. Required inputs must be filled. Skipped when the template has no inputs.
 3. **Activate** - the dialog provisions the template and turns it on.
 

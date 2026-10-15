@@ -88,7 +88,7 @@ const {openDialog} = useConnectDialog({
 
 Two optional modes narrow what the dialog does. They are exclusive: pass one or neither, and TypeScript rejects `connectionOnly` together with `reauthorizeConnectionId`, and each callback outside its mode.
 
-- **`connectionOnly: true`** with `onConnected(integrationInstanceId, connectionId)`. The dialog closes as soon as the integration instance exists, instead of continuing to the workflows view. If the user already has an instance with valid credentials, `onConnected` runs at once without showing the dialog. If its credentials are invalid, the user reconnects first.
+- **`connectionOnly: true`** with `onConnected(integrationInstanceId, connectionId)`. The dialog closes as soon as the integration instance exists, instead of continuing to the workflows view. If the user already has an instance with valid credentials, `onConnected` runs at once without showing the dialog. In this mode `onClose` also runs after `onConnected`, whether the connection already existed or was just created. If its credentials are invalid, the user reconnects first.
 - **`reauthorizeConnectionId`** with `onReauthorized(connectionId)`. The dialog shows the connection form for that existing connection and replaces its credentials.
 
 ```tsx
