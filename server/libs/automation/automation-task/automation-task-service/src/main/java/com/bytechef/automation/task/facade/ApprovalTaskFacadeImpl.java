@@ -55,8 +55,12 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin() or " +
+        "hasPermission(@approvalTaskJobResolver.getJobId(#approvalTask.jobResumeId), 'Job', 'DEPLOYMENT_EDIT')")
     public ApprovalTask createApprovalTask(ApprovalTask approvalTask) {
-        approvalTask.setEnvironment(getEnvironment(approvalTask.getJobResumeId()));
+        if (approvalTask.getJobResumeId() != null) {
+            approvalTask.setEnvironment(getEnvironment(approvalTask.getJobResumeId()));
+        }
 
         return approvalTaskService.create(approvalTask);
     }
@@ -82,18 +86,16 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
     }
 
     @Override
-    @PostFilter(
-        "hasPermission(filterObject.id, 'ApprovalTask', 'DEPLOYMENT_VIEW') or " +
-            "isResourceOwner(filterObject.id, 'ApprovalTask')")
+    @PostFilter("hasPermission(filterObject.id, 'ApprovalTask', 'DEPLOYMENT_VIEW') or " +
+        "isResourceOwner(filterObject.id, 'ApprovalTask')")
     @Transactional(readOnly = true)
     public List<ApprovalTask> getApprovalTasks(List<Long> ids) {
         return approvalTaskService.getApprovalTasks(ids);
     }
 
     @Override
-    @PreAuthorize(
-        "hasPermission(#approvalTask.id, 'ApprovalTask', 'DEPLOYMENT_EDIT') or " +
-            "isResourceOwner(#approvalTask.id, 'ApprovalTask')")
+    @PreAuthorize("hasPermission(#approvalTask.id, 'ApprovalTask', 'DEPLOYMENT_EDIT') or " +
+        "isResourceOwner(#approvalTask.id, 'ApprovalTask')")
     public ApprovalTask updateApprovalTask(ApprovalTask approvalTask) {
         return approvalTaskService.update(approvalTask);
     }

@@ -195,6 +195,12 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
     @Override
     @PreAuthorize("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')")
+    public void attach(long jobId) {
+        // The guard is the whole operation: the events are buffered by the caller, not here.
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')")
     public void stop(long jobId) {
         jobSyncExecutor.stopJob(jobId);
     }
