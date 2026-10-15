@@ -164,6 +164,10 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
             return JsonUtils.read(responseData) instanceof Map<?, ?> response
                 && Boolean.TRUE.equals(response.get(AWAITING_ANSWER_KEY));
         } catch (RuntimeException exception) {
+            log.warn(
+                "Tool {} returned an {} payload that isn't valid JSON; continuing the turn", toolResponse.name(),
+                AWAITING_ANSWER_KEY, exception);
+
             return false;
         }
     }
