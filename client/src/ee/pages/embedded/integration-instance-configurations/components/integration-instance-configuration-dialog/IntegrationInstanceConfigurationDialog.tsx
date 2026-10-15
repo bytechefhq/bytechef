@@ -43,15 +43,15 @@ import {useShallow} from 'zustand/react/shallow';
 import IntegrationInstanceConfigurationDialogBasicStep from './IntegrationInstanceConfigurationDialogBasicStep';
 import IntegrationInstanceConfigurationDialogWorkflowsStep from './IntegrationInstanceConfigurationDialogWorkflowsStep';
 
-const OAUTH2_AUTHORIZATION_TYPES: string[] = [
+const OAUTH2_AUTHORIZATION_TYPES = new Set<string>([
     AuthorizationType.Oauth2AuthorizationCode,
     AuthorizationType.Oauth2AuthorizationCodePkce,
     AuthorizationType.Oauth2ImplicitCode,
-];
+]);
 
 const getDefaultAuthorizationType = (authorizations?: Authorization[]) =>
     (
-        authorizations?.find((authorization) => OAUTH2_AUTHORIZATION_TYPES.includes(authorization.type!)) ??
+        authorizations?.find((authorization) => OAUTH2_AUTHORIZATION_TYPES.has(authorization.type!)) ??
         authorizations?.[0]
     )?.type as IntegrationInstanceConfiguration['authorizationType'];
 
@@ -155,7 +155,7 @@ const IntegrationInstanceConfigurationDialog = ({
     );
 
     const oAuth2Authorization =
-        selectedAuthorization && OAUTH2_AUTHORIZATION_TYPES.includes(selectedAuthorization.type!)
+        selectedAuthorization && OAUTH2_AUTHORIZATION_TYPES.has(selectedAuthorization.type!)
             ? selectedAuthorization
             : undefined;
 
