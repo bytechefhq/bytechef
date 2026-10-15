@@ -142,10 +142,6 @@ class SpringAIAgentTextSplittingTest {
         return events;
     }
 
-    /**
-     * Streams some text and a tool call on the first round, then a reply on the second round, like a model that
-     * explains what it is about to do before calling a tool.
-     */
     private static class TextToolTextChatModel implements ChatModel {
 
         private final AtomicInteger streamCalls = new AtomicInteger();
