@@ -5,7 +5,7 @@ description: Embed a ready-made catalog where your end users browse your automat
 
 ![Automation Hub illustration](automation-hub/automation-hub-overview.png)
 
-The **Automation Hub** is an end-user surface you drop into your product with one React component. Your connected users see the [automation templates](/platform/embedded/build/automations) you published, activate one in a short wizard, and turn their automations on and off. They do all of this without leaving your app or seeing ByteChef.
+The **Automation Hub** is an end-user surface you drop into your product with one React component. Your connected users see the [automation templates](/platform/embedded/build/automations) you published, activate one in the [activation dialog](/platform/embedded/build/activation-dialog), and turn their automations on and off. They do all of this without leaving your app or seeing ByteChef.
 
 It renders in an iframe and has two tabs:
 
@@ -50,8 +50,8 @@ The component renders `automation-hub.html` from your ByteChef host, waits for t
 | `environment` | `'DEVELOPMENT' \| 'STAGING' \| 'PRODUCTION'` | `'PRODUCTION'` | The environment whose catalog and connections the hub shows. |
 | `className` | `string` | - | Class for the wrapping element. Give it a height; the iframe fills it. |
 | `tabs` | `{automations?, connections?, newWorkflow?}` | all `true` | Which parts of the hub are shown. See [Tabs](#tabs). |
-| `connectionDialogAllowed` | `boolean` | `true` | Whether users can create a new connection from the activation wizard and the builder. When `false`, they can only pick existing connections. |
-| `editWorkflowAllowed` | `boolean` | `true` | Whether users can open copies of your templates in the builder: **Edit workflow** and **Open in builder** in the activation wizard, and **Customize** on a card. Blank automations stay editable while `tabs.newWorkflow` is on. |
+| `connectionDialogAllowed` | `boolean` | `true` | Whether users can create a new connection from the activation dialog and the builder. When `false`, they can only pick existing connections. |
+| `editWorkflowAllowed` | `boolean` | `true` | Whether users can open copies of your templates in the builder: **Edit workflow** in the activation dialog, and **Customize** on a card. **Edit workflow** is never offered for templates from code-workflow projects. Blank automations stay editable while `tabs.newWorkflow` is on. |
 | `includeComponents` | `string[]` | - | Restricts the components offered in the builder to these names. |
 | `defaultLayout` | `'grid' \| 'list'` | `'grid'` | The initial catalog layout. |
 | `layoutSwitcherAllowed` | `boolean` | `true` | Whether users can switch between grid and list. When `false`, `defaultLayout` always applies. |
@@ -75,7 +75,7 @@ The tab bar appears only when both `automations` and `connections` are on. If a 
 
 Each published template appears as a card with its label, description, and the icons of the components it uses. Users can search by label and filter by **All**, **Active** (they have an automation for the template), or **Enabled**.
 
-A template the user has not activated shows **Use**, which opens the activation wizard. Once activated, the card shows the automation's version, an **Enable** / **Disable** button, and a menu:
+A template the user has not activated shows **Use**, which opens the activation dialog. Once activated, the card shows the automation's version, an **Enable** / **Disable** button, and a menu:
 
 - **Settings** - edit the workflow inputs. Shown only when the template has inputs.
 - **Customize** - open the user's copy in the builder. Shown only for a copy, never for a reference (see [Copies and references](#copies-and-references)).
@@ -83,15 +83,15 @@ A template the user has not activated shows **Use**, which opens the activation 
 
 **Enable** is unavailable for an automation that has not been published from the builder yet, and for one whose template is gone (see [Needs attention](#needs-attention)). If enabling fails because a connection or a required input is missing, the hub says which and, for an input, opens the settings dialog.
 
-### The activation wizard
+### The activation dialog
 
-The wizard has up to three steps:
+The activation dialog has up to three steps. It is the same dialog you can open from your own page - see [Activate templates from your app](/platform/embedded/build/activation-dialog).
 
-1. **Connect** - one account picker per component that needs a connection. **Connect** next to a picker creates a new connection, unless `connectionDialogAllowed` is `false`. Skipped when the template needs no connections.
+1. **Connect** - one row per component that needs a connection. **Connect** opens the Connect dialog for the integration behind that component, unless `connectionDialogAllowed` is `false`. The new connection is an integration instance connection that the user's integrations share. If the component's integration has no enabled configuration in the environment, the row shows `<App> isn't set up yet — ask your administrator` and activation cannot continue. Skipped when the template needs no connections.
 2. **Configure** - one field per workflow input. Required inputs must be filled. Skipped when the template has no inputs.
 3. **Activate** - the hub gives the user a reference to the template with the chosen connections and inputs, and turns it on. If this fails, the reference is removed so the user can try again.
 
-When it finishes the user sees "Your automation is running". With `editWorkflowAllowed`, **Edit workflow** instead copies the template and opens the copy in the builder. Activating after that turns on the copy rather than adding a reference, and **Open in builder** then opens it.
+When it finishes the user sees "Your automation is running". With `editWorkflowAllowed`, **Edit workflow** instead copies the template and opens the copy in the builder. **Edit workflow** is not offered for templates from code-workflow projects; they can only be activated as references.
 
 ### The builder
 
@@ -101,9 +101,11 @@ The builder opens only what a user may edit: a copy of a template needs `editWor
 
 ### Connections
 
-The **Connections** tab lists the user's connections with their name, app, creation date, and a **Shared** badge on the connections you share with every connected user. Users can **Reconnect** (replace the credentials) or **Delete** their own connections; shared connections are read-only. A connection that an enabled automation still uses cannot be deleted.
+The **Connections** tab lists the user's connections with their name, app, creation date, and a **Shared** badge on the connections you share with every connected user. Users can **Reconnect** or **Delete** their own connections; shared connections are read-only. A connection that an enabled automation still uses cannot be deleted.
 
-New connections are created from the wizard or the builder, not from this tab. See [Connections](/platform/embedded/build/connections).
+**Reconnect** opens the Connect dialog in reconnect mode, with the same credentials form as the first connect. It is offered only for connections that belong to an integration instance, and it keeps the integration's OAuth2 app credentials.
+
+New connections are created from the activation dialog or the builder, not from this tab. See [Connections](/platform/embedded/build/connections).
 
 ### Needs attention
 
@@ -139,10 +141,11 @@ An automation a user activates in the hub is a **reference**: it points at your 
 | `segmentColor` | The selected item in segmented controls. |
 | `cssVariables` | Any other CSS custom property, as `{'--name': 'value'}`. |
 
-Colors are hex values or any value the browser accepts as a CSS color. The same theme applies inside the builder opened from the hub.
+Colors are hex values or any value the browser accepts as a CSS color. The same theme applies inside the builder opened from the hub. It also styles the activation dialog and the Connect dialog the hub opens; see [Theming and Localization](/platform/embedded/build/theming-and-localization).
 
 ## Related
 
 - [Integration Marketplace](/platform/embedded/build/integration-marketplace) - the embeddable catalog of integrations.
+- [Activate templates from your app](/platform/embedded/build/activation-dialog) - open the activation dialog from your own page.
 - [Automations](/platform/embedded/build/automations) - authoring and publishing the templates the hub lists.
 - [Troubleshooting](/platform/embedded/monitor/troubleshooting#embedding-problems) - a blank iframe or a hub stuck on loading.

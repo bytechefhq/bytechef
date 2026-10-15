@@ -72,7 +72,7 @@ const {openDialog} = useConnectDialog({
 });
 ```
 
-To match a dark host page, pass `mode: 'dark'`. It switches the dialog's surfaces, borders and text to a dark palette. The default is `'light'`, and the dialog takes no other styling options:
+To match a dark host page, pass `mode: 'dark'`. It switches the dialog's surfaces, borders and text to a dark palette. The default is `'light'`. For finer control, set the `--bytechef-dialog-*` CSS variables described in [Theming and Localization](/platform/embedded/build/theming-and-localization#styling-the-dialogs):
 
 ```tsx
 const {openDialog} = useConnectDialog({
@@ -83,6 +83,26 @@ const {openDialog} = useConnectDialog({
     mode: 'dark',
 });
 ```
+
+### Connection-only and reconnect modes
+
+Two optional modes narrow what the dialog does. They are exclusive: pass one or neither, and TypeScript rejects `connectionOnly` together with `reauthorizeConnectionId`, and each callback outside its mode.
+
+- **`connectionOnly: true`** with `onConnected(integrationInstanceId, connectionId)`. The dialog closes as soon as the integration instance exists, instead of continuing to the workflows view. If the user already has an instance with valid credentials, `onConnected` runs at once without showing the dialog. If its credentials are invalid, the user reconnects first.
+- **`reauthorizeConnectionId`** with `onReauthorized(connectionId)`. The dialog shows the connection form for that existing connection and replaces its credentials.
+
+```tsx
+const {openDialog} = useConnectDialog({
+    baseUrl: 'https://your-bytechef-host.example.com',
+    environment: 'DEVELOPMENT',
+    integrationId,
+    jwtToken,
+    onReauthorized: (connectionId) => refetchConnections(),
+    reauthorizeConnectionId: connectionId,
+});
+```
+
+Only one Connect dialog renders per page. Do not keep a `useConnectDialog` instance mounted while the [activation dialog](/platform/embedded/build/activation-dialog)'s **Connect** is in use.
 
 <Callout title="The dialog can collect more than credentials">
     Beyond the account authorization step, the dialog renders any end-user-facing **workflow inputs** (including live dropdowns fetched against the user's new connection) and, when configured, a **[Field Mapping](/platform/embedded/build/workflows/field-mapping)** step where the user maps your application's fields to the integration's fields.

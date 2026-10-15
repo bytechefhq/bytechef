@@ -1,0 +1,91 @@
+---
+title: Activate templates from your app
+description: Open the activation dialog from your own page so a connected user can connect accounts, fill in inputs, and turn on a published automation template.
+---
+
+The **activation dialog** is the same flow the [Automation Hub](/platform/embedded/build/automation-hub) uses to activate a template, available on its own. Use it when you render your own list of automations and want ByteChef to handle the activation. It renders in your page, not in an iframe.
+
+## Before you start
+
+- A Signing Key and a backend that mints end-user JWTs - see [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk).
+- A **published** automation project with the template. See [Automations](/platform/embedded/build/automations#publishing).
+- For each component in the template that needs a connection, an integration that is set up and has an enabled configuration in the environment. See [Adding an Integration](/platform/embedded/get-started/initial-setup/adding-an-integration). A component without one shows `<App> isn't set up yet — ask your administrator`, and activation cannot continue.
+
+## Open the dialog
+
+```tsx
+'use client';
+import {useActivationDialog} from '@bytechef/embedded';
+
+export function ActivateButton({jwtToken, templateId}: {jwtToken: string; templateId: string}) {
+    const {openDialog} = useActivationDialog({
+        baseUrl: 'https://your-bytechef-host.example.com',
+        environment: 'PRODUCTION',
+        jwtToken,
+        onActivated: (workflowUuid) => refreshAutomations(),
+        onEditWorkflow: (workflowUuid) => openBuilder(workflowUuid),
+        workflowTemplateId: templateId,
+    });
+
+    return <button onClick={openDialog}>Activate</button>;
+}
+```
+
+`useActivationDialog` returns `openDialog` and `closeDialog`. `<ActivationDialog />` is the same dialog as a component, for when you render it yourself; it is always open while mounted.
+
+### Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `workflowTemplateId` | `string` | - | **Required.** The id of the template to activate. |
+| `jwtToken` | `string` | - | **Required.** The connected user's signed token. |
+| `baseUrl` | `string` | `https://app.bytechef.io` | Your ByteChef host. |
+| `environment` | `string` | `'PRODUCTION'` | The environment whose templates and connections the dialog uses. |
+| `connectionCreationAllowed` | `boolean` | `true` | Whether users can create a connection from the dialog. When `false`, **Connect** is hidden and they can only pick existing connections. |
+| `mode` | `'dark' \| 'light'` | `'light'` | The dialog's color mode. See [Theming and Localization](/platform/embedded/build/theming-and-localization#styling-the-dialogs). |
+| `onActivated` | `(workflowUuid: string) => void` | - | Runs after the template is activated. |
+| `onEditWorkflow` | `(workflowUuid: string) => void` | - | Runs after **Edit workflow** copies the template, with the uuid of the copy. Omit it to hide **Edit workflow**. |
+| `onClose` | `() => void` | - | Runs when the dialog closes. Required on `<ActivationDialog />`; optional on the hook. |
+
+## The flow
+
+The dialog has up to three steps. A step with nothing to show is skipped.
+
+1. **Connect** - one row per component that needs a connection. **Connect** opens the [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) for the integration behind that component. The connection it creates belongs to an integration instance. Skipped when the template needs no connections.
+2. **Configure** - one field per workflow input. Required inputs must be filled. Skipped when the template has no inputs.
+3. **Activate** - the dialog provisions the template and turns it on.
+
+## What Activate does
+
+**Activate** provisions a reference to the template with the chosen connections and inputs, then enables it. If this fails, the dialog removes the reference it created so the user can try again. A reference that already existed before the attempt is left in place.
+
+## What Edit workflow does
+
+**Edit workflow** copies the template into the user's own workflow and calls `onEditWorkflow` with the uuid of the copy, then closes the dialog. Opening the copy is up to your app, for example in the [workflow builder](/platform/embedded/build/automations/automation-workflows). It is not offered for templates from code-workflow projects, which can only be activated as references.
+
+## Finding template ids
+
+List the projects and their templates for the current user:
+
+```ts
+const response = await fetch(`${baseUrl}/api/embedded/v1/automation/projects`, {
+    headers: {
+        'Authorization': `Bearer ${jwtToken}`,
+        'X-Environment': 'PRODUCTION',
+    },
+});
+
+const projects = await response.json();
+```
+
+Each project has a `workflowTemplates` array. The `id` of a template is the `workflowTemplateId`.
+
+## One Connect dialog per page
+
+Only one Connect dialog renders per page. Do not keep a `useConnectDialog` instance mounted on the same page while **Connect** in the activation dialog is in use.
+
+## Related
+
+- [Automation Hub](/platform/embedded/build/automation-hub) - the iframe catalog that uses the same flow.
+- [Displaying the Connect Dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) - the Connect dialog and its modes.
+- [Automations](/platform/embedded/build/automations) - authoring and publishing templates.
