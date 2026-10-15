@@ -54,6 +54,7 @@ function debounce<T extends (...args: unknown[]) => unknown>(fn: T, delay: numbe
 
 interface UseConnectDialogProps {
     baseUrl?: string;
+    connectionOnly?: boolean;
     environment?: string;
     integrationId: string;
     integrationInstanceId?: string;
@@ -61,10 +62,14 @@ interface UseConnectDialogProps {
     mapObjectFields?: MapObjectFieldsType;
     mode?: 'dark' | 'light';
     onClose?: () => void;
+    onConnected?: (integrationInstanceId: number, connectionId: number | undefined) => void;
+    onReauthorized?: (connectionId: number) => void;
+    reauthorizeConnectionId?: number;
 }
 
 export default function useConnectDialog({
     baseUrl = 'https://app.bytechef.io',
+    connectionOnly,
     environment = 'PRODUCTION',
     integrationId,
     integrationInstanceId,
@@ -72,6 +77,9 @@ export default function useConnectDialog({
     mapObjectFields,
     mode,
     onClose,
+    onConnected,
+    onReauthorized,
+    reauthorizeConnectionId,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
     const [integration, setIntegration] = useState<IntegrationType | undefined>(undefined);
     const [isOpen, setIsOpen] = useState(false);
@@ -221,74 +229,86 @@ export default function useConnectDialog({
         formSubmitRef.current = submitFn;
     }, []);
 
+    const finishAndClose = useCallback(() => {
+        setWorkflowsView(false);
+        setIsOpen(false);
+
+        onClose?.();
+    }, [onClose]);
+
+    const persistConnection = useCallback(
+        async (parameters: object) => {
+            if (reauthorizeConnectionId) {
+                await fetch(`/api/embedded/v1/connections/${reauthorizeConnectionId}/reauthorize`, {
+                    method: 'POST',
+                    body: {parameters},
+                });
+
+                onReauthorized?.(reauthorizeConnectionId);
+
+                finishAndClose();
+
+                return;
+            }
+
+            const newIntegrationInstanceId: number = await fetch(
+                `/api/embedded/v1/integrations/${integrationId}/instances`,
+                {
+                    method: 'POST',
+                    body: {
+                        connection: {
+                            parameters,
+                        },
+                    },
+                }
+            );
+
+            const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
+
+            const createdInstance =
+                integrationData.integrationInstances?.find((instance) => instance.id === newIntegrationInstanceId) ||
+                integrationData.integrationInstances?.[0];
+
+            if (connectionOnly) {
+                if (createdInstance) {
+                    onConnected?.(createdInstance.id, createdInstance.connectionId);
+                }
+
+                finishAndClose();
+
+                return;
+            }
+
+            if (createdInstance) {
+                setCurrentIntegrationInstanceId(createdInstance.id);
+            }
+
+            setIntegration(integrationData);
+            setWorkflowsView(true);
+        },
+        [connectionOnly, fetch, finishAndClose, integrationId, onConnected, onReauthorized, reauthorizeConnectionId]
+    );
+
     const saveOAuth2Connection = useCallback(
         async (payload: CodePayloadI | TokenPayloadI) => {
             try {
-                const newIntegrationInstanceId: number = await fetch(
-                    `/api/embedded/v1/integrations/${integrationId}/instances`,
-                    {
-                        method: 'POST',
-                        body: {
-                            connection: {
-                                parameters: payload,
-                            },
-                        },
-                    }
-                );
-
-                const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
-
-                const createdInstance =
-                    integrationData.integrationInstances?.find(
-                        (instance) => instance.id === newIntegrationInstanceId
-                    ) || integrationData.integrationInstances?.[0];
-
-                if (createdInstance) {
-                    setCurrentIntegrationInstanceId(createdInstance.id);
-                }
-
-                setIntegration(integrationData);
-                setWorkflowsView(true);
+                await persistConnection(payload);
             } catch (error) {
                 console.error('Failed to save OAuth2 connection:', error);
             }
         },
-        [fetch, integrationId]
+        [persistConnection]
     );
 
     const saveNonOAuth2Connection = useCallback(
         async (formData: Record<string, string>) => {
             try {
-                const newIntegrationInstanceId: number = await fetch(
-                    `/api/embedded/v1/integrations/${integrationId}/instances`,
-                    {
-                        method: 'POST',
-                        body: {
-                            connection: {
-                                parameters: formData,
-                            },
-                        },
-                    }
-                );
-
-                const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
-
-                const createdInstance =
-                    integrationData.integrationInstances?.find(
-                        (instance) => instance.id === newIntegrationInstanceId
-                    ) || integrationData.integrationInstances?.[0];
-
-                if (createdInstance) {
-                    setCurrentIntegrationInstanceId(createdInstance.id);
-                }
-
-                setIntegration(integrationData);
-                setWorkflowsView(true);
+                await persistConnection(formData);
             } catch (error) {
                 console.error('Failed to save non-OAuth2 connection:', error);
             }
         },
-        [fetch, integrationId]
+        [persistConnection]
     );
 
     const handleSubmit = useCallback(() => {
@@ -560,6 +580,34 @@ export default function useConnectDialog({
 
         try {
             const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
+
+            if (reauthorizeConnectionId) {
+                setCurrentIntegrationInstanceId(undefined);
+                setWorkflowsView(false);
+                setIntegration(integrationData);
+
+                return;
+            }
+
+            if (connectionOnly) {
+                const existingInstance = integrationData.integrationInstances?.[0];
+
+                if (existingInstance) {
+                    onConnected?.(existingInstance.id, existingInstance.connectionId);
+
+                    setIsOpen(false);
+
+                    onClose?.();
+
+                    return;
+                }
+
+                setCurrentIntegrationInstanceId(undefined);
+                setWorkflowsView(false);
+                setIntegration(integrationData);
+
+                return;
+            }
 
             let targetInstance: IntegrationInstanceType | undefined;
 
@@ -920,6 +968,7 @@ export default function useConnectDialog({
                 mode={mode}
                 properties={integration?.connectionConfig?.inputs}
                 registerFormSubmit={registerFormSubmit}
+                title={reauthorizeConnectionId ? `Reconnect ${integration?.name ?? ''}`.trim() : undefined}
                 workflowsView={workflowsView}
             />
         );
@@ -947,6 +996,7 @@ export default function useConnectDialog({
         mergedMcpWorkflows,
         mergedWorkflows,
         mode,
+        reauthorizeConnectionId,
         registerFormSubmit,
         workflowsView,
         currentIntegrationInstanceId,
