@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { type ComponentProps, type FC, type ReactNode } from 'react';
-import * as Twoslash from 'fumadocs-twoslash/ui';
+import { Popup, PopupContent, PopupTrigger } from '@/components/mdx/lazy';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
@@ -118,7 +118,9 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
         {page.data.preview && <PreviewRenderer preview={page.data.preview} />}
         <Mdx
           components={getMDXComponents({
-            ...Twoslash,
+            Popup,
+            PopupContent,
+            PopupTrigger,
             a: ({ href, ...props }) => {
               const found = source.getPageByHref(href ?? '', {
                 dir: PathUtils.dirname(page.path),
