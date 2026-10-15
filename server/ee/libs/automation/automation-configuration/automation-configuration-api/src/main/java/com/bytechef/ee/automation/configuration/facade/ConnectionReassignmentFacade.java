@@ -16,10 +16,9 @@ import java.util.List;
  * per-row moves that return a removed user's credentials to an active owner without losing audit continuity.
  *
  * <p>
- * <b>Authorization.</b> Queries and mutations are {@code @PreAuthorize(ROLE_ADMIN)} on the facade implementation. The
- * GraphQL admin entry uses {@link #markConnectionsPendingReassignmentAsAdmin(long, String)} (guarded);
- * {@link #markConnectionsPendingReassignment(long, String)} is the unguarded internal variant invoked by the non-admin
- * user-removal path ({@code WorkspaceUserRemovalListener}), so the listener is not blocked by an ADMIN check.
+ * <b>Authorization.</b> Every method is {@code @PreAuthorize(ROLE_ADMIN)} on the facade implementation. The
+ * user-removal path ({@code WorkspaceUserRemovalListener}) acts for whoever removed the member, who need not be a
+ * tenant admin, so it calls {@link #markConnectionsPendingReassignment(long, String)} as the system principal.
  *
  * <p>
  * <b>Partial-failure surfacing.</b> {@code markConnectionsPendingReassignment} returns a
@@ -43,13 +42,6 @@ public interface ConnectionReassignmentFacade {
      * listener) can log / alert specifically on {@code failed > 0}.
      */
     BulkReassignResultDTO markConnectionsPendingReassignment(long workspaceId, String userLogin);
-
-    /**
-     * Admin-gated GraphQL entry point for the bulk mark. Carries {@code @PreAuthorize(ROLE_ADMIN)} and delegates to
-     * {@link #markConnectionsPendingReassignment(long, String)} (the unguarded internal variant the user-removal
-     * listener calls). Split so the listener's non-admin system path is not blocked by the admin check.
-     */
-    BulkReassignResultDTO markConnectionsPendingReassignmentAsAdmin(long workspaceId, String userLogin);
 
     /**
      * Per-row worker invoked through the AOP proxy by {@link #markConnectionsPendingReassignment} so each row commits

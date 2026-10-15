@@ -150,11 +150,6 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public BulkReassignResultDTO markConnectionsPendingReassignmentAsAdmin(long workspaceId, String userLogin) {
-        return markConnectionsPendingReassignment(workspaceId, userLogin);
-    }
-
-    @Override
     public BulkReassignResultDTO markConnectionsPendingReassignment(long workspaceId, String userLogin) {
         List<ConnectionReassignmentItem> connections = getUnresolvedConnections(workspaceId, userLogin);
 
@@ -225,6 +220,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
      * throwing — that's a benign outcome that the batch counts as {@code skipped}, distinct from real failures.
      */
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public MarkPendingOutcome markSingleConnectionPendingReassignment(long connectionId) {
         // Re-read current status inside the REQUIRES_NEW tx so a row whose status changed between the enumeration

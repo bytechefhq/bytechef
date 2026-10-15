@@ -14,6 +14,7 @@ import com.bytechef.ee.automation.configuration.dto.BulkReassignResultDTO;
 import com.bytechef.ee.automation.configuration.facade.ConnectionReassignmentFacade;
 import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -90,8 +91,11 @@ public class WorkspaceUserRemovalListener {
         }
 
         try {
-            BulkReassignResultDTO result = connectionReassignmentFacade.markConnectionsPendingReassignment(
-                event.workspaceId(), event.userLogin());
+            // Marking connections is tenant-admin work, but whoever removed the member need not be a tenant admin; the
+            // removal they were allowed to make is what authorizes this step.
+            BulkReassignResultDTO result = SecurityUtils.runAsSystem(
+                () -> connectionReassignmentFacade.markConnectionsPendingReassignment(
+                    event.workspaceId(), event.userLogin()));
 
             if (result.failed() > 0) {
                 // Partial failure: facade has already logged per-row errors. Surface a single WARN so

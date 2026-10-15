@@ -108,7 +108,7 @@ class EndpointGateCoverageTest {
         Map.entry("ConnectionGraphQlController#disconnectConnection",
             "WorkspaceConnectionFacadeImpl#disconnectConnection"),
         Map.entry("ConnectionReassignmentGraphQlController#markConnectionsPendingReassignment",
-            "ConnectionReassignmentFacadeImpl#markConnectionsPendingReassignmentAsAdmin"),
+            "ConnectionReassignmentFacadeImpl#markConnectionsPendingReassignment"),
         Map.entry("ConnectionReassignmentGraphQlController#reassignAllConnections",
             "ConnectionReassignmentFacadeImpl#reassignAllConnections"),
         Map.entry("ConnectionReassignmentGraphQlController#reassignConnection",
