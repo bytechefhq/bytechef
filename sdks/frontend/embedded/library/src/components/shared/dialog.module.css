@@ -1,18 +1,18 @@
 .dialogOverlay,
 .dialogContainer {
-    --bytechef-blue: #1071e5;
-    --bytechef-blue-hover: #0b50a3;
+    --bytechef-blue: var(--bytechef-dialog-primary, #1071e5);
+    --bytechef-blue-hover: var(--bytechef-dialog-primary-hover, #0b50a3);
     --gray-200: #f1f5f9;
     --gray-300: #e2e8f0;
     --gray-500: #6b7280;
     --bytechef-red: rgb(220, 38, 38);
     --bytechef-red-hover: rgba(220, 38, 38, 0.9);
-    --dialog-surface: #fff;
-    --dialog-surface-raised: #fff;
-    --dialog-border: #e5e7eb;
-    --dialog-text: #0a0a0a;
-    --dialog-text-muted: var(--gray-500);
-    --dialog-hover: var(--gray-200);
+    --dialog-surface: var(--bytechef-dialog-surface, #fff);
+    --dialog-surface-raised: var(--bytechef-dialog-surface-raised, #fff);
+    --dialog-border: var(--bytechef-dialog-border, #e5e7eb);
+    --dialog-text: var(--bytechef-dialog-text, #0a0a0a);
+    --dialog-text-muted: var(--bytechef-dialog-text-muted, var(--gray-500));
+    --dialog-hover: var(--bytechef-dialog-hover, var(--gray-200));
 }
 
 .dialogOverlay.dark,
@@ -20,12 +20,12 @@
     --gray-200: #1f2937;
     --gray-300: #374151;
     --gray-500: #9ca3af;
-    --dialog-surface: #111827;
-    --dialog-surface-raised: #1f2937;
-    --dialog-border: #374151;
-    --dialog-text: #f9fafb;
-    --dialog-text-muted: #9ca3af;
-    --dialog-hover: #374151;
+    --dialog-surface: var(--bytechef-dialog-surface, #111827);
+    --dialog-surface-raised: var(--bytechef-dialog-surface-raised, #1f2937);
+    --dialog-border: var(--bytechef-dialog-border, #374151);
+    --dialog-text: var(--bytechef-dialog-text, #f9fafb);
+    --dialog-text-muted: var(--bytechef-dialog-text-muted, #9ca3af);
+    --dialog-hover: var(--bytechef-dialog-hover, #374151);
 }
 
 .dialogContainer h2 {

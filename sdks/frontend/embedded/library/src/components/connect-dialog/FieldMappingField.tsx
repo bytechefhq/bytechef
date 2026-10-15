@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 
-import styles from './styles.module.css';
+import styles from '../shared/dialog.module.css';
 import {BoundFieldMappingConfigType, FieldMappingValueType, OptionType} from './types';
 
 interface FieldMappingFieldProps {
