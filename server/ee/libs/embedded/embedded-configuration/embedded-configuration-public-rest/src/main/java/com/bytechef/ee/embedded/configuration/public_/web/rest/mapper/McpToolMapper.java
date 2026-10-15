@@ -26,6 +26,7 @@ public class McpToolMapper {
 
         @Override
         @Mapping(target = "description", ignore = true)
+        @Mapping(target = "label", ignore = true)
         McpToolModel convert(McpTool mcpTool);
     }
 }

@@ -120,6 +120,8 @@ public interface ConnectedUserIntegrationMapper {
         McpToolModel map(ConnectedUserIntegrationDTO.McpToolInfo mcpToolInfo);
 
         @Mapping(target = "componentReference", ignore = true)
+        @Mapping(target = "internalOnly", ignore = true)
+        @Mapping(target = "objectName", ignore = true)
         InputModel map(ConnectedUserIntegrationDTO.Input input);
 
         @AfterMapping
