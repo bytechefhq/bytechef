@@ -19,6 +19,8 @@ package com.bytechef.ai.copilot.agent;
 import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.exception.AGUIException;
+import com.agui.core.message.BaseMessage;
+import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
@@ -29,12 +31,14 @@ import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 
 /**
@@ -162,6 +166,27 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         } catch (RuntimeException exception) {
             return false;
         }
+    }
+
+    @Override
+    protected void prepareChatMemory(RunAgentInput input, ChatMemory chatMemory, String conversationId) {
+        State state = input.state();
+
+        if (state == null || state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID) == null) {
+            return;
+        }
+
+        List<String> userTexts = input.messages()
+            .stream()
+            .filter(message -> message instanceof UserMessage)
+            .map(BaseMessage::getContent)
+            .toList();
+
+        if (userTexts.isEmpty()) {
+            return;
+        }
+
+        ChatMemoryRewinder.rewind(chatMemory, conversationId, userTexts.subList(0, userTexts.size() - 1));
     }
 
     @Override
