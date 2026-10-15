@@ -978,7 +978,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     if (data.clusterFrame) {
         return (
-            <ClusterFrameShell data={data} nodeId={id}>
+            <ClusterFrameShell data={data} nodeId={id} nodeMenu={regularNodeMenuTrigger}>
                 <WorkflowNodeContextMenu
                     canPaste={canPaste}
                     data={data}
@@ -997,7 +997,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     showInfoAction
                     showRenameAction
                 >
-                    <WorkflowNodeContent {...sharedContentProps} nodeMenuTrigger={regularNodeMenuTrigger} />
+                    <WorkflowNodeContent {...sharedContentProps} />
                 </WorkflowNodeContextMenu>
             </ClusterFrameShell>
         );
