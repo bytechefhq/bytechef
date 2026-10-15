@@ -93,7 +93,6 @@ const renderDialog = (onOpenChange: () => void = vi.fn()) =>
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             updateWorkflowMutation={{} as any}
             workflowNodeOutputs={[]}
-            workflowReferenceId={1}
         />
     );
 
@@ -104,7 +103,6 @@ describe('ClusterElementsCanvasDialog - evals reachability and cleanup', () => {
         useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
         useClusterElementsCanvasDialogStore.setState({
             copilotPanelOpen: false,
-            editorPreferences: {},
             showAiAgentEditor: false,
             showDataStreamEditor: false,
             testingPanelOpen: false,
@@ -136,7 +134,7 @@ describe('ClusterElementsCanvasDialog - evals reachability and cleanup', () => {
         useWorkflowEditorStore.setState({rootClusterElementNodeData: AI_AGENT_ROOT_DATA});
         useAiAgentEvalsStore.setState({evalsPanelOpen: true});
 
-        useClusterElementsCanvasDialogStore.setState({editorPreferences: {'1:dataStream_1': false}});
+        useClusterElementsCanvasDialogStore.setState({dataStreamSimpleEditorPreferred: false});
 
         const {rerender} = renderDialog(onOpenChange);
 
@@ -157,7 +155,6 @@ describe('ClusterElementsCanvasDialog - evals reachability and cleanup', () => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 updateWorkflowMutation={{} as any}
                 workflowNodeOutputs={[]}
-                workflowReferenceId={1}
             />
         );
 

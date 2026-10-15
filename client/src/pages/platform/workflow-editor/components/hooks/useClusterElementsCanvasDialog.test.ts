@@ -20,7 +20,7 @@ describe('useClusterElementsCanvasDialog - editor preference restoration', () =>
         useWorkflowDataStore.setState({workflow: {definition: undefined, id: 'workflow-1', nodeNames: [], version: 1}});
         useWorkflowEditorStore.setState({rootClusterElementNodeData: AI_AGENT_ROOT_DATA});
         useClusterElementsCanvasDialogStore.setState({
-            editorPreferences: {'workflow-1:aiAgent_1': false},
+            aiAgentSimpleEditorPreferred: false,
             showAiAgentEditor: true,
         });
     });

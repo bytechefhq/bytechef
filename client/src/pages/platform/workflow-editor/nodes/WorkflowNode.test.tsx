@@ -11,9 +11,8 @@ import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../utils/canvasDrag
 import WorkflowNode from './WorkflowNode';
 
 // Mutable slice of the editor store so each test can toggle which node is being renamed.
-const {directionStoreState, editorStoreState, popoverMenuMock} = vi.hoisted(() => ({
+const {directionStoreState, editorStoreState, popoverMenuMock, recordedContextMenuProps} = vi.hoisted(() => ({
     directionStoreState: {layoutDirection: 'TB'},
-const {editorStoreState, popoverMenuMock, recordedContextMenuProps} = vi.hoisted(() => ({
     editorStoreState: {renamingNodeName: undefined as string | undefined},
     popoverMenuMock: vi.fn(),
     recordedContextMenuProps: {value: undefined as Record<string, unknown> | undefined},
@@ -188,38 +187,6 @@ describe('WorkflowNode', () => {
         fireEvent.dragEnter(nodeBox, {dataTransfer: {types: [CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE]}});
 
         expect(nodeBox).not.toHaveAttribute('data-dropzone-active');
-    describe('main root cluster element', () => {
-        const MAIN_ROOT_DATA = {
-            clusterRoot: true,
-            componentName: 'aiAgent',
-            label: 'AI Agent',
-            name: 'aiAgent_1',
-            operationName: 'chat',
-            version: 1,
-            workflowNodeName: 'aiAgent_1',
-        } as unknown as NodeDataType;
-
-        it('carries the node menu when drawn as a box on the main canvas', () => {
-            recordedContextMenuProps.value = undefined;
-
-            renderNode(
-                {
-                    ...MAIN_ROOT_DATA,
-                    clusterFrame: {clusterRootId: 'aiAgent_1', contentOrigin: {x: 32, y: 40}, height: 320, width: 640},
-                } as NodeDataType,
-                'aiAgent_1'
-            );
-
-            expect(recordedContextMenuProps.value).toBeDefined();
-        });
-
-        it('carries no node menu inside the dialog, whose chrome owns those actions', () => {
-            recordedContextMenuProps.value = undefined;
-
-            renderNode(MAIN_ROOT_DATA, 'aiAgent_1');
-
-            expect(recordedContextMenuProps.value).toBeUndefined();
-        });
     });
 
     it('renders a rename input for a nested cluster root that is being renamed', () => {
@@ -286,6 +253,39 @@ describe('WorkflowNode', () => {
 
         expect(screen.queryByText('TRUE')).not.toBeInTheDocument();
         expect(screen.queryByText('FALSE')).not.toBeInTheDocument();
+    });
+    describe('main root cluster element', () => {
+        const MAIN_ROOT_DATA = {
+            clusterRoot: true,
+            componentName: 'aiAgent',
+            label: 'AI Agent',
+            name: 'aiAgent_1',
+            operationName: 'chat',
+            version: 1,
+            workflowNodeName: 'aiAgent_1',
+        } as unknown as NodeDataType;
+
+        it('carries the node menu when drawn as a box on the main canvas', () => {
+            recordedContextMenuProps.value = undefined;
+
+            renderNode(
+                {
+                    ...MAIN_ROOT_DATA,
+                    clusterFrame: {clusterRootId: 'aiAgent_1', contentOrigin: {x: 32, y: 40}, height: 320, width: 640},
+                } as NodeDataType,
+                'aiAgent_1'
+            );
+
+            expect(recordedContextMenuProps.value).toBeDefined();
+        });
+
+        it('carries no node menu inside the dialog, whose chrome owns those actions', () => {
+            recordedContextMenuProps.value = undefined;
+
+            renderNode(MAIN_ROOT_DATA, 'aiAgent_1');
+
+            expect(recordedContextMenuProps.value).toBeUndefined();
+        });
     });
 });
 
