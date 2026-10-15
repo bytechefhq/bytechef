@@ -127,8 +127,9 @@ describe('useFetchInterceptor', () => {
 
             const result = hoisted.registeredHandlers!.request('/internal/api/test', {headers: {}});
 
-            expect((result as [string, Record<string, unknown>])[1].headers).toEqual(
-                expect.objectContaining({'X-XSRF-TOKEN': 'test-xsrf-token'})
+            expect((result as [string, RequestInit])[1].headers).toBeInstanceOf(Headers);
+            expect(((result as [string, RequestInit])[1].headers as Headers).get('X-XSRF-TOKEN')).toBe(
+                'test-xsrf-token'
             );
         });
 
@@ -137,9 +138,23 @@ describe('useFetchInterceptor', () => {
 
             const result = hoisted.registeredHandlers!.request('/graphql', {headers: {}});
 
-            expect((result as [string, Record<string, unknown>])[1].headers).toEqual(
-                expect.objectContaining({'X-XSRF-TOKEN': 'test-xsrf-token'})
+            expect((result as [string, RequestInit])[1].headers).toBeInstanceOf(Headers);
+            expect(((result as [string, RequestInit])[1].headers as Headers).get('X-XSRF-TOKEN')).toBe(
+                'test-xsrf-token'
             );
+        });
+
+        it('replaces, not duplicates, an XSRF token header the caller already set', () => {
+            renderHook(() => useFetchInterceptor());
+
+            const [, config] = hoisted.registeredHandlers!.request('/graphql', {
+                headers: {'Content-Type': 'application/json', 'x-xsrf-token': 'stale-token'},
+            }) as [string, RequestInit];
+
+            const sentHeaders = config.headers as Headers;
+
+            expect(sentHeaders.get('X-XSRF-TOKEN')).toBe('test-xsrf-token');
+            expect(sentHeaders.get('Content-Type')).toBe('application/json');
         });
 
         it('does not add XSRF-TOKEN header for other URLs', () => {

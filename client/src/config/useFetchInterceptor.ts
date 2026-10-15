@@ -127,16 +127,11 @@ export default function useFetchInterceptor() {
                 }
 
                 if (url.includes('/internal/') || url.includes('/graphql')) {
-                    return [
-                        url,
-                        {
-                            ...config,
-                            headers: {
-                                ...config.headers,
-                                'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
-                            },
-                        },
-                    ];
+                    const headers = new Headers(config?.headers);
+
+                    headers.set('X-XSRF-TOKEN', getCookie('XSRF-TOKEN') || '');
+
+                    return [url, {...config, headers}];
                 } else {
                     return [url, config];
                 }
