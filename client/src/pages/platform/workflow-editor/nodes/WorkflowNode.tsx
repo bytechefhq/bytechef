@@ -14,7 +14,7 @@ import {ClusterElementsType, NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {CheckIcon, ComponentIcon, EllipsisVerticalIcon, XIcon} from 'lucide-react';
-import {KeyboardEvent, ReactNode, forwardRef, memo, useCallback, useMemo, useState} from 'react';
+import {CSSProperties, KeyboardEvent, ReactNode, forwardRef, memo, useCallback, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -79,6 +79,30 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     setSwitchPopoverOpen: (open: boolean) => void;
     switchPopoverOpen: boolean;
     workflowNodeDetailsPanelOpen: boolean;
+}
+
+interface GetNodeBoxStyleProps {
+    isClusterFrameRoot: boolean;
+    isMainRootClusterElement: boolean;
+    isNestedClusterRoot: boolean;
+    nodeWidth: number;
+}
+
+function getNodeBoxStyle({
+    isClusterFrameRoot,
+    isMainRootClusterElement,
+    isNestedClusterRoot,
+    nodeWidth,
+}: GetNodeBoxStyleProps): CSSProperties | undefined {
+    if (isClusterFrameRoot || isNestedClusterRoot) {
+        return {width: `${nodeWidth}px`};
+    }
+
+    if (isMainRootClusterElement) {
+        return {minWidth: `${nodeWidth}px`};
+    }
+
+    return undefined;
 }
 
 const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>(
@@ -205,15 +229,12 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             data-dropzone-active={isDropzoneActive || undefined}
                             data-node-box
                             onClick={handleNodeClick}
-                            style={
-                                isMainRootClusterElement && data.clusterFrame
-                                    ? {width: `${nodeWidth}px`}
-                                    : isMainRootClusterElement
-                                      ? {minWidth: `${nodeWidth}px`}
-                                      : isNestedClusterRoot
-                                        ? {width: `${nodeWidth}px`}
-                                        : undefined
-                            }
+                            style={getNodeBoxStyle({
+                                isClusterFrameRoot: isMainRootClusterElement && !!data.clusterFrame,
+                                isMainRootClusterElement,
+                                isNestedClusterRoot: !!isNestedClusterRoot,
+                                nodeWidth,
+                            })}
                         >
                             <div
                                 className={twMerge(

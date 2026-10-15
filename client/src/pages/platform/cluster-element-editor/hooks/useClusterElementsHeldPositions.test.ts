@@ -35,7 +35,7 @@ vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
 }));
 
 vi.mock('@tanstack/react-query', () => ({
-    useQueryClient: () => ({fetchQuery: vi.fn().mockResolvedValue({clusterElementTypes: []})}),
+    useQueryClient: () => ({query: vi.fn().mockResolvedValue({clusterElementTypes: []})}),
 }));
 
 const ROOT_NODE_NAME = 'aiAgent_1';

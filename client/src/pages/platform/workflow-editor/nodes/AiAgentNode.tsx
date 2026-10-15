@@ -378,6 +378,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 suppressHover ? 'top-0' : 'top-8'
                             )}
                             onMouseDown={(event) => event.stopPropagation()}
+                            role="presentation"
                         >
                             <Button
                                 aria-label="Expand cluster elements"

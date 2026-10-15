@@ -173,6 +173,7 @@ const ClusterFrameShell = ({children, data, nodeId, nodeMenu}: ClusterFrameShell
                 <div
                     className="nodrag invisible absolute top-2 -left-8 z-10 group-hover:visible focus-within:visible"
                     onMouseDown={(event) => event.stopPropagation()}
+                    role="presentation"
                 >
                     {nodeMenu}
                 </div>
