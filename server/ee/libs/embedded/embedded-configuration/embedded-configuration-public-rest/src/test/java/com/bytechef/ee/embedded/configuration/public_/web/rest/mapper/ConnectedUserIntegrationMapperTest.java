@@ -18,6 +18,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Property.Type;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
@@ -39,6 +40,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +124,26 @@ class ConnectedUserIntegrationMapperTest {
         assertEquals("getEmail", mcpToolModel.getName());
         assertEquals("Get Email", mcpToolModel.getLabel());
         assertEquals("Get an email", mcpToolModel.getDescription());
+    }
+
+    @Test
+    void testIntegrationInstanceMapsConnectionId() {
+        IntegrationInstance integrationInstance = new IntegrationInstance();
+
+        integrationInstance.setId(5L);
+        integrationInstance.setConnectionId(77L);
+        integrationInstance.setEnabled(true);
+
+        ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationMapper generatedMapper =
+            new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationMapperImpl();
+
+        IntegrationInstanceModel integrationInstanceModel = generatedMapper.map(
+            new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
+                new Connection(), integrationInstance, List.of(), List.of(), List.of()));
+
+        assertEquals(5L, integrationInstanceModel.getId());
+        assertEquals(77L, integrationInstanceModel.getConnectionId());
+        assertEquals(Boolean.TRUE, integrationInstanceModel.getEnabled());
     }
 
     @Test
