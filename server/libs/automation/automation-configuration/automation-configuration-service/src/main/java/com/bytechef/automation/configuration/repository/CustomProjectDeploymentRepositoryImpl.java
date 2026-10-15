@@ -57,9 +57,9 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
             query += "WHERE ";
 
             if (embedded) {
-                query += startsWith("project.name", EMBEDDED_NAME_PREFIX) + " ";
+                query += startsWith("project_deployment.name", EMBEDDED_NAME_PREFIX) + " ";
             } else {
-                query += "NOT " + startsWith("project.name", EMBEDDED_NAME_PREFIX) + " ";
+                query += "NOT " + startsWith("project_deployment.name", EMBEDDED_NAME_PREFIX) + " ";
             }
         }
 
