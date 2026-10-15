@@ -25,7 +25,6 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -52,7 +51,6 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -67,7 +65,6 @@ public class ProjectDeploymentWorkflowGraphQlController {
 
     private final EnvironmentService environmentService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
-    private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
@@ -78,14 +75,12 @@ public class ProjectDeploymentWorkflowGraphQlController {
     @SuppressFBWarnings("EI")
     public ProjectDeploymentWorkflowGraphQlController(
         EnvironmentService environmentService, ProjectDeploymentFacade projectDeploymentFacade,
-        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TriggerDefinitionService triggerDefinitionService,
         @Value("${bytechef.webhook.url}") String webhookUrl, WorkflowService workflowService) {
 
         this.environmentService = environmentService;
         this.projectDeploymentFacade = projectDeploymentFacade;
-        this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
@@ -172,12 +167,11 @@ public class ProjectDeploymentWorkflowGraphQlController {
      * mappings incurred.
      */
     @QueryMapping(name = "workspaceChatWorkflows")
-    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'DEPLOYMENT_VIEW', #environmentId)")
     public List<ChatWorkflow> workspaceChatWorkflows(@Argument Long workspaceId, @Argument Long environmentId) {
         Environment environment = environmentService.getEnvironment(environmentId);
 
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            false, environment, null, null, workspaceId);
+        List<ProjectDeployment> projectDeployments = projectDeploymentFacade.getProjectDeployments(
+            workspaceId, environment, null, null);
 
         if (projectDeployments.isEmpty()) {
             return List.of();
