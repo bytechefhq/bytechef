@@ -803,11 +803,15 @@ const ConnectionDialog = ({
 
                                         <AlertTitle>Heads up!</AlertTitle>
 
-                                        <AlertDescription className="flex">
-                                            Excellent! You can connect and create the
-                                            <span className="font-semibold">{selectedComponentDefinition?.title}</span>
-                                            connection under name
-                                            <span className="font-semibold">{`'${getValues()?.name}'`}</span>.
+                                        <AlertDescription className="block wrap-anywhere">
+                                            <>
+                                                Excellent! You can connect and create the{' '}
+                                                <span className="font-semibold">
+                                                    {selectedComponentDefinition?.title}
+                                                </span>{' '}
+                                                connection under name{' '}
+                                                <span className="font-semibold">{`'${getValues()?.name}'`}</span>.
+                                            </>
                                         </AlertDescription>
                                     </Alert>
 
