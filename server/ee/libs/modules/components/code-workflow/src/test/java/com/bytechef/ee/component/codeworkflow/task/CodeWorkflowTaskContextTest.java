@@ -115,6 +115,83 @@ class CodeWorkflowTaskContextTest {
     }
 
     @Test
+    void testComponentWithoutConnectionNameResolvesTheConnectionNamedAfterTheComponent() throws Exception {
+        ComponentConnection componentConnection = new ComponentConnection("component1", 1, 1L, Map.of(), null);
+
+        Map<String, ComponentConnection> componentConnections = Map.of("component1", componentConnection);
+
+        when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+        when(actionDefinitionService.actionDefinesConnection("component1", 0, "action1")).thenReturn(true);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService, componentConnections, componentDefinitionService, Map.of(),
+            List.of(), Map.of());
+
+        taskContext.component("component1", "action1", Map.of(), null);
+
+        verify(actionDefinitionService).executePerformForPolyglot(
+            "component1", 0, "action1", Map.of(), componentConnection, componentConnections, Map.of(), null,
+            actionContext);
+    }
+
+    @Test
+    void testComponentWithBlankConnectionNameResolvesTheConnectionNamedAfterTheComponent() throws Exception {
+        ComponentConnection componentConnection = new ComponentConnection("component1", 1, 1L, Map.of(), null);
+
+        when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService, Map.of("component1", componentConnection),
+            componentDefinitionService, Map.of(), List.of(), Map.of());
+
+        taskContext.component("component1", "action1", Map.of(), " ");
+
+        verify(actionDefinitionService).executePerformForPolyglot(
+            eq("component1"), eq(0), eq("action1"), eq(Map.of()), eq(componentConnection), any(), any(), isNull(),
+            eq(actionContext));
+    }
+
+    @Test
+    void testComponentWithoutConnectionNameFailsNamingTheComponentWhenNoneIsDeclaredForIt() {
+        ComponentConnection otherConnection = new ComponentConnection("component2", 1, 1L, Map.of(), null);
+
+        when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+        when(actionDefinitionService.actionDefinesConnection("component1", 0, "action1")).thenReturn(true);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService, Map.of("component2", otherConnection),
+            componentDefinitionService, Map.of(), List.of(), Map.of());
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class, () -> taskContext.component("component1", "action1", Map.of(), null));
+
+        assertEquals(
+            "No connection is declared for component component1; declare one or pass its name",
+            exception.getMessage());
+    }
+
+    @Test
+    void testComponentWithConnectionNameKeepsTheNamedConnectionOverTheOneNamedAfterTheComponent()
+        throws Exception {
+
+        ComponentConnection componentNamedConnection = new ComponentConnection("component1", 1, 1L, Map.of(), null);
+        ComponentConnection namedConnection = new ComponentConnection("component1", 1, 2L, Map.of(), null);
+
+        when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService,
+            Map.of("component1", componentNamedConnection, "connection1", namedConnection),
+            componentDefinitionService, Map.of(), List.of(), Map.of());
+
+        taskContext.component("component1", "action1", Map.of(), "connection1");
+
+        verify(actionDefinitionService).executePerformForPolyglot(
+            eq("component1"), eq(0), eq("action1"), eq(Map.of()), eq(namedConnection), any(), any(), isNull(),
+            eq(actionContext));
+    }
+
+    @Test
     void testComponentDispatchesWithoutConnectionWhenComponentDoesNotRequireConnection() throws Exception {
         when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
         when(actionDefinitionService.actionDefinesConnection("component1", 0, "action1")).thenReturn(false);
