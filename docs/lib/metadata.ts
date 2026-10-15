@@ -7,6 +7,7 @@ export function createMetadata(override: Metadata): Metadata {
     openGraph: {
       title: override.title ?? undefined,
       description: override.description ?? undefined,
+      type: 'website',
       url: 'https://docs.bytechef.io',
       images: '/banner.png',
       siteName: 'ByteChef',
