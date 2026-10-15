@@ -43,15 +43,15 @@ public class ReadProjectWorkflowTools {
     @Tool(
         description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
     public WorkflowInfo getWorkflow(
-        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId) {
-        return delegate.getWorkflow(workflowId);
+        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId, ToolContext toolContext) {
+        return delegate.getWorkflow(workflowId, toolContext);
     }
 
     @Tool(
         description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
     public List<WorkflowInfo> listWorkflows(
-        @ToolParam(description = "The ID of the project") long projectId) {
-        return delegate.listWorkflows(projectId);
+        @ToolParam(description = "The ID of the project") long projectId, ToolContext toolContext) {
+        return delegate.listWorkflows(projectId, toolContext);
     }
 
     @Tool(
