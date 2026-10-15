@@ -536,7 +536,7 @@ class IntegrationCodeWorkflowFacadeDraftTest {
 
         assertThat(connectionRequirement.getName()).isEqualTo("googleMail");
         assertThat(connectionRequirement.getComponentName()).isEqualTo("googleMail");
-        assertThat(connectionRequirement.getComponentVersion()).isEmpty();
+        assertThat(connectionRequirement.getComponentVersion()).hasValue(1);
     }
 
     @Test

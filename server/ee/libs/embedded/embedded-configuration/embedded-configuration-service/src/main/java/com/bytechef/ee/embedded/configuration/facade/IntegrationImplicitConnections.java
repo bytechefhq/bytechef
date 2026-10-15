@@ -36,38 +36,50 @@ final class IntegrationImplicitConnections {
     private IntegrationImplicitConnections() {
     }
 
-    static List<WorkflowDefinition> addTo(List<WorkflowDefinition> workflowDefinitions, String componentName) {
+    static List<WorkflowDefinition> addTo(
+        List<WorkflowDefinition> workflowDefinitions, String componentName, int componentVersion) {
+
+        ImplicitConnectionRequirement implicitConnectionRequirement = new ImplicitConnectionRequirement(
+            componentName, componentVersion);
+
         return workflowDefinitions.stream()
             .map(workflowDefinition -> (WorkflowDefinition) new ImplicitConnectionWorkflowDefinition(
-                workflowDefinition, componentName))
+                workflowDefinition, implicitConnectionRequirement))
             .toList();
     }
 
     private static WorkflowTaskDefinition toWorkflowTaskDefinition(
-        WorkflowTaskDefinition workflowTaskDefinition, String componentName) {
+        WorkflowTaskDefinition workflowTaskDefinition, ImplicitConnectionRequirement implicitConnectionRequirement) {
 
         if (workflowTaskDefinition instanceof CompositeTaskDefinition compositeTaskDefinition) {
-            return new ImplicitConnectionCompositeTaskDefinition(compositeTaskDefinition, componentName);
+            return new ImplicitConnectionCompositeTaskDefinition(compositeTaskDefinition,
+                implicitConnectionRequirement);
         }
 
         if (workflowTaskDefinition instanceof TaskDefinition taskDefinition) {
-            return toTaskDefinition(taskDefinition, componentName);
+            return toTaskDefinition(taskDefinition, implicitConnectionRequirement);
         }
 
         return workflowTaskDefinition;
     }
 
-    private static boolean isOwnConnection(ConnectionRequirement connectionRequirement, String componentName) {
+    private static boolean isOwnConnection(
+        ConnectionRequirement connectionRequirement, ImplicitConnectionRequirement implicitConnectionRequirement) {
+
+        String componentName = implicitConnectionRequirement.getComponentName();
+
         return Objects.equals(connectionRequirement.getComponentName(), componentName) ||
             Objects.equals(connectionRequirement.getName(), componentName);
     }
 
-    private static TaskDefinition toTaskDefinition(TaskDefinition taskDefinition, String componentName) {
+    private static TaskDefinition toTaskDefinition(
+        TaskDefinition taskDefinition, ImplicitConnectionRequirement implicitConnectionRequirement) {
+
         List<? extends ConnectionRequirement> declaredConnectionRequirements = taskDefinition.getConnections()
             .orElseGet(List::of);
 
         boolean declaresOwnConnection = declaredConnectionRequirements.stream()
-            .anyMatch(connectionRequirement -> isOwnConnection(connectionRequirement, componentName));
+            .anyMatch(connectionRequirement -> isOwnConnection(connectionRequirement, implicitConnectionRequirement));
 
         if (declaresOwnConnection) {
             return taskDefinition;
@@ -75,20 +87,21 @@ final class IntegrationImplicitConnections {
 
         List<ConnectionRequirement> connectionRequirements = new ArrayList<>(declaredConnectionRequirements);
 
-        connectionRequirements.add(new ImplicitConnectionRequirement(componentName));
+        connectionRequirements.add(implicitConnectionRequirement);
 
         return new ImplicitConnectionTaskDefinition(taskDefinition, List.copyOf(connectionRequirements));
     }
 
     private static List<TaskDefinition> toTaskDefinitions(
-        List<? extends TaskDefinition> taskDefinitions, String componentName) {
+        List<? extends TaskDefinition> taskDefinitions, ImplicitConnectionRequirement implicitConnectionRequirement) {
 
         return taskDefinitions.stream()
-            .map(taskDefinition -> toTaskDefinition(taskDefinition, componentName))
+            .map(taskDefinition -> toTaskDefinition(taskDefinition, implicitConnectionRequirement))
             .toList();
     }
 
-    private record ImplicitConnectionRequirement(String componentName) implements ConnectionRequirement {
+    private record ImplicitConnectionRequirement(String componentName, int componentVersion)
+        implements ConnectionRequirement {
 
         @Override
         public String getComponentName() {
@@ -97,7 +110,7 @@ final class IntegrationImplicitConnections {
 
         @Override
         public OptionalInt getComponentVersion() {
-            return OptionalInt.empty();
+            return OptionalInt.of(componentVersion);
         }
 
         @Override
@@ -142,13 +155,14 @@ final class IntegrationImplicitConnections {
     }
 
     private record ImplicitConnectionCompositeTaskDefinition(
-        CompositeTaskDefinition compositeTaskDefinition, String componentName) implements CompositeTaskDefinition {
+        CompositeTaskDefinition compositeTaskDefinition, ImplicitConnectionRequirement implicitConnectionRequirement)
+        implements CompositeTaskDefinition {
 
         @Override
         public List<? extends List<? extends TaskDefinition>> getBranches() {
             return compositeTaskDefinition.getBranches()
                 .stream()
-                .map(branch -> toTaskDefinitions(branch, componentName))
+                .map(branch -> toTaskDefinitions(branch, implicitConnectionRequirement))
                 .toList();
         }
 
@@ -169,7 +183,7 @@ final class IntegrationImplicitConnections {
 
         @Override
         public List<? extends TaskDefinition> getTasks() {
-            return toTaskDefinitions(compositeTaskDefinition.getTasks(), componentName);
+            return toTaskDefinitions(compositeTaskDefinition.getTasks(), implicitConnectionRequirement);
         }
 
         @Override
@@ -179,7 +193,8 @@ final class IntegrationImplicitConnections {
     }
 
     private record ImplicitConnectionWorkflowDefinition(
-        WorkflowDefinition workflowDefinition, String componentName) implements WorkflowDefinition {
+        WorkflowDefinition workflowDefinition, ImplicitConnectionRequirement implicitConnectionRequirement)
+        implements WorkflowDefinition {
 
         @Override
         public Optional<String> getDescription() {
@@ -210,7 +225,8 @@ final class IntegrationImplicitConnections {
         public Optional<List<? extends WorkflowTaskDefinition>> getTasks() {
             return workflowDefinition.getTasks()
                 .map(workflowTaskDefinitions -> workflowTaskDefinitions.stream()
-                    .map(workflowTaskDefinition -> toWorkflowTaskDefinition(workflowTaskDefinition, componentName))
+                    .map(workflowTaskDefinition -> toWorkflowTaskDefinition(workflowTaskDefinition,
+                        implicitConnectionRequirement))
                     .toList());
         }
 
