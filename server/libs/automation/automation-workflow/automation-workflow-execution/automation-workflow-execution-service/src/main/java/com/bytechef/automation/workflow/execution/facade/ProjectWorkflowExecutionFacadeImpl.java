@@ -219,6 +219,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         Long projectId, Long projectDeploymentId, String workflowId, Integer projectVersion, long workspaceId,
         int pageNumber) {
 
+        List<ProjectDeployment> embeddedProjectDeployments = null;
         List<String> workflowIds = new ArrayList<>();
 
         if (workflowId != null) {
@@ -226,17 +227,21 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         } else if (projectId != null) {
             workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
         } else {
-            workflowIds.addAll(
+            Set<String> workspaceWorkflowIds = new LinkedHashSet<>(
                 CollectionUtils.map(
                     projectFacade.getWorkspaceProjectWorkflows(workspaceId), ProjectWorkflowDTO::getId));
 
             if (Boolean.TRUE.equals(embedded)) {
-                for (String embeddedWorkflowId : getEmbeddedDeploymentWorkflowIds(environmentId, workspaceId)) {
-                    if (!workflowIds.contains(embeddedWorkflowId)) {
-                        workflowIds.add(embeddedWorkflowId);
-                    }
-                }
+                Environment environment =
+                    environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
+                embeddedProjectDeployments = projectDeploymentService.getProjectDeployments(
+                    true, environment, null, null, workspaceId);
+
+                workspaceWorkflowIds.addAll(getProjectDeploymentWorkflowIds(embeddedProjectDeployments));
             }
+
+            workflowIds.addAll(workspaceWorkflowIds);
         }
 
         Page<WorkflowExecutionDTO> workflowExecutionPage;
@@ -248,6 +253,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
             if (projectDeploymentId != null) {
                 projectDeploymentIds.add(projectDeploymentId);
+            } else if (embeddedProjectDeployments != null) {
+                projectDeploymentIds.addAll(CollectionUtils.map(embeddedProjectDeployments, ProjectDeployment::getId));
             } else {
                 Environment environment =
                     environmentId == null ? null : environmentService.getEnvironment(environmentId);
@@ -364,22 +371,18 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return workflowExecutionPage;
     }
 
-    private List<String> getEmbeddedDeploymentWorkflowIds(Long environmentId, long workspaceId) {
-        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
-
-        List<Long> embeddedProjectIds = projectDeploymentService
-            .getProjectDeployments(true, environment, null, null, workspaceId)
-            .stream()
+    private List<String> getProjectDeploymentWorkflowIds(List<ProjectDeployment> projectDeployments) {
+        List<Long> projectIds = projectDeployments.stream()
             .map(ProjectDeployment::getProjectId)
             .distinct()
             .toList();
 
-        if (embeddedProjectIds.isEmpty()) {
+        if (projectIds.isEmpty()) {
             return List.of();
         }
 
         return CollectionUtils.map(
-            projectWorkflowService.getProjectWorkflows(embeddedProjectIds), ProjectWorkflow::getWorkflowId);
+            projectWorkflowService.getProjectWorkflows(projectIds), ProjectWorkflow::getWorkflowId);
     }
 
     private List<WorkflowExecutionDTO> buildWorkflowExecutionDTOs(
