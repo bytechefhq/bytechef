@@ -106,6 +106,22 @@ describe('AutomationWorkflowProjectList', () => {
         expect(screen.getByText('DRAFT')).toBeInTheDocument();
     });
 
+    it('renders the code language badge for a code project', () => {
+        const projects = [
+            makeProject({
+                codeWorkflowLanguage: CodeWorkflowLanguage.Javascript,
+                codeWorkflowProject: true,
+                id: 'p1',
+                name: 'Code Project',
+            }),
+            makeProject({id: 'p2', name: 'Visual Project'}),
+        ];
+
+        renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
+
+        expect(screen.getAllByText('JavaScript')).toHaveLength(1);
+    });
+
     it('renders a published badge with the published version', () => {
         const projects = [makeProject({id: 'p1', lastPublishedVersion: 3, name: 'Published Project', published: true})];
 
