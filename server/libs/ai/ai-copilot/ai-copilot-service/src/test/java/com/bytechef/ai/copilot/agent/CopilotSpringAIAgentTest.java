@@ -40,6 +40,25 @@ import org.springframework.ai.chat.model.ChatModel;
 class CopilotSpringAIAgentTest {
 
     @Nested
+    class ConversationIdTest {
+
+        @Test
+        void testConversationIdPrefixesTheThreadIdWithTheServerScope() throws AGUIException {
+            State state = new State();
+
+            state.set(CopilotConstants.STATE_CONVERSATION_SCOPE, "embedded:000001:user-1:workflow-1");
+
+            assertThat(newAgent().conversationId(newInput(state)))
+                .isEqualTo("embedded:000001:user-1:workflow-1:thread");
+        }
+
+        @Test
+        void testConversationIdFallsBackToTheThreadIdWithoutAScope() throws AGUIException {
+            assertThat(newAgent().conversationId(newInput(new State()))).isEqualTo("thread");
+        }
+    }
+
+    @Nested
     class EnvironmentContextTest {
 
         @BeforeEach
