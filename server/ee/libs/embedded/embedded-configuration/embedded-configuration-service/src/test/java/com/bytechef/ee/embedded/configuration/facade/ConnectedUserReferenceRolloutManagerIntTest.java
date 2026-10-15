@@ -49,12 +49,14 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -98,6 +100,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -194,6 +197,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     @Autowired
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
+
+    @Autowired
+    private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
 
     @Autowired
     private ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
@@ -337,8 +343,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         connectedUserWorkflowReferenceFacade.deleteReference(EXTERNAL_USER_ID, workflowUuid,
             Environment.PRODUCTION);
 
-        assertThat(projectDeploymentService.fetchProjectDeploymentByName(
-            automationWorkflowProjectId, "__EMBEDDED__" + EXTERNAL_USER_ID + "__PRODUCTION")).isEmpty();
+        assertThat(fetchReferenceDeployment(automationWorkflowProjectId)).isEmpty();
         assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId())).isEmpty();
     }
 
@@ -434,8 +439,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(connectedUserProjectWorkflowRepository.findAll())
             .noneMatch(reference -> workflowUuid.equals(reference.getAutomationWorkflowUuid()));
-        assertThat(projectDeploymentService.fetchProjectDeploymentByName(
-            automationWorkflowProjectId, "__EMBEDDED__" + EXTERNAL_USER_ID + "__PRODUCTION")).isEmpty();
+        assertThat(fetchReferenceDeployment(automationWorkflowProjectId)).isEmpty();
     }
 
     @Test
@@ -705,8 +709,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .get()
             .extracting(ConnectedUserProjectWorkflow::isDangling)
             .isEqualTo(true);
-        assertThat(projectDeploymentService.fetchProjectDeploymentByName(
-            automationWorkflowProjectId, "__EMBEDDED__" + EXTERNAL_USER_ID + "__PRODUCTION")).isEmpty();
+        assertThat(fetchReferenceDeployment(automationWorkflowProjectId)).isEmpty();
     }
 
     @Test
@@ -976,6 +979,45 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
+    void testRollOutLeavesAMarkerDeploymentWithoutAConnectedUserReferenceDeploymentRelationAlone() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Marker Without Relation");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        long markerProjectDeploymentId = createProjectDeployment(
+            automationWorkflowProjectId, "__EMBEDDED__" + EXTERNAL_USER_ID + "__PRODUCTION");
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+
+        assertThat(projectDeploymentService.fetchProjectDeployment(markerProjectDeploymentId))
+            .get()
+            .extracting(ProjectDeployment::getProjectVersion)
+            .isEqualTo(1);
+    }
+
+    @Test
+    void testDeleteReferenceDeploymentsDeletesMarkerDeploymentsWithoutARelationButNotAdminDeployments() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Legacy Marker Deployment");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        long markerProjectDeploymentId = createProjectDeployment(
+            automationWorkflowProjectId, "__EMBEDDED__legacy-user__PRODUCTION");
+        long adminProjectDeploymentId = createProjectDeployment(automationWorkflowProjectId, "Admin deployment");
+
+        connectedUserReferenceRolloutManager.deleteReferenceDeployments(automationWorkflowProjectId);
+
+        assertThat(projectDeploymentService.fetchProjectDeployment(markerProjectDeploymentId)).isEmpty();
+        assertThat(projectDeploymentService.fetchProjectDeployment(adminProjectDeploymentId)).isPresent();
+    }
+
+    @Test
     void testRollOutDeploymentIfBehindDeletesADeploymentWithoutReferences() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Lazy Without References");
 
@@ -994,6 +1036,24 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(projectDeploymentId)).isTrue();
         assertThat(projectDeploymentService.fetchProjectDeployment(projectDeploymentId)).isEmpty();
+    }
+
+    private long createProjectDeployment(long automationWorkflowProjectId, String name) {
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(Environment.PRODUCTION);
+        projectDeployment.setName(name);
+        projectDeployment.setProjectId(automationWorkflowProjectId);
+        projectDeployment.setProjectVersion(1);
+
+        return projectDeploymentFacade.createProjectDeployment(projectDeployment, List.of(), List.of());
+    }
+
+    private Optional<ConnectedUserReferenceDeployment> fetchReferenceDeployment(long automationWorkflowProjectId) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(EXTERNAL_USER_ID, Environment.PRODUCTION);
+
+        return connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            connectedUser.getId(), automationWorkflowProjectId);
     }
 
     private static ListAppender<ILoggingEvent> attachAppenderToRolloutManagerLogger() {

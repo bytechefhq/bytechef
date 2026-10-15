@@ -33,8 +33,6 @@ public interface ProjectDeploymentService {
 
     Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment);
 
-    Optional<ProjectDeployment> fetchProjectDeploymentByName(long projectId, String name);
-
     List<ProjectDeployment> getAllProjectDeployments(long projectId);
 
     ProjectDeployment getProjectDeployment(long id);
