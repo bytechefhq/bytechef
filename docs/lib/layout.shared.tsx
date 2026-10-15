@@ -35,8 +35,6 @@ export const logo = (
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      // `/` permanently redirects to /platform; linking the logo there directly saves every page an
-      // internal redirect.
       url: '/platform',
       title: (
         <>
