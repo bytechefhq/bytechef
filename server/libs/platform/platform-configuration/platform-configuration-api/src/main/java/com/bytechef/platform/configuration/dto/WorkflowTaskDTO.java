@@ -34,6 +34,7 @@ public final class WorkflowTaskDTO {
     private final ClusterElementMap clusterElements;
     private final boolean clusterRoot;
     private final String description;
+    private final boolean disabled;
     private final List<WorkflowTask> finalize;
     private final String label;
     private final int maxRetries;
@@ -50,14 +51,15 @@ public final class WorkflowTaskDTO {
     @SuppressFBWarnings("EI")
     public WorkflowTaskDTO(
         ClusterElementMap clusterElements, boolean clusterRoot, List<ComponentConnection> connections,
-        String description, List<WorkflowTask> finalize, String label, int maxRetries, Map<String, ?> metadata,
-        String name, String node, Map<String, ?> parameters, List<WorkflowTask> post, List<WorkflowTask> pre,
-        int taskNumber, String timeout, String type) {
+        String description, boolean disabled, List<WorkflowTask> finalize, String label, int maxRetries,
+        Map<String, ?> metadata, String name, String node, Map<String, ?> parameters, List<WorkflowTask> post,
+        List<WorkflowTask> pre, int taskNumber, String timeout, String type) {
 
         this.clusterElements = clusterElements;
         this.clusterRoot = clusterRoot;
         this.connections = Collections.unmodifiableList(connections);
         this.description = description;
+        this.disabled = disabled;
         this.finalize = Collections.unmodifiableList(finalize);
         this.label = label;
         this.maxRetries = maxRetries;
@@ -77,10 +79,11 @@ public final class WorkflowTaskDTO {
         List<ComponentConnection> connections) {
 
         this(
-            clusterElements, clusterRoot, connections, workflowTask.getDescription(), workflowTask.getFinalize(),
-            workflowTask.getLabel(), workflowTask.getMaxRetries(), workflowTask.getMetadata(), workflowTask.getName(),
-            workflowTask.getNode(), workflowTask.getParameters(), workflowTask.getPost(), workflowTask.getPre(),
-            workflowTask.getTaskNumber(), workflowTask.getTimeout(), workflowTask.getType());
+            clusterElements, clusterRoot, connections, workflowTask.getDescription(), workflowTask.isDisabled(),
+            workflowTask.getFinalize(), workflowTask.getLabel(), workflowTask.getMaxRetries(),
+            workflowTask.getMetadata(), workflowTask.getName(), workflowTask.getNode(), workflowTask.getParameters(),
+            workflowTask.getPost(), workflowTask.getPre(), workflowTask.getTaskNumber(), workflowTask.getTimeout(),
+            workflowTask.getType());
     }
 
     @SuppressFBWarnings("EI")
@@ -98,6 +101,10 @@ public final class WorkflowTaskDTO {
 
     public String getDescription() {
         return description;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
     }
 
     public List<WorkflowTask> getFinalize() {
@@ -162,6 +169,7 @@ public final class WorkflowTaskDTO {
 
         return Objects.equals(this.clusterElements, that.clusterElements) && clusterRoot == that.clusterRoot &&
             Objects.equals(this.connections, that.connections) && Objects.equals(this.description, that.description) &&
+            this.disabled == that.disabled &&
             Objects.equals(this.finalize, that.finalize) && Objects.equals(this.label, that.label) &&
             this.maxRetries == that.maxRetries && Objects.equals(this.name, that.name) &&
             Objects.equals(this.metadata, that.metadata) && Objects.equals(this.node, that.node) &&
@@ -173,8 +181,8 @@ public final class WorkflowTaskDTO {
     @Override
     public int hashCode() {
         return Objects.hash(
-            clusterElements, clusterRoot, connections, description, finalize, label, maxRetries, metadata, name, node,
-            parameters, post, pre, taskNumber, timeout, type);
+            clusterElements, clusterRoot, connections, description, disabled, finalize, label, maxRetries, metadata,
+            name, node, parameters, post, pre, taskNumber, timeout, type);
     }
 
     @Override
@@ -182,6 +190,7 @@ public final class WorkflowTaskDTO {
         return "WorkflowTaskDTO[" +
             "connections=" + connections + ", " +
             "description=" + description + ", " +
+            "disabled=" + disabled + ", " +
             "finalize=" + finalize + ", " +
             "label=" + label + ", " +
             "maxRetries=" + maxRetries + ", " +
