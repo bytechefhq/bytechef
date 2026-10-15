@@ -434,6 +434,12 @@ describe('ActivationDialog', () => {
         expect(screen.queryByRole('button', {name: 'Edit workflow'})).not.toBeInTheDocument();
     });
 
+    it('offers Edit workflow for a template from a project without a kind', async () => {
+        renderDialog({onEditWorkflow: vi.fn(), workflowTemplateId: 'wf-plain'});
+
+        expect(await screen.findByRole('button', {name: 'Edit workflow'})).toBeInTheDocument();
+    });
+
     it('offers Edit workflow only when a handler is given, copies the template and hands over the uuid', async () => {
         renderDialog({workflowTemplateId: 'wf-plain'});
 
