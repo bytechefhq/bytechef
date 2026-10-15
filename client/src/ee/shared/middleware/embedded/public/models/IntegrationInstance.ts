@@ -48,6 +48,12 @@ export interface IntegrationInstance {
      */
     id?: number;
     /**
+     * The id of the connection this integration instance uses.
+     * @type {number}
+     * @memberof IntegrationInstance
+     */
+    readonly connectionId?: number;
+    /**
      * 
      * @type {CredentialStatus}
      * @memberof IntegrationInstance
@@ -100,6 +106,7 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'id': json['id'] == null ? undefined : json['id'],
+        'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
         'enabled': json['enabled'],
         'mcpTools': json['mcpTools'] == null ? undefined : ((json['mcpTools'] as Array<any>).map(McpIntegrationInstanceToolFromJSON)),
@@ -112,7 +119,7 @@ export function IntegrationInstanceToJSON(json: any): IntegrationInstance {
     return IntegrationInstanceToJSONTyped(json, false);
 }
 
-export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance, 'mcpTools'|'mcpWorkflows'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance, 'connectionId'|'mcpTools'|'mcpWorkflows'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
