@@ -45,6 +45,11 @@ public class IntegrationCodeWorkflowServiceImpl implements IntegrationCodeWorkfl
     }
 
     @Override
+    public void deleteIntegrationCodeWorkflows(long integrationId) {
+        integrationCodeWorkflowRepository.deleteByIntegrationId(integrationId);
+    }
+
+    @Override
     public Optional<IntegrationCodeWorkflow> fetchIntegrationCodeWorkflow(long integrationId) {
         return integrationCodeWorkflowRepository.findFirstByIntegrationIdOrderByIdDesc(integrationId);
     }
