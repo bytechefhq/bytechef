@@ -35,6 +35,7 @@ The application accepts the following command line arguments:
 - `--parameters=<json_string>`: JSON string containing workflow input parameters
 - `--connections=<json_string>`: JSON string containing connection configurations
 - `--timeout=<duration>`: Maximum time to wait for the workflow to finish, e.g. `30s`, `15m`, `1h`. When it elapses the job is abandoned and the process exits with code `1`. Without it the app waits indefinitely.
+- `--outputs-file=<path>`: File to write the workflow's `outputs` to as a JSON object once the job completes. The outputs of a completed job are also logged at `INFO`; a failed, stopped or timed-out job has no outputs and the file is not written.
 
 ## Where Workflows Are Loaded From
 
