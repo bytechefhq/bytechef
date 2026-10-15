@@ -100,7 +100,8 @@ public class WorkflowComponentResolver {
             ComponentDefinition componentDefinition = componentDefinitionOptional.get();
 
             return new ConnectedUserWorkflowTemplateDTO.Component(
-                componentDefinition.getName(), componentDefinition.getTitle(), componentDefinition.getIcon());
+                componentDefinition.getName(), componentDefinition.getTitle(), componentDefinition.getIcon(),
+                componentDefinition.isConnectionRequired(), null);
         }
 
         Optional<TaskDispatcherDefinition> taskDispatcherDefinitionOptional =

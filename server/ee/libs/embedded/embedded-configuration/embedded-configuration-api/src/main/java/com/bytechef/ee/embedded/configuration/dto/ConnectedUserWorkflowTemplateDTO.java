@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.dto;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -31,7 +32,34 @@ public record ConnectedUserWorkflowTemplateDTO(
             null);
     }
 
-    public record Component(String name, String title, String icon) {
+    public ConnectedUserWorkflowTemplateDTO withIntegrationIds(Map<String, Long> integrationIdsByComponentName) {
+        return new ConnectedUserWorkflowTemplateDTO(
+            workflowUuid, label, description, lastModifiedDate,
+            resolveIntegrationIds(triggers, integrationIdsByComponentName),
+            resolveIntegrationIds(components, integrationIdsByComponentName), inputs, permissionExpression,
+            workflowId);
+    }
+
+    private static List<Component> resolveIntegrationIds(
+        List<Component> components, Map<String, Long> integrationIdsByComponentName) {
+
+        return components.stream()
+            .map(component -> component.connectionRequired()
+                ? component.withIntegrationId(integrationIdsByComponentName.get(component.name()))
+                : component)
+            .toList();
+    }
+
+    public record Component(
+        String name, String title, String icon, boolean connectionRequired, @Nullable Long integrationId) {
+
+        public Component(String name, String title, String icon) {
+            this(name, title, icon, false, null);
+        }
+
+        public Component withIntegrationId(@Nullable Long integrationId) {
+            return new Component(name, title, icon, connectionRequired, integrationId);
+        }
     }
 
     public record Input(String name, String label, String type, boolean required) {
