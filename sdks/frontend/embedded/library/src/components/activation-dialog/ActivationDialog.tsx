@@ -1,6 +1,7 @@
 import {RefObject, useCallback, useEffect, useMemo, useReducer, useRef, useState} from 'react';
 import {ApiResponseError, createApiClient} from '../shared/apiClient';
 import dialogStyles from '../shared/dialog.module.css';
+import DialogPoweredBy from '../shared/DialogPoweredBy';
 import XIcon from '../connect-dialog/assets/x.svg';
 import {activationReducer, canProceed, initialActivationState, toInputValueText} from './activationReducer';
 import ConnectDialogOpener from './ConnectDialogOpener';
@@ -520,6 +521,8 @@ const ActivationBody = ({
             </main>
 
             <footer className={dialogStyles.dialogFooter}>
+                <DialogPoweredBy />
+
                 <div className={styles.footerActions}>
                     {state.step === 'done' ? (
                         <button className={dialogStyles.buttonPrimary} onClick={onClose} type="button">

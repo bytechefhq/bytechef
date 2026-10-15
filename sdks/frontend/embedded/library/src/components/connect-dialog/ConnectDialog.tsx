@@ -1,8 +1,8 @@
 import {useEffect, useRef, useState} from 'react';
-import Logo from './assets/logo.svg';
 import XIcon from './assets/x.svg';
 import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
 import styles from '../shared/dialog.module.css';
+import DialogPoweredBy from '../shared/DialogPoweredBy';
 import {
     ApiFetch,
     BoundFieldMappingIntegrationFieldArgsType,
@@ -207,11 +207,12 @@ const ConnectDialog = ({
                     </p>
                 )}
 
-                {integration && !loading && (
-                    <DialogFooter workflowsView={workflowsView} handleClick={handleClick} isOAuth2={isOAuth2} />
-                )}
-
-                <DialogPoweredBy />
+                <DialogFooter
+                    handleClick={handleClick}
+                    isOAuth2={isOAuth2}
+                    showActions={!!integration && !loading}
+                    workflowsView={workflowsView}
+                />
             </div>
         </div>
     );
@@ -568,17 +569,20 @@ interface DialogFooterProps {
     workflowsView?: boolean;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     isOAuth2?: boolean;
+    showActions: boolean;
 }
 
-const DialogFooter = ({workflowsView = false, handleClick, isOAuth2 = false}: DialogFooterProps) => (
+const DialogFooter = ({workflowsView = false, handleClick, isOAuth2 = false, showActions}: DialogFooterProps) => (
     <footer className={styles.dialogFooter}>
-        {workflowsView && (
+        <DialogPoweredBy />
+
+        {showActions && workflowsView && (
             <button name="disconnectButton" onClick={handleClick} className={styles.buttonDestructive} type="button">
                 Disconnect
             </button>
         )}
 
-        {!workflowsView && (
+        {showActions && !workflowsView && (
             <button autoFocus onClick={handleClick} className={styles.buttonPrimary} type="button">
                 {isOAuth2 ? (
                     <span>
@@ -591,19 +595,6 @@ const DialogFooter = ({workflowsView = false, handleClick, isOAuth2 = false}: Di
             </button>
         )}
     </footer>
-);
-
-const DialogPoweredBy = () => (
-    <div className={styles.poweredByContainer}>
-        <img src={Logo} alt="ByteChef Logo" />
-
-        <span>
-            Powered by
-            <a href="https://bytechef.io" target="_blank" rel="noopener noreferrer">
-                ByteChef
-            </a>
-        </span>
-    </div>
 );
 
 const hasUnsatisfiedDependencies = (dependencyValues: Record<string, unknown>): boolean =>
