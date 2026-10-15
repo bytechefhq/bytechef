@@ -3,7 +3,7 @@ import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/
 import {Edge, Node} from '@xyflow/react';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../canvasDragData';
+import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE, getClusterElementTypeDragDataType} from '../canvasDragData';
 import {handleCanvasDragOver, handleCanvasDrop} from '../canvasDrop';
 
 const nodes: Node[] = [
@@ -237,6 +237,30 @@ describe('handleCanvasDrop inside an inline cluster frame', () => {
         );
 
         expect(Object.values(handlers).every((handler) => handler.mock.calls.length === 0)).toBe(true);
+    });
+
+    it('allows a drag over a cluster element placeholder when the component has an element of its type', () => {
+        const event = createDragEvent(renderNode(clusterElementPlaceholderNode.id), '', [
+            CANVAS_DRAG_DATA_TYPE,
+            getClusterElementTypeDragDataType('MODEL'),
+        ]);
+
+        handleCanvasDragOver(event, edges, [...nodes, clusterElementPlaceholderNode]);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(event.dataTransfer.dropEffect).toBe('move');
+    });
+
+    it('refuses a drag over a cluster element placeholder when the component has no element of its type', () => {
+        const event = createDragEvent(renderNode(clusterElementPlaceholderNode.id), '', [
+            CANVAS_DRAG_DATA_TYPE,
+            getClusterElementTypeDragDataType('TOOLS'),
+        ]);
+
+        handleCanvasDragOver(event, edges, [...nodes, clusterElementPlaceholderNode]);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(event.dataTransfer.dropEffect).toBe('none');
     });
 
     it('refuses a drag over an edge between a cluster root and its elements', () => {

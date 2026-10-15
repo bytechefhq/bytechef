@@ -3,7 +3,7 @@ import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
 import {convertNameToSnakeCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
-import {CANVAS_DRAG_DATA_TYPE, getCanvasDragKind} from './canvasDragData';
+import {CANVAS_DRAG_DATA_TYPE, carriesClusterElementType, getCanvasDragKind} from './canvasDragData';
 import resolveCanvasDropTarget from './resolveCanvasDropTarget';
 import resolveTargetTriggerName from './resolveTargetTriggerName';
 
@@ -33,7 +33,13 @@ export function handleCanvasDragOver(event: CanvasDragEventType, edges: Edge[], 
 
     const dragKind = getCanvasDragKind(event.dataTransfer);
 
-    if (dragKind && !resolveCanvasDropTarget({dragKind, edges, nodes, target: event.target})) {
+    const dropTarget = dragKind ? resolveCanvasDropTarget({dragKind, edges, nodes, target: event.target}) : undefined;
+
+    const isRefusedClusterElementDrop =
+        dropTarget?.type === 'clusterElementPlaceholder' &&
+        !carriesClusterElementType(event.dataTransfer, (dropTarget.node.data as NodeDataType).clusterElementType!);
+
+    if (dragKind && (!dropTarget || isRefusedClusterElementDrop)) {
         event.dataTransfer.dropEffect = 'none';
 
         return;

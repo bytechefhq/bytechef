@@ -1,7 +1,11 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../../../utils/canvasDragData';
+import {
+    CANVAS_DRAG_DATA_TYPE,
+    TRIGGER_DRAG_DATA_TYPE,
+    getClusterElementTypeDragDataType,
+} from '../../../utils/canvasDragData';
 import WorkflowNodesTabsItem from '../WorkflowNodesTabsItem';
 
 type NodePropType = Parameters<typeof WorkflowNodesTabsItem>[0]['node'];
@@ -43,5 +47,13 @@ describe('WorkflowNodesTabsItem', () => {
 
         expect(setData).toHaveBeenCalledWith(CANVAS_DRAG_DATA_TYPE, 'logger');
         expect(setData).not.toHaveBeenCalledWith(TRIGGER_DRAG_DATA_TYPE, expect.anything());
+    });
+
+    it('marks a drag with each cluster element type the component has, so cluster placeholders can refuse others', () => {
+        const setData = startDrag({clusterElementsCount: {CHAT_MEMORY: 2, MODEL: 1, TOOLS: 0}, name: 'openAi'});
+
+        expect(setData).toHaveBeenCalledWith(getClusterElementTypeDragDataType('CHAT_MEMORY'), 'openAi');
+        expect(setData).toHaveBeenCalledWith(getClusterElementTypeDragDataType('MODEL'), 'openAi');
+        expect(setData).not.toHaveBeenCalledWith(getClusterElementTypeDragDataType('TOOLS'), expect.anything());
     });
 });

@@ -46,7 +46,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const {updateWorkflowMutation} = useWorkflowEditor();
 
-    const {dropzoneHandlers, isDropzoneActive} = useCanvasDropzone('task');
+    const {dropzoneHandlers, isDropzoneActive} = useCanvasDropzone('task', data.clusterElementType);
 
     const nodeIndex = nodes.findIndex((node) => node.id === id);
     const isClusterElement = !!data.clusterElementType;
