@@ -170,11 +170,7 @@ const ClusterFrameShell = ({children, data, nodeId, nodeMenu}: ClusterFrameShell
             style={{height: clusterFrame.height, width: clusterFrame.width}}
         >
             {nodeMenu && (
-                <div
-                    className="nodrag invisible absolute top-2 -left-8 z-10 group-hover:visible focus-within:visible"
-                    onMouseDown={(event) => event.stopPropagation()}
-                    role="presentation"
-                >
+                <div className="nodrag invisible absolute top-2 -left-8 z-10 group-hover:visible focus-within:visible">
                     {nodeMenu}
                 </div>
             )}
