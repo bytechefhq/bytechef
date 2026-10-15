@@ -30,16 +30,21 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.category.domain.Category;
@@ -80,10 +85,12 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,6 +137,9 @@ class AutomationWorkflowProjectFacadeIntTest {
 
     private static final String TEST_EXTERNAL_USER_ID = "test-external-user-42";
 
+    private final List<Long> createdIntegrationInstanceConfigurationIds = new ArrayList<>();
+    private final List<Long> createdIntegrationIds = new ArrayList<>();
+
     @Autowired
     private AutomationWorkflowProjectService automationWorkflowProjectService;
 
@@ -155,6 +165,12 @@ class AutomationWorkflowProjectFacadeIntTest {
     private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
 
     @Autowired
+    private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
+
+    @Autowired
+    private IntegrationService integrationService;
+
+    @Autowired
     private ProjectService projectService;
 
     @Autowired
@@ -176,6 +192,15 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         when(embeddedPermissionEvaluator.evaluate(any(), any()))
             .thenReturn(true);
+    }
+
+    @AfterEach
+    void tearDown() {
+        createdIntegrationInstanceConfigurationIds.forEach(integrationInstanceConfigurationService::delete);
+        createdIntegrationIds.forEach(integrationService::delete);
+
+        createdIntegrationInstanceConfigurationIds.clear();
+        createdIntegrationIds.clear();
     }
 
     @Test
@@ -768,6 +793,113 @@ class AutomationWorkflowProjectFacadeIntTest {
             .filter(project -> project.id() == projectId)
             .flatMap(project -> project.workflowTemplates()
                 .stream())
+            .findFirst()
+            .orElseThrow();
+    }
+
+    @Test
+    void testPublishedTemplateComponentCarriesTheIntegrationEnabledInTheEnvironment() {
+        stubSlackComponentDefinition();
+
+        long integrationId = createIntegrationWithConfiguration("slack", Environment.PRODUCTION, true);
+
+        String workflowUuid = createPublishedSlackTemplate();
+
+        ConnectedUserWorkflowTemplateDTO.Component slack = getPublishedSlackComponent(workflowUuid);
+
+        assertThat(slack.connectionRequired()).isTrue();
+        assertThat(slack.integrationId()).isEqualTo(integrationId);
+    }
+
+    @Test
+    void testPublishedTemplateComponentHasNoIntegrationWhenTheConfigurationIsElsewhereOrDisabled() {
+        stubSlackComponentDefinition();
+
+        createIntegrationWithConfiguration("slack", Environment.STAGING, true);
+        createIntegrationWithConfiguration("slack", Environment.PRODUCTION, false);
+
+        String workflowUuid = createPublishedSlackTemplate();
+
+        ConnectedUserWorkflowTemplateDTO.Component slack = getPublishedSlackComponent(workflowUuid);
+
+        assertThat(slack.connectionRequired()).isTrue();
+        assertThat(slack.integrationId()).isNull();
+    }
+
+    @Test
+    void testTheLowestIdIntegrationWinsWhenTwoAreEnabledForOneComponent() {
+        stubSlackComponentDefinition();
+
+        long firstIntegrationId = createIntegrationWithConfiguration("slack", Environment.PRODUCTION, true);
+
+        createIntegrationWithConfiguration("slack", Environment.PRODUCTION, true);
+
+        String workflowUuid = createPublishedSlackTemplate();
+
+        assertThat(getPublishedSlackComponent(workflowUuid).integrationId()).isEqualTo(firstIntegrationId);
+    }
+
+    private void stubSlackComponentDefinition() {
+        when(componentDefinitionService.fetchComponentDefinition("slack", 1))
+            .thenReturn(Optional.of(new ComponentDefinition(
+                ComponentDsl.component("slack")
+                    .title("Slack")
+                    .connection(ComponentDsl.connection()))));
+    }
+
+    private long createIntegrationWithConfiguration(String componentName, Environment environment, boolean enabled) {
+        Integration integration = new Integration();
+
+        integration.setComponentName(componentName);
+        integration.setName(componentName + "-" + UUID.randomUUID());
+
+        integration = integrationService.create(integration);
+
+        createdIntegrationIds.add(integration.getId());
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setConnectionParameters(Map.of());
+        integrationInstanceConfiguration.setEnabled(enabled);
+        integrationInstanceConfiguration.setEnvironment(environment);
+        integrationInstanceConfiguration.setIntegrationId(integration.getId());
+        integrationInstanceConfiguration.setIntegrationVersion(1);
+        integrationInstanceConfiguration.setName(integration.getName());
+
+        integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
+            integrationInstanceConfiguration);
+
+        createdIntegrationInstanceConfigurationIds.add(integrationInstanceConfiguration.getId());
+
+        if (enabled) {
+            integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), true);
+        }
+
+        return integration.getId();
+    }
+
+    private String createPublishedSlackTemplate() {
+        long projectId = automationWorkflowProjectFacade.createProject("Slack digest", "", null, List.of(), null, null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            projectId,
+            "{\"label\":\"Slack digest\",\"tasks\":[{\"name\":\"post\",\"type\":\"slack/v1/sendMessage\",\"parameters\":{}}]}",
+            null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        return workflowUuid;
+    }
+
+    private ConnectedUserWorkflowTemplateDTO.Component getPublishedSlackComponent(String workflowUuid) {
+        return automationWorkflowProjectFacade.getPublishedProjects(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION)
+            .stream()
+            .flatMap(project -> project.workflowTemplates()
+                .stream())
+            .filter(template -> workflowUuid.equals(template.workflowUuid()))
+            .flatMap(template -> template.components()
+                .stream())
+            .filter(component -> "slack".equals(component.name()))
             .findFirst()
             .orElseThrow();
     }
