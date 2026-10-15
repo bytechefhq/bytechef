@@ -199,6 +199,32 @@ describe('layoutClusterFrames', () => {
         expect(placedNestedMember.position).toEqual({x: 10, y: 150});
     });
 
+    it('keeps only direct members inside the frame, leaving nested members free of the frame extent', () => {
+        const result = layoutClusterFrames(
+            [buildRootNode()],
+            [],
+            {
+                edgesByRootId: {[ROOT_ID]: []},
+                nodesByRootId: {
+                    [ROOT_ID]: [
+                        buildElementNode('sub_agent_1', {x: 100, y: 200}),
+                        buildElementNode('nested_model_1', {x: -8, y: 150}, 'sub_agent_1'),
+                    ],
+                },
+            },
+            {}
+        );
+
+        const placedNestedRoot = result.memberNodes.find((node) => node.id === 'sub_agent_1')!;
+        const placedNestedMember = result.memberNodes.find((node) => node.id === 'nested_model_1')!;
+
+        expect(placedNestedRoot.extent).toEqual([
+            [0, CLUSTER_FRAME_HEADER_HEIGHT],
+            [Infinity, Infinity],
+        ]);
+        expect(placedNestedMember.extent).toBeUndefined();
+    });
+
     it('sizes the box around a nested member', () => {
         const result = layoutClusterFrames(
             [buildRootNode()],

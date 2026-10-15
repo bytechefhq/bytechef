@@ -106,7 +106,7 @@ export function layoutClusterFrames(
             ...elementNode,
             connectable: false,
             draggable: !isLocked && elementNode.type !== 'placeholder',
-            extent: CLUSTER_FRAME_MEMBER_EXTENT,
+            extent: elementNode.parentId === node.id ? CLUSTER_FRAME_MEMBER_EXTENT : elementNode.extent,
             position:
                 elementNode.parentId === node.id
                     ? toClusterFrameChildPosition(elementNode.position, contentOrigin)
