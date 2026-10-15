@@ -25,6 +25,7 @@ export interface AutomationTemplateType {
 
 export interface AutomationProjectType {
     id: number;
+    kind?: 'COPY' | 'REFERENCE';
     name?: string;
     workflowTemplates?: AutomationTemplateType[];
 }
