@@ -249,4 +249,27 @@ describe('ActivationDialog', () => {
         await waitFor(() => expect(onEditWorkflow).toHaveBeenCalledWith('wf-copy'));
         expect(onClose).toHaveBeenCalled();
     });
+
+    it('closes on Escape, but not while the connect form is open', async () => {
+        const onClose = vi.fn();
+
+        renderDialog({onClose});
+
+        const row = await screen.findByTestId('connect-row-slack');
+
+        await userEvent.click(within(row).getByRole('button', {name: 'Connect'}));
+        await waitFor(() => expect(openConnectDialogMock).toHaveBeenCalled());
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onClose).not.toHaveBeenCalled();
+
+        const connectProps = useConnectDialogMock.mock.calls[useConnectDialogMock.mock.calls.length - 1][0];
+
+        await act(async () => connectProps.onClose());
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
 });
