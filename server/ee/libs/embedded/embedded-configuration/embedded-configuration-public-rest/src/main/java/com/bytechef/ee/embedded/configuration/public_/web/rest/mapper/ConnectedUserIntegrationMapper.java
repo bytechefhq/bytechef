@@ -39,8 +39,10 @@ import com.bytechef.platform.configuration.domain.WorkflowInput;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -120,6 +122,15 @@ public interface ConnectedUserIntegrationMapper {
         @Mapping(target = "componentReference", ignore = true)
         InputModel map(ConnectedUserIntegrationDTO.Input input);
 
+        @AfterMapping
+        default void clearEmptyOptions(@MappingTarget InputModel inputModel) {
+            List<OptionModel> options = inputModel.getOptions();
+
+            if (options != null && options.isEmpty()) {
+                inputModel.setOptions(null);
+            }
+        }
+
         @Mapping(target = "description", source = "description")
         @Mapping(target = "inputs", source = "inputs")
         @Mapping(target = "label", source = "label")
@@ -180,6 +191,7 @@ public interface ConnectedUserIntegrationMapper {
                 .label(input.getLabel())
                 .name(input.getName())
                 .objectName(input.getObjectName())
+                .options(null)
                 .required(input.isRequired())
                 .type(InputTypeModel.valueOf(StringUtils.upperCase(input.getType())));
 
@@ -199,6 +211,7 @@ public interface ConnectedUserIntegrationMapper {
             return new InputModel()
                 .label(input.label())
                 .name(input.name())
+                .options(null)
                 .required(input.required())
                 .type(InputTypeModel.valueOf(StringUtils.upperCase(input.type())));
         }

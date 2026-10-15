@@ -156,6 +156,7 @@ class ConnectedUserIntegrationMapperTest {
         InputModel model = mapper.map(input);
 
         assertNull(model.getComponentReference());
+        assertNull(model.getOptions());
     }
 
     @Test
@@ -220,7 +221,7 @@ class ConnectedUserIntegrationMapperTest {
         InputModel inputModel = mapConnectionInput(keyProperty);
 
         assertNull(inputModel.getDefaultValue());
-        assertEquals(List.of(), inputModel.getOptions());
+        assertNull(inputModel.getOptions());
     }
 
     @Test
