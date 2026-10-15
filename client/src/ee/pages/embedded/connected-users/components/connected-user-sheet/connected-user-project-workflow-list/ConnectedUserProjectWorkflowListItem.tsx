@@ -136,7 +136,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                                     )}
                                 </TooltipTrigger>
 
-                                <TooltipContent>Last Execution Date</TooltipContent>
+                                <TooltipContent side="left">Last Execution Date</TooltipContent>
                             </Tooltip>
                         </div>
                     </div>
