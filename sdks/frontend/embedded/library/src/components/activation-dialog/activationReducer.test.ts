@@ -1,4 +1,3 @@
-// sdks/frontend/embedded/library/src/components/activation-dialog/activationReducer.test.ts
 import {describe, expect, it} from 'vitest';
 import {activationReducer, canProceed, initialActivationState, toInputValueText} from './activationReducer';
 import {TemplateComponentType} from './types';
@@ -132,6 +131,27 @@ describe('activationReducer', () => {
         expect(state.step).toBe('done');
         expect(state.error).toBeUndefined();
         expect(state.workflowUuid).toBe('wf-1');
+    });
+
+    it('ignores failures and missing connections once the automation is on', () => {
+        let state = initialActivationState([slack], []);
+
+        state = activationReducer(state, {componentName: 'slack', connectionId: 9, type: 'SELECT_CONNECTION'});
+        state = activationReducer(state, {type: 'NEXT'});
+        state = activationReducer(state, {type: 'ACTIVATED', workflowUuid: 'wf-1'});
+
+        const done = state;
+
+        expect(activationReducer(done, {error: 'boom', type: 'FAILED'})).toBe(done);
+        expect(activationReducer(done, {componentName: 'slack', type: 'MISSING_CONNECTION'})).toBe(done);
+    });
+
+    it('ignores a selection for a component the template does not need', () => {
+        const state = initialActivationState([slack], []);
+
+        expect(activationReducer(state, {componentName: 'gmail', connectionId: 3, type: 'SELECT_CONNECTION'})).toBe(
+            state
+        );
     });
 });
 
