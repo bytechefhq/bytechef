@@ -176,7 +176,7 @@ const WorkflowTestConfigurationDialog = ({
                                 className="max-h-workflow-test-configuration-dialog-height w-full min-w-0 gap-2.5"
                                 defaultValue="connections"
                             >
-                                <TabsList className="mx-6 flex">
+                                <TabsList className="flex">
                                     <TabsTrigger
                                         className="flex w-full data-[state=active]:shadow-none"
                                         value="connections"
@@ -202,10 +202,7 @@ const WorkflowTestConfigurationDialog = ({
                                     id="workflow-test-configuration-form"
                                     onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}
                                 >
-                                    <TabsContent
-                                        className="mt-2 min-w-0 overflow-hidden px-6 py-2.5"
-                                        value="connections"
-                                    >
+                                    <TabsContent className="mt-2 min-w-0 overflow-hidden py-2.5" value="connections">
                                         <ConnectionConfigurationList
                                             componentConnections={componentConnections}
                                             connectionDialogAllowed={connectionDialogAllowed}
@@ -229,7 +226,7 @@ const WorkflowTestConfigurationDialog = ({
                                         />
                                     </TabsContent>
 
-                                    <TabsContent className="mt-2 px-6 py-2.5" value="inputs">
+                                    <TabsContent className="mt-2 py-2.5" value="inputs">
                                         <InputConfigurationList
                                             control={control as unknown as Control<FieldValues>}
                                             controlPath="inputs"
@@ -243,25 +240,27 @@ const WorkflowTestConfigurationDialog = ({
                         </Form>
                     </DialogBody>
 
-                    <DialogFooter className="flex items-center p-6">
-                        {componentConnections.length > 1 && (
-                            <div className="mr-auto flex items-center gap-2">
-                                <Switch
-                                    checked={connectionsGrouped}
-                                    label="Group Connections"
-                                    onCheckedChange={handleConnectionsGroupedChange}
-                                />
+                    <DialogFooter
+                        startContent={
+                            componentConnections.length > 1 && (
+                                <div className="flex items-center gap-2">
+                                    <Switch
+                                        checked={connectionsGrouped}
+                                        label="Group Connections"
+                                        onCheckedChange={handleConnectionsGroupedChange}
+                                    />
 
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
-                                    </TooltipTrigger>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
+                                        </TooltipTrigger>
 
-                                    <TooltipContent>Connections grouped by their component.</TooltipContent>
-                                </Tooltip>
-                            </div>
-                        )}
-
+                                        <TooltipContent>Connections grouped by their component.</TooltipContent>
+                                    </Tooltip>
+                                </div>
+                            )
+                        }
+                    >
                         <DialogCancelButton />
 
                         <Tooltip>
