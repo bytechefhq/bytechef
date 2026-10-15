@@ -291,7 +291,7 @@ const WorkflowEditorLayout = ({
                 <Suspense fallback={null}>
                     <div
                         className={twMerge(
-                            'absolute inset-y-4 top-2 bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-surface-main',
+                            'absolute top-[15px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-surface-main',
                             copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]'
                         )}
                     >
