@@ -26,7 +26,9 @@ import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,13 +45,41 @@ class CopilotSpringAIAgentTest {
     class ConversationIdTest {
 
         @Test
-        void testConversationIdPrefixesTheThreadIdWithTheServerScope() throws AGUIException {
+        void testConversationIdDerivesAUuidFromTheServerScopeAndThreadId() throws AGUIException {
             State state = new State();
 
             state.set(CopilotConstants.STATE_CONVERSATION_SCOPE, "embedded:000001:user-1:workflow-1");
 
             assertThat(newAgent().conversationId(newInput(state)))
-                .isEqualTo("embedded:000001:user-1:workflow-1:thread");
+                .isEqualTo(
+                    UUID.nameUUIDFromBytes(
+                        "embedded:000001:user-1:workflow-1:thread".getBytes(StandardCharsets.UTF_8))
+                        .toString());
+        }
+
+        @Test
+        void testConversationIdFitsTheChatMemoryColumnForALongScope() throws AGUIException {
+            State state = new State();
+
+            state.set(
+                CopilotConstants.STATE_CONVERSATION_SCOPE,
+                "embedded:000001:1234567890:3971538b-be9a-485d-89bb-fc5eb98f8033");
+
+            assertThat(newAgent().conversationId(newInput(state))).hasSizeLessThanOrEqualTo(36);
+        }
+
+        @Test
+        void testConversationIdSeparatesScopesThatShareAThreadId() throws AGUIException {
+            State victimState = new State();
+
+            victimState.set(CopilotConstants.STATE_CONVERSATION_SCOPE, "embedded:000001:victim:workflow-1");
+
+            State attackerState = new State();
+
+            attackerState.set(CopilotConstants.STATE_CONVERSATION_SCOPE, "embedded:000001:attacker:workflow-1");
+
+            assertThat(newAgent().conversationId(newInput(attackerState)))
+                .isNotEqualTo(newAgent().conversationId(newInput(victimState)));
         }
 
         @Test
