@@ -558,6 +558,22 @@ class ConnectedUserConnectionFacadeIntTest {
     }
 
     @Test
+    void testReauthorizeMergesTheIntegrationConfigurationCredentialsUnderTheNewParameters() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createIntegrationInstance(
+            connectedUserId, 83701L, Environment.PRODUCTION,
+            Map.of("clientId", "app-id", "clientSecret", "app-secret"));
+        stubOwnedConnectionDTOs(List.of(83701L));
+
+        connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+            connectedUserId, 83701L, Map.of("code", "fresh-code"));
+
+        verify(connectionFacade).replaceAuthorizationParameters(
+            83701L, Map.of("clientId", "app-id", "clientSecret", "app-secret", "code", "fresh-code"));
+    }
+
+    @Test
     void testReauthorizeRejectsForeignId() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
 
@@ -630,6 +646,12 @@ class ConnectedUserConnectionFacadeIntTest {
     }
 
     private void createIntegrationInstance(long connectedUserId, long connectionId, Environment environment) {
+        createIntegrationInstance(connectedUserId, connectionId, environment, Map.of());
+    }
+
+    private void createIntegrationInstance(
+        long connectedUserId, long connectionId, Environment environment, Map<String, ?> connectionParameters) {
+
         registerConnection(connectionId, environment, PlatformType.EMBEDDED);
 
         String componentName = "integration-" + UUID.randomUUID();
@@ -643,7 +665,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
-        integrationInstanceConfiguration.setConnectionParameters(Map.of());
+        integrationInstanceConfiguration.setConnectionParameters(connectionParameters);
         integrationInstanceConfiguration.setEnvironment(environment);
         integrationInstanceConfiguration.setIntegrationId(integration.getId());
         integrationInstanceConfiguration.setIntegrationVersion(1);
