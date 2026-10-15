@@ -27,6 +27,8 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -75,6 +77,7 @@ public class ProjectWorkflowTools {
     private static final String PERSISTED_WORKFLOW_CAPTURE_KEY = "bytechef.workflowEditor.persistedWorkflows";
     private static final String DEFAULT_WORKFLOW_NAME = "Workflow";
 
+    private final ComponentDefinitionService componentDefinitionService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final ScopedProjectGuard scopedProjectGuard;
@@ -82,10 +85,11 @@ public class ProjectWorkflowTools {
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowTools(
-        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
-        ScopedProjectGuard scopedProjectGuard,
+        ComponentDefinitionService componentDefinitionService, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService, ScopedProjectGuard scopedProjectGuard,
         ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider) {
 
+        this.componentDefinitionService = componentDefinitionService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.scopedProjectGuard = scopedProjectGuard;
@@ -235,6 +239,7 @@ public class ProjectWorkflowTools {
         ToolContext toolContext) {
 
         checkWorkspaceProject(projectId, workspaceId, toolContext, ProjectWorkflowToolErrorType.CREATE_WORKFLOW);
+        checkAllowedComponents(definition, toolContext, ProjectWorkflowToolErrorType.CREATE_WORKFLOW);
 
         try {
             ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(projectId, definition);
@@ -302,6 +307,7 @@ public class ProjectWorkflowTools {
         ToolContext toolContext) {
 
         checkWorkspaceWorkflow(workflowId, workspaceId, toolContext, ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);
+        checkAllowedComponents(definition, toolContext, ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
@@ -405,6 +411,20 @@ public class ProjectWorkflowTools {
                     + "current environment and that the connection key matches the node.")
                         .formatted(connectionId, workflowNodeName, connectionKey, e.getMessage()),
                 e, ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION);
+        }
+    }
+
+    private void checkAllowedComponents(
+        String definition, @Nullable ToolContext toolContext,
+        ProjectWorkflowToolErrorType projectWorkflowToolErrorType) {
+
+        List<String> disallowedComponentNames = AllowedComponentNamesUtils.getDisallowedComponentNames(
+            definition, toolContext, componentDefinitionService);
+
+        if (!disallowedComponentNames.isEmpty()) {
+            throw new ExecutionException(
+                AllowedComponentNamesUtils.getNotAllowedMessage(disallowedComponentNames),
+                projectWorkflowToolErrorType);
         }
     }
 

@@ -21,8 +21,13 @@ import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.exception.ErrorType;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ToolContext;
@@ -40,11 +45,16 @@ public class ClusterElementTools {
 
     private static final Logger log = LoggerFactory.getLogger(ClusterElementTools.class);
 
+    private final ComponentDefinitionService componentDefinitionService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ScopedProjectGuard scopedProjectGuard;
 
     @SuppressFBWarnings("EI")
-    public ClusterElementTools(ProjectWorkflowFacade projectWorkflowFacade, ScopedProjectGuard scopedProjectGuard) {
+    public ClusterElementTools(
+        ComponentDefinitionService componentDefinitionService, ProjectWorkflowFacade projectWorkflowFacade,
+        ScopedProjectGuard scopedProjectGuard) {
+
+        this.componentDefinitionService = componentDefinitionService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.scopedProjectGuard = scopedProjectGuard;
     }
@@ -73,6 +83,8 @@ public class ClusterElementTools {
             ((ObjectNode) rootNode).setAll((ObjectNode) rootPropertiesNode);
 
             String updatedWorkflowDefinition = JsonUtils.writeWithDefaultPrettyPrinter(rootNode);
+
+            checkAllowedComponents(updatedWorkflowDefinition, toolContext, ScriptToolErrorType.UPDATE_WORKFLOW_ROOT);
 
             projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());
@@ -141,6 +153,8 @@ public class ClusterElementTools {
 
             String updatedWorkflowDefinition = JsonUtils.writeWithDefaultPrettyPrinter(rootNode);
 
+            checkAllowedComponents(updatedWorkflowDefinition, toolContext, ScriptToolErrorType.UPDATE_SCRIPT);
+
             projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());
 
@@ -164,6 +178,16 @@ public class ClusterElementTools {
 
             throw new ExecutionException(
                 "Failed to update workflow: " + e.getMessage(), e, ScriptToolErrorType.UPDATE_SCRIPT);
+        }
+    }
+
+    private void checkAllowedComponents(String definition, @Nullable ToolContext toolContext, ErrorType errorType) {
+        List<String> disallowedComponentNames = AllowedComponentNamesUtils.getDisallowedComponentNames(
+            definition, toolContext, componentDefinitionService);
+
+        if (!disallowedComponentNames.isEmpty()) {
+            throw new ExecutionException(
+                AllowedComponentNamesUtils.getNotAllowedMessage(disallowedComponentNames), errorType);
         }
     }
 }
