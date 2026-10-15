@@ -238,7 +238,7 @@ Those are libraries you build an application around: you own deployment, persist
 
 ### Which LLM providers ship out of the box?
 
-Twelve direct providers (OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, Google Gemini, Mistral, Groq, DeepSeek, Nvidia, Perplexity, Stability and Ollama) plus three aggregator components (OpenRouter, LiteLLM, NanoGPT) if you would rather route through a gateway.
+Twelve direct providers (OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, Google Gemini, Mistral, Groq, DeepSeek, Nvidia, Perplexity, Stability and Ollama) plus four aggregator components (OpenRouter, Requesty, LiteLLM, NanoGPT) if you would rather route through a gateway.
 
 ### How does an agent get its tools?
 
