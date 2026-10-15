@@ -2,11 +2,13 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ActionDefinitionApi,
+    ClusterElementDefinitionApi,
     ComponentDefinitionApi,
     TaskDispatcherDefinition,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
+import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {invalidatePreviousWorkflowNodeOutputsForWorkflow} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -21,11 +23,20 @@ import {
 import {QueryClient, useQueryClient} from '@tanstack/react-query';
 import {Edge, Node} from '@xyflow/react';
 
+import {
+    convertNameToSnakeCase,
+    initializeClusterElementsObject,
+} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import calculateNodeInsertIndex from '../utils/calculateNodeInsertIndex';
 import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
+import {getTask} from '../utils/getTask';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
+import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
+import processClusterElementsHierarchy from '../utils/processClusterElementsHierarchy';
+import {resolveClusterRootId} from '../utils/resolveClusterRootId';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 
@@ -194,6 +205,7 @@ export default function useHandleDrop({
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
     (droppedNode: ClickedDefinitionType, targetTriggerName: string) => void,
     (droppedNode: ClickedDefinitionType) => void,
+    (targetNode: Node, droppedNode: ClickedDefinitionType) => Promise<void>,
 ] {
     const {captureComponentUsed} = useAnalytics();
     const {updateWorkflowMutation} = useWorkflowEditor();
@@ -275,10 +287,118 @@ export default function useHandleDrop({
         });
     }
 
+    async function handleDropOnClusterElementPlaceholder(targetNode: Node, droppedNode: ClickedDefinitionType) {
+        const {clusterElementType, multipleClusterElementsNode} = targetNode.data as NodeDataType;
+        const {nodes, workflow} = useWorkflowDataStore.getState();
+
+        const sourceNodeId = targetNode.id.split('-')[0];
+        const sourceNode = nodes.find((node) => node.id === sourceNodeId);
+        const clusterRootId = sourceNode ? resolveClusterRootId(sourceNode.data as NodeDataType) : undefined;
+
+        const clusterRootComponentDefinition = clusterRootId
+            ? useWorkflowEditorStore.getState().clusterRootComponentDefinitions[clusterRootId]
+            : undefined;
+
+        if (!clusterElementType || !clusterRootId || !clusterRootComponentDefinition || !workflow.definition) {
+            console.error(`Cannot resolve the cluster root of the placeholder ${targetNode.id}`);
+
+            return;
+        }
+
+        const clusterRootTask = getTask({
+            tasks: JSON.parse(workflow.definition).tasks,
+            workflowNodeName: clusterRootId,
+        });
+
+        if (!clusterRootTask) {
+            console.error(`Cannot find the cluster root task ${clusterRootId}`);
+
+            return;
+        }
+
+        const getComponentDefinitionRequest = {
+            componentName: droppedNode.name!,
+            componentVersion: droppedNode.version!,
+        };
+
+        const componentDefinition = await queryClient.query({
+            queryFn: () => new ComponentDefinitionApi().getComponentDefinition(getComponentDefinitionRequest),
+            queryKey: ComponentDefinitionKeys.componentDefinition(getComponentDefinitionRequest),
+            staleTime: DEFINITION_STALE_TIME,
+        });
+
+        const clusterElementTypeName = convertNameToSnakeCase(clusterElementType);
+
+        const matchingClusterElement = componentDefinition.clusterElements?.find(
+            (clusterElement) => clusterElement.type === clusterElementTypeName
+        );
+
+        if (!matchingClusterElement) {
+            return;
+        }
+
+        const getClusterElementDefinitionRequest = {
+            clusterElementName: matchingClusterElement.name,
+            clusterElementType: clusterElementTypeName,
+            componentName: componentDefinition.name,
+            componentVersion: componentDefinition.version,
+        };
+
+        const clusterElementDefinition = await queryClient.query({
+            queryFn: () =>
+                new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
+                    getClusterElementDefinitionRequest
+                ),
+            queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(getClusterElementDefinitionRequest),
+            staleTime: DEFINITION_STALE_TIME,
+        });
+
+        const clusterElements = initializeClusterElementsObject({
+            clusterElementsData: clusterRootTask.clusterElements || {},
+            mainClusterRootComponentDefinition: clusterRootComponentDefinition,
+            mainClusterRootTask: clusterRootTask,
+        });
+
+        const {nestedClusterElements} = processClusterElementsHierarchy({
+            clusterElementData: {
+                clusterElements: componentDefinition.clusterRoot ? {} : undefined,
+                label: droppedNode.title,
+                metadata: {},
+                name: getFormattedName(componentDefinition.name),
+                parameters:
+                    getParametersWithDefaultValues({
+                        properties: clusterElementDefinition?.properties as Array<PropertyAllType>,
+                    }) || {},
+                type: `${componentDefinition.name}/v${componentDefinition.version}/${matchingClusterElement.name}`,
+            },
+            clusterElements,
+            elementType: clusterElementType,
+            isMultipleElements: !!multipleClusterElementsNode,
+            mainRootId: clusterRootId,
+            sourceNodeId,
+        });
+
+        captureComponentUsed(componentDefinition.name, undefined, matchingClusterElement.name);
+
+        const clusterRootNodeData = {
+            ...clusterRootTask,
+            clusterElements: nestedClusterElements,
+            componentName: clusterRootTask.type.split('/')[0],
+            workflowNodeName: clusterRootId,
+        };
+
+        saveWorkflowDefinition({
+            nodeData: clusterRootNodeData,
+            onSuccess: () => handleComponentAddedSuccess({nodeData: clusterRootNodeData, queryClient, workflow}),
+            updateWorkflowMutation: updateWorkflowMutation!,
+        });
+    }
+
     return [
         handleDropOnPlaceholderNode,
         handleDropOnWorkflowEdge,
         handleDropOnTriggerNode,
         handleDropOnTriggerPlaceholder,
+        handleDropOnClusterElementPlaceholder,
     ];
 }
