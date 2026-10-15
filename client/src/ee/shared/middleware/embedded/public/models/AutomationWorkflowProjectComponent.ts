@@ -44,7 +44,7 @@ export interface AutomationWorkflowProjectComponent {
      */
     connectionRequired?: boolean;
     /**
-     * The id of the integration that backs this component in the current environment, or null when no enabled integration configuration exists for it; present only when connectionRequired is true.
+     * The id of the integration that backs this component in the current environment, absent when no enabled integration configuration exists for it; present only when connectionRequired is true.
      * @type {number}
      * @memberof AutomationWorkflowProjectComponent
      */
