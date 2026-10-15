@@ -17,15 +17,16 @@
 package com.bytechef.ai.copilot.connection;
 
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * SPI for listing the connections the copilot can offer for a component before {@code createConnection}, so the LLM can
- * suggest an existing connection instead of forcing the user through the create dialog. Each surface contributes an
- * implementation that {@link #supports(CopilotConnectionRequest) claims} the requests it can serve: the in-editor / AI
- * Hub surface lists the workspace's connections scoped to the current environment; the embedded workflow chat has no
- * workspace and lists the connected user's connections instead. The {@code listConnectionsForComponent} tool builds a
- * {@link CopilotConnectionRequest} from its invocation context and dispatches to the first supporting implementation.
+ * SPI for listing the connections a copilot caller may use. The {@code listConnectionsForComponent} tool offers them to
+ * the LLM before {@code createConnection}, and the scoped connection guard checks model-supplied connection ids against
+ * them. Each surface contributes an implementation that {@link #supports(CopilotConnectionRequest) claims} the requests
+ * it can serve: the in-editor / AI Hub surface lists the workspace's connections scoped to the current environment; the
+ * embedded workflow chat has no workspace and lists the connected user's connections instead. Callers dispatch to the
+ * first supporting implementation via {@link #findSupporting(List, CopilotConnectionRequest)}.
  *
  * @author Ivica Cardic
  */
@@ -42,13 +43,21 @@ public interface CopilotConnectionLister {
     boolean supports(CopilotConnectionRequest request);
 
     /**
-     * Lists the connections available for the request's component. Only called when {@link #supports} returned
-     * {@code true} for the same request.
+     * Lists the connections available for the request, filtered by its component when one is given. Only called when
+     * {@link #supports} returned {@code true} for the same request.
      *
      * @param request the request describing the component, environment, and calling principal
      * @return the matching connections, possibly empty
      */
     List<CopilotConnection> listConnections(CopilotConnectionRequest request);
+
+    static Optional<CopilotConnectionLister> findSupporting(
+        List<CopilotConnectionLister> connectionListers, CopilotConnectionRequest request) {
+
+        return connectionListers.stream()
+            .filter(connectionLister -> connectionLister.supports(request))
+            .findFirst();
+    }
 
     /**
      * Surface-neutral description of a connection-listing request. Carries the union of the fields the surfaces need;
@@ -61,12 +70,12 @@ public interface CopilotConnectionLister {
      * @param externalUserId    the embedded connected user's external id when invoked from embedded chat, otherwise
      *                          {@code null}
      * @param environmentId     the {@code Environment} ordinal to scope connections to
-     * @param componentName     the component to filter connections by
+     * @param componentName     the component to filter connections by, or {@code null} for every component
      * @param connectionVersion the connection definition version to filter by, or {@code null} to not filter by version
      */
     record CopilotConnectionRequest(
         @Nullable Long workspaceId, @Nullable Long userId, @Nullable String externalUserId, int environmentId,
-        String componentName, @Nullable Integer connectionVersion) {
+        @Nullable String componentName, @Nullable Integer connectionVersion) {
     }
 
     record CopilotConnection(long id, String name, int environmentId, boolean active) {

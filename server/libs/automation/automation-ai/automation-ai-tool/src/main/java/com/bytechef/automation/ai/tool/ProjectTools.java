@@ -64,20 +64,20 @@ public class ProjectTools {
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectFacade projectFacade;
     private final ProjectService projectService;
+    private final ScopedProjectGuard scopedProjectGuard;
     private final TagService tagService;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
 
     @SuppressFBWarnings("EI")
     public ProjectTools(
         CategoryService categoryService, ProjectDeploymentService projectDeploymentService, ProjectFacade projectFacade,
-        ProjectService projectService, TagService tagService, WorkspaceScopeResolver workspaceScopeResolver) {
+        ProjectService projectService, ScopedProjectGuard scopedProjectGuard, TagService tagService) {
 
         this.categoryService = categoryService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectFacade = projectFacade;
         this.projectService = projectService;
+        this.scopedProjectGuard = scopedProjectGuard;
         this.tagService = tagService;
-        this.workspaceScopeResolver = workspaceScopeResolver;
     }
 
     @Tool(
@@ -86,11 +86,10 @@ public class ProjectTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        long resolvedWorkspaceId = resolveWorkspaceId(workspaceId, toolContext, ProjectToolErrorType.LIST_PROJECTS);
+        List<Project> projects = scopedProjectGuard.getAccessibleProjects(
+            workspaceId, toolContext, ProjectToolErrorType.LIST_PROJECTS);
 
         try {
-            List<Project> projects = getWorkspaceProjects(resolvedWorkspaceId);
-
             List<ProjectInfo> projectInfos = projects.stream()
                 .map(ProjectTools::getProjectInfo)
                 .collect(Collectors.toList());
@@ -156,10 +155,10 @@ public class ProjectTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        long resolvedWorkspaceId = resolveWorkspaceId(workspaceId, toolContext, ProjectToolErrorType.SEARCH_PROJECTS);
+        List<Project> allProjects = scopedProjectGuard.getAccessibleProjects(
+            workspaceId, toolContext, ProjectToolErrorType.SEARCH_PROJECTS);
 
         try {
-            List<Project> allProjects = getWorkspaceProjects(resolvedWorkspaceId);
             query = query.toLowerCase();
 
             String lowerQuery = query.trim();
@@ -248,7 +247,10 @@ public class ProjectTools {
         @ToolParam(required = false, description = "The tag IDs to associate with the project") List<Long> tagIds,
         ToolContext toolContext) {
 
-        long resolvedWorkspaceId = resolveWorkspaceId(workspaceId, toolContext, ProjectToolErrorType.CREATE_PROJECT);
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectToolErrorType.CREATE_PROJECT);
+
+        long resolvedWorkspaceId = scopedProjectGuard.resolveWorkspaceId(
+            workspaceId, toolContext, ProjectToolErrorType.CREATE_PROJECT);
 
         try {
             Project.Builder projectBuilder = Project.builder()
@@ -306,6 +308,8 @@ public class ProjectTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectToolErrorType.UPDATE_PROJECT);
+
         Project existingProject =
             getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.UPDATE_PROJECT);
 
@@ -360,6 +364,8 @@ public class ProjectTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectToolErrorType.DELETE_PROJECT);
+
         Project project = getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.DELETE_PROJECT);
 
         try {
@@ -389,6 +395,8 @@ public class ProjectTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectToolErrorType.PUBLISH_PROJECT);
+
         getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.PUBLISH_PROJECT);
 
         try {
@@ -413,24 +421,11 @@ public class ProjectTools {
         }
     }
 
-    private long resolveWorkspaceId(
-        @Nullable Long workspaceId, @Nullable ToolContext toolContext, ProjectToolErrorType projectToolErrorType) {
-
-        return ProjectWorkspaceScope.resolveWorkspaceId(
-            workspaceScopeResolver, workspaceId, toolContext, projectToolErrorType);
-    }
-
     private Project getWorkspaceProject(
         long projectId, @Nullable Long workspaceId, @Nullable ToolContext toolContext,
         ProjectToolErrorType projectToolErrorType) {
 
-        return ProjectWorkspaceScope.getWorkspaceProject(
-            projectService, projectId, resolveWorkspaceId(workspaceId, toolContext, projectToolErrorType),
-            projectToolErrorType);
-    }
-
-    private List<Project> getWorkspaceProjects(long workspaceId) {
-        return ProjectWorkspaceScope.getWorkspaceProjects(projectService, workspaceId);
+        return scopedProjectGuard.getProject(projectId, workspaceId, toolContext, projectToolErrorType);
     }
 
     private static ProjectInfo getProjectInfo(Project project) {

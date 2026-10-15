@@ -36,6 +36,7 @@ import com.bytechef.ai.copilot.tool.LookupActionPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.LookupTriggerPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.SelectConnectionToolCallback;
 import com.bytechef.ai.copilot.tool.SelectPropertyOptionToolCallback;
@@ -123,6 +124,7 @@ public class CopilotConfiguration {
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final PropertyOptionsResolver propertyOptionsResolver;
     private final ObjectProvider<CopilotConnectionLister> connectionListerProvider;
+    private final ScopedConnectionGuard scopedConnectionGuard;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI")
@@ -142,9 +144,11 @@ public class CopilotConfiguration {
         ComponentDefinitionService componentDefinitionService, ActionDefinitionService actionDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, PropertyOptionsResolver propertyOptionsResolver,
-        ObjectProvider<CopilotConnectionLister> connectionListerProvider) {
+        ObjectProvider<CopilotConnectionLister> connectionListerProvider,
+        ScopedConnectionGuard scopedConnectionGuard) {
 
         this.connectionListerProvider = connectionListerProvider;
+        this.scopedConnectionGuard = scopedConnectionGuard;
         this.connectionDefinitionService = connectionDefinitionService;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
         this.componentDefinitionService = componentDefinitionService;
@@ -312,16 +316,16 @@ public class CopilotConfiguration {
             new SelectConnectionToolCallback(componentDefinitionService),
             new LookupActionPropertyOptionsToolCallback(
                 actionDefinitionService, actionDefinitionFacade, propertyOptionsResolver,
-                ToolStateVisibilityMetrics.NOOP),
+                ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
             new LookupTriggerPropertyOptionsToolCallback(
                 triggerDefinitionService, triggerDefinitionFacade, propertyOptionsResolver,
-                ToolStateVisibilityMetrics.NOOP),
+                ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
             new SelectPropertyOptionToolCallback(
                 actionDefinitionService, actionDefinitionFacade, propertyOptionsResolver,
-                ToolStateVisibilityMetrics.NOOP),
+                ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
             new SelectTriggerPropertyOptionToolCallback(
                 triggerDefinitionService, triggerDefinitionFacade, propertyOptionsResolver,
-                ToolStateVisibilityMetrics.NOOP),
+                ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
             new AskUserQuestionToolCallback(ToolStateVisibilityMetrics.NOOP),
             new CreateConnectionToolCallback(componentDefinitionService));
     }

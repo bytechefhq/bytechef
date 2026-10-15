@@ -21,20 +21,26 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
+import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.model.ProjectDetailInfo;
 import com.bytechef.automation.ai.tool.model.ProjectInfo;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,6 +49,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 /**
  * @author Ivica Cardic
@@ -73,6 +80,84 @@ class ProjectToolsTest {
 
     @Mock
     private WorkspaceScopeResolver workspaceScopeResolver;
+
+    @Nested
+    class ScopedProjectTest {
+
+        private static final long OWN_PROJECT_ID = 1114L;
+
+        @Test
+        void testScopedRunListsOnlyItsOwnProject() {
+            Project project = project(OWN_PROJECT_ID, WORKSPACE_ID);
+
+            when(projectService.getProject(OWN_PROJECT_ID)).thenReturn(project);
+
+            List<ProjectInfo> projectInfos = newTools().listProjects(null, scopedToolContext());
+
+            assertThat(projectInfos).extracting(ProjectInfo::id)
+                .containsExactly(OWN_PROJECT_ID);
+            verify(projectService, never()).getWorkspaceProjectIds(anyLong());
+            verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
+        }
+
+        @Test
+        void testScopedRunCannotReadAnotherProject() {
+            ProjectTools projectTools = newTools();
+
+            assertThatCode(() -> projectTools.getProject(7L, null, scopedToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+
+            verify(projectService, never()).getProjectVersions(anyLong());
+        }
+
+        @Test
+        void testScopedRunCannotCreateChangeDeleteOrPublishProjects() {
+            ProjectTools projectTools = newTools();
+
+            assertThatCode(() -> projectTools.createProject("name", null, null, null, null, scopedToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
+            assertThatCode(
+                () -> projectTools.updateProject(OWN_PROJECT_ID, "name", null, null, null, null, scopedToolContext()))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
+            assertThatCode(() -> projectTools.deleteProject(OWN_PROJECT_ID, null, scopedToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
+            assertThatCode(() -> projectTools.publishProject(OWN_PROJECT_ID, null, null, scopedToolContext()))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
+
+            verify(projectService, never()).create(any());
+            verify(projectFacade, never()).updateProject(any());
+            verify(projectFacade, never()).deleteProject(anyLong());
+            verify(projectFacade, never()).publishProject(anyLong(), any(), anyBoolean());
+        }
+
+        @Test
+        void testRunThatSkipsAuthorizationWithoutAScopedProjectCannotListProjects() {
+            ToolContext toolContext = new ToolContext(
+                AgentToolInvocationContext.builder()
+                    .authentication(new UsernamePasswordAuthenticationToken("1234567890", null, List.of()))
+                    .skipAutomationAuthorization(true)
+                    .build()
+                    .toToolContext());
+
+            ProjectTools projectTools = newTools();
+
+            assertThatCode(() -> projectTools.listProjects(null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.UNSCOPED_MESSAGE);
+
+            verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
+        }
+
+        private ToolContext scopedToolContext() {
+            return new ToolContext(
+                Map.of(ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID));
+        }
+    }
 
     @Nested
     class WorkspaceScopeTest {
@@ -229,8 +314,11 @@ class ProjectToolsTest {
 
     private ProjectTools newTools() {
         return new ProjectTools(
-            categoryService, projectDeploymentService, projectFacade, projectService, tagService,
-            workspaceScopeResolver);
+            categoryService, projectDeploymentService, projectFacade, projectService,
+            new ScopedProjectGuard(
+                projectService, mock(ProjectWorkflowService.class), mock(ScopedConnectionGuard.class),
+                workspaceScopeResolver),
+            tagService);
     }
 
     private static Project project(long projectId, long workspaceId) {

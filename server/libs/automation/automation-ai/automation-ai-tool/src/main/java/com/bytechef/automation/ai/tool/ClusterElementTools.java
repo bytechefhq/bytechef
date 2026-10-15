@@ -20,8 +20,6 @@ import com.bytechef.automation.ai.tool.exception.ScriptToolErrorType;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,23 +40,13 @@ public class ClusterElementTools {
 
     private static final Logger log = LoggerFactory.getLogger(ClusterElementTools.class);
 
-    private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
-    private final ProjectWorkflowService projectWorkflowService;
     private final ScopedProjectGuard scopedProjectGuard;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
 
     @SuppressFBWarnings("EI")
-    public ClusterElementTools(
-        ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
-        ProjectWorkflowService projectWorkflowService, ScopedProjectGuard scopedProjectGuard,
-        WorkspaceScopeResolver workspaceScopeResolver) {
-
-        this.projectService = projectService;
+    public ClusterElementTools(ProjectWorkflowFacade projectWorkflowFacade, ScopedProjectGuard scopedProjectGuard) {
         this.projectWorkflowFacade = projectWorkflowFacade;
-        this.projectWorkflowService = projectWorkflowService;
         this.scopedProjectGuard = scopedProjectGuard;
-        this.workspaceScopeResolver = workspaceScopeResolver;
     }
 
     @Tool(
@@ -73,15 +61,8 @@ public class ClusterElementTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        if (scopedProjectGuard.fetchScopedProjectId(toolContext) == null) {
-            ProjectWorkspaceScope.checkWorkspaceWorkflow(
-                projectService, projectWorkflowService, workflowId,
-                ProjectWorkspaceScope.resolveWorkspaceId(
-                    workspaceScopeResolver, workspaceId, toolContext, ScriptToolErrorType.UPDATE_WORKFLOW_ROOT),
-                ScriptToolErrorType.UPDATE_WORKFLOW_ROOT);
-        } else {
-            scopedProjectGuard.checkWorkflow(workflowId, toolContext, ScriptToolErrorType.UPDATE_WORKFLOW_ROOT);
-        }
+        scopedProjectGuard.checkWorkflow(workflowId, workspaceId, toolContext,
+            ScriptToolErrorType.UPDATE_WORKFLOW_ROOT);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
@@ -126,15 +107,7 @@ public class ClusterElementTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        if (scopedProjectGuard.fetchScopedProjectId(toolContext) == null) {
-            ProjectWorkspaceScope.checkWorkspaceWorkflow(
-                projectService, projectWorkflowService, workflowId,
-                ProjectWorkspaceScope.resolveWorkspaceId(
-                    workspaceScopeResolver, workspaceId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT),
-                ScriptToolErrorType.UPDATE_SCRIPT);
-        } else {
-            scopedProjectGuard.checkWorkflow(workflowId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT);
-        }
+        scopedProjectGuard.checkWorkflow(workflowId, workspaceId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);

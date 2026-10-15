@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
-import org.springframework.security.core.Authentication;
 import tools.jackson.core.JacksonException;
 
 /**
@@ -238,20 +237,11 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
     private @Nullable List<CopilotConnection> listConnections(
         AgentToolInvocationContext invocationContext, String componentName, int connectionVersion) {
 
-        Authentication authentication = invocationContext.authentication();
+        CopilotConnectionRequest request = invocationContext.toConnectionRequest(componentName, connectionVersion);
 
-        CopilotConnectionRequest request = new CopilotConnectionRequest(
-            invocationContext.workspaceId(), invocationContext.userId(),
-            authentication == null ? null : authentication.getName(), invocationContext.resolveEnvironmentOrDefault(),
-            componentName, connectionVersion);
-
-        for (CopilotConnectionLister connectionLister : connectionListers) {
-            if (connectionLister.supports(request)) {
-                return connectionLister.listConnections(request);
-            }
-        }
-
-        return null;
+        return CopilotConnectionLister.findSupporting(connectionListers, request)
+            .map(connectionLister -> connectionLister.listConnections(request))
+            .orElse(null);
     }
 
     private String toolError(String message) {

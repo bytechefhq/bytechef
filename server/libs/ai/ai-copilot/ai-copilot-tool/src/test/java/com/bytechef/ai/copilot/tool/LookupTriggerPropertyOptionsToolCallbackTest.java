@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
@@ -81,6 +82,25 @@ class LookupTriggerPropertyOptionsToolCallbackTest {
     }
 
     @Test
+    void testRejectsAConnectionTheScopedCallerDoesNotOwnBeforeAnyLookup() throws Exception {
+        TriggerDefinitionService service = mock(TriggerDefinitionService.class);
+        TriggerDefinitionFacade facade = mock(TriggerDefinitionFacade.class);
+
+        LookupTriggerPropertyOptionsToolCallback callback = new LookupTriggerPropertyOptionsToolCallback(
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class),
+            ScopedConnectionTestFixtures.newGuardEntitledTo(List.of(42L)));
+
+        String result = callback.call(
+            "{\"componentName\":\"slack\",\"triggerName\":\"newMessage\",\"propertyName\":\"channel\"," +
+                "\"connectionId\":900}",
+            ScopedConnectionTestFixtures.scopedToolContext());
+
+        assertThat(result).contains(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+        verifyNoInteractions(service, facade);
+    }
+
+    @Test
     void testReturnsNoOptionsWhenPropertyHasNoDataSource() throws Exception {
         TriggerDefinitionService service = mock(TriggerDefinitionService.class);
 
@@ -88,7 +108,8 @@ class LookupTriggerPropertyOptionsToolCallbackTest {
         when(service.propertyHasOptionsDataSource("slack", 1, "newMessage", "text")).thenReturn(false);
 
         LookupTriggerPropertyOptionsToolCallback callback = new LookupTriggerPropertyOptionsToolCallback(
-            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"triggerName\":\"newMessage\",\"propertyName\":\"text\"}", toolContext());
@@ -109,7 +130,8 @@ class LookupTriggerPropertyOptionsToolCallbackTest {
             .thenReturn(List.of("spreadsheetId"));
 
         LookupTriggerPropertyOptionsToolCallback callback = new LookupTriggerPropertyOptionsToolCallback(
-            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"googleSheets\",\"triggerName\":\"newRow\",\"propertyName\":\"sheetName\"}",
@@ -134,7 +156,8 @@ class LookupTriggerPropertyOptionsToolCallbackTest {
         when(service.triggerDefinesConnection("slack", 1, "newMessage")).thenReturn(true);
 
         LookupTriggerPropertyOptionsToolCallback callback = new LookupTriggerPropertyOptionsToolCallback(
-            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"triggerName\":\"newMessage\",\"propertyName\":\"channel\"}",
@@ -172,7 +195,7 @@ class LookupTriggerPropertyOptionsToolCallbackTest {
                 .thenReturn(options);
 
         LookupTriggerPropertyOptionsToolCallback callback = new LookupTriggerPropertyOptionsToolCallback(
-            service, facade, resolver, mock(ToolStateVisibilityMetrics.class));
+            service, facade, resolver, mock(ToolStateVisibilityMetrics.class), mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"triggerName\":\"newMessage\",\"propertyName\":\"channel\","
@@ -199,7 +222,8 @@ class LookupTriggerPropertyOptionsToolCallbackTest {
         when(service.getTriggerDefinitions("slack", 1)).thenReturn(List.of(real));
 
         LookupTriggerPropertyOptionsToolCallback callback = new LookupTriggerPropertyOptionsToolCallback(
-            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"triggerName\":\"onMessage\",\"propertyName\":\"channel\"}",
@@ -221,7 +245,8 @@ class LookupTriggerPropertyOptionsToolCallbackTest {
         stubValidTrigger(service, "slack", 1, "newMessage", "channel", "text");
 
         LookupTriggerPropertyOptionsToolCallback callback = new LookupTriggerPropertyOptionsToolCallback(
-            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            service, mock(TriggerDefinitionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class),
+            mock(ScopedConnectionGuard.class));
 
         String result = callback.call(
             "{\"componentName\":\"slack\",\"triggerName\":\"newMessage\",\"propertyName\":\"channelId\"}",

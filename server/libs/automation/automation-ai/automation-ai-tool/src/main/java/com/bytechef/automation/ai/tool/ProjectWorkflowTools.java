@@ -24,7 +24,6 @@ import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
@@ -76,26 +75,21 @@ public class ProjectWorkflowTools {
     private static final String PERSISTED_WORKFLOW_CAPTURE_KEY = "bytechef.workflowEditor.persistedWorkflows";
     private static final String DEFAULT_WORKFLOW_NAME = "Workflow";
 
-    private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final ScopedProjectGuard scopedProjectGuard;
     private final ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowTools(
-        ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
-        ProjectWorkflowService projectWorkflowService, ScopedProjectGuard scopedProjectGuard,
-        ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
+        ScopedProjectGuard scopedProjectGuard,
+        ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider) {
 
-        this.projectService = projectService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.scopedProjectGuard = scopedProjectGuard;
         this.workflowTestConfigurationFacadeProvider = workflowTestConfigurationFacadeProvider;
-        this.workspaceScopeResolver = workspaceScopeResolver;
     }
 
     @Tool(
@@ -170,29 +164,17 @@ public class ProjectWorkflowTools {
         @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
-
-        if (scopedProjectId != null && projectId != null) {
-            scopedProjectGuard.checkProject(projectId, toolContext, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
-        }
-
-        long resolvedWorkspaceId = scopedProjectId == null
-            ? ProjectWorkspaceScope.resolveWorkspaceId(
-                workspaceScopeResolver, workspaceId, toolContext, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS)
-            : 0L;
+        Set<Long> accessibleProjectIds = scopedProjectGuard.getAccessibleProjectIds(
+            workspaceId, toolContext, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
 
         try {
-            Set<Long> accessibleProjectIds = scopedProjectId == null
-                ? Set.copyOf(projectService.getWorkspaceProjectIds(resolvedWorkspaceId))
-                : Set.of(scopedProjectId);
-
             List<ProjectWorkflowDTO> allWorkflows;
 
             if (projectId != null) {
                 if (!accessibleProjectIds.contains(projectId)) {
                     throw new ExecutionException(
-                        "Project " + projectId + " is not in workspace " + resolvedWorkspaceId + ", so it was not "
-                            + "searched. This is not a statement that the project has no workflows.",
+                        "Project " + projectId + " is not accessible to this conversation, so it was not searched. "
+                            + "This is not a statement that the project has no workflows.",
                         ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
                 }
 
@@ -371,6 +353,9 @@ public class ProjectWorkflowTools {
         checkWorkspaceWorkflow(
             workflowId, workspaceId, toolContext, ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION);
 
+        scopedProjectGuard.checkConnection(connectionId, toolContext,
+            ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION);
+
         try {
             WorkflowTestConfigurationFacade workflowTestConfigurationFacade =
                 workflowTestConfigurationFacadeProvider.getIfAvailable();
@@ -427,34 +412,14 @@ public class ProjectWorkflowTools {
         long projectId, @Nullable Long workspaceId, @Nullable ToolContext toolContext,
         ProjectWorkflowToolErrorType projectWorkflowToolErrorType) {
 
-        if (scopedProjectGuard.fetchScopedProjectId(toolContext) != null) {
-            scopedProjectGuard.checkProject(projectId, toolContext, projectWorkflowToolErrorType);
-
-            return;
-        }
-
-        ProjectWorkspaceScope.getWorkspaceProject(
-            projectService, projectId,
-            ProjectWorkspaceScope.resolveWorkspaceId(
-                workspaceScopeResolver, workspaceId, toolContext, projectWorkflowToolErrorType),
-            projectWorkflowToolErrorType);
+        scopedProjectGuard.getProject(projectId, workspaceId, toolContext, projectWorkflowToolErrorType);
     }
 
     private void checkWorkspaceWorkflow(
         String workflowId, @Nullable Long workspaceId, @Nullable ToolContext toolContext,
         ProjectWorkflowToolErrorType projectWorkflowToolErrorType) {
 
-        if (scopedProjectGuard.fetchScopedProjectId(toolContext) != null) {
-            scopedProjectGuard.checkWorkflow(workflowId, toolContext, projectWorkflowToolErrorType);
-
-            return;
-        }
-
-        ProjectWorkspaceScope.checkWorkspaceWorkflow(
-            projectService, projectWorkflowService, workflowId,
-            ProjectWorkspaceScope.resolveWorkspaceId(
-                workspaceScopeResolver, workspaceId, toolContext, projectWorkflowToolErrorType),
-            projectWorkflowToolErrorType);
+        scopedProjectGuard.checkWorkflow(workflowId, workspaceId, toolContext, projectWorkflowToolErrorType);
     }
 
     private static @Nullable Long resolveEnvironmentId(@Nullable ToolContext toolContext) {
