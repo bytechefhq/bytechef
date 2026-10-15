@@ -1,0 +1,222 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.configuration.facade;
+
+import com.bytechef.workflow.definition.CompositeTaskDefinition;
+import com.bytechef.workflow.definition.ConnectionRequirement;
+import com.bytechef.workflow.definition.Input;
+import com.bytechef.workflow.definition.Output;
+import com.bytechef.workflow.definition.TaskDefinition;
+import com.bytechef.workflow.definition.TriggerDefinition;
+import com.bytechef.workflow.definition.WorkflowDefinition;
+import com.bytechef.workflow.definition.WorkflowTaskDefinition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalInt;
+
+/**
+ * Adds the integration's own connection to every code task of an integration code workflow that does not declare one,
+ * so a task can call the integration's component without declaring the connection and without naming it.
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+final class IntegrationImplicitConnections {
+
+    private IntegrationImplicitConnections() {
+    }
+
+    static List<WorkflowDefinition> addTo(List<WorkflowDefinition> workflowDefinitions, String componentName) {
+        return workflowDefinitions.stream()
+            .map(workflowDefinition -> (WorkflowDefinition) new ImplicitConnectionWorkflowDefinition(
+                workflowDefinition, componentName))
+            .toList();
+    }
+
+    private static WorkflowTaskDefinition toWorkflowTaskDefinition(
+        WorkflowTaskDefinition workflowTaskDefinition, String componentName) {
+
+        if (workflowTaskDefinition instanceof CompositeTaskDefinition compositeTaskDefinition) {
+            return new ImplicitConnectionCompositeTaskDefinition(compositeTaskDefinition, componentName);
+        }
+
+        if (workflowTaskDefinition instanceof TaskDefinition taskDefinition) {
+            return toTaskDefinition(taskDefinition, componentName);
+        }
+
+        return workflowTaskDefinition;
+    }
+
+    private static boolean isOwnConnection(ConnectionRequirement connectionRequirement, String componentName) {
+        return Objects.equals(connectionRequirement.getComponentName(), componentName) ||
+            Objects.equals(connectionRequirement.getName(), componentName);
+    }
+
+    private static TaskDefinition toTaskDefinition(TaskDefinition taskDefinition, String componentName) {
+        List<? extends ConnectionRequirement> declaredConnectionRequirements = taskDefinition.getConnections()
+            .orElseGet(List::of);
+
+        boolean declaresOwnConnection = declaredConnectionRequirements.stream()
+            .anyMatch(connectionRequirement -> isOwnConnection(connectionRequirement, componentName));
+
+        if (declaresOwnConnection) {
+            return taskDefinition;
+        }
+
+        List<ConnectionRequirement> connectionRequirements = new ArrayList<>(declaredConnectionRequirements);
+
+        connectionRequirements.add(new ImplicitConnectionRequirement(componentName));
+
+        return new ImplicitConnectionTaskDefinition(taskDefinition, List.copyOf(connectionRequirements));
+    }
+
+    private static List<TaskDefinition> toTaskDefinitions(
+        List<? extends TaskDefinition> taskDefinitions, String componentName) {
+
+        return taskDefinitions.stream()
+            .map(taskDefinition -> toTaskDefinition(taskDefinition, componentName))
+            .toList();
+    }
+
+    private record ImplicitConnectionRequirement(String componentName) implements ConnectionRequirement {
+
+        @Override
+        public String getComponentName() {
+            return componentName;
+        }
+
+        @Override
+        public OptionalInt getComponentVersion() {
+            return OptionalInt.empty();
+        }
+
+        @Override
+        public String getName() {
+            return componentName;
+        }
+    }
+
+    @SuppressFBWarnings("EI")
+    private record ImplicitConnectionTaskDefinition(
+        TaskDefinition taskDefinition, List<ConnectionRequirement> connectionRequirements) implements TaskDefinition {
+
+        @Override
+        public Optional<List<? extends ConnectionRequirement>> getConnections() {
+            return Optional.of(connectionRequirements);
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return taskDefinition.getDescription();
+        }
+
+        @Override
+        public Optional<String> getLabel() {
+            return taskDefinition.getLabel();
+        }
+
+        @Override
+        public String getName() {
+            return taskDefinition.getName();
+        }
+
+        @Override
+        public Optional<Map<String, ?>> getParameters() {
+            return taskDefinition.getParameters();
+        }
+
+        @Override
+        public PerformFunction getPerform() {
+            return taskDefinition.getPerform();
+        }
+    }
+
+    private record ImplicitConnectionCompositeTaskDefinition(
+        CompositeTaskDefinition compositeTaskDefinition, String componentName) implements CompositeTaskDefinition {
+
+        @Override
+        public List<? extends List<? extends TaskDefinition>> getBranches() {
+            return compositeTaskDefinition.getBranches()
+                .stream()
+                .map(branch -> toTaskDefinitions(branch, componentName))
+                .toList();
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return compositeTaskDefinition.getDescription();
+        }
+
+        @Override
+        public Optional<String> getLabel() {
+            return compositeTaskDefinition.getLabel();
+        }
+
+        @Override
+        public String getName() {
+            return compositeTaskDefinition.getName();
+        }
+
+        @Override
+        public List<? extends TaskDefinition> getTasks() {
+            return toTaskDefinitions(compositeTaskDefinition.getTasks(), componentName);
+        }
+
+        @Override
+        public Type getType() {
+            return compositeTaskDefinition.getType();
+        }
+    }
+
+    private record ImplicitConnectionWorkflowDefinition(
+        WorkflowDefinition workflowDefinition, String componentName) implements WorkflowDefinition {
+
+        @Override
+        public Optional<String> getDescription() {
+            return workflowDefinition.getDescription();
+        }
+
+        @Override
+        public Optional<List<? extends Input>> getInputs() {
+            return workflowDefinition.getInputs();
+        }
+
+        @Override
+        public Optional<String> getLabel() {
+            return workflowDefinition.getLabel();
+        }
+
+        @Override
+        public String getName() {
+            return workflowDefinition.getName();
+        }
+
+        @Override
+        public Optional<List<? extends Output>> getOutputs() {
+            return workflowDefinition.getOutputs();
+        }
+
+        @Override
+        public Optional<List<? extends WorkflowTaskDefinition>> getTasks() {
+            return workflowDefinition.getTasks()
+                .map(workflowTaskDefinitions -> workflowTaskDefinitions.stream()
+                    .map(workflowTaskDefinition -> toWorkflowTaskDefinition(workflowTaskDefinition, componentName))
+                    .toList());
+        }
+
+        @Override
+        public Optional<List<? extends TriggerDefinition>> getTriggers() {
+            return workflowDefinition.getTriggers();
+        }
+    }
+}
