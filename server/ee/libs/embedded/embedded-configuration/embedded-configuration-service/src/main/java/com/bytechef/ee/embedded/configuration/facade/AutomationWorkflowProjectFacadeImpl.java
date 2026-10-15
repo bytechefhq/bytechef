@@ -20,6 +20,8 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProject;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCategoryDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
@@ -28,6 +30,8 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateD
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectPublishedEvent;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -41,6 +45,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,6 +89,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
     private final ConnectedUserService connectedUserService;
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+    private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
+    private final IntegrationService integrationService;
     private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
@@ -100,7 +107,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         AutomationWorkflowProjectService automationWorkflowProjectService, CategoryService categoryService,
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
-        ProjectService projectService,
+        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        IntegrationService integrationService, ProjectService projectService,
         ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
@@ -112,6 +120,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
         this.connectedUserService = connectedUserService;
         this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
+        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
+        this.integrationService = integrationService;
         this.projectService = projectService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
@@ -322,9 +332,11 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
+        Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment);
+
         return getPublishedProjects().stream()
             .filter(project -> embeddedPermissionEvaluator.evaluate(project.permissionExpression(), connectedUser))
-            .map(project -> filterWorkflowTemplates(project, connectedUser))
+            .map(project -> filterWorkflowTemplates(project, connectedUser, integrationIdsByComponentName))
             .toList();
     }
 
@@ -442,12 +454,36 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .toList();
     }
 
+    private Map<String, Long> getIntegrationIdsByComponentName(Environment environment) {
+        List<Long> integrationIds = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfigurations(environment, true)
+            .stream()
+            .map(IntegrationInstanceConfiguration::getIntegrationId)
+            .distinct()
+            .toList();
+
+        if (integrationIds.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, Long> integrationIdsByComponentName = new HashMap<>();
+
+        for (Integration integration : integrationService.getIntegrations(integrationIds)) {
+            integrationIdsByComponentName.merge(integration.getComponentName(), integration.getId(), Math::min);
+        }
+
+        return integrationIdsByComponentName;
+    }
+
     private AutomationWorkflowProjectDTO filterWorkflowTemplates(
-        AutomationWorkflowProjectDTO project, ConnectedUser connectedUser) {
+        AutomationWorkflowProjectDTO project, ConnectedUser connectedUser,
+        Map<String, Long> integrationIdsByComponentName) {
+
         List<ConnectedUserWorkflowTemplateDTO> visibleTemplates = project.workflowTemplates()
             .stream()
             .filter(template -> embeddedPermissionEvaluator.evaluate(
                 template.permissionExpression(), connectedUser))
+            .map(template -> template.withIntegrationIds(integrationIdsByComponentName))
             .toList();
 
         return new AutomationWorkflowProjectDTO(
