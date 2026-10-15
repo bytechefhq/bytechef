@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   MAX_DESCRIPTION_LENGTH,
+  MAX_TITLE_LENGTH,
   MIN_DESCRIPTION_LENGTH,
   fitDescription,
   getDescriptionFillers,
@@ -69,7 +70,30 @@ describe('getSeoTitle length', () => {
         title: "Get all connected user's connections",
         versionCount: 1,
       }),
-    ).toContain('Get All Frontend Connections');
+    ).toBe("Get all connected user's… - Get All Frontend Connections, Frontend");
+  });
+
+  it('uses the page slug label alone when it leaves too little room for the title', () => {
+    const result = getSeoTitle({
+      distinguishingSlugs: ['enableConnectedUserProjectWorkflowForIntegrationInstance'],
+      slugs: ['openapi', 'backend', 'embedded-workflow', 'enableConnectedUserProjectWorkflowForIntegrationInstance'],
+      title: 'Enable a workflow',
+      versionCount: 1,
+    });
+
+    expect(result).toBe('Enable Connected User Project Workflow For Integration Instance');
+  });
+
+  it('stays within the limit when the page slug label alone is too long', () => {
+    const result = getSeoTitle({
+      distinguishingSlugs: ['getAllEmbeddedConfigurationIntegrationInstanceWorkflowsForConnectedUserAndEnvironment'],
+      slugs: ['openapi', 'backend', 'embedded-workflow', 'getAllEmbeddedConfigurationIntegrationInstanceWorkflowsForConnectedUserAndEnvironment'],
+      title: 'Get workflows',
+      versionCount: 1,
+    });
+
+    expect(result.length).toBeLessThanOrEqual(MAX_TITLE_LENGTH);
+    expect(result.endsWith('…')).toBe(true);
   });
 
   it('cuts a title that is too long on its own at a word boundary', () => {
@@ -135,6 +159,32 @@ describe('fitDescription', () => {
     const description = 'a'.repeat(140);
 
     expect(fitDescription(description, [])).toBe(description);
+  });
+
+  it('keeps a description of exactly the maximum length', () => {
+    const description = 'a'.repeat(MAX_DESCRIPTION_LENGTH);
+
+    expect(fitDescription(description, [])).toBe(description);
+  });
+
+  it('ends the original sentence before adding a filler', () => {
+    const fillers = getDescriptionFillers(['platform', 'aws-ecs'], 'AWS ECS');
+    const result = fitDescription('Learn how to deploy ByteChef on AWS ECS', fillers);
+
+    expect(result).toBe(`Learn how to deploy ByteChef on AWS ECS. ${fillers[0]}`);
+  });
+
+  it('cuts mid-word rather than dropping most of a description with a long unbroken token', () => {
+    const result = fitDescription(`Version 2. ${'z'.repeat(200)}`, []);
+
+    expect(result.length).toBe(MAX_DESCRIPTION_LENGTH);
+    expect(result.endsWith('z…')).toBe(true);
+  });
+
+  it('does not split an emoji when cutting', () => {
+    const result = fitDescription('🚀'.repeat(100), []);
+
+    expect(result).not.toMatch(/[\uD800-\uDBFF]…$/);
   });
 
   it('builds a description for a page without one', () => {
