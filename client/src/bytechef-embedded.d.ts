@@ -1,11 +1,16 @@
 declare module '@bytechef/embedded' {
     interface UseConnectDialogProps {
         baseUrl?: string;
+        connectionOnly?: boolean;
         environment?: string;
         integrationId: string;
         integrationInstanceId?: string;
         jwtToken: string;
+        mode?: 'dark' | 'light';
         onClose?: () => void;
+        onConnected?: (connectionId: number) => void;
+        onReauthorized?: (connectionId: number) => void;
+        reauthorizeConnectionId?: number;
     }
 
     interface ConnectionDialogHookReturnI {

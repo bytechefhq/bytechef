@@ -6,8 +6,12 @@ import {Badge} from '@/components/ui/badge';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {useDeleteHubConnectionMutation} from '@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations';
-import {useGetConnectionsQuery} from '@/ee/pages/embedded/automation-hub/queries/automationHub.queries';
-import HubConnectionDialog from '@/ee/pages/embedded/automation-hub/views/components/HubConnectionDialog';
+import {
+    AutomationHubKeys,
+    useGetConnectionsQuery,
+    useGetIntegrationsQuery,
+} from '@/ee/pages/embedded/automation-hub/queries/automationHub.queries';
+import HubReconnectDialog from '@/ee/pages/embedded/automation-hub/views/components/HubReconnectDialog';
 import {
     Connection,
     ConnectionInUseError,
@@ -15,6 +19,7 @@ import {
     ResponseError,
 } from '@/ee/shared/middleware/embedded/public';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon, RefreshCwIcon, Trash2Icon} from 'lucide-react';
 import {Fragment, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -31,6 +36,9 @@ const ConnectionsView = () => {
 
     const {data: connections, error: connectionsError, isLoading: connectionsLoading} = useGetConnectionsQuery();
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
+    const {data: integrations} = useGetIntegrationsQuery();
+
+    const queryClient = useQueryClient();
 
     const {isPending: deleteConnectionPending, mutate: deleteConnection} = useDeleteHubConnectionMutation();
 
@@ -46,6 +54,20 @@ const ConnectionsView = () => {
 
         return infoByName;
     }, [componentDefinitions]);
+
+    const integrationIdByConnectionId = useMemo(() => {
+        const byConnectionId = new Map<number, number>();
+
+        for (const integration of integrations || []) {
+            for (const integrationInstance of integration.integrationInstances || []) {
+                if (integration.id != null && integrationInstance.connectionId != null) {
+                    byConnectionId.set(integrationInstance.connectionId, integration.id);
+                }
+            }
+        }
+
+        return byConnectionId;
+    }, [integrations]);
 
     const handleDeleteConfirm = () => {
         if (!deletingConnection) {
@@ -176,11 +198,15 @@ const ConnectionsView = () => {
                                                         </DropdownMenuTrigger>
 
                                                         <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem
-                                                                onClick={() => setReconnectingConnection(connection)}
-                                                            >
-                                                                <RefreshCwIcon /> Reconnect
-                                                            </DropdownMenuItem>
+                                                            {integrationIdByConnectionId.has(connection.id) && (
+                                                                <DropdownMenuItem
+                                                                    onClick={() =>
+                                                                        setReconnectingConnection(connection)
+                                                                    }
+                                                                >
+                                                                    <RefreshCwIcon /> Reconnect
+                                                                </DropdownMenuItem>
+                                                            )}
 
                                                             <DropdownMenuItem
                                                                 onClick={() => setDeletingConnection(connection)}
@@ -224,13 +250,13 @@ const ConnectionsView = () => {
                 title="Remove connection?"
             />
 
-            {reconnectingConnection?.componentName && (
-                <HubConnectionDialog
-                    componentName={reconnectingConnection.componentName}
-                    existingConnectionCredentialStatus={reconnectingConnection.credentialStatus}
-                    existingConnectionId={reconnectingConnection.id}
-                    existingConnectionVersion={reconnectingConnection.connectionVersion}
-                    onClose={() => setReconnectingConnection(undefined)}
+            {reconnectingConnection && integrationIdByConnectionId.has(reconnectingConnection.id) && (
+                <HubReconnectDialog
+                    connectionId={reconnectingConnection.id}
+                    integrationId={integrationIdByConnectionId.get(reconnectingConnection.id)!}
+                    key={reconnectingConnection.id}
+                    onDone={() => setReconnectingConnection(undefined)}
+                    onReauthorized={() => void queryClient.invalidateQueries({queryKey: AutomationHubKeys.connections})}
                 />
             )}
         </div>
