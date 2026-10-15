@@ -114,8 +114,6 @@ const ProjectHeader = ({
         <LoadingIndicator isFetching={isSaving} isOnline={isOnline} showLabel />
     );
 
-    const settingsMenuVisible = !codeWorkflow;
-
     if (!project) {
         return <ProjectSkeleton />;
     }
@@ -196,7 +194,7 @@ const ProjectHeader = ({
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                {!embedded && settingsMenuVisible && (
+                {!embedded && (
                     <SettingsMenu
                         bottomResizablePanelRef={bottomResizablePanelRef}
                         project={project}

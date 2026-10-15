@@ -5,6 +5,7 @@ import {EditIcon, HistoryIcon, PlusIcon, Trash2Icon, UploadIcon} from 'lucide-re
 import {ChangeEvent, MouseEvent, useRef} from 'react';
 
 const IntegrationTabButtons = ({
+    codeWorkflow = false,
     onCloseDropdownMenuClick,
     onDeleteIntegrationClick,
     onImportWorkflow,
@@ -12,6 +13,7 @@ const IntegrationTabButtons = ({
     onShowEditIntegrationDialogClick,
     onShowIntegrationVersionHistorySheet,
 }: {
+    codeWorkflow?: boolean;
     onCloseDropdownMenuClick: () => void;
     onDeleteIntegrationClick: () => void;
     onImportWorkflow: (workflowDefinition: string) => void;
@@ -49,29 +51,33 @@ const IntegrationTabButtons = ({
                     variant="ghost"
                 />
 
-                <Separator />
+                {!codeWorkflow && (
+                    <>
+                        <Separator />
 
-                <Button
-                    aria-label="New Workflow"
-                    className="dropdown-menu-item"
-                    icon={<PlusIcon />}
-                    label="New Workflow"
-                    onClick={onNewWorkflowClick}
-                    variant="ghost"
-                />
+                        <Button
+                            aria-label="New Workflow"
+                            className="dropdown-menu-item"
+                            icon={<PlusIcon />}
+                            label="New Workflow"
+                            onClick={onNewWorkflowClick}
+                            variant="ghost"
+                        />
 
-                <Button
-                    aria-label="Import Workflow Button"
-                    className="dropdown-menu-item"
-                    icon={<UploadIcon />}
-                    label="Import Workflow"
-                    onClick={() => {
-                        if (hiddenFileInputRef.current) {
-                            hiddenFileInputRef.current.click();
-                        }
-                    }}
-                    variant="ghost"
-                />
+                        <Button
+                            aria-label="Import Workflow Button"
+                            className="dropdown-menu-item"
+                            icon={<UploadIcon />}
+                            label="Import Workflow"
+                            onClick={() => {
+                                if (hiddenFileInputRef.current) {
+                                    hiddenFileInputRef.current.click();
+                                }
+                            }}
+                            variant="ghost"
+                        />
+                    </>
+                )}
 
                 <Separator />
 

@@ -122,6 +122,27 @@ const SettingsMenu = ({
               }
             : undefined);
 
+    const projectTabButtons = (
+        <ProjectTabButtons
+            codeWorkflow={project.codeWorkflow}
+            importN8nWorkflowDisabled={importN8nWorkflowDisabled}
+            onCloseDropdownMenuClick={() => setOpenDropdownMenu(false)}
+            onDeleteProjectClick={() => setShowDeleteProjectAlertDialog(true)}
+            onDuplicateProjectClick={handleDuplicateProjectClick}
+            onImportN8nWorkflowClick={() => n8nWorkflowFileInputRef.current?.click()}
+            onImportWorkflowClick={() => workflowFileInputRef.current?.click()}
+            onNewWorkflowClick={() => setShowCreateWorkflowDialog(true)}
+            onNewWorkflowFromTemplateClick={() => navigate(`/automation/projects/${project.id}/templates`)}
+            onPullProjectFromGitClick={handlePullProjectFromGitClick}
+            onShareProject={() => setShowProjectShareDialog(true)}
+            onShowEditProjectDialogClick={() => setShowEditProjectDialog(true)}
+            onShowProjectGitConfigurationDialog={() => setShowProjectGitConfigurationDialog(true)}
+            onShowProjectVersionHistorySheet={() => setShowProjectVersionHistorySheet(true)}
+            projectGitConfigurationEnabled={projectGitConfiguration?.enabled ?? false}
+            projectId={project.id!}
+        />
+    );
+
     return (
         <>
             <DropdownMenu onOpenChange={setOpenDropdownMenu} open={openDropdownMenu}>
@@ -150,15 +171,18 @@ const SettingsMenu = ({
                 </Tooltip>
 
                 <DropdownMenuContent align="end" className="p-0">
-                    <Tabs aria-label="Settings menu" defaultValue={resolvedFirstTab?.value ?? 'project'}>
-                        {resolvedFirstTab && (
-                            <TabsList className="rounded-none">
-                                <TabsTrigger
-                                    aria-label={resolvedFirstTab.ariaLabel}
-                                    className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
-                                    value={resolvedFirstTab.value}
-                                >
-                                    {resolvedFirstTab.label}
+                    {project.codeWorkflow ? (
+                        projectTabButtons
+                    ) : (
+                        <Tabs aria-label="Settings menu" defaultValue={resolvedFirstTab?.value ?? 'project'}>
+                            {resolvedFirstTab && (
+                                <TabsList className="rounded-none">
+                                    <TabsTrigger
+                                        aria-label={resolvedFirstTab.ariaLabel}
+                                        className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
+                                        value={resolvedFirstTab.value}
+                                    >
+                                        {resolvedFirstTab.label}
                                 </TabsTrigger>
 
                                 <TabsTrigger
@@ -169,36 +193,19 @@ const SettingsMenu = ({
                                     Project
                                 </TabsTrigger>
                             </TabsList>
-                        )}
+                            )}
 
-                        {resolvedFirstTab && (
-                            <TabsContent className="mt-0" value={resolvedFirstTab.value}>
-                                {resolvedFirstTab.content(() => setOpenDropdownMenu(false))}
+                            {resolvedFirstTab && (
+                                <TabsContent className="mt-0" value={resolvedFirstTab.value}>
+                                    {resolvedFirstTab.content(() => setOpenDropdownMenu(false))}
+                                </TabsContent>
+                            )}
+
+                            <TabsContent className="mt-0" value="project">
+                                {projectTabButtons}
                             </TabsContent>
-                        )}
-
-                        <TabsContent className="mt-0" value="project">
-                            <ProjectTabButtons
-                                importN8nWorkflowDisabled={importN8nWorkflowDisabled}
-                                onCloseDropdownMenuClick={() => setOpenDropdownMenu(false)}
-                                onDeleteProjectClick={() => setShowDeleteProjectAlertDialog(true)}
-                                onDuplicateProjectClick={handleDuplicateProjectClick}
-                                onImportN8nWorkflowClick={() => n8nWorkflowFileInputRef.current?.click()}
-                                onImportWorkflowClick={() => workflowFileInputRef.current?.click()}
-                                onNewWorkflowClick={() => setShowCreateWorkflowDialog(true)}
-                                onNewWorkflowFromTemplateClick={() =>
-                                    navigate(`/automation/projects/${project.id}/templates`)
-                                }
-                                onPullProjectFromGitClick={handlePullProjectFromGitClick}
-                                onShareProject={() => setShowProjectShareDialog(true)}
-                                onShowEditProjectDialogClick={() => setShowEditProjectDialog(true)}
-                                onShowProjectGitConfigurationDialog={() => setShowProjectGitConfigurationDialog(true)}
-                                onShowProjectVersionHistorySheet={() => setShowProjectVersionHistorySheet(true)}
-                                projectGitConfigurationEnabled={projectGitConfiguration?.enabled ?? false}
-                                projectId={project.id!}
-                            />
-                        </TabsContent>
-                    </Tabs>
+                        </Tabs>
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
 
