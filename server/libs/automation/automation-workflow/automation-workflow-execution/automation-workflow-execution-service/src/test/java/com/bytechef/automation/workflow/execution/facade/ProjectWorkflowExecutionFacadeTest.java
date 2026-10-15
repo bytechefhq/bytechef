@@ -19,8 +19,12 @@ package com.bytechef.automation.workflow.execution.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -38,6 +42,8 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -47,6 +53,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -56,8 +63,12 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Page;
 
 /**
  * @author Ivica Cardic
@@ -68,9 +79,13 @@ public class ProjectWorkflowExecutionFacadeTest {
     private Evaluator evaluator;
     private ProjectWorkflowExecutionFacadeImpl facade;
     private JobService jobService;
+    private ProjectDeploymentService projectDeploymentService;
+    private ProjectFacade projectFacade;
+    private ProjectWorkflowService projectWorkflowService;
     private TaskExecution taskExecution;
     private TaskExecutionService taskExecutionService;
     private TaskFileStorage taskFileStorage;
+    private WorkflowExecutionRowService workflowExecutionRowService;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
@@ -80,14 +95,17 @@ public class ProjectWorkflowExecutionFacadeTest {
         contextService = mock(ContextService.class);
         evaluator = mock(Evaluator.class);
         jobService = mock(JobService.class);
+        projectDeploymentService = mock(ProjectDeploymentService.class);
+        projectFacade = mock(ProjectFacade.class);
+        projectWorkflowService = mock(ProjectWorkflowService.class);
         taskExecutionService = mock(TaskExecutionService.class);
         taskFileStorage = mock(TaskFileStorage.class);
+        workflowExecutionRowService = mock(WorkflowExecutionRowService.class);
 
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService, contextService, evaluator, mock(EnvironmentService.class),
-            mock(WorkflowExecutionRowService.class), jobService, mock(PrincipalJobService.class),
-            mock(ProjectFacade.class),
-            mock(ProjectDeploymentService.class), mock(ProjectService.class), mock(ProjectWorkflowService.class),
+            workflowExecutionRowService, jobService, mock(PrincipalJobService.class), projectFacade,
+            projectDeploymentService, mock(ProjectService.class), projectWorkflowService,
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
             mock(TriggerExecutionService.class), mock(TriggerFileStorage.class), mock(WorkflowService.class));
 
@@ -228,5 +246,65 @@ public class ProjectWorkflowExecutionFacadeTest {
             .isEmpty();
 
         verify(taskExecutionService, never()).getJobTaskExecutions(anyLong());
+    }
+
+    @Nested
+    class GetWorkflowExecutionsTest {
+
+        private static final String CATALOG_WORKFLOW_ID = "catalog-workflow";
+        private static final long CATALOG_PROJECT_ID = 7L;
+        private static final long REFERENCE_DEPLOYMENT_ID = 5L;
+        private static final long WORKSPACE_ID = 1L;
+
+        @BeforeEach
+        public void beforeEach() {
+            ProjectDeployment referenceProjectDeployment = new ProjectDeployment();
+
+            referenceProjectDeployment.setId(REFERENCE_DEPLOYMENT_ID);
+            referenceProjectDeployment.setName("__EMBEDDED__ext__DEVELOPMENT");
+            referenceProjectDeployment.setProjectId(CATALOG_PROJECT_ID);
+            referenceProjectDeployment.setProjectVersion(1);
+
+            lenient()
+                .when(projectFacade.getWorkspaceProjectWorkflows(WORKSPACE_ID))
+                .thenReturn(List.of());
+            lenient()
+                .when(projectDeploymentService.getProjectDeployments(true, null, null, null, WORKSPACE_ID))
+                .thenReturn(List.of(referenceProjectDeployment));
+            lenient()
+                .when(projectDeploymentService.getProjectDeployments(true, null, null, null, null))
+                .thenReturn(List.of(referenceProjectDeployment));
+            lenient()
+                .when(projectWorkflowService.getProjectWorkflows(List.of(CATALOG_PROJECT_ID)))
+                .thenReturn(
+                    List.of(new ProjectWorkflow(CATALOG_PROJECT_ID, 1, CATALOG_WORKFLOW_ID, UUID.randomUUID())));
+            lenient()
+                .when(workflowExecutionRowService.getWorkflowExecutionRows(
+                    any(), any(), any(), anyList(), any(), anyList(), anyBoolean(), anyList(), anyInt()))
+                .thenReturn(Page.empty());
+        }
+
+        @Test
+        @SuppressWarnings("unchecked")
+        public void testEmbeddedIncludesWorkflowsOfEmbeddedDeploymentProjects() {
+            facade.getWorkflowExecutions(true, null, null, null, null, null, null, null, null, WORKSPACE_ID, 0);
+
+            ArgumentCaptor<List<String>> workflowIdsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+
+            verify(workflowExecutionRowService).getWorkflowExecutionRows(
+                any(), any(), any(), eq(List.of(REFERENCE_DEPLOYMENT_ID)), eq(PlatformType.AUTOMATION),
+                workflowIdsArgumentCaptor.capture(), anyBoolean(), anyList(), anyInt());
+
+            assertThat(workflowIdsArgumentCaptor.getValue()).containsExactly(CATALOG_WORKFLOW_ID);
+        }
+
+        @Test
+        public void testNotEmbeddedDoesNotLookUpEmbeddedDeploymentProjects() {
+            facade.getWorkflowExecutions(false, null, null, null, null, null, null, null, null, WORKSPACE_ID, 0);
+
+            verify(projectDeploymentService, never()).getProjectDeployments(
+                eq(true), any(), any(), any(), any());
+            verifyNoInteractions(workflowExecutionRowService);
+        }
     }
 }
