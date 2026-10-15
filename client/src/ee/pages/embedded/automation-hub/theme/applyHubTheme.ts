@@ -27,6 +27,12 @@ const HOVER_VARIABLES: Record<string, string> = {
     enableColor: '--hub-enable-hover',
 };
 
+const DIALOG_VARIABLES: Record<string, string[]> = {
+    activeBorderColor: ['--bytechef-dialog-border'],
+    cardColor: ['--bytechef-dialog-surface', '--bytechef-dialog-surface-raised'],
+    surfaceColor: ['--bytechef-dialog-hover'],
+};
+
 function toRgb(color: string): [number, number, number] | undefined {
     if (HEX_COLOR.test(color)) {
         const full = color.length === 4 ? `#${Array.from(color.slice(1), (char) => char + char).join('')}` : color;
@@ -112,6 +118,9 @@ const BRAND_VARIABLES = [
 ];
 
 function applyBrandColor(primaryColor: string, root: HTMLElement) {
+    root.style.setProperty('--bytechef-dialog-primary', primaryColor);
+    root.style.setProperty('--bytechef-dialog-primary-hover', primaryColor);
+
     const brandTriplet = toHslTriplet(primaryColor);
     const foregroundTriplet = contrastForeground(primaryColor);
 
@@ -128,6 +137,10 @@ function applyBrandColor(primaryColor: string, root: HTMLElement) {
 
 function applySurfaceColor(themeKey: string, variable: string, value: string, root: HTMLElement) {
     root.style.setProperty(variable, value);
+
+    for (const dialogVariable of DIALOG_VARIABLES[themeKey] ?? []) {
+        root.style.setProperty(dialogVariable, value);
+    }
 
     const triplet = toHslTriplet(value);
 
