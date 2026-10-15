@@ -19,7 +19,6 @@ package com.bytechef.platform.notification.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.facade.NotificationFacade;
-import com.bytechef.platform.notification.service.NotificationService;
 import com.bytechef.platform.notification.web.rest.model.NotificationModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -38,16 +37,11 @@ public class NotificationApiController implements NotificationApi {
 
     private final ConversionService conversionService;
     private final NotificationFacade notificationFacade;
-    private final NotificationService notificationService;
 
     @SuppressFBWarnings("EI")
-    public NotificationApiController(
-        ConversionService conversionService, NotificationFacade notificationFacade,
-        NotificationService notificationService) {
-
+    public NotificationApiController(ConversionService conversionService, NotificationFacade notificationFacade) {
         this.conversionService = conversionService;
         this.notificationFacade = notificationFacade;
-        this.notificationService = notificationService;
     }
 
     @Override
@@ -60,7 +54,7 @@ public class NotificationApiController implements NotificationApi {
 
     @Override
     public ResponseEntity<Void> deleteNotification(Long notificationId) {
-        notificationService.delete(notificationId);
+        notificationFacade.deleteNotification(notificationId);
 
         return ResponseEntity.noContent()
             .build();

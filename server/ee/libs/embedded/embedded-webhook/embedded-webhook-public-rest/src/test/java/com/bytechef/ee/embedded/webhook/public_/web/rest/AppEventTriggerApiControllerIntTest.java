@@ -39,6 +39,7 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.config.EmbeddedWebhookPublicRestSharedMocks;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.config.EmbeddedWebhookPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.webhook.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
@@ -61,7 +62,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -130,7 +130,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testEnabledReferenceWithAppEventTriggerIsIncludedInFanOut() {
         stubConnectedUser("user-1", 1L);
 
@@ -159,7 +159,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void
         testAutomationBridgeUnsupportedOperationExceptionSkipsTheBridgeSourceWithoutAffectingIntegrationFanOut() {
         stubConnectedUser("user-1", 1L);
@@ -187,7 +187,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testDanglingReferenceIsSkipped() {
         stubConnectedUser("user-1", 1L);
 
@@ -200,7 +200,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testDisabledReferenceIsSkipped() {
         stubConnectedUser("user-1", 1L);
 
@@ -213,7 +213,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testReferenceWithoutAppEventTriggerIsSkipped() {
         stubConnectedUser("user-1", 1L);
 
@@ -234,7 +234,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testFirstReferenceFailureDoesNotStopFanOutToRemainingReferences() {
         stubConnectedUser("user-1", 1L);
 
@@ -265,7 +265,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "login-a")
+    @WithMockConnectedUser(externalUserId = "login-a")
     void testCrossUserResolutionUsesOnlyTheCallersConnectedUserId() {
         stubConnectedUser("login-a", 10L);
 
@@ -286,7 +286,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testExistingIntegrationFanOutIsUnaffectedByAutomationBridgeReferences() {
         stubConnectedUser("user-1", 1L);
 
@@ -324,7 +324,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testCopyModeWorkflowWithAppEventTriggerFires() {
         stubConnectedUser("user-1", 1L);
 
@@ -361,7 +361,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testMixedCopyAndReferenceWorkflowsBothFire() {
         stubConnectedUser("user-1", 1L);
 
@@ -410,7 +410,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testJsonBodyIsDeliveredToEveryMatchingWorkflow() {
         stubConnectedUser("user-1", 1L);
         stubIntegrationWorkflows(5L, "int-wf-1", "int-wf-2");
@@ -439,7 +439,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testFailedBridgeDispatchIsReportedInsteadOfSucceeding() {
         stubConnectedUser("user-1", 1L);
 
@@ -475,7 +475,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "ext-1")
+    @WithMockConnectedUser(externalUserId = "ext-1")
     void testExecuteWorkflowsForAnExternalUserIdFansOutForThatConnectedUser() {
         stubConnectedUser("ext-1", 1L);
 
@@ -493,7 +493,7 @@ class AppEventTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "ext-1")
+    @WithMockConnectedUser(externalUserId = "ext-1")
     void testExecuteWorkflowsRefusesAnExternalUserIdOtherThanTheAuthenticatedOne() {
         Throwable throwable = catchThrowable(() -> mockMvc.perform(post(EXTERNAL_USER_APP_EVENTS_PATH, "ext-2")));
 

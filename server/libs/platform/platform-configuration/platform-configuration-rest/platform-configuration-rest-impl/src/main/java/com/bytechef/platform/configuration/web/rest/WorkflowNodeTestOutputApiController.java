@@ -65,7 +65,7 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     public ResponseEntity<Void> deleteWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Long environmentId) {
 
-        workflowNodeTestOutputService.deleteWorkflowNodeTestOutput(workflowId, workflowNodeName, environmentId);
+        workflowNodeTestOutputFacade.deleteWorkflowNodeTestOutput(workflowId, workflowNodeName, environmentId);
 
         return ResponseEntity
             .noContent()

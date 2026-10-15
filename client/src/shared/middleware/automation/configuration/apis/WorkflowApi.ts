@@ -61,6 +61,10 @@ export interface GetWorkflowRequest {
     id: string;
 }
 
+export interface GetWorkspaceWorkflowsRequest {
+    id: number;
+}
+
 export interface UpdateWorkflowRequest {
     id: string;
     workflow: Workflow;
@@ -465,6 +469,53 @@ export class WorkflowApi extends runtime.BaseAPI {
      */
     async getWorkflows(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Workflow>> {
         const response = await this.getWorkflowsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getWorkspaceWorkflows without sending the request
+     */
+    async getWorkspaceWorkflowsRequestOpts(requestParameters: GetWorkspaceWorkflowsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkspaceWorkflows().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/workspaces/{id}/workflows`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get workflows for particular workspace.
+     * Get workflows for particular workspace.
+     */
+    async getWorkspaceWorkflowsRaw(requestParameters: GetWorkspaceWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Workflow>>> {
+        const requestOptions = await this.getWorkspaceWorkflowsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowFromJSON));
+    }
+
+    /**
+     * Get workflows for particular workspace.
+     * Get workflows for particular workspace.
+     */
+    async getWorkspaceWorkflows(requestParameters: GetWorkspaceWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Workflow>> {
+        const response = await this.getWorkspaceWorkflowsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -24,6 +24,7 @@ import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,8 +69,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
     void testGetMcpToolsUsesClusterElementTitleAsLabel() {
         McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "sendEmail");
 
-        List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos =
-            connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME);
+        List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos = getMcpTools();
 
         assertThat(mcpToolInfos).containsExactly(
             new ConnectedUserIntegrationDTO.McpToolInfo(mcpTool.getId(), "sendEmail", "Send Email", "Send an email"));
@@ -79,8 +79,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
     void testGetMcpToolsKeepsNullLabelWhenClusterElementHasNoTitle() {
         McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "getEmail");
 
-        List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos =
-            connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME);
+        List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos = getMcpTools();
 
         assertThat(mcpToolInfos).containsExactly(
             new ConnectedUserIntegrationDTO.McpToolInfo(mcpTool.getId(), "getEmail", null, "Get an email"));
@@ -90,14 +89,19 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
     void testGetMcpToolsSkipsToolsOfDisabledMcpServer() {
         createMcpTool(PlatformType.EMBEDDED, false, "sendEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME)).isEmpty();
+        assertThat(getMcpTools()).isEmpty();
     }
 
     @Test
     void testGetMcpToolsSkipsToolsOfNonEmbeddedMcpServer() {
         createMcpTool(PlatformType.AUTOMATION, true, "sendEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME)).isEmpty();
+        assertThat(getMcpTools()).isEmpty();
+    }
+
+    private List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools() {
+        return connectedUserIntegrationFacade.getMcpTools(
+            COMPONENT_NAME, connectedUserIntegrationFacade.getEnabledEmbeddedMcpServerIds());
     }
 
     @Test
@@ -106,7 +110,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
         createDisabledMcpTool(enabledMcpTool.getMcpComponentId(), "getEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME))
+        assertThat(getMcpTools())
             .extracting(ConnectedUserIntegrationDTO.McpToolInfo::id)
             .containsExactly(enabledMcpTool.getId());
     }
@@ -121,7 +125,10 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
                 new McpIntegrationInstanceTool(1L, enabledMcpTool.getId(), true),
                 new McpIntegrationInstanceTool(1L, disabledMcpTool.getId(), true)));
 
-        assertThat(connectedUserIntegrationFacade.getMcpInstanceTools(1L)).containsExactly(
+        Set<Long> enabledEmbeddedMcpToolIds = connectedUserIntegrationFacade.getEnabledEmbeddedMcpToolIds(
+            connectedUserIntegrationFacade.getEnabledEmbeddedMcpServerIds());
+
+        assertThat(connectedUserIntegrationFacade.getMcpInstanceTools(1L, enabledEmbeddedMcpToolIds)).containsExactly(
             new ConnectedUserIntegrationDTO.McpInstanceToolInfo(enabledMcpTool.getId(), true));
     }
 

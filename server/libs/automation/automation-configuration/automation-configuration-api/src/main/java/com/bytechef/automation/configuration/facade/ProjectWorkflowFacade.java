@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
@@ -35,6 +36,11 @@ public interface ProjectWorkflowFacade {
     void deleteWorkflow(String workflowId);
 
     String duplicateWorkflow(long projectId, String workflowId);
+
+    /**
+     * Returns the workflow behind a project workflow so its definition can be downloaded.
+     */
+    Workflow exportWorkflow(String workflowId);
 
     void exportSharedWorkflow(String workflowId, @Nullable String description);
 

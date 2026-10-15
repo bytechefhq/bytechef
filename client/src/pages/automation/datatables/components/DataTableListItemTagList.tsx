@@ -1,5 +1,7 @@
 import useDataTableListItemTagList from '@/pages/automation/datatables/components/hooks/useDataTableListItemTagList';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {Tag} from '@/shared/middleware/graphql';
 import {useMemo} from 'react';
 
@@ -15,7 +17,10 @@ const convertTagToTagListFormat = (tag: Tag) => ({
 });
 
 const DataTableListItemTagList = ({datatableId, remainingTags, tags}: DataTableListItemTagListProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {updateTagsMutation} = useDataTableListItemTagList({tableId: datatableId});
+    const canEditDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_EDIT');
 
     const convertedTags = useMemo(() => tags.map(convertTagToTagListFormat), [tags]);
 
@@ -30,6 +35,7 @@ const DataTableListItemTagList = ({datatableId, remainingTags, tags}: DataTableL
                 },
             })}
             id={+datatableId}
+            readOnly={!canEditDataTable}
             remainingTags={convertedRemainingTags}
             tags={convertedTags}
             updateTagsMutation={updateTagsMutation}

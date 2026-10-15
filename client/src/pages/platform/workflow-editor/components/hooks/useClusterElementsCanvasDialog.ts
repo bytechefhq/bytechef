@@ -3,6 +3,7 @@ import {useTestingModeStore} from '@/pages/platform/cluster-element-editor/ai-ag
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import useClusterElementsDataStore from '@/pages/platform/cluster-element-editor/stores/useClusterElementsDataStore';
 import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
+import {useWorkflowEditorCopilotAllowed} from '@/pages/platform/workflow-editor/providers/workflowEditorCopilotContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -48,7 +49,9 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
-    const copilotEnabled = ai.copilot.enabled && ff_1570;
+    const copilotAllowed = useWorkflowEditorCopilotAllowed();
+
+    const copilotEnabled = ai.copilot.enabled && ff_1570 && copilotAllowed;
 
     const workflow = useWorkflowDataStore((state) => state.workflow);
 

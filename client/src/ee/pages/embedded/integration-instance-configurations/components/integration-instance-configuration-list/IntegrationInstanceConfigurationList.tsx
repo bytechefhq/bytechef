@@ -1,5 +1,6 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Integration, IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useMcpIntegrationInstanceConfigurationsQuery} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useMemo} from 'react';
@@ -20,7 +21,11 @@ const IntegrationInstanceConfigurationList = ({
     tags: Tag[];
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
-    const {data: mcpIntegrationInstanceConfigurationsData} = useMcpIntegrationInstanceConfigurationsQuery();
+    const isTenantAdmin = useIsTenantAdmin();
+
+    const {data: mcpIntegrationInstanceConfigurationsData} = useMcpIntegrationInstanceConfigurationsQuery(undefined, {
+        enabled: isTenantAdmin,
+    });
 
     const mcpWorkflowIdsByConfigurationId = useMemo(() => {
         const result = new Map<number, Set<string>>();

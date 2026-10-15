@@ -18,11 +18,9 @@ package com.bytechef.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
@@ -48,17 +46,14 @@ public class ProjectGraphQlController {
 
     private final CategoryService categoryService;
     private final ProjectFacade projectFacade;
-    private final ProjectService projectService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ProjectGraphQlController(
-        CategoryService categoryService, ProjectFacade projectFacade, ProjectService projectService,
-        TagService tagService) {
+        CategoryService categoryService, ProjectFacade projectFacade, TagService tagService) {
 
         this.categoryService = categoryService;
         this.projectFacade = projectFacade;
-        this.projectService = projectService;
         this.tagService = tagService;
     }
 
@@ -102,15 +97,12 @@ public class ProjectGraphQlController {
 
     @QueryMapping(name = "project")
     public Project project(@Argument long id) {
-        return projectService.getProject(id);
+        return projectFacade.getProjectEntity(id);
     }
 
     @QueryMapping(name = "projects")
     public List<Project> projects() {
-        return projectService.getProjects()
-            .stream()
-            .filter(project -> !SystemProjects.isSystemProject(project))
-            .toList();
+        return projectFacade.getNonSystemProjects();
     }
 
     @QueryMapping(name = "sharedProject")

@@ -7,6 +7,7 @@ dependencies {
     implementation(libs.io.swagger.parser.v3.swagger.parser)
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":cli:commands:component:init:openapi"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":sdks:backend:java:component-api"))

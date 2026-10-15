@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -109,25 +110,30 @@ class AutomationMethodSecurityExpressionRootIntTest {
             .isInstanceOf(AccessDeniedException.class);
     }
 
+    // Skip-checks mode no longer bypasses the user, tenant-admin and ownership checks: they are evaluated as usual, so
+    // code running with checks skipped still cannot act as another user or as a tenant admin it is not.
     @Test
-    void testIsCurrentUserShortCircuitsUnderSkipChecks() throws Throwable {
-        assertThat(callSkippingChecks(() -> guardedOperations.currentUserOperation(7L))).isEqualTo(GRANTED);
+    void testIsCurrentUserIsEvaluatedUnderSkipChecks() {
+        assertThatThrownBy(() -> callSkippingChecks(() -> guardedOperations.currentUserOperation(7L)))
+            .isInstanceOf(AccessDeniedException.class);
 
-        verifyNoInteractions(permissionService);
+        verify(permissionService).isCurrentUser(7L);
     }
 
     @Test
-    void testIsTenantAdminShortCircuitsUnderSkipChecks() throws Throwable {
-        assertThat(callSkippingChecks(guardedOperations::tenantAdminOperation)).isEqualTo(GRANTED);
+    void testIsTenantAdminIsEvaluatedUnderSkipChecks() {
+        assertThatThrownBy(() -> callSkippingChecks(guardedOperations::tenantAdminOperation))
+            .isInstanceOf(AccessDeniedException.class);
 
-        verifyNoInteractions(permissionService);
+        verify(permissionService).isTenantAdmin();
     }
 
     @Test
-    void testIsResourceOwnerShortCircuitsUnderSkipChecks() throws Throwable {
-        assertThat(callSkippingChecks(() -> guardedOperations.resourceOwnerOperation(9L))).isEqualTo(GRANTED);
+    void testIsResourceOwnerIsEvaluatedUnderSkipChecks() {
+        assertThatThrownBy(() -> callSkippingChecks(() -> guardedOperations.resourceOwnerOperation(9L)))
+            .isInstanceOf(AccessDeniedException.class);
 
-        verifyNoInteractions(permissionService);
+        verify(permissionService).isResourceOwner("ApiKey", 9L);
     }
 
     @Test

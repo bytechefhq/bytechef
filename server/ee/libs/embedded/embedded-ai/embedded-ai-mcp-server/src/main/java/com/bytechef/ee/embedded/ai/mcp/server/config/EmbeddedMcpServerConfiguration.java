@@ -11,6 +11,7 @@ import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -96,6 +97,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -104,6 +106,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.function.RouterFunction;
@@ -118,6 +121,7 @@ import org.springframework.web.servlet.function.ServerResponse;
 @ConditionalOnEEVersion
 public class EmbeddedMcpServerConfiguration {
 
+    private static final String AUTHENTICATION = "authentication";
     private static final String ENVIRONMENT = "environment";
     private static final String EXTERNAL_USER_ID = "externalUserId";
     private static final String SECRET_KEY = "secretKey";
@@ -156,7 +160,9 @@ public class EmbeddedMcpServerConfiguration {
         McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
-        PrincipalJobFacade principalJobFacade, SubflowResolver subflowResolver,
+        PrincipalJobFacade principalJobFacade,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
+        SubflowResolver subflowResolver,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService,
         @Qualifier("syncWorkerExecutor") TaskExecutor syncWorkerExecutor,
@@ -171,7 +177,8 @@ public class EmbeddedMcpServerConfiguration {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, evaluator, jobService, -1, asyncMessageBroker,
             getAdditionalApplicationEventListeners(
-                evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
+                evaluator, coordinatorEventPublisher, jobService, sharedApplicationEventListenerProvider,
+                taskExecutionService, taskFileStorage),
             getTaskCompletionHandlerFactories(
                 contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
             getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
@@ -221,6 +228,8 @@ public class EmbeddedMcpServerConfiguration {
 
                 String tenantId = tenantKey.getTenantId();
 
+                Authentication authentication = (Authentication) mcpTransportContext.get(AUTHENTICATION);
+
                 mcpComponentService.getMcpServerMcpComponents(mcpServer.getId())
                     .stream()
                     .flatMap(
@@ -228,7 +237,7 @@ public class EmbeddedMcpServerConfiguration {
                             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
                     .forEach(mcpTool -> {
                         var callback = embeddedMcpToolFacade.getFunctionToolCallback(
-                            mcpTool, externalUserId, environment, tenantId);
+                            mcpTool, externalUserId, environment, tenantId, authentication);
 
                         if (callback != null) {
                             toolSpecifications.add(McpToolUtils.toAsyncToolSpecification(callback));
@@ -240,7 +249,8 @@ public class EmbeddedMcpServerConfiguration {
                     .stream()
                     .flatMap(mcpIntegrationInstanceConfiguration -> CollectionUtils.stream(
                         embeddedMcpToolFacade.getFunctionToolCallbacks(
-                            mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId)))
+                            mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId,
+                            authentication)))
                     .map(McpToolUtils::toAsyncToolSpecification)
                     .forEach(toolSpecifications::add);
 
@@ -279,8 +289,16 @@ public class EmbeddedMcpServerConfiguration {
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        if (!(securityContext.getAuthentication() instanceof McpAnonymousAuthenticationToken)) {
+        Authentication authentication = securityContext.getAuthentication();
+
+        if (!(authentication instanceof McpAnonymousAuthenticationToken)) {
             context.put(EXTERNAL_USER_ID, SecurityUtils.getCurrentUserLogin());
+        }
+
+        // The tool callbacks run on a pooled worker that does not inherit the request's security context, so they get
+        // the principal from here and act as that connected user rather than as nobody.
+        if (authentication != null) {
+            context.put(AUTHENTICATION, authentication);
         }
 
         return McpTransportContext.create(context);
@@ -298,11 +316,19 @@ public class EmbeddedMcpServerConfiguration {
 
     private static List<ApplicationEventListener> getAdditionalApplicationEventListeners(
         Evaluator evaluator, ApplicationEventPublisher coordinatorEventPublisher, JobService jobService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
-        return List.of(
+        List<ApplicationEventListener> applicationEventListeners = new ArrayList<>();
+
+        applicationEventListeners.add(
             new SubflowJobStatusEventListener(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+
+        sharedApplicationEventListenerProvider.orderedStream()
+            .forEach(applicationEventListeners::add);
+
+        return applicationEventListeners;
     }
 
     private com.bytechef.platform.configuration.domain.Environment getEnvironment(String environment) {

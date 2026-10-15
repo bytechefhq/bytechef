@@ -23,6 +23,7 @@ import {useShallow} from 'zustand/react/shallow';
 import {useStoreWithEqualityFn} from 'zustand/traditional';
 
 import {getNestedClusterElements, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -215,6 +216,8 @@ export default function useLayout({
     // progress) or a failed layout computation — without it either path left
     // the canvas stale until an unrelated dependency changed.
     const [layoutRetryNonce, setLayoutRetryNonce] = useState(0);
+
+    const inheritedReadOnly = useWorkflowEditorReadOnly();
 
     const cancelAnimationRef = useRef<(() => void) | null>(null);
     const layoutRetryStateRef = useRef(createLayoutRetryState());
@@ -876,7 +879,7 @@ export default function useLayout({
                 definition: readOnlyWorkflow
                     ? readOnlyWorkflow.definition
                     : useWorkflowDataStore.getState().workflow.definition,
-                readOnly: !!readOnlyWorkflow,
+                readOnly: !!readOnlyWorkflow || inheritedReadOnly,
             });
 
         const stickyNoteNodes = buildCurrentStickyNoteNodes();

@@ -69,7 +69,13 @@ public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvi
             throw new BadCredentialsException("Admin API key required");
         }
 
-        org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())
+        Long userId = apiKey.getUserId();
+
+        if (userId == null) {
+            throw new BadCredentialsException("API key has no owner");
+        }
+
+        org.springframework.security.core.userdetails.User user = userService.fetchUser(userId)
             .map(curUser -> createSpringSecurityUser(platformApiKeyAuthenticationToken.getSecretKey(), curUser))
             .orElseThrow(() -> new UsernameNotFoundException(
                 "User with token " + platformApiKeyAuthenticationToken.getSecretKey() +

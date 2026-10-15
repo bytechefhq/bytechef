@@ -61,6 +61,7 @@ dependencies {
 
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
@@ -83,4 +84,5 @@ dependencies {
 
     testRuntimeOnly(libs.jjwt.impl)
     testRuntimeOnly(libs.jjwt.jackson)
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

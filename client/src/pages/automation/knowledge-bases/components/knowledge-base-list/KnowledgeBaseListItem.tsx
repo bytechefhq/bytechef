@@ -11,6 +11,8 @@ import EditKnowledgeBaseDialog from '@/pages/automation/knowledge-base/component
 import KnowledgeBaseListItemDeleteDialog from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemDeleteDialog';
 import KnowledgeBaseListItemTagList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemTagList';
 import useKnowledgeBaseListItem from '@/pages/automation/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseListItem';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {KnowledgeBase, Tag} from '@/shared/middleware/graphql';
 import {DatabaseIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
@@ -31,6 +33,13 @@ const KnowledgeBaseListItem = ({knowledgeBase, remainingTags, tags}: KnowledgeBa
         showDeleteDialog,
         showEditDialog,
     } = useKnowledgeBaseListItem({knowledgeBase});
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    // Delete is ADMIN-tier on the server (WorkspaceKnowledgeBaseFacadeImpl.deleteWorkspaceKnowledgeBase), so offering it
+    // to a member without KNOWLEDGE_BASE_DELETE means a confirm dialog that ends in a 403.
+    const canDelete = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_DELETE');
+    const canEditKnowledgeBase = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_EDIT');
 
     return (
         <>
@@ -96,33 +105,39 @@ const KnowledgeBaseListItem = ({knowledgeBase, remainingTags, tags}: KnowledgeBa
                             </Tooltip>
                         </div>
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild onClick={(event) => event.stopPropagation()}>
-                                <Button
-                                    aria-label="More KnowledgeBase Actions"
-                                    icon={<EllipsisVerticalIcon />}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </DropdownMenuTrigger>
+                        {(canEditKnowledgeBase || canDelete) && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild onClick={(event) => event.stopPropagation()}>
+                                    <Button
+                                        aria-label="More KnowledgeBase Actions"
+                                        icon={<EllipsisVerticalIcon />}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={handleEditClick} />
+                                <DropdownMenuContent align="end">
+                                    {canEditKnowledgeBase && (
+                                        <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={handleEditClick} />
+                                    )}
 
-                                <DropdownMenuSeparator />
+                                    {canEditKnowledgeBase && canDelete && <DropdownMenuSeparator />}
 
-                                <DropdownMenuItem
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={(event) => {
-                                        event.stopPropagation();
+                                    {canDelete && (
+                                        <DropdownMenuItem
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
 
-                                        handleShowDeleteDialog();
-                                    }}
-                                    variant="destructive"
-                                />
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                                handleShowDeleteDialog();
+                                            }}
+                                            variant="destructive"
+                                        />
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
                     </div>
                 </div>
             </div>

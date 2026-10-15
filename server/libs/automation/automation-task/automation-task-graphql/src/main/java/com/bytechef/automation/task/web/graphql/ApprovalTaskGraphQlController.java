@@ -20,7 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.domain.ApprovalTask.Priority;
 import com.bytechef.automation.task.domain.ApprovalTask.Status;
-import com.bytechef.automation.task.service.ApprovalTaskService;
+import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -36,43 +36,43 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class ApprovalTaskGraphQlController {
 
-    private final ApprovalTaskService approvalTaskService;
+    private final ApprovalTaskFacade approvalTaskFacade;
 
     @SuppressFBWarnings("EI")
-    public ApprovalTaskGraphQlController(ApprovalTaskService approvalTaskService) {
-        this.approvalTaskService = approvalTaskService;
+    public ApprovalTaskGraphQlController(ApprovalTaskFacade approvalTaskFacade) {
+        this.approvalTaskFacade = approvalTaskFacade;
     }
 
     @MutationMapping
     public ApprovalTask createApprovalTask(@Argument ApprovalTaskInput approvalTask) {
-        return approvalTaskService.create(toApprovalTask(approvalTask));
+        return approvalTaskFacade.createApprovalTask(toApprovalTask(approvalTask));
     }
 
     @MutationMapping
     public boolean deleteApprovalTask(@Argument long id) {
-        approvalTaskService.delete(id);
+        approvalTaskFacade.deleteApprovalTask(id);
 
         return true;
     }
 
     @QueryMapping
     public ApprovalTask approvalTask(@Argument long id) {
-        return approvalTaskService.getApprovalTask(id);
+        return approvalTaskFacade.getApprovalTask(id);
     }
 
     @QueryMapping
     public List<ApprovalTask> approvalTasks(@Argument Integer environmentId) {
-        return approvalTaskService.getApprovalTasks(environmentId);
+        return approvalTaskFacade.getApprovalTasks(environmentId);
     }
 
     @QueryMapping
     public List<ApprovalTask> approvalTasksByIds(@Argument List<Long> ids) {
-        return approvalTaskService.getApprovalTasks(ids);
+        return approvalTaskFacade.getApprovalTasks(ids);
     }
 
     @MutationMapping
     public ApprovalTask updateApprovalTask(@Argument ApprovalTaskInput approvalTask) {
-        return approvalTaskService.update(toApprovalTask(approvalTask));
+        return approvalTaskFacade.updateApprovalTask(toApprovalTask(approvalTask));
     }
 
     private ApprovalTask toApprovalTask(ApprovalTaskInput approvalTaskInput) {

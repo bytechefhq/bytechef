@@ -11,13 +11,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.configuration.security.constant.PermissionScopeType;
+import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
+import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.ApiPlatformPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.ConnectionPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.DataTablePermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.ExecutionPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.KnowledgeBasePermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.WorkspacePermissionScopeProvider;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -91,6 +100,56 @@ class PermissionScopeRegistryTest {
     }
 
     @Test
+    void testBuiltInRolesReadLeastPrivilegedFirstAndCarryInheritedScopes() {
+        // Read downwards, each tier shows what the one above adds — which only works if the scopes a role inherits are
+        // included rather than only its delta. WorkspaceRole declares itself most-privileged-first, so this is not the
+        // enum's own order and cannot be left to it.
+        assertThat(permissionScopeRegistry.getBuiltInRoles())
+            .extracting(BuiltInRoleDTO::name)
+            .containsExactly("VIEWER", "EDITOR", "ADMIN");
+
+        for (BuiltInRoleDTO builtInRole : permissionScopeRegistry.getBuiltInRoles()) {
+            assertThat(builtInRole.scopes())
+                .containsExactlyInAnyOrderElementsOf(
+                    permissionScopeRegistry.getScopeNames(WorkspaceRole.valueOf(builtInRole.name())));
+        }
+    }
+
+    @Test
+    void testScopeGroupsComeFromTheDeclaringEnum() {
+        // A module owns an enum, not a provider — two providers contributing constants of the same enum are one
+        // module, and a module's own second enum would be its own group. Grouping on the provider instead would let
+        // an EE/CE split of the same module render as two headings for one thing.
+        PermissionScopeRegistry registry = new PermissionScopeRegistry(
+            List.<PermissionScopeProvider>of(
+                () -> Set.of(new ScopeDefinition(TestPermissionScope.ALPHA_EDIT, WorkspaceRole.EDITOR)),
+                () -> Set.of(new ScopeDefinition(TestPermissionScope.ALPHA_VIEW, WorkspaceRole.VIEWER)),
+                () -> Set.of(new ScopeDefinition(OtherModulePermissionScope.OTHER_VIEW, WorkspaceRole.VIEWER))));
+
+        // Groups sorted by module and scopes in the enum's declaration order: the catalogue must read identically on
+        // every boot, and the providers hand their scopes over in Set order, which is neither.
+        assertThat(registry.getScopeGroups())
+            .containsExactly(
+                new PermissionScopeGroupDTO("OTHER_MODULE", List.of("OTHER_VIEW")),
+                new PermissionScopeGroupDTO("TEST", List.of("ALPHA_VIEW", "ALPHA_EDIT")));
+    }
+
+    @Test
+    void testScopeGroupsCoverEveryRegisteredScopeExactlyOnce() {
+        List<String> groupedScopeNames = permissionScopeRegistry.getScopeGroups()
+            .stream()
+            .flatMap(scopeGroup -> scopeGroup.scopes()
+                .stream())
+            .toList();
+
+        // A scope missing from the grouped view is a permission no operator can grant through the editor, while a
+        // duplicated one is a checkbox that appears twice under different headings.
+        assertThat(groupedScopeNames).doesNotHaveDuplicates();
+        assertThat(groupedScopeNames)
+            .containsExactlyInAnyOrderElementsOf(permissionScopeRegistry.getAllScopeNames());
+    }
+
+    @Test
     void testConflictingMinimumRoleFailsFast() {
         PermissionScopeProvider first =
             () -> Set.of(new ScopeDefinition(TestPermissionScope.X_SCOPE, WorkspaceRole.VIEWER));
@@ -122,8 +181,16 @@ class PermissionScopeRegistryTest {
     @Nested
     class ShippedCatalog {
 
-        private static final Pattern HAS_PERMISSION_PATTERN = Pattern.compile(
-            "hasPermission\\([^)]*,\\s*'[A-Za-z]+'\\s*,\\s*'([A-Z][A-Z0-9_]{2,})'\\s*\\)");
+        private static final Pattern BLOCK_COMMENT_PATTERN = Pattern.compile("/\\*[\\s\\S]*?\\*/");
+
+        private static final Pattern GATE_ANNOTATION_PATTERN = Pattern.compile(
+            "@(?:PreAuthorize|PostAuthorize|PostFilter)\\(");
+
+        private static final Pattern LINE_COMMENT_PATTERN = Pattern.compile("(?m)^\\s*//.*$");
+
+        // A scope is upper snake case, which is what separates it from the resource token beside it ('Project',
+        // 'Connection'), so every such literal inside a gate is a scope whichever function names it.
+        private static final Pattern GATE_SCOPE_LITERAL_PATTERN = Pattern.compile("'([A-Z][A-Z0-9_]{2,})'");
 
         private static final Pattern PROGRAMMATIC_SCOPE_CHECK_PATTERN = Pattern.compile(
             "\\.(?:hasWorkspaceScope|hasWorkspaceScopeForProject|hasResourceScope)\\(([^)]*)\\)");
@@ -132,8 +199,12 @@ class PermissionScopeRegistryTest {
 
         private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
             List.<PermissionScopeProvider>of(
-                new DeploymentPermissionScopeProvider(), new McpPermissionScopeProvider(),
-                new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider()));
+                new ApiKeyPermissionScopeProvider(), new ApiPlatformPermissionScopeProvider(),
+                new ConnectionPermissionScopeProvider(), new DataTablePermissionScopeProvider(),
+                new DeploymentPermissionScopeProvider(), new ExecutionPermissionScopeProvider(),
+                new KnowledgeBasePermissionScopeProvider(), new McpPermissionScopeProvider(),
+                new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider(),
+                new WorkspacePermissionScopeProvider()));
 
         @Test
         void testEveryScopeNamedByAGateIsRegistered() {
@@ -190,12 +261,22 @@ class PermissionScopeRegistryTest {
                     .toList();
 
                 for (Path javaPath : javaPaths) {
-                    String source = Files.readString(javaPath);
+                    String source = stripComments(Files.readString(javaPath));
 
-                    Matcher hasPermissionMatcher = HAS_PERMISSION_PATTERN.matcher(source);
+                    Matcher gateAnnotationMatcher = GATE_ANNOTATION_PATTERN.matcher(source);
 
-                    while (hasPermissionMatcher.find()) {
-                        scopeNames.add(hasPermissionMatcher.group(1));
+                    while (gateAnnotationMatcher.find()) {
+                        Matcher gateScopeLiteralMatcher = GATE_SCOPE_LITERAL_PATTERN.matcher(
+                            readAnnotationArguments(source, gateAnnotationMatcher.end()));
+
+                        while (gateScopeLiteralMatcher.find()) {
+                            String literal = gateScopeLiteralMatcher.group(1);
+
+                            // An authority such as hasAuthority('ROLE_ADMIN') shares the shape but is not a scope.
+                            if (!literal.startsWith("ROLE_")) {
+                                scopeNames.add(literal);
+                            }
+                        }
                     }
 
                     Matcher programmaticScopeCheckMatcher = PROGRAMMATIC_SCOPE_CHECK_PATTERN.matcher(source);
@@ -216,6 +297,33 @@ class PermissionScopeRegistryTest {
             return scopeNames;
         }
 
+        private static String readAnnotationArguments(String source, int startIndex) {
+            int depth = 1;
+            int index = startIndex;
+
+            while (index < source.length() && depth > 0) {
+                char character = source.charAt(index);
+
+                if (character == '(') {
+                    depth++;
+                } else if (character == ')') {
+                    depth--;
+                }
+
+                index++;
+            }
+
+            return source.substring(startIndex, index);
+        }
+
+        private static String stripComments(String source) {
+            String withoutBlockComments = BLOCK_COMMENT_PATTERN.matcher(source)
+                .replaceAll("");
+
+            return LINE_COMMENT_PATTERN.matcher(withoutBlockComments)
+                .replaceAll("");
+        }
+
         private static Path findRepositoryRootPath() {
             Path path = Path.of("")
                 .toAbsolutePath();
@@ -230,5 +338,11 @@ class PermissionScopeRegistryTest {
 
             return path;
         }
+    }
+
+    // A second enum, so the grouping is pinned to the declaring enum rather than to the provider that hands it over.
+    private enum OtherModulePermissionScope implements PermissionScopeType {
+
+        OTHER_VIEW
     }
 }

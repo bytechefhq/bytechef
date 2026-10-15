@@ -25,6 +25,10 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -51,10 +55,49 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin() or " +
+        "hasPermission(@approvalTaskJobResolver.getJobId(#approvalTask.jobResumeId), 'Job', 'DEPLOYMENT_EDIT')")
     public ApprovalTask createApprovalTask(ApprovalTask approvalTask) {
-        approvalTask.setEnvironment(getEnvironment(approvalTask.getJobResumeId()));
+        if (approvalTask.getJobResumeId() != null) {
+            approvalTask.setEnvironment(getEnvironment(approvalTask.getJobResumeId()));
+        }
 
         return approvalTaskService.create(approvalTask);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'ApprovalTask', 'DEPLOYMENT_EDIT')")
+    public void deleteApprovalTask(long id) {
+        approvalTaskService.delete(id);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'ApprovalTask', 'DEPLOYMENT_VIEW') or isResourceOwner(#id, 'ApprovalTask')")
+    @Transactional(readOnly = true)
+    public ApprovalTask getApprovalTask(long id) {
+        return approvalTaskService.getApprovalTask(id);
+    }
+
+    @Override
+    @PostFilter("isTenantAdmin() or (filterObject.assigneeId != null and isCurrentUser(filterObject.assigneeId))")
+    @Transactional(readOnly = true)
+    public List<ApprovalTask> getApprovalTasks(@Nullable Integer environmentId) {
+        return approvalTaskService.getApprovalTasks(environmentId);
+    }
+
+    @Override
+    @PostFilter("hasPermission(filterObject.id, 'ApprovalTask', 'DEPLOYMENT_VIEW') or " +
+        "isResourceOwner(filterObject.id, 'ApprovalTask')")
+    @Transactional(readOnly = true)
+    public List<ApprovalTask> getApprovalTasks(List<Long> ids) {
+        return approvalTaskService.getApprovalTasks(ids);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#approvalTask.id, 'ApprovalTask', 'DEPLOYMENT_EDIT') or " +
+        "isResourceOwner(#approvalTask.id, 'ApprovalTask')")
+    public ApprovalTask updateApprovalTask(ApprovalTask approvalTask) {
+        return approvalTaskService.update(approvalTask);
     }
 
     private Environment getEnvironment(String jobResumeIdString) {

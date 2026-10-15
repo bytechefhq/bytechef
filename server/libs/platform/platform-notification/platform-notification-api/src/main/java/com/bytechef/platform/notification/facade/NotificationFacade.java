@@ -29,5 +29,7 @@ public interface NotificationFacade {
 
     NotificationDTO createNotification(Notification notification);
 
+    void deleteNotification(long id);
+
     NotificationDTO updateNotification(Notification notification);
 }

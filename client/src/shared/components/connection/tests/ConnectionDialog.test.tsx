@@ -166,6 +166,20 @@ describe('ConnectionDialog', () => {
         );
     });
 
+    it('renders the Tags field when the tags query hook is provided', () => {
+        renderDialog();
+
+        expect(screen.getByText('Tags', {selector: 'label'})).toBeInTheDocument();
+    });
+
+    it('omits the Tags field and shows no tags error when the tags query hook is not provided', () => {
+        renderDialog({useGetConnectionTagsQuery: undefined});
+
+        expect(screen.getByText('Component', {selector: 'label'})).toBeInTheDocument();
+        expect(screen.queryByText('Tags', {selector: 'label'})).not.toBeInTheDocument();
+        expect(screen.queryByText('Response returned an error code')).not.toBeInTheDocument();
+    });
+
     describe('editing a connection whose credentials were rejected', () => {
         const invalidConnection = {
             componentName: 'slack',

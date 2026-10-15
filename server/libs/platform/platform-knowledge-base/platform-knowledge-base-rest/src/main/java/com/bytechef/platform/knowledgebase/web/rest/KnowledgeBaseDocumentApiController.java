@@ -43,7 +43,7 @@ class KnowledgeBaseDocumentApiController {
     }
 
     @PostMapping("/{id}/documents")
-    ResponseEntity<KnowledgeBaseDocument> uploadDocument(
+    public ResponseEntity<KnowledgeBaseDocument> uploadDocument(
         @PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
 
         return ResponseEntity.ok(

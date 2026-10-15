@@ -1,0 +1,6 @@
+query PermissionScopeGroups {
+    permissionScopeGroups {
+        name
+        scopes
+    }
+}

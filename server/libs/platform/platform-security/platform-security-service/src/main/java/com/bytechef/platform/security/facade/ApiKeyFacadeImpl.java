@@ -17,20 +17,43 @@
 package com.bytechef.platform.security.facade;
 
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.ApiKeyRevoker;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * An API key authenticates as the user who owns it, carrying that user's authorities, so it is a second credential for
+ * a person rather than a shared resource. Every read and write here is therefore restricted to the owner, with the
+ * tenant admin as the single exception -- the same exception every other authorization check in the tree makes.
+ *
+ * <p>
+ * Enforced in plain Java rather than through {@code @PreAuthorize}: the ownership SpEL functions are contributed by
+ * {@code AutomationMethodSecurityConfiguration}, which is {@code @ConditionalOnBean(PermissionService.class)}. This
+ * facade also serves deployments that carry no such bean, where a gate naming those functions would fail to evaluate
+ * rather than deny. Ownership is knowable here without any of that machinery.
+ *
+ * <p>
+ * Note that a workspace role cannot decide this. A key acts as its owner in every workspace they belong to, so a
+ * workspace admin asked to approve it would be ruling on authority wider than their own -- and API keys carry no
+ * workspace at all, being keyed on (user, environment, type).
+ *
  * @author Ivica Cardic
  */
 @Service
 @Transactional
-public class ApiKeyFacadeImpl implements ApiKeyFacade {
+public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
 
     private final ApiKeyService apiKeyService;
     private final UserService userService;
@@ -41,8 +64,99 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
         this.userService = userService;
     }
 
+    /**
+     * A null {@code type} mints a platform key -- the kind the Admin API Keys page issues, which authenticates against
+     * the management surface rather than an automation or embedded one; an {@code EMBEDDED} key is what the Embedded
+     * API Keys page issues. The schema leaves the argument open, so without this any authenticated caller could issue
+     * either for themselves. Workspace-scoped automation keys go through {@link #createAutomationApiKey(ApiKey)}.
+     */
     @Override
     public ApiKey create(ApiKey apiKey, PlatformType type) {
+        checkNotConnectedUser();
+
+        if (!isTenantAdmin()) {
+            throw new AccessDeniedException("Only a tenant admin may create this API key");
+        }
+
+        return createOwnedApiKey(apiKey, type);
+    }
+
+    @Override
+    public ApiKey createAutomationApiKey(ApiKey apiKey) {
+        checkNotConnectedUser();
+
+        return createOwnedApiKey(apiKey, PlatformType.AUTOMATION);
+    }
+
+    @Override
+    public void delete(long id) {
+        checkNotConnectedUser();
+
+        getOwnedApiKey(id);
+
+        apiKeyService.delete(id);
+    }
+
+    /**
+     * Tenant admin only, rather than owner-filtered like the ordinary listing. These are the platform keys, and the
+     * page that shows them is an administrative one: a member has no business enumerating that surface at all, even
+     * though the filter would hand them nothing but their own.
+     */
+    @Override
+    public List<ApiKey> getAdminApiKeys(long environmentId) {
+        checkNotConnectedUser();
+
+        if (!isTenantAdmin()) {
+            throw new AccessDeniedException("Only a tenant admin may list platform API keys");
+        }
+
+        return apiKeyService.getApiKeys(environmentId, null);
+    }
+
+    @Override
+    public ApiKey getApiKey(long id) {
+        checkNotConnectedUser();
+
+        return getOwnedApiKey(id);
+    }
+
+    @Override
+    public List<ApiKey> getApiKeys(long environmentId, PlatformType type) {
+        checkNotConnectedUser();
+
+        return filterOwned(apiKeyService.getApiKeys(environmentId, type));
+    }
+
+    @Override
+    public ApiKey update(ApiKey apiKey) {
+        checkNotConnectedUser();
+
+        getOwnedApiKey(apiKey.getId());
+
+        return apiKeyService.update(apiKey);
+    }
+
+    /**
+     * Revokes every key a departing user owns. Deliberately not owner-filtered: the keys belong to the account being
+     * deleted, never to the caller. Reaching it requires {@code UserManagementFacade.deleteUser}, which is
+     * {@code ADMIN}-only, and that is the whole of its authorization. The deletions are not audited.
+     */
+    @Override
+    public void revokeAll(long userId) {
+        List<ApiKey> apiKeys = apiKeyService.getUserApiKeys(userId);
+
+        for (ApiKey apiKey : apiKeys) {
+            apiKeyService.delete(apiKey.getId());
+        }
+    }
+
+    private static void checkNotConnectedUser() {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            throw new AccessDeniedException("A connected user has no platform API keys");
+        }
+    }
+
+    private ApiKey createOwnedApiKey(ApiKey apiKey, PlatformType type) {
         User user = userService.getCurrentUser();
 
         apiKey.setType(type);
@@ -51,28 +165,46 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
         return apiKeyService.create(apiKey);
     }
 
-    @Override
-    public void delete(long id) {
-        apiKeyService.delete(id);
+    private List<ApiKey> filterOwned(List<ApiKey> apiKeys) {
+        if (isTenantAdmin()) {
+            return apiKeys;
+        }
+
+        Long currentUserId = fetchCurrentUserId();
+
+        return apiKeys.stream()
+            .filter(apiKey -> Objects.equals(apiKey.getUserId(), currentUserId))
+            .toList();
     }
 
-    @Override
-    public java.util.List<ApiKey> getAdminApiKeys(long environmentId) {
-        return apiKeyService.getApiKeys(environmentId, null);
+    /**
+     * A key belonging to somebody else answers "not found" rather than "forbidden". The ids are sequential, so the
+     * difference between those two answers is an oracle for who holds machine access to which environment -- and the
+     * caller has no legitimate use for the distinction, since neither answer gives them the key.
+     */
+    private ApiKey getOwnedApiKey(long id) {
+        ApiKey apiKey = apiKeyService.getApiKey(id);
+
+        if (isTenantAdmin() || Objects.equals(apiKey.getUserId(), fetchCurrentUserId())) {
+            return apiKey;
+        }
+
+        throw new IllegalArgumentException("Api key not found for id: " + id);
     }
 
-    @Override
-    public ApiKey getApiKey(long id) {
-        return apiKeyService.getApiKey(id);
+    /**
+     * Null rather than an exception when nobody is authenticated: the comparison against an owner id then fails, which
+     * is the same denial the check would otherwise have to spell out.
+     */
+    @Nullable
+    private Long fetchCurrentUserId() {
+        return SecurityUtils.fetchCurrentUserLogin()
+            .flatMap(userService::fetchUserByLogin)
+            .map(User::getId)
+            .orElse(null);
     }
 
-    @Override
-    public java.util.List<ApiKey> getApiKeys(long environmentId, PlatformType type) {
-        return apiKeyService.getApiKeys(environmentId, type);
-    }
-
-    @Override
-    public ApiKey update(ApiKey apiKey) {
-        return apiKeyService.update(apiKey);
+    private static boolean isTenantAdmin() {
+        return SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
     }
 }

@@ -1,6 +1,8 @@
 dependencies {
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
@@ -34,5 +36,7 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
     implementation(project(":server:libs:modules:task-dispatchers:terminate"))
 
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:test:test-support"))
 }

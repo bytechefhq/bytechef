@@ -106,6 +106,8 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         value = "CRLF_INJECTION_LOGS",
         justification = "jobId is Long (no CRLF), exception messages sanitized with StringUtils.sanitize")
     public SseEmitter attachWorkflowTest(@PathVariable Long jobId) {
+        testWorkflowExecutor.attach(jobId);
+
         final String key = TenantCacheKeyUtils.getKey(jobId);
         final SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 

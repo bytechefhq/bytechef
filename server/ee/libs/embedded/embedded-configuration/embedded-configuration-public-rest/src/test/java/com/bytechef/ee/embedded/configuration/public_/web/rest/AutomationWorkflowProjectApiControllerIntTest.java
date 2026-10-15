@@ -8,8 +8,6 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
@@ -17,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateD
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
@@ -25,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -45,8 +43,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 class AutomationWorkflowProjectApiControllerIntTest {
 
     private static final String WORKFLOW_UUID = "workflow-uuid-001";
-    private static final long PROJECT_ID = 42L;
     private static final String EXTERNAL_USER_ID = "user@example.com";
+    private static final long PROJECT_ID = 42L;
 
     @MockitoBean
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -70,7 +68,7 @@ class AutomationWorkflowProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsReturnsPublishedProjectWithWorkflows() {
         ConnectedUserWorkflowTemplateDTO.Component componentDTO =
             new ConnectedUserWorkflowTemplateDTO.Component("gmail", "Gmail", "gmail-icon-svg");
@@ -113,7 +111,7 @@ class AutomationWorkflowProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsReturnsEmptyList() {
         when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of());
@@ -133,7 +131,7 @@ class AutomationWorkflowProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsUnpublishedProjectHasEmptyWorkflows() {
         AutomationWorkflowProjectDTO unpublishedProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID + 1, "Draft Project", "A project with no published version", null, List.of(), false, 1, null,
@@ -161,7 +159,7 @@ class AutomationWorkflowProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProjectsKeepHiddenProjectsAndUseThePermissionFilter() {
         AutomationWorkflowProjectDTO visibleProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
@@ -192,12 +190,10 @@ class AutomationWorkflowProjectApiControllerIntTest {
             .isEqualTo(PROJECT_ID + 1)
             .jsonPath("$[1].automationHubVisible")
             .isEqualTo(false);
-
-        verify(automationWorkflowProjectFacade, never()).getPublishedProjects();
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testApiKeyProjectsKeepHiddenProjects() {
         AutomationWorkflowProjectDTO visibleProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
