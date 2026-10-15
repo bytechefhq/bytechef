@@ -49,7 +49,9 @@ const respond = (status: number, body: unknown) => ({
 });
 
 let connections: Array<{componentName: string; id: number; name: string}> = [];
+let enableResponse: {body: unknown; status: number} = {body: {}, status: 200};
 let provisionResponse: {body: unknown; status: number} = {body: {}, status: 200};
+let workflowsResponse: {body: unknown; status: number} = {body: [], status: 200};
 
 const installFetch = () => {
     global.fetch = vi.fn(async (url: string, init?: RequestInit) => {
@@ -65,8 +67,16 @@ const installFetch = () => {
             return respond(200, connections);
         }
 
+        if (url.endsWith('/automation/workflows') && method === 'GET') {
+            return respond(workflowsResponse.status, workflowsResponse.body);
+        }
+
         if (url.endsWith('/provision') && method === 'POST') {
             return respond(provisionResponse.status, provisionResponse.body);
+        }
+
+        if (url.endsWith('/enable') && method === 'POST') {
+            return respond(enableResponse.status, enableResponse.body);
         }
 
         if (url.endsWith('/copy') && method === 'POST') {
@@ -93,7 +103,9 @@ describe('ActivationDialog', () => {
     beforeEach(() => {
         calls.length = 0;
         connections = [];
+        enableResponse = {body: {}, status: 200};
         provisionResponse = {body: {}, status: 200};
+        workflowsResponse = {body: [], status: 200};
         installFetch();
         useConnectDialogMock.mockReturnValue({closeDialog: vi.fn(), openDialog: openConnectDialogMock});
         vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -220,6 +232,54 @@ describe('ActivationDialog', () => {
             )
         ).toBe(true);
         expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+    });
+
+    const isDeprovision = (call: FetchCall) =>
+        call.url.endsWith('/workflow-templates/wf-plain/provision') && call.method === 'DELETE';
+
+    it('keeps an automation that was already activated when re-activating it fails', async () => {
+        provisionResponse = {body: {missingConnectionComponentName: 'slack'}, status: 409};
+        workflowsResponse = {
+            body: [
+                {automationWorkflowUuid: 'wf-other', kind: 'REFERENCE', name: 'Other', tasks: []},
+                {automationWorkflowUuid: 'wf-plain', kind: 'REFERENCE', name: 'Plain', tasks: []},
+            ],
+            status: 200,
+        };
+
+        renderDialog({workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
+
+        expect(await screen.findByRole('alert')).toBeInTheDocument();
+        expect(calls.some(isDeprovision)).toBe(false);
+    });
+
+    it('removes a first activation that failed to enable', async () => {
+        enableResponse = {body: {}, status: 500};
+        workflowsResponse = {
+            body: [{copiedFromWorkflowUuid: 'wf-plain', kind: 'COPY', name: 'Plain copy', tasks: []}],
+            status: 200,
+        };
+
+        renderDialog({workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
+
+        expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+        await waitFor(() => expect(calls.some(isDeprovision)).toBe(true));
+    });
+
+    it('never removes the automation when it cannot tell whether it existed before', async () => {
+        enableResponse = {body: {}, status: 500};
+        workflowsResponse = {body: {}, status: 500};
+
+        renderDialog({workflowTemplateId: 'wf-plain'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
+
+        expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+        expect(calls.some(isDeprovision)).toBe(false);
     });
 
     it('shows a generic error on any other failure', async () => {

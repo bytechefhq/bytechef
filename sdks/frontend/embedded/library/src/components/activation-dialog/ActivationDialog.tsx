@@ -8,6 +8,7 @@ import styles from './ActivationDialog.module.css';
 import {
     AutomationProjectType,
     AutomationTemplateType,
+    ConnectedUserWorkflowType,
     ConnectionType,
     MissingConnectionErrorType,
     TemplateComponentType,
@@ -212,6 +213,14 @@ const ActivationBody = ({
             Object.entries(state.selections).filter((selection): selection is [string, number] => selection[1] != null)
         );
 
+        const activatedBefore = await fetch<ConnectedUserWorkflowType[]>('/api/embedded/v1/automation/workflows')
+            .then((workflows) =>
+                workflows.some(
+                    (workflow) => workflow.kind === 'REFERENCE' && workflow.automationWorkflowUuid === template.id
+                )
+            )
+            .catch(() => true);
+
         try {
             await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/provision`, {
                 body: {connections, inputs: inputs.length > 0 ? state.inputValues : undefined},
@@ -223,9 +232,11 @@ const ActivationBody = ({
 
             onActivated?.(template.id);
         } catch (error) {
-            await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/provision`, {
-                method: 'DELETE',
-            }).catch(() => undefined);
+            if (!activatedBefore) {
+                await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/provision`, {
+                    method: 'DELETE',
+                }).catch(() => undefined);
+            }
 
             const missingConnectionComponentName = readMissingConnectionComponentName(error);
 

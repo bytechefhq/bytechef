@@ -35,6 +35,11 @@ export interface ConnectionType {
     name?: string;
 }
 
+export interface ConnectedUserWorkflowType {
+    automationWorkflowUuid?: string;
+    kind?: 'COPY' | 'REFERENCE';
+}
+
 export interface MissingConnectionErrorType {
     missingConnectionComponentName?: string;
 }
