@@ -25,7 +25,7 @@ beforeEach(() => {
     vi.clearAllMocks();
 });
 
-const renderWorkflowsListItem = () => {
+const renderWorkflowsListItem = (project = mockProject) => {
     render(
         <MemoryRouter>
             <TooltipProvider>
@@ -34,7 +34,7 @@ const renderWorkflowsListItem = () => {
                     currentWorkflowId="1001"
                     findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
                     onProjectClick={mockOnProjectClick}
-                    project={mockProject}
+                    project={project}
                     setSelectedProjectId={vi.fn()}
                     workflow={mockWorkflow}
                 />
@@ -77,6 +77,12 @@ it('should not select the workflow when the actions menu is used', async () => {
     await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
 
     expect(mockOnProjectClick).not.toHaveBeenCalled();
+});
+
+it('should not offer workflow actions for a code workflow project', () => {
+    renderWorkflowsListItem({...mockProject, codeWorkflow: true} as typeof mockProject);
+
+    expect(screen.queryByRole('button', {name: 'Workflow actions for Workflow One'})).not.toBeInTheDocument();
 });
 
 it('should render the trigger apart from the task component icons', () => {

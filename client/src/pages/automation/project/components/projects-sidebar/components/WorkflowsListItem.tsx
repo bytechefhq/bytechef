@@ -86,7 +86,8 @@ const WorkflowsListItem = ({
             editedTimeAgo={timeAgo}
             label={workflow.label}
             menu={
-                project && (
+                project &&
+                !project.codeWorkflow && (
                     <WorkflowsListItemDropdownMenu
                         currentWorkflowId={currentWorkflowId}
                         project={project}

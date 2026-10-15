@@ -98,6 +98,8 @@ const IntegrationsLeftSidebar = ({
 
     const selectedIntegration = integrations?.find((integration) => integration.id === selectedIntegrationId);
 
+    const targetIntegration = integrations?.find((integration) => integration.id === targetIntegrationId);
+
     const filteredWorkflowsList = useMemo(
         () => getFilteredWorkflows(workflows, sortBy, searchValue),
         [workflows, sortBy, searchValue, getFilteredWorkflows]
@@ -174,7 +176,7 @@ const IntegrationsLeftSidebar = ({
                     sortBy={sortBy}
                 />
 
-                {canCreateWorkflow && (
+                {canCreateWorkflow && !targetIntegration?.codeWorkflow && (
                     <ButtonGroup className="w-full">
                         <Button
                             className="flex-1 [&_svg]:size-5"
