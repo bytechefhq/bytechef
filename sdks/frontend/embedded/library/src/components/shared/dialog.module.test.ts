@@ -13,6 +13,7 @@ const OVERRIDABLE_TOKENS = [
     ['--dialog-hover', '--bytechef-dialog-hover'],
     ['--bytechef-blue', '--bytechef-dialog-primary'],
     ['--bytechef-blue-hover', '--bytechef-dialog-primary-hover'],
+    ['--dialog-primary-foreground', '--bytechef-dialog-primary-foreground'],
 ];
 
 describe('dialog.module.css', () => {

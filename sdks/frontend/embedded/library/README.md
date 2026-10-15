@@ -64,7 +64,10 @@ const {openDialog} = useActivationDialog({
 });
 ```
 
-`<ActivationDialog …/>` is the same flow as a component for apps that render it themselves. A component whose
+`<ActivationDialog …/>` is the same flow as a component for apps that render it themselves. Props: `baseUrl`,
+`environment`, `jwtToken`, `workflowTemplateId`, `onClose`, `onActivated`, `onEditWorkflow`, `mode` (`'light'` or
+`'dark'`) and `connectionCreationAllowed` (default `true`; `false` hides Connect so users can only pick existing
+accounts). A component whose
 integration has no enabled instance configuration in the environment shows "isn't set up yet — ask your administrator";
 set the integration up first.
 
@@ -74,7 +77,8 @@ activation dialog's Connect is in use.
 ### Connection-only and reauthorize modes of `useConnectDialog`
 
 - `connectionOnly: true` + `onConnected(integrationInstanceId, connectionId)`: closes once the integration instance
-  exists (or hands back the existing one) instead of continuing to the workflows view.
+  exists instead of continuing to the workflows view. An existing instance with valid credentials is handed back at
+  once; one with invalid credentials is reconnected first.
 - `reauthorizeConnectionId` + `onReauthorized(connectionId)`: shows the connection form for an existing connection
   and posts to `/connections/{id}/reauthorize`.
 
@@ -82,8 +86,12 @@ activation dialog's Connect is in use.
 
 Both dialogs read their colors from `--bytechef-dialog-surface`, `--bytechef-dialog-surface-raised`,
 `--bytechef-dialog-border`, `--bytechef-dialog-text`, `--bytechef-dialog-text-muted`, `--bytechef-dialog-hover`,
-`--bytechef-dialog-primary` and `--bytechef-dialog-primary-hover`; set them on `:root` (or any ancestor) to restyle.
-`mode: 'dark'` switches the fallbacks.
+`--bytechef-dialog-primary`, `--bytechef-dialog-primary-hover` and `--bytechef-dialog-primary-foreground` (the primary
+button text); set them on `:root` (or any ancestor) to restyle. `mode: 'dark'` switches the surface, border, text and
+hover fallbacks.
+
+The three modes are exclusive: TypeScript rejects `connectionOnly` together with `reauthorizeConnectionId`, and
+`onConnected` / `onReauthorized` outside their mode.
 
 ## Upgrading to 0.4.0
 
