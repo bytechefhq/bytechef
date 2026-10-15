@@ -16,6 +16,10 @@ function loadPostHog(): Promise<PostHog> {
     })
 
     return posthog
+  }).catch((error: unknown) => {
+    postHogPromise = undefined
+
+    throw error
   })
 
   return postHogPromise
@@ -49,7 +53,9 @@ function PostHogPageView() : null {
     }
 
     return whenIdle(() => {
-      void loadPostHog().then((posthog) => posthog.capture('$pageview', { '$current_url': url }))
+      loadPostHog()
+        .then((posthog) => posthog.capture('$pageview', { '$current_url': url }))
+        .catch((error: unknown) => console.warn('PostHog failed to load', error))
     })
   }, [pathname, searchParams])
 
