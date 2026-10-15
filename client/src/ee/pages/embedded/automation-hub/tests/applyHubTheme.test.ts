@@ -120,4 +120,18 @@ describe('applyHubTheme', () => {
 
         expect(root.style.getPropertyValue('position')).toBe('');
     });
+
+    it('maps the Hub surfaces and brand color onto the SDK dialog override variables', () => {
+        applyHubTheme(
+            {activeBorderColor: '#abcdef', cardColor: '#ffffff', primaryColor: '#ff0000', surfaceColor: '#eeeeee'},
+            root
+        );
+
+        expect(root.style.getPropertyValue('--bytechef-dialog-surface')).toBe('#ffffff');
+        expect(root.style.getPropertyValue('--bytechef-dialog-surface-raised')).toBe('#ffffff');
+        expect(root.style.getPropertyValue('--bytechef-dialog-hover')).toBe('#eeeeee');
+        expect(root.style.getPropertyValue('--bytechef-dialog-border')).toBe('#abcdef');
+        expect(root.style.getPropertyValue('--bytechef-dialog-primary')).toBe('#ff0000');
+        expect(root.style.getPropertyValue('--bytechef-dialog-primary-hover')).toBe('#ff0000');
+    });
 });

@@ -52,6 +52,28 @@ vi.mock('@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations', 
     useUpdateAutomationInputsMutation: () => ({mutateAsync: updateInputsMutateAsyncMock}),
 }));
 
+vi.mock('@bytechef/embedded', () => ({
+    ActivationDialog: ({
+        connectionCreationAllowed,
+        onEditWorkflow,
+        workflowTemplateId,
+    }: {
+        connectionCreationAllowed?: boolean;
+        onEditWorkflow?: (workflowUuid: string) => void;
+        workflowTemplateId: string;
+    }) => (
+        <div data-testid="activation-dialog">
+            {workflowTemplateId}:{String(connectionCreationAllowed)}:{onEditWorkflow ? 'edit' : 'noedit'}
+        </div>
+    ),
+}));
+
+vi.mock('@tanstack/react-query', async () => {
+    const actual = await vi.importActual<typeof import('@tanstack/react-query')>('@tanstack/react-query');
+
+    return {...actual, useQueryClient: () => ({invalidateQueries: vi.fn()})};
+});
+
 vi.mock('sonner', () => ({
     toast: {error: toastErrorMock},
 }));
@@ -884,5 +906,21 @@ describe('AutomationsView', () => {
 
             expect(screen.getByRole('button', {name: 'Remove'})).not.toBeDisabled();
         });
+    });
+
+    it('opens the SDK activation dialog for the chosen template, honouring the Hub permissions', async () => {
+        const user = userEvent.setup();
+
+        useAutomationHubStore.setState({connectionDialogAllowed: false, editWorkflowAllowed: false});
+
+        render(
+            <MemoryRouter>
+                <AutomationsView />
+            </MemoryRouter>
+        );
+
+        await user.click(within(templateCard('Slack sync')).getByRole('button', {name: 'Use'}));
+
+        expect(screen.getByTestId('activation-dialog')).toHaveTextContent('wf-2:false:noedit');
     });
 });
