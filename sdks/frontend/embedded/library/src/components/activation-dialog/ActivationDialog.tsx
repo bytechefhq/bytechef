@@ -27,6 +27,25 @@ export interface ActivationDialogProps {
     workflowTemplateId: string;
 }
 
+function findExistingCopiedWorkflowUuid(error: unknown): string | undefined {
+    if (!(error instanceof ApiResponseError) || error.status !== 400) {
+        return undefined;
+    }
+
+    const body = error.body as
+        | {entityClass?: unknown; errorKey?: unknown; inputParameters?: {copiedWorkflowUuid?: unknown} | null}
+        | null
+        | undefined;
+
+    if (body?.entityClass !== 'ConnectedUserProjectWorkflow' || body.errorKey !== 100) {
+        return undefined;
+    }
+
+    const copiedWorkflowUuid = body.inputParameters?.copiedWorkflowUuid;
+
+    return typeof copiedWorkflowUuid === 'string' && copiedWorkflowUuid !== '' ? copiedWorkflowUuid : undefined;
+}
+
 const GENERIC_ERROR_MESSAGE = 'Something went wrong. Please try again.';
 const TEMPLATE_NOT_FOUND_MESSAGE = 'This automation could not be found.';
 const SESSION_EXPIRED_MESSAGE = 'Your session has expired. Reload the page and try again.';
@@ -352,12 +371,18 @@ const ActivationBody = ({
                 method: 'POST',
             });
         } catch (error) {
-            console.error('Failed to copy the workflow template:', error);
+            const existingCopiedWorkflowUuid = findExistingCopiedWorkflowUuid(error);
 
-            dispatch({error: describeError(error), type: 'FAILED'});
-            setBusy(false);
+            if (existingCopiedWorkflowUuid === undefined) {
+                console.error('Failed to copy the workflow template:', error);
 
-            return;
+                dispatch({error: describeError(error), type: 'FAILED'});
+                setBusy(false);
+
+                return;
+            }
+
+            copiedWorkflowUuid = existingCopiedWorkflowUuid;
         }
 
         setBusy(false);
