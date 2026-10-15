@@ -475,7 +475,12 @@ const DialogContent = ({
             {!workflowsView && form && (
                 <form id="form">
                     {properties?.map((property) => {
-                        const field = form.register(property.name);
+                        const registeredField = form.register(property.name);
+
+                        const field = {
+                            ...registeredField,
+                            defaultValue: registeredField.defaultValue ?? property.defaultValue ?? '',
+                        };
 
                         const error = form.formState.errors[property.name];
 
@@ -744,7 +749,7 @@ const DialogGroupField = ({
                     }
                     label={member.label ?? member.name}
                     name={`${group.name}.${member.name}`}
-                    options={member.options?.map((option) => option.value)}
+                    options={member.options}
                     required={member.required}
                     field={{value: memberValues[member.name] as string | undefined}}
                 />
@@ -854,7 +859,7 @@ interface DialogInputFieldsetProps {
     label: string;
     name: string;
     placeholder?: string;
-    options?: string[];
+    options?: OptionType[];
     onChange?: (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => void;
     required?: boolean;
     field?: React.InputHTMLAttributes<HTMLInputElement | HTMLSelectElement>;
@@ -880,13 +885,13 @@ const DialogInputField = ({
             {required && <span className={styles.requiredIndicator}>*</span>}
         </label>
 
-        {options ? (
-            <select id={name} {...field}>
+        {options && options.length > 0 ? (
+            <select id={name} {...field} onChange={onChange}>
                 <option value="">Select {label}</option>
 
                 {options.map((option) => (
-                    <option key={option} value={option}>
-                        {option}
+                    <option key={option.value} value={option.value}>
+                        {option.label}
                     </option>
                 ))}
             </select>
