@@ -46,6 +46,8 @@ public abstract class ProjectWorkflowMapper {
         public abstract WorkflowModel convert(ProjectWorkflowDTO workflowDTO);
 
         @Mapping(target = "componentReference", ignore = true)
+        @Mapping(target = "internalOnly", ignore = true)
+        @Mapping(target = "objectName", ignore = true)
         public abstract WorkflowInputModel map(Workflow.Input input);
 
         @AfterMapping
