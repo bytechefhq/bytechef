@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -51,6 +52,8 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
         LIMIT 1
         """)
     Optional<Long> findConnectedUserIdByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
+
+    List<ConnectedUserProject> findAllByConnectedUserId(long connectedUserId);
 
     Optional<ConnectedUserProject> findByConnectedUserId(Long connectedUserid);
 
