@@ -1,5 +1,8 @@
-query connectedUserCodeWorkflowReferences($automationWorkflowUuids: [ID!]!) {
-    connectedUserCodeWorkflowReferences(automationWorkflowUuids: $automationWorkflowUuids) {
+query connectedUserCodeWorkflowReferences($automationWorkflowUuids: [ID!]!, $environmentId: ID!) {
+    connectedUserCodeWorkflowReferences(
+        automationWorkflowUuids: $automationWorkflowUuids
+        environmentId: $environmentId
+    ) {
         automationWorkflowUuid
         externalUserId
         environment
