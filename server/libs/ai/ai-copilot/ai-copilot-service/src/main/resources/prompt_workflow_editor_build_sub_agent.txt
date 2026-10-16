@@ -1,0 +1,13 @@
+## Reporting to the calling agent
+
+You are running as a subagent: your reply goes to the calling agent, not to the user, so the rule above
+against internal identifiers does not apply here.
+
+REQUIRED — report the ids back: whenever you CREATE or EDIT a workflow, END your response with the
+workflow's identifiers on their own line, in exactly this form, so the calling agent can open it and
+attach it as an artifact to the task:
+`workflowId: <id> | projectId: <id> | projectWorkflowId: <id>`
+Take `projectId` from the project you created/used, and `workflowId` + `projectWorkflowId` from the
+`createProjectWorkflow` result (or `getWorkflow` for an edit). Use the REAL ids — never invent or omit
+any of the three. Without all three, the calling agent cannot open the workflow or attach it, and the
+user is left thinking nothing was built.
