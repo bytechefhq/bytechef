@@ -4,6 +4,7 @@ import {Sheet, SheetCloseButton, SheetContent, SheetDescription, SheetTitle} fro
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useConnectedUserCodeWorkflowReferencesQuery} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 
 interface CodeWorkflowReferencesSheetProps {
     onClose: () => void;
@@ -15,11 +16,13 @@ interface CodeWorkflowReferencesSheetProps {
 }
 
 const CodeWorkflowReferencesSheet = ({onClose, projectName, workflowTemplates}: CodeWorkflowReferencesSheetProps) => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
     const automationWorkflowUuids = workflowTemplates.map((workflowTemplate) => workflowTemplate.workflowUuid);
 
     const {data, error, isLoading} = useConnectedUserCodeWorkflowReferencesQuery(
-        {automationWorkflowUuids},
-        {enabled: automationWorkflowUuids.length > 0}
+        {automationWorkflowUuids, environmentId: String(currentEnvironmentId)},
+        {enabled: automationWorkflowUuids.length > 0 && currentEnvironmentId !== undefined}
     );
 
     const references = data?.connectedUserCodeWorkflowReferences || [];
@@ -72,8 +75,6 @@ const CodeWorkflowReferencesSheet = ({onClose, projectName, workflowTemplates}: 
 
                                     <TableHead>External User</TableHead>
 
-                                    <TableHead>Environment</TableHead>
-
                                     <TableHead>Status</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -87,8 +88,6 @@ const CodeWorkflowReferencesSheet = ({onClose, projectName, workflowTemplates}: 
                                         </TableCell>
 
                                         <TableCell>{reference.externalUserId}</TableCell>
-
-                                        <TableCell>{reference.environment}</TableCell>
 
                                         <TableCell>
                                             <div className="flex items-center gap-2">
