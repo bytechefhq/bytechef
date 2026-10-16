@@ -82,9 +82,7 @@ public class ConnectedUserReferenceRolloutManager {
         for (ProjectDeployment projectDeployment : projectDeploymentService.getAllProjectDeployments(
             automationWorkflowProjectId)) {
 
-            if (!connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment.getId()) &&
-                !connectedUserReferenceDeploymentManager.isLegacyReferenceDeployment(projectDeployment)) {
-
+            if (!connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment.getId())) {
                 continue;
             }
 
@@ -178,49 +176,14 @@ public class ConnectedUserReferenceRolloutManager {
             exception);
     }
 
-    private boolean adoptLegacyDeployment(
-        ProjectDeployment projectDeployment, List<ConnectedUserProjectWorkflow> references) {
-
-        Set<Long> connectedUserProjectIds = references.stream()
-            .map(ConnectedUserProjectWorkflow::getConnectedUserProjectId)
-            .collect(Collectors.toSet());
-
-        if (connectedUserProjectIds.size() == 1) {
-            ConnectedUserProject connectedUserProject = connectedUserProjectService.getConnectedUserProject(
-                connectedUserProjectIds.iterator()
-                    .next());
-
-            if (connectedUserReferenceDeploymentManager.adoptLegacyDeployment(
-                projectDeployment, connectedUserProject.getConnectedUserId())) {
-
-                return true;
-            }
-        }
-
-        log.warn(
-            "Not rolling out legacy reference deployment id={} of automation workflow project id={}: it was not adopted",
-            projectDeployment.getId(), projectDeployment.getProjectId());
-
-        return false;
-    }
-
     private boolean rollOutDeploymentWithReferences(ProjectDeployment projectDeployment, int lastPublishedVersion) {
         long projectDeploymentId = projectDeployment.getId();
 
-        boolean referenceDeployment = connectedUserReferenceDeploymentManager.isReferenceDeployment(
-            projectDeploymentId);
-
-        if (!referenceDeployment &&
-            !connectedUserReferenceDeploymentManager.isLegacyReferenceDeployment(projectDeployment)) {
-
+        if (!connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeploymentId)) {
             return false;
         }
 
         List<ConnectedUserProjectWorkflow> references = getReferences(projectDeploymentId);
-
-        if (!referenceDeployment && (references.isEmpty() || !adoptLegacyDeployment(projectDeployment, references))) {
-            return false;
-        }
 
         if (references.isEmpty()) {
             connectedUserReferenceDeploymentManager.deleteDeployment(projectDeploymentId);
