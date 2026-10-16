@@ -127,6 +127,8 @@ class ComponentDefinitionFacadeIntTest {
                 .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
             assertThatThrownBy(() -> securedFacade.getComponentDefinition(COMPONENT_NAME, 1))
                 .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+            assertThatThrownBy(() -> securedFacade.fetchComponentDefinition(COMPONENT_NAME, null))
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
         }
 
         @Test
