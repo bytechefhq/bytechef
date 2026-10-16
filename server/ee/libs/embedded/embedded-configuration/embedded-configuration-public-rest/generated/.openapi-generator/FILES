@@ -27,6 +27,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Crea
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendProjectWorkflowFromPromptRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CredentialStatusModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/DisableFrontendProjectWorkflow409ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/EnableFrontendProjectWorkflow409ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputModel.java
@@ -37,6 +38,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Inte
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationWorkflowModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InvalidWorkflowErrorModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/McpIntegrationInstanceToolModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/McpToolModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/MissingConnectionErrorModel.java

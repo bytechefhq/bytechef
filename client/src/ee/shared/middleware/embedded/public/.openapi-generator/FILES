@@ -29,6 +29,7 @@ docs/CreateFrontendIntegrationInstanceRequestConnection.md
 docs/CreateFrontendProjectWorkflowFromPromptRequest.md
 docs/CreateFrontendProjectWorkflowRequest.md
 docs/CredentialStatus.md
+docs/DisableFrontendProjectWorkflow409Response.md
 docs/EnableFrontendProjectWorkflow409Response.md
 docs/Environment.md
 docs/Input.md
@@ -42,6 +43,7 @@ docs/IntegrationInstanceBasic.md
 docs/IntegrationInstanceWorkflow.md
 docs/IntegrationInstanceWorkflowApi.md
 docs/IntegrationWorkflow.md
+docs/InvalidWorkflowError.md
 docs/McpIntegrationInstanceTool.md
 docs/McpTool.md
 docs/MissingConnectionError.md
@@ -75,6 +77,7 @@ models/CreateFrontendIntegrationInstanceRequestConnection.ts
 models/CreateFrontendProjectWorkflowFromPromptRequest.ts
 models/CreateFrontendProjectWorkflowRequest.ts
 models/CredentialStatus.ts
+models/DisableFrontendProjectWorkflow409Response.ts
 models/EnableFrontendProjectWorkflow409Response.ts
 models/Environment.ts
 models/Input.ts
@@ -85,6 +88,7 @@ models/IntegrationInstance.ts
 models/IntegrationInstanceBasic.ts
 models/IntegrationInstanceWorkflow.ts
 models/IntegrationWorkflow.ts
+models/InvalidWorkflowError.ts
 models/McpIntegrationInstanceTool.ts
 models/McpTool.ts
 models/MissingConnectionError.ts

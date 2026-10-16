@@ -13,6 +13,13 @@
  */
 
 import { parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import type { InvalidWorkflowError } from './InvalidWorkflowError';
+import {
+    instanceOfInvalidWorkflowError,
+    InvalidWorkflowErrorFromJSON,
+    InvalidWorkflowErrorFromJSONTyped,
+    InvalidWorkflowErrorToJSON,
+} from './InvalidWorkflowError';
 import type { MissingConnectionError } from './MissingConnectionError';
 import {
     instanceOfMissingConnectionError,
@@ -33,7 +40,7 @@ import {
  * 
  * @export
  */
-export type EnableFrontendProjectWorkflow409Response = MissingConnectionError | MissingInputError;
+export type EnableFrontendProjectWorkflow409Response = InvalidWorkflowError | MissingConnectionError | MissingInputError;
 
 export function EnableFrontendProjectWorkflow409ResponseFromJSON(json: any): EnableFrontendProjectWorkflow409Response {
     return EnableFrontendProjectWorkflow409ResponseFromJSONTyped(json, false);
@@ -45,6 +52,9 @@ export function EnableFrontendProjectWorkflow409ResponseFromJSONTyped(json: any,
     }
     if (typeof json !== 'object') {
         return json;
+    }
+    if (instanceOfInvalidWorkflowError(json)) {
+        return InvalidWorkflowErrorFromJSONTyped(json, true);
     }
     if (instanceOfMissingConnectionError(json)) {
         return MissingConnectionErrorFromJSONTyped(json, true);
@@ -65,6 +75,9 @@ export function EnableFrontendProjectWorkflow409ResponseToJSONTyped(value?: Enab
     }
     if (typeof value !== 'object') {
         return value;
+    }
+    if (instanceOfInvalidWorkflowError(value)) {
+        return InvalidWorkflowErrorToJSON(value as InvalidWorkflowError);
     }
     if (instanceOfMissingConnectionError(value)) {
         return MissingConnectionErrorToJSON(value as MissingConnectionError);

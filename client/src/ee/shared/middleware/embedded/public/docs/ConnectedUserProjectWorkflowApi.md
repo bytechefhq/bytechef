@@ -1015,7 +1015,7 @@ example().catch(console.error);
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **204** | Successful operation. |  -  |
-| **409** | A required connection could not be auto-wired, or a required workflow input has no value. |  -  |
+| **409** | A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -1093,7 +1093,7 @@ example().catch(console.error);
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **204** | Successful operation. |  -  |
-| **409** | A required connection could not be auto-wired, or a required workflow input has no value. |  -  |
+| **409** | A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

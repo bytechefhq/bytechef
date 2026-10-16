@@ -29,6 +29,11 @@ import {
     CreateFrontendProjectWorkflowRequestToJSON,
 } from '../models/CreateFrontendProjectWorkflowRequest';
 import {
+    type DisableFrontendProjectWorkflow409Response,
+    DisableFrontendProjectWorkflow409ResponseFromJSON,
+    DisableFrontendProjectWorkflow409ResponseToJSON,
+} from '../models/DisableFrontendProjectWorkflow409Response';
+import {
     type EnableFrontendProjectWorkflow409Response,
     EnableFrontendProjectWorkflow409ResponseFromJSON,
     EnableFrontendProjectWorkflow409ResponseToJSON,
