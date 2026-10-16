@@ -27,16 +27,4 @@ public final class SystemProjects {
 
     private SystemProjects() {
     }
-
-    public static boolean isSystemProject(Project project) {
-        return project != null && isSystemProjectName(project.getName());
-    }
-
-    public static boolean isSystemProjectName(String name) {
-        if (name == null) {
-            return false;
-        }
-
-        return name.startsWith(EMBEDDED_AUTOMATION_NAME_PREFIX);
-    }
 }

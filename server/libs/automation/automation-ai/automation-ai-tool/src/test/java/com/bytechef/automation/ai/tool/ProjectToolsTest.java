@@ -34,6 +34,7 @@ import com.bytechef.automation.ai.tool.model.ProjectInfo;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
@@ -316,7 +317,8 @@ class ProjectToolsTest {
         return new ProjectTools(
             categoryService, projectDeploymentService, projectFacade, projectService,
             new ScopedProjectGuard(
-                projectService, mock(ProjectWorkflowService.class), mock(ScopedConnectionGuard.class),
+                mock(ProjectOwnershipService.class), projectService, mock(ProjectWorkflowService.class),
+                mock(ScopedConnectionGuard.class),
                 workspaceScopeResolver),
             tagService);
     }

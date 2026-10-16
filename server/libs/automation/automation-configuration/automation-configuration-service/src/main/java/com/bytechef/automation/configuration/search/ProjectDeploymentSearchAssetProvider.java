@@ -18,11 +18,13 @@ package com.bytechef.automation.configuration.search;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.domain.SystemProjects;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,11 +40,15 @@ import org.springframework.stereotype.Component;
 class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
 
     private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
 
-    ProjectDeploymentSearchAssetProvider(ProjectDeploymentService projectDeploymentService,
+    ProjectDeploymentSearchAssetProvider(
+        ProjectDeploymentService projectDeploymentService, ProjectOwnershipService projectOwnershipService,
         ProjectService projectService) {
+
         this.projectDeploymentService = projectDeploymentService;
+        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
     }
 
@@ -50,7 +56,8 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
     public List<ProjectDeploymentSearchResult> search(String query, int limit, Set<Long> workspaceIds) {
         String queryLower = query.toLowerCase(Locale.ROOT);
 
-        List<ProjectDeployment> deployments = projectDeploymentService.getProjectDeployments();
+        List<ProjectDeployment> deployments =
+            projectDeploymentService.getProjectDeployments(false, null, null, null, null);
 
         if (deployments.isEmpty()) {
             return List.of();
@@ -65,11 +72,14 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
             .stream()
             .collect(Collectors.toMap(Project::getId, Function.identity()));
 
+        Set<Long> ownedProjectIds = projectOwnershipService.getOwnedProjectIds(
+            projectIds, EnumSet.allOf(ProjectOwner.class));
+
         return deployments.stream()
             .filter(deployment -> {
                 Project project = projectMap.get(deployment.getProjectId());
 
-                return project != null && !SystemProjects.isSystemProject(project) &&
+                return project != null && !ownedProjectIds.contains(project.getId()) &&
                     workspaceIds.contains(project.getWorkspaceId()) &&
                     containsIgnoreCase(project.getName(), queryLower);
             })
