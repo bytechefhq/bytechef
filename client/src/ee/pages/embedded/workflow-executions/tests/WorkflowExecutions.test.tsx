@@ -1,10 +1,11 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {WorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/WorkflowExecutions';
-import {mockScrollIntoView, render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
-import {MemoryRouter} from 'react-router-dom';
+import {act, mockScrollIntoView, render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
+import {MemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {useWorkflowExecutionsMock} = vi.hoisted(() => ({
+const {useOnEnvironmentChangeMock, useWorkflowExecutionsMock} = vi.hoisted(() => ({
+    useOnEnvironmentChangeMock: vi.fn(),
     useWorkflowExecutionsMock: vi.fn(),
 }));
 
@@ -13,16 +14,18 @@ vi.mock('@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions', (
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries', () => ({
-    useGetIntegrationInstanceConfigurationQuery: () => ({data: undefined}),
-    useGetIntegrationInstanceConfigurationsQuery: () => ({data: []}),
+    useGetIntegrationInstanceConfigurationQuery: () => ({data: {id: 4, integrationVersion: 1}}),
+    useGetIntegrationInstanceConfigurationsQuery: () => ({
+        data: [{id: 4, integration: {componentName: 'googleMail'}, integrationId: 2, tags: []}],
+    }),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
-    useGetIntegrationVersionWorkflowsQuery: () => ({data: []}),
+    useGetIntegrationVersionWorkflowsQuery: () => ({data: [{id: 'workflow-1', label: 'Send Email'}]}),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
-    useGetIntegrationsQuery: () => ({data: []}),
+    useGetIntegrationsQuery: () => ({data: [{componentName: 'googleMail', id: 2, name: 'Gmail', tags: []}]}),
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
@@ -31,7 +34,7 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 }));
 
 vi.mock('@/shared/hooks/useOnEnvironmentChange', () => ({
-    useOnEnvironmentChange: vi.fn(),
+    useOnEnvironmentChange: useOnEnvironmentChangeMock,
 }));
 
 vi.mock('@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet', () => ({
@@ -47,17 +50,40 @@ const connectedUserProjects = [
     {connectedUser: {externalId: 'user-8', id: 8}, projectId: 12},
 ];
 
+let currentSearch = '';
+
+const LocationProbe = () => {
+    currentSearch = useLocation().search;
+
+    return null;
+};
+
 const renderWorkflowExecutions = (search: string) =>
     render(
         <MemoryRouter initialEntries={[`/embedded/executions?${search}`]}>
             <TooltipProvider>
                 <WorkflowExecutions />
+
+                <LocationProbe />
             </TooltipProvider>
         </MemoryRouter>
     );
 
-const getConnectedUsersComboBox = () =>
-    within(screen.getByText('Connected Users', {selector: 'label'}).parentElement!).getByRole('combobox');
+const getFilterComboBox = (label: string) =>
+    within(screen.getByText(label, {selector: 'label'}).parentElement!).getByRole('combobox');
+
+const pickFilterOption = async (label: string, optionName: string) => {
+    await userEvent.click(getFilterComboBox(label));
+    await userEvent.click(await screen.findByRole('option', {name: optionName}));
+};
+
+const expectConnectedUserKeptInTheUrl = async () => {
+    await waitFor(() => {
+        expect(new URLSearchParams(currentSearch).get('connectedUserId')).toBe('7');
+    });
+};
+
+const getConnectedUsersComboBox = () => getFilterComboBox('Connected Users');
 
 const lastWorkflowExecutionsRequest = () => useWorkflowExecutionsMock.mock.calls.at(-1)?.[1];
 
@@ -66,6 +92,11 @@ describe('WorkflowExecutions', () => {
         vi.clearAllMocks();
 
         mockScrollIntoView();
+
+        Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || vi.fn();
+        Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture || vi.fn();
+
+        useOnEnvironmentChangeMock.mockImplementation(() => undefined);
 
         useWorkflowExecutionsMock.mockReturnValue({
             connectedUserProjects,
@@ -106,5 +137,57 @@ describe('WorkflowExecutions', () => {
         await waitFor(() => {
             expect(lastWorkflowExecutionsRequest()).toEqual(expect.objectContaining({connectedUserId: undefined}));
         });
+    });
+
+    it('keeps the connected user when the status filter changes', async () => {
+        renderWorkflowExecutions('automations=1&connectedUserId=7');
+
+        await pickFilterOption('Status', 'COMPLETED');
+
+        await expectConnectedUserKeptInTheUrl();
+
+        expect(new URLSearchParams(currentSearch).get('status')).toBe('COMPLETED');
+    });
+
+    it('keeps the connected user when the integration filters change', async () => {
+        renderWorkflowExecutions('automations=0&connectedUserId=7');
+
+        await pickFilterOption('Integration', 'googleMail');
+        await expectConnectedUserKeptInTheUrl();
+
+        await pickFilterOption('Instance Configuration', 'googleMail');
+        await expectConnectedUserKeptInTheUrl();
+
+        await pickFilterOption('Workflow', 'Send Email');
+        await expectConnectedUserKeptInTheUrl();
+
+        expect(new URLSearchParams(currentSearch).get('workflowId')).toBe('workflow-1');
+    });
+
+    it('keeps the connected user when the type changes', async () => {
+        renderWorkflowExecutions('automations=1&connectedUserId=7');
+
+        await userEvent.click(getFilterComboBox('Type'));
+        await userEvent.click(await screen.findByRole('option', {name: 'Integrations'}));
+
+        await waitFor(() => {
+            expect(new URLSearchParams(currentSearch).get('automations')).toBe('0');
+        });
+
+        expect(new URLSearchParams(currentSearch).get('connectedUserId')).toBe('7');
+    });
+
+    it('keeps the connected user when the environment changes', async () => {
+        let environmentChangeCallback: (() => void) | undefined;
+
+        useOnEnvironmentChangeMock.mockImplementation((callback: () => void) => {
+            environmentChangeCallback = callback;
+        });
+
+        renderWorkflowExecutions('automations=1&connectedUserId=7');
+
+        act(() => environmentChangeCallback?.());
+
+        await expectConnectedUserKeptInTheUrl();
     });
 });
