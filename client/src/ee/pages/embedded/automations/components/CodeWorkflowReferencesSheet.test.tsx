@@ -116,6 +116,11 @@ describe('CodeWorkflowReferencesSheet', () => {
         expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
         expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
         expect(screen.getByText(/this list is read-only/i)).toBeInTheDocument();
+        expect(screen.queryByRole('columnheader', {name: 'Environment'})).not.toBeInTheDocument();
+        expect(hoisted.mockUseConnectedUserCodeWorkflowReferencesQuery).toHaveBeenCalledWith(
+            expect.objectContaining({environmentId: expect.any(String)}),
+            expect.anything()
+        );
         expect(document.querySelector('[data-slot="sheet-content"]')).toBeInTheDocument();
     });
 });
