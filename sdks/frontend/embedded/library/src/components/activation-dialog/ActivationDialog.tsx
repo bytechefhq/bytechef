@@ -132,11 +132,17 @@ interface LoadResultType {
     template?: AutomationTemplateType;
 }
 
+interface IntegrationInstanceStatusType {
+    connectionId?: number | null;
+    credentialStatus?: string;
+}
+
 interface ConnectRowProps {
     component: TemplateComponentType;
     connectionCreationAllowed: boolean;
     connections: ConnectionType[];
     highlighted: boolean;
+    integrationConnected: boolean;
     loadFailed: boolean;
     onConnect: () => void;
     onRetry: () => void;
@@ -149,6 +155,7 @@ const ConnectRow = ({
     connectionCreationAllowed,
     connections,
     highlighted,
+    integrationConnected,
     loadFailed,
     onConnect,
     onRetry,
@@ -190,7 +197,7 @@ const ConnectRow = ({
                         ))}
                     </select>
 
-                    {connectionCreationAllowed && (
+                    {connectionCreationAllowed && !integrationConnected && (
                         <button className={dialogStyles.buttonSecondary} onClick={onConnect} type="button">
                             Connect
                         </button>
@@ -245,6 +252,7 @@ const ActivationBody = ({
     template,
 }: ActivationBodyProps) => {
     const [busy, setBusy] = useState(false);
+    const [connectedIntegrationComponents, setConnectedIntegrationComponents] = useState<Record<string, boolean>>({});
     const [connectingComponent, setConnectingComponent] = useState<TemplateComponentType>();
     const [connectionLoadFailures, setConnectionLoadFailures] = useState<Record<string, boolean>>({});
     const [connectionsByComponent, setConnectionsByComponent] = useState<Record<string, ConnectionType[]>>({});
@@ -360,7 +368,18 @@ const ActivationBody = ({
         if (onActivated) {
             runHostCallback('onActivated', () => onActivated(template.id));
         }
-    }, [fetch, inputs.length, onActivated, rollBackProvision, state.inputValues, state.selections, template.id]);
+
+        onClose();
+    }, [
+        fetch,
+        inputs.length,
+        onActivated,
+        onClose,
+        rollBackProvision,
+        state.inputValues,
+        state.selections,
+        template.id,
+    ]);
 
     const editWorkflow = useCallback(async () => {
         setBusy(true);
@@ -397,6 +416,8 @@ const ActivationBody = ({
 
     const handleConnected = useCallback(
         (componentName: string, connectionId: number | undefined) => {
+            setConnectedIntegrationComponents((previous) => ({...previous, [componentName]: true}));
+
             void loadConnections(componentName).then((loaded) => {
                 if (loaded && connectionId !== undefined) {
                     dispatch({componentName, connectionId, type: 'SELECT_CONNECTION'});
@@ -410,6 +431,39 @@ const ActivationBody = ({
         state.step !== 'connect' &&
         state.step !== 'done' &&
         (state.requiredComponents.length > 0 || (state.step === 'activate' && inputs.length > 0));
+
+    useEffect(() => {
+        let cancelled = false;
+
+        requiredComponents
+            .filter((component) => component.integrationId !== null && component.integrationId !== undefined)
+            .forEach((component) => {
+                fetch<{integrationInstances?: IntegrationInstanceStatusType[]}>(
+                    `/api/embedded/v1/integrations/${component.integrationId}`
+                )
+                    .then((integration) => {
+                        if (cancelled) {
+                            return;
+                        }
+
+                        const connected = (integration?.integrationInstances ?? []).some(
+                            (integrationInstance) =>
+                                integrationInstance.connectionId !== undefined &&
+                                integrationInstance.connectionId !== null &&
+                                integrationInstance.credentialStatus !== 'INVALID'
+                        );
+
+                        setConnectedIntegrationComponents((previous) => ({...previous, [component.name]: connected}));
+                    })
+                    .catch((error: unknown) => {
+                        console.error(`Failed to load the ${component.name} integration:`, error);
+                    });
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [fetch, requiredComponents]);
 
     useEffect(() => {
         let cancelled = false;
@@ -469,6 +523,7 @@ const ActivationBody = ({
                                 connectionCreationAllowed={connectionCreationAllowed}
                                 connections={connectionsByComponent[component.name] ?? []}
                                 highlighted={state.highlightedComponent === component.name}
+                                integrationConnected={connectedIntegrationComponents[component.name] === true}
                                 key={component.name}
                                 loadFailed={connectionLoadFailures[component.name] === true}
                                 onConnect={() => {
@@ -516,19 +571,13 @@ const ActivationBody = ({
                 {state.step === 'activate' && (
                     <p className={styles.notice}>Everything is ready. Activate to switch this automation on.</p>
                 )}
-
-                {state.step === 'done' && <p className={styles.notice}>{template.label || 'This automation'} is on.</p>}
             </main>
 
             <footer className={dialogStyles.dialogFooter}>
                 <DialogPoweredBy />
 
                 <div className={styles.footerActions}>
-                    {state.step === 'done' ? (
-                        <button className={dialogStyles.buttonPrimary} onClick={onClose} type="button">
-                            Done
-                        </button>
-                    ) : (
+                    {state.step !== 'done' && (
                         <>
                             {onEditWorkflow && editable && (
                                 <button
