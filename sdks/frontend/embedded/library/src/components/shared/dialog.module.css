@@ -308,6 +308,8 @@
 .poweredByContainer {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .poweredByContainer span {
