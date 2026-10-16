@@ -39,6 +39,8 @@ public interface ConnectedUserProjectService {
 
     ConnectedUserProject getConnectUserProject(String externalUserId, Environment environment);
 
+    List<ConnectedUserProject> getConnectedUserConnectedUserProjects(long connectedUserId);
+
     List<ConnectedUserProject> getConnectedUserProjects(Long connectedUserId, Environment environment);
 
     List<ConnectedUserProject> getConnectedUserProjects(List<Long> ids);

@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,8 @@ public interface ConnectedUserReferenceDeploymentRepository
     extends ListCrudRepository<ConnectedUserReferenceDeployment, Long> {
 
     boolean existsByProjectDeploymentId(long projectDeploymentId);
+
+    List<ConnectedUserReferenceDeployment> findAllByConnectedUserId(long connectedUserId);
 
     Optional<ConnectedUserReferenceDeployment> findByConnectedUserIdAndProjectId(long connectedUserId, long projectId);
 }
