@@ -91,12 +91,17 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService {
 
     @Override
     public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, ProjectOwner projectOwner) {
-        if (projectIds.isEmpty()) {
+        return getOwnedProjectIds(projectIds, Set.of(projectOwner));
+    }
+
+    @Override
+    public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners) {
+        if (projectIds.isEmpty() || projectOwners.isEmpty()) {
             return Set.of();
         }
 
         List<String> conditions = projectOwnerContributors.stream()
-            .filter(contributor -> contributor.getProjectOwner() == projectOwner)
+            .filter(contributor -> projectOwners.contains(contributor.getProjectOwner()))
             .map(contributor -> contributor.getProjectClaimCondition("project.id"))
             .toList();
 

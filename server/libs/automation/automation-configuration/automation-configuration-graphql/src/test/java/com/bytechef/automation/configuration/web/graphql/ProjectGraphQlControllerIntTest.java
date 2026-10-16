@@ -36,6 +36,7 @@ import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import java.time.Instant;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -193,21 +194,22 @@ public class ProjectGraphQlControllerIntTest {
     }
 
     @Test
-    void testProjectsHidesCatalogProjectsAndKeepsConnectedUserProjects() {
+    void testProjectsHidesEmbeddedOwnedProjects() {
         List<Project> mockProjects = List.of(
             createMockProject(1L, "catalog"),
             createMockProject(2L, "user"),
             createMockProject(3L, "plain"));
 
         when(projectService.getProjects()).thenReturn(mockProjects);
-        when(projectFacade.getOwnedProjectIds(any(), eq(ProjectOwner.EMBEDDED_CATALOG))).thenReturn(Set.of(1L));
+        when(projectFacade.getOwnedProjectIds(any(), eq(EnumSet.allOf(ProjectOwner.class))))
+            .thenReturn(Set.of(1L, 2L));
 
         this.graphQlTester
             .documentName("projects")
             .execute()
             .path("projects[*].name")
             .entityList(String.class)
-            .containsExactly("user", "plain");
+            .containsExactly("plain");
     }
 
     @Test

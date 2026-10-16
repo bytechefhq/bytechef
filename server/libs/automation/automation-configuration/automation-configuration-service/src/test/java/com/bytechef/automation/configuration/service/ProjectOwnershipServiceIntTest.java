@@ -30,6 +30,7 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
@@ -136,6 +137,24 @@ public class ProjectOwnershipServiceIntTest {
             projectOwnershipService.getOwnedProjectIds(
                 List.of(firstProjectId, secondProjectId), ProjectOwner.EMBEDDED_CATALOG))
                     .isEqualTo(Set.of(firstProjectId));
+    }
+
+    @Test
+    public void testGetOwnedProjectIdsForSeveralOwnersReturnsIdsClaimedByAny() {
+        long catalogProjectId = saveProject("p1");
+        long connectedUserProjectId = saveProject("p2");
+        long plainProjectId = saveProject("p3");
+
+        testOwnerContributors.addCatalogId(catalogProjectId);
+        testOwnerContributors.addConnectedUserId(connectedUserProjectId);
+
+        assertThat(
+            projectOwnershipService.getOwnedProjectIds(
+                List.of(catalogProjectId, connectedUserProjectId, plainProjectId),
+                EnumSet.allOf(ProjectOwner.class)))
+                    .isEqualTo(Set.of(catalogProjectId, connectedUserProjectId));
+        assertThat(
+            projectOwnershipService.getOwnedProjectIds(List.of(catalogProjectId), Set.of())).isEmpty();
     }
 
     @Test

@@ -46,6 +46,8 @@ public interface ProjectFacade {
 
     Set<Long> getOwnedProjectIds(Collection<Long> projectIds, ProjectOwner projectOwner);
 
+    Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners);
+
     ProjectTemplateDTO getProjectTemplate(String id, boolean sharedProject);
 
     ProjectDTO getProject(long id);

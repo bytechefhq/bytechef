@@ -35,4 +35,6 @@ public interface ProjectOwnershipService {
         Set<ProjectDeploymentOwner> projectDeploymentOwners, String projectDeploymentIdColumn);
 
     Set<Long> getOwnedProjectIds(Collection<Long> projectIds, ProjectOwner projectOwner);
+
+    Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners);
 }

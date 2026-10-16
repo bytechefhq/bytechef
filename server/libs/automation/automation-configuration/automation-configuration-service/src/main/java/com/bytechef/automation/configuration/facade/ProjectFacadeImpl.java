@@ -262,6 +262,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners) {
+        return projectOwnershipService.getOwnedProjectIds(projectIds, projectOwners);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProjectTemplateDTO getProjectTemplate(String id, boolean sharedProject) {
         byte[] data;

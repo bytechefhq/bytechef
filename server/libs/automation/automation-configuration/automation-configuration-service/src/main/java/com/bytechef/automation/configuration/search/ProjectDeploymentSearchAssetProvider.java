@@ -24,6 +24,7 @@ import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -70,14 +71,14 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
             .stream()
             .collect(Collectors.toMap(Project::getId, Function.identity()));
 
-        Set<Long> catalogProjectIds = projectOwnershipService.getOwnedProjectIds(
-            projectIds, ProjectOwner.EMBEDDED_CATALOG);
+        Set<Long> embeddedProjectIds = projectOwnershipService.getOwnedProjectIds(
+            projectIds, EnumSet.allOf(ProjectOwner.class));
 
         return deployments.stream()
             .filter(deployment -> {
                 Project project = projectMap.get(deployment.getProjectId());
 
-                return project != null && !catalogProjectIds.contains(project.getId()) &&
+                return project != null && !embeddedProjectIds.contains(project.getId()) &&
                     workspaceIds.contains(project.getWorkspaceId()) &&
                     containsIgnoreCase(project.getName(), queryLower);
             })

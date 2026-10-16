@@ -29,6 +29,7 @@ import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -110,14 +111,14 @@ public class ProjectGraphQlController {
     public List<Project> projects() {
         List<Project> projects = projectService.getProjects();
 
-        Set<Long> catalogProjectIds = projectFacade.getOwnedProjectIds(
+        Set<Long> embeddedProjectIds = projectFacade.getOwnedProjectIds(
             projects.stream()
                 .map(Project::getId)
                 .toList(),
-            ProjectOwner.EMBEDDED_CATALOG);
+            EnumSet.allOf(ProjectOwner.class));
 
         return projects.stream()
-            .filter(project -> !catalogProjectIds.contains(project.getId()))
+            .filter(project -> !embeddedProjectIds.contains(project.getId()))
             .toList();
     }
 
