@@ -37,8 +37,23 @@ public interface ProjectWorkflowExecutionFacade {
 
     TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId);
 
-    Page<WorkflowExecutionDTO> getWorkflowExecutions(
+    default Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
         Long projectId, Long projectDeploymentId, String workflowId, Integer projectVersion, long workspaceId,
-        int pageNumber);
+        int pageNumber) {
+
+        return getWorkflowExecutions(
+            embedded, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, null,
+            workflowId, projectVersion, workspaceId, pageNumber);
+    }
+
+    /**
+     * Returns a page of workflow executions. A non-null {@code connectedUserId} restricts the page to the executions of
+     * the connected user's automation workflows, both those copied into the connected user's own project and those
+     * referenced from catalog projects.
+     */
+    Page<WorkflowExecutionDTO> getWorkflowExecutions(
+        Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,
+        long workspaceId, int pageNumber);
 }
