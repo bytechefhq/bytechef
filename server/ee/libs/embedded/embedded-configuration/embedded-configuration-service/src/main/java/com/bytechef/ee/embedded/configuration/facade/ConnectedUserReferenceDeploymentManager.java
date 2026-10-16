@@ -51,8 +51,6 @@ import org.springframework.transaction.annotation.Transactional;
 @SkipAutomationAuthorization
 class ConnectedUserReferenceDeploymentManager {
 
-    private static final String MARKER = "__EMBEDDED__";
-
     private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserService connectedUserService;
     private final ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver;
@@ -284,7 +282,7 @@ class ConnectedUserReferenceDeploymentManager {
 
         projectDeployment.setEnabled(true);
         projectDeployment.setEnvironment(environment);
-        projectDeployment.setName(getDeploymentName(connectedUser.getExternalId(), environment));
+        projectDeployment.setName(connectedUser.getExternalId());
         projectDeployment.setProjectId(automationWorkflowProjectId);
         projectDeployment.setProjectVersion(getLastPublishedVersion(automationWorkflowProjectId));
 
@@ -306,10 +304,6 @@ class ConnectedUserReferenceDeploymentManager {
                 projectDeployment.getProjectId(), projectDeployment.getProjectVersion(), automationWorkflowUuid)
             .flatMap(projectWorkflow -> projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(
                 projectDeployment.getId(), projectWorkflow.getWorkflowId()));
-    }
-
-    private static String getDeploymentName(String externalUserId, Environment environment) {
-        return MARKER + externalUserId + "__" + environment.name();
     }
 
     private Map<String, ProjectDeploymentWorkflow> getRowsByAutomationWorkflowUuid(long projectDeploymentId) {

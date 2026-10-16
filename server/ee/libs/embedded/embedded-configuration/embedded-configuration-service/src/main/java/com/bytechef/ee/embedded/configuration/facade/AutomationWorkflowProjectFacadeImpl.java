@@ -12,7 +12,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
@@ -71,7 +70,7 @@ import tools.jackson.core.type.TypeReference;
 @ConditionalOnEEVersion
 @SkipAutomationAuthorization
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
-    private static final String MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
+    private static final String LEGACY_NAME_PREFIX = "__EMBEDDED_AUTOMATION__";
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -143,7 +142,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         Project project = new Project();
 
-        project.setName(MARKER + name);
+        project.setName(name);
         project.setDescription(description);
         project.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
         project.setCategoryId(resolveCategory(category));
@@ -254,12 +253,11 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public long duplicateProject(long projectId) {
         Project sourceProject = getMarkedProject(projectId);
 
-        String sourceDisplayName = sourceProject.getName()
-            .substring(MARKER.length());
+        String sourceDisplayName = getDisplayName(sourceProject);
 
         Project newProject = new Project();
 
-        newProject.setName(MARKER + sourceDisplayName + " (Copy)");
+        newProject.setName(sourceDisplayName + " (Copy)");
         newProject.setDescription(sourceProject.getDescription());
         newProject.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
         newProject.setCategoryId(sourceProject.getCategoryId());
@@ -373,9 +371,13 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
         String permissionExpression, @Nullable Boolean automationHubVisible) {
+        if (name != null && name.startsWith("__EMBEDDED")) {
+            throw new IllegalArgumentException("Project name must not start with '__EMBEDDED': " + name);
+        }
+
         Project project = getMarkedProject(projectId);
 
-        project.setName(MARKER + name);
+        project.setName(name);
         project.setDescription(description);
         project.setCategoryId(resolveCategory(category));
         project.setTagIds(resolveTags(tags));
@@ -527,6 +529,16 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .collect(Collectors.toMap(AutomationWorkflowProject::getProjectId, Function.identity()));
     }
 
+    private static String getDisplayName(Project project) {
+        String name = project.getName();
+
+        if (name.startsWith(LEGACY_NAME_PREFIX)) {
+            return name.substring(LEGACY_NAME_PREFIX.length());
+        }
+
+        return name;
+    }
+
     private Project getMarkedProject(long projectId) {
         Project project = projectService.getProject(projectId);
 
@@ -587,8 +599,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .filter(Objects::nonNull)
             .toList();
 
-        String markedName = project.getName();
-        String displayName = markedName.substring(MARKER.length());
+        String displayName = getDisplayName(project);
 
         ProjectVersion lastPublishedProjectVersion = project.getLastPublishedProjectVersion();
 
@@ -631,8 +642,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
                 .toList();
         }
 
-        String markedName = project.getName();
-        String displayName = markedName.substring(MARKER.length());
+        String displayName = getDisplayName(project);
 
         boolean published = lastPublishedProjectVersion != null;
         Integer lastPublishedVersion = published ? lastPublishedProjectVersion.getVersion() : null;
