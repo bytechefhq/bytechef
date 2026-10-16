@@ -43,4 +43,10 @@ describe('TagsFormField', () => {
 
         expect(screen.getByText('Tags')).toBeInTheDocument();
     });
+
+    it('should hint that new tags can be typed', () => {
+        render(<FormHarness remainingTags={[]} />);
+
+        expect(screen.getByText('Select or type to create tags...')).toBeInTheDocument();
+    });
 });

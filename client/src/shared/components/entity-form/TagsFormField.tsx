@@ -40,6 +40,7 @@ const TagsFormField = ({remainingTags}: TagsFormFieldProps) => {
                                 value: tag.name.toLowerCase().replace(/\W/g, ''),
                                 ...tag,
                             }))}
+                            placeholder="Select or type to create tags..."
                         />
                     </FormControl>
 

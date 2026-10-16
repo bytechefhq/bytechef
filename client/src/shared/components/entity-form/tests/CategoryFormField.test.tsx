@@ -49,4 +49,10 @@ describe('CategoryFormField', () => {
 
         expect(screen.getByText('Category')).toBeInTheDocument();
     });
+
+    it('should hint that a new category can be typed', () => {
+        render(<FormHarness categories={[]} />);
+
+        expect(screen.getByText('Select or type to create, e.g. Marketing...')).toBeInTheDocument();
+    });
 });
