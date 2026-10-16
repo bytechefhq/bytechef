@@ -1,4 +1,5 @@
 dependencies {
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("io.micrometer:micrometer-core")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.aspectj:aspectjweaver")

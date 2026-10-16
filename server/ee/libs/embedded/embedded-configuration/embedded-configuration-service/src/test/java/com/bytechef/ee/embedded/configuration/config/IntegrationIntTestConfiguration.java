@@ -16,7 +16,10 @@
 
 package com.bytechef.ee.embedded.configuration.config;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
@@ -32,6 +35,7 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -84,7 +88,12 @@ public class IntegrationIntTestConfiguration {
 
     @Bean
     WorkflowValidatorFacade workflowValidatorFacade() {
-        return mock(WorkflowValidatorFacade.class);
+        WorkflowValidatorFacade workflowValidatorFacade = mock(WorkflowValidatorFacade.class);
+
+        when(workflowValidatorFacade.validateWorkflow(anyString(), anyLong()))
+            .thenReturn(new WorkflowValidationResult(List.of(), List.of()));
+
+        return workflowValidatorFacade;
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

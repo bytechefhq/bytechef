@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowTemplateNotVisibleException;
+import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
@@ -85,7 +86,8 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
 
     @Override
     @Transactional(noRollbackFor = {
-        DanglingReferenceException.class, MissingConnectionException.class, MissingInputException.class
+        DanglingReferenceException.class, InvalidWorkflowException.class, MissingConnectionException.class,
+        MissingInputException.class
     })
     public void enableReference(
         String externalUserId, String automationWorkflowUuid, boolean enable, Environment environment) {
@@ -251,6 +253,10 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
 
         if (enable && throwOnMissingInput && resolution.missingInputName() != null) {
             throw new MissingInputException(resolution.missingInputName());
+        }
+
+        if (enable && throwOnMissingInput && resolution.workflowErrorCount() > 0) {
+            throw new InvalidWorkflowException(automationWorkflowUuid, resolution.workflowErrorCount());
         }
 
         return savedReference;

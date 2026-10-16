@@ -621,11 +621,13 @@ paths:
         "204":
           description: "Successful operation."
         "409":
-          description: "A required connection could not be auto-wired, or a required workflow input has no value."
+          description: "A required connection could not be auto-wired, a required workflow input has no value, or\
+            \ the workflow that would run has validation errors."
           content:
             application/json:
               schema:
                 oneOf:
+                  - $ref: "#/components/schemas/InvalidWorkflowError"
                   - $ref: "#/components/schemas/MissingConnectionError"
                   - $ref: "#/components/schemas/MissingInputError"
       security:
@@ -1520,11 +1522,13 @@ paths:
         "204":
           description: "Successful operation."
         "409":
-          description: "A required connection could not be auto-wired, or a required workflow input has no value."
+          description: "A required connection could not be auto-wired, a required workflow input has no value, or\
+            \ the workflow that would run has validation errors."
           content:
             application/json:
               schema:
                 oneOf:
+                  - $ref: "#/components/schemas/InvalidWorkflowError"
                   - $ref: "#/components/schemas/MissingConnectionError"
                   - $ref: "#/components/schemas/MissingInputError"
       security:
@@ -2065,8 +2069,8 @@ components:
           type: "object"
           additionalProperties: true
         attentionReason:
-          description: "Why a REFERENCE needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or\
-            \ UPDATE_PENDING. Null when healthy or for COPY rows."
+          description: "Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>,\
+            \ UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy."
           type: "string"
     Connection:
       description: "Contains all required information to open a connection to a service defined by componentName parameter"
@@ -2559,6 +2563,15 @@ components:
             \ in the same call."
           type: "object"
           additionalProperties: true
+    InvalidWorkflowError:
+      type: "object"
+      description: "Returned when an automation cannot be enabled because the workflow that would run has validation\
+        \ errors."
+      properties:
+        invalidWorkflowErrorCount:
+          description: "The number of validation errors of the workflow that would run."
+          type: "integer"
+          format: "int32"
     MissingInputError:
       type: "object"
       description: "Returned when a reference cannot be enabled because a required workflow input has no value yet."

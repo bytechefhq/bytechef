@@ -35,6 +35,9 @@ class ConnectedUserReferenceAttentionResolverTest {
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
 
     @Mock
+    private ConnectedUserWorkflowValidator connectedUserWorkflowValidator;
+
+    @Mock
     private WorkflowConnectionSlot workflowConnectionSlot;
 
     private ConnectedUserReferenceAttentionResolver resolver;
@@ -42,7 +45,7 @@ class ConnectedUserReferenceAttentionResolverTest {
     @BeforeEach
     void setUp() {
         resolver = new ConnectedUserReferenceAttentionResolver(
-            connectedUserReferenceDeploymentManager, workflowConnectionSlot);
+            connectedUserReferenceDeploymentManager, connectedUserWorkflowValidator, workflowConnectionSlot);
     }
 
     @Test

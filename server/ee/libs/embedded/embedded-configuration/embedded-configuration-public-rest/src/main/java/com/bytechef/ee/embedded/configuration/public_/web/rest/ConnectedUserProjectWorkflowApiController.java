@@ -11,6 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowTemplateNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledException;
+import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
@@ -500,6 +501,12 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         ConnectionNotEntitledException connectionNotEntitledException) {
         return ResponseEntity.badRequest()
             .build();
+    }
+
+    @ExceptionHandler(InvalidWorkflowException.class)
+    public ResponseEntity<Object> handleInvalidWorkflowException(InvalidWorkflowException invalidWorkflowException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(Map.of("invalidWorkflowErrorCount", invalidWorkflowException.getErrorCount()));
     }
 
     @ExceptionHandler(MissingInputException.class)

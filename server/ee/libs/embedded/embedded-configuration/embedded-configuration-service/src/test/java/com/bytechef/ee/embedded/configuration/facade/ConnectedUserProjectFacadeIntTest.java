@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -40,6 +41,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
+import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -85,6 +87,8 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
@@ -135,6 +139,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class ConnectedUserProjectFacadeIntTest {
 
     private static final String HIDDEN_PERMISSION_EXPRESSION = "connectedUser.metadata.plan == 'hidden'";
+
+    private static final String BROKEN_COPY_WORKFLOW_DEFINITION = """
+        {"label":"Broken leads","inputs":[],"triggers":[],"tasks":[]}
+        """;
+
+    private static final String BROKEN_SLACK_WORKFLOW_DEFINITION = """
+        {"label":"Broken post","description":"Posts without a channel","triggers":[],
+         "tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
 
     private static final String COPY_WORKFLOW_WITH_SHEET_INPUT_DEFINITION = """
         {"label":"Leads","inputs":[{"name":"sheetName","label":"Sheet","type":"string","required":false}],
@@ -208,6 +221,9 @@ class ConnectedUserProjectFacadeIntTest {
     @Autowired
     private ProjectWorkflowService projectWorkflowService;
 
+    @Autowired
+    private WorkflowValidatorFacade workflowValidatorFacade;
+
     private String externalUserId;
 
     @BeforeEach
@@ -230,6 +246,111 @@ class ConnectedUserProjectFacadeIntTest {
             .thenReturn(false);
 
         stubEntitledSlackConnection(777L);
+
+        when(workflowValidatorFacade.validateWorkflow(
+            argThat(definition -> definition != null && definition.contains("\"Broken ")), anyLong()))
+                .thenReturn(
+                    new WorkflowValidationResult(
+                        List.of("[postMessage1] Missing required property: channel"),
+                        List.of("[postMessage1] Property 'text' might not exist")));
+    }
+
+    @Test
+    void testEnableProjectWorkflowOnACopyWhosePublishedWorkflowHasErrorsIsRefused() {
+        String workflowUuid = createPublishedCopy(externalUserId, BROKEN_COPY_WORKFLOW_DEFINITION);
+
+        long projectDeploymentId = getCopyProjectDeploymentId(externalUserId);
+        String publishedWorkflowId = getPublishedCopyWorkflowId(externalUserId, workflowUuid);
+
+        connectedUserProjectFacade.enableProjectWorkflow(externalUserId, workflowUuid, false, null);
+
+        assertThatThrownBy(
+            () -> connectedUserProjectFacade.enableProjectWorkflow(externalUserId, workflowUuid, true, null))
+                .isInstanceOfSatisfying(
+                    InvalidWorkflowException.class,
+                    invalidWorkflowException -> assertThat(invalidWorkflowException.getErrorCount()).isEqualTo(1));
+
+        assertThat(projectDeploymentWorkflowService.isProjectDeploymentWorkflowEnabled(
+            projectDeploymentId, publishedWorkflowId)).isFalse();
+    }
+
+    @Test
+    void testEnableProjectWorkflowOnACopyEnablesAValidPublishedVersionDespiteABrokenDraft() {
+        String workflowUuid = createPublishedCopy(externalUserId, COPY_WORKFLOW_WITH_SHEET_INPUT_DEFINITION);
+
+        connectedUserProjectFacade.updateProjectWorkflow(
+            externalUserId, workflowUuid, BROKEN_COPY_WORKFLOW_DEFINITION, Environment.PRODUCTION);
+
+        long projectDeploymentId = getCopyProjectDeploymentId(externalUserId);
+        String publishedWorkflowId = getPublishedCopyWorkflowId(externalUserId, workflowUuid);
+
+        connectedUserProjectFacade.enableProjectWorkflow(externalUserId, workflowUuid, false, null);
+        connectedUserProjectFacade.enableProjectWorkflow(externalUserId, workflowUuid, true, null);
+
+        assertThat(projectDeploymentWorkflowService.isProjectDeploymentWorkflowEnabled(
+            projectDeploymentId, publishedWorkflowId)).isTrue();
+    }
+
+    @Test
+    void testEnableProjectWorkflowOnAReferenceWhoseCatalogWorkflowHasErrorsIsRefused() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Broken Reference");
+
+        String automationWorkflowUuid = addAutomationWorkflow(
+            automationWorkflowProjectId, BROKEN_SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
+
+        assertThat(getReference(reference.getId()).isEnabled()).isFalse();
+
+        assertThatThrownBy(
+            () -> connectedUserProjectFacade.enableProjectWorkflow(externalUserId, automationWorkflowUuid, true, null))
+                .isInstanceOfSatisfying(
+                    InvalidWorkflowException.class,
+                    invalidWorkflowException -> assertThat(invalidWorkflowException.getErrorCount()).isEqualTo(1));
+
+        assertThat(getReference(reference.getId()).isEnabled()).isFalse();
+    }
+
+    @Test
+    void testGetConnectedUserProjectWorkflowsReportsAnInvalidWorkflowOnACopyAndOnAReference() {
+        createPublishedCopy(externalUserId, BROKEN_COPY_WORKFLOW_DEFINITION);
+
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Broken Listed Reference");
+
+        String automationWorkflowUuid = addAutomationWorkflow(
+            automationWorkflowProjectId, BROKEN_SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
+
+        List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflowDTOs =
+            connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectWorkflowDTOs)
+            .hasSize(2)
+            .allSatisfy(connectedUserProjectWorkflowDTO -> assertThat(connectedUserProjectWorkflowDTO.attentionReason())
+                .isEqualTo(ConnectedUserReferenceAttentionResolver.INVALID_WORKFLOW_PREFIX + 1));
+    }
+
+    @Test
+    void testGetConnectedUserProjectWorkflowsReportsNoInvalidWorkflowForAValidPublishedCopyWithABrokenDraft() {
+        String workflowUuid = createPublishedCopy(externalUserId, COPY_WORKFLOW_WITH_SHEET_INPUT_DEFINITION);
+
+        connectedUserProjectFacade.updateProjectWorkflow(
+            externalUserId, workflowUuid, BROKEN_COPY_WORKFLOW_DEFINITION, Environment.PRODUCTION);
+
+        List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflowDTOs =
+            connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectWorkflowDTOs)
+            .singleElement()
+            .satisfies(connectedUserProjectWorkflowDTO -> assertThat(connectedUserProjectWorkflowDTO.attentionReason())
+                .isNull());
     }
 
     @Test
