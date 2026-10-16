@@ -17,10 +17,13 @@ export interface AnalyticsI {
     captureOAuth2AuthorizationStarted(componentName: string | undefined): void;
     captureOAuth2AuthorizationSucceeded(componentName: string | undefined): void;
     captureProjectCreated(): void;
+    captureProjectCreatedFromTemplate(): void;
     captureProjectDeploymentCreated(): void;
     captureProjectDeploymentEnabled(): void;
+    captureProjectImported(): void;
     captureProjectPublished(): void;
     captureProjectWorkflowCreated(): void;
+    captureProjectWorkflowCreatedFromTemplate(): void;
     captureProjectWorkflowImported(): void;
     captureProjectWorkflowTested(): void;
     captureUserSignedUp(email: string): void;
@@ -94,10 +97,13 @@ export const useAnalytics = (): AnalyticsI => {
         captureOAuth2AuthorizationSucceeded: (componentName: string | undefined) =>
             captureEvent('oauth2_authorization_succeeded', {componentName}),
         captureProjectCreated: () => captureEvent('project_created'),
+        captureProjectCreatedFromTemplate: () => captureEvent('project_created', {template: true}),
         captureProjectDeploymentCreated: () => captureEvent('project_deployment_created'),
         captureProjectDeploymentEnabled: () => captureEvent('project_deployment_enabled'),
+        captureProjectImported: () => captureEvent('project_created', {imported: true}),
         captureProjectPublished: () => captureEvent('project_published'),
         captureProjectWorkflowCreated: () => captureEvent('project_workflow_created'),
+        captureProjectWorkflowCreatedFromTemplate: () => captureEvent('project_workflow_created', {template: true}),
         captureProjectWorkflowImported: () => captureEvent('project_workflow_created', {imported: true}),
         captureProjectWorkflowTested: () => captureEvent('project_workflow_tested'),
         captureUserSignedUp: (email: string) => captureEvent('user_signed_up', {email}),
