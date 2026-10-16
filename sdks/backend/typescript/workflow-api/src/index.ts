@@ -122,6 +122,15 @@ export type InputType = 'BOOLEAN' | 'DATE' | 'DATE_TIME' | 'FIELD_MAPPING' | 'IN
  * A workflow input. At run time it arrives in `context.input()` under its own name.
  */
 export interface InputDefinition {
+    /**
+     * The component whose declared input this input takes its options from, for example `slack` for Slack's
+     * `channel`. Set together with `componentVersion` and `groupName`.
+     */
+    componentName?: string;
+    componentVersion?: number;
+
+    /** The name of the component input group, for example `channel`. */
+    groupName?: string;
     label?: string;
     name: string;
     required?: boolean;

@@ -183,6 +183,7 @@ public class WorkflowDsl {
 
     public static class ModifiableInput implements Input {
 
+        private ComponentInputReference componentInput;
         private String label;
         private final String name;
         private boolean required;
@@ -190,6 +191,16 @@ public class WorkflowDsl {
 
         private ModifiableInput(String name) {
             this.name = name;
+        }
+
+        /**
+         * Takes the input's options from the input group {@code groupName} of the component {@code componentName} at
+         * {@code componentVersion}, for example {@code component("slack", 1, "channel")}.
+         */
+        public ModifiableInput component(String componentName, int componentVersion, String groupName) {
+            this.componentInput = new ComponentInputReference(componentName, componentVersion, groupName);
+
+            return this;
         }
 
         public ModifiableInput label(String label) {
@@ -208,6 +219,11 @@ public class WorkflowDsl {
             this.type = type;
 
             return this;
+        }
+
+        @Override
+        public Optional<ComponentInputReference> getComponentInput() {
+            return Optional.ofNullable(componentInput);
         }
 
         @Override
