@@ -2,7 +2,7 @@ import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {Separator} from '@/components/ui/separator';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {CopyIcon, DownloadIcon, EditIcon, Share2Icon, Trash2Icon} from 'lucide-react';
+import {CopyIcon, DownloadIcon, EditIcon, HistoryIcon, Share2Icon, Trash2Icon} from 'lucide-react';
 import {MouseEvent} from 'react';
 
 const WorkflowTabButtons = ({
@@ -11,6 +11,7 @@ const WorkflowTabButtons = ({
     onShareWorkflow,
     onShowDeleteWorkflowAlertDialog,
     onShowEditWorkflowDialog,
+    onShowLoadWorkflowVersionDialog,
     workflowId,
 }: {
     onCloseDropdownMenu: () => void;
@@ -18,6 +19,7 @@ const WorkflowTabButtons = ({
     onShareWorkflow: () => void;
     onShowEditWorkflowDialog: () => void;
     onShowDeleteWorkflowAlertDialog: () => void;
+    onShowLoadWorkflowVersionDialog: () => void;
     workflowId: string;
 }) => {
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
@@ -43,6 +45,14 @@ const WorkflowTabButtons = ({
                 icon={<CopyIcon />}
                 label="Duplicate"
                 onClick={onDuplicateWorkflow}
+                variant="ghost"
+            />
+
+            <Button
+                className="dropdown-menu-item"
+                icon={<HistoryIcon />}
+                label="Load Previous Version"
+                onClick={onShowLoadWorkflowVersionDialog}
                 variant="ghost"
             />
 
