@@ -23,9 +23,5 @@ import java.util.List;
  */
 public interface ConnectedUserProjectDeploymentResolver {
 
-    /**
-     * Returns the ids of every project deployment whose executions belong to the connected user: the deployments of the
-     * connected user's own projects and the connected user's reference deployments of catalog projects.
-     */
     List<Long> getProjectDeploymentIds(long connectedUserId);
 }
