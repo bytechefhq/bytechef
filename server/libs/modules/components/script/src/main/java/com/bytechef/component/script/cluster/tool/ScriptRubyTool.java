@@ -58,7 +58,21 @@ public class ScriptRubyTool {
                         .description("Custom Ruby code to execute as a tool.")
                         .controlType(CODE_EDITOR)
                         .languageId("ruby")
-                        .defaultValue("def perform(input, context)\n\treturn nil;\nend")
+                        .defaultValue(
+                            """
+                                def perform(input, connection, context)
+                                  # input holds the values defined in the Input panel (top right of this editor).
+                                  #
+                                  # connection holds the parameters of each connection defined in the
+                                  # Connections panel (bottom right of this editor), keyed by its name:
+                                  # token = connection["my-connection"]["token"]
+                                  #
+                                  # Reach another component's action through the context:
+                                  # response = context.component.httpClient.get(
+                                  #   { "uri" => "https://api.example.com/items" }, "my-connection")
+
+                                  return nil
+                                end""")
                         .required(true)),
             "ruby", polyglotEngine);
     }
