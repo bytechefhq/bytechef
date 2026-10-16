@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface ConnectionDefinitionHelp {
     /**
      * 
-     * @type {string}
-     * @memberof ConnectionDefinitionHelp
      */
     body?: string;
     /**
      * 
-     * @type {string}
-     * @memberof ConnectionDefinitionHelp
      */
     learnMoreUrl?: string;
 }

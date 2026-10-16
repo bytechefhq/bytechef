@@ -30,22 +30,55 @@ import {
 } from '../models/WorkflowExecution';
 
 export interface GetWorkflowExecutionRequest {
+    /**
+     * The id of an execution.
+     */
     id: number;
 }
 
 export interface GetWorkflowExecutionTaskExecutionRequest {
+    /**
+     * The id of an execution.
+     */
     id: number;
+    /**
+     * The id of a task execution.
+     */
     taskExecutionId: number;
 }
 
 export interface GetWorkflowExecutionsPageRequest {
+    /**
+     * The id of an environment.
+     */
     environmentId?: number;
+    /**
+     * The status of an executed job
+     */
     jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
+    /**
+     * The start date of a job.
+     */
     jobStartDate?: Date;
+    /**
+     * The end date of a job.
+     */
     jobEndDate?: Date;
+    /**
+     * The id of a Integration.
+     */
     integrationId?: number;
+    /**
+     * The id of a Integration instance configuration.
+     */
     integrationInstanceConfigurationId?: number;
+    /**
+     * The id of a workflow.
+     */
     workflowId?: string;
+    /**
+     * The number of the page to return.
+     */
     pageNumber?: number;
 }
 
@@ -171,11 +204,11 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['jobStartDate'] != null) {
-            queryParameters['jobStartDate'] = (requestParameters['jobStartDate'] as any).toISOString();
+            queryParameters['jobStartDate'] = runtime.serializeDateTime(requestParameters['jobStartDate'] as any);
         }
 
         if (requestParameters['jobEndDate'] != null) {
-            queryParameters['jobEndDate'] = (requestParameters['jobEndDate'] as any).toISOString();
+            queryParameters['jobEndDate'] = runtime.serializeDateTime(requestParameters['jobEndDate'] as any);
         }
 
         if (requestParameters['integrationId'] != null) {
@@ -237,6 +270,6 @@ export const GetWorkflowExecutionsPageJobStatusEnum = {
     Started: 'STARTED',
     Stopped: 'STOPPED',
     Failed: 'FAILED',
-    Completed: 'COMPLETED'
+    Completed: 'COMPLETED',
 } as const;
 export type GetWorkflowExecutionsPageJobStatusEnum = typeof GetWorkflowExecutionsPageJobStatusEnum[keyof typeof GetWorkflowExecutionsPageJobStatusEnum];

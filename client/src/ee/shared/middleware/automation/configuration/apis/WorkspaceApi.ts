@@ -20,19 +20,34 @@ import {
 } from '../models/Workspace';
 
 export interface CreateWorkspaceRequest {
+    /**
+     * 
+     */
     workspace: Omit<Workspace, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 export interface DeleteWorkspaceRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
 }
 
 export interface GetWorkspaceRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
 }
 
 export interface UpdateWorkspaceRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
+    /**
+     * 
+     */
     workspace: Omit<Workspace, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 

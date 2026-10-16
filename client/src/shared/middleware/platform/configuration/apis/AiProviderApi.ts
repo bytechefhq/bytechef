@@ -25,23 +25,50 @@ import {
 } from '../models/UpdateAiProviderRequest';
 
 export interface DeleteAiProviderRequest {
+    /**
+     * The id of an AI provider.
+     */
     id: number;
+    /**
+     * The environment of an AI provider.
+     */
     environment: number;
 }
 
 export interface EnableAiProviderRequest {
+    /**
+     * The id of an AI provider.
+     */
     id: number;
+    /**
+     * The enable status of an AI provider.
+     */
     enable: boolean;
+    /**
+     * The environment of an AI provider.
+     */
     environment: number;
 }
 
 export interface GetAiProvidersRequest {
+    /**
+     * The environment of an AI provider.
+     */
     environment: number;
 }
 
 export interface UpdateAiProviderOperationRequest {
+    /**
+     * The id of an AI provider.
+     */
     id: number;
+    /**
+     * The environment of an AI provider.
+     */
     environment: number;
+    /**
+     * 
+     */
     updateAiProviderRequest: UpdateAiProviderRequest;
 }
 

@@ -25,13 +25,28 @@ import {
 } from '../models/TriggerDefinitionBasic';
 
 export interface GetComponentTriggerDefinitionRequest {
+    /**
+     * The name of the component.
+     */
     componentName: string;
+    /**
+     * The version of a component.
+     */
     componentVersion: number;
+    /**
+     * The name of a trigger to get.
+     */
     triggerName: string;
 }
 
 export interface GetComponentTriggerDefinitionsRequest {
+    /**
+     * The name of a component.
+     */
     componentName: string;
+    /**
+     * The version of a component.
+     */
     componentVersion: number;
 }
 

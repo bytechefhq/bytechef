@@ -20,13 +20,28 @@ import {
 } from '../models/Environment';
 
 export interface UpdateConnectedUserRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
+    /**
+     * 
+     */
     requestBody?: { [key: string]: any; };
 }
 
 export interface UpdateFrontendConnectedUserRequest {
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
+    /**
+     * 
+     */
     requestBody?: { [key: string]: any; };
 }
 

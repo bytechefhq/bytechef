@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { WorkflowOutput } from './WorkflowOutput';
 import {
     WorkflowOutputFromJSON,
@@ -57,122 +57,82 @@ import {
 export interface Workflow1 {
     /**
      * The created by.
-     * @type {string}
-     * @memberof Workflow1
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof Workflow1
      */
     readonly createdDate?: Date;
     /**
      * The number of workflow connections
-     * @type {number}
-     * @memberof Workflow1
      */
     readonly connectionsCount?: number;
     /**
      * The definition of a workflow.
-     * @type {string}
-     * @memberof Workflow1
      */
     definition?: string;
     /**
      * The description of a workflow.
-     * @type {string}
-     * @memberof Workflow1
      */
     description?: string;
     /**
      * 
-     * @type {WorkflowFormat}
-     * @memberof Workflow1
      */
     format?: WorkflowFormat;
     /**
      * The id of a workflow.
-     * @type {string}
-     * @memberof Workflow1
      */
     readonly id?: string;
     /**
      * The workflow's expected list of inputs.
-     * @type {Array<WorkflowInput>}
-     * @memberof Workflow1
      */
     readonly inputs?: Array<WorkflowInput>;
     /**
      * The number of workflow inputs
-     * @type {number}
-     * @memberof Workflow1
      */
     readonly inputsCount?: number;
     /**
      * The descriptive name for the workflow
-     * @type {string}
-     * @memberof Workflow1
      */
     readonly label?: string;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof Workflow1
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof Workflow1
      */
     readonly lastModifiedDate?: Date;
     /**
      * The workflow's list of expected outputs.
-     * @type {Array<WorkflowOutput>}
-     * @memberof Workflow1
      */
     readonly outputs?: Array<WorkflowOutput>;
     /**
      * The type of the source which stores the workflow definition.
-     * @type {Workflow1SourceTypeEnum}
-     * @memberof Workflow1
      */
     sourceType?: Workflow1SourceTypeEnum;
     /**
      * The maximum number of times a task may retry.
-     * @type {number}
-     * @memberof Workflow1
      */
     readonly maxRetries?: number;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof Workflow1
      */
     readonly workflowTaskComponentNames?: Array<string>;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof Workflow1
      */
     readonly workflowTriggerComponentNames?: Array<string>;
     /**
      * The steps that make up the workflow.
-     * @type {Array<WorkflowTask>}
-     * @memberof Workflow1
      */
     readonly tasks?: Array<WorkflowTask>;
     /**
      * The steps that make up the workflow.
-     * @type {Array<WorkflowTrigger>}
-     * @memberof Workflow1
      */
     readonly triggers?: Array<WorkflowTrigger>;
     /**
      * 
-     * @type {number}
-     * @memberof Workflow1
      */
     version?: number;
 }
@@ -185,7 +145,7 @@ export const Workflow1SourceTypeEnum = {
     Classpath: 'CLASSPATH',
     Filesystem: 'FILESYSTEM',
     Git: 'GIT',
-    Jdbc: 'JDBC'
+    Jdbc: 'JDBC',
 } as const;
 export type Workflow1SourceTypeEnum = typeof Workflow1SourceTypeEnum[keyof typeof Workflow1SourceTypeEnum];
 
@@ -208,7 +168,7 @@ export function Workflow1FromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'connectionsCount': json['connectionsCount'] == null ? undefined : json['connectionsCount'],
         'definition': json['definition'] == null ? undefined : json['definition'],
         'description': json['description'] == null ? undefined : json['description'],
@@ -218,7 +178,7 @@ export function Workflow1FromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'inputsCount': json['inputsCount'] == null ? undefined : json['inputsCount'],
         'label': json['label'] == null ? undefined : json['label'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'outputs': json['outputs'] == null ? undefined : ((json['outputs'] as Array<any>).map(WorkflowOutputFromJSON)),
         'sourceType': json['sourceType'] == null ? undefined : json['sourceType'],
         'maxRetries': json['maxRetries'] == null ? undefined : json['maxRetries'],

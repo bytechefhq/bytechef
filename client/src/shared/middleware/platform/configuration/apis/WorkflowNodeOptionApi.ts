@@ -20,22 +20,64 @@ import {
 } from '../models/Option';
 
 export interface GetClusterElementNodeOptionsRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's cluster root action task (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a cluster element type.
+     */
     clusterElementType: string;
+    /**
+     * The name of a cluster element workflow node.
+     */
     clusterElementWorkflowNodeName: string;
+    /**
+     * The name of a property.
+     */
     propertyName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * The list of dependency paths.
+     */
     lookupDependsOnPaths?: Array<string>;
+    /**
+     * Optional search text used to filter option items
+     */
     searchText?: string;
 }
 
 export interface GetWorkflowNodeOptionsRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a property.
+     */
     propertyName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * The list of dependency paths.
+     */
     lookupDependsOnPaths?: Array<string>;
+    /**
+     * Optional search text used to filter option items
+     */
     searchText?: string;
 }
 

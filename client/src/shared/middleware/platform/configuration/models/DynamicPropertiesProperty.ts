@@ -43,14 +43,10 @@ import {
 export interface DynamicPropertiesProperty extends Property {
     /**
      * The dynamic property header.
-     * @type {string}
-     * @memberof DynamicPropertiesProperty
      */
     header?: string;
     /**
      * 
-     * @type {PropertiesDataSource}
-     * @memberof DynamicPropertiesProperty
      */
     propertiesDataSource?: PropertiesDataSource;
 }

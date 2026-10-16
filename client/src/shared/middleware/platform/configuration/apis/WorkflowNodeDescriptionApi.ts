@@ -20,15 +20,36 @@ import {
 } from '../models/GetWorkflowNodeDescription200Response';
 
 export interface GetClusterElementWorkflowNodeDescriptionRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of an workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a cluster element to get.
+     */
     clusterElementName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 
 export interface GetWorkflowNodeDescriptionRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of an workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 

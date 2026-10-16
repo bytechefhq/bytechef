@@ -20,6 +20,9 @@ import {
 } from '../models/TriggerForm';
 
 export interface GetTriggerFormRequest {
+    /**
+     * The id of a trigger form.
+     */
     id: string;
 }
 

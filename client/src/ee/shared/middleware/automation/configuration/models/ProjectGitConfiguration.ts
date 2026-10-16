@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * The git configuration.
  * @export
@@ -21,50 +21,34 @@ import { mapValues } from '../runtime';
 export interface ProjectGitConfiguration {
     /**
      * The project id of a project git configuration.
-     * @type {number}
-     * @memberof ProjectGitConfiguration
      */
     readonly projectId: number;
     /**
      * The branch.
-     * @type {string}
-     * @memberof ProjectGitConfiguration
      */
     branch: string;
     /**
      * The enabled.
-     * @type {boolean}
-     * @memberof ProjectGitConfiguration
      */
     enabled: boolean;
     /**
      * The created by.
-     * @type {string}
-     * @memberof ProjectGitConfiguration
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof ProjectGitConfiguration
      */
     readonly createdDate?: Date;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof ProjectGitConfiguration
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof ProjectGitConfiguration
      */
     readonly lastModifiedDate?: Date;
     /**
      * 
-     * @type {number}
-     * @memberof ProjectGitConfiguration
      */
     version?: number;
 }
@@ -93,9 +77,9 @@ export function ProjectGitConfigurationFromJSONTyped(json: any, ignoreDiscrimina
         'branch': json['branch'],
         'enabled': json['enabled'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }

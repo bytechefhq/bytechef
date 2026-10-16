@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * A category.
  * @export
@@ -21,44 +21,30 @@ import { mapValues } from '../runtime';
 export interface Category {
     /**
      * The created by.
-     * @type {string}
-     * @memberof Category
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof Category
      */
     readonly createdDate?: Date;
     /**
      * The id of the category.
-     * @type {number}
-     * @memberof Category
      */
     id?: number;
     /**
      * The name of the category.
-     * @type {string}
-     * @memberof Category
      */
     name: string;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof Category
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof Category
      */
     readonly lastModifiedDate?: Date;
     /**
      * 
-     * @type {number}
-     * @memberof Category
      */
     version?: number;
 }
@@ -82,11 +68,11 @@ export function CategoryFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }

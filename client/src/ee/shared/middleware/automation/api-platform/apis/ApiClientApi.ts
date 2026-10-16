@@ -25,19 +25,34 @@ import {
 } from '../models/CreateApiClient200Response';
 
 export interface CreateApiClientRequest {
+    /**
+     * 
+     */
     apiClient: Omit<ApiClient, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
 }
 
 export interface DeleteApiClientRequest {
+    /**
+     * The id of an API client.
+     */
     id: number;
 }
 
 export interface GetApiClientRequest {
+    /**
+     * The id of an API client.
+     */
     id: number;
 }
 
 export interface UpdateApiClientRequest {
+    /**
+     * The id of an API client.
+     */
     id: number;
+    /**
+     * 
+     */
     apiClient: Omit<ApiClient, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
 }
 

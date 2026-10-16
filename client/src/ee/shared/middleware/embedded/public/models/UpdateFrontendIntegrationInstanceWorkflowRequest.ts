@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface UpdateFrontendIntegrationInstanceWorkflowRequest {
     /**
      * The workflow inputs
-     * @type {{ [key: string]: any; }}
-     * @memberof UpdateFrontendIntegrationInstanceWorkflowRequest
      */
     inputs?: { [key: string]: any; };
 }

@@ -25,12 +25,24 @@ import {
 } from '../models/ConnectionDefinitionBasic';
 
 export interface GetComponentConnectionDefinitionRequest {
+    /**
+     * The name of a component.
+     */
     componentName: string;
+    /**
+     * The version of a component.
+     */
     componentVersion?: number;
 }
 
 export interface GetComponentConnectionDefinitionsRequest {
+    /**
+     * The name of a component.
+     */
     componentName: string;
+    /**
+     * The version of a component.
+     */
     componentVersion?: number;
 }
 

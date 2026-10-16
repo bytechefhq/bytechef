@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface UpdateFrontendWorkflowConfigurationConnectionRequest {
     /**
      * 
-     * @type {number}
-     * @memberof UpdateFrontendWorkflowConfigurationConnectionRequest
      */
     connectionId?: number;
 }

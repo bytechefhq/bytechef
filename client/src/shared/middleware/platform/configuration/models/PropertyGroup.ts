@@ -29,20 +29,14 @@ import {
 export interface PropertyGroup {
     /**
      * 
-     * @type {string}
-     * @memberof PropertyGroup
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof PropertyGroup
      */
     label?: string;
     /**
      * 
-     * @type {Array<Property>}
-     * @memberof PropertyGroup
      */
     properties?: Array<Property>;
 }

@@ -64,44 +64,30 @@ import {
 export interface ObjectProperty extends ValueProperty {
     /**
      * Types of dynamically defined properties.
-     * @type {Array<Property>}
-     * @memberof ObjectProperty
      */
     additionalProperties?: Array<Property>;
     /**
      * The property default value.
-     * @type {{ [key: string]: any; }}
-     * @memberof ObjectProperty
      */
     defaultValue?: { [key: string]: any; };
     /**
      * The property sample value.
-     * @type {{ [key: string]: any; }}
-     * @memberof ObjectProperty
      */
     exampleValue?: { [key: string]: any; };
     /**
      * If the object can contain multiple additional properties.
-     * @type {boolean}
-     * @memberof ObjectProperty
      */
     multipleValues?: boolean;
     /**
      * The list of valid property options.
-     * @type {Array<Option>}
-     * @memberof ObjectProperty
      */
     options?: Array<Option>;
     /**
      * 
-     * @type {OptionsDataSource}
-     * @memberof ObjectProperty
      */
     optionsDataSource?: OptionsDataSource;
     /**
      * The list of valid object property types.
-     * @type {Array<Property>}
-     * @memberof ObjectProperty
      */
     properties?: Array<Property>;
 }

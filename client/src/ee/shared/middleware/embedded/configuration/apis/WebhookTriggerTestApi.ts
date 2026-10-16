@@ -20,14 +20,32 @@ import {
 } from '../models/StartWebhookTriggerTest200Response';
 
 export interface StartWebhookTriggerTestRequest {
+    /**
+     * The id of a workflow.
+     */
     workflowId: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * The name of the workflow trigger to test. Defaults to the first trigger.
+     */
     triggerName?: string;
 }
 
 export interface StopWebhookTriggerTestRequest {
+    /**
+     * The id of a workflow.
+     */
     workflowId: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * The name of the workflow trigger to test. Defaults to the first trigger.
+     */
     triggerName?: string;
 }
 

@@ -30,7 +30,7 @@ export const PropertyType = {
     String: 'STRING',
     Object: 'OBJECT',
     Task: 'TASK',
-    Time: 'TIME'
+    Time: 'TIME',
 } as const;
 export type PropertyType = typeof PropertyType[keyof typeof PropertyType];
 

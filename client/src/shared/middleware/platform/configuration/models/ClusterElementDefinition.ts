@@ -36,80 +36,54 @@ import {
 export interface ClusterElementDefinition {
     /**
      * The component name.
-     * @type {string}
-     * @memberof ClusterElementDefinition
      */
     componentName: string;
     /**
      * The component version.
-     * @type {number}
-     * @memberof ClusterElementDefinition
      */
     componentVersion: number;
     /**
      * The cluster element description.
-     * @type {string}
-     * @memberof ClusterElementDefinition
      */
     description?: string;
     /**
      * 
-     * @type {Help}
-     * @memberof ClusterElementDefinition
      */
     help?: Help;
     /**
      * The cluster element name.
-     * @type {string}
-     * @memberof ClusterElementDefinition
      */
     name: string;
     /**
      * The component icon.
-     * @type {string}
-     * @memberof ClusterElementDefinition
      */
     icon?: string;
     /**
      * Does action defines output.
-     * @type {boolean}
-     * @memberof ClusterElementDefinition
      */
     outputDefined: boolean;
     /**
      * Does action defines output function.
-     * @type {boolean}
-     * @memberof ClusterElementDefinition
      */
     outputFunctionDefined?: boolean;
     /**
      * Does action defines output schema.
-     * @type {boolean}
-     * @memberof ClusterElementDefinition
      */
     outputSchemaDefined?: boolean;
     /**
      * The cluster element title.
-     * @type {string}
-     * @memberof ClusterElementDefinition
      */
     title?: string;
     /**
      * The cluster element type.
-     * @type {string}
-     * @memberof ClusterElementDefinition
      */
     type: string;
     /**
      * The list of action properties.
-     * @type {Array<Property>}
-     * @memberof ClusterElementDefinition
      */
     properties?: Array<Property>;
     /**
      * Can the cluster element be run on its own to test it.
-     * @type {boolean}
-     * @memberof ClusterElementDefinition
      */
     testable?: boolean;
 }

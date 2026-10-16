@@ -29,20 +29,14 @@ import {
 export interface ComponentPropertyGroup {
     /**
      * 
-     * @type {string}
-     * @memberof ComponentPropertyGroup
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof ComponentPropertyGroup
      */
     label?: string;
     /**
      * 
-     * @type {Array<ComponentProperty>}
-     * @memberof ComponentPropertyGroup
      */
     properties?: Array<ComponentProperty>;
 }

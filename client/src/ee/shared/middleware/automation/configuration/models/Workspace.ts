@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * A workspace.
  * @export
@@ -21,50 +21,34 @@ import { mapValues } from '../runtime';
 export interface Workspace {
     /**
      * The created by.
-     * @type {string}
-     * @memberof Workspace
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof Workspace
      */
     readonly createdDate?: Date;
     /**
      * The description of a workspace.
-     * @type {string}
-     * @memberof Workspace
      */
     description?: string;
     /**
      * The id of the category.
-     * @type {number}
-     * @memberof Workspace
      */
     id?: number;
     /**
      * The name of the category.
-     * @type {string}
-     * @memberof Workspace
      */
     name: string;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof Workspace
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof Workspace
      */
     readonly lastModifiedDate?: Date;
     /**
      * 
-     * @type {number}
-     * @memberof Workspace
      */
     version?: number;
 }
@@ -88,12 +72,12 @@ export function WorkspaceFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }

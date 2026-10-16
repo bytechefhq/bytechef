@@ -29,44 +29,30 @@ import {
 export interface WorkflowInput {
     /**
      * If true, the input is configured in the admin integration instance configuration; if false (default), it is rendered in the end-user connect dialog.
-     * @type {boolean}
-     * @memberof WorkflowInput
      */
     internalOnly?: boolean;
     /**
      * The descriptive name of an input
-     * @type {string}
-     * @memberof WorkflowInput
      */
     label?: string;
     /**
      * The name of an input
-     * @type {string}
-     * @memberof WorkflowInput
      */
     name: string;
     /**
      * For field_mapping inputs, the name of the object whose fields are being mapped.
-     * @type {string}
-     * @memberof WorkflowInput
      */
     objectName?: string;
     /**
      * If an input is required, or not
-     * @type {boolean}
-     * @memberof WorkflowInput
      */
     required?: boolean;
     /**
      * The type of an input, for example \"string\"
-     * @type {string}
-     * @memberof WorkflowInput
      */
     type?: string;
     /**
      * 
-     * @type {ComponentInputReference}
-     * @memberof WorkflowInput
      */
     componentReference?: ComponentInputReference;
 }

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { ExecutionError } from './ExecutionError';
 import {
     ExecutionErrorFromJSON,
@@ -43,116 +43,78 @@ import {
 export interface Job {
     /**
      * The created by.
-     * @type {string}
-     * @memberof Job
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof Job
      */
     readonly createdDate?: Date;
     /**
      * The index of the step on the job's workflow on which the job is working on right now.
-     * @type {number}
-     * @memberof Job
      */
     readonly currentTask?: number;
     /**
      * The time execution entered end status COMPLETED, STOPPED, FAILED
-     * @type {Date}
-     * @memberof Job
      */
     endDate?: Date;
     /**
      * 
-     * @type {ExecutionError}
-     * @memberof Job
      */
     error?: ExecutionError;
     /**
      * The id of a job.
-     * @type {string}
-     * @memberof Job
      */
     readonly id?: string;
     /**
      * The key-value map of the inputs passed to the job when it was created.
-     * @type {{ [key: string]: any; }}
-     * @memberof Job
      */
     readonly inputs?: { [key: string]: any; };
     /**
      * The job's human-readable name.
-     * @type {string}
-     * @memberof Job
      */
     readonly label?: string;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof Job
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof Job
      */
     readonly lastModifiedDate?: Date;
     /**
      * Key-value map of metadata.
-     * @type {{ [key: string]: any; }}
-     * @memberof Job
      */
     readonly metadata?: { [key: string]: any; };
     /**
      * The key-value map of the outputs returned.
-     * @type {{ [key: string]: any; }}
-     * @memberof Job
      */
     readonly outputs?: { [key: string]: any; };
     /**
      * The id of the parent task that created this job. Required for sub-flows.
-     * @type {number}
-     * @memberof Job
      */
     readonly parentTaskExecutionId?: number;
     /**
      * The priority value.
-     * @type {number}
-     * @memberof Job
      */
     readonly priority: number;
     /**
      * The time of when the job began.
-     * @type {Date}
-     * @memberof Job
      */
     readonly startDate: Date;
     /**
      * The job's status.
-     * @type {JobStatusEnum}
-     * @memberof Job
      */
     readonly status: JobStatusEnum;
     /**
      * 
-     * @type {Array<TaskExecution>}
-     * @memberof Job
      */
     taskExecutions?: Array<TaskExecution>;
     /**
      * The list of the webhooks configured.
-     * @type {Array<Webhook>}
-     * @memberof Job
      */
     readonly webhooks?: Array<Webhook>;
     /**
      * 
-     * @type {string}
-     * @memberof Job
      */
     readonly workflowId?: string;
 }
@@ -166,7 +128,7 @@ export const JobStatusEnum = {
     Started: 'STARTED',
     Stopped: 'STOPPED',
     Failed: 'FAILED',
-    Completed: 'COMPLETED'
+    Completed: 'COMPLETED',
 } as const;
 export type JobStatusEnum = typeof JobStatusEnum[keyof typeof JobStatusEnum];
 
@@ -192,20 +154,20 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'currentTask': json['currentTask'] == null ? undefined : json['currentTask'],
-        'endDate': json['endDate'] == null ? undefined : (new Date(json['endDate'])),
+        'endDate': json['endDate'] == null ? undefined : (parseDateTime(json['endDate'])),
         'error': json['error'] == null ? undefined : ExecutionErrorFromJSON(json['error']),
         'id': json['id'] == null ? undefined : json['id'],
         'inputs': json['inputs'] == null ? undefined : json['inputs'],
         'label': json['label'] == null ? undefined : json['label'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'outputs': json['outputs'] == null ? undefined : json['outputs'],
         'parentTaskExecutionId': json['parentTaskExecutionId'] == null ? undefined : json['parentTaskExecutionId'],
         'priority': json['priority'],
-        'startDate': (new Date(json['startDate'])),
+        'startDate': (json['startDate'] == null ? json['startDate'] : parseDateTime(json['startDate'])),
         'status': json['status'],
         'taskExecutions': json['taskExecutions'] == null ? undefined : ((json['taskExecutions'] as Array<any>).map(TaskExecutionFromJSON)),
         'webhooks': json['webhooks'] == null ? undefined : ((json['webhooks'] as Array<any>).map(WebhookFromJSON)),
@@ -224,7 +186,7 @@ export function JobToJSONTyped(value?: Omit<Job, 'createdBy'|'createdDate'|'curr
 
     return {
         
-        'endDate': value['endDate'] == null ? value['endDate'] : value['endDate'].toISOString(),
+        'endDate': value['endDate'] == null ? value['endDate'] : serializeDateTime(value['endDate']),
         'error': ExecutionErrorToJSON(value['error']),
         'taskExecutions': value['taskExecutions'] == null ? undefined : ((value['taskExecutions'] as Array<any>).map(TaskExecutionToJSON)),
     };

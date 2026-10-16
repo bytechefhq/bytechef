@@ -57,44 +57,30 @@ import {
 export interface WorkflowExecutionBasic {
     /**
      * The id of a workflow execution.
-     * @type {number}
-     * @memberof WorkflowExecutionBasic
      */
     readonly id: number;
     /**
      * 
-     * @type {ProjectBasic}
-     * @memberof WorkflowExecutionBasic
      */
     project: ProjectBasic;
     /**
      * 
-     * @type {ProjectDeploymentBasic}
-     * @memberof WorkflowExecutionBasic
      */
     projectDeployment: ProjectDeploymentBasic;
     /**
      * The version of the project the workflow execution ran.
-     * @type {number}
-     * @memberof WorkflowExecutionBasic
      */
     readonly projectVersion?: number;
     /**
      * 
-     * @type {JobBasic}
-     * @memberof WorkflowExecutionBasic
      */
     job?: JobBasic;
     /**
      * 
-     * @type {TriggerExecution}
-     * @memberof WorkflowExecutionBasic
      */
     triggerExecution?: TriggerExecution;
     /**
      * 
-     * @type {WorkflowBasic}
-     * @memberof WorkflowExecutionBasic
      */
     workflow: WorkflowBasic;
 }

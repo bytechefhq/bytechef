@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface ReauthorizeConnectionRequest {
     /**
      * 
-     * @type {{ [key: string]: any; }}
-     * @memberof ReauthorizeConnectionRequest
      */
     parameters: { [key: string]: any; };
 }

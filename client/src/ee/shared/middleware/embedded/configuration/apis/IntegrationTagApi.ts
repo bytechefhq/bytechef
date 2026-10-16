@@ -25,7 +25,13 @@ import {
 } from '../models/UpdateTagsRequest';
 
 export interface UpdateIntegrationTagsRequest {
+    /**
+     * The id of an integration.
+     */
     id: number;
+    /**
+     * 
+     */
     updateTagsRequest: UpdateTagsRequest;
 }
 

@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface CheckoutSession {
     /**
      * The Stripe Checkout URL.
-     * @type {string}
-     * @memberof CheckoutSession
      */
     checkoutUrl?: string;
 }

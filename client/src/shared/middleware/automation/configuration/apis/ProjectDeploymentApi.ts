@@ -30,49 +30,109 @@ import {
 } from '../models/ProjectDeploymentWorkflow';
 
 export interface CreateProjectDeploymentRequest {
+    /**
+     * 
+     */
     projectDeployment: ProjectDeployment;
 }
 
 export interface CreateProjectDeploymentWorkflowJobRequest {
+    /**
+     * The id of a project deployment.
+     */
     id: number;
+    /**
+     * The id of the workflow to execute.
+     */
     workflowId: string;
 }
 
 export interface DeleteProjectDeploymentRequest {
+    /**
+     * The id of a project deployment.
+     */
     id: number;
 }
 
 export interface EnableProjectDeploymentRequest {
+    /**
+     * The id of a project deployment.
+     */
     id: number;
+    /**
+     * Enable/disable the project deployment.
+     */
     enable: boolean;
 }
 
 export interface EnableProjectDeploymentWorkflowRequest {
+    /**
+     * The id of a project deployment.
+     */
     id: number;
+    /**
+     * The id of a project workflow.
+     */
     workflowId: string;
+    /**
+     * Enable/disable the workflow of a project deployment.
+     */
     enable: boolean;
 }
 
 export interface GetProjectDeploymentRequest {
+    /**
+     * The id of a project deployment.
+     */
     id: number;
 }
 
 export interface GetWorkspaceProjectDeploymentsRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
+    /**
+     * The id of an environment.
+     */
     environmentId?: number;
+    /**
+     * The project ids used for filtering project deployments.
+     */
     projectId?: number;
+    /**
+     * The tag id of used for filtering project deployments.
+     */
     tagId?: number;
+    /**
+     * Use for including all fields or just basic ones.
+     */
     includeAllFields?: boolean;
 }
 
 export interface UpdateProjectDeploymentRequest {
+    /**
+     * The id of a project deployment.
+     */
     id: number;
+    /**
+     * 
+     */
     projectDeployment: ProjectDeployment;
 }
 
 export interface UpdateProjectDeploymentWorkflowRequest {
+    /**
+     * The id of a project deployment.
+     */
     id: number;
+    /**
+     * The id of a project deployment workflow.
+     */
     projectDeploymentWorkflowId: number;
+    /**
+     * 
+     */
     projectDeploymentWorkflow: Omit<ProjectDeploymentWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowUuid'>;
 }
 

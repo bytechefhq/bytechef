@@ -25,13 +25,28 @@ import {
 } from '../models/ActionDefinitionBasic';
 
 export interface GetComponentActionDefinitionRequest {
+    /**
+     * The name of a component.
+     */
     componentName: string;
+    /**
+     * The version of a component.
+     */
     componentVersion: number;
+    /**
+     * The name of the action to get.
+     */
     actionName: string;
 }
 
 export interface GetComponentActionDefinitionsRequest {
+    /**
+     * The name of a component.
+     */
     componentName: string;
+    /**
+     * The version of a component.
+     */
     componentVersion: number;
 }
 

@@ -30,18 +30,30 @@ import {
 } from '../models/TriggerExecution';
 
 export interface GetJobRequest {
+    /**
+     * The id of a job to return.
+     */
     id: number;
 }
 
 export interface GetJobsPageRequest {
+    /**
+     * The number of the page to return.
+     */
     pageNumber?: number;
 }
 
 export interface RestartJobRequest {
+    /**
+     * The id of a job to restart.
+     */
     id: number;
 }
 
 export interface StopJobRequest {
+    /**
+     * The id of a job to stop.
+     */
     id: number;
 }
 

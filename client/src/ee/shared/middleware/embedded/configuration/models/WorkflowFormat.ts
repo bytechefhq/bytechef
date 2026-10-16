@@ -19,7 +19,7 @@
  */
 export const WorkflowFormat = {
     Json: 'JSON',
-    Yaml: 'YAML'
+    Yaml: 'YAML',
 } as const;
 export type WorkflowFormat = typeof WorkflowFormat[keyof typeof WorkflowFormat];
 

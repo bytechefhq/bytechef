@@ -40,36 +40,84 @@ import {
 } from '../models/ReauthorizeConnectionRequest';
 
 export interface CreateFrontendConnectionRequest {
+    /**
+     * The component name.
+     */
     componentName: string;
+    /**
+     * 
+     */
     createConnectionRequest: CreateConnectionRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface DeleteFrontendConnectionRequest {
+    /**
+     * The id of a connection.
+     */
     id: number;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetAllFrontendConnectionsRequest {
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetConnectionsRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The component name.
+     */
     componentName: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
+    /**
+     * The list of allowed connection ids.
+     */
     connectionIds?: Array<number>;
 }
 
 export interface GetFrontendConnectionsRequest {
+    /**
+     * The component name.
+     */
     componentName: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
+    /**
+     * The list of allowed connection ids.
+     */
     connectionIds?: Array<number>;
 }
 
 export interface ReauthorizeFrontendConnectionRequest {
+    /**
+     * The id of a connection.
+     */
     id: number;
+    /**
+     * 
+     */
     reauthorizeConnectionRequest: ReauthorizeConnectionRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 

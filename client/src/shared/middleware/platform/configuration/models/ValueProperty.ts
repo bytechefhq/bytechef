@@ -43,20 +43,14 @@ import {
 export interface ValueProperty extends Property {
     /**
      * 
-     * @type {ControlType}
-     * @memberof ValueProperty
      */
     controlType: ControlType;
     /**
      * The property label.
-     * @type {string}
-     * @memberof ValueProperty
      */
     label?: string;
     /**
      * The property placeholder.
-     * @type {string}
-     * @memberof ValueProperty
      */
     placeholder?: string;
 }

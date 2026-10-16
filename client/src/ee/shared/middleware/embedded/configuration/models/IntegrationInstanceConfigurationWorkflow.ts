@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { IntegrationInstanceConfigurationWorkflowConnection } from './IntegrationInstanceConfigurationWorkflowConnection';
 import {
     IntegrationInstanceConfigurationWorkflowConnectionFromJSON,
@@ -29,80 +29,54 @@ import {
 export interface IntegrationInstanceConfigurationWorkflow {
     /**
      * The created by.
-     * @type {string}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     readonly createdDate?: Date;
     /**
      * The input parameters of an integration instance configuration used as workflow input values.
-     * @type {{ [key: string]: any; }}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     inputs?: { [key: string]: any; };
     /**
      * The connections used by an integration instance configuration.
-     * @type {Array<IntegrationInstanceConfigurationWorkflowConnection>}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     connections?: Array<IntegrationInstanceConfigurationWorkflowConnection>;
     /**
      * If a workflow is enabled or not in the integration instance configuration workflow.
-     * @type {boolean}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     enabled?: boolean;
     /**
      * The id of an integration instance configuration workflow.
-     * @type {number}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     readonly id?: number;
     /**
      * The id of an integration instance configuration.
-     * @type {number}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     integrationInstanceConfigurationId?: number;
     /**
      * The last execution date of an integration instance configuration workflow.
-     * @type {Date}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     lastExecutionDate?: Date;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     readonly lastModifiedDate?: Date;
     /**
      * The id of a workflow.
-     * @type {string}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     workflowId?: string;
     /**
      * The workflow uuid
-     * @type {string}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     readonly workflowUuid?: string;
     /**
      * 
-     * @type {number}
-     * @memberof IntegrationInstanceConfigurationWorkflow
      */
     version?: number;
 }
@@ -125,15 +99,15 @@ export function IntegrationInstanceConfigurationWorkflowFromJSONTyped(json: any,
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'inputs': json['inputs'] == null ? undefined : json['inputs'],
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowConnectionFromJSON)),
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'id': json['id'] == null ? undefined : json['id'],
         'integrationInstanceConfigurationId': json['integrationInstanceConfigurationId'] == null ? undefined : json['integrationInstanceConfigurationId'],
-        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
         'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],
         'version': json['__version'] == null ? undefined : json['__version'],
@@ -155,7 +129,7 @@ export function IntegrationInstanceConfigurationWorkflowToJSONTyped(value?: Omit
         'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowConnectionToJSON)),
         'enabled': value['enabled'],
         'integrationInstanceConfigurationId': value['integrationInstanceConfigurationId'],
-        'lastExecutionDate': value['lastExecutionDate'] == null ? value['lastExecutionDate'] : value['lastExecutionDate'].toISOString(),
+        'lastExecutionDate': value['lastExecutionDate'] == null ? value['lastExecutionDate'] : serializeDateTime(value['lastExecutionDate']),
         'workflowId': value['workflowId'],
         '__version': value['version'],
     };

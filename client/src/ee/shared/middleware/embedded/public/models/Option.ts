@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface Option {
     /**
      * 
-     * @type {string}
-     * @memberof Option
      */
     label: string;
     /**
      * 
-     * @type {string}
-     * @memberof Option
      */
     value: string;
 }

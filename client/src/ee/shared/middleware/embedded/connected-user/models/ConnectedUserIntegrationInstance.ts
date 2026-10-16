@@ -29,50 +29,34 @@ import {
 export interface ConnectedUserIntegrationInstance {
     /**
      * The name of a component.
-     * @type {string}
-     * @memberof ConnectedUserIntegrationInstance
      */
     componentName?: string;
     /**
      * If an integration's instance is enable dor not.
-     * @type {boolean}
-     * @memberof ConnectedUserIntegrationInstance
      */
     enabled?: boolean;
     /**
      * The id of an integration instance.
-     * @type {number}
-     * @memberof ConnectedUserIntegrationInstance
      */
     readonly id?: number;
     /**
      * The id of an integration.
-     * @type {number}
-     * @memberof ConnectedUserIntegrationInstance
      */
     readonly integrationId?: number;
     /**
      * The id of an integration instance configuration.
-     * @type {number}
-     * @memberof ConnectedUserIntegrationInstance
      */
     readonly integrationInstanceConfigurationId?: number;
     /**
      * The version of an integration.
-     * @type {number}
-     * @memberof ConnectedUserIntegrationInstance
      */
     readonly integrationVersion?: number;
     /**
      * The id of a connection.
-     * @type {number}
-     * @memberof ConnectedUserIntegrationInstance
      */
     readonly connectionId?: number;
     /**
      * 
-     * @type {CredentialStatus}
-     * @memberof ConnectedUserIntegrationInstance
      */
     credentialStatus?: CredentialStatus;
 }

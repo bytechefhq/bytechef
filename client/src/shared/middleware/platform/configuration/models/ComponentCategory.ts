@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface ComponentCategory {
     /**
      * The name of a category.
-     * @type {string}
-     * @memberof ComponentCategory
      */
     name: string;
     /**
      * The label of a category.
-     * @type {string}
-     * @memberof ComponentCategory
      */
     label?: string;
 }

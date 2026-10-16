@@ -9,6 +9,7 @@ Name | Type
 ------------ | -------------
 `description` | string
 `id` | number
+`label` | string
 `name` | string
 
 ## Example
@@ -20,6 +21,7 @@ import type { McpTool } from ''
 const example = {
   "description": null,
   "id": null,
+  "label": null,
   "name": null,
 } satisfies McpTool
 

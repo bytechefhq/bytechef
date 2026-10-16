@@ -43,74 +43,50 @@ import {
 export interface TriggerDefinition {
     /**
      * The component name.
-     * @type {string}
-     * @memberof TriggerDefinition
      */
     componentName?: string;
     /**
      * The component version.
-     * @type {number}
-     * @memberof TriggerDefinition
      */
     componentVersion?: number;
     /**
      * The description.
-     * @type {string}
-     * @memberof TriggerDefinition
      */
     description?: string;
     /**
      * 
-     * @type {Help}
-     * @memberof TriggerDefinition
      */
     help?: Help;
     /**
      * The action name.
-     * @type {string}
-     * @memberof TriggerDefinition
      */
     name: string;
     /**
      * Does trigger defines output.
-     * @type {boolean}
-     * @memberof TriggerDefinition
      */
     outputDefined: boolean;
     /**
      * Does trigger defines output function.
-     * @type {boolean}
-     * @memberof TriggerDefinition
      */
     outputFunctionDefined: boolean;
     /**
      * Does trigger defines output schema.
-     * @type {boolean}
-     * @memberof TriggerDefinition
      */
     outputSchemaDefined?: boolean;
     /**
      * The list of action properties.
-     * @type {Array<Property>}
-     * @memberof TriggerDefinition
      */
     properties?: Array<Property>;
     /**
      * The title
-     * @type {string}
-     * @memberof TriggerDefinition
      */
     title?: string;
     /**
      * 
-     * @type {TriggerType}
-     * @memberof TriggerDefinition
      */
     type: TriggerType;
     /**
      * Does trigger define dynamic node description.
-     * @type {boolean}
-     * @memberof TriggerDefinition
      */
     workflowNodeDescriptionDefined?: boolean;
 }

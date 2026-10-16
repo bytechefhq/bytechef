@@ -25,7 +25,7 @@ export const InputType = {
     Number: 'NUMBER',
     String: 'STRING',
     Time: 'TIME',
-    FieldMapping: 'FIELD_MAPPING'
+    FieldMapping: 'FIELD_MAPPING',
 } as const;
 export type InputType = typeof InputType[keyof typeof InputType];
 

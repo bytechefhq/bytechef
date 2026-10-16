@@ -29,68 +29,46 @@ import {
 export interface ActionDefinitionBasic {
     /**
      * The component name.
-     * @type {string}
-     * @memberof ActionDefinitionBasic
      */
     componentName: string;
     /**
      * The component version.
-     * @type {number}
-     * @memberof ActionDefinitionBasic
      */
     componentVersion: number;
     /**
      * The description.
-     * @type {string}
-     * @memberof ActionDefinitionBasic
      */
     description?: string;
     /**
      * 
-     * @type {Help}
-     * @memberof ActionDefinitionBasic
      */
     help?: Help;
     /**
      * The action name.
-     * @type {string}
-     * @memberof ActionDefinitionBasic
      */
     name: string;
     /**
      * Does action defines output.
-     * @type {boolean}
-     * @memberof ActionDefinitionBasic
      */
     outputDefined: boolean;
     /**
      * Does action defines output function.
-     * @type {boolean}
-     * @memberof ActionDefinitionBasic
      */
     outputFunctionDefined: boolean;
     /**
      * Does action defines output schema.
-     * @type {boolean}
-     * @memberof ActionDefinitionBasic
      */
     outputSchemaDefined?: boolean;
     /**
      * Does action define resume perform function.
-     * @type {boolean}
-     * @memberof ActionDefinitionBasic
      */
     resumePerformFunctionDefined?: boolean;
     /**
      * Does action support SSE streaming.
-     * @type {boolean}
-     * @memberof ActionDefinitionBasic
      */
     sseStreamResponse?: boolean;
     /**
      * The title
-     * @type {string}
-     * @memberof ActionDefinitionBasic
      */
     title?: string;
 }

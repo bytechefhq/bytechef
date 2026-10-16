@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { IntegrationStatus } from './IntegrationStatus';
 import {
     IntegrationStatusFromJSON,
@@ -29,86 +29,58 @@ import {
 export interface IntegrationBasic {
     /**
      * The name of the integration's component.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     componentName: string;
     /**
      * The created by.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof IntegrationBasic
      */
     readonly createdDate?: Date;
     /**
      * The description of an integration.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     description?: string;
     /**
      * The icon.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     icon?: string;
     /**
      * The id of an integration.
-     * @type {number}
-     * @memberof IntegrationBasic
      */
     readonly id?: number;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof IntegrationBasic
      */
     readonly lastModifiedDate?: Date;
     /**
      * The last published date.
-     * @type {Date}
-     * @memberof IntegrationBasic
      */
     readonly lastPublishedDate?: Date;
     /**
      * 
-     * @type {IntegrationStatus}
-     * @memberof IntegrationBasic
      */
     lastStatus?: IntegrationStatus;
     /**
      * The last version of an integration.
-     * @type {number}
-     * @memberof IntegrationBasic
      */
     readonly lastIntegrationVersion?: number;
     /**
      * If multiple instances of an integration are allowed or not.
-     * @type {boolean}
-     * @memberof IntegrationBasic
      */
     multipleInstances: boolean;
     /**
      * The name of an integration.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     name?: string;
     /**
      * The SpEL permission expression evaluated against the connected user to control integration visibility.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     permissionExpression?: string;
 }
@@ -136,13 +108,13 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
         
         'componentName': json['componentName'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
-        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
+        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (parseDateTime(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : IntegrationStatusFromJSON(json['lastStatus']),
         'lastIntegrationVersion': json['lastIntegrationVersion'] == null ? undefined : json['lastIntegrationVersion'],
         'multipleInstances': json['multipleInstances'],

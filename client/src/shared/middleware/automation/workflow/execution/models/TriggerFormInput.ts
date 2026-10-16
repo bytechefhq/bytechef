@@ -29,68 +29,46 @@ import {
 export interface TriggerFormInput {
     /**
      * 
-     * @type {string}
-     * @memberof TriggerFormInput
      */
     defaultValue?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TriggerFormInput
      */
     fieldDescription?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TriggerFormInput
      */
     fieldLabel?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TriggerFormInput
      */
     fieldName?: string;
     /**
      * 
-     * @type {Array<FieldOption>}
-     * @memberof TriggerFormInput
      */
     fieldOptions?: Array<FieldOption>;
     /**
      * 
-     * @type {number}
-     * @memberof TriggerFormInput
      */
     fieldType?: number;
     /**
      * 
-     * @type {number}
-     * @memberof TriggerFormInput
      */
     maxSelection?: number;
     /**
      * 
-     * @type {number}
-     * @memberof TriggerFormInput
      */
     minSelection?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof TriggerFormInput
      */
     multipleChoice?: boolean;
     /**
      * 
-     * @type {string}
-     * @memberof TriggerFormInput
      */
     placeholder?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof TriggerFormInput
      */
     required?: boolean;
 }

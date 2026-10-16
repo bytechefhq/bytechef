@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface AutomationWorkflowProjectWorkflowInput {
     /**
      * The name of the input, and the key its value is stored under.
-     * @type {string}
-     * @memberof AutomationWorkflowProjectWorkflowInput
      */
     name?: string;
     /**
      * The label shown to the connected user.
-     * @type {string}
-     * @memberof AutomationWorkflowProjectWorkflowInput
      */
     label?: string;
     /**
      * The input type, e.g. STRING, NUMBER or BOOLEAN.
-     * @type {string}
-     * @memberof AutomationWorkflowProjectWorkflowInput
      */
     type?: string;
     /**
      * Whether a value must be supplied.
-     * @type {boolean}
-     * @memberof AutomationWorkflowProjectWorkflowInput
      */
     required?: boolean;
 }

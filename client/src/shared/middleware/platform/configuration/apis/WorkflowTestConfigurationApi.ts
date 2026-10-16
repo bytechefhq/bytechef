@@ -35,32 +35,77 @@ import {
 } from '../models/WorkflowTestConfigurationConnection';
 
 export interface DeleteWorkflowTestConfigurationConnectionOperationRequest {
+    /**
+     * The id of a testing workflow.
+     */
     workflowId: string;
+    /**
+     * The action/trigger name defined in the workflow.
+     */
     workflowNodeName: string;
+    /**
+     * The key of a connection.
+     */
     workflowConnectionKey: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * 
+     */
     deleteWorkflowTestConfigurationConnectionRequest: DeleteWorkflowTestConfigurationConnectionRequest;
 }
 
 export interface GetWorkflowTestConfigurationRequest {
+    /**
+     * The id of a workflow.
+     */
     workflowId: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 
 export interface GetWorkflowTestConfigurationConnectionsRequest {
+    /**
+     * The id of a testing workflow.
+     */
     workflowId: string;
+    /**
+     * The action/trigger name defined in the workflow.
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 
 export interface SaveWorkflowTestConfigurationRequest {
+    /**
+     * The id of a workflow.
+     */
     workflowId: string;
+    /**
+     * 
+     */
     workflowTestConfiguration: Omit<WorkflowTestConfiguration, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'workflowId'>;
 }
 
 export interface SaveWorkflowTestConfigurationInputsOperationRequest {
+    /**
+     * The id of a testing workflow.
+     */
     workflowId: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * 
+     */
     saveWorkflowTestConfigurationInputsRequest: SaveWorkflowTestConfigurationInputsRequest;
 }
 

@@ -36,32 +36,22 @@ import {
 export interface Authorization {
     /**
      * The description.
-     * @type {string}
-     * @memberof Authorization
      */
     description?: string;
     /**
      * The authorization name.
-     * @type {string}
-     * @memberof Authorization
      */
     name?: string;
     /**
      * Properties of the connection.
-     * @type {Array<Property>}
-     * @memberof Authorization
      */
     properties?: Array<Property>;
     /**
      * The title
-     * @type {string}
-     * @memberof Authorization
      */
     title?: string;
     /**
      * 
-     * @type {AuthorizationType}
-     * @memberof Authorization
      */
     type?: AuthorizationType;
 }

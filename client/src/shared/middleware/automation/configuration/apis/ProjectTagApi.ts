@@ -25,7 +25,13 @@ import {
 } from '../models/UpdateTagsRequest';
 
 export interface UpdateProjectTagsRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * 
+     */
     updateTagsRequest: UpdateTagsRequest;
 }
 

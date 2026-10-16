@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * A billing subscription.
  * @export
@@ -21,44 +21,30 @@ import { mapValues } from '../runtime';
 export interface BillingSubscription {
     /**
      * The plan name.
-     * @type {string}
-     * @memberof BillingSubscription
      */
     planName?: string;
     /**
      * The subscription status.
-     * @type {string}
-     * @memberof BillingSubscription
      */
     status?: string;
     /**
      * The number of units that can be used in the current billing period under flat plan.
-     * @type {number}
-     * @memberof BillingSubscription
      */
     productUnitLimit?: number;
     /**
      * The current period end date.
-     * @type {Date}
-     * @memberof BillingSubscription
      */
     currentPeriodEnd?: Date;
     /**
      * Whether the subscription cancels at period end.
-     * @type {boolean}
-     * @memberof BillingSubscription
      */
     cancelAtPeriodEnd?: boolean;
     /**
      * The plan name scheduled to take effect at the next billing period (set when a downgrade is pending).
-     * @type {string}
-     * @memberof BillingSubscription
      */
     scheduledPlanName?: string;
     /**
      * Number of job executions used in the current billing period.
-     * @type {number}
-     * @memberof BillingSubscription
      */
     jobsExecuted?: number;
 }
@@ -83,7 +69,7 @@ export function BillingSubscriptionFromJSONTyped(json: any, ignoreDiscriminator:
         'planName': json['planName'] == null ? undefined : json['planName'],
         'status': json['status'] == null ? undefined : json['status'],
         'productUnitLimit': json['productUnitLimit'] == null ? undefined : json['productUnitLimit'],
-        'currentPeriodEnd': json['currentPeriodEnd'] == null ? undefined : (new Date(json['currentPeriodEnd'])),
+        'currentPeriodEnd': json['currentPeriodEnd'] == null ? undefined : (parseDateTime(json['currentPeriodEnd'])),
         'cancelAtPeriodEnd': json['cancelAtPeriodEnd'] == null ? undefined : json['cancelAtPeriodEnd'],
         'scheduledPlanName': json['scheduledPlanName'] == null ? undefined : json['scheduledPlanName'],
         'jobsExecuted': json['jobsExecuted'] == null ? undefined : json['jobsExecuted'],
@@ -104,7 +90,7 @@ export function BillingSubscriptionToJSONTyped(value?: BillingSubscription | nul
         'planName': value['planName'],
         'status': value['status'],
         'productUnitLimit': value['productUnitLimit'],
-        'currentPeriodEnd': value['currentPeriodEnd'] == null ? value['currentPeriodEnd'] : value['currentPeriodEnd'].toISOString(),
+        'currentPeriodEnd': value['currentPeriodEnd'] == null ? value['currentPeriodEnd'] : serializeDateTime(value['currentPeriodEnd']),
         'cancelAtPeriodEnd': value['cancelAtPeriodEnd'],
         'scheduledPlanName': value['scheduledPlanName'],
         'jobsExecuted': value['jobsExecuted'],
