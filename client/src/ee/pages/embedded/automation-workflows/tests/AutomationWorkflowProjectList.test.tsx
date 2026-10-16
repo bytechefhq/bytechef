@@ -242,7 +242,7 @@ describe('AutomationWorkflowProjectList', () => {
 
         await user.click(screen.getByTestId('project-10-moreProjectActionsButton'));
 
-        await screen.findByRole('menuitem', {name: /view references/i});
+        await screen.findByRole('menuitem', {name: 'Usage'});
 
         expect(screen.queryByRole('menuitem', {name: /edit source/i})).not.toBeInTheDocument();
     });
@@ -460,7 +460,7 @@ describe('AutomationWorkflowProjectList', () => {
 
             await screen.findByRole('menuitem', {name: /edit source/i});
 
-            expect(screen.getByRole('menuitem', {name: /view references/i})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Usage'})).toBeInTheDocument();
             expect(screen.getByRole('menuitem', {name: /publish/i})).toBeInTheDocument();
             expect(screen.getByRole('menuitem', {name: /edit project/i})).toBeInTheDocument();
             expect(screen.getByRole('menuitem', {name: /delete project/i})).toBeInTheDocument();
@@ -504,6 +504,7 @@ describe('AutomationWorkflowProjectList', () => {
 
             expect(await screen.findByRole('menuitem', {name: /new workflow/i})).toBeInTheDocument();
             expect(screen.getByRole('menuitem', {name: /import workflow/i})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Usage'})).toBeInTheDocument();
         });
 
         it('still offers Delete Workflow on the workflow rows of a visual project', async () => {
