@@ -28,6 +28,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,12 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
         return componentDefinitionService.executeWorkflowInputOptions(
             componentName, componentVersion, groupName, propertyName, inputParameters, lookupDependsOnPaths,
             searchText, componentConnection);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
+        return componentDefinitionService.fetchComponentDefinition(name, version);
     }
 
     private @Nullable ComponentConnection getComponentConnection(@Nullable Long connectionId) {

@@ -17,8 +17,6 @@
 package com.bytechef.platform.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -26,7 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.ai.tool.WorkflowValidatorTools.WorkflowValidationResult;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
@@ -54,19 +52,17 @@ class WorkflowValidatorToolsTest {
             ]
         }""";
 
-    private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+    private final ComponentDefinitionFacade componentDefinitionFacade = mock(ComponentDefinitionFacade.class);
     private final WorkflowValidatorFacade workflowValidatorFacade = mock(WorkflowValidatorFacade.class);
     private final WorkflowValidatorTools workflowValidatorTools = new WorkflowValidatorTools(
-        componentDefinitionService, workflowValidatorFacade);
+        componentDefinitionFacade, workflowValidatorFacade);
 
     @Test
     void testValidateWorkflowReportsAComponentOutsideTheAllowList() {
         ComponentDefinition salesforceComponentDefinition = mock(ComponentDefinition.class);
 
         when(salesforceComponentDefinition.isConnectionRequired()).thenReturn(true);
-        when(componentDefinitionService.fetchComponentDefinition(anyString(), isNull()))
-            .thenReturn(Optional.empty());
-        when(componentDefinitionService.fetchComponentDefinition("salesforce", null))
+        when(componentDefinitionFacade.fetchComponentDefinition("salesforce", null))
             .thenReturn(Optional.of(salesforceComponentDefinition));
         when(workflowValidatorFacade.validateWorkflow(WORKFLOW))
             .thenReturn(new WorkflowValidatorFacade.WorkflowValidationResult(List.of(), List.of()));
@@ -88,6 +84,21 @@ class WorkflowValidatorToolsTest {
         WorkflowValidationResult workflowValidationResult = workflowValidatorTools.validateWorkflow(WORKFLOW, null);
 
         assertThat(workflowValidationResult.valid()).isTrue();
-        verifyNoInteractions(componentDefinitionService);
+        verifyNoInteractions(componentDefinitionFacade);
+    }
+
+    @Test
+    void testValidateWorkflowWithOnlyAllowedComponentsLoadsNoComponentDefinition() {
+        when(workflowValidatorFacade.validateWorkflow(WORKFLOW))
+            .thenReturn(new WorkflowValidatorFacade.WorkflowValidationResult(List.of(), List.of()));
+
+        WorkflowValidationResult workflowValidationResult = workflowValidatorTools.validateWorkflow(
+            WORKFLOW, new ToolContext(
+                Map.of(
+                    AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY,
+                    Set.of("condition", "salesforce", "slack"))));
+
+        assertThat(workflowValidationResult.valid()).isTrue();
+        verifyNoInteractions(componentDefinitionFacade);
     }
 }

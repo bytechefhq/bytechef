@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,8 +35,13 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,6 +59,9 @@ class ClusterElementToolsTest {
 
     private static final long FOREIGN_PROJECT_ID = 9L;
     private static final long OWN_PROJECT_ID = 7L;
+
+    @Mock
+    private ComponentDefinitionFacade componentDefinitionFacade;
 
     @Mock
     private ProjectWorkflowFacade projectWorkflowFacade;
@@ -112,6 +121,70 @@ class ClusterElementToolsTest {
             assertThat(workflowInfo).isNotNull();
             verify(projectWorkflowFacade).updateWorkflow(anyString(), anyString(), anyInt());
         }
+
+        @Test
+        void testUpdateClusterElementTaskRejectsAClusterElementOutsideTheAllowList() {
+            when(projectWorkflowService.getWorkflowProjectWorkflow("wf-uuid-1"))
+                .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-uuid-1"));
+
+            mockProjectWorkflow();
+
+            ComponentDefinition openAiComponentDefinition = mock(ComponentDefinition.class);
+
+            when(openAiComponentDefinition.isConnectionRequired()).thenReturn(true);
+            when(componentDefinitionFacade.fetchComponentDefinition("openAi", null))
+                .thenReturn(Optional.of(openAiComponentDefinition));
+
+            ClusterElementTools clusterElementTools = newTools();
+
+            ToolContext allowListToolContext = new ToolContext(
+                Map.of(
+                    ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID,
+                    AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("aiAgent")));
+
+            assertThatCode(
+                () -> clusterElementTools.updateClusterElementTask(
+                    "wf-uuid-1", "agent_1", "{\"model\": {\"name\": \"model_1\", \"type\": \"openAi/v1/model\"}}",
+                    allowListToolContext))
+                        .isInstanceOf(ExecutionException.class)
+                        .hasMessageContaining(
+                            "This chat can't use openAi: it isn't one of the integrations available to this user.")
+                        .hasMessageNotContaining("Failed to update");
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
+        }
+
+        @Test
+        void testUpdateWorkflowRootPropertiesRejectsATaskOutsideTheAllowList() {
+            when(projectWorkflowService.getWorkflowProjectWorkflow("wf-uuid-1"))
+                .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-uuid-1"));
+
+            mockProjectWorkflow();
+
+            ComponentDefinition openAiComponentDefinition = mock(ComponentDefinition.class);
+
+            when(openAiComponentDefinition.isConnectionRequired()).thenReturn(true);
+            when(componentDefinitionFacade.fetchComponentDefinition("openAi", null))
+                .thenReturn(Optional.of(openAiComponentDefinition));
+
+            ClusterElementTools clusterElementTools = newTools();
+
+            ToolContext allowListToolContext = new ToolContext(
+                Map.of(
+                    ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY, OWN_PROJECT_ID,
+                    AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("aiAgent")));
+
+            assertThatCode(
+                () -> clusterElementTools.updateWorkflowRootProperties(
+                    "wf-uuid-1", "{\"tasks\": [{\"name\": \"ask_1\", \"type\": \"openAi/v1/ask\"}]}",
+                    allowListToolContext))
+                        .isInstanceOf(ExecutionException.class)
+                        .hasMessageContaining(
+                            "This chat can't use openAi: it isn't one of the integrations available to this user.")
+                        .hasMessageNotContaining("Failed to update");
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
+        }
     }
 
     @Test
@@ -137,7 +210,7 @@ class ClusterElementToolsTest {
 
     private ClusterElementTools newTools() {
         return new ClusterElementTools(
-            projectWorkflowFacade,
+            componentDefinitionFacade, projectWorkflowFacade,
             new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService, scopedConnectionGuard));
     }
 
