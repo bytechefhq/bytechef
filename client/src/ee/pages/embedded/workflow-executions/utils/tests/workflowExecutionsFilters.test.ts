@@ -21,8 +21,8 @@ describe('getWorkflowExecutionsFilters', () => {
             endDate,
             integrationId: 2,
             integrationInstanceConfigurationId: 4,
-            integrationInstanceConfigurations: [{id: 4, integration: {componentName: 'affinity'}}],
-            integrations: [{componentName: 'affinity', id: 2}],
+            integrationInstanceConfigurations: [{id: 4, integrationId: 2}],
+            integrations: [{componentName: 'affinity', id: 2, name: 'Affinity Sync'}],
             startDate,
             status: 'FAILED',
             workflowId: 'workflow-uuid',
@@ -32,8 +32,8 @@ describe('getWorkflowExecutionsFilters', () => {
         expect(findValue(filters, 'Status')).toBe('FAILED');
         expect(findValue(filters, 'Start date')).toBe(startDate.toLocaleDateString());
         expect(findValue(filters, 'End date')).toBe(endDate.toLocaleDateString());
-        expect(findValue(filters, 'Integration')).toBe('affinity');
-        expect(findValue(filters, 'Instance Configuration')).toBe('affinity');
+        expect(findValue(filters, 'Integration')).toBe('Affinity Sync');
+        expect(findValue(filters, 'Instance Configuration')).toBe('Affinity Sync');
         expect(findValue(filters, 'Workflow')).toBe('workflow1');
         expect(findValue(filters, 'Connected User')).toBeUndefined();
     });
@@ -42,14 +42,30 @@ describe('getWorkflowExecutionsFilters', () => {
         const filters = getWorkflowExecutionsFilters({
             automations: 0,
             integrationId: 2,
-            integrationInstanceConfiguration: {id: 4, integration: {componentName: 'hubspot'}},
+            integrationInstanceConfiguration: {id: 4, integration: {componentName: 'hubspot', name: 'HubSpot Sync'}},
             integrationInstanceConfigurationId: 4,
             workflowId: 'workflow-uuid',
         });
 
         expect(findValue(filters, 'Integration')).toBe('2');
-        expect(findValue(filters, 'Instance Configuration')).toBe('hubspot');
+        expect(findValue(filters, 'Instance Configuration')).toBe('HubSpot Sync');
         expect(findValue(filters, 'Workflow')).toBe('workflow-uuid');
+    });
+
+    it('resolves the connected user of integration executions', () => {
+        const filters = getWorkflowExecutionsFilters({
+            automations: 0,
+            connectedUserId: 7,
+            connectedUsers: [{externalId: 'user-7', id: 7}],
+        });
+
+        expect(findValue(filters, 'Connected User')).toBe('User user-7');
+    });
+
+    it('falls back to the connected user id when the connected users are not loaded', () => {
+        const filters = getWorkflowExecutionsFilters({automations: 0, connectedUserId: 7});
+
+        expect(findValue(filters, 'Connected User')).toBe('7');
     });
 
     it('falls back to the instance configuration id when nothing is loaded', () => {

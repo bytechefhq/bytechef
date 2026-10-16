@@ -4,7 +4,22 @@ import {act, mockScrollIntoView, render, screen, userEvent, waitFor, within} fro
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {useOnEnvironmentChangeMock, useWorkflowExecutionsMock} = vi.hoisted(() => ({
+const {
+    useGetConnectedUsersQueryMock,
+    useGetIntegrationInstanceConfigurationQueryMock,
+    useGetIntegrationInstanceConfigurationsQueryMock,
+    useGetIntegrationVersionWorkflowsQueryMock,
+    useGetIntegrationVersionsQueryMock,
+    useGetIntegrationsQueryMock,
+    useOnEnvironmentChangeMock,
+    useWorkflowExecutionsMock,
+} = vi.hoisted(() => ({
+    useGetConnectedUsersQueryMock: vi.fn(),
+    useGetIntegrationInstanceConfigurationQueryMock: vi.fn(),
+    useGetIntegrationInstanceConfigurationsQueryMock: vi.fn(),
+    useGetIntegrationVersionWorkflowsQueryMock: vi.fn(),
+    useGetIntegrationVersionsQueryMock: vi.fn(),
+    useGetIntegrationsQueryMock: vi.fn(),
     useOnEnvironmentChangeMock: vi.fn(),
     useWorkflowExecutionsMock: vi.fn(),
 }));
@@ -13,19 +28,25 @@ vi.mock('@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions', (
     useWorkflowExecutions: useWorkflowExecutionsMock,
 }));
 
+vi.mock('@/ee/shared/queries/embedded/connectedUsers.queries', () => ({
+    useGetConnectedUsersQuery: useGetConnectedUsersQueryMock,
+}));
+
 vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries', () => ({
-    useGetIntegrationInstanceConfigurationQuery: () => ({data: {id: 4, integrationVersion: 1}}),
-    useGetIntegrationInstanceConfigurationsQuery: () => ({
-        data: [{id: 4, integration: {componentName: 'googleMail'}, integrationId: 2, tags: []}],
-    }),
+    useGetIntegrationInstanceConfigurationQuery: useGetIntegrationInstanceConfigurationQueryMock,
+    useGetIntegrationInstanceConfigurationsQuery: useGetIntegrationInstanceConfigurationsQueryMock,
+}));
+
+vi.mock('@/ee/shared/queries/embedded/integrationVersions.queries', () => ({
+    useGetIntegrationVersionsQuery: useGetIntegrationVersionsQueryMock,
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
-    useGetIntegrationVersionWorkflowsQuery: () => ({data: [{id: 'workflow-1', label: 'Send Email'}]}),
+    useGetIntegrationVersionWorkflowsQuery: useGetIntegrationVersionWorkflowsQueryMock,
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
-    useGetIntegrationsQuery: () => ({data: [{componentName: 'googleMail', id: 2, name: 'Gmail', tags: []}]}),
+    useGetIntegrationsQuery: useGetIntegrationsQueryMock,
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
@@ -44,6 +65,20 @@ vi.mock('@/pages/automation/workflow-executions/components/workflow-execution-sh
 vi.mock('@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet', () => ({
     default: () => null,
 }));
+
+const integrations = [
+    {componentName: 'googleMail', id: 2, name: 'Gmail Sync', tags: []},
+    {componentName: 'googleMail', id: 3, name: 'Gmail Archive', tags: []},
+];
+
+const integrationVersions: Record<number, Array<{status: string; version: number}>> = {
+    2: [
+        {status: 'PUBLISHED', version: 1},
+        {status: 'PUBLISHED', version: 2},
+        {status: 'DRAFT', version: 3},
+    ],
+    3: [{status: 'DRAFT', version: 1}],
+};
 
 const connectedUserProjects = [
     {
@@ -111,6 +146,18 @@ describe('WorkflowExecutions', () => {
 
         useOnEnvironmentChangeMock.mockImplementation(() => undefined);
 
+        useGetConnectedUsersQueryMock.mockReturnValue({
+            data: {content: [{externalId: 'user-7', id: 7}]},
+        });
+        useGetIntegrationInstanceConfigurationQueryMock.mockReturnValue({data: undefined});
+        useGetIntegrationInstanceConfigurationsQueryMock.mockReturnValue({
+            data: [{environmentId: 0, id: 4, integrationId: 2, integrationVersion: 1, name: 'Production'}],
+        });
+        useGetIntegrationVersionWorkflowsQueryMock.mockReturnValue({data: [{id: 'workflow-1', label: 'Send Email'}]});
+        useGetIntegrationVersionsQueryMock.mockImplementation((integrationId: number, enabled: boolean) => ({
+            data: enabled ? integrationVersions[integrationId] : undefined,
+        }));
+        useGetIntegrationsQueryMock.mockReturnValue({data: integrations});
         useWorkflowExecutionsMock.mockReturnValue({
             connectedUserProjects,
             refetchWorkflowExecutions: vi.fn(),
@@ -165,10 +212,10 @@ describe('WorkflowExecutions', () => {
     it('keeps the connected user when the integration filters change', async () => {
         renderWorkflowExecutions('automations=0&connectedUserId=7');
 
-        await pickFilterOption('Integration', 'googleMail');
+        await pickFilterOption('Integration', 'Gmail Sync');
         await expectConnectedUserKeptInTheUrl();
 
-        await pickFilterOption('Instance Configuration', 'googleMail');
+        await pickFilterOption('Instance Configuration', 'Gmail Sync');
         await expectConnectedUserKeptInTheUrl();
 
         await pickFilterOption('Workflow', 'Send Email');
@@ -238,5 +285,77 @@ describe('WorkflowExecutions', () => {
         await userEvent.click(getFilterComboBox('Workflow'));
 
         expect(screen.queryByRole('option', {name: 'Copied workflow'})).not.toBeInTheDocument();
+    });
+
+    it('labels integrations with their name instead of their component name', async () => {
+        renderWorkflowExecutions('integrationId=2');
+
+        expect(getFilterComboBox('Integration')).toHaveTextContent('Gmail Sync');
+
+        await userEvent.click(getFilterComboBox('Integration'));
+
+        const options = await screen.findAllByRole('option');
+
+        expect(options.map((option) => option.textContent)).toEqual(['Any', 'Gmail Sync', 'Gmail Archive']);
+    });
+
+    it('labels the instance configurations of the picked integration with the integration name', async () => {
+        renderWorkflowExecutions('integrationId=2');
+
+        await userEvent.click(getFilterComboBox('Instance Configuration'));
+
+        const options = await screen.findAllByRole('option');
+
+        expect(options.map((option) => option.textContent)).toEqual(['Any', 'Gmail Sync']);
+    });
+
+    it('lists the workflows of the last published integration version when only an integration is picked', async () => {
+        renderWorkflowExecutions('integrationId=2');
+
+        expect(useGetIntegrationVersionWorkflowsQueryMock).toHaveBeenLastCalledWith(2, 2, false, true);
+
+        await userEvent.click(getFilterComboBox('Workflow'));
+
+        expect(await screen.findByRole('option', {name: 'Send Email'})).toBeInTheDocument();
+    });
+
+    it('lists the workflows of the version of the picked instance configuration', () => {
+        useGetIntegrationInstanceConfigurationQueryMock.mockReturnValue({
+            data: {id: 4, integrationId: 2, integrationVersion: 3},
+        });
+
+        renderWorkflowExecutions('integrationId=2&integrationInstanceConfigurationId=4');
+
+        expect(useGetIntegrationVersionWorkflowsQueryMock).toHaveBeenLastCalledWith(2, 3, false, true);
+    });
+
+    it('does not list workflows when the picked integration has no published version', () => {
+        renderWorkflowExecutions('integrationId=3');
+
+        expect(useGetIntegrationVersionWorkflowsQueryMock).toHaveBeenLastCalledWith(3, undefined, false, false);
+    });
+
+    it('sends the picked connected user to the integration executions query', async () => {
+        renderWorkflowExecutions('integrationId=2');
+
+        expect(useGetConnectedUsersQueryMock).toHaveBeenLastCalledWith({environmentId: 0, integrationId: 2}, true);
+
+        await userEvent.click(getFilterComboBox('Connected User'));
+
+        await userEvent.click(await screen.findByRole('option', {name: 'User user-7'}));
+
+        await waitFor(() => {
+            expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith(
+                0,
+                expect.objectContaining({connectedUserId: 7, integrationId: 2})
+            );
+        });
+    });
+
+    it('reads the connected user filter from the URL', () => {
+        renderWorkflowExecutions('connectedUserId=7');
+
+        expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith(0, expect.objectContaining({connectedUserId: 7}));
+        expect(getFilterComboBox('Connected User')).toHaveTextContent('User user-7');
     });
 });
