@@ -13,6 +13,8 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.Emb
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectComponentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectWorkflowTemplateModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,10 @@ public interface AutomationProjectMapper
     AutomationProjectModel convert(AutomationProjectDTO automationProjectDTO);
 
     AutomationProjectComponentModel toComponentModel(ConnectedUserWorkflowTemplateDTO.Component component);
+
+    @Mapping(target = "group", ignore = true)
+    ComponentInputReferenceModel toComponentInputReferenceModel(
+        WorkflowInput.ComponentInputReference componentInputReference);
 
     @Mapping(target = "components", expression = "java(toComponentModels(workflowTemplateDTO))")
     @Mapping(target = "id", source = "workflowUuid")
