@@ -19,7 +19,8 @@ package com.bytechef.automation.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.domain.SystemProjects;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -48,16 +49,18 @@ public class ProjectDeploymentGraphQlController {
 
     private final EnvironmentService environmentService;
     private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectFacade projectFacade;
     private final ProjectService projectService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentGraphQlController(
         EnvironmentService environmentService, ProjectDeploymentService projectDeploymentService,
-        ProjectService projectService, TagService tagService) {
+        ProjectFacade projectFacade, ProjectService projectService, TagService tagService) {
 
         this.environmentService = environmentService;
         this.projectDeploymentService = projectDeploymentService;
+        this.projectFacade = projectFacade;
         this.projectService = projectService;
         this.tagService = tagService;
     }
@@ -119,19 +122,15 @@ public class ProjectDeploymentGraphQlController {
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
             false, environment, projectId, tagId, workspaceId);
 
-        Set<Long> systemProjectIds = projectService
-            .getProjects(
-                projectDeployments.stream()
-                    .map(ProjectDeployment::getProjectId)
-                    .distinct()
-                    .toList())
-            .stream()
-            .filter(SystemProjects::isSystemProject)
-            .map(Project::getId)
-            .collect(Collectors.toSet());
+        Set<Long> catalogProjectIds = projectFacade.getOwnedProjectIds(
+            projectDeployments.stream()
+                .map(ProjectDeployment::getProjectId)
+                .distinct()
+                .toList(),
+            ProjectOwner.EMBEDDED_CATALOG);
 
         return projectDeployments.stream()
-            .filter(projectDeployment -> !systemProjectIds.contains(projectDeployment.getProjectId()))
+            .filter(projectDeployment -> !catalogProjectIds.contains(projectDeployment.getProjectId()))
             .toList();
     }
 

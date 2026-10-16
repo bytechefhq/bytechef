@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
@@ -36,6 +37,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -188,6 +190,24 @@ public class ProjectGraphQlControllerIntTest {
                     "name": "Project 2"
                 }
                 """);
+    }
+
+    @Test
+    void testProjectsHidesCatalogProjectsAndKeepsConnectedUserProjects() {
+        List<Project> mockProjects = List.of(
+            createMockProject(1L, "catalog"),
+            createMockProject(2L, "user"),
+            createMockProject(3L, "plain"));
+
+        when(projectService.getProjects()).thenReturn(mockProjects);
+        when(projectFacade.getOwnedProjectIds(any(), eq(ProjectOwner.EMBEDDED_CATALOG))).thenReturn(Set.of(1L));
+
+        this.graphQlTester
+            .documentName("projects")
+            .execute()
+            .path("projects[*].name")
+            .entityList(String.class)
+            .containsExactly("user", "plain");
     }
 
     @Test

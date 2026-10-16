@@ -18,8 +18,9 @@ package com.bytechef.automation.configuration.search;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.domain.SystemProjects;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
@@ -38,11 +39,15 @@ import org.springframework.stereotype.Component;
 class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
 
     private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
 
-    ProjectDeploymentSearchAssetProvider(ProjectDeploymentService projectDeploymentService,
+    ProjectDeploymentSearchAssetProvider(
+        ProjectDeploymentService projectDeploymentService, ProjectOwnershipService projectOwnershipService,
         ProjectService projectService) {
+
         this.projectDeploymentService = projectDeploymentService;
+        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
     }
 
@@ -65,11 +70,14 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
             .stream()
             .collect(Collectors.toMap(Project::getId, Function.identity()));
 
+        Set<Long> catalogProjectIds = projectOwnershipService.getOwnedProjectIds(
+            projectIds, ProjectOwner.EMBEDDED_CATALOG);
+
         return deployments.stream()
             .filter(deployment -> {
                 Project project = projectMap.get(deployment.getProjectId());
 
-                return project != null && !SystemProjects.isSystemProject(project) &&
+                return project != null && !catalogProjectIds.contains(project.getId()) &&
                     workspaceIds.contains(project.getWorkspaceId()) &&
                     containsIgnoreCase(project.getName(), queryLower);
             })

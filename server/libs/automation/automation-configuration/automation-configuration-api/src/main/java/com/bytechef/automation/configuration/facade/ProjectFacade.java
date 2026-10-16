@@ -21,7 +21,10 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -40,6 +43,8 @@ public interface ProjectFacade {
     byte[] exportProject(long id);
 
     void exportSharedProject(long id, @Nullable String description);
+
+    Set<Long> getOwnedProjectIds(Collection<Long> projectIds, ProjectOwner projectOwner);
 
     ProjectTemplateDTO getProjectTemplate(String id, boolean sharedProject);
 

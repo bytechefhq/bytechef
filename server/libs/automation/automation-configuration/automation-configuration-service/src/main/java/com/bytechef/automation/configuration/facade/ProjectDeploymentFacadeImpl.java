@@ -27,13 +27,14 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
 import com.bytechef.automation.configuration.listener.ProjectDeploymentDeleteEventListener;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -100,6 +101,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
@@ -115,7 +117,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ConnectionService connectionService, Evaluator evaluator, EnvironmentService environmentService,
         PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService, JobFacade jobFacade,
         JobService jobService, ProjectDeploymentService projectDeploymentService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ProjectOwnershipService projectOwnershipService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
@@ -132,6 +135,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.projectDeploymentDeleteEventListeners = projectDeploymentDeleteEventListeners;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
@@ -339,7 +343,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
 
-        List<ProjectDeployment> projectDeployments = filterOutSystemProjectDeployments(
+        List<ProjectDeployment> projectDeployments = filterOutCatalogProjectDeployments(
             projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, id));
 
         if (includeAllFields) {
@@ -798,22 +802,24 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             .orElse(null);
     }
 
-    private List<ProjectDeployment> filterOutSystemProjectDeployments(List<ProjectDeployment> projectDeployments) {
+    private List<ProjectDeployment> filterOutCatalogProjectDeployments(List<ProjectDeployment> projectDeployments) {
         if (projectDeployments.isEmpty()) {
             return projectDeployments;
         }
 
-        Set<Long> systemProjectIds = getProjects(projectDeployments).stream()
-            .filter(SystemProjects::isSystemProject)
-            .map(Project::getId)
-            .collect(Collectors.toSet());
+        Set<Long> catalogProjectIds = projectOwnershipService.getOwnedProjectIds(
+            projectDeployments.stream()
+                .map(ProjectDeployment::getProjectId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet()),
+            ProjectOwner.EMBEDDED_CATALOG);
 
-        if (systemProjectIds.isEmpty()) {
+        if (catalogProjectIds.isEmpty()) {
             return projectDeployments;
         }
 
         return projectDeployments.stream()
-            .filter(projectDeployment -> !systemProjectIds.contains(projectDeployment.getProjectId()))
+            .filter(projectDeployment -> !catalogProjectIds.contains(projectDeployment.getProjectId()))
             .toList();
     }
 

@@ -25,12 +25,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
-import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryConcurrentModificationException;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryNotFoundException;
@@ -52,6 +52,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.AfterEach;
@@ -136,7 +137,7 @@ class AiAutoMemoryGraphQlControllerIntTest {
     private ProjectDeploymentService projectDeploymentService;
 
     @MockitoBean
-    private ProjectService projectService;
+    private ProjectFacade projectFacade;
 
     @MockitoBean
     private UserService userService;
@@ -683,8 +684,8 @@ class AiAutoMemoryGraphQlControllerIntTest {
 
     @Test
     void testListingsDropEmbeddedConnectedUserDeployments() {
-        givenDeployments(deployment(5L, 50L, "Orders"), deployment(6L, 60L, "__EMBEDDED__customer-42"));
-        givenProjects(project(50L, "Orders"), project(60L, "__EMBEDDED__customer-42"));
+        givenDeployments(deployment(5L, 50L, "Orders"), deployment(6L, 60L, "customer-42"));
+        givenEmbeddedConnectedUserProjects(60L);
         givenPrincipalCounts(
             new AiAutoMemoryPrincipalCount(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 5L, 1),
             new AiAutoMemoryPrincipalCount(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 6L, 1));
@@ -730,7 +731,7 @@ class AiAutoMemoryGraphQlControllerIntTest {
     @Test
     void testADeploymentWhoseProjectIsGoneIsNotTreatedAsEmbedded() {
         givenDeployments(deployment(6L, 60L, "Orders"));
-        givenProjects();
+        givenEmbeddedConnectedUserProjects();
         givenPrincipalCounts(new AiAutoMemoryPrincipalCount(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 6L, 1));
 
         graphQlTester.document(PRINCIPALS_QUERY)
@@ -744,8 +745,8 @@ class AiAutoMemoryGraphQlControllerIntTest {
     void testEmbeddedConnectedUserDeploymentMemoryIsNotAddressable() {
         authenticateWith("ROLE_ADMIN");
 
-        givenDeployments(deployment(5L, 60L, "__EMBEDDED__customer-42"));
-        givenProjects(project(60L, "__EMBEDDED__customer-42"));
+        givenDeployments(deployment(5L, 60L, "customer-42"));
+        givenEmbeddedConnectedUserProjects(60L);
 
         listWithPrincipal("PROJECT_DEPLOYMENT", 5L)
             .execute()
@@ -877,14 +878,9 @@ class AiAutoMemoryGraphQlControllerIntTest {
         });
     }
 
-    private void givenProjects(Project... projects) {
-        when(projectService.getProjects(any())).thenAnswer(invocation -> {
-            List<Long> projectIds = invocation.getArgument(0);
-
-            return Arrays.stream(projects)
-                .filter(project -> projectIds.contains(project.getId()))
-                .toList();
-        });
+    private void givenEmbeddedConnectedUserProjects(Long... embeddedProjectIds) {
+        when(projectFacade.getOwnedProjectIds(any(), eq(ProjectOwner.EMBEDDED_CONNECTED_USER)))
+            .thenReturn(Set.of(embeddedProjectIds));
     }
 
     private static ProjectDeployment deployment(long id, long projectId, String name) {
@@ -895,15 +891,6 @@ class AiAutoMemoryGraphQlControllerIntTest {
         projectDeployment.setProjectId(projectId);
 
         return projectDeployment;
-    }
-
-    private static Project project(long id, String name) {
-        Project project = new Project();
-
-        project.setId(id);
-        project.setName(name);
-
-        return project;
     }
 
     private static String updateWithPrincipal(String principalType, long principalId) {
