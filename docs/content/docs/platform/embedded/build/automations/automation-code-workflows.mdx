@@ -28,9 +28,8 @@ duplicate the same container for no benefit.
 
 Practically:
 
-- The catalog project is resolved (or created, on first deploy) by name, hidden behind the same
-  `__EMBEDDED_AUTOMATION__` marker convention the visual bridge uses to keep the underlying
-  automation `Project` out of view.
+- The catalog project is created on the first deploy and reused by later deploys. It is kept out of
+  the regular Automation screens because Embedded owns it.
 - Redeploying the same artifact **upgrades every referencing user's workflow at once** - there is no
   per-user version pinning and no per-user bespoke deploy. If you need to stage a change, stage it in
   a separate environment before deploying to the one your customers use.

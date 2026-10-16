@@ -12,7 +12,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
@@ -71,7 +70,8 @@ import tools.jackson.core.type.TypeReference;
 @ConditionalOnEEVersion
 @SkipAutomationAuthorization
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
-    private static final String MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
+    private static final String RESERVED_NAME_PREFIX = "__EMBEDDED";
+    private static final String LEGACY_NAME_PREFIX = "__EMBEDDED_AUTOMATION__";
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -137,13 +137,14 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public long createProject(
         String name, String description, String category, List<String> tags, String permissionExpression,
         @Nullable Boolean automationHubVisible) {
-        if (name != null && name.startsWith("__EMBEDDED")) {
-            throw new IllegalArgumentException("Project name must not start with '__EMBEDDED': " + name);
+        if (name != null && name.startsWith(RESERVED_NAME_PREFIX)) {
+            throw new IllegalArgumentException(
+                "Project name must not start with '" + RESERVED_NAME_PREFIX + "': " + name);
         }
 
         Project project = new Project();
 
-        project.setName(MARKER + name);
+        project.setName(name);
         project.setDescription(description);
         project.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
         project.setCategoryId(resolveCategory(category));
@@ -160,7 +161,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public String createProjectWorkflow(long projectId, String definition, String permissionExpression) {
-        getMarkedProject(projectId);
+        getCatalogProject(projectId);
 
         ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
             projectId, StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition);
@@ -177,7 +178,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public void deleteProject(long projectId) {
-        getMarkedProject(projectId);
+        getCatalogProject(projectId);
 
         connectedUserReferenceRolloutManager.deleteReferenceDeployments(projectId);
 
@@ -215,7 +216,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         ProjectWorkflow lastProjectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(lastWorkflowId);
 
-        Project project = getMarkedProject(lastProjectWorkflow.getProjectId());
+        Project project = getCatalogProject(lastProjectWorkflow.getProjectId());
 
         projectWorkflowService.fetchProjectWorkflow(project.getId(), project.getLastProjectVersion(), workflowUuid)
             .ifPresent(draftProjectWorkflow -> projectWorkflowFacade.deleteWorkflow(
@@ -230,7 +231,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         long projectId = sourceProjectWorkflow.getProjectId();
 
-        getMarkedProject(projectId);
+        getCatalogProject(projectId);
 
         Workflow sourceWorkflow = workflowService.getWorkflow(workflowId);
 
@@ -252,14 +253,13 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public long duplicateProject(long projectId) {
-        Project sourceProject = getMarkedProject(projectId);
+        Project sourceProject = getCatalogProject(projectId);
 
-        String sourceDisplayName = sourceProject.getName()
-            .substring(MARKER.length());
+        String sourceDisplayName = getDisplayName(sourceProject);
 
         Project newProject = new Project();
 
-        newProject.setName(MARKER + sourceDisplayName + " (Copy)");
+        newProject.setName(sourceDisplayName + " (Copy)");
         newProject.setDescription(sourceProject.getDescription());
         newProject.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
         newProject.setCategoryId(sourceProject.getCategoryId());
@@ -288,7 +288,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public List<AutomationWorkflowProjectVersionDTO> getProjectVersions(long projectId) {
-        Project project = getMarkedProject(projectId);
+        Project project = getCatalogProject(projectId);
 
         return project.getProjectVersions()
             .stream()
@@ -303,7 +303,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public AutomationWorkflowProjectDTO getProject(long projectId) {
-        Project project = getMarkedProject(projectId);
+        Project project = getCatalogProject(projectId);
 
         return toDTO(project, automationWorkflowProjectService.getAutomationWorkflowProject(projectId));
     }
@@ -342,7 +342,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public void publishProject(long projectId, @Nullable String description) {
-        Project project = getMarkedProject(projectId);
+        Project project = getCatalogProject(projectId);
 
         int oldProjectVersion = project.getLastProjectVersion();
 
@@ -373,9 +373,14 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
         String permissionExpression, @Nullable Boolean automationHubVisible) {
-        Project project = getMarkedProject(projectId);
+        if (name != null && name.startsWith(RESERVED_NAME_PREFIX)) {
+            throw new IllegalArgumentException(
+                "Project name must not start with '" + RESERVED_NAME_PREFIX + "': " + name);
+        }
 
-        project.setName(MARKER + name);
+        Project project = getCatalogProject(projectId);
+
+        project.setName(name);
         project.setDescription(description);
         project.setCategoryId(resolveCategory(category));
         project.setTagIds(resolveTags(tags));
@@ -398,7 +403,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        getMarkedProject(projectWorkflow.getProjectId());
+        getCatalogProject(projectWorkflow.getProjectId());
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -417,7 +422,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        getMarkedProject(projectWorkflow.getProjectId());
+        getCatalogProject(projectWorkflow.getProjectId());
 
         automationWorkflowProjectService.updateWorkflowPermissionExpression(
             projectWorkflow.getProjectId(), projectWorkflow.getUuid(),
@@ -517,7 +522,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return projectService.getProjects(List.copyOf(projectIds))
             .stream()
             .filter(project -> Objects.equals(project.getWorkspaceId(), Workspace.DEFAULT_WORKSPACE_ID))
-            .sorted(Comparator.comparing(Project::getName))
+            .sorted(Comparator.comparing(AutomationWorkflowProjectFacadeImpl::getDisplayName,
+                String.CASE_INSENSITIVE_ORDER))
             .toList();
     }
 
@@ -527,7 +533,17 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .collect(Collectors.toMap(AutomationWorkflowProject::getProjectId, Function.identity()));
     }
 
-    private Project getMarkedProject(long projectId) {
+    private static String getDisplayName(Project project) {
+        String name = project.getName();
+
+        if (name.startsWith(LEGACY_NAME_PREFIX)) {
+            return name.substring(LEGACY_NAME_PREFIX.length());
+        }
+
+        return name;
+    }
+
+    private Project getCatalogProject(long projectId) {
         Project project = projectService.getProject(projectId);
 
         Optional<AutomationWorkflowProject> automationWorkflowProject =
@@ -587,8 +603,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .filter(Objects::nonNull)
             .toList();
 
-        String markedName = project.getName();
-        String displayName = markedName.substring(MARKER.length());
+        String displayName = getDisplayName(project);
 
         ProjectVersion lastPublishedProjectVersion = project.getLastPublishedProjectVersion();
 
@@ -631,8 +646,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
                 .toList();
         }
 
-        String markedName = project.getName();
-        String displayName = markedName.substring(MARKER.length());
+        String displayName = getDisplayName(project);
 
         boolean published = lastPublishedProjectVersion != null;
         Integer lastPublishedVersion = published ? lastPublishedProjectVersion.getVersion() : null;

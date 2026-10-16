@@ -21,7 +21,6 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -755,10 +754,82 @@ class AutomationWorkflowProjectFacadeIntTest {
     }
 
     @Test
+    void testDisplayNameStripsOnlyTheLegacyPrefix() {
+        Project legacyProject = new Project();
+
+        legacyProject.setName("__EMBEDDED_AUTOMATION__Legacy");
+        legacyProject.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
+
+        long legacyProjectId = projectService.create(legacyProject)
+            .getId();
+
+        automationWorkflowProjectService.create(legacyProjectId, null, true);
+
+        long plainProjectId = automationWorkflowProjectFacade.createProject(
+            "Xylophone", "", null, List.of(), null, null);
+
+        assertThat(automationWorkflowProjectFacade.getProject(legacyProjectId)
+            .name()).isEqualTo("Legacy");
+        assertThat(automationWorkflowProjectFacade.getProject(plainProjectId)
+            .name()).isEqualTo("Xylophone");
+        assertThat(projectService.getProject(plainProjectId)
+            .getName()).isEqualTo("Xylophone");
+    }
+
+    @Test
+    void testGetProjectsSortsByDisplayNameIgnoringCase() {
+        Project legacyProject = new Project();
+
+        legacyProject.setName("__EMBEDDED_AUTOMATION__Zeta");
+        legacyProject.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
+
+        long legacyProjectId = projectService.create(legacyProject)
+            .getId();
+
+        automationWorkflowProjectService.create(legacyProjectId, null, true);
+
+        long betaProjectId = automationWorkflowProjectFacade.createProject("Beta", "", null, List.of(), null, null);
+        long alphaProjectId = automationWorkflowProjectFacade.createProject("alpha", "", null, List.of(), null, null);
+
+        List<Long> projectIds = List.of(legacyProjectId, betaProjectId, alphaProjectId);
+
+        assertThat(
+            automationWorkflowProjectFacade.getProjects()
+                .stream()
+                .filter(project -> projectIds.contains(project.id()))
+                .map(AutomationWorkflowProjectDTO::name)
+                .toList()).containsExactly("alpha", "Beta", "Zeta");
+    }
+
+    @Test
+    void testDuplicateProjectOfAPlainNamedProject() {
+        long projectId = automationWorkflowProjectFacade.createProject(
+            "Xylophone", "", null, List.of(), null, null);
+
+        long duplicateProjectId = automationWorkflowProjectFacade.duplicateProject(projectId);
+
+        assertThat(projectService.getProject(duplicateProjectId)
+            .getName()).isEqualTo("Xylophone (Copy)");
+        assertThat(automationWorkflowProjectFacade.getProject(duplicateProjectId)
+            .name()).isEqualTo("Xylophone (Copy)");
+    }
+
+    @Test
+    void testUpdateProjectRejectsAnEmbeddedPrefixedName() {
+        long projectId = automationWorkflowProjectFacade.createProject(
+            "Updatable " + UUID.randomUUID(), "", null, List.of(), null, null);
+
+        assertThatThrownBy(
+            () -> automationWorkflowProjectFacade.updateProject(
+                projectId, "__EMBEDDED_x", "", null, List.of(), null, null))
+                    .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void testProjectWithTheMarkerNameButNoSettingsRowIsNotAnAutomationWorkflowProject() {
         Project project = new Project();
 
-        project.setName(SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX + "Unregistered " + UUID.randomUUID());
+        project.setName("__EMBEDDED_AUTOMATION__Unregistered " + UUID.randomUUID());
         project.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
 
         long projectId = projectService.create(project)
