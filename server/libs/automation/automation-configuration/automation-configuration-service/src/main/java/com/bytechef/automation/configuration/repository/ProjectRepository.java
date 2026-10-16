@@ -40,8 +40,6 @@ public interface ProjectRepository
         """)
     Optional<Project> findByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
 
-    Optional<Project> findByNameIgnoreCaseAndWorkspaceId(String name, long workspaceId);
-
     Optional<Project> findByUuid(UUID uuid);
 
     @Query("""

@@ -94,12 +94,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Project> fetchProject(String name, long workspaceId) {
-        return projectRepository.findByNameIgnoreCaseAndWorkspaceId(name, workspaceId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Project getProjectDeploymentProject(long projectDeploymentId) {
         return OptionalUtils.get(projectRepository.findByProjectDeploymentId(projectDeploymentId));
     }
