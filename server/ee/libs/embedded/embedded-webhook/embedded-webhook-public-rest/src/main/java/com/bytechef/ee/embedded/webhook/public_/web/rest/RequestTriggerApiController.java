@@ -318,9 +318,6 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
             .findFirst();
     }
 
-    /**
-     * A workflow that only a component trigger (for example a Gmail poll) starts has nothing to call here.
-     */
     private static ResponseEntity<Object> noRequestTrigger(String workflowUuid) {
         return ResponseEntity.badRequest()
             .body(
