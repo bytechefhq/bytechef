@@ -27,7 +27,7 @@ import {
 import {MouseEvent, useCallback, useMemo, useRef, useState} from 'react';
 
 import isEditableCodeLanguage from '../../utils/isEditableCodeLanguage';
-import CodeWorkflowReferencesDialog from '../CodeWorkflowReferencesDialog';
+import CodeWorkflowReferencesSheet from '../CodeWorkflowReferencesSheet';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 type EmbeddedTagType = AutomationWorkflowProjectTagsQuery['automationWorkflowProjectTags'][number];
@@ -305,7 +305,7 @@ const AutomationWorkflowProjectListItem = ({
             />
 
             {showReferencesDialog && (
-                <CodeWorkflowReferencesDialog
+                <CodeWorkflowReferencesSheet
                     onClose={() => setShowReferencesDialog(false)}
                     projectName={project.name}
                     workflowTemplates={project.workflowTemplates}
