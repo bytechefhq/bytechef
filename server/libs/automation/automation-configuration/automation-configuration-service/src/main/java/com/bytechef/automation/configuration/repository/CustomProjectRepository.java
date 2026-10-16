@@ -27,4 +27,6 @@ public interface CustomProjectRepository {
     List<Project> findAllProjects(
         Boolean apiCollections, Long categoryId, Boolean projectDeployments, Long tagId, Integer status,
         Long workspaceId);
+
+    List<Long> findProjectIdsByNameIgnoreCaseExcludingOwned(String name);
 }

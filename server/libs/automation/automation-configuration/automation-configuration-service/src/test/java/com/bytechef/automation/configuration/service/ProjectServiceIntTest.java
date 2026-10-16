@@ -189,6 +189,41 @@ public class ProjectServiceIntTest {
     }
 
     @Test
+    public void testFetchProjectByNameIgnoresOwnedProjects() {
+        Project catalogProject = projectRepository.save(
+            Project.builder()
+                .name("Sales")
+                .workspaceId(workspace.getId())
+                .build());
+
+        testOwnerContributors.addCatalogId(catalogProject.getId());
+
+        assertThat(projectService.fetchProject("sales")).isEmpty();
+    }
+
+    @Test
+    public void testFetchProjectByNameReturnsTheUnownedProjectWhenAnOwnedOneSharesItsName() {
+        Project catalogProject = projectRepository.save(
+            Project.builder()
+                .name("Sales")
+                .workspaceId(workspace.getId())
+                .build());
+
+        Project regularProject = projectRepository.save(
+            Project.builder()
+                .name("Sales")
+                .workspaceId(workspace.getId())
+                .build());
+
+        testOwnerContributors.addCatalogId(catalogProject.getId());
+
+        assertThat(projectService.fetchProject("SALES"))
+            .isPresent()
+            .map(Project::getId)
+            .hasValue(regularProject.getId());
+    }
+
+    @Test
     public void testFetchProjectByNameAndWorkspaceId() {
         Workspace secondWorkspace = workspaceRepository.save(new Workspace("test2"));
 
