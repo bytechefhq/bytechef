@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWor
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +64,14 @@ public class ConnectedUserProjectWorkflowServiceImpl implements ConnectedUserPro
     @Transactional(readOnly = true)
     public List<ConnectedUserProjectWorkflow> getCopiedConnectedUserProjectWorkflows(String copiedFromWorkflowUuid) {
         return connectedUserProjectWorkflowRepository.findAllByCopiedFromWorkflowUuid(copiedFromWorkflowUuid);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConnectedUserProjectWorkflow> getCopiedConnectedUserProjectWorkflows(
+        Set<String> copiedFromWorkflowUuids) {
+
+        return connectedUserProjectWorkflowRepository.findAllByCopiedFromWorkflowUuidIn(copiedFromWorkflowUuids);
     }
 
     @Override

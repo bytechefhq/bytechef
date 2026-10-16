@@ -1,3 +1,12 @@
+type ConnectedUserCatalogWorkflowCopy {
+    copiedFromWorkflowUuid: ID!
+    workflowUuid: ID!
+    externalUserId: String!
+    connectedUserName: String
+    connectedUserEmail: String
+    enabled: Boolean!
+}
+
 type ConnectedUserCodeWorkflowReference {
     automationWorkflowUuid: ID!
     externalUserId: String!
@@ -8,6 +17,10 @@ type ConnectedUserCodeWorkflowReference {
 }
 
 extend type Query {
+    connectedUserCatalogWorkflowCopies(
+        automationWorkflowUuids: [ID!]!, environmentId: ID!
+    ): [ConnectedUserCatalogWorkflowCopy!]!
+
     connectedUserCodeWorkflowReferences(
         automationWorkflowUuids: [ID!]!, environmentId: ID!
     ): [ConnectedUserCodeWorkflowReference!]!
