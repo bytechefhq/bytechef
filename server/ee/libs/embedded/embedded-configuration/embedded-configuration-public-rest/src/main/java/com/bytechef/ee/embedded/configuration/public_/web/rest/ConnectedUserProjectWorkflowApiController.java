@@ -16,19 +16,23 @@ import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.exception.ProvidedValueLockedException;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserComponentInputFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationComponentInputOptionsRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowFromPromptRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnableConnectedUserWorkflowResponseModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ProvisionWorkflowReferenceRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendWorkflowConfigurationConnectionRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateWorkflowInputsRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -62,6 +66,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class ConnectedUserProjectWorkflowApiController implements ConnectedUserProjectWorkflowApi {
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserProjectWorkflowApiController.class);
 
+    private final ConnectedUserComponentInputFacade connectedUserComponentInputFacade;
     private final ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConversionService conversionService;
@@ -69,9 +74,11 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowApiController(
+        ConnectedUserComponentInputFacade connectedUserComponentInputFacade,
         ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade,
         ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService,
         EnvironmentService environmentService) {
+        this.connectedUserComponentInputFacade = connectedUserComponentInputFacade;
         this.connectedUserWorkflowReferenceFacade = connectedUserWorkflowReferenceFacade;
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.conversionService = conversionService;
@@ -419,6 +426,33 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @Override
+    @CrossOrigin
+    public ResponseEntity<List<OptionModel>> getFrontendAutomationComponentInputOptions(
+        AutomationComponentInputOptionsRequestModel automationComponentInputOptionsRequestModel,
+        EnvironmentModel xEnvironment) {
+
+        Map<String, Object> lookupDependsOnValues =
+            automationComponentInputOptionsRequestModel.getLookupDependsOnValues();
+
+        List<Option> options = connectedUserComponentInputFacade.getComponentInputOptions(
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), getEnvironment(xEnvironment),
+            automationComponentInputOptionsRequestModel.getComponentName(),
+            automationComponentInputOptionsRequestModel.getComponentVersion(),
+            automationComponentInputOptionsRequestModel.getGroupName(),
+            automationComponentInputOptionsRequestModel.getPropertyName(),
+            lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues,
+            automationComponentInputOptionsRequestModel.getSearchText(),
+            automationComponentInputOptionsRequestModel.getConnectionId());
+
+        return ResponseEntity.ok(
+            options.stream()
+                .map(option -> new OptionModel()
+                    .label(option.getLabel())
+                    .value(String.valueOf(option.getValue())))
+                .toList());
     }
 
     @Override
