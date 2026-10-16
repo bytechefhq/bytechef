@@ -70,6 +70,7 @@ import tools.jackson.core.type.TypeReference;
 @ConditionalOnEEVersion
 @SkipAutomationAuthorization
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
+    private static final String RESERVED_NAME_PREFIX = "__EMBEDDED";
     private static final String LEGACY_NAME_PREFIX = "__EMBEDDED_AUTOMATION__";
 
     private static final String DEFAULT_DEFINITION = """
@@ -136,7 +137,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public long createProject(
         String name, String description, String category, List<String> tags, String permissionExpression,
         @Nullable Boolean automationHubVisible) {
-        if (name != null && name.startsWith("__EMBEDDED")) {
+        if (name != null && name.startsWith(RESERVED_NAME_PREFIX)) {
             throw new IllegalArgumentException("Project name must not start with '__EMBEDDED': " + name);
         }
 
@@ -371,7 +372,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
         String permissionExpression, @Nullable Boolean automationHubVisible) {
-        if (name != null && name.startsWith("__EMBEDDED")) {
+        if (name != null && name.startsWith(RESERVED_NAME_PREFIX)) {
             throw new IllegalArgumentException("Project name must not start with '__EMBEDDED': " + name);
         }
 

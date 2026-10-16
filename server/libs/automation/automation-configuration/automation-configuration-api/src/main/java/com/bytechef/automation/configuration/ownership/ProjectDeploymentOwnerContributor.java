@@ -21,6 +21,9 @@ package com.bytechef.automation.configuration.ownership;
  * SQL expression that is true when the row whose id is the given column is owned. It must not reference outer aliases
  * other than that column, and it must be safe to wrap in {@code NOT (...)} and to combine with {@code OR}.
  *
+ * The condition must never evaluate to NULL, since it is wrapped in {@code NOT (...)}. The column argument is formatted
+ * into the SQL rather than bound, and the condition must not contain {@code ?} or {@code :name} placeholders.
+ *
  * @author Ivica Cardic
  */
 public interface ProjectDeploymentOwnerContributor {
