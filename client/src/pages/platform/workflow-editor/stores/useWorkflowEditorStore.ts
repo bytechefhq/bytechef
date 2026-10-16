@@ -82,7 +82,8 @@ export interface WorkflowEditorI {
     workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>;
     setWorkflowTestNodeState: (nodeName: string, nodeState: WorkflowTestNodeStateI) => void;
     removeWorkflowTestNodeState: (nodeName: string) => void;
-    resetWorkflowTestNodeStates: () => void;
+    resetWorkflowTestNodeStates: (workflowId: string | undefined) => void;
+    workflowTestNodeStatesWorkflowId: string | undefined;
 }
 
 const useWorkflowEditorStore = create<WorkflowEditorI>()(
@@ -228,10 +229,13 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
 
                     return {workflowTestNodeStates};
                 }),
-            resetWorkflowTestNodeStates: () =>
+            resetWorkflowTestNodeStates: (workflowId) =>
                 set(() => ({
                     workflowTestNodeStates: {},
+                    workflowTestNodeStatesWorkflowId: workflowId,
                 })),
+
+            workflowTestNodeStatesWorkflowId: undefined,
         }),
         {
             name: 'workflow-editor',

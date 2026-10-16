@@ -7,7 +7,7 @@ import {WorkflowTestExecutionFromJSON} from '@/shared/middleware/platform/workfl
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
-import {useCallback, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 export interface UseWorkflowTestStreamProps {
@@ -108,7 +108,7 @@ function backfillNodeStatesFromResult(workflowTestExecution: WorkflowTestExecuti
                 setWorkflowTestNodeState(name, {...nodeState, status: 'COMPLETED'});
             }
         }
-    } else if (jobStatus === 'FAILED' || jobStatus === 'STOPPED' || jobStatus === 'CANCELLED') {
+    } else if (jobStatus === 'FAILED' || jobStatus === 'STOPPED') {
         const {removeWorkflowTestNodeState, workflowTestNodeStates: currentNodeStates} =
             useWorkflowEditorStore.getState();
 
@@ -163,7 +163,7 @@ export function useWorkflowTestStream({
                 setWorkflowTestNodeState: state.setWorkflowTestNodeState,
             }))
         );
-    const {appendToLastAssistantMessage, setLastAssistantMessageContent, setResumeUrl} = useWorkflowTestChatStore(
+    const {appendToLastAssistantMessage, setLastAssistantMessageContent} = useWorkflowTestChatStore(
         useShallow((state) => ({
             appendToLastAssistantMessage: state.appendToLastAssistantMessage,
             setLastAssistantMessageContent: state.setLastAssistantMessageContent,
@@ -268,7 +268,7 @@ export function useWorkflowTestStream({
 
                     const jobId = String(startData.jobId);
 
-                    resetWorkflowTestNodeStates();
+                    resetWorkflowTestNodeStates(workflowId);
 
                     persistJobId(jobId);
 
