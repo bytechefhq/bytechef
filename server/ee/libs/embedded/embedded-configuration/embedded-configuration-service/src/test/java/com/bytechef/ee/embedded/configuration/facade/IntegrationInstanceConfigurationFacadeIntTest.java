@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -802,6 +803,59 @@ class IntegrationInstanceConfigurationFacadeIntTest {
                         assertThat(integrationInstanceConfigurationWorkflow.getWorkflowId()).isEqualTo("workflow-a");
                         assertThat(integrationInstanceConfigurationWorkflow.isEnabled()).isTrue();
                     });
+    }
+
+    @Test
+    void testEnableIntegrationVersionCreatesWithAWorkflowNeedingAnAdminConnectionLeftDisabled() {
+        authenticate(admin());
+
+        stubWorkflowNeedingAnAdminConnection("workflow-slack");
+
+        Integration integration = createPublishedIntegration("workflow-slack");
+
+        long integrationInstanceConfigurationId = integrationInstanceConfigurationFacade.enableIntegrationVersion(
+            integration.getId(), 1, Environment.STAGING);
+
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId)
+                .isEnabled())
+                    .isTrue();
+        assertThat(
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                integrationInstanceConfigurationId))
+                    .singleElement()
+                    .satisfies(integrationInstanceConfigurationWorkflow -> assertThat(
+                        integrationInstanceConfigurationWorkflow.isEnabled()).isFalse());
+    }
+
+    @Test
+    void testEnableIntegrationVersionMovesWithANewWorkflowNeedingAnAdminConnectionLeftDisabled() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            integration.getId(), Environment.STAGING, true);
+
+        stubWorkflowNeedingAnAdminConnection("workflow-slack");
+
+        integrationWorkflowService.addWorkflow(integration.getId(), 2, "workflow-b");
+        integrationWorkflowService.addWorkflow(integration.getId(), 2, "workflow-slack");
+
+        integrationService.publishIntegration(integration.getId(), null);
+
+        integrationInstanceConfigurationFacade.enableIntegrationVersion(integration.getId(), 2, Environment.STAGING);
+
+        Map<String, Boolean> enabledByWorkflowId = integrationInstanceConfigurationWorkflowService
+            .getIntegrationInstanceConfigurationWorkflows(integrationInstanceConfigurationId)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    IntegrationInstanceConfigurationWorkflow::getWorkflowId,
+                    IntegrationInstanceConfigurationWorkflow::isEnabled));
+
+        assertThat(enabledByWorkflowId).containsOnly(Map.entry("workflow-b", true), Map.entry("workflow-slack", false));
     }
 
     @Test
@@ -1990,6 +2044,16 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             integrationInstanceConfigurationWorkflow);
 
         return integrationInstanceConfigurationWorkflow.getId();
+    }
+
+    private void stubWorkflowNeedingAnAdminConnection(String workflowId) {
+        when(workflowService.getWorkflow(workflowId))
+            .thenReturn(
+                new Workflow(
+                    "{\"tasks\":[{\"name\":\"postToSlack\",\"type\":\"slack/v1/sendChannelMessage\"}]}",
+                    Workflow.Format.JSON));
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenReturn(List.of(new ComponentConnection("slack", 1, "postToSlack", "slack", true)));
     }
 
     private void stubConnection(AuthorizationType... authorizationTypes) {
