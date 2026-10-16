@@ -185,9 +185,9 @@ class AiAgentUtilsSkillsToolTest {
 
         ToolDefinition toolDefinition = scriptToolCallback.getToolDefinition();
 
-        Map<String, ?> inputSchema = JsonUtils.readMap(toolDefinition.inputSchema());
+        Map<String, Object> inputSchema = JsonUtils.readMap(toolDefinition.inputSchema(), Object.class);
 
-        assertThat(inputSchema.get("required")).isEqualTo(List.of("input"));
+        assertThat(inputSchema).containsEntry("required", List.of("input"));
         assertThat(inputSchema).extractingByKey("properties", InstanceOfAssertFactories.MAP)
             .containsKey("input");
         assertThat(toolDefinition.description()).contains("scripts/group_commits.js", "release-notes");
