@@ -125,10 +125,10 @@ public class AiAutoMemoryGraphQlController {
         List<ResolvedPrincipal> resolvedPrincipals = new ArrayList<>();
 
         for (AiAutoMemoryPrincipalCount principalCount : aiAutoMemoryService.listPrincipals(workspaceId, environment)) {
-            ResolvedPrincipal resolved = resolvePrincipalForListing(principalCount, userId);
+            ResolvedPrincipal resolvedPrincipal = resolvePrincipalForListing(principalCount, userId);
 
-            if (resolved != null) {
-                resolvedPrincipals.add(resolved);
+            if (resolvedPrincipal != null) {
+                resolvedPrincipals.add(resolvedPrincipal);
             }
         }
 
@@ -136,21 +136,17 @@ public class AiAutoMemoryGraphQlController {
 
         Set<PrincipalKey> addressable = new HashSet<>();
 
-        for (ResolvedPrincipal resolved : resolvedPrincipals) {
-            if (!deploymentLookup.isEmbedded(resolved)) {
-                addressable.add(new PrincipalKey(resolved.principalType(), resolved.principalId()));
+        for (ResolvedPrincipal resolvedPrincipal : resolvedPrincipals) {
+            if (!deploymentLookup.isEmbedded(resolvedPrincipal)) {
+                addressable.add(new PrincipalKey(resolvedPrincipal.principalType(), resolvedPrincipal.principalId()));
             }
         }
 
         return aiAutoMemoryService.listAllOwners(workspaceId, environment, memoryType)
             .stream()
             .filter(
-                memory -> addressable.contains(
-                    new PrincipalKey(memory.getPrincipalType(), memory.getPrincipalId())))
+                memory -> addressable.contains(new PrincipalKey(memory.getPrincipalType(), memory.getPrincipalId())))
             .toList();
-    }
-
-    private record PrincipalKey(AiAutoMemoryPrincipalType principalType, long principalId) {
     }
 
     @QueryMapping
@@ -201,7 +197,7 @@ public class AiAutoMemoryGraphQlController {
                 .map(ResolvedPrincipalCount::principal)
                 .toList());
 
-        List<AiAutoMemoryPrincipal> principals = new ArrayList<>();
+        List<AiAutoMemoryPrincipal> aiAutoMemoryPrincipals = new ArrayList<>();
 
         for (ResolvedPrincipalCount resolvedCount : addressable) {
             ResolvedPrincipal resolved = resolvedCount.principal();
@@ -210,13 +206,13 @@ public class AiAutoMemoryGraphQlController {
                 continue;
             }
 
-            principals.add(
+            aiAutoMemoryPrincipals.add(
                 new AiAutoMemoryPrincipal(
                     resolved.principalType(), resolved.principalId(),
                     resolveLabel(resolved, deploymentLookup.namesById()), resolvedCount.memoryCount()));
         }
 
-        return principals;
+        return aiAutoMemoryPrincipals;
     }
 
     private DeploymentLookup lookUpDeployments(List<ResolvedPrincipal> principals) {
@@ -276,24 +272,27 @@ public class AiAutoMemoryGraphQlController {
     }
 
     private @Nullable ResolvedPrincipal resolvePrincipalForListing(
-        AiAutoMemoryPrincipalCount principalCount, long currentUserId) {
+        AiAutoMemoryPrincipalCount aiAutoMemoryPrincipalCount, long currentUserId) {
 
-        AiAutoMemoryPrincipalType principalType = principalCount.principalType();
+        AiAutoMemoryPrincipalType aiAutoMemoryPrincipalType = aiAutoMemoryPrincipalCount.principalType();
 
-        if (principalType == AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE) {
+        if (aiAutoMemoryPrincipalType == AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE) {
             return null;
         }
 
         return resolvePrincipal(
-            new AiAutoMemoryPrincipalInput(principalType, principalCount.principalId()), currentUserId, false);
+            new AiAutoMemoryPrincipalInput(
+                aiAutoMemoryPrincipalType, aiAutoMemoryPrincipalCount.principalId()),
+            currentUserId, false);
     }
 
-    private static String resolveLabel(ResolvedPrincipal principal, Map<Long, String> deploymentNames) {
-        if (principal.principalType() == AiAutoMemoryPrincipalType.USER) {
+    private static String resolveLabel(ResolvedPrincipal resolvedPrincipal, Map<Long, String> deploymentNames) {
+        if (resolvedPrincipal.principalType() == AiAutoMemoryPrincipalType.USER) {
             return "My memories";
         }
 
-        return deploymentNames.getOrDefault(principal.principalId(), "Deployment " + principal.principalId());
+        return deploymentNames.getOrDefault(
+            resolvedPrincipal.principalId(), "Deployment " + resolvedPrincipal.principalId());
     }
 
     @MutationMapping
@@ -414,26 +413,6 @@ public class AiAutoMemoryGraphQlController {
             .build();
     }
 
-    private static void logRejection(DataFetchingEnvironment dataFetchingEnvironment, RuntimeException exception) {
-        if (log.isDebugEnabled()) {
-            Field field = dataFetchingEnvironment.getField();
-
-            log.debug("Rejected auto-memory request {}", field.getName(), exception);
-        }
-    }
-
-    private @Nullable ResolvedPrincipal resolveAddressablePrincipal(
-        @Nullable AiAutoMemoryPrincipalInput principal, long currentUserId, boolean mutating) {
-
-        ResolvedPrincipal resolvedPrincipal = resolvePrincipal(principal, currentUserId, mutating);
-
-        if (resolvedPrincipal == null || lookUpDeployments(List.of(resolvedPrincipal)).isEmbedded(resolvedPrincipal)) {
-            return null;
-        }
-
-        return resolvedPrincipal;
-    }
-
     @Nullable
     ResolvedPrincipal resolvePrincipal(
         @Nullable AiAutoMemoryPrincipalInput principal, long currentUserId, boolean mutating) {
@@ -466,6 +445,26 @@ public class AiAutoMemoryGraphQlController {
         return new ResolvedPrincipal(principalType, principalId);
     }
 
+    private static void logRejection(DataFetchingEnvironment dataFetchingEnvironment, RuntimeException exception) {
+        if (log.isDebugEnabled()) {
+            Field field = dataFetchingEnvironment.getField();
+
+            log.debug("Rejected auto-memory request {}", field.getName(), exception);
+        }
+    }
+
+    private @Nullable ResolvedPrincipal resolveAddressablePrincipal(
+        @Nullable AiAutoMemoryPrincipalInput principal, long currentUserId, boolean mutating) {
+
+        ResolvedPrincipal resolvedPrincipal = resolvePrincipal(principal, currentUserId, mutating);
+
+        if (resolvedPrincipal == null || lookUpDeployments(List.of(resolvedPrincipal)).isEmbedded(resolvedPrincipal)) {
+            return null;
+        }
+
+        return resolvedPrincipal;
+    }
+
     private static Environment toEnvironment(int environment) {
         Environment[] environments = Environment.values();
 
@@ -487,13 +486,6 @@ public class AiAutoMemoryGraphQlController {
         }
     }
 
-    record ResolvedPrincipal(AiAutoMemoryPrincipalType principalType, long principalId) {
-
-        AiAutoMemoryOwner toOwner(long workspaceId, Environment environment) {
-            return new AiAutoMemoryOwner(workspaceId, principalType, principalId, environment);
-        }
-    }
-
     public record AiAutoMemoryPrincipalInput(AiAutoMemoryPrincipalType principalType, long principalId) {
 
         public AiAutoMemoryPrincipalInput {
@@ -509,5 +501,15 @@ public class AiAutoMemoryGraphQlController {
         long id, long workspaceId, int environment, long expectedVersion, @Nullable String title,
         @Nullable String description, @Nullable AiAutoMemoryType memoryType, @Nullable String content,
         @Nullable AiAutoMemoryPrincipalInput principal) {
+    }
+
+    private record ResolvedPrincipal(AiAutoMemoryPrincipalType principalType, long principalId) {
+
+        AiAutoMemoryOwner toOwner(long workspaceId, Environment environment) {
+            return new AiAutoMemoryOwner(workspaceId, principalType, principalId, environment);
+        }
+    }
+
+    private record PrincipalKey(AiAutoMemoryPrincipalType principalType, long principalId) {
     }
 }
