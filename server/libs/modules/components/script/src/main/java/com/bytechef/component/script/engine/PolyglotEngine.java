@@ -76,6 +76,19 @@ public class PolyglotEngine {
         String languageId, Parameters inputParameters,
         @Nullable Map<String, ComponentConnection> componentConnections, JobContextAware jobContextAware) {
 
+        return execute(languageId, inputParameters, componentConnections, true, jobContextAware);
+    }
+
+    /**
+     * Runs the script's {@code perform} function. A {@code perform(input, connection, context)} function receives the
+     * parameters of each connection keyed by its name, unless {@code exposeConnectionParameters} is false, in which
+     * case it receives an empty map; the connections stay reachable through {@code context.component}.
+     */
+    public Object execute(
+        String languageId, Parameters inputParameters,
+        @Nullable Map<String, ComponentConnection> componentConnections, boolean exposeConnectionParameters,
+        JobContextAware jobContextAware) {
+
         try (Context polyglotContext = getContext()) {
             polyglotContext.eval(languageId, inputParameters.getString(SCRIPT, switch (languageId) {
                 case "java" ->
@@ -97,12 +110,19 @@ public class PolyglotEngine {
             Value performFunction = polyglotContext.getBindings(languageId)
                 .getMember("perform");
 
+            if (performFunction == null || !performFunction.canExecute()) {
+                throw new IllegalArgumentException("The script must define a function named 'perform'");
+            }
+
             Value value;
 
-            if (getPerformParameterCount(polyglotContext, languageId) >= 3) {
+            if (getRequiredPerformParameterCount(polyglotContext, languageId) >= 3) {
+                Map<String, ComponentConnection> exposedComponentConnections =
+                    exposeConnectionParameters ? scriptComponentConnections : Map.of();
+
                 value = performFunction.execute(
                     copyToGuestValue(inputMap, languageId),
-                    copyToGuestValue(toConnectionMap(scriptComponentConnections), languageId), contextProxyObject);
+                    copyConnectionsToGuestValue(exposedComponentConnections, languageId), contextProxyObject);
             } else {
                 value = performFunction.execute(copyToGuestValue(inputMap, languageId), contextProxyObject);
             }
@@ -111,11 +131,11 @@ public class PolyglotEngine {
         }
     }
 
-    private static int getPerformParameterCount(Context polyglotContext, String languageId) {
+    private static int getRequiredPerformParameterCount(Context polyglotContext, String languageId) {
         String parameterCountExpression = switch (languageId) {
             case "js" -> "perform.length";
-            case "python" -> "perform.__code__.co_argcount";
-            case "ruby" -> "method(:perform).parameters.length";
+            case "python" -> "perform.__code__.co_argcount - len(perform.__defaults__ or ())";
+            case "ruby" -> "method(:perform).parameters.count { |type, _| type == :req }";
             default -> null;
         };
 
@@ -125,19 +145,28 @@ public class PolyglotEngine {
 
         Value parameterCount = polyglotContext.eval(languageId, parameterCountExpression);
 
-        return parameterCount.asInt();
+        return parameterCount.fitsInInt() ? parameterCount.asInt() : 2;
     }
 
-    private static Map<String, Object> toConnectionMap(Map<String, ComponentConnection> componentConnections) {
+    private static MapProxyObject copyConnectionsToGuestValue(
+        Map<String, ComponentConnection> componentConnections, String languageId) {
+
         Map<String, Object> connectionMap = new HashMap<>();
 
         for (Map.Entry<String, ComponentConnection> entry : componentConnections.entrySet()) {
             ComponentConnection componentConnection = entry.getValue();
 
-            connectionMap.put(entry.getKey(), componentConnection.getParameters());
+            Map<String, ?> parameters = componentConnection.getParameters();
+            Map<String, Object> parameterMap = new HashMap<>();
+
+            for (Map.Entry<String, ?> parameterEntry : parameters.entrySet()) {
+                parameterMap.put(parameterEntry.getKey(), copyToGuestValue(parameterEntry.getValue(), languageId));
+            }
+
+            connectionMap.put(entry.getKey(), new MapProxyObject(parameterMap));
         }
 
-        return connectionMap;
+        return new MapProxyObject(connectionMap);
     }
 
     /**
@@ -249,7 +278,7 @@ public class PolyglotEngine {
                 proxyMap.put((String) entry.getKey(), copyToGuestValue(entry.getValue(), languageId));
             }
 
-            return new MapProxyObject(proxyMap);
+            return ProxyObject.fromMap(proxyMap);
         } else if (value instanceof Number number) {
             return number;
         } else if (value instanceof String string) {
@@ -263,7 +292,7 @@ public class PolyglotEngine {
                 proxyMap.put((String) entry.getKey(), copyToGuestValue(entry.getValue(), languageId));
             }
 
-            return new MapProxyObject(proxyMap);
+            return ProxyObject.fromMap(proxyMap);
         } else {
             throw new IllegalArgumentException("Cannot copy value %s to %s type.".formatted(value, languageId));
         }
@@ -312,9 +341,10 @@ public class PolyglotEngine {
     }
 
     /**
-     * Exposes a map to guest code both as an object and as a hash, so a script can read entries by member access
-     * ({@code input.name}) or by subscript ({@code connection["my-connection"]}), which Python requires for keys that
-     * are not identifiers.
+     * Exposes the connection map both as an object and as a hash, so a script can read it by subscript
+     * ({@code connection["my-connection"]}), the only syntax Python and Ruby offer for keys that are not identifiers.
+     * Input maps stay plain objects, because a hash's own methods ({@code items}, {@code count}) would hide input keys
+     * of the same name.
      */
     private static final class MapProxyObject implements ProxyHashMap, ProxyObject {
 
@@ -404,21 +434,15 @@ public class PolyglotEngine {
                     inputParameters = (Map<String, ?>) copyToJavaValue(arguments[0]);
                 }
 
-                ComponentConnection componentConnection = null;
+                Map.Entry<String, ComponentConnection> entry;
 
-                if (!componentConnections.isEmpty()) {
-                    Map.Entry<String, ComponentConnection> entry;
-
-                    if (arguments.length < 2) {
-                        entry = getFirstComponentConnectionEntry();
-                    } else {
-                        entry = getComponentConnectionEntry(arguments[1].asString());
-                    }
-
-                    if (entry != null) {
-                        componentConnection = entry.getValue();
-                    }
+                if (arguments.length < 2) {
+                    entry = getFirstComponentConnectionEntry();
+                } else {
+                    entry = getComponentConnectionEntry(arguments[1].asString());
                 }
+
+                ComponentConnection componentConnection = entry == null ? null : entry.getValue();
 
                 ActionDefinitionService actionDefinitionService = applicationContext.getBean(
                     ActionDefinitionService.class);
