@@ -172,12 +172,16 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         mergedParameters.putAll(connectionParameters);
 
+        String connectionName = getConnectionName(
+            connectedUser.getId(), integration.getComponentName(), integrationInstanceConfiguration.getName(),
+            environment);
+
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .authorizationType(integrationInstanceConfiguration.getAuthorizationType())
             .componentName(integration.getComponentName())
             .connectionVersion(connectionDefinition.getVersion())
             .environmentId(environment.ordinal())
-            .name(integrationInstanceConfiguration.getName())
+            .name(connectionName)
             .parameters(mergedParameters)
             .tags(List.of())
             .build();
@@ -303,6 +307,37 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .map(integrationInstanceConfigurationDTO -> toConnectedUserIntegrationDTO(
                 connectedUser, integrationInstanceConfigurationDTO, environment))
             .toList();
+    }
+
+    private String getConnectionName(
+        long connectedUserId, String componentName, String name, Environment environment) {
+
+        List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
+            connectedUserId, componentName, environment);
+
+        if (integrationInstances.isEmpty()) {
+            return name;
+        }
+
+        Set<String> connectionNames = connectionService.getConnections(
+            integrationInstances.stream()
+                .map(IntegrationInstance::getConnectionId)
+                .toList())
+            .stream()
+            .map(Connection::getName)
+            .collect(Collectors.toSet());
+
+        if (!connectionNames.contains(name)) {
+            return name;
+        }
+
+        int number = 2;
+
+        while (connectionNames.contains(name + " " + number)) {
+            number++;
+        }
+
+        return name + " " + number;
     }
 
     private boolean isIntegrationVisible(IntegrationDTO integrationDTO, ConnectedUser connectedUser) {
