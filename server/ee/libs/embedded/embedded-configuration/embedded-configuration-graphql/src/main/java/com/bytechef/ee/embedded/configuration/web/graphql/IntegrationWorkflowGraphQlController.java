@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
@@ -60,8 +61,7 @@ public class IntegrationWorkflowGraphQlController {
         return new ArrayList<>(
             integrationWorkflowDTO.getTasks()
                 .stream()
-                .map(workflowTask -> workflowTask.getType()
-                    .split("/")[0])
+                .flatMap(workflowTaskDTO -> CollectionUtils.stream(workflowTaskDTO.getComponentNames()))
                 .collect(Collectors.toSet()));
     }
 
