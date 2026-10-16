@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowCopyDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceAdminFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -38,6 +39,14 @@ public class ConnectedUserWorkflowReferenceGraphQlController {
 
         this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
         this.environmentService = environmentService;
+    }
+
+    @QueryMapping
+    public List<ConnectedUserWorkflowCopyDTO> connectedUserCatalogWorkflowCopies(
+        @Argument List<String> automationWorkflowUuids, @Argument Long environmentId) {
+
+        return connectedUserWorkflowReferenceAdminFacade.getCopies(
+            Set.copyOf(automationWorkflowUuids), environmentService.getEnvironment(environmentId));
     }
 
     @QueryMapping
