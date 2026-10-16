@@ -12,6 +12,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -90,70 +91,55 @@ public class CustomConnectedUserRepositoryImpl implements CustomConnectedUserRep
             query = "SELECT connected_user.* FROM connected_user ";
         }
 
-        if (integrationId != null) {
-            query +=
-                """
-                        JOIN integration_instance ON integration_instance.connected_user_id = connected_user.id
-                        JOIN integration_instance_configuration ON integration_instance_configuration.id = integration_instance.integration_instance_configuration_id
-                    """;
-        }
-
-        if (environment != null || search != null || createDateFrom != null || createDateTo != null ||
-            integrationId != null) {
-
-            query += "WHERE ";
-        }
-
+        List<String> conditions = new ArrayList<>();
         List<Object> arguments = new ArrayList<>();
 
         if (environment != null) {
-            query += "environment = ? ";
+            conditions.add("connected_user.environment = ?");
 
             arguments.add(environment);
         }
 
         if (search != null) {
-            if (environment != null) {
-                query += "AND ";
-            }
+            conditions.add(
+                "(LOWER(connected_user.name) LIKE ? OR LOWER(connected_user.email) LIKE ? OR " +
+                    "LOWER(connected_user.external_id) LIKE ?)");
 
-            query += "name LIKE ? or email LIKE ? or external_id LIKE ? ";
+            String searchPattern = "%" + search.toLowerCase(Locale.ROOT) + "%";
 
-            arguments.addAll(List.of("%" + search + "%", "%" + search + "%", "%" + search + "%"));
+            arguments.addAll(List.of(searchPattern, searchPattern, searchPattern));
         }
 
         if (createDateFrom != null) {
-            if (environment != null || search != null) {
-                query += "AND ";
-            }
-
-            query += "created_date >= ? ";
+            conditions.add("connected_user.created_date >= ?");
 
             arguments.add(createDateFrom);
         }
 
         if (createDateTo != null) {
-            if (environment != null || search != null || createDateFrom != null) {
-                query += "AND ";
-            }
-
-            query += "created_date <= ? ";
+            conditions.add("connected_user.created_date <= ?");
 
             arguments.add(createDateTo);
         }
 
         if (integrationId != null) {
-            if (environment != null || search != null || createDateFrom != null || createDateTo != null) {
-                query += "AND ";
-            }
-
-            query += "integration_instance_configuration.integration_id = ? ";
+            conditions.add(
+                """
+                    connected_user.id IN (
+                        SELECT integration_instance.connected_user_id FROM integration_instance
+                        JOIN integration_instance_configuration ON integration_instance_configuration.id = integration_instance.integration_instance_configuration_id
+                        WHERE integration_instance_configuration.integration_id = ?)""");
 
             arguments.add(integrationId);
         }
 
+        if (!conditions.isEmpty()) {
+            query += "WHERE " + String.join(" AND ", conditions) + " ";
+        }
+
         if (!countQuery && pageable != null) {
-            query += "LIMIT %s OFFSET %s".formatted(pageable.getPageSize(), pageable.getOffset());
+            query +=
+                "ORDER BY connected_user.id LIMIT %s OFFSET %s".formatted(pageable.getPageSize(), pageable.getOffset());
         }
 
         return jdbcClient
