@@ -20,11 +20,20 @@ import {
 } from '../models/GitConfiguration';
 
 export interface GetGitConfigurationRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
 }
 
 export interface UpdateGitConfigurationRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
+    /**
+     * 
+     */
     gitConfiguration: GitConfiguration;
 }
 

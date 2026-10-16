@@ -36,32 +36,22 @@ import {
 export interface AutomationWorkflowProjectWorkflowTemplate {
     /**
      * The workflow UUID.
-     * @type {string}
-     * @memberof AutomationWorkflowProjectWorkflowTemplate
      */
     id?: string;
     /**
      * The label of the workflow.
-     * @type {string}
-     * @memberof AutomationWorkflowProjectWorkflowTemplate
      */
     label?: string;
     /**
      * The description of the workflow.
-     * @type {string}
-     * @memberof AutomationWorkflowProjectWorkflowTemplate
      */
     description?: string;
     /**
      * The list of components used in this workflow.
-     * @type {Array<AutomationWorkflowProjectComponent>}
-     * @memberof AutomationWorkflowProjectWorkflowTemplate
      */
     components?: Array<AutomationWorkflowProjectComponent>;
     /**
      * The values the connected user is asked for before this workflow runs.
-     * @type {Array<AutomationWorkflowProjectWorkflowInput>}
-     * @memberof AutomationWorkflowProjectWorkflowTemplate
      */
     inputs?: Array<AutomationWorkflowProjectWorkflowInput>;
 }

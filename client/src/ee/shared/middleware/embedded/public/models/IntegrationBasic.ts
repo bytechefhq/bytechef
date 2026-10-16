@@ -29,50 +29,34 @@ import {
 export interface IntegrationBasic {
     /**
      * The name of the integration's component.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     componentName: string;
     /**
      * The description of a project.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     description?: string;
     /**
      * The icon.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     icon: string;
     /**
      * The id of an integration.
-     * @type {number}
-     * @memberof IntegrationBasic
      */
     id?: number;
     /**
      * The list of integration instances that represent configured and connected integrations for specific users
-     * @type {Array<IntegrationInstance>}
-     * @memberof IntegrationBasic
      */
     integrationInstances?: Array<IntegrationInstance>;
     /**
      * The version of an integration.
-     * @type {number}
-     * @memberof IntegrationBasic
      */
     integrationVersion?: number;
     /**
      * If multiple instances of an integration are allowed or not.
-     * @type {boolean}
-     * @memberof IntegrationBasic
      */
     multipleInstances: boolean;
     /**
      * The name of an integration.
-     * @type {string}
-     * @memberof IntegrationBasic
      */
     name?: string;
 }

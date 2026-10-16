@@ -50,74 +50,50 @@ import {
 export interface Integration {
     /**
      * The name of the integration's component.
-     * @type {string}
-     * @memberof Integration
      */
     componentName: string;
     /**
      * The description of a project.
-     * @type {string}
-     * @memberof Integration
      */
     description?: string;
     /**
      * The icon.
-     * @type {string}
-     * @memberof Integration
      */
     icon: string;
     /**
      * The id of an integration.
-     * @type {number}
-     * @memberof Integration
      */
     id?: number;
     /**
      * The list of integration instances that represent configured and connected integrations for specific users
-     * @type {Array<IntegrationInstance>}
-     * @memberof Integration
      */
     integrationInstances?: Array<IntegrationInstance>;
     /**
      * The version of an integration.
-     * @type {number}
-     * @memberof Integration
      */
     integrationVersion?: number;
     /**
      * If multiple instances of an integration are allowed or not.
-     * @type {boolean}
-     * @memberof Integration
      */
     multipleInstances: boolean;
     /**
      * The name of an integration.
-     * @type {string}
-     * @memberof Integration
      */
     name?: string;
     /**
      * 
-     * @type {ConnectionConfig}
-     * @memberof Integration
      */
     connectionConfig?: ConnectionConfig;
     /**
      * The list of MCP workflows defined for this integration.
-     * @type {Array<IntegrationWorkflow>}
-     * @memberof Integration
      */
     readonly mcpWorkflows?: Array<IntegrationWorkflow>;
     /**
      * The list of MCP tools defined for this integration's component.
-     * @type {Array<McpTool>}
-     * @memberof Integration
      */
     readonly mcpTools?: Array<McpTool>;
     /**
      * The list of workflows.
-     * @type {Array<IntegrationWorkflow>}
-     * @memberof Integration
      */
     workflows?: Array<IntegrationWorkflow>;
 }

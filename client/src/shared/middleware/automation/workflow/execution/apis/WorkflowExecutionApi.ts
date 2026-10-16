@@ -30,30 +30,78 @@ import {
 } from '../models/WorkflowExecution';
 
 export interface GetTriggerExecutionWorkflowExecutionRequest {
+    /**
+     * The id of a trigger execution.
+     */
     triggerExecutionId: number;
 }
 
 export interface GetWorkflowExecutionRequest {
+    /**
+     * The id of an execution.
+     */
     id: number;
 }
 
 export interface GetWorkflowExecutionTaskExecutionRequest {
+    /**
+     * The id of an execution.
+     */
     id: number;
+    /**
+     * The id of a task execution.
+     */
     taskExecutionId: number;
 }
 
 export interface GetWorkflowExecutionsPageRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
+    /**
+     * If embedded automation workflows executions should be filtered.
+     */
     embedded?: boolean;
+    /**
+     * The id of an environment.
+     */
     environmentId?: number;
+    /**
+     * The status of an executed job
+     */
     jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
+    /**
+     * The start date of a job.
+     */
     jobStartDate?: Date;
+    /**
+     * The end date of a job.
+     */
     jobEndDate?: Date;
+    /**
+     * The id of a project.
+     */
     projectId?: number;
+    /**
+     * The id of a project deployment.
+     */
     projectDeploymentId?: number;
+    /**
+     * The id of a connected user. Restricts embedded executions to those of the connected user's automation workflows, copied into the connected user's project or referenced from a catalog project.
+     */
     connectedUserId?: number;
+    /**
+     * The id of a workflow. Executions of every version of the workflow are matched unless projectVersion is set.
+     */
     workflowId?: string;
+    /**
+     * The project version the workflow executions ran. Only applies together with workflowId.
+     */
     projectVersion?: number;
+    /**
+     * The number of the page to return.
+     */
     pageNumber?: number;
 }
 
@@ -237,11 +285,11 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['jobStartDate'] != null) {
-            queryParameters['jobStartDate'] = (requestParameters['jobStartDate'] as any).toISOString();
+            queryParameters['jobStartDate'] = runtime.serializeDateTime(requestParameters['jobStartDate'] as any);
         }
 
         if (requestParameters['jobEndDate'] != null) {
-            queryParameters['jobEndDate'] = (requestParameters['jobEndDate'] as any).toISOString();
+            queryParameters['jobEndDate'] = runtime.serializeDateTime(requestParameters['jobEndDate'] as any);
         }
 
         if (requestParameters['projectId'] != null) {
@@ -312,6 +360,6 @@ export const GetWorkflowExecutionsPageJobStatusEnum = {
     Started: 'STARTED',
     Stopped: 'STOPPED',
     Failed: 'FAILED',
-    Completed: 'COMPLETED'
+    Completed: 'COMPLETED',
 } as const;
 export type GetWorkflowExecutionsPageJobStatusEnum = typeof GetWorkflowExecutionsPageJobStatusEnum[keyof typeof GetWorkflowExecutionsPageJobStatusEnum];

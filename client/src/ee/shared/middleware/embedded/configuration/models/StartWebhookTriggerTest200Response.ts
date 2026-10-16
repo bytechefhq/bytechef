@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface StartWebhookTriggerTest200Response {
     /**
      * The webhook URL.
-     * @type {string}
-     * @memberof StartWebhookTriggerTest200Response
      */
     webhookUrl?: string;
 }

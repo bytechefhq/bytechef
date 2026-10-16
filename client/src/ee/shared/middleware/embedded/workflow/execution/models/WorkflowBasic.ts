@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * The blueprint that describe the execution of a job.
  * @export
@@ -21,62 +21,42 @@ import { mapValues } from '../runtime';
 export interface WorkflowBasic {
     /**
      * The created by.
-     * @type {string}
-     * @memberof WorkflowBasic
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof WorkflowBasic
      */
     readonly createdDate?: Date;
     /**
      * The description of a workflow.
-     * @type {string}
-     * @memberof WorkflowBasic
      */
     description?: string;
     /**
      * The id of a workflow.
-     * @type {string}
-     * @memberof WorkflowBasic
      */
     readonly id?: string;
     /**
      * The descriptive name for the workflow
-     * @type {string}
-     * @memberof WorkflowBasic
      */
     readonly label?: string;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof WorkflowBasic
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof WorkflowBasic
      */
     readonly lastModifiedDate?: Date;
     /**
      * 
-     * @type {number}
-     * @memberof WorkflowBasic
      */
     version?: number;
     /**
      * The integration workflow id
-     * @type {number}
-     * @memberof WorkflowBasic
      */
     readonly integrationWorkflowId?: number;
     /**
      * The workflow uuid
-     * @type {string}
-     * @memberof WorkflowBasic
      */
     readonly workflowUuid?: string;
 }
@@ -99,12 +79,12 @@ export function WorkflowBasicFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
         'label': json['label'] == null ? undefined : json['label'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'version': json['__version'] == null ? undefined : json['__version'],
         'integrationWorkflowId': json['integrationWorkflowId'] == null ? undefined : json['integrationWorkflowId'],
         'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],

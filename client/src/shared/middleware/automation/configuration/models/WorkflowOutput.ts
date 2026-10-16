@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface WorkflowOutput {
     /**
      * The name of an output
-     * @type {string}
-     * @memberof WorkflowOutput
      */
     name: string;
     /**
      * The value of an output
-     * @type {object}
-     * @memberof WorkflowOutput
      */
     value: object;
 }

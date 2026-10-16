@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface WorkflowNodeTestOutput {
     /**
      * The workflow test node output id
-     * @type {number}
-     * @memberof WorkflowNodeTestOutput
      */
     id?: number;
     /**
      * The workflow node name.
-     * @type {string}
-     * @memberof WorkflowNodeTestOutput
      */
     workflowNodeName?: string;
     /**
      * The workflow id.
-     * @type {string}
-     * @memberof WorkflowNodeTestOutput
      */
     workflowId?: string;
 }

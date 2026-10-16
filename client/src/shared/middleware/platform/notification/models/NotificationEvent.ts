@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface NotificationEvent {
     /**
      * Notification Id
-     * @type {number}
-     * @memberof NotificationEvent
      */
     readonly id: number;
     /**
      * 
-     * @type {NotificationEventTypeEnum}
-     * @memberof NotificationEvent
      */
     type?: NotificationEventTypeEnum;
 }
@@ -43,7 +39,7 @@ export const NotificationEventTypeEnum = {
     JobCompleted: 'JOB_COMPLETED',
     JobFailed: 'JOB_FAILED',
     JobStarted: 'JOB_STARTED',
-    JobStopped: 'JOB_STOPPED'
+    JobStopped: 'JOB_STOPPED',
 } as const;
 export type NotificationEventTypeEnum = typeof NotificationEventTypeEnum[keyof typeof NotificationEventTypeEnum];
 

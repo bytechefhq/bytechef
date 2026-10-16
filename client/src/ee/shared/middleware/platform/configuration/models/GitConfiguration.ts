@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface GitConfiguration {
     /**
      * The repository url.
-     * @type {string}
-     * @memberof GitConfiguration
      */
     url: string;
     /**
      * The username.
-     * @type {string}
-     * @memberof GitConfiguration
      */
     username: string;
     /**
      * The password.
-     * @type {string}
-     * @memberof GitConfiguration
      */
     password: string;
 }

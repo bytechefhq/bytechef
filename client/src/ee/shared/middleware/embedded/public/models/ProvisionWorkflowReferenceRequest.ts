@@ -14,21 +14,17 @@
 
 import { mapValues } from '../runtime';
 /**
- * Connections the connected user chose, keyed by component name. Components not listed keep their current connection or are auto-matched.
+ * Connections the connected user chose, keyed by component name, and optional workflow input values. Components not listed keep their current connection or are auto-matched.
  * @export
  * @interface ProvisionWorkflowReferenceRequest
  */
 export interface ProvisionWorkflowReferenceRequest {
     /**
      * 
-     * @type {{ [key: string]: number; }}
-     * @memberof ProvisionWorkflowReferenceRequest
      */
     connections?: { [key: string]: number; };
     /**
      * Input values for the workflow's inputs, keyed by input name. When given, they replace the reference's stored input values before it is enabled, so a workflow with required inputs is enabled in the same call.
-     * @type {{ [key: string]: any; }}
-     * @memberof ProvisionWorkflowReferenceRequest
      */
     inputs?: { [key: string]: any; };
 }

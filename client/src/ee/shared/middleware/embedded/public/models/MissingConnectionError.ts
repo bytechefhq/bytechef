@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface MissingConnectionError {
     /**
      * The name of the component that is missing a matching connection for the connected user.
-     * @type {string}
-     * @memberof MissingConnectionError
      */
     missingConnectionComponentName?: string;
 }

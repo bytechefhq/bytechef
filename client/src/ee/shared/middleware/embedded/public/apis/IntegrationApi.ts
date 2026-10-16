@@ -30,22 +30,46 @@ import {
 } from '../models/IntegrationBasic';
 
 export interface GetFrontendIntegrationRequest {
+    /**
+     * The id of an integration.
+     */
     id: number;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetFrontendIntegrationsRequest {
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetIntegrationRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The id of an integration.
+     */
     id: number;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetIntegrationsRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 

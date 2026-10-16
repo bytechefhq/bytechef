@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface CheckoutSessionRequest {
     /**
      * The plan name.
-     * @type {CheckoutSessionRequestPlanNameEnum}
-     * @memberof CheckoutSessionRequest
      */
     planName: CheckoutSessionRequestPlanNameEnum;
 }
@@ -33,7 +31,7 @@ export interface CheckoutSessionRequest {
  */
 export const CheckoutSessionRequestPlanNameEnum = {
     Starter: 'STARTER',
-    Growth: 'GROWTH'
+    Growth: 'GROWTH',
 } as const;
 export type CheckoutSessionRequestPlanNameEnum = typeof CheckoutSessionRequestPlanNameEnum[keyof typeof CheckoutSessionRequestPlanNameEnum];
 

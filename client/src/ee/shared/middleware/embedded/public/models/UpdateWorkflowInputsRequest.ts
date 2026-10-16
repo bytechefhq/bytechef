@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface UpdateWorkflowInputsRequest {
     /**
      * Input values keyed by input name. An absent key clears that input.
-     * @type {{ [key: string]: any; }}
-     * @memberof UpdateWorkflowInputsRequest
      */
     inputs: { [key: string]: any; };
 }

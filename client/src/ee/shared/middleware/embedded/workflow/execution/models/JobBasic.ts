@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * Represents an execution of a workflow.
  * @export
@@ -21,74 +21,50 @@ import { mapValues } from '../runtime';
 export interface JobBasic {
     /**
      * The created by.
-     * @type {string}
-     * @memberof JobBasic
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof JobBasic
      */
     readonly createdDate?: Date;
     /**
      * The time execution entered end status COMPLETED, STOPPED, FAILED
-     * @type {Date}
-     * @memberof JobBasic
      */
     endDate?: Date;
     /**
      * The id of a job.
-     * @type {string}
-     * @memberof JobBasic
      */
     readonly id?: string;
     /**
      * The job's human-readable name.
-     * @type {string}
-     * @memberof JobBasic
      */
     readonly label?: string;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof JobBasic
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof JobBasic
      */
     readonly lastModifiedDate?: Date;
     /**
      * Key-value map of metadata.
-     * @type {{ [key: string]: any; }}
-     * @memberof JobBasic
      */
     readonly metadata?: { [key: string]: any; };
     /**
      * The priority value.
-     * @type {number}
-     * @memberof JobBasic
      */
     readonly priority: number;
     /**
      * The time of when the job began.
-     * @type {Date}
-     * @memberof JobBasic
      */
     readonly startDate: Date;
     /**
      * The job's status.
-     * @type {JobBasicStatusEnum}
-     * @memberof JobBasic
      */
     readonly status: JobBasicStatusEnum;
     /**
      * 
-     * @type {string}
-     * @memberof JobBasic
      */
     readonly workflowId?: string;
 }
@@ -102,7 +78,7 @@ export const JobBasicStatusEnum = {
     Started: 'STARTED',
     Stopped: 'STOPPED',
     Failed: 'FAILED',
-    Completed: 'COMPLETED'
+    Completed: 'COMPLETED',
 } as const;
 export type JobBasicStatusEnum = typeof JobBasicStatusEnum[keyof typeof JobBasicStatusEnum];
 
@@ -128,15 +104,15 @@ export function JobBasicFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
-        'endDate': json['endDate'] == null ? undefined : (new Date(json['endDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
+        'endDate': json['endDate'] == null ? undefined : (parseDateTime(json['endDate'])),
         'id': json['id'] == null ? undefined : json['id'],
         'label': json['label'] == null ? undefined : json['label'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'priority': json['priority'],
-        'startDate': (new Date(json['startDate'])),
+        'startDate': (json['startDate'] == null ? json['startDate'] : parseDateTime(json['startDate'])),
         'status': json['status'],
         'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
     };
@@ -153,7 +129,7 @@ export function JobBasicToJSONTyped(value?: Omit<JobBasic, 'createdBy'|'createdD
 
     return {
         
-        'endDate': value['endDate'] == null ? value['endDate'] : value['endDate'].toISOString(),
+        'endDate': value['endDate'] == null ? value['endDate'] : serializeDateTime(value['endDate']),
     };
 }
 

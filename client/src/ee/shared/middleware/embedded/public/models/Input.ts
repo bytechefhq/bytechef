@@ -47,26 +47,18 @@ export interface Input {
     defaultValue?: string;
     /**
      * If true, the input is configured in the admin IntegrationInstanceConfigurationDialog; if false (default), it is rendered in the end-user ConnectDialog.
-     * @type {boolean}
-     * @memberof Input
      */
     internalOnly?: boolean;
     /**
      * The descriptive name of an input
-     * @type {string}
-     * @memberof Input
      */
     label?: string;
     /**
      * The name of an input
-     * @type {string}
-     * @memberof Input
      */
     name: string;
     /**
      * For FIELD_MAPPING inputs, the object name used to match the SDK mapObjectFields config.
-     * @type {string}
-     * @memberof Input
      */
     objectName?: string;
     /**
@@ -75,20 +67,14 @@ export interface Input {
     options?: Array<Option>;
     /**
      * If an input is required, or not
-     * @type {boolean}
-     * @memberof Input
      */
     required?: boolean;
     /**
      * 
-     * @type {InputType}
-     * @memberof Input
      */
     type: InputType;
     /**
      * 
-     * @type {ComponentInputReference}
-     * @memberof Input
      */
     componentReference?: ComponentInputReference;
 }

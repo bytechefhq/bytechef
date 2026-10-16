@@ -25,23 +25,41 @@ import {
 } from '../models/SigningKey';
 
 export interface CreateSigningKeyRequest {
+    /**
+     * 
+     */
     signingKey: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
 }
 
 export interface DeleteSigningKeyRequest {
+    /**
+     * The id of an Signing key.
+     */
     id: number;
 }
 
 export interface GetSigningKeyRequest {
+    /**
+     * The id of an Signing key.
+     */
     id: number;
 }
 
 export interface GetSigningKeysRequest {
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 
 export interface UpdateSigningKeyRequest {
+    /**
+     * The id of an Signing key.
+     */
     id: number;
+    /**
+     * 
+     */
     signingKey: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
 }
 

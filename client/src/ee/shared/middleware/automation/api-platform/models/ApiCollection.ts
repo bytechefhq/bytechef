@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { ApiCollectionEndpoint } from './ApiCollectionEndpoint';
 import {
     ApiCollectionEndpointFromJSON,
@@ -50,122 +50,82 @@ import {
 export interface ApiCollection {
     /**
      * The version of an API collection.
-     * @type {number}
-     * @memberof ApiCollection
      */
     collectionVersion?: number;
     /**
      * The collection context path.
-     * @type {string}
-     * @memberof ApiCollection
      */
     contextPath: string;
     /**
      * The created by.
-     * @type {string}
-     * @memberof ApiCollection
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof ApiCollection
      */
     readonly createdDate?: Date;
     /**
      * The description of an API collection.
-     * @type {string}
-     * @memberof ApiCollection
      */
     description?: string;
     /**
      * If an API collection is enabled or not.
-     * @type {boolean}
-     * @memberof ApiCollection
      */
     enabled: boolean;
     /**
      * 
-     * @type {Array<ApiCollectionEndpoint>}
-     * @memberof ApiCollection
      */
     endpoints?: Array<ApiCollectionEndpoint>;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof ApiCollection
      */
     environmentId?: number;
     /**
      * The id of an API collection.
-     * @type {number}
-     * @memberof ApiCollection
      */
     readonly id?: number;
     /**
      * The name of an API collection.
-     * @type {string}
-     * @memberof ApiCollection
      */
     name: string;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof ApiCollection
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof ApiCollection
      */
     readonly lastModifiedDate?: Date;
     /**
      * The id of a project the API collection is connected to.
-     * @type {number}
-     * @memberof ApiCollection
      */
     projectId: number;
     /**
      * 
-     * @type {ProjectBasic}
-     * @memberof ApiCollection
      */
     project?: ProjectBasic;
     /**
      * The id of an project deployment the API collection is connected to.
-     * @type {number}
-     * @memberof ApiCollection
      */
     readonly projectDeploymentId?: number;
     /**
      * 
-     * @type {ProjectDeploymentBasic}
-     * @memberof ApiCollection
      */
     projectDeployment?: ProjectDeploymentBasic;
     /**
      * The version of a project the API collection is connected to.
-     * @type {number}
-     * @memberof ApiCollection
      */
     projectVersion: number;
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof ApiCollection
      */
     tags?: Array<Tag>;
     /**
      * The workspace id.
-     * @type {number}
-     * @memberof ApiCollection
      */
     workspaceId: number;
     /**
      * 
-     * @type {number}
-     * @memberof ApiCollection
      */
     version?: number;
 }
@@ -196,7 +156,7 @@ export function ApiCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'collectionVersion': json['collectionVersion'] == null ? undefined : json['collectionVersion'],
         'contextPath': json['contextPath'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'],
         'endpoints': json['endpoints'] == null ? undefined : ((json['endpoints'] as Array<any>).map(ApiCollectionEndpointFromJSON)),
@@ -204,7 +164,7 @@ export function ApiCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'projectId': json['projectId'],
         'project': json['project'] == null ? undefined : ProjectBasicFromJSON(json['project']),
         'projectDeploymentId': json['projectDeploymentId'] == null ? undefined : json['projectDeploymentId'],

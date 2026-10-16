@@ -29,92 +29,62 @@ import {
 export interface WorkflowTask {
     /**
      * 
-     * @type {boolean}
-     * @memberof WorkflowTask
      */
     readonly clusterRoot?: boolean;
     /**
      * 
-     * @type {{ [key: string]: any; }}
-     * @memberof WorkflowTask
      */
     readonly clusterElements?: { [key: string]: any; };
     /**
      * 
-     * @type {Array<ComponentConnection>}
-     * @memberof WorkflowTask
      */
     readonly connections?: Array<ComponentConnection>;
     /**
      * The description of the task.
-     * @type {string}
-     * @memberof WorkflowTask
      */
     description?: string;
     /**
      * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
-     * @type {Array<WorkflowTask>}
-     * @memberof WorkflowTask
      */
     finalize?: Array<WorkflowTask>;
     /**
      * The human-readable description of the task.
-     * @type {string}
-     * @memberof WorkflowTask
      */
     label?: string;
     /**
      * The maximum number of times a task may retry.
-     * @type {number}
-     * @memberof WorkflowTask
      */
     maxRetries?: number;
     /**
      * Key-value map of metadata.
-     * @type {{ [key: string]: any; }}
-     * @memberof WorkflowTask
      */
     metadata?: { [key: string]: any; };
     /**
      * The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
-     * @type {string}
-     * @memberof WorkflowTask
      */
     name: string;
     /**
      * Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is "encoder", then the task will be routed to the "encoder" queue which is presumably subscribed to by worker nodes of "encoder" type.
-     * @type {string}
-     * @memberof WorkflowTask
      */
     node?: string;
     /**
      * Key-value map of task parameters.
-     * @type {{ [key: string]: any; }}
-     * @memberof WorkflowTask
      */
     parameters?: { [key: string]: any; };
     /**
      * The (optional) list of tasks that are to be executed after the successful execution of a task.
-     * @type {Array<WorkflowTask>}
-     * @memberof WorkflowTask
      */
     post?: Array<WorkflowTask>;
     /**
      * The (optional) list of tasks that are to be executed prior to a task.
-     * @type {Array<WorkflowTask>}
-     * @memberof WorkflowTask
      */
     pre?: Array<WorkflowTask>;
     /**
      * The timeout expression which describes when a task should be deemed as timed-out.
-     * @type {string}
-     * @memberof WorkflowTask
      */
     timeout?: string;
     /**
      * The type of the task.
-     * @type {string}
-     * @memberof WorkflowTask
      */
     type: string;
 }

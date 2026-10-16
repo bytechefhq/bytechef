@@ -20,19 +20,34 @@ import {
 } from '../models/AppEvent';
 
 export interface CreateAppEventRequest {
+    /**
+     * 
+     */
     appEvent: Omit<AppEvent, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 export interface DeleteAppEventRequest {
+    /**
+     * The id of an app event.
+     */
     id: number;
 }
 
 export interface GetAppEventRequest {
+    /**
+     * The id of an app event.
+     */
     id: number;
 }
 
 export interface UpdateAppEventRequest {
+    /**
+     * The id of an app event.
+     */
     id: number;
+    /**
+     * 
+     */
     appEvent: Omit<AppEvent, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 

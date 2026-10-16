@@ -43,56 +43,38 @@ import {
 export interface ConnectionDefinition {
     /**
      * If a connection requires an authorization to be defined or not
-     * @type {boolean}
-     * @memberof ConnectionDefinition
      */
     authorizationRequired?: boolean;
     /**
      * 
-     * @type {Array<Authorization>}
-     * @memberof ConnectionDefinition
      */
     authorizations?: Array<Authorization>;
     /**
      * Defines the base URI for all future HTTP requests.
-     * @type {string}
-     * @memberof ConnectionDefinition
      */
     baseUri?: string;
     /**
      * The description used from the connection's component.
-     * @type {string}
-     * @memberof ConnectionDefinition
      */
     componentDescription?: string;
     /**
      * The component name used from the connection's component.
-     * @type {string}
-     * @memberof ConnectionDefinition
      */
     componentName: string;
     /**
      * 
-     * @type {ConnectionDefinitionHelp}
-     * @memberof ConnectionDefinition
      */
     help?: ConnectionDefinitionHelp;
     /**
      * The properties of the connection.
-     * @type {Array<Property>}
-     * @memberof ConnectionDefinition
      */
     properties?: Array<Property>;
     /**
      * The title used from the connection's component.
-     * @type {string}
-     * @memberof ConnectionDefinition
      */
     componentTitle?: string;
     /**
      * The version of a connection.
-     * @type {number}
-     * @memberof ConnectionDefinition
      */
     version: number;
 }

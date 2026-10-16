@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface CreateFrontendIntegrationInstanceRequestConnection {
     /**
      * 
-     * @type {{ [key: string]: any; }}
-     * @memberof CreateFrontendIntegrationInstanceRequestConnection
      */
     parameters?: { [key: string]: any; };
 }

@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface ClusterElementType {
     /**
      * The name of a cluster element type.
-     * @type {string}
-     * @memberof ClusterElementType
      */
     name?: string;
     /**
      * The label of a cluster element type.
-     * @type {string}
-     * @memberof ClusterElementType
      */
     label?: string;
     /**
      * If the cluster element type is required.
-     * @type {boolean}
-     * @memberof ClusterElementType
      */
     required?: boolean;
     /**
      * If multiple elements can be added.
-     * @type {boolean}
-     * @memberof ClusterElementType
      */
     multipleElements?: boolean;
 }

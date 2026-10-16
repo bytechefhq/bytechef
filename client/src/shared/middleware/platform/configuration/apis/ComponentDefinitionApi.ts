@@ -30,20 +30,38 @@ import {
 } from '../models/UnifiedApiCategory';
 
 export interface GetComponentDefinitionRequest {
+    /**
+     * The name of a component to get.
+     */
     componentName: string;
+    /**
+     * The version of a component to get.
+     */
     componentVersion: number;
 }
 
 export interface GetComponentDefinitionVersionsRequest {
+    /**
+     * The name of a component.
+     */
     componentName: string;
 }
 
 export interface GetConnectionComponentDefinitionRequest {
+    /**
+     * The name of a component to get.
+     */
     componentName: string;
+    /**
+     * The version of a component connection to get.
+     */
     connectionVersion: number;
 }
 
 export interface GetUnifiedApiComponentDefinitionsRequest {
+    /**
+     * The name of a unified API category.
+     */
     category: UnifiedApiCategory;
 }
 

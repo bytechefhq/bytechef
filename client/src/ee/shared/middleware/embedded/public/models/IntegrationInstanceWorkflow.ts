@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface IntegrationInstanceWorkflow {
     /**
      * If a workflow is enabled or not.
-     * @type {boolean}
-     * @memberof IntegrationInstanceWorkflow
      */
     enabled?: boolean;
     /**
      * 
-     * @type {{ [key: string]: any; }}
-     * @memberof IntegrationInstanceWorkflow
      */
     inputs?: { [key: string]: any; };
     /**
      * The reference code of a workflow.
-     * @type {string}
-     * @memberof IntegrationInstanceWorkflow
      */
     workflowUuid?: string;
 }

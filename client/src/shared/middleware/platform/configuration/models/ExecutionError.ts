@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface ExecutionError {
     /**
      * The error message.
-     * @type {string}
-     * @memberof ExecutionError
      */
     message?: string;
     /**
      * The error stacktrace.
-     * @type {Array<string>}
-     * @memberof ExecutionError
      */
     stackTrace?: Array<string>;
 }

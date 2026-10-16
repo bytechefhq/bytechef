@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface DuplicateWorkflow200Response {
     /**
      * The id of a new duplicated workflow.
-     * @type {string}
-     * @memberof DuplicateWorkflow200Response
      */
     workflowId?: string;
 }

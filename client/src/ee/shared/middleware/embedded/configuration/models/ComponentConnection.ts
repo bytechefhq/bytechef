@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface ComponentConnection {
     /**
      * The name of the component
-     * @type {string}
-     * @memberof ComponentConnection
      */
     componentName: string;
     /**
      * The version of the component
-     * @type {number}
-     * @memberof ComponentConnection
      */
     componentVersion: number;
     /**
      * The key of the connection
-     * @type {string}
-     * @memberof ComponentConnection
      */
     key: string;
     /**
      * If the connection is required, or not
-     * @type {boolean}
-     * @memberof ComponentConnection
      */
     required: boolean;
     /**
      * 
-     * @type {string}
-     * @memberof ComponentConnection
      */
     workflowNodeName: string;
 }

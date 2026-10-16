@@ -29,26 +29,18 @@ import {
 export interface ConnectedUserProjectWorkflow {
     /**
      * The connected user id
-     * @type {number}
-     * @memberof ConnectedUserProjectWorkflow
      */
     connectedUserId?: number;
     /**
      * The project id
-     * @type {number}
-     * @memberof ConnectedUserProjectWorkflow
      */
     projectId?: number;
     /**
      * The workflow version
-     * @type {number}
-     * @memberof ConnectedUserProjectWorkflow
      */
     workflowVersion?: number;
     /**
      * 
-     * @type {Workflow}
-     * @memberof ConnectedUserProjectWorkflow
      */
     workflow?: Workflow;
 }

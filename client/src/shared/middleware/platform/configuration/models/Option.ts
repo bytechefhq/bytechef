@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface Option {
     /**
      * Description of the option.
-     * @type {string}
-     * @memberof Option
      */
     description?: string;
     /**
      * The label of an option.
-     * @type {string}
-     * @memberof Option
      */
     label?: string;
     /**
      * Can be anything: string, number, array, object, etc. (except `null`)
-     * @type {any}
-     * @memberof Option
      */
     value?: any | null;
 }
@@ -58,7 +52,7 @@ export function OptionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Op
         
         'description': json['description'] == null ? undefined : json['description'],
         'label': json['label'] == null ? undefined : json['label'],
-        'value': json['value'] == null ? undefined : json['value'],
+        'value': json['value'] === undefined ? undefined : json['value'] === null ? null : json['value'],
     };
 }
 

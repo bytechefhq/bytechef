@@ -57,50 +57,34 @@ import {
 export interface WorkflowNodeOutput {
     /**
      * 
-     * @type {ActionDefinitionBasic}
-     * @memberof WorkflowNodeOutput
      */
     actionDefinition?: ActionDefinitionBasic;
     /**
      * 
-     * @type {ClusterElementDefinitionBasic}
-     * @memberof WorkflowNodeOutput
      */
     clusterElementDefinition?: ClusterElementDefinitionBasic;
     /**
      * 
-     * @type {OutputResponse}
-     * @memberof WorkflowNodeOutput
      */
     outputResponse?: OutputResponse;
     /**
      * 
-     * @type {TaskDispatcherDefinitionBasic}
-     * @memberof WorkflowNodeOutput
      */
     taskDispatcherDefinition?: TaskDispatcherDefinitionBasic;
     /**
      * If the output response is a sample or the real one
-     * @type {boolean}
-     * @memberof WorkflowNodeOutput
      */
     testOutputResponse?: boolean;
     /**
      * 
-     * @type {TriggerDefinitionBasic}
-     * @memberof WorkflowNodeOutput
      */
     triggerDefinition?: TriggerDefinitionBasic;
     /**
      * 
-     * @type {OutputResponse}
-     * @memberof WorkflowNodeOutput
      */
     variableOutputResponse?: OutputResponse;
     /**
      * The workflow node name
-     * @type {string}
-     * @memberof WorkflowNodeOutput
      */
     workflowNodeName: string;
 }

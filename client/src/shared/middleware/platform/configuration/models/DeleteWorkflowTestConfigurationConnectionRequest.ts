@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface DeleteWorkflowTestConfigurationConnectionRequest {
     /**
      * 
-     * @type {number}
-     * @memberof DeleteWorkflowTestConfigurationConnectionRequest
      */
     connectionId: number;
 }

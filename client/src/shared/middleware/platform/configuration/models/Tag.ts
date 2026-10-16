@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * A tag.
  * @export
@@ -21,44 +21,30 @@ import { mapValues } from '../runtime';
 export interface Tag {
     /**
      * The created by.
-     * @type {string}
-     * @memberof Tag
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof Tag
      */
     readonly createdDate?: Date;
     /**
      * The id of the tag.
-     * @type {number}
-     * @memberof Tag
      */
     id?: number;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof Tag
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof Tag
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of the tag.
-     * @type {string}
-     * @memberof Tag
      */
     name: string;
     /**
      * 
-     * @type {number}
-     * @memberof Tag
      */
     version?: number;
 }
@@ -82,10 +68,10 @@ export function TagFromJSONTyped(json: any, ignoreDiscriminator: boolean): Tag {
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };

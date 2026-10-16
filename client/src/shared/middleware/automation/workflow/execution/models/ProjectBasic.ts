@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { ProjectStatus } from './ProjectStatus';
 import {
     ProjectStatusFromJSON,
@@ -29,68 +29,46 @@ import {
 export interface ProjectBasic {
     /**
      * The created by.
-     * @type {string}
-     * @memberof ProjectBasic
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof ProjectBasic
      */
     readonly createdDate?: Date;
     /**
      * The description of a project.
-     * @type {string}
-     * @memberof ProjectBasic
      */
     description?: string;
     /**
      * The id of a project.
-     * @type {number}
-     * @memberof ProjectBasic
      */
     readonly id?: number;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof ProjectBasic
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof ProjectBasic
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of a project.
-     * @type {string}
-     * @memberof ProjectBasic
      */
     name: string;
     /**
      * The last published date.
-     * @type {Date}
-     * @memberof ProjectBasic
      */
     readonly lastPublishedDate?: Date;
     /**
      * 
-     * @type {ProjectStatus}
-     * @memberof ProjectBasic
      */
     lastStatus?: ProjectStatus;
     /**
      * The last version of a project.
-     * @type {number}
-     * @memberof ProjectBasic
      */
     readonly lastProjectVersion?: number;
     /**
      * The uuid of a project.
-     * @type {string}
-     * @memberof ProjectBasic
      */
     uuid?: string;
 }
@@ -116,13 +94,13 @@ export function ProjectBasicFromJSONTyped(json: any, ignoreDiscriminator: boolea
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
-        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
+        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (parseDateTime(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusFromJSON(json['lastStatus']),
         'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
         'uuid': json['uuid'] == null ? undefined : json['uuid'],

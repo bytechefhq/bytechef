@@ -25,28 +25,70 @@ import {
 } from '../models/WorkflowNodeTestOutput';
 
 export interface CheckWorkflowNodeTestOutputExistsRequest {
+    /**
+     * The id of a workflow.
+     */
     id: string;
+    /**
+     * The name of a workflow node for which to create test output objects.
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * Check if a test output exists after a specific date.
+     */
     createdDate?: Date;
 }
 
 export interface DeleteWorkflowNodeTestOutputRequest {
+    /**
+     * The id of a workflow.
+     */
     id: string;
+    /**
+     * The name of a workflow node for which to create test output objects.
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 
 export interface SaveWorkflowNodeTestOutputRequest {
+    /**
+     * The id of a workflow.
+     */
     id: string;
+    /**
+     * The name of a workflow node for which to create test output objects.
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 
 export interface UploadWorkflowNodeSampleOutputRequest {
+    /**
+     * The id of a workflow.
+     */
     id: string;
+    /**
+     * The name of a workflow node for which to create test output objects.
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * 
+     */
     body: object;
 }
 
@@ -83,7 +125,7 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         if (requestParameters['createdDate'] != null) {
-            queryParameters['createdDate'] = (requestParameters['createdDate'] as any).toISOString();
+            queryParameters['createdDate'] = runtime.serializeDateTime(requestParameters['createdDate'] as any);
         }
 
         if (requestParameters['environmentId'] != null) {

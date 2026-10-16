@@ -20,6 +20,9 @@ import {
 } from '../models/Workspace';
 
 export interface GetUserWorkspacesRequest {
+    /**
+     * The id of a user.
+     */
     id: number;
 }
 
