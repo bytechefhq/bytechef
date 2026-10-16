@@ -8,16 +8,20 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -35,6 +39,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(ObjectMapperSetupExtension.class)
 class WorkflowComponentResolverTest {
 
+    private final ComponentConnectionFacade componentConnectionFacade = mock(ComponentConnectionFacade.class);
     private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService =
         mock(TaskDispatcherDefinitionService.class);
@@ -49,7 +54,7 @@ class WorkflowComponentResolverTest {
             .thenReturn(Optional.empty());
 
         workflowComponentResolver = new WorkflowComponentResolver(
-            componentDefinitionService, taskDispatcherDefinitionService);
+            componentConnectionFacade, componentDefinitionService, taskDispatcherDefinitionService);
     }
 
     @Test
@@ -104,6 +109,27 @@ class WorkflowComponentResolverTest {
             .satisfies(component -> {
                 assertThat(component.name()).isEqualTo("condition");
                 assertThat(component.connectionRequired()).isFalse();
+            });
+    }
+
+    @Test
+    void testTaskComponentsIncludeTheComponentsACodeTaskDeclaresConnectionsTo() {
+        when(componentDefinitionService.fetchComponentDefinition("slack", 1))
+            .thenReturn(Optional.of(new ComponentDefinition(
+                ComponentDsl.component("slack")
+                    .title("Slack")
+                    .connection(ComponentDsl.connection()))));
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenReturn(List.of(new ComponentConnection("slack", 1, "postToSlack", "slack", true)));
+
+        List<ConnectedUserWorkflowTemplateDTO.Component> components = workflowComponentResolver.getTaskComponents(
+            workflowWithTask("codeWorkflow/v1/perform"));
+
+        assertThat(components)
+            .singleElement()
+            .satisfies(component -> {
+                assertThat(component.name()).isEqualTo("slack");
+                assertThat(component.connectionRequired()).isTrue();
             });
     }
 
