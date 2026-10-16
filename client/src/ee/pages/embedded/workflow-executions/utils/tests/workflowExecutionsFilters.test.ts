@@ -58,19 +58,26 @@ describe('getWorkflowExecutionsFilters', () => {
         expect(findValue(filters, 'Instance Configuration')).toBe('4');
     });
 
-    it('resolves the connected user for automations and ignores integration filters', () => {
+    it('resolves the connected user and the workflow for automations and ignores integration filters', () => {
         const filters = getWorkflowExecutionsFilters({
             automations: 1,
             connectedUserProjects: [{connectedUser: {externalId: '1234'}, projectId: '9'}],
             integrationId: 2,
             projectId: 9,
             workflowId: 'workflow-uuid',
+            workflows: [{id: 'workflow-uuid', label: 'Sync contacts'}],
         });
 
         expect(findValue(filters, 'Type')).toBe('Automations');
         expect(findValue(filters, 'Connected User')).toBe('User 1234');
         expect(findValue(filters, 'Integration')).toBeUndefined();
-        expect(findValue(filters, 'Workflow')).toBeUndefined();
+        expect(findValue(filters, 'Workflow')).toBe('Sync contacts');
+    });
+
+    it('falls back to the workflow id for automations when the workflow is not loaded', () => {
+        const filters = getWorkflowExecutionsFilters({automations: 1, workflowId: 'workflow-uuid'});
+
+        expect(findValue(filters, 'Workflow')).toBe('workflow-uuid');
     });
 
     it('falls back to the project id when the connected user is not loaded', () => {

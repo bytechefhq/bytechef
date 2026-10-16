@@ -172,6 +172,19 @@ export const WorkflowExecutions = () => {
         !!integrationInstanceConfiguration
     );
 
+    const automationWorkflows = useMemo(() => {
+        const workflowsById = new Map<string, {id: string; label?: string | null}>();
+
+        connectedUserProjects
+            ?.filter((connectedUserProject) => !filterProjectId || +connectedUserProject.projectId === filterProjectId)
+            .flatMap((connectedUserProject) => connectedUserProject.connectedUserProjectWorkflows)
+            .forEach((connectedUserProjectWorkflow) =>
+                workflowsById.set(connectedUserProjectWorkflow.workflow.id, connectedUserProjectWorkflow.workflow)
+            );
+
+        return [...workflowsById.values()];
+    }, [connectedUserProjects, filterProjectId]);
+
     const emptyListMessage =
         !filterStatus &&
         !filterIntegrationId &&
@@ -204,9 +217,12 @@ export const WorkflowExecutions = () => {
                 startDate: filterStartDate,
                 status: filterStatus,
                 workflowId: filterWorkflowId,
-                workflows,
+                workflows: filterAutomations
+                    ? automationWorkflows.map((workflow) => ({id: workflow.id, label: workflow.label ?? undefined}))
+                    : workflows,
             }),
         [
+            automationWorkflows,
             connectedUserProjects,
             filterAutomations,
             filterEndDate,
@@ -242,6 +258,7 @@ export const WorkflowExecutions = () => {
     const handleAutomationChange = (automations: string) => {
         setFilterAutomations(Number(automations));
         setFilterPageNumber(undefined);
+        setFilterWorkflowId(undefined);
 
         filter(
             Number(automations),
@@ -251,7 +268,7 @@ export const WorkflowExecutions = () => {
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
-            filterWorkflowId,
+            undefined,
             undefined
         );
     };
@@ -601,6 +618,26 @@ export const WorkflowExecutions = () => {
                                 ]}
                                 onChange={handleProjectChange}
                                 value={filterProjectId}
+                            />
+                        </div>
+                    )}
+
+                    {!!filterAutomations && (
+                        <div className="flex flex-col space-y-2">
+                            <Label>Workflow</Label>
+
+                            <ComboBox
+                                items={[
+                                    ANY_FILTER_OPTION,
+                                    ...automationWorkflows.map((workflow) => ({
+                                        label: workflow.label || 'undefined label',
+                                        value: workflow.id,
+                                    })),
+                                ]}
+                                maxHeight
+                                name="workflow"
+                                onChange={handleWorkflowChange}
+                                value={filterWorkflowId}
                             />
                         </div>
                     )}
