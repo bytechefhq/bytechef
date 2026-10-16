@@ -403,6 +403,13 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
                 inputNode.put("label", input.getLabel());
             }
 
+            OptionalUtils.ifPresent(
+                input.getComponentInput(),
+                componentInput -> inputNode
+                    .put(WorkflowExtConstants.COMPONENT_NAME, componentInput.componentName())
+                    .put(WorkflowExtConstants.COMPONENT_VERSION, componentInput.componentVersion())
+                    .put(WorkflowExtConstants.GROUP_NAME, componentInput.groupName()));
+
             inputsNode.add(inputNode);
         }
 
