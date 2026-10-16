@@ -18,7 +18,7 @@ package com.bytechef.platform.ai.tool;
 
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.platform.workflow.validator.exception.WorkflowValidatorErrorType;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,14 +44,14 @@ public class WorkflowValidatorTools {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowValidatorTools.class);
 
-    private final ComponentDefinitionService componentDefinitionService;
+    private final ComponentDefinitionFacade componentDefinitionFacade;
     private final WorkflowValidatorFacade workflowValidatorFacade;
 
     @SuppressFBWarnings("EI")
     public WorkflowValidatorTools(
-        ComponentDefinitionService componentDefinitionService, WorkflowValidatorFacade workflowValidatorFacade) {
+        ComponentDefinitionFacade componentDefinitionFacade, WorkflowValidatorFacade workflowValidatorFacade) {
 
-        this.componentDefinitionService = componentDefinitionService;
+        this.componentDefinitionFacade = componentDefinitionFacade;
         this.workflowValidatorFacade = workflowValidatorFacade;
     }
 
@@ -68,7 +68,7 @@ public class WorkflowValidatorTools {
             List<String> errors = new ArrayList<>(workflowValidationResult.errors());
 
             List<String> disallowedComponentNames = AllowedComponentNamesUtils.getDisallowedComponentNames(
-                workflow, toolContext, componentDefinitionService);
+                workflow, toolContext, componentDefinitionFacade);
 
             if (!disallowedComponentNames.isEmpty()) {
                 errors.addFirst(AllowedComponentNamesUtils.getNotAllowedMessage(disallowedComponentNames));
