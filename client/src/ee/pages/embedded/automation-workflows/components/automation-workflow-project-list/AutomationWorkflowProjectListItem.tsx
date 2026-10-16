@@ -176,8 +176,6 @@ const AutomationWorkflowProjectListItem = ({
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
                             <div className="flex min-h-8 items-center space-x-2">
-                                {project.codeWorkflowProject && <Badge label="Reference" styleType="secondary-outline" />}
-
                                 {project.published ? (
                                     <Badge
                                         className="flex space-x-1 border-transparent"
