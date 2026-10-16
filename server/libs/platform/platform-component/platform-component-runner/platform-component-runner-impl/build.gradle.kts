@@ -16,5 +16,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")
+    testImplementation(rootProject.libs.org.graalvm.polyglot.js)
+    testImplementation(rootProject.libs.org.graalvm.polyglot.python)
     testImplementation(project(":server:libs:test:test-support"))
 }
