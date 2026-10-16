@@ -4,6 +4,7 @@ import {
     DeleteWorkflowRequest,
     DuplicateWorkflow200Response,
     DuplicateWorkflowRequest,
+    RestoreProjectVersionWorkflowRequest,
     UpdateWorkflowRequest,
     Workflow,
     WorkflowApi,
@@ -48,6 +49,20 @@ export const useDuplicateWorkflowMutation = (mutationProps?: DuplicateWorkflowMu
     useMutation({
         mutationFn: (request: DuplicateWorkflowRequest) => {
             return new WorkflowApi().duplicateWorkflow(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface RestoreProjectVersionWorkflowMutationProps {
+    onSuccess?: (result: void, variables: RestoreProjectVersionWorkflowRequest) => void;
+    onError?: (error: Error, variables: RestoreProjectVersionWorkflowRequest) => void;
+}
+
+export const useRestoreProjectVersionWorkflowMutation = (mutationProps?: RestoreProjectVersionWorkflowMutationProps) =>
+    useMutation({
+        mutationFn: (request: RestoreProjectVersionWorkflowRequest) => {
+            return new WorkflowApi().restoreProjectVersionWorkflow(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
