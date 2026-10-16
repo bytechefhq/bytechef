@@ -104,13 +104,13 @@ const embeddedNavigation: NavigationType[] = [
         icon: Settings2Icon,
         name: 'Integration Configurations',
     },
-    {href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
     {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
     {
         href: '/embedded/automation-workflows',
         icon: Workflow,
         name: 'Automations',
     },
+    {href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
     {
         href: '/embedded/connected-users',
         icon: UsersIcon,
