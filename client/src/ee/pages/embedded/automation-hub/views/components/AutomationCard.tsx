@@ -91,7 +91,7 @@ const AutomationCard = ({
                 {attentionDescription && <p className="text-sm text-muted-foreground">{attentionDescription}</p>}
 
                 {automation.description && (
-                    <CardDescription className="col-span-2 line-clamp-2" title={automation.description}>
+                    <CardDescription className="col-span-full line-clamp-2" title={automation.description}>
                         {automation.description}
                     </CardDescription>
                 )}
