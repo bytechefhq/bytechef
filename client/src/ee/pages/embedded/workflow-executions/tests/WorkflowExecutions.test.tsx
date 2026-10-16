@@ -5,6 +5,7 @@ import {MemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const {
+    useGetConnectedUserQueryMock,
     useGetConnectedUsersQueryMock,
     useGetIntegrationInstanceConfigurationQueryMock,
     useGetIntegrationInstanceConfigurationsQueryMock,
@@ -14,6 +15,7 @@ const {
     useOnEnvironmentChangeMock,
     useWorkflowExecutionsMock,
 } = vi.hoisted(() => ({
+    useGetConnectedUserQueryMock: vi.fn(),
     useGetConnectedUsersQueryMock: vi.fn(),
     useGetIntegrationInstanceConfigurationQueryMock: vi.fn(),
     useGetIntegrationInstanceConfigurationsQueryMock: vi.fn(),
@@ -29,6 +31,7 @@ vi.mock('@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions', (
 }));
 
 vi.mock('@/ee/shared/queries/embedded/connectedUsers.queries', () => ({
+    useGetConnectedUserQuery: useGetConnectedUserQueryMock,
     useGetConnectedUsersQuery: useGetConnectedUsersQueryMock,
 }));
 
@@ -146,6 +149,7 @@ describe('WorkflowExecutions', () => {
 
         useOnEnvironmentChangeMock.mockImplementation(() => undefined);
 
+        useGetConnectedUserQueryMock.mockReturnValue({data: undefined});
         useGetConnectedUsersQueryMock.mockReturnValue({
             data: {content: [{externalId: 'user-7', id: 7}]},
         });
@@ -352,10 +356,84 @@ describe('WorkflowExecutions', () => {
         });
     });
 
-    it('reads the connected user filter from the URL', () => {
+    it('reads the connected user filter from the URL', async () => {
+        useGetConnectedUserQueryMock.mockReturnValue({data: {externalId: 'user-7', id: 7}});
+
         renderWorkflowExecutions('connectedUserId=7');
 
         expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith(0, expect.objectContaining({connectedUserId: 7}));
         expect(getFilterComboBox('Connected User')).toHaveTextContent('User user-7');
+
+        await userEvent.click(getFilterComboBox('Connected User'));
+
+        const options = await screen.findAllByRole('option');
+
+        expect(options.map((option) => option.textContent)).toEqual(['Any', 'User user-7']);
+    });
+
+    it('searches the server for connected users that are not on the first page', async () => {
+        useGetConnectedUserQueryMock.mockImplementation((id: number, enabled: boolean) => ({
+            data: enabled && id === 42 ? {externalId: 'user-42', id: 42} : undefined,
+        }));
+        useGetConnectedUsersQueryMock.mockImplementation(({search}: {search?: string}) => ({
+            data: {
+                content: search === 'user-42' ? [{externalId: 'user-42', id: 42}] : [{externalId: 'user-7', id: 7}],
+            },
+        }));
+
+        renderWorkflowExecutions('integrationId=2');
+
+        await userEvent.click(getFilterComboBox('Connected User'));
+
+        await userEvent.type(screen.getByPlaceholderText('Search...'), 'user-42');
+
+        await userEvent.click(await screen.findByRole('option', {name: 'User user-42'}));
+
+        expect(useGetConnectedUsersQueryMock).toHaveBeenCalledWith(
+            {environmentId: 0, integrationId: 2, search: 'user-42'},
+            true
+        );
+
+        await waitFor(() => {
+            expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith(
+                0,
+                expect.objectContaining({connectedUserId: 42, integrationId: 2})
+            );
+        });
+
+        expect(useGetConnectedUsersQueryMock).toHaveBeenLastCalledWith({environmentId: 0, integrationId: 2}, true);
+        expect(getFilterComboBox('Connected User')).toHaveTextContent('User user-42');
+    });
+
+    it('shows the connected user picked in the URL when it is not on the first page', async () => {
+        useGetConnectedUserQueryMock.mockImplementation((id: number, enabled: boolean) => ({
+            data: enabled && id === 42 ? {externalId: 'user-42', id: 42} : undefined,
+        }));
+        useWorkflowExecutionsMock.mockReturnValue({
+            connectedUserProjects: [],
+            refetchWorkflowExecutions: vi.fn(),
+            workflowExecutionPage: {content: [{id: 1}], size: 20, totalElements: 1, totalPages: 1},
+            workflowExecutionsError: null,
+            workflowExecutionsIsFetching: false,
+            workflowExecutionsIsLoading: false,
+        });
+
+        renderWorkflowExecutions('connectedUserId=42');
+
+        expect(useGetConnectedUserQueryMock).toHaveBeenLastCalledWith(42, true);
+        expect(getFilterComboBox('Connected User')).toHaveTextContent('User user-42');
+        expect(screen.getAllByText(/user-42/).length).toBeGreaterThan(1);
+
+        await userEvent.click(getFilterComboBox('Connected User'));
+
+        const options = await screen.findAllByRole('option');
+
+        expect(options.map((option) => option.textContent)).toEqual(['Any', 'User user-42', 'User user-7']);
+    });
+
+    it('does not load a connected user when none is picked', () => {
+        renderWorkflowExecutions('integrationId=2');
+
+        expect(useGetConnectedUserQueryMock).toHaveBeenLastCalledWith(undefined, false);
     });
 });
