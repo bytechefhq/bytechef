@@ -134,18 +134,20 @@ public class AiAutoMemoryGraphQlController {
 
         DeploymentLookup deploymentLookup = lookUpDeployments(resolvedPrincipals);
 
-        Set<PrincipalKey> addressable = new HashSet<>();
+        Set<PrincipalKey> addressablePrincipalKeys = new HashSet<>();
 
         for (ResolvedPrincipal resolvedPrincipal : resolvedPrincipals) {
             if (!deploymentLookup.isEmbedded(resolvedPrincipal)) {
-                addressable.add(new PrincipalKey(resolvedPrincipal.principalType(), resolvedPrincipal.principalId()));
+                addressablePrincipalKeys
+                    .add(new PrincipalKey(resolvedPrincipal.principalType(), resolvedPrincipal.principalId()));
             }
         }
 
         return aiAutoMemoryService.listAllOwners(workspaceId, environment, memoryType)
             .stream()
             .filter(
-                memory -> addressable.contains(new PrincipalKey(memory.getPrincipalType(), memory.getPrincipalId())))
+                memory -> addressablePrincipalKeys
+                    .contains(new PrincipalKey(memory.getPrincipalType(), memory.getPrincipalId())))
             .toList();
     }
 
@@ -179,37 +181,39 @@ public class AiAutoMemoryGraphQlController {
 
         verifyUserCanAccessWorkspace(userId, workspaceId);
 
-        List<AiAutoMemoryPrincipalCount> principalCounts =
+        List<AiAutoMemoryPrincipalCount> aiAutoMemoryPrincipalCounts =
             aiAutoMemoryService.listPrincipals(workspaceId, toEnvironment(environment));
 
-        List<ResolvedPrincipalCount> addressable = new ArrayList<>();
+        List<ResolvedPrincipalCount> resolvedPrincipalCounts = new ArrayList<>();
 
-        for (AiAutoMemoryPrincipalCount principalCount : principalCounts) {
-            ResolvedPrincipal resolved = resolvePrincipalForListing(principalCount, userId);
+        for (AiAutoMemoryPrincipalCount principalCount : aiAutoMemoryPrincipalCounts) {
+            ResolvedPrincipal resolvedPrincipal = resolvePrincipalForListing(principalCount, userId);
 
-            if (resolved != null) {
-                addressable.add(new ResolvedPrincipalCount(resolved, principalCount.memoryCount()));
+            if (resolvedPrincipal != null) {
+                resolvedPrincipalCounts
+                    .add(new ResolvedPrincipalCount(resolvedPrincipal, principalCount.memoryCount()));
             }
         }
 
         DeploymentLookup deploymentLookup = lookUpDeployments(
-            addressable.stream()
+            resolvedPrincipalCounts.stream()
                 .map(ResolvedPrincipalCount::principal)
                 .toList());
 
         List<AiAutoMemoryPrincipal> aiAutoMemoryPrincipals = new ArrayList<>();
 
-        for (ResolvedPrincipalCount resolvedCount : addressable) {
-            ResolvedPrincipal resolved = resolvedCount.principal();
+        for (ResolvedPrincipalCount resolvedPrincipalCount : resolvedPrincipalCounts) {
+            ResolvedPrincipal resolvedPrincipal = resolvedPrincipalCount.principal();
 
-            if (deploymentLookup.isEmbedded(resolved)) {
+            if (deploymentLookup.isEmbedded(resolvedPrincipal)) {
                 continue;
             }
 
             aiAutoMemoryPrincipals.add(
                 new AiAutoMemoryPrincipal(
-                    resolved.principalType(), resolved.principalId(),
-                    resolveLabel(resolved, deploymentLookup.namesById()), resolvedCount.memoryCount()));
+                    resolvedPrincipal.principalType(), resolvedPrincipal.principalId(),
+                    resolveLabel(resolvedPrincipal, deploymentLookup.namesById()),
+                    resolvedPrincipalCount.memoryCount()));
         }
 
         return aiAutoMemoryPrincipals;
