@@ -6,10 +6,10 @@ import ProjectBreadcrumb from '@/pages/automation/project/components/project-hea
 import ProjectItemSelect from '@/pages/automation/project/components/project-header/components/ProjectItemSelect';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import PublishPopover from '@/pages/automation/project/components/project-header/components/PublishPopover';
-import WorkflowActionsButton from '@/pages/automation/project/components/project-header/components/WorkflowActionsButton';
 import SettingsMenu from '@/pages/automation/project/components/project-header/components/settings-menu/SettingsMenu';
 import {useProjectHeader} from '@/pages/automation/project/components/project-header/hooks/useProjectHeader';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
+import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
