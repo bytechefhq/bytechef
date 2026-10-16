@@ -65,7 +65,6 @@ class ConnectedUserProjectWorkflowManager {
             "tasks": []
         }
         """;
-    private static final String MARKER = "__EMBEDDED__";
 
     private final ConnectedUserProjectService connectUserProjectService;
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
@@ -142,7 +141,7 @@ class ConnectedUserProjectWorkflowManager {
             .orElseGet(() -> {
                 Project project = new Project();
 
-                project.setName(MARKER + externalUserId);
+                project.setName(externalUserId);
                 project.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
 
                 project = projectService.create(project);

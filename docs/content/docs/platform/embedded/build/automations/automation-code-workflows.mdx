@@ -33,9 +33,8 @@ or the deploy passes the `release` flag (below).
 
 Practically:
 
-- The catalog project is resolved (or created, on first deploy) by name, hidden behind the same
-  `__EMBEDDED_AUTOMATION__` marker convention the visual bridge uses to keep the underlying
-  automation `Project` out of view.
+- The catalog project is created on the first deploy and reused by later deploys. It is kept out of
+  the regular Automation screens because Embedded owns it.
 - Redeploying the same artifact **publishes a new version**. It reaches an environment's connected
   users when that environment's [configuration](/platform/embedded/build/automations#configurations)
   is moved to it, which then upgrades every referencing user's workflow in that environment at once -

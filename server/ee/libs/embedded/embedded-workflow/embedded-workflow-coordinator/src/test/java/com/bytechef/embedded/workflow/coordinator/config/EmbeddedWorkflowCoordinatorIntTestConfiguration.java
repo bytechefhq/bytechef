@@ -11,6 +11,7 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConve
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowServiceImpl;
@@ -40,7 +41,8 @@ import tools.jackson.databind.ObjectMapper;
  */
 @EnableAutoConfiguration
 @Import({
-    EmbeddedIntegrationFixtures.class, EncryptionImpl.class, IntegrationInstanceConfigurationWorkflowServiceImpl.class,
+    EmbeddedOwnerContributorConfiguration.class, EmbeddedIntegrationFixtures.class, EncryptionImpl.class,
+    IntegrationInstanceConfigurationWorkflowServiceImpl.class,
     IntegrationInstanceServiceImpl.class, IntegrationInstanceWorkflowServiceImpl.class,
     IntegrationServiceImpl.class, IntegrationTaskDispatcherPreSendProcessor.class,
     IntegrationTriggerDispatcherPreSendProcessor.class, IntegrationWorkflowServiceImpl.class,

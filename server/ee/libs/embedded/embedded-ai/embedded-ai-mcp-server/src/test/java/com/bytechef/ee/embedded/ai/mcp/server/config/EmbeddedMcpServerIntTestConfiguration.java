@@ -15,6 +15,7 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolServiceImpl;
+import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
@@ -51,7 +52,8 @@ import tools.jackson.databind.ObjectMapper;
 @EnableAutoConfiguration
 @EnableCaching
 @Import({
-    ConnectedUserServiceImpl.class, EncryptionImpl.class, IntegrationInstanceConfigurationServiceImpl.class,
+    EmbeddedOwnerContributorConfiguration.class, ConnectedUserServiceImpl.class, EncryptionImpl.class,
+    IntegrationInstanceConfigurationServiceImpl.class,
     IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceServiceImpl.class,
     IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class, JacksonConfiguration.class,
     LiquibaseConfiguration.class, McpComponentServiceImpl.class, McpIntegrationInstanceConfigurationServiceImpl.class,

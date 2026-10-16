@@ -98,8 +98,6 @@ import org.springframework.transaction.annotation.Transactional;
 @SkipAutomationAuthorization
 public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacade {
 
-    private static final String MARKER = "__EMBEDDED__";
-
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
     private final ComponentDefinitionService componentDefinitionService;
@@ -583,7 +581,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             ConnectedUser connectedUser = connectedUserService.getConnectedUser(
                 connectedUserProject.getConnectedUserId());
 
-            projectDeployment.setName(MARKER + connectedUser.getExternalId());
+            projectDeployment.setName(connectedUser.getExternalId());
 
             projectDeployment.setProjectId(connectedUserProject.getProjectId());
             projectDeployment.setProjectVersion(1);
