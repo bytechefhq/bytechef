@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime.js';
+import type { ComponentInputReference } from './ComponentInputReference.js';
+import {
+    ComponentInputReferenceFromJSON,
+    ComponentInputReferenceFromJSONTyped,
+    ComponentInputReferenceToJSON,
+    ComponentInputReferenceToJSONTyped,
+} from './ComponentInputReference.js';
+
 /**
  * A value the connected user supplies before an automation workflow runs.
  * @export
@@ -35,6 +43,10 @@ export interface AutomationWorkflowProjectWorkflowInput {
      * Whether a value must be supplied.
      */
     required?: boolean;
+    /**
+     * 
+     */
+    componentReference?: ComponentInputReference;
     /**
      * Whether the configuration provides the value of this input, so the connected user cannot set it. The value itself is not returned.
      */
@@ -62,6 +74,7 @@ export function AutomationWorkflowProjectWorkflowInputFromJSONTyped(json: any, i
         'label': json['label'] == null ? undefined : json['label'],
         'type': json['type'] == null ? undefined : json['type'],
         'required': json['required'] == null ? undefined : json['required'],
+        'componentReference': json['componentReference'] == null ? undefined : ComponentInputReferenceFromJSON(json['componentReference']),
         'provided': json['provided'] == null ? undefined : json['provided'],
     };
 }
@@ -81,6 +94,7 @@ export function AutomationWorkflowProjectWorkflowInputToJSONTyped(value?: Automa
         'label': value['label'],
         'type': value['type'],
         'required': value['required'],
+        'componentReference': ComponentInputReferenceToJSON(value['componentReference']),
         'provided': value['provided'],
     };
 }
