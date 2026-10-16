@@ -434,10 +434,6 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
     }
 
-    /**
-     * The connected user's instances of this integration. Instances are looked up by component, so another integration
-     * of the same component - a code integration next to a visual one - has its instances filtered out here.
-     */
     private List<IntegrationInstance> getIntegrationInstances(
         ConnectedUser connectedUser, IntegrationDTO integrationDTO, Environment environment) {
 
