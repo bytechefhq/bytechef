@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationCodeWorkflowRepository;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class IntegrationCodeWorkflowServiceImpl implements IntegrationCodeWorkfl
 
     private final IntegrationCodeWorkflowRepository integrationCodeWorkflowRepository;
 
+    @SuppressFBWarnings("EI")
     public IntegrationCodeWorkflowServiceImpl(IntegrationCodeWorkflowRepository integrationCodeWorkflowRepository) {
         this.integrationCodeWorkflowRepository = integrationCodeWorkflowRepository;
     }
