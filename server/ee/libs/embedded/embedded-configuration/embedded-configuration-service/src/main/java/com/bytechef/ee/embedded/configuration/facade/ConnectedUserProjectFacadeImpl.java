@@ -58,6 +58,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
@@ -937,7 +938,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         return inputs.stream()
             .map(input -> new ConnectedUserWorkflowTemplateDTO.Input(
-                input.name(), input.label(), input.type(), input.required()))
+                input.name(), input.label(), input.type(), input.required(),
+                new WorkflowInput(input).getComponentInputReference()))
             .toList();
     }
 

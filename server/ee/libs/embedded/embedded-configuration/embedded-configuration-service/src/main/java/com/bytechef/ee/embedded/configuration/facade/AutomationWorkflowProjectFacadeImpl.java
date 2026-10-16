@@ -43,6 +43,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
@@ -582,7 +583,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         return inputs.stream()
             .map(input -> new ConnectedUserWorkflowTemplateDTO.Input(
-                input.name(), input.label(), input.type(), input.required()))
+                input.name(), input.label(), input.type(), input.required(),
+                new WorkflowInput(input).getComponentInputReference()))
             .toList();
     }
 
