@@ -85,7 +85,7 @@ const TemplateCard = ({
             )}
         >
             <CardHeader className="px-3">
-                <CardTitle className="flex min-w-0 items-center gap-2 self-center text-base">
+                <CardTitle className="flex min-h-9 min-w-0 items-center gap-2 self-center text-base">
                     <h3 className="truncate text-base font-semibold" title={label}>
                         {label}
                     </h3>
@@ -96,7 +96,7 @@ const TemplateCard = ({
                 </CardTitle>
 
                 {description && (
-                    <CardDescription className="line-clamp-2" title={description}>
+                    <CardDescription className="col-span-2 line-clamp-2" title={description}>
                         {description}
                     </CardDescription>
                 )}
