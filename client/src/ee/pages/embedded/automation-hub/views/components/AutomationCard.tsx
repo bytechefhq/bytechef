@@ -78,7 +78,7 @@ const AutomationCard = ({
             )}
         >
             <CardHeader className="px-3">
-                <CardTitle className="flex min-w-0 items-center gap-2 self-center text-base">
+                <CardTitle className="flex min-h-9 min-w-0 items-center gap-2 self-center text-base">
                     <h3 className="truncate text-base font-semibold" title={label}>
                         {label}
                     </h3>
@@ -91,7 +91,7 @@ const AutomationCard = ({
                 {attentionDescription && <p className="text-sm text-muted-foreground">{attentionDescription}</p>}
 
                 {automation.description && (
-                    <CardDescription className="line-clamp-2" title={automation.description}>
+                    <CardDescription className="col-span-2 line-clamp-2" title={automation.description}>
                         {automation.description}
                     </CardDescription>
                 )}
