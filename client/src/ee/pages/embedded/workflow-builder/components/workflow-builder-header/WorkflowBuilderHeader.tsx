@@ -83,24 +83,12 @@ const WorkflowBuilderHeader = ({
 
                 <div>{workflow.label}</div>
 
-                <div></div>
-
                 <Badge label={`V${(workflowVersion ?? 0) + 1} DRAFT`} styleType="outline-outline" weight="semibold" />
+
+                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
             </div>
 
             <div className="flex items-center gap-1">
-                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
-
-                <Button
-                    className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
-                    icon={<EditIcon />}
-                    onClick={() => setShowEditWorkflowDialog(true)}
-                    size="icon"
-                    variant="ghost"
-                />
-
-                <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
-
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
@@ -112,6 +100,17 @@ const WorkflowBuilderHeader = ({
                 <PublishPopover
                     isPending={publishProjectMutationIsPending}
                     onPublishProjectSubmit={handlePublishProjectSubmit}
+                />
+
+                <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
+
+                <Button
+                    aria-label="Edit workflow"
+                    className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
+                    icon={<EditIcon />}
+                    onClick={() => setShowEditWorkflowDialog(true)}
+                    size="icon"
+                    variant="ghost"
                 />
             </div>
 
