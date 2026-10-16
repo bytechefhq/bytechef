@@ -110,6 +110,10 @@
     justify-content: flex-end;
 }
 
+.footerActions button {
+    white-space: nowrap;
+}
+
 .retryRow {
     align-items: center;
     display: flex;

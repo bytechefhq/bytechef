@@ -360,7 +360,18 @@ const ActivationBody = ({
         if (onActivated) {
             runHostCallback('onActivated', () => onActivated(template.id));
         }
-    }, [fetch, inputs.length, onActivated, rollBackProvision, state.inputValues, state.selections, template.id]);
+
+        onClose();
+    }, [
+        fetch,
+        inputs.length,
+        onActivated,
+        onClose,
+        rollBackProvision,
+        state.inputValues,
+        state.selections,
+        template.id,
+    ]);
 
     const editWorkflow = useCallback(async () => {
         setBusy(true);
@@ -516,19 +527,13 @@ const ActivationBody = ({
                 {state.step === 'activate' && (
                     <p className={styles.notice}>Everything is ready. Activate to switch this automation on.</p>
                 )}
-
-                {state.step === 'done' && <p className={styles.notice}>{template.label || 'This automation'} is on.</p>}
             </main>
 
             <footer className={dialogStyles.dialogFooter}>
                 <DialogPoweredBy />
 
                 <div className={styles.footerActions}>
-                    {state.step === 'done' ? (
-                        <button className={dialogStyles.buttonPrimary} onClick={onClose} type="button">
-                            Done
-                        </button>
-                    ) : (
+                    {state.step !== 'done' && (
                         <>
                             {onEditWorkflow && editable && (
                                 <button
