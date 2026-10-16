@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.configuration.search;
 
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
@@ -43,7 +42,6 @@ class ProjectSearchAssetProvider implements SearchAssetProvider {
 
         return projectService.getProjects(false, null, null, null, null, null)
             .stream()
-            .filter(project -> !SystemProjects.isSystemProject(project))
             .filter(project -> workspaceIds.contains(project.getWorkspaceId()))
             .filter(
                 project -> containsIgnoreCase(project.getName(), queryLower) ||

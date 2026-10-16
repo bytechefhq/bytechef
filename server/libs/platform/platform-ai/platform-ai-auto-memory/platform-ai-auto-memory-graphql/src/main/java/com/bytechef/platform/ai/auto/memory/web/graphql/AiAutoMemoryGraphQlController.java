@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.ai.auto.memory.web.graphql;
 
-import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
-import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryConcurrentModificationException;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryNotFoundException;
@@ -43,6 +43,7 @@ import graphql.language.Field;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -75,24 +76,22 @@ public class AiAutoMemoryGraphQlController {
 
     static final ErrorClassification CONFLICT = ErrorClassification.errorClassification("CONFLICT");
 
-    private static final String EMBEDDED_PROJECT_NAME_PREFIX = "__EMBEDDED__";
-
     private final AiAutoMemoryService aiAutoMemoryService;
     private final UserService userService;
     private final WorkspaceFacade workspaceFacade;
     private final ProjectDeploymentService projectDeploymentService;
-    private final ProjectService projectService;
+    private final ProjectFacade projectFacade;
 
     @SuppressFBWarnings("EI")
     public AiAutoMemoryGraphQlController(
         AiAutoMemoryService aiAutoMemoryService, UserService userService, WorkspaceFacade workspaceFacade,
-        ProjectDeploymentService projectDeploymentService, ProjectService projectService) {
+        ProjectDeploymentService projectDeploymentService, ProjectFacade projectFacade) {
 
         this.aiAutoMemoryService = aiAutoMemoryService;
         this.userService = userService;
         this.workspaceFacade = workspaceFacade;
         this.projectDeploymentService = projectDeploymentService;
-        this.projectService = projectService;
+        this.projectFacade = projectFacade;
     }
 
     @QueryMapping
@@ -243,25 +242,15 @@ public class AiAutoMemoryGraphQlController {
             .distinct()
             .toList();
 
-        Set<Long> embeddedProjectIds = projectIds.isEmpty() ? Set.of()
-            : projectService.getProjects(projectIds)
-                .stream()
-                .filter(AiAutoMemoryGraphQlController::isEmbeddedProject)
-                .map(Project::getId)
-                .collect(Collectors.toSet());
+        Set<Long> ownedProjectIds = projectFacade.getOwnedProjectIds(
+            projectIds, EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER));
 
         Set<Long> embeddedDeploymentIds = projectDeployments.stream()
-            .filter(projectDeployment -> embeddedProjectIds.contains(projectDeployment.getProjectId()))
+            .filter(projectDeployment -> ownedProjectIds.contains(projectDeployment.getProjectId()))
             .map(ProjectDeployment::getId)
             .collect(Collectors.toSet());
 
         return new DeploymentLookup(namesById, embeddedDeploymentIds);
-    }
-
-    private static boolean isEmbeddedProject(Project project) {
-        String name = project.getName();
-
-        return name != null && name.startsWith(EMBEDDED_PROJECT_NAME_PREFIX);
     }
 
     private record DeploymentLookup(Map<Long, String> namesById, Set<Long> embeddedDeploymentIds) {

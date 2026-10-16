@@ -38,6 +38,8 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
@@ -48,6 +50,7 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +87,9 @@ class ProjectWorkflowToolsTest {
 
     @Mock
     private ComponentDefinitionService componentDefinitionService;
+
+    @Mock
+    private ProjectOwnershipService projectOwnershipService;
 
     @Mock
     private ProjectService projectService;
@@ -719,6 +725,23 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
+        void testGetWorkflowRejectsAWorkflowOfAnOwnedProject() {
+            resolveWorkspace(WORKSPACE_ID);
+            mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
+
+            when(projectOwnershipService.getOwnedProjectIds(List.of(7L), EnumSet.allOf(ProjectOwner.class)))
+                .thenReturn(Set.of(7L));
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(() -> tools.getWorkflow("wf-uuid-1", null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("not found in workspace " + WORKSPACE_ID);
+
+            verify(projectWorkflowFacade, never()).getProjectWorkflow(anyString());
+        }
+
+        @Test
         void testGetWorkflowRejectsAnUnknownWorkflow() {
             resolveWorkspace(WORKSPACE_ID);
 
@@ -841,7 +864,8 @@ class ProjectWorkflowToolsTest {
         return new ProjectWorkflowTools(
             componentDefinitionService, projectWorkflowFacade, projectWorkflowService,
             new ScopedProjectGuard(
-                projectService, projectWorkflowService, scopedConnectionGuard, workspaceScopeResolver),
+                projectOwnershipService, projectService, projectWorkflowService, scopedConnectionGuard,
+                workspaceScopeResolver),
             testConfigurationFacadeProvider);
     }
 

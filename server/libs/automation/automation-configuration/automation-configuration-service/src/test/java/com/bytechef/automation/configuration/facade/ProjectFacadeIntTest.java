@@ -30,6 +30,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
+import com.bytechef.automation.configuration.config.TestOwnerContributors;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
@@ -106,6 +107,9 @@ public class ProjectFacadeIntTest {
     private ProjectFacade projectFacade;
 
     @Autowired
+    private TestOwnerContributors testOwnerContributors;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
@@ -163,6 +167,8 @@ public class ProjectFacadeIntTest {
 
     @BeforeEach
     public void beforeEach() {
+        testOwnerContributors.clear();
+
         workspace = workspaceRepository.save(new Workspace("test"));
     }
 
@@ -603,6 +609,36 @@ public class ProjectFacadeIntTest {
 
         assertThat(projectTemplateDTO.workflows()).hasSize(1);
         assertThat(projectTemplateDTO.components()).isNotNull();
+    }
+
+    @Test
+    public void testGetWorkspaceProjectsHidesEmbeddedCatalogProjects() {
+        ProjectDTO catalogProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+        ProjectDTO plainProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        testOwnerContributors.addCatalogId(catalogProjectDTO.id());
+
+        List<ProjectDTO> workspaceProjects = projectFacade.getWorkspaceProjects(
+            null, null, false, null, null, null, workspace.getId());
+
+        assertThat(workspaceProjects).extracting(ProjectDTO::id)
+            .containsExactly(plainProjectDTO.id());
+    }
+
+    @Test
+    public void testGetWorkspaceProjectWorkflowsHidesEmbeddedOwnedProjects() {
+        ProjectDTO catalogProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+        ProjectDTO plainProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(catalogProjectDTO);
+
+        ProjectWorkflowDTO plainProjectWorkflowDTO = projectFacadeInstanceHelper.addTestWorkflow(plainProjectDTO);
+
+        testOwnerContributors.addCatalogId(catalogProjectDTO.id());
+
+        assertThat(projectFacade.getWorkspaceProjectWorkflows(workspace.getId()))
+            .extracting(ProjectWorkflowDTO::getId)
+            .containsExactly(plainProjectWorkflowDTO.getId());
     }
 
     @Test
