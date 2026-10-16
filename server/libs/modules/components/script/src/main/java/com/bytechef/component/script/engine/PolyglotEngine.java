@@ -79,11 +79,6 @@ public class PolyglotEngine {
         return execute(languageId, inputParameters, componentConnections, true, jobContextAware);
     }
 
-    /**
-     * Runs the script's {@code perform} function. A {@code perform(input, connection, context)} function receives the
-     * parameters of each connection keyed by its name, unless {@code exposeConnectionParameters} is false, in which
-     * case it receives an empty map; the connections stay reachable through {@code context.component}.
-     */
     public Object execute(
         String languageId, Parameters inputParameters,
         @Nullable Map<String, ComponentConnection> componentConnections, boolean exposeConnectionParameters,
@@ -340,12 +335,6 @@ public class PolyglotEngine {
         return newMap;
     }
 
-    /**
-     * Exposes the connection map both as an object and as a hash, so a script can read it by subscript
-     * ({@code connection["my-connection"]}), the only syntax Python and Ruby offer for keys that are not identifiers.
-     * Input maps stay plain objects, because a hash's own methods ({@code items}, {@code count}) would hide input keys
-     * of the same name.
-     */
     private static final class MapProxyObject implements ProxyHashMap, ProxyObject {
 
         private final ProxyHashMap proxyHashMap;
