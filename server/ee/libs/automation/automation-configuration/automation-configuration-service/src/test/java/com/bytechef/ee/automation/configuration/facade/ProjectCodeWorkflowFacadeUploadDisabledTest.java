@@ -29,6 +29,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,8 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
-            mock(ProjectDeploymentWorkflowService.class));
+            mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.JAVA))
             .isInstanceOf(ConfigurationException.class)
@@ -86,7 +88,8 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
-            mock(ProjectDeploymentWorkflowService.class));
+            mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.JAVASCRIPT))
             .isNotInstanceOf(ConfigurationException.class);
@@ -107,7 +110,8 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
-            mock(ProjectDeploymentWorkflowService.class));
+            mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
+            mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.RUBY))
             .isInstanceOf(ConfigurationException.class)

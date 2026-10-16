@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -20,6 +22,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.automation.configuration.exception.CodeWorkflowErrorType;
@@ -33,7 +36,10 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -76,11 +82,13 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     private final ProjectCodeWorkflowService projectCodeWorkflowService;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
+    private final ComponentConnectionFacade componentConnectionFacade;
     private final TagService tagService;
     private final ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final WorkflowService workflowService;
     private final boolean javaEnabled;
 
     @SuppressFBWarnings("EI")
@@ -92,7 +100,8 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         CodeWorkflowFileStorage codeWorkflowFileStorage,
         ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService, TagService tagService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
 
         this.cacheManager = cacheManager;
         this.projectService = projectService;
@@ -101,11 +110,13 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         this.projectCodeWorkflowService = projectCodeWorkflowService;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
+        this.componentConnectionFacade = componentConnectionFacade;
         this.projectCodeWorkflowDraftService = projectCodeWorkflowDraftService;
         this.tagService = tagService;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.workflowService = workflowService;
         this.javaEnabled = applicationProperties.getWorkflow()
             .getCodeWorkflow()
             .isJavaEnabled();
@@ -391,7 +402,9 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             projectDeployment, projectDeploymentWorkflows, List.of());
 
         for (String workflowId : workflowIds) {
-            projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, true);
+            if (!requiresConnections(workflowId)) {
+                projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, true);
+            }
         }
 
         projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
@@ -428,12 +441,34 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             projectId, projectVersion, null, List.of(), (long) environment.ordinal());
 
         for (String newWorkflowId : newWorkflowIds) {
-            projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, newWorkflowId, true);
+            if (!requiresConnections(newWorkflowId)) {
+                projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, newWorkflowId, true);
+            }
         }
 
         if (!projectDeployment.isEnabled()) {
             projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
         }
+    }
+
+    private boolean requiresConnections(String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        boolean triggerRequiresConnection = WorkflowTrigger.of(workflow)
+            .stream()
+            .flatMap(workflowTrigger -> CollectionUtils.stream(
+                componentConnectionFacade.getComponentConnections(workflowTrigger)))
+            .anyMatch(ComponentConnection::required);
+
+        if (triggerRequiresConnection) {
+            return true;
+        }
+
+        return workflow.getTasks(true)
+            .stream()
+            .flatMap(
+                workflowTask -> CollectionUtils.stream(componentConnectionFacade.getComponentConnections(workflowTask)))
+            .anyMatch(ComponentConnection::required);
     }
 
     private static ProjectDeploymentWorkflow toProjectDeploymentWorkflow(String workflowId) {
