@@ -54,6 +54,14 @@ public class PolyglotEngine {
         ScriptSandboxMode mode, @Nullable Duration timeout, String languageId, Parameters inputParameters,
         @Nullable Map<String, ComponentConnection> componentConnections, JobContextAware jobContextAware) {
 
+        return execute(mode, timeout, languageId, inputParameters, componentConnections, true, jobContextAware);
+    }
+
+    public Object execute(
+        ScriptSandboxMode mode, @Nullable Duration timeout, String languageId, Parameters inputParameters,
+        @Nullable Map<String, ComponentConnection> componentConnections, boolean exposeConnectionParameters,
+        JobContextAware jobContextAware) {
+
         return PolyglotSandbox.call(mode, languageId, timeout, polyglotContext -> {
             polyglotContext.eval(languageId, inputParameters.getString(SCRIPT, switch (languageId) {
                 case "java" ->
@@ -79,26 +87,34 @@ public class PolyglotEngine {
             Value performFunction = polyglotContext.getBindings(languageId)
                 .getMember("perform");
 
+            if (performFunction == null || !performFunction.canExecute()) {
+                throw new IllegalArgumentException("The script must define a function named 'perform'");
+            }
+
             Value value;
 
-            if (getPerformParameterCount(polyglotContext, languageId) >= 3) {
+            if (getRequiredPerformParameterCount(polyglotContext, languageId) >= 3) {
+                Map<String, ComponentConnection> exposedComponentConnections =
+                    exposeConnectionParameters ? scriptComponentConnections : Map.of();
+
                 value = performFunction.execute(
                     PolyglotValues.copyToGuestValue(inputMap, languageId),
-                    PolyglotValues.copyToGuestMemberAndHashMap(toConnectionMap(scriptComponentConnections), languageId),
+                    PolyglotValues.copyToGuestMemberAndHashMap(
+                        toConnectionMap(exposedComponentConnections), languageId),
                     contextProxyObject);
             } else {
-                value =
-                    performFunction.execute(PolyglotValues.copyToGuestValue(inputMap, languageId), contextProxyObject);
+                value = performFunction.execute(
+                    PolyglotValues.copyToGuestValue(inputMap, languageId), contextProxyObject);
             }
 
             return PolyglotValues.copyFromPolyglotContext(PolyglotValues.copyToJavaValue(value));
         });
     }
 
-    private static int getPerformParameterCount(Context polyglotContext, String languageId) {
+    private static int getRequiredPerformParameterCount(Context polyglotContext, String languageId) {
         String parameterCountExpression = switch (languageId) {
             case "js" -> "perform.length";
-            case "python" -> "perform.__code__.co_argcount";
+            case "python" -> "perform.__code__.co_argcount - len(perform.__defaults__ or ())";
             default -> null;
         };
 
@@ -108,7 +124,7 @@ public class PolyglotEngine {
 
         Value parameterCount = polyglotContext.eval(languageId, parameterCountExpression);
 
-        return parameterCount.asInt();
+        return parameterCount.fitsInInt() ? parameterCount.asInt() : 2;
     }
 
     private static Map<String, Object> toConnectionMap(Map<String, ComponentConnection> componentConnections) {
