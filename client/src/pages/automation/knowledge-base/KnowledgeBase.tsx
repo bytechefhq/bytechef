@@ -10,13 +10,13 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 
 const KnowledgeBase = () => {
-    const {documents, error, handleBackClick, isLoading, knowledgeBase, knowledgeBaseId} = useKnowledgeBase();
+    const {documents, error, isLoading, knowledgeBase, knowledgeBaseId} = useKnowledgeBase();
 
     const {embeddingActive, isLoading: embeddingActiveLoading} = useKnowledgeBaseEmbeddingActive();
 
     return (
         <LayoutContainer
-            header={<KnowledgeBaseHeader knowledgeBaseName={knowledgeBase?.name} onBackClick={handleBackClick} />}
+            header={<KnowledgeBaseHeader knowledgeBaseName={knowledgeBase?.name} />}
             leftSidebarBody={embeddingActive && <KnowledgeBaseLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="Knowledge Base" />}
             leftSidebarWidth="64"
