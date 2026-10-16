@@ -54,44 +54,29 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
                 "integration_instance_configuration_tag.integration_instance_configuration_id ";
         }
 
-        if (environment != null || integrationId != null || tagId != null) {
-            query += "WHERE ";
-        }
+        List<String> conditions = new ArrayList<>();
 
         if (environment != null) {
             arguments.add(environment);
 
-            query += "environment = ? ";
+            conditions.add("environment = ?");
         }
 
         if (integrationId != null) {
             arguments.add(integrationId);
 
-            if (environment != null) {
-                query += "AND ";
-            }
-
-            query += "integration_id = ? ";
+            conditions.add("integration_id = ?");
         }
 
         if (tagId != null) {
             arguments.add(tagId);
 
-            if (environment != null || integrationId != null) {
-                query += "AND ";
-            }
-
-            query += "tag_id = ? ";
+            conditions.add("tag_id = ?");
         }
 
-        if (environment != null || integrationId != null || tagId != null) {
-            query += "AND ";
-        } else {
-            query += "WHERE ";
+        if (!conditions.isEmpty()) {
+            query += "WHERE " + String.join(" AND ", conditions) + " ";
         }
-
-        // Matches McpServer.MCP_SERVER_NAME_PREFIX in platform-mcp-api
-        query += "integration_instance_configuration.name NOT LIKE '__MCP_SERVER__%' ";
 
         query += "ORDER BY integration.component_name ASC, integration_instance_configuration.integration_version " +
             "ASC, integration_instance_configuration.environment ASC";
