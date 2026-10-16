@@ -1,17 +1,26 @@
 interface IntegrationInstanceConfigurationOptionI {
     id?: number;
-    integration?: {componentName?: string};
+    integration?: {componentName?: string; name?: string};
+    integrationId?: number;
+}
+
+interface IntegrationOptionI {
+    componentName?: string;
+    id?: number;
+    name?: string;
 }
 
 interface WorkflowExecutionsFiltersParamsI {
     automations: number;
+    connectedUserId?: number;
     connectedUserProjects?: Array<{connectedUser: {externalId: string}; projectId: number | string}>;
+    connectedUsers?: Array<{externalId: string; id?: number}>;
     endDate?: Date;
     integrationId?: number;
     integrationInstanceConfiguration?: IntegrationInstanceConfigurationOptionI;
     integrationInstanceConfigurationId?: number;
     integrationInstanceConfigurations?: IntegrationInstanceConfigurationOptionI[];
-    integrations?: Array<{componentName?: string; id?: number}>;
+    integrations?: IntegrationOptionI[];
     projectId?: number;
     startDate?: Date;
     status?: string;
@@ -19,9 +28,18 @@ interface WorkflowExecutionsFiltersParamsI {
     workflows?: Array<{id?: string; label?: string}>;
 }
 
+export const getIntegrationInstanceConfigurationIntegrationName = (
+    integrationInstanceConfiguration?: IntegrationInstanceConfigurationOptionI,
+    integrations?: IntegrationOptionI[]
+) =>
+    integrations?.find((integration) => integration.id === integrationInstanceConfiguration?.integrationId)?.name ||
+    integrationInstanceConfiguration?.integration?.name;
+
 export const getWorkflowExecutionsFilters = ({
     automations,
+    connectedUserId,
     connectedUserProjects,
+    connectedUsers,
     endDate,
     integrationId,
     integrationInstanceConfiguration,
@@ -52,8 +70,7 @@ export const getWorkflowExecutionsFilters = ({
     } else {
         if (integrationId) {
             integrationLabel =
-                integrations?.find((integration) => integration.id === integrationId)?.componentName ||
-                String(integrationId);
+                integrations?.find((integration) => integration.id === integrationId)?.name || String(integrationId);
         }
 
         if (integrationInstanceConfigurationId) {
@@ -63,8 +80,16 @@ export const getWorkflowExecutionsFilters = ({
                 ) || integrationInstanceConfiguration;
 
             instanceConfigurationLabel =
-                selectedIntegrationInstanceConfiguration?.integration?.componentName ||
-                String(integrationInstanceConfigurationId);
+                getIntegrationInstanceConfigurationIntegrationName(
+                    selectedIntegrationInstanceConfiguration,
+                    integrations
+                ) || String(integrationInstanceConfigurationId);
+        }
+
+        if (connectedUserId) {
+            const connectedUser = connectedUsers?.find((connectedUser) => connectedUser.id === connectedUserId);
+
+            connectedUserLabel = connectedUser ? `User ${connectedUser.externalId}` : String(connectedUserId);
         }
 
         if (workflowId) {
