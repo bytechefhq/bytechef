@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface PublishIntegrationRequest {
     /**
      * The description of a integration version.
-     * @type {string}
-     * @memberof PublishIntegrationRequest
      */
     description?: string;
 }

@@ -29,8 +29,6 @@ import {
 export interface UpdateTagsRequest {
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof UpdateTagsRequest
      */
     tags?: Array<Tag>;
 }

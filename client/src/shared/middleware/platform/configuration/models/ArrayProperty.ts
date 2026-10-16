@@ -64,50 +64,34 @@ import {
 export interface ArrayProperty extends ValueProperty {
     /**
      * The property default value.
-     * @type {Array<object>}
-     * @memberof ArrayProperty
      */
     defaultValue?: Array<object>;
     /**
      * The property sample value.
-     * @type {Array<object>}
-     * @memberof ArrayProperty
      */
     exampleValue?: Array<object>;
     /**
      * Types of the array items.
-     * @type {Array<Property>}
-     * @memberof ArrayProperty
      */
     items?: Array<Property>;
     /**
      * 
-     * @type {number}
-     * @memberof ArrayProperty
      */
     maxItems?: number;
     /**
      * 
-     * @type {number}
-     * @memberof ArrayProperty
      */
     minItems?: number;
     /**
      * If the array can contain multiple items.
-     * @type {boolean}
-     * @memberof ArrayProperty
      */
     multipleValues?: boolean;
     /**
      * The list of valid property options.
-     * @type {Array<Option>}
-     * @memberof ArrayProperty
      */
     options?: Array<Option>;
     /**
      * 
-     * @type {OptionsDataSource}
-     * @memberof ArrayProperty
      */
     optionsDataSource?: OptionsDataSource;
 }

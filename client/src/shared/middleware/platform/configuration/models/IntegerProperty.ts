@@ -57,38 +57,26 @@ import {
 export interface IntegerProperty extends ValueProperty {
     /**
      * The property default value.
-     * @type {number}
-     * @memberof IntegerProperty
      */
     defaultValue?: number;
     /**
      * The property sample value.
-     * @type {number}
-     * @memberof IntegerProperty
      */
     exampleValue?: number;
     /**
      * The maximum property value.
-     * @type {number}
-     * @memberof IntegerProperty
      */
     maxValue?: number;
     /**
      * The minimum property value.
-     * @type {number}
-     * @memberof IntegerProperty
      */
     minValue?: number;
     /**
      * The list of valid property options.
-     * @type {Array<Option>}
-     * @memberof IntegerProperty
      */
     options?: Array<Option>;
     /**
      * 
-     * @type {OptionsDataSource}
-     * @memberof IntegerProperty
      */
     optionsDataSource?: OptionsDataSource;
 }

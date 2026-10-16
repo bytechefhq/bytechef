@@ -36,50 +36,34 @@ import {
 export interface ComponentProperty {
     /**
      * 
-     * @type {string}
-     * @memberof ComponentProperty
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof ComponentProperty
      */
     label?: string;
     /**
      * 
-     * @type {InputType}
-     * @memberof ComponentProperty
      */
     type: InputType;
     /**
      * 
-     * @type {string}
-     * @memberof ComponentProperty
      */
     controlType?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof ComponentProperty
      */
     required?: boolean;
     /**
      * 
-     * @type {Array<Option>}
-     * @memberof ComponentProperty
      */
     options?: Array<Option>;
     /**
      * True when options must be fetched from the options endpoint.
-     * @type {boolean}
-     * @memberof ComponentProperty
      */
     dynamicOptions?: boolean;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof ComponentProperty
      */
     optionsLookupDependsOn?: Array<string>;
 }

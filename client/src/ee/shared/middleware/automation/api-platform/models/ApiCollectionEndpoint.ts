@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { HttpMethod } from './HttpMethod';
 import {
     HttpMethodFromJSON,
@@ -29,86 +29,58 @@ import {
 export interface ApiCollectionEndpoint {
     /**
      * The id of an API collection.
-     * @type {number}
-     * @memberof ApiCollectionEndpoint
      */
     apiCollectionId?: number;
     /**
      * The created by.
-     * @type {string}
-     * @memberof ApiCollectionEndpoint
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof ApiCollectionEndpoint
      */
     readonly createdDate?: Date;
     /**
      * If an API collection is enabled or not.
-     * @type {boolean}
-     * @memberof ApiCollectionEndpoint
      */
     enabled: boolean;
     /**
      * 
-     * @type {HttpMethod}
-     * @memberof ApiCollectionEndpoint
      */
     httpMethod: HttpMethod;
     /**
      * The id of an API collection.
-     * @type {number}
-     * @memberof ApiCollectionEndpoint
      */
     readonly id?: number;
     /**
      * The name of an API collection.
-     * @type {string}
-     * @memberof ApiCollectionEndpoint
      */
     name?: string;
     /**
      * The last execution date.
-     * @type {Date}
-     * @memberof ApiCollectionEndpoint
      */
     readonly lastExecutionDate?: Date;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof ApiCollectionEndpoint
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof ApiCollectionEndpoint
      */
     readonly lastModifiedDate?: Date;
     /**
      * The endpoint path.
-     * @type {string}
-     * @memberof ApiCollectionEndpoint
      */
     path: string;
     /**
      * The project deployment workflow id.
-     * @type {number}
-     * @memberof ApiCollectionEndpoint
      */
     readonly projectDeploymentWorkflowId?: number;
     /**
      * The workflow uuid.
-     * @type {string}
-     * @memberof ApiCollectionEndpoint
      */
     workflowUuid: string;
     /**
      * 
-     * @type {number}
-     * @memberof ApiCollectionEndpoint
      */
     version?: number;
 }
@@ -138,14 +110,14 @@ export function ApiCollectionEndpointFromJSONTyped(json: any, ignoreDiscriminato
         
         'apiCollectionId': json['apiCollectionId'] == null ? undefined : json['apiCollectionId'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'enabled': json['enabled'],
         'httpMethod': HttpMethodFromJSON(json['httpMethod']),
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'] == null ? undefined : json['name'],
-        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'path': json['path'],
         'projectDeploymentWorkflowId': json['projectDeploymentWorkflowId'] == null ? undefined : json['projectDeploymentWorkflowId'],
         'workflowUuid': json['workflowUuid'],

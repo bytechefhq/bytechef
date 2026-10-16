@@ -20,7 +20,7 @@
 export const Environment = {
     Development: 'DEVELOPMENT',
     Staging: 'STAGING',
-    Production: 'PRODUCTION'
+    Production: 'PRODUCTION',
 } as const;
 export type Environment = typeof Environment[keyof typeof Environment];
 

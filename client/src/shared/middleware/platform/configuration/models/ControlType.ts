@@ -38,7 +38,7 @@ export const ControlType = {
     Text: 'TEXT',
     TextArea: 'TEXT_AREA',
     Time: 'TIME',
-    Url: 'URL'
+    Url: 'URL',
 } as const;
 export type ControlType = typeof ControlType[keyof typeof ControlType];
 

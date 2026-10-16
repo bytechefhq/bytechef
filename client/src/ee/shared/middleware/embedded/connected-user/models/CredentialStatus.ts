@@ -19,7 +19,7 @@
  */
 export const CredentialStatus = {
     Valid: 'VALID',
-    Invalid: 'INVALID'
+    Invalid: 'INVALID',
 } as const;
 export type CredentialStatus = typeof CredentialStatus[keyof typeof CredentialStatus];
 

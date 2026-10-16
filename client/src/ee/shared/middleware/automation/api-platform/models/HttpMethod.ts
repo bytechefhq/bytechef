@@ -22,7 +22,7 @@ export const HttpMethod = {
     Get: 'GET',
     Patch: 'PATCH',
     Post: 'POST',
-    Put: 'PUT'
+    Put: 'PUT',
 } as const;
 export type HttpMethod = typeof HttpMethod[keyof typeof HttpMethod];
 

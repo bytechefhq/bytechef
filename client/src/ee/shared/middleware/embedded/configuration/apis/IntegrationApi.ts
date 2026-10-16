@@ -40,41 +40,86 @@ import {
 } from '../models/Workflow';
 
 export interface CreateIntegrationRequest {
+    /**
+     * 
+     */
     integration: Integration;
 }
 
 export interface CreateIntegrationWorkflowRequest {
+    /**
+     * The id of an integration.
+     */
     id: number;
+    /**
+     * 
+     */
     workflow: Workflow;
 }
 
 export interface DeleteIntegrationRequest {
+    /**
+     * The id of an integration.
+     */
     id: number;
 }
 
 export interface GetIntegrationRequest {
+    /**
+     * The id of an integration.
+     */
     id: number;
 }
 
 export interface GetIntegrationVersionsRequest {
+    /**
+     * The id of an integration.
+     */
     id: number;
 }
 
 export interface GetIntegrationsRequest {
+    /**
+     * The category id used for filtering integrations.
+     */
     categoryId?: number;
+    /**
+     * Use for filtering integrations for which integration instance configurations exist.
+     */
     integrationInstanceConfigurations?: boolean;
+    /**
+     * Use for filtering integrations by status.
+     */
     status?: IntegrationStatus;
+    /**
+     * The tag id of used for filtering integrations.
+     */
     tagId?: number;
+    /**
+     * Use for including all fields or just basic ones.
+     */
     includeAllFields?: boolean;
 }
 
 export interface PublishIntegrationOperationRequest {
+    /**
+     * The id of a integration.
+     */
     id: number;
+    /**
+     * 
+     */
     publishIntegrationRequest?: PublishIntegrationRequest;
 }
 
 export interface UpdateIntegrationRequest {
+    /**
+     * The id of an integration.
+     */
     id: number;
+    /**
+     * 
+     */
     integration: Integration;
 }
 

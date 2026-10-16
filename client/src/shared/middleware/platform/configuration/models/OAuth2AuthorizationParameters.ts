@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface OAuth2AuthorizationParameters {
     /**
      * 
-     * @type {string}
-     * @memberof OAuth2AuthorizationParameters
      */
     authorizationUrl?: string;
     /**
      * 
-     * @type {{ [key: string]: string; }}
-     * @memberof OAuth2AuthorizationParameters
      */
     extraQueryParameters?: { [key: string]: string; };
     /**
      * 
-     * @type {string}
-     * @memberof OAuth2AuthorizationParameters
      */
     clientId?: string;
     /**
      * 
-     * @type {{ [key: string]: boolean; }}
-     * @memberof OAuth2AuthorizationParameters
      */
     scopes?: { [key: string]: boolean; };
 }

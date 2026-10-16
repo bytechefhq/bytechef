@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { IntegrationStatus } from './IntegrationStatus';
 import {
     IntegrationStatusFromJSON,
@@ -29,26 +29,18 @@ import {
 export interface IntegrationVersion {
     /**
      * The description of an integration version.
-     * @type {string}
-     * @memberof IntegrationVersion
      */
     description?: string;
     /**
      * The published date.
-     * @type {Date}
-     * @memberof IntegrationVersion
      */
     publishedDate?: Date;
     /**
      * The version of an integration.
-     * @type {number}
-     * @memberof IntegrationVersion
      */
     readonly version?: number;
     /**
      * 
-     * @type {IntegrationStatus}
-     * @memberof IntegrationVersion
      */
     status?: IntegrationStatus;
 }
@@ -73,7 +65,7 @@ export function IntegrationVersionFromJSONTyped(json: any, ignoreDiscriminator: 
     return {
         
         'description': json['description'] == null ? undefined : json['description'],
-        'publishedDate': json['publishedDate'] == null ? undefined : (new Date(json['publishedDate'])),
+        'publishedDate': json['publishedDate'] == null ? undefined : (parseDateTime(json['publishedDate'])),
         'version': json['version'] == null ? undefined : json['version'],
         'status': json['status'] == null ? undefined : IntegrationStatusFromJSON(json['status']),
     };
@@ -91,7 +83,7 @@ export function IntegrationVersionToJSONTyped(value?: Omit<IntegrationVersion, '
     return {
         
         'description': value['description'],
-        'publishedDate': value['publishedDate'] == null ? value['publishedDate'] : value['publishedDate'].toISOString(),
+        'publishedDate': value['publishedDate'] == null ? value['publishedDate'] : serializeDateTime(value['publishedDate']),
         'status': IntegrationStatusToJSON(value['status']),
     };
 }

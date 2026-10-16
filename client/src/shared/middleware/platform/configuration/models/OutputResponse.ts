@@ -29,20 +29,14 @@ import {
 export interface OutputResponse {
     /**
      * 
-     * @type {Property}
-     * @memberof OutputResponse
      */
     outputSchema?: Property;
     /**
      * The placeholder of an output.
-     * @type {object}
-     * @memberof OutputResponse
      */
     placeholder?: object;
     /**
      * The sample value of an output.
-     * @type {object}
-     * @memberof OutputResponse
      */
     sampleOutput?: object;
 }

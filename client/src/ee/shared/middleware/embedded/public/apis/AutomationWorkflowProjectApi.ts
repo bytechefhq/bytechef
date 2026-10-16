@@ -25,11 +25,20 @@ import {
 } from '../models/Environment';
 
 export interface GetFrontendProjectsRequest {
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetProjectsRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 

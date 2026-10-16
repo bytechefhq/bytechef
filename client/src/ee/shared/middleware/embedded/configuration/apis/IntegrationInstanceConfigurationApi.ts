@@ -30,48 +30,105 @@ import {
 } from '../models/IntegrationInstanceConfigurationWorkflow';
 
 export interface CreateIntegrationInstanceConfigurationRequest {
+    /**
+     * 
+     */
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
 }
 
 export interface CreateIntegrationInstanceConfigurationWorkflowJobRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
     id: number;
+    /**
+     * The id of the workflow to execute.
+     */
     workflowId: string;
 }
 
 export interface DeleteIntegrationInstanceConfigurationRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
     id: number;
 }
 
 export interface EnableIntegrationInstanceConfigurationRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
     id: number;
+    /**
+     * Enable/disable the integration instance configuration.
+     */
     enable: boolean;
 }
 
 export interface EnableIntegrationInstanceConfigurationWorkflowRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
     id: number;
+    /**
+     * The id of an integration workflow.
+     */
     workflowId: string;
+    /**
+     * Enable/disable the workflow of an integration instance configuration.
+     */
     enable: boolean;
 }
 
 export interface GetIntegrationInstanceConfigurationRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
     id: number;
 }
 
 export interface GetIntegrationInstanceConfigurationsRequest {
+    /**
+     * The environment id.
+     */
     environmentId?: number;
+    /**
+     * The integration id used for filtering integration instance configurations.
+     */
     integrationId?: number;
+    /**
+     * The tag id of used for filtering integration instance configurations.
+     */
     tagId?: number;
+    /**
+     * Use for including all fields or just basic ones.
+     */
     includeAllFields?: boolean;
 }
 
 export interface UpdateIntegrationInstanceConfigurationRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
     id: number;
+    /**
+     * 
+     */
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
 }
 
 export interface UpdateIntegrationInstanceConfigurationWorkflowRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
     id: number;
+    /**
+     * The id of an integration instance configuration workflow.
+     */
     workflowId: number;
+    /**
+     * 
+     */
     integrationInstanceConfigurationWorkflow: Omit<IntegrationInstanceConfigurationWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowUuid'>;
 }
 

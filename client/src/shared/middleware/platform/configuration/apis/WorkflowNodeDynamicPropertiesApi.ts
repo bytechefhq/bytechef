@@ -20,20 +20,56 @@ import {
 } from '../models/Property';
 
 export interface GetClusterElementNodeDynamicPropertiesRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a cluster element type.
+     */
     clusterElementType: string;
+    /**
+     * The name of a cluster element workflow node name.
+     */
     clusterElementWorkflowNodeName: string;
+    /**
+     * The name of a property.
+     */
     propertyName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * The list of dependency paths.
+     */
     lookupDependsOnPaths?: Array<string>;
 }
 
 export interface GetWorkflowNodeDynamicPropertiesRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a property.
+     */
     propertyName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * The list of dependency paths.
+     */
     lookupDependsOnPaths?: Array<string>;
 }
 

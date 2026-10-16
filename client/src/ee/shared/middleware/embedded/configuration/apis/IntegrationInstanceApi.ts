@@ -20,21 +20,42 @@ import {
 } from '../models/IntegrationInstance';
 
 export interface DeleteIntegrationInstanceRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
 }
 
 export interface EnableIntegrationInstanceRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * Enable/disable the integration instance.
+     */
     enable: boolean;
 }
 
 export interface EnableIntegrationInstanceWorkflowRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * The id of an integration instance workflow.
+     */
     workflowId: string;
+    /**
+     * Enable/disable the integration instance workflow.
+     */
     enable: boolean;
 }
 
 export interface GetIntegrationInstanceRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
 }
 

@@ -20,10 +20,25 @@ import {
 } from '../models/ComponentDefinitionBasic';
 
 export interface GetComponentDefinitionsRequest {
+    /**
+     * Use for filtering components which define action definitions.
+     */
     actionDefinitions?: boolean;
+    /**
+     * Use for filtering components which define cluster element definitions.
+     */
     clusterElementDefinitions?: boolean;
+    /**
+     * Use for filtering components which define connection definitions.
+     */
     connectionDefinitions?: boolean;
+    /**
+     * Use for filtering components which define trigger definitions.
+     */
     triggerDefinitions?: boolean;
+    /**
+     * The list of component names to include in the result.
+     */
     include?: Array<string>;
 }
 

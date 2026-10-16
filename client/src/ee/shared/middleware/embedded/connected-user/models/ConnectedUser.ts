@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { ConnectedUserIntegrationInstance } from './ConnectedUserIntegrationInstance';
 import {
     ConnectedUserIntegrationInstanceFromJSON,
@@ -29,80 +29,54 @@ import {
 export interface ConnectedUser {
     /**
      * The created by.
-     * @type {string}
-     * @memberof ConnectedUser
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof ConnectedUser
      */
     readonly createdDate?: Date;
     /**
      * The email address.
-     * @type {string}
-     * @memberof ConnectedUser
      */
     email?: string;
     /**
      * If a connected user is enabled or not
-     * @type {boolean}
-     * @memberof ConnectedUser
      */
     enabled?: boolean;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof ConnectedUser
      */
     environmentId?: number;
     /**
      * The connected user external id.
-     * @type {string}
-     * @memberof ConnectedUser
      */
     readonly externalId: string;
     /**
      * The id of a connected user.
-     * @type {number}
-     * @memberof ConnectedUser
      */
     readonly id?: number;
     /**
      * 
-     * @type {Array<ConnectedUserIntegrationInstance>}
-     * @memberof ConnectedUser
      */
     integrationInstances?: Array<ConnectedUserIntegrationInstance>;
     /**
      * 
-     * @type {{ [key: string]: any; }}
-     * @memberof ConnectedUser
      */
     readonly metadata?: { [key: string]: any; };
     /**
      * The name of a connection.
-     * @type {string}
-     * @memberof ConnectedUser
      */
     name?: string;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof ConnectedUser
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof ConnectedUser
      */
     readonly lastModifiedDate?: Date;
     /**
      * 
-     * @type {number}
-     * @memberof ConnectedUser
      */
     version?: number;
 }
@@ -126,7 +100,7 @@ export function ConnectedUserFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'email': json['email'] == null ? undefined : json['email'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
@@ -136,7 +110,7 @@ export function ConnectedUserFromJSONTyped(json: any, ignoreDiscriminator: boole
         'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'name': json['name'] == null ? undefined : json['name'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }

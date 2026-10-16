@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface ConnectionInUseError {
     /**
      * 
-     * @type {ConnectionInUseErrorReasonEnum}
-     * @memberof ConnectionInUseError
      */
     reason?: ConnectionInUseErrorReasonEnum;
 }
@@ -32,7 +30,7 @@ export interface ConnectionInUseError {
  * @export
  */
 export const ConnectionInUseErrorReasonEnum = {
-    ConnectionIsUsed: 'CONNECTION_IS_USED'
+    ConnectionIsUsed: 'CONNECTION_IS_USED',
 } as const;
 export type ConnectionInUseErrorReasonEnum = typeof ConnectionInUseErrorReasonEnum[keyof typeof ConnectionInUseErrorReasonEnum];
 

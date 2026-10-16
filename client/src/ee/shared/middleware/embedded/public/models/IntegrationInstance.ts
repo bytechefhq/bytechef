@@ -43,44 +43,30 @@ import {
 export interface IntegrationInstance {
     /**
      * The id of an integration instance.
-     * @type {number}
-     * @memberof IntegrationInstance
      */
     id?: number;
     /**
      * The id of the connection this integration instance uses.
-     * @type {number}
-     * @memberof IntegrationInstance
      */
     readonly connectionId?: number;
     /**
      * 
-     * @type {CredentialStatus}
-     * @memberof IntegrationInstance
      */
     credentialStatus?: CredentialStatus;
     /**
      * If an integration instance is enabled or not
-     * @type {boolean}
-     * @memberof IntegrationInstance
      */
     enabled: boolean;
     /**
      * The array of MCP tools for this integration instance.
-     * @type {Array<McpIntegrationInstanceTool>}
-     * @memberof IntegrationInstance
      */
     readonly mcpTools?: Array<McpIntegrationInstanceTool>;
     /**
      * The array of MCP workflows for this integration instance.
-     * @type {Array<IntegrationInstanceWorkflow>}
-     * @memberof IntegrationInstance
      */
     readonly mcpWorkflows?: Array<IntegrationInstanceWorkflow>;
     /**
      * 
-     * @type {Array<IntegrationInstanceWorkflow>}
-     * @memberof IntegrationInstance
      */
     workflows?: Array<IntegrationInstanceWorkflow>;
 }

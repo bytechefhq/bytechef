@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface CreateFrontendProjectWorkflowRequest {
     /**
      * The workflow definition
-     * @type {string}
-     * @memberof CreateFrontendProjectWorkflowRequest
      */
     definition?: string;
 }

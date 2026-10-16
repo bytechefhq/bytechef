@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface UpdateAiProviderRequest {
     /**
      * The API key of an AI provider.
-     * @type {string}
-     * @memberof UpdateAiProviderRequest
      */
     apiKey?: string;
     /**
      * The base URL of an AI provider (used by Ollama; blank defaults to localhost).
-     * @type {string}
-     * @memberof UpdateAiProviderRequest
      */
     url?: string;
 }

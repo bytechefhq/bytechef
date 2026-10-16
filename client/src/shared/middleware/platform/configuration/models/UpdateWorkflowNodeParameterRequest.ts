@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface UpdateWorkflowNodeParameterRequest {
     /**
      * If path and value type should be included in metadata.
-     * @type {boolean}
-     * @memberof UpdateWorkflowNodeParameterRequest
      */
     includeInMetadata?: boolean;
     /**
      * The workflow node parameter path.
-     * @type {string}
-     * @memberof UpdateWorkflowNodeParameterRequest
      */
     path: string;
     /**
      * The type of a property.
-     * @type {string}
-     * @memberof UpdateWorkflowNodeParameterRequest
      */
     type: string;
     /**
      * The value.
-     * @type {object}
-     * @memberof UpdateWorkflowNodeParameterRequest
      */
     value?: object;
 }

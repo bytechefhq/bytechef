@@ -25,10 +25,16 @@ import {
 } from '../models/TriggerExecution';
 
 export interface GetTriggerExecutionRequest {
+    /**
+     * The id of a trigger execution to return.
+     */
     id: number;
 }
 
 export interface GetTriggerExecutionsPageRequest {
+    /**
+     * The number of the page to return.
+     */
     pageNumber?: number;
 }
 

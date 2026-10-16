@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface MissingInputError {
     /**
      * The name of the required input that has no value.
-     * @type {string}
-     * @memberof MissingInputError
      */
     missingInputName?: string;
 }

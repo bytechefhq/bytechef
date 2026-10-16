@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { OptionsDataSource } from './OptionsDataSource';
 import {
     OptionsDataSourceFromJSON,
@@ -57,26 +57,18 @@ import {
 export interface DateProperty extends ValueProperty {
     /**
      * The property default value.
-     * @type {Date}
-     * @memberof DateProperty
      */
     defaultValue?: Date;
     /**
      * The property sample value.
-     * @type {Date}
-     * @memberof DateProperty
      */
     exampleValue?: Date;
     /**
      * The list of valid property options.
-     * @type {Array<Option>}
-     * @memberof DateProperty
      */
     options?: Array<Option>;
     /**
      * 
-     * @type {OptionsDataSource}
-     * @memberof DateProperty
      */
     optionsDataSource?: OptionsDataSource;
 }
@@ -100,8 +92,8 @@ export function DatePropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         ...ValuePropertyFromJSONTyped(json, true),
-        'defaultValue': json['defaultValue'] == null ? undefined : (new Date(json['defaultValue'])),
-        'exampleValue': json['exampleValue'] == null ? undefined : (new Date(json['exampleValue'])),
+        'defaultValue': json['defaultValue'] == null ? undefined : (parseDate(json['defaultValue'])),
+        'exampleValue': json['exampleValue'] == null ? undefined : (parseDate(json['exampleValue'])),
         'options': json['options'] == null ? undefined : ((json['options'] as Array<any>).map(OptionFromJSON)),
         'optionsDataSource': json['optionsDataSource'] == null ? undefined : OptionsDataSourceFromJSON(json['optionsDataSource']),
     };
@@ -118,8 +110,8 @@ export function DatePropertyToJSONTyped(value?: DateProperty | null, ignoreDiscr
 
     return {
         ...ValuePropertyToJSONTyped(value, true),
-        'defaultValue': value['defaultValue'] == null ? value['defaultValue'] : value['defaultValue'].toISOString().substring(0,10),
-        'exampleValue': value['exampleValue'] == null ? value['exampleValue'] : value['exampleValue'].toISOString().substring(0,10),
+        'defaultValue': value['defaultValue'] == null ? value['defaultValue'] : serializeDate(value['defaultValue']),
+        'exampleValue': value['exampleValue'] == null ? value['exampleValue'] : serializeDate(value['exampleValue']),
         'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionToJSON)),
         'optionsDataSource': OptionsDataSourceToJSON(value['optionsDataSource']),
     };

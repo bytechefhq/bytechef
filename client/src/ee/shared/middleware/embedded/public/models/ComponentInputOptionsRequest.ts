@@ -21,38 +21,26 @@ import { mapValues } from '../runtime';
 export interface ComponentInputOptionsRequest {
     /**
      * The component the input group belongs to.
-     * @type {string}
-     * @memberof ComponentInputOptionsRequest
      */
     componentName: string;
     /**
      * The component version.
-     * @type {number}
-     * @memberof ComponentInputOptionsRequest
      */
     componentVersion: number;
     /**
      * The component input group the property belongs to.
-     * @type {string}
-     * @memberof ComponentInputOptionsRequest
      */
     groupName: string;
     /**
      * The group member property whose options to resolve.
-     * @type {string}
-     * @memberof ComponentInputOptionsRequest
      */
     propertyName: string;
     /**
      * Current values of the properties this lookup depends on.
-     * @type {{ [key: string]: any; }}
-     * @memberof ComponentInputOptionsRequest
      */
     lookupDependsOnValues?: { [key: string]: any; };
     /**
      * 
-     * @type {string}
-     * @memberof ComponentInputOptionsRequest
      */
     searchText?: string;
 }

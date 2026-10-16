@@ -30,25 +30,58 @@ import {
 } from '../models/Page';
 
 export interface DeleteConnectedUserRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
     id: number;
 }
 
 export interface EnableConnectedUserRequest {
+    /**
+     * The id of a connected user.
+     */
     id: number;
+    /**
+     * Enable/disable the connected user.
+     */
     enable: boolean;
 }
 
 export interface GetConnectedUserRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
 }
 
 export interface GetConnectedUsersRequest {
+    /**
+     * The environment id.
+     */
     environmentId?: number;
+    /**
+     * The id of an integration instance.
+     */
     credentialStatus?: CredentialStatus;
+    /**
+     * The start range of a create date.
+     */
     createDateFrom?: Date;
+    /**
+     * The end range of a create date .
+     */
     createDateTo?: Date;
+    /**
+     * The id of an integration.
+     */
     integrationId?: number;
+    /**
+     * The number of the page to return.
+     */
     pageNumber?: number;
+    /**
+     * The name, email or external reference code of a connected user.
+     */
     search?: string;
 }
 
@@ -219,11 +252,11 @@ export class ConnectedUserApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['createDateFrom'] != null) {
-            queryParameters['createDateFrom'] = (requestParameters['createDateFrom'] as any).toISOString().substring(0,10);
+            queryParameters['createDateFrom'] = runtime.serializeDate(requestParameters['createDateFrom'] as any);
         }
 
         if (requestParameters['createDateTo'] != null) {
-            queryParameters['createDateTo'] = (requestParameters['createDateTo'] as any).toISOString().substring(0,10);
+            queryParameters['createDateTo'] = runtime.serializeDate(requestParameters['createDateTo'] as any);
         }
 
         if (requestParameters['integrationId'] != null) {

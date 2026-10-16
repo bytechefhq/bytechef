@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface Environment {
     /**
      * The environment id.
-     * @type {number}
-     * @memberof Environment
      */
     id?: number;
     /**
      * The environment name.
-     * @type {string}
-     * @memberof Environment
      */
     name: string;
 }

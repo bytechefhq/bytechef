@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface WebhookRetry {
     /**
      * 
-     * @type {number}
-     * @memberof WebhookRetry
      */
     initialInterval?: number;
     /**
      * 
-     * @type {number}
-     * @memberof WebhookRetry
      */
     maxInterval?: number;
     /**
      * 
-     * @type {number}
-     * @memberof WebhookRetry
      */
     maxAttempts?: number;
     /**
      * 
-     * @type {number}
-     * @memberof WebhookRetry
      */
     multiplier?: number;
 }

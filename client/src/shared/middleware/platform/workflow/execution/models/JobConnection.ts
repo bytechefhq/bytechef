@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface JobConnection {
     /**
      * The connection id
-     * @type {number}
-     * @memberof JobConnection
      */
     id?: number;
     /**
      * The connection key under which a connection is defined in a workflow definition.
-     * @type {string}
-     * @memberof JobConnection
      */
     key?: string;
     /**
      * The task name to which a connection belongs.
-     * @type {string}
-     * @memberof JobConnection
      */
     taskName?: string;
 }

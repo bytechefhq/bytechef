@@ -20,23 +20,41 @@ import {
 } from '../models/ProjectGitConfiguration';
 
 export interface GetProjectGitConfigurationRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
 }
 
 export interface GetProjectRemoteBranchesRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
 }
 
 export interface GetWorkspaceProjectGitConfigurationsRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
 }
 
 export interface PullProjectFromGitRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
 }
 
 export interface UpdateProjectGitConfigurationRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * 
+     */
     projectGitConfiguration: Omit<ProjectGitConfiguration, 'projectId'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 

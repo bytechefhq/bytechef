@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface CreateProjectWorkflow200Response {
     /**
      * The id of a created project workflow.
-     * @type {number}
-     * @memberof CreateProjectWorkflow200Response
      */
     projectWorkflowId?: number;
 }

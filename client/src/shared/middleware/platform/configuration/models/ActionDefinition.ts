@@ -36,80 +36,54 @@ import {
 export interface ActionDefinition {
     /**
      * The component name.
-     * @type {string}
-     * @memberof ActionDefinition
      */
     componentName: string;
     /**
      * The component version.
-     * @type {number}
-     * @memberof ActionDefinition
      */
     componentVersion: number;
     /**
      * The description.
-     * @type {string}
-     * @memberof ActionDefinition
      */
     description?: string;
     /**
      * 
-     * @type {Help}
-     * @memberof ActionDefinition
      */
     help?: Help;
     /**
      * The action name.
-     * @type {string}
-     * @memberof ActionDefinition
      */
     name: string;
     /**
      * Does action defines output.
-     * @type {boolean}
-     * @memberof ActionDefinition
      */
     outputDefined: boolean;
     /**
      * Does action defines output function.
-     * @type {boolean}
-     * @memberof ActionDefinition
      */
     outputFunctionDefined: boolean;
     /**
      * Does action defines output schema.
-     * @type {boolean}
-     * @memberof ActionDefinition
      */
     outputSchemaDefined?: boolean;
     /**
      * The list of action properties.
-     * @type {Array<Property>}
-     * @memberof ActionDefinition
      */
     properties?: Array<Property>;
     /**
      * Does action define resume perform function.
-     * @type {boolean}
-     * @memberof ActionDefinition
      */
     resumePerformFunctionDefined?: boolean;
     /**
      * Does action support SSE streaming.
-     * @type {boolean}
-     * @memberof ActionDefinition
      */
     sseStreamResponse?: boolean;
     /**
      * The title
-     * @type {string}
-     * @memberof ActionDefinition
      */
     title?: string;
     /**
      * Does action define dynamic node description.
-     * @type {boolean}
-     * @memberof ActionDefinition
      */
     workflowNodeDescriptionDefined?: boolean;
 }

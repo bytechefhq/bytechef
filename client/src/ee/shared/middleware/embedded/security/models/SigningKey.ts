@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * Contains generated public key used for signing JWT tokens.
  * @export
@@ -21,56 +21,38 @@ import { mapValues } from '../runtime';
 export interface SigningKey {
     /**
      * The created by.
-     * @type {string}
-     * @memberof SigningKey
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof SigningKey
      */
     readonly createdDate?: Date;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof SigningKey
      */
     environmentId?: number;
     /**
      * The id of a public key.
-     * @type {number}
-     * @memberof SigningKey
      */
     readonly id?: number;
     /**
      * The id of a key used for identifying corresponding private key when validating the JWT token.
-     * @type {string}
-     * @memberof SigningKey
      */
     readonly keyId: string;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof SigningKey
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof SigningKey
      */
     readonly lastModifiedDate?: Date;
     /**
      * The last used date.
-     * @type {Date}
-     * @memberof SigningKey
      */
     readonly lastUsedDate?: Date;
     /**
      * The name of a public key.
-     * @type {string}
-     * @memberof SigningKey
      */
     name: string;
 }
@@ -95,13 +77,13 @@ export function SigningKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'keyId': json['keyId'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
-        'lastUsedDate': json['lastUsedDate'] == null ? undefined : (new Date(json['lastUsedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
+        'lastUsedDate': json['lastUsedDate'] == null ? undefined : (parseDateTime(json['lastUsedDate'])),
         'name': json['name'],
     };
 }

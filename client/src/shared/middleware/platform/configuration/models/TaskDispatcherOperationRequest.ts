@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface TaskDispatcherOperationRequest {
     /**
      * The parameters of an action.
-     * @type {{ [key: string]: any; }}
-     * @memberof TaskDispatcherOperationRequest
      */
     parameters: { [key: string]: any; };
 }
