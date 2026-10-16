@@ -17,13 +17,13 @@
 package com.bytechef.platform.ai.tool.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +62,7 @@ class AllowedComponentNamesUtilsTest {
 
     @Test
     void testGetDisallowedComponentNamesFindsVersionedAndUnversionedTypes() {
-        ComponentDefinitionService componentDefinitionService = mockComponentDefinitionService();
+        ComponentDefinitionFacade componentDefinitionFacade = mockComponentDefinitionFacade();
 
         String definition = """
             {"tasks": [
@@ -73,14 +73,14 @@ class AllowedComponentNamesUtilsTest {
             """;
 
         List<String> disallowedComponentNames = AllowedComponentNamesUtils.getDisallowedComponentNames(
-            definition, SLACK_ONLY_TOOL_CONTEXT, componentDefinitionService);
+            definition, SLACK_ONLY_TOOL_CONTEXT, componentDefinitionFacade);
 
         assertThat(disallowedComponentNames).containsExactly("hubspot", "salesforce");
     }
 
     @Test
     void testGetDisallowedComponentNamesLetsThroughComponentsWithoutConnectionAndUnknownOnes() {
-        ComponentDefinitionService componentDefinitionService = mockComponentDefinitionService();
+        ComponentDefinitionFacade componentDefinitionFacade = mockComponentDefinitionFacade();
 
         String definition = """
             {"tasks": [
@@ -91,30 +91,29 @@ class AllowedComponentNamesUtilsTest {
             """;
 
         List<String> disallowedComponentNames = AllowedComponentNamesUtils.getDisallowedComponentNames(
-            definition, SLACK_ONLY_TOOL_CONTEXT, componentDefinitionService);
+            definition, SLACK_ONLY_TOOL_CONTEXT, componentDefinitionFacade);
 
         assertThat(disallowedComponentNames).isEmpty();
     }
 
-    private static ComponentDefinitionService mockComponentDefinitionService() {
-        ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+    private static ComponentDefinitionFacade mockComponentDefinitionFacade() {
+        ComponentDefinitionFacade componentDefinitionFacade = mock(ComponentDefinitionFacade.class);
 
-        when(componentDefinitionService.fetchComponentDefinition(any(), any())).thenReturn(Optional.empty());
+        Map<String, ComponentDefinition> componentDefinitions = Map.of(
+            "hubspot", mockComponentDefinition(true), "salesforce", mockComponentDefinition(true),
+            "logger", mockComponentDefinition(false));
 
-        for (String componentName : List.of("hubspot", "salesforce")) {
-            ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+        when(componentDefinitionFacade.fetchComponentDefinition(anyString(), isNull()))
+            .thenAnswer(invocation -> Optional.ofNullable(componentDefinitions.get(invocation.getArgument(0))));
 
-            when(componentDefinition.isConnectionRequired()).thenReturn(true);
-            when(componentDefinitionService.fetchComponentDefinition(eq(componentName), any()))
-                .thenReturn(Optional.of(componentDefinition));
-        }
+        return componentDefinitionFacade;
+    }
 
-        ComponentDefinition loggerComponentDefinition = mock(ComponentDefinition.class);
+    private static ComponentDefinition mockComponentDefinition(boolean connectionRequired) {
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(loggerComponentDefinition.isConnectionRequired()).thenReturn(false);
-        when(componentDefinitionService.fetchComponentDefinition(eq("logger"), any()))
-            .thenReturn(Optional.of(loggerComponentDefinition));
+        when(componentDefinition.isConnectionRequired()).thenReturn(connectionRequired);
 
-        return componentDefinitionService;
+        return componentDefinition;
     }
 }

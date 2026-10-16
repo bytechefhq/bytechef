@@ -34,6 +34,7 @@ public class ProjectWorkflowErrorType extends AbstractErrorType {
     public static final ProjectWorkflowErrorType SAVE_TEST_CONNECTION = new ProjectWorkflowErrorType(107);
     public static final ProjectWorkflowErrorType UPDATE_SCRIPT = new ProjectWorkflowErrorType(108);
     public static final ProjectWorkflowErrorType UPDATE_WORKFLOW_ROOT = new ProjectWorkflowErrorType(109);
+    public static final ProjectWorkflowErrorType UPDATE_CLUSTER_ELEMENT_TASK = new ProjectWorkflowErrorType(110);
 
     private ProjectWorkflowErrorType(int errorKey) {
         super(ProjectWorkflow.class, errorKey);
