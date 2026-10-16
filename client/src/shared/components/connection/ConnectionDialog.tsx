@@ -785,6 +785,7 @@ const ConnectionDialog = ({
                                                                     ...tag,
                                                                 })) ?? []
                                                             }
+                                                            placeholder="Select or type to create tags..."
                                                         />
                                                     </FormControl>
 

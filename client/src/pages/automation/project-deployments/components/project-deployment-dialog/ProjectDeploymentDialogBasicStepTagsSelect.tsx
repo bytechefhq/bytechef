@@ -33,6 +33,7 @@ const ProjectDeploymentDialogBasicStepTagsSelect = ({
                     ...tag,
                 };
             })}
+            placeholder="Select or type to create tags..."
         />
     ) : (
         <Skeleton className="h-9 w-full" />

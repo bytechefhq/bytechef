@@ -141,7 +141,7 @@ const AutomationWorkflowProjectDialog = ({
                                                         setValue('category', {label: inputValue, value: inputValue});
                                                     }}
                                                     options={categoryOptions}
-                                                    placeholder="Marketing, Sales, Social Media..."
+                                                    placeholder="Select or type to create, e.g. Marketing..."
                                                 />
                                             </FormControl>
 
@@ -168,6 +168,7 @@ const AutomationWorkflowProjectDialog = ({
                                                         ]);
                                                     }}
                                                     options={tagOptions}
+                                                    placeholder="Select or type to create tags..."
                                                 />
                                             </FormControl>
 

@@ -54,7 +54,14 @@ const CreatableSelect = <
         )}
 
         <div className={twMerge([label && 'mt-1'])}>
-            <ReactSelectCreatable {...field} classNamePrefix="react-select" isMulti={isMulti} {...props} />
+            <ReactSelectCreatable
+                {...field}
+                classNamePrefix="react-select"
+                isMulti={isMulti}
+                noOptionsMessage={() => 'Type to create a new value'}
+                placeholder="Select or type to create..."
+                {...props}
+            />
         </div>
 
         {error && (

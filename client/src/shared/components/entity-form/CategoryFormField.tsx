@@ -38,7 +38,7 @@ const CategoryFormField = ({categories, categoriesLoading}: CategoryFormFieldPro
                                 value: category.name.toLowerCase().replace(/\W/g, ''),
                                 ...category,
                             }))}
-                            placeholder="Marketing, Sales, Social Media..."
+                            placeholder="Select or type to create, e.g. Marketing..."
                         />
                     </FormControl>
 
