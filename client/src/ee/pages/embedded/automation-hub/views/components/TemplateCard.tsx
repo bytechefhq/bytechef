@@ -96,7 +96,7 @@ const TemplateCard = ({
                 </CardTitle>
 
                 {description && (
-                    <CardDescription className="col-span-2 line-clamp-2" title={description}>
+                    <CardDescription className="col-span-full line-clamp-2" title={description}>
                         {description}
                     </CardDescription>
                 )}
