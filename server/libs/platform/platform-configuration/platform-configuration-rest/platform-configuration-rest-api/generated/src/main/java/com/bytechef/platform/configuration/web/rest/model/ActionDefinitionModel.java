@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ActionDefinitionModel {
 
   private String componentName;
@@ -46,7 +46,6 @@ public class ActionDefinitionModel {
 
   private @Nullable Boolean outputSchemaDefined;
 
-  @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
 
   private @Nullable Boolean resumePerformFunctionDefined;
@@ -257,7 +256,7 @@ public class ActionDefinitionModel {
    * The list of action properties.
    * @return properties
    */
-  @Valid 
+  
   @Schema(name = "properties", description = "The list of action properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
   public List<@Valid PropertyModel> getProperties() {

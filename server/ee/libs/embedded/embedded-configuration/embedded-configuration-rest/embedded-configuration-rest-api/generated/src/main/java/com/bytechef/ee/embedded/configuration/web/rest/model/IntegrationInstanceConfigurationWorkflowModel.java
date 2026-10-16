@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationWorkflow", description = "Contains configuration and connections required for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceConfigurationWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.705345+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationInstanceConfigurationWorkflowModel {
 
   private @Nullable String createdBy;
@@ -38,10 +38,8 @@ public class IntegrationInstanceConfigurationWorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime createdDate;
 
-  @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
-  @Valid
   private List<@Valid IntegrationInstanceConfigurationWorkflowConnectionModel> connections = new ArrayList<>();
 
   private @Nullable Boolean enabled;
@@ -152,7 +150,7 @@ public class IntegrationInstanceConfigurationWorkflowModel {
    * The connections used by an integration instance configuration.
    * @return connections
    */
-  @Valid 
+  
   @Schema(name = "connections", description = "The connections used by an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
   public List<@Valid IntegrationInstanceConfigurationWorkflowConnectionModel> getConnections() {

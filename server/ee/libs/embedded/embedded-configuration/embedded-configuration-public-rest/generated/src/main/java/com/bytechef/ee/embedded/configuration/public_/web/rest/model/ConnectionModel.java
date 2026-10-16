@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -26,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ConnectionModel {
 
   private Long id;

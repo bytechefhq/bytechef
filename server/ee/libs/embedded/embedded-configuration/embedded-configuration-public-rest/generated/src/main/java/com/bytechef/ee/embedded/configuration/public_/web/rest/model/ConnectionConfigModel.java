@@ -29,12 +29,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionConfig", description = "The connection configuration")
 @JsonTypeName("ConnectionConfig")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ConnectionConfigModel {
 
   private @Nullable AuthorizationTypeModel authorizationType;
 
-  @Valid
   private List<@Valid InputModel> inputs = new ArrayList<>();
 
   private @Nullable OAuth2Model oauth2;
@@ -77,7 +76,7 @@ public class ConnectionConfigModel {
    * Get inputs
    * @return inputs
    */
-  @Valid 
+  
   @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public List<@Valid InputModel> getInputs() {

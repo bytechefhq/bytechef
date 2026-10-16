@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstance", description = "Contains configurations and connections required for the execution of integration workflows for a connected user.")
 @JsonTypeName("IntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.705345+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationInstanceModel {
 
   private Long connectionId;
@@ -59,7 +59,6 @@ public class IntegrationInstanceModel {
 
   private @Nullable IntegrationInstanceConfigurationBasicModel integrationInstanceConfiguration;
 
-  @Valid
   private List<@Valid IntegrationInstanceWorkflowModel> integrationInstanceWorkflows = new ArrayList<>();
 
   private @Nullable Integer version;
@@ -344,7 +343,7 @@ public class IntegrationInstanceModel {
    * The array of integration instance workflows.
    * @return integrationInstanceWorkflows
    */
-  @Valid 
+  
   @Schema(name = "integrationInstanceWorkflows", accessMode = Schema.AccessMode.READ_ONLY, description = "The array of integration instance workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstanceWorkflows")
   public List<@Valid IntegrationInstanceWorkflowModel> getIntegrationInstanceWorkflows() {

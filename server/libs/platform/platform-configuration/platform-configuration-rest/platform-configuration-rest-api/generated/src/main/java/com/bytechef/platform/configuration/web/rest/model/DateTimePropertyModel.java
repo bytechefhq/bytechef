@@ -38,7 +38,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateTimeProperty", description = "A date-time property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class DateTimePropertyModel extends ValuePropertyModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -47,7 +47,6 @@ public class DateTimePropertyModel extends ValuePropertyModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime exampleValue;
 
-  @Valid
   private List<@Valid OptionModel> options = new ArrayList<>();
 
   private @Nullable OptionsDataSourceModel optionsDataSource;
@@ -122,7 +121,7 @@ public class DateTimePropertyModel extends ValuePropertyModel {
    * The list of valid property options.
    * @return options
    */
-  @Valid 
+  
   @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("options")
   public List<@Valid OptionModel> getOptions() {

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUser")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.265133+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.229961+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ConnectedUserModel {
 
   private @Nullable String createdBy;
@@ -47,10 +47,8 @@ public class ConnectedUserModel {
 
   private @Nullable Long id;
 
-  @Valid
   private List<@Valid ConnectedUserIntegrationInstanceModel> integrationInstances = new ArrayList<>();
 
-  @Valid
   private Map<String, Object> metadata = new HashMap<>();
 
   private @Nullable String name;
@@ -237,7 +235,7 @@ public class ConnectedUserModel {
    * Get integrationInstances
    * @return integrationInstances
    */
-  @Valid 
+  
   @Schema(name = "integrationInstances", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstances")
   public List<@Valid ConnectedUserIntegrationInstanceModel> getIntegrationInstances() {

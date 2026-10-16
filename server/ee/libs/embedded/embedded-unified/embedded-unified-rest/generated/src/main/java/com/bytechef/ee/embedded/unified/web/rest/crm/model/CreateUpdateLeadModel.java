@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("create_update_lead")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:34.742723+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:08:48.999333+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class CreateUpdateLeadModel {
 
   private JsonNullable<String> company = JsonNullable.<String>undefined();
@@ -43,10 +43,8 @@ public class CreateUpdateLeadModel {
 
   private @Nullable String title;
 
-  @Valid
   private List<@Valid EmailsInnerModel> emails = new ArrayList<>();
 
-  @Valid
   private List<@Valid AddressesInnerModel> addresses = new ArrayList<>();
 
   private JsonNullable<String> ownerId = JsonNullable.<String>undefined();
@@ -55,7 +53,6 @@ public class CreateUpdateLeadModel {
 
   private JsonNullable<String> convertedAccountId = JsonNullable.<String>undefined();
 
-  @Valid
   private Map<String, Object> customFields = new HashMap<>();
 
   public CreateUpdateLeadModel company(String company) {
@@ -68,7 +65,7 @@ public class CreateUpdateLeadModel {
    * @return company
    */
   
-  @Schema(name = "company", example = "ByteChef", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "company", example = "ByteChef", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
   @JsonProperty("company")
   public JsonNullable<String> getCompany() {
     return company;
@@ -88,7 +85,7 @@ public class CreateUpdateLeadModel {
    * @return firstName
    */
   
-  @Schema(name = "firstName", example = "George", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "firstName", example = "George", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
   @JsonProperty("firstName")
   public JsonNullable<String> getFirstName() {
     return firstName;
@@ -108,7 +105,7 @@ public class CreateUpdateLeadModel {
    * @return lastName
    */
   
-  @Schema(name = "lastName", example = "Xing", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "lastName", example = "Xing", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
   @JsonProperty("lastName")
   public JsonNullable<String> getLastName() {
     return lastName;
@@ -128,7 +125,7 @@ public class CreateUpdateLeadModel {
    * @return leadSource
    */
   
-  @Schema(name = "leadSource", example = "API Blogger", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "leadSource", example = "API Blogger", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
   @JsonProperty("leadSource")
   public JsonNullable<String> getLeadSource() {
     return leadSource;
@@ -176,7 +173,7 @@ public class CreateUpdateLeadModel {
    * Get emails
    * @return emails
    */
-  @Valid 
+  
   @Schema(name = "emails", example = "[{emailAddress=hello@bytechef.io, emailAddressType=work}]", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("emails")
   public List<@Valid EmailsInnerModel> getEmails() {
@@ -205,7 +202,7 @@ public class CreateUpdateLeadModel {
    * Get addresses
    * @return addresses
    */
-  @Valid 
+  
   @Schema(name = "addresses", example = "[{addressType=shipping, city=San Francisco, country=US, postalCode=94107, state=CA, street1=525 Brannan, street2=null}]", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("addresses")
   public List<@Valid AddressesInnerModel> getAddresses() {
@@ -227,7 +224,7 @@ public class CreateUpdateLeadModel {
    * @return ownerId
    */
   
-  @Schema(name = "ownerId", example = "9f3e97fd-4d5d-4efc-959d-bbebfac079f5", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "ownerId", example = "9f3e97fd-4d5d-4efc-959d-bbebfac079f5", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
   @JsonProperty("ownerId")
   public JsonNullable<String> getOwnerId() {
     return ownerId;
@@ -247,7 +244,7 @@ public class CreateUpdateLeadModel {
    * @return convertedContactId
    */
   
-  @Schema(name = "convertedContactId", example = "ad43955d-2b27-4ec3-b38a-0ca07a76d43b", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "convertedContactId", example = "ad43955d-2b27-4ec3-b38a-0ca07a76d43b", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
   @JsonProperty("convertedContactId")
   public JsonNullable<String> getConvertedContactId() {
     return convertedContactId;
@@ -267,7 +264,7 @@ public class CreateUpdateLeadModel {
    * @return convertedAccountId
    */
   
-  @Schema(name = "convertedAccountId", example = "2e1e6813-0459-47f5-ad4c-3d137c0e1fdd", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "convertedAccountId", example = "2e1e6813-0459-47f5-ad4c-3d137c0e1fdd", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
   @JsonProperty("convertedAccountId")
   public JsonNullable<String> getConvertedAccountId() {
     return convertedAccountId;

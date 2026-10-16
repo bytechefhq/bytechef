@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "Contains user configurations for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.705345+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationInstanceWorkflowModel {
 
   private @Nullable String createdBy;
@@ -34,7 +34,6 @@ public class IntegrationInstanceWorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime createdDate;
 
-  @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
   private Boolean enabled;

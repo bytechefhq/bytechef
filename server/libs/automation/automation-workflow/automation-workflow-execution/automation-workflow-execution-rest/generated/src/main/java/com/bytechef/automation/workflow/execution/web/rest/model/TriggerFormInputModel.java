@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("TriggerFormInput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:32.315554+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.962843+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TriggerFormInputModel {
 
   private @Nullable String defaultValue;
@@ -35,7 +35,6 @@ public class TriggerFormInputModel {
 
   private @Nullable String fieldName;
 
-  @Valid
   private List<com.bytechef.platform.configuration.web.rest.model.@Valid FieldOptionModel> fieldOptions = new ArrayList<>();
 
   private @Nullable Integer fieldType;
@@ -151,7 +150,7 @@ public class TriggerFormInputModel {
    * Get fieldOptions
    * @return fieldOptions
    */
-  @Valid 
+  
   @Schema(name = "fieldOptions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("fieldOptions")
   public List<com.bytechef.platform.configuration.web.rest.model.@Valid FieldOptionModel> getFieldOptions() {

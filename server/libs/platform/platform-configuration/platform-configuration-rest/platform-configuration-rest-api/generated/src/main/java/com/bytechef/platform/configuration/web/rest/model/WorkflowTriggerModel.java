@@ -28,22 +28,19 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowTriggerModel {
 
-  @Valid
   private List<@Valid ComponentConnectionModel> connections = new ArrayList<>();
 
   private @Nullable String description;
 
   private @Nullable String label;
 
-  @Valid
   private Map<String, Object> metadata = new HashMap<>();
 
   private String name;
 
-  @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
   private @Nullable String timeout;
@@ -79,7 +76,7 @@ public class WorkflowTriggerModel {
    * Get connections
    * @return connections
    */
-  @Valid 
+  
   @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
   public List<@Valid ComponentConnectionModel> getConnections() {
