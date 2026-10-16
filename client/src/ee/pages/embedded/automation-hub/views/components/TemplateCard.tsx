@@ -11,12 +11,12 @@ import AutomationCardMenu from '@/ee/pages/embedded/automation-hub/views/compone
 import AutomationInputsDialog from '@/ee/pages/embedded/automation-hub/views/components/AutomationInputsDialog';
 import AutomationStatusButton from '@/ee/pages/embedded/automation-hub/views/components/AutomationStatusButton';
 import AutomationVersion from '@/ee/pages/embedded/automation-hub/views/components/AutomationVersion';
+import ComponentIconStack from '@/ee/pages/embedded/automation-hub/views/components/ComponentIconStack';
 import {
     AutomationWorkflowProjectWorkflowTemplate,
     ConnectedUserProjectWorkflow,
 } from '@/ee/shared/middleware/embedded/public';
 import {useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -122,19 +122,7 @@ const TemplateCard = ({
             </CardHeader>
 
             <CardFooter className="mt-auto justify-end px-3">
-                {!!template.components?.length && (
-                    <div className="mr-auto flex items-center -space-x-2">
-                        {template.components.map((component) => (
-                            <div
-                                className="flex size-9 shrink-0 items-center justify-center rounded-full border bg-background p-1.5"
-                                key={`component-${component.name}`}
-                                title={component.title || component.name}
-                            >
-                                {component.icon && <InlineSVG className="size-5 flex-none" src={component.icon} />}
-                            </div>
-                        ))}
-                    </div>
-                )}
+                <ComponentIconStack components={template.components} />
 
                 {automation ? (
                     <>
