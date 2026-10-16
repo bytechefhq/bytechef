@@ -5,6 +5,7 @@ import ComponentRow from '@/pages/automation/template/components/ComponentRow';
 import TemplateLayoutContainer from '@/pages/automation/template/components/TemplateLayoutContainer';
 import WorkflowTemplatePreview from '@/pages/automation/template/components/WorkflowTemplatePreview';
 import ProjectsComboBox from '@/pages/automation/template/workflow-template/components/ProjectsComboBox';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useImportWorkflowTemplateMutation, useWorkflowTemplateQuery} from '@/shared/middleware/graphql';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
@@ -25,6 +26,7 @@ const WorkflowTemplate = ({
     const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(projectId);
 
     const navigate = useNavigate();
+    const {captureProjectWorkflowCreatedFromTemplate} = useAnalytics();
 
     const {data: {workflowTemplate} = {}} = useWorkflowTemplateQuery({
         id: id!,
@@ -35,6 +37,8 @@ const WorkflowTemplate = ({
 
     const importWorkflowTemplateMutation = useImportWorkflowTemplateMutation({
         onSuccess: ({importWorkflowTemplate}) => {
+            captureProjectWorkflowCreatedFromTemplate();
+
             navigate(`/automation/projects/${selectedProjectId}/project-workflows/${importWorkflowTemplate}`);
         },
     });
