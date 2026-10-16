@@ -4921,6 +4921,7 @@ export type QueryConnectedUserArgs = {
 
 export type QueryConnectedUserCodeWorkflowReferencesArgs = {
   automationUuids: Array<Scalars['ID']['input']>;
+  environmentId: Scalars['ID']['input'];
 };
 
 
