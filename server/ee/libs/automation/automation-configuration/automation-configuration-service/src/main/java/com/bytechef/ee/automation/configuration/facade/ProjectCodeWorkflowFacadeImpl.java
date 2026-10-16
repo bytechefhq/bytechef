@@ -72,7 +72,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             throw new RuntimeException(e);
         }
 
-        Project project = projectService.fetchProject(projectDefinition.getName())
+        Project project = projectService.fetchProject(projectDefinition.getName(), workspaceId)
             .map(curProject -> updateProject(curProject, projectDefinition))
             .orElseGet(() -> createProject(workspaceId, projectDefinition));
 
