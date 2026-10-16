@@ -18,6 +18,7 @@ package com.bytechef.platform.component.runner;
 
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
@@ -27,6 +28,7 @@ import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.polyglot.ScriptSandboxMode;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -92,9 +94,62 @@ class PolyglotEngineTest {
         assertThat(result).isEqualTo(0);
     }
 
-    private Object execute(String languageId, String script) {
+    @Test
+    void testExecutePythonReadsInputKeyNamedLikeDictMethodBySubscript() {
+        Object result = execute(
+            "python", "def perform(input, context):\n\treturn input[\"items\"]", Map.of("items", List.of(1, 2)));
+
+        assertThat(result).isEqualTo(List.of(1, 2));
+    }
+
+    @Test
+    void testExecutePythonWithInputContextAndOptionalParameter() {
+        Object result = execute(
+            "python",
+            "def perform(input, context, debug=False):\n\treturn 'context' if hasattr(context, 'component') " +
+                "else 'connection'");
+
+        assertThat(result).isEqualTo("context");
+    }
+
+    @Test
+    void testExecuteJavaScriptPassesContextAsThirdArgument() {
+        Object result = execute(
+            "js", "function perform(input, connection, context) {\n\treturn typeof context.component;\n}");
+
+        assertThat(result).isEqualTo("object");
+    }
+
+    @Test
+    void testExecuteWithoutExposedConnectionParameters() {
         Parameters inputParameters = ParametersFactory.create(
-            Map.of(INPUT, Map.of("name", "ByteChef"), SCRIPT, script));
+            Map.of(
+                INPUT, Map.of(),
+                SCRIPT, "function perform(input, connection, context) {\n\treturn Object.keys(connection).length;\n}"));
+
+        Object result = polyglotEngine.execute(
+            ScriptSandboxMode.STRICT, null, "js", inputParameters, COMPONENT_CONNECTIONS, false, jobContextAware);
+
+        assertThat(result).isEqualTo(0);
+    }
+
+    @Test
+    void testExecuteWithoutPerformFunction() {
+        Parameters inputParameters = ParametersFactory.create(Map.of(INPUT, Map.of(), SCRIPT, "var perform = {};"));
+
+        assertThatThrownBy(
+            () -> polyglotEngine.execute(
+                ScriptSandboxMode.STRICT, null, "js", inputParameters, COMPONENT_CONNECTIONS, jobContextAware))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("perform");
+    }
+
+    private Object execute(String languageId, String script) {
+        return execute(languageId, script, Map.of("name", "ByteChef"));
+    }
+
+    private Object execute(String languageId, String script, Map<String, Object> input) {
+        Parameters inputParameters = ParametersFactory.create(Map.of(INPUT, input, SCRIPT, script));
 
         return polyglotEngine.execute(
             ScriptSandboxMode.STRICT, null, languageId, inputParameters, COMPONENT_CONNECTIONS, jobContextAware);

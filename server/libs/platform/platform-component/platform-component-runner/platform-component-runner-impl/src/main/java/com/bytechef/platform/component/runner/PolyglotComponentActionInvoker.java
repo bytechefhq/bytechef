@@ -63,21 +63,15 @@ class PolyglotComponentActionInvoker implements ComponentActionInvoker {
 
         ComponentDefinition componentDefinition = componentCatalog.getComponentDefinition(componentName);
 
-        ComponentConnection componentConnection = null;
+        Map.Entry<String, ComponentConnection> entry;
 
-        if (!componentConnections.isEmpty()) {
-            Map.Entry<String, ComponentConnection> entry;
-
-            if (connectionName == null) {
-                entry = getFirstComponentConnectionEntry(componentDefinition);
-            } else {
-                entry = getComponentConnectionEntry(connectionName);
-            }
-
-            if (entry != null) {
-                componentConnection = entry.getValue();
-            }
+        if (connectionName == null) {
+            entry = getFirstComponentConnectionEntry(componentDefinition);
+        } else {
+            entry = getComponentConnectionEntry(connectionName);
         }
+
+        ComponentConnection componentConnection = entry == null ? null : entry.getValue();
 
         ActionDefinitionService actionDefinitionService = applicationContext.getBean(ActionDefinitionService.class);
 
