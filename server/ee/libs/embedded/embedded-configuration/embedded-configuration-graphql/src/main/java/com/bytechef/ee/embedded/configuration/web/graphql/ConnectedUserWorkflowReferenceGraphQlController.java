@@ -11,6 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceAdminFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Set;
@@ -28,16 +29,22 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnEEVersion
 public class ConnectedUserWorkflowReferenceGraphQlController {
     private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserWorkflowReferenceGraphQlController(
-        ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade) {
+        ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
+        EnvironmentService environmentService) {
+
         this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
+        this.environmentService = environmentService;
     }
 
     @QueryMapping
     public List<ConnectedUserWorkflowReferenceDTO> connectedUserCodeWorkflowReferences(
-        @Argument List<String> automationWorkflowUuids) {
-        return connectedUserWorkflowReferenceAdminFacade.getReferences(Set.copyOf(automationWorkflowUuids));
+        @Argument List<String> automationWorkflowUuids, @Argument Long environmentId) {
+
+        return connectedUserWorkflowReferenceAdminFacade.getReferences(
+            Set.copyOf(automationWorkflowUuids), environmentService.getEnvironment(environmentId));
     }
 }
