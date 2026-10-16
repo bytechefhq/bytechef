@@ -34,7 +34,8 @@ public interface IntegrationInstanceConfigurationFacade {
 
     /**
      * Makes a published integration version live in an environment: creates and enables an instance configuration when
-     * the integration has none there, otherwise moves the existing one to the version and enables it.
+     * the integration has none there, otherwise moves the existing one to the version and enables it. Workflows new to
+     * the configuration are enabled too, except those needing a connection an administrator has yet to pick.
      *
      * @return the id of the instance configuration
      */

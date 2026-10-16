@@ -719,8 +719,11 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         for (IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO : integrationInstanceConfigurationWorkflowDTOs) {
 
-            enableIntegrationInstanceConfigurationWorkflow(
-                integrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowDTO.workflowId(), true);
+            String workflowId = integrationInstanceConfigurationWorkflowDTO.workflowId();
+
+            if (getRequiredAdminComponentConnections(integration, workflowId).isEmpty()) {
+                enableIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationId, workflowId, true);
+            }
         }
 
         enableIntegrationInstanceConfiguration(integrationInstanceConfigurationId, true);
@@ -790,8 +793,14 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         updateIntegrationInstanceConfiguration(integrationInstanceConfigurationDTO);
 
+        Integration integration =
+            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId());
+
         for (String newWorkflowId : newWorkflowIds) {
-            enableIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationId, newWorkflowId, true);
+            if (getRequiredAdminComponentConnections(integration, newWorkflowId).isEmpty()) {
+                enableIntegrationInstanceConfigurationWorkflow(
+                    integrationInstanceConfigurationId, newWorkflowId, true);
+            }
         }
 
         if (!integrationInstanceConfiguration.isEnabled()) {
@@ -885,6 +894,31 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
 
+    /**
+     * The required connections an administrator sets in the instance configuration: those of the workflow's triggers
+     * and tasks, except the integration's own component, which runs on the connected user's integration connection.
+     */
+    private List<ComponentConnection> getRequiredAdminComponentConnections(Integration integration, String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        return CollectionUtils.concat(
+            WorkflowTrigger.of(workflow)
+                .stream()
+                .flatMap(workflowTrigger -> CollectionUtils.stream(
+                    componentConnectionFacade.getComponentConnections(workflowTrigger)))
+                .toList(),
+            workflow.getTasks(true)
+                .stream()
+                .flatMap(workflowTask -> CollectionUtils.stream(
+                    componentConnectionFacade.getComponentConnections(workflowTask)))
+                .toList())
+            .stream()
+            .filter(ComponentConnection::required)
+            .filter(componentConnection -> !Objects.equals(
+                componentConnection.componentName(), integration.getComponentName()))
+            .toList();
+    }
+
     private IntegrationInstanceConfigurationWorkflow doEnableIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId, boolean enable) {
 
@@ -895,26 +929,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         if (enable) {
             Integration integration = integrationService.getIntegrationInstanceConfigurationIntegration(
                 integrationInstanceConfigurationId);
-            Workflow workflow = workflowService.getWorkflow(workflowId);
 
-            List<ComponentConnection> requiredComponentConnections = CollectionUtils.concat(
-                WorkflowTrigger.of(workflow)
-                    .stream()
-                    .flatMap(workflowTrigger -> CollectionUtils.stream(
-                        componentConnectionFacade.getComponentConnections(workflowTrigger)))
-                    .filter(ComponentConnection::required)
-                    .toList(),
-                workflow.getTasks(true)
-                    .stream()
-                    .flatMap(workflowTask -> CollectionUtils.stream(
-                        componentConnectionFacade.getComponentConnections(workflowTask)))
-                    .filter(ComponentConnection::required)
-                    .toList());
-
-            requiredComponentConnections = requiredComponentConnections.stream()
-                .filter(workflowConnection -> !Objects.equals(
-                    workflowConnection.componentName(), integration.getComponentName()))
-                .toList();
+            List<ComponentConnection> requiredComponentConnections = getRequiredAdminComponentConnections(
+                integration, workflowId);
 
             List<String> workflowNodeNames = requiredComponentConnections.stream()
                 .map(ComponentConnection::workflowNodeName)
@@ -928,7 +945,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
             if (!requiredComponentConnections.isEmpty() && requiredComponentConnections.size() != connections.size()) {
                 throw new ConfigurationException(
-                    "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
+                    "Not all required connections are set for a workflow with id=%s".formatted(workflowId),
                     IntegrationInstanceConfigurationErrorType.WORKFLOW_CONNECTIONS_NOT_FOUND);
             }
         }
