@@ -33,21 +33,19 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:32.834141+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:22.372603+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ConnectionModel {
 
   private @Nullable Boolean active;
 
   private @Nullable AuthorizationTypeModel authorizationType;
 
-  @Valid
   private Map<String, Object> authorizationParameters = new HashMap<>();
 
   private @Nullable String baseUri;
 
   private String componentName;
 
-  @Valid
   private Map<String, Object> connectionParameters = new HashMap<>();
 
   private Integer connectionVersion;
@@ -70,10 +68,8 @@ public class ConnectionModel {
 
   private String name;
 
-  @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
-  @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
   private @Nullable Integer version;
@@ -471,7 +467,7 @@ public class ConnectionModel {
    * Get tags
    * @return tags
    */
-  @Valid 
+  
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
   public List<@Valid TagModel> getTags() {

@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration for a particular service represented by component.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationBasicModel {
 
   private String componentName;
@@ -37,7 +37,6 @@ public class IntegrationBasicModel {
 
   private @Nullable Long id;
 
-  @Valid
   private List<@Valid IntegrationInstanceModel> integrationInstances = new ArrayList<>();
 
   private @Nullable Integer integrationVersion;
@@ -160,7 +159,7 @@ public class IntegrationBasicModel {
    * The list of integration instances that represent configured and connected integrations for specific users
    * @return integrationInstances
    */
-  @Valid 
+  
   @Schema(name = "integrationInstances", description = "The list of integration instances that represent configured and connected integrations for specific users", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstances")
   public List<@Valid IntegrationInstanceModel> getIntegrationInstances() {

@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationWorkflowProject", description = "An automation workflow automation workflow project.")
 @JsonTypeName("AutomationWorkflowProject")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class AutomationWorkflowProjectModel {
 
   private @Nullable Long id;
@@ -37,7 +37,6 @@ public class AutomationWorkflowProjectModel {
 
   private @Nullable Boolean automationHubVisible;
 
-  @Valid
   private List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> workflowTemplates = new ArrayList<>();
 
   public AutomationWorkflowProjectModel id(@Nullable Long id) {
@@ -141,7 +140,7 @@ public class AutomationWorkflowProjectModel {
    * The list of automation workflow templates belonging to this project.
    * @return workflowTemplates
    */
-  @Valid 
+  
   @Schema(name = "workflowTemplates", description = "The list of automation workflow templates belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTemplates")
   public List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> getWorkflowTemplates() {

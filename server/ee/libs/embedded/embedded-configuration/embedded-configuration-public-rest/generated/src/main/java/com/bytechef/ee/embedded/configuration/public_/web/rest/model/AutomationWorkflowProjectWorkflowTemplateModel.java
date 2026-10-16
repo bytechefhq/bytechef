@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationWorkflowProjectWorkflowTemplate", description = "An automation workflow template within an automation workflow project.")
 @JsonTypeName("AutomationWorkflowProjectWorkflowTemplate")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class AutomationWorkflowProjectWorkflowTemplateModel {
 
   private @Nullable String id;
@@ -36,10 +36,8 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
 
   private @Nullable String description;
 
-  @Valid
   private List<@Valid AutomationWorkflowProjectComponentModel> components = new ArrayList<>();
 
-  @Valid
   private List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs = new ArrayList<>();
 
   public AutomationWorkflowProjectWorkflowTemplateModel id(@Nullable String id) {
@@ -122,7 +120,7 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
    * The list of components used in this workflow.
    * @return components
    */
-  @Valid 
+  
   @Schema(name = "components", description = "The list of components used in this workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("components")
   public List<@Valid AutomationWorkflowProjectComponentModel> getComponents() {
@@ -151,7 +149,7 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
    * The values the connected user is asked for before this workflow runs.
    * @return inputs
    */
-  @Valid 
+  
   @Schema(name = "inputs", description = "The values the connected user is asked for before this workflow runs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public List<@Valid AutomationWorkflowProjectWorkflowInputModel> getInputs() {
