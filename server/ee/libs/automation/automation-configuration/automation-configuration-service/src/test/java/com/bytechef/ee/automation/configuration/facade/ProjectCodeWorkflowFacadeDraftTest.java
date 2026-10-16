@@ -37,6 +37,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade.CodeWorkflowReconciliation;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
@@ -306,7 +307,8 @@ class ProjectCodeWorkflowFacadeDraftTest {
                 codeWorkflowContainerFacade, codeWorkflowContainerService, projectCodeWorkflowService,
                 projectWorkflowService, workflowService, List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
-            mock(ProjectDeploymentWorkflowService.class));
+            mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
+            mock(WorkflowService.class));
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {
