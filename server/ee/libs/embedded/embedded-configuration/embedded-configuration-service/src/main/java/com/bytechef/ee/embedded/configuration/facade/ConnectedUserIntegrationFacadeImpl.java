@@ -236,8 +236,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         IntegrationInstanceConfigurationDTO filteredConfiguration =
             filterWorkflows(integrationInstanceConfigurationDTO, connectedUser, mcpWorkflows);
 
-        List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
-            connectedUser.getId(), integrationDTO.componentName(), environment);
+        List<IntegrationInstance> integrationInstances = getIntegrationInstances(
+            connectedUser, integrationDTO, environment);
 
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             integrationDTO.componentName(), integrationDTO.componentVersion());
@@ -412,8 +412,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         IntegrationInstanceConfigurationDTO filteredConfiguration =
             filterWorkflows(integrationInstanceConfigurationDTO, connectedUser, mcpWorkflows);
 
-        List<IntegrationInstance> integrationInstances = integrationInstanceService
-            .getIntegrationInstances(connectedUser.getId(), integrationDTO.componentName(), environment);
+        List<IntegrationInstance> integrationInstances = getIntegrationInstances(
+            connectedUser, integrationDTO, environment);
 
         List<Connection> connections = connectionService.getConnections(
             integrationInstances.stream()
@@ -432,6 +432,23 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         return connectedUserIntegrationDTO.withMcp(
             getMcpTools(integrationDTO.componentName()), mcpWorkflows,
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
+    }
+
+    private List<IntegrationInstance> getIntegrationInstances(
+        ConnectedUser connectedUser, IntegrationDTO integrationDTO, Environment environment) {
+
+        Set<Long> integrationInstanceConfigurationIds = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfigurations(Objects.requireNonNull(integrationDTO.id()))
+            .stream()
+            .map(IntegrationInstanceConfiguration::getId)
+            .collect(Collectors.toSet());
+
+        return integrationInstanceService
+            .getIntegrationInstances(connectedUser.getId(), integrationDTO.componentName(), environment)
+            .stream()
+            .filter(integrationInstance -> integrationInstanceConfigurationIds.contains(
+                integrationInstance.getIntegrationInstanceConfigurationId()))
+            .toList();
     }
 
     private boolean isEmbeddedMcpServerEnabled(long mcpServerId) {
