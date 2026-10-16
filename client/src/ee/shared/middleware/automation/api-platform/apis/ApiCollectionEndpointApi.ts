@@ -20,19 +20,34 @@ import {
 } from '../models/ApiCollectionEndpoint';
 
 export interface CreateApiCollectionEndpointRequest {
+    /**
+     * 
+     */
     apiCollectionEndpoint: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentWorkflowId'>;
 }
 
 export interface DeleteApiCollectionEndpointRequest {
+    /**
+     * The id of an API collection endpoint.
+     */
     id: number;
 }
 
 export interface GetApiCollectionEndpointRequest {
+    /**
+     * The id of an API collection endpoint.
+     */
     id: number;
 }
 
 export interface UpdateApiCollectionEndpointRequest {
+    /**
+     * The id of an API collection endpoint.
+     */
     id: number;
+    /**
+     * 
+     */
     apiCollectionEndpoint: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentWorkflowId'>;
 }
 

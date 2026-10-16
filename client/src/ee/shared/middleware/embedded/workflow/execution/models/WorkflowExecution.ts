@@ -64,44 +64,30 @@ import {
 export interface WorkflowExecution {
     /**
      * The id of a workflow execution.
-     * @type {number}
-     * @memberof WorkflowExecution
      */
     readonly id: number;
     /**
      * 
-     * @type {IntegrationBasic}
-     * @memberof WorkflowExecution
      */
     integration: IntegrationBasic;
     /**
      * 
-     * @type {IntegrationInstanceConfiguration}
-     * @memberof WorkflowExecution
      */
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
     /**
      * 
-     * @type {IntegrationInstanceBasic}
-     * @memberof WorkflowExecution
      */
     integrationInstance: IntegrationInstanceBasic;
     /**
      * 
-     * @type {Job}
-     * @memberof WorkflowExecution
      */
     job: Job;
     /**
      * 
-     * @type {TriggerExecution}
-     * @memberof WorkflowExecution
      */
     triggerExecution?: TriggerExecution;
     /**
      * 
-     * @type {WorkflowBasic}
-     * @memberof WorkflowExecution
      */
     workflow: WorkflowBasic;
 }

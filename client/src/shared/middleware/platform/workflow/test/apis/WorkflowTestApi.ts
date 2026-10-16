@@ -15,6 +15,9 @@
 import * as runtime from '../runtime';
 
 export interface StopWorkflowTestRequest {
+    /**
+     * The job identifier obtained from the start endpoint.
+     */
     jobId: string;
 }
 

@@ -40,48 +40,132 @@ import {
 } from '../models/UpdateWorkflowNodeParameterRequest';
 
 export interface DeleteClusterElementParameterOperationRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a cluster element type.
+     */
     clusterElementType: string;
+    /**
+     * The name of a cluster element workflow node name.
+     */
     clusterElementWorkflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * 
+     */
     deleteClusterElementParameterRequest: DeleteClusterElementParameterRequest;
 }
 
 export interface DeleteWorkflowNodeParameterRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * 
+     */
     deleteClusterElementParameterRequest: DeleteClusterElementParameterRequest;
 }
 
 export interface GetClusterElementParameterDisplayConditionsRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a cluster element type.
+     */
     clusterElementType: string;
+    /**
+     * The name of a cluster element workflow node name.
+     */
     clusterElementWorkflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 
 export interface GetWorkflowNodeParameterDisplayConditionsRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 
 export interface UpdateClusterElementParameterOperationRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a cluster element type.
+     */
     clusterElementType: string;
+    /**
+     * The name of a cluster element workflow node name.
+     */
     clusterElementWorkflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * 
+     */
     updateClusterElementParameterRequest: UpdateClusterElementParameterRequest;
 }
 
 export interface UpdateWorkflowNodeParameterOperationRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * 
+     */
     updateWorkflowNodeParameterRequest: UpdateWorkflowNodeParameterRequest;
 }
 

@@ -25,24 +25,54 @@ import {
 } from '../models/Environment';
 
 export interface CreateFrontendIntegrationInstanceOperationRequest {
+    /**
+     * The id of an integration.
+     */
     id: number;
+    /**
+     * 
+     */
     createFrontendIntegrationInstanceRequest: CreateFrontendIntegrationInstanceRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface CreateIntegrationInstanceRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The id of an integration.
+     */
     id: number;
+    /**
+     * 
+     */
     createFrontendIntegrationInstanceRequest: CreateFrontendIntegrationInstanceRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface DeleteFrontendIntegrationInstanceRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
 }
 
 export interface DeleteIntegrationInstanceRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The id of an integration instance.
+     */
     id: number;
 }
 

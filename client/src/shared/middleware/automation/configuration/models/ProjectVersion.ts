@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { ProjectStatus } from './ProjectStatus';
 import {
     ProjectStatusFromJSON,
@@ -29,26 +29,18 @@ import {
 export interface ProjectVersion {
     /**
      * The description of a project version
-     * @type {string}
-     * @memberof ProjectVersion
      */
     description?: string;
     /**
      * The published date.
-     * @type {Date}
-     * @memberof ProjectVersion
      */
     publishedDate?: Date;
     /**
      * The version of a project.
-     * @type {number}
-     * @memberof ProjectVersion
      */
     readonly version?: number;
     /**
      * 
-     * @type {ProjectStatus}
-     * @memberof ProjectVersion
      */
     status?: ProjectStatus;
 }
@@ -73,7 +65,7 @@ export function ProjectVersionFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         
         'description': json['description'] == null ? undefined : json['description'],
-        'publishedDate': json['publishedDate'] == null ? undefined : (new Date(json['publishedDate'])),
+        'publishedDate': json['publishedDate'] == null ? undefined : (parseDateTime(json['publishedDate'])),
         'version': json['version'] == null ? undefined : json['version'],
         'status': json['status'] == null ? undefined : ProjectStatusFromJSON(json['status']),
     };
@@ -91,7 +83,7 @@ export function ProjectVersionToJSONTyped(value?: Omit<ProjectVersion, 'version'
     return {
         
         'description': value['description'],
-        'publishedDate': value['publishedDate'] == null ? value['publishedDate'] : value['publishedDate'].toISOString(),
+        'publishedDate': value['publishedDate'] == null ? value['publishedDate'] : serializeDateTime(value['publishedDate']),
         'status': ProjectStatusToJSON(value['status']),
     };
 }

@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface CreateConnectionRequest {
     /**
      * 
-     * @type {string}
-     * @memberof CreateConnectionRequest
      */
     name: string;
     /**
      * The authorization type name; null for connections without authorization.
-     * @type {string}
-     * @memberof CreateConnectionRequest
      */
     authorizationType?: string;
     /**
      * 
-     * @type {number}
-     * @memberof CreateConnectionRequest
      */
     connectionVersion: number;
     /**
      * 
-     * @type {{ [key: string]: any; }}
-     * @memberof CreateConnectionRequest
      */
     parameters: { [key: string]: any; };
 }

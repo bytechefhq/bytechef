@@ -29,68 +29,46 @@ import {
 export interface ApprovalFormInput {
     /**
      * 
-     * @type {string}
-     * @memberof ApprovalFormInput
      */
     defaultValue?: string;
     /**
      * 
-     * @type {string}
-     * @memberof ApprovalFormInput
      */
     fieldDescription?: string;
     /**
      * 
-     * @type {string}
-     * @memberof ApprovalFormInput
      */
     fieldLabel?: string;
     /**
      * 
-     * @type {string}
-     * @memberof ApprovalFormInput
      */
     fieldName?: string;
     /**
      * 
-     * @type {Array<FieldOption>}
-     * @memberof ApprovalFormInput
      */
     fieldOptions?: Array<FieldOption>;
     /**
      * 
-     * @type {number}
-     * @memberof ApprovalFormInput
      */
     fieldType?: number;
     /**
      * 
-     * @type {number}
-     * @memberof ApprovalFormInput
      */
     maxSelection?: number;
     /**
      * 
-     * @type {number}
-     * @memberof ApprovalFormInput
      */
     minSelection?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof ApprovalFormInput
      */
     multipleChoice?: boolean;
     /**
      * 
-     * @type {string}
-     * @memberof ApprovalFormInput
      */
     placeholder?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof ApprovalFormInput
      */
     required?: boolean;
 }

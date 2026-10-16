@@ -25,7 +25,7 @@ export const UnifiedApiCategory = {
     Hris: 'HRIS',
     FileStorage: 'FILE_STORAGE',
     MarketingAutomation: 'MARKETING_AUTOMATION',
-    Ticketing: 'TICKETING'
+    Ticketing: 'TICKETING',
 } as const;
 export type UnifiedApiCategory = typeof UnifiedApiCategory[keyof typeof UnifiedApiCategory];
 

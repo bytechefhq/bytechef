@@ -30,6 +30,9 @@ import {
 } from '../models/OAuth2Properties';
 
 export interface GetOAuth2AuthorizationParametersOperationRequest {
+    /**
+     * 
+     */
     getOAuth2AuthorizationParametersRequest: GetOAuth2AuthorizationParametersRequest;
 }
 

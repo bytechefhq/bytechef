@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { IntegrationInstanceWorkflow } from './IntegrationInstanceWorkflow';
 import {
     IntegrationInstanceWorkflowFromJSON,
@@ -36,86 +36,58 @@ import {
 export interface IntegrationInstance {
     /**
      * The id of a connection.
-     * @type {number}
-     * @memberof IntegrationInstance
      */
     readonly connectionId: number;
     /**
      * The id of a connected user.
-     * @type {number}
-     * @memberof IntegrationInstance
      */
     readonly connectedUserId?: number;
     /**
      * The created by.
-     * @type {string}
-     * @memberof IntegrationInstance
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof IntegrationInstance
      */
     readonly createdDate?: Date;
     /**
      * If an integration instance is enabled or not.
-     * @type {boolean}
-     * @memberof IntegrationInstance
      */
     enabled?: boolean;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof IntegrationInstance
      */
     environmentId?: number;
     /**
      * The id of an integration instance.
-     * @type {number}
-     * @memberof IntegrationInstance
      */
     readonly id?: number;
     /**
      * The last execution date.
-     * @type {Date}
-     * @memberof IntegrationInstance
      */
     readonly lastExecutionDate?: Date;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof IntegrationInstance
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof IntegrationInstance
      */
     readonly lastModifiedDate?: Date;
     /**
      * Th id of an integration instance configuration.
-     * @type {number}
-     * @memberof IntegrationInstance
      */
     integrationInstanceConfigurationId?: number;
     /**
      * 
-     * @type {IntegrationInstanceConfigurationBasic}
-     * @memberof IntegrationInstance
      */
     integrationInstanceConfiguration?: IntegrationInstanceConfigurationBasic;
     /**
      * The array of integration instance workflows.
-     * @type {Array<IntegrationInstanceWorkflow>}
-     * @memberof IntegrationInstance
      */
     readonly integrationInstanceWorkflows?: Array<IntegrationInstanceWorkflow>;
     /**
      * 
-     * @type {number}
-     * @memberof IntegrationInstance
      */
     version?: number;
 }
@@ -141,13 +113,13 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
         'connectionId': json['connectionId'],
         'connectedUserId': json['connectedUserId'] == null ? undefined : json['connectedUserId'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
-        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'integrationInstanceConfigurationId': json['integrationInstanceConfigurationId'] == null ? undefined : json['integrationInstanceConfigurationId'],
         'integrationInstanceConfiguration': json['integrationInstanceConfiguration'] == null ? undefined : IntegrationInstanceConfigurationBasicFromJSON(json['integrationInstanceConfiguration']),
         'integrationInstanceWorkflows': json['integrationInstanceWorkflows'] == null ? undefined : ((json['integrationInstanceWorkflows'] as Array<any>).map(IntegrationInstanceWorkflowFromJSON)),

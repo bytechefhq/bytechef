@@ -21,74 +21,50 @@ import { mapValues } from '../runtime';
 export interface AiProvider {
     /**
      * The id of an AI provider.
-     * @type {number}
-     * @memberof AiProvider
      */
     readonly id?: number;
     /**
      * The name of an AI provider.
-     * @type {string}
-     * @memberof AiProvider
      */
     readonly name: string;
     /**
      * The icon of an AI provider.
-     * @type {string}
-     * @memberof AiProvider
      */
     readonly icon?: string;
     /**
      * The API key of an AI provider.
-     * @type {string}
-     * @memberof AiProvider
      */
     apiKey?: string;
     /**
      * The base URL of an AI provider (used by Ollama; blank defaults to localhost).
-     * @type {string}
-     * @memberof AiProvider
      */
     url?: string;
     /**
      * The enabled status of an AI provider.
-     * @type {boolean}
-     * @memberof AiProvider
      */
     enabled?: boolean;
     /**
      * Whether this AI provider requires an API key.
-     * @type {boolean}
-     * @memberof AiProvider
      */
     readonly requiresApiKey?: boolean;
     /**
      * Whether this AI provider requires a per-deployment endpoint URL.
-     * @type {boolean}
-     * @memberof AiProvider
      */
     readonly requiresEndpoint?: boolean;
     /**
      * Whether this AI provider can be used for text (chat) generation.
-     * @type {boolean}
-     * @memberof AiProvider
      */
     readonly supportsText?: boolean;
     /**
      * Whether this AI provider can be used for image generation.
-     * @type {boolean}
-     * @memberof AiProvider
      */
     readonly supportsImage?: boolean;
     /**
      * Whether this AI provider can be used for embeddings.
-     * @type {boolean}
-     * @memberof AiProvider
      */
     readonly supportsEmbeddings?: boolean;
     /**
      * Whether this AI provider is the one used to embed the shared Copilot documentation.
-     * @type {boolean}
-     * @memberof AiProvider
      */
     readonly copilotDocsProvider?: boolean;
 }

@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface CreateIntegrationInstanceConfigurationWorkflowJob200Response {
     /**
      * The id of an executed job.
-     * @type {number}
-     * @memberof CreateIntegrationInstanceConfigurationWorkflowJob200Response
      */
     jobId?: number;
 }

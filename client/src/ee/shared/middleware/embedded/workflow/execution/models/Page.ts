@@ -21,38 +21,26 @@ import { mapValues } from '../runtime';
 export interface Page {
     /**
      * The current page.
-     * @type {number}
-     * @memberof Page
      */
     number?: number;
     /**
      * The size of the page.
-     * @type {number}
-     * @memberof Page
      */
     size?: number;
     /**
      * The number of elements.
-     * @type {number}
-     * @memberof Page
      */
     numberOfElements?: number;
     /**
      * The total number of pages.
-     * @type {number}
-     * @memberof Page
      */
     totalPages?: number;
     /**
      * The total number of elements.
-     * @type {number}
-     * @memberof Page
      */
     totalElements?: number;
     /**
      * The list of elements.
-     * @type {Array<object>}
-     * @memberof Page
      */
     content?: Array<object>;
 }

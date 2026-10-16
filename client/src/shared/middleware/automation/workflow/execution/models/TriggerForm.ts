@@ -29,56 +29,38 @@ import {
 export interface TriggerForm {
     /**
      * 
-     * @type {string}
-     * @memberof TriggerForm
      */
     buttonLabel?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TriggerForm
      */
     customFormStyling?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TriggerForm
      */
     formDescription?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TriggerForm
      */
     formPath?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TriggerForm
      */
     formTitle?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof TriggerForm
      */
     appendAttribution?: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof TriggerForm
      */
     ignoreBots?: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof TriggerForm
      */
     useWorkflowTimezone?: boolean;
     /**
      * 
-     * @type {Array<TriggerFormInput>}
-     * @memberof TriggerForm
      */
     inputs?: Array<TriggerFormInput>;
 }

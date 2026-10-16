@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * Contains generated key required for calling API.
  * @export
@@ -21,50 +21,34 @@ import { mapValues } from '../runtime';
 export interface ApiClient {
     /**
      * The created by.
-     * @type {string}
-     * @memberof ApiClient
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof ApiClient
      */
     readonly createdDate?: Date;
     /**
      * The id of an API key.
-     * @type {number}
-     * @memberof ApiClient
      */
     readonly id?: number;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof ApiClient
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof ApiClient
      */
     readonly lastModifiedDate?: Date;
     /**
      * The last used date.
-     * @type {Date}
-     * @memberof ApiClient
      */
     readonly lastUsedDate?: Date;
     /**
      * The name of an API key.
-     * @type {string}
-     * @memberof ApiClient
      */
     name: string;
     /**
      * The preview of secret API key.
-     * @type {string}
-     * @memberof ApiClient
      */
     readonly secretKey: string;
 }
@@ -89,11 +73,11 @@ export function ApiClientFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
-        'lastUsedDate': json['lastUsedDate'] == null ? undefined : (new Date(json['lastUsedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
+        'lastUsedDate': json['lastUsedDate'] == null ? undefined : (parseDateTime(json['lastUsedDate'])),
         'name': json['name'],
         'secretKey': json['secretKey'],
     };

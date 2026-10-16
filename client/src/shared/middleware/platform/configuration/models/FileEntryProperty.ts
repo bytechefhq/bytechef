@@ -50,8 +50,6 @@ import {
 export interface FileEntryProperty extends ValueProperty {
     /**
      * The list of valid file entry property types.
-     * @type {Array<Property>}
-     * @memberof FileEntryProperty
      */
     properties?: Array<Property>;
 }

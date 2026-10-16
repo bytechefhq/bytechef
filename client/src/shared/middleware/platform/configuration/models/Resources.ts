@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface Resources {
     /**
      * The url of available documentation.
-     * @type {string}
-     * @memberof Resources
      */
     documentationUrl?: string;
 }

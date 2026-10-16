@@ -29,26 +29,18 @@ import {
 export interface GetOAuth2AuthorizationParametersRequest {
     /**
      * 
-     * @type {AuthorizationType}
-     * @memberof GetOAuth2AuthorizationParametersRequest
      */
     authorizationType: AuthorizationType;
     /**
      * The name of a component that uses this connection.
-     * @type {string}
-     * @memberof GetOAuth2AuthorizationParametersRequest
      */
     componentName: string;
     /**
      * The version of a connection.
-     * @type {number}
-     * @memberof GetOAuth2AuthorizationParametersRequest
      */
     connectionVersion?: number;
     /**
      * The parameters of a connection.
-     * @type {{ [key: string]: any; }}
-     * @memberof GetOAuth2AuthorizationParametersRequest
      */
     parameters: { [key: string]: any; };
 }

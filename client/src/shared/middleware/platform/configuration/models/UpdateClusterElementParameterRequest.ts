@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface UpdateClusterElementParameterRequest {
     /**
      * If fromAi should be included in metadata.
-     * @type {boolean}
-     * @memberof UpdateClusterElementParameterRequest
      */
     fromAiInMetadata?: boolean;
     /**
      * If path and value type should be included in metadata.
-     * @type {boolean}
-     * @memberof UpdateClusterElementParameterRequest
      */
     includeInMetadata?: boolean;
     /**
      * The workflow node parameter path.
-     * @type {string}
-     * @memberof UpdateClusterElementParameterRequest
      */
     path: string;
     /**
      * The type of a property.
-     * @type {string}
-     * @memberof UpdateClusterElementParameterRequest
      */
     type: string;
     /**
      * The value.
-     * @type {object}
-     * @memberof UpdateClusterElementParameterRequest
      */
     value?: object;
 }

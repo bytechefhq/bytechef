@@ -20,26 +20,53 @@ import {
 } from '../models/ApiCollection';
 
 export interface CreateApiCollectionRequest {
+    /**
+     * 
+     */
     apiCollection: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentId'>;
 }
 
 export interface DeleteApiCollectionRequest {
+    /**
+     * The id of an API collection.
+     */
     id: number;
 }
 
 export interface GetApiCollectionRequest {
+    /**
+     * The id of an API collection.
+     */
     id: number;
 }
 
 export interface GetWorkspaceApiCollectionsRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
+    /**
+     * The environment id.
+     */
     environmentId?: number;
+    /**
+     * The project ids used for filtering project deployments.
+     */
     projectId?: number;
+    /**
+     * The tag id of used for filtering project deployments.
+     */
     tagId?: number;
 }
 
 export interface UpdateApiCollectionRequest {
+    /**
+     * The id of an API collection.
+     */
     id: number;
+    /**
+     * 
+     */
     apiCollection: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentId'>;
 }
 

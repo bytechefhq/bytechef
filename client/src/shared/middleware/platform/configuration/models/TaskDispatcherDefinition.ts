@@ -36,74 +36,50 @@ import {
 export interface TaskDispatcherDefinition {
     /**
      * The description.
-     * @type {string}
-     * @memberof TaskDispatcherDefinition
      */
     description?: string;
     /**
      * The icon.
-     * @type {string}
-     * @memberof TaskDispatcherDefinition
      */
     icon?: string;
     /**
      * The task dispatcher name..
-     * @type {string}
-     * @memberof TaskDispatcherDefinition
      */
     name: string;
     /**
      * Does task dispatcher defines output.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinition
      */
     outputDefined: boolean;
     /**
      * Does task dispatcher defines output function.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinition
      */
     outputFunctionDefined?: boolean;
     /**
      * Does task dispatcher defines output schema.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinition
      */
     outputSchemaDefined?: boolean;
     /**
      * The list of task dispatcher properties.
-     * @type {Array<Property>}
-     * @memberof TaskDispatcherDefinition
      */
     properties?: Array<Property>;
     /**
      * 
-     * @type {Resources}
-     * @memberof TaskDispatcherDefinition
      */
     resources?: Resources;
     /**
      * Properties used to define tasks to be dispatched.
-     * @type {Array<Property>}
-     * @memberof TaskDispatcherDefinition
      */
     taskProperties?: Array<Property>;
     /**
      * The title
-     * @type {string}
-     * @memberof TaskDispatcherDefinition
      */
     title?: string;
     /**
      * Does task dispatcher define dynamic variable properties.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinition
      */
     variablePropertiesDefined?: boolean;
     /**
      * The version of a task dispatcher.
-     * @type {number}
-     * @memberof TaskDispatcherDefinition
      */
     version: number;
 }

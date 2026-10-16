@@ -35,51 +35,108 @@ import {
 } from '../models/PublishProjectRequest';
 
 export interface CreateProjectRequest {
+    /**
+     * 
+     */
     project: Project;
 }
 
 export interface DeleteProjectRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
 }
 
 export interface DuplicateProjectRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
 }
 
 export interface ExportProjectRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
 }
 
 export interface GetProjectRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
 }
 
 export interface GetProjectVersionsRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
 }
 
 export interface GetWorkspaceProjectsRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
+    /**
+     * Use for filtering API Collection based projects.
+     */
     apiCollections?: boolean;
+    /**
+     * The category id used for filtering projects.
+     */
     categoryId?: number;
+    /**
+     * Use for including all fields or just basic ones.
+     */
     includeAllFields?: boolean;
+    /**
+     * Use for filtering projects for which project deployments exist.
+     */
     projectDeployments?: boolean;
+    /**
+     * Use for filtering projects per status.
+     */
     status?: ProjectStatus;
+    /**
+     * The tag id of used for filtering projects.
+     */
     tagId?: number;
 }
 
 export interface ImportProjectRequest {
+    /**
+     * The id of the workspace.
+     */
     workspaceId: number;
+    /**
+     * 
+     */
     file: Blob;
 }
 
 export interface PublishProjectOperationRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * 
+     */
     publishProjectRequest?: PublishProjectRequest;
 }
 
 export interface UpdateProjectRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * 
+     */
     project: Project;
 }
 
@@ -265,7 +322,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Export project as a zip file.
      * Export project.
      */
-    async exportProjectRaw(requestParameters: ExportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+    async exportProjectRaw(requestParameters: ExportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<runtime.HttpFile>> {
         const requestOptions = await this.exportProjectRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
@@ -276,7 +333,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Export project as a zip file.
      * Export project.
      */
-    async exportProject(requestParameters: ExportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+    async exportProject(requestParameters: ExportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.HttpFile> {
         const response = await this.exportProjectRaw(requestParameters, initOverrides);
         return await response.value();
     }

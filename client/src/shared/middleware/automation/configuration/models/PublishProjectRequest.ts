@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface PublishProjectRequest {
     /**
      * The description of a project version.
-     * @type {string}
-     * @memberof PublishProjectRequest
      */
     description?: string;
 }

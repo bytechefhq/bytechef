@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface CreateFrontendProjectWorkflowFromPromptRequest {
     /**
      * Natural language description of the workflow to build.
-     * @type {string}
-     * @memberof CreateFrontendProjectWorkflowFromPromptRequest
      */
     prompt: string;
     /**
      * Optional additional instructions for the AI, merged as a non-overriding advisory block into the workflow-builder agent's system prompt.
-     * @type {string}
-     * @memberof CreateFrontendProjectWorkflowFromPromptRequest
      */
     systemPrompt?: string;
 }

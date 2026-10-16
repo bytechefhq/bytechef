@@ -29,26 +29,18 @@ import {
 export interface ApprovalForm {
     /**
      * 
-     * @type {number}
-     * @memberof ApprovalForm
      */
     environmentId?: number;
     /**
      * 
-     * @type {string}
-     * @memberof ApprovalForm
      */
     formDescription?: string;
     /**
      * 
-     * @type {string}
-     * @memberof ApprovalForm
      */
     formTitle?: string;
     /**
      * 
-     * @type {Array<ApprovalFormInput>}
-     * @memberof ApprovalForm
      */
     inputs?: Array<ApprovalFormInput>;
 }

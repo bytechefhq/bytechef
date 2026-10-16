@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface AutomationWorkflowProjectComponent {
     /**
      * The name of the component.
-     * @type {string}
-     * @memberof AutomationWorkflowProjectComponent
      */
     name?: string;
     /**
      * The title of the component.
-     * @type {string}
-     * @memberof AutomationWorkflowProjectComponent
      */
     title?: string;
     /**
      * The icon of the component.
-     * @type {string}
-     * @memberof AutomationWorkflowProjectComponent
      */
     icon?: string;
     /**
      * Whether the component needs a connection before the workflow can run.
-     * @type {boolean}
-     * @memberof AutomationWorkflowProjectComponent
      */
     connectionRequired?: boolean;
     /**
      * The id of the integration that backs this component in the current environment, absent when no enabled integration configuration visible to the connected user exists for it; present only when connectionRequired is true. When several integrations back the component, the one with the lowest id is returned.
-     * @type {number}
-     * @memberof AutomationWorkflowProjectComponent
      */
     integrationId?: number;
 }

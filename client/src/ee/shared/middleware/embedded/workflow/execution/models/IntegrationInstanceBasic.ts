@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * Contains configurations and connections required for the execution of integration workflows for a connected user.
  * @export
@@ -21,68 +21,46 @@ import { mapValues } from '../runtime';
 export interface IntegrationInstanceBasic {
     /**
      * The id of a connection.
-     * @type {number}
-     * @memberof IntegrationInstanceBasic
      */
     readonly connectionId: number;
     /**
      * The id of a connected user.
-     * @type {number}
-     * @memberof IntegrationInstanceBasic
      */
     readonly connectedUserId?: number;
     /**
      * The created by.
-     * @type {string}
-     * @memberof IntegrationInstanceBasic
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof IntegrationInstanceBasic
      */
     readonly createdDate?: Date;
     /**
      * If an integration instance is enabled or not.
-     * @type {boolean}
-     * @memberof IntegrationInstanceBasic
      */
     enabled?: boolean;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof IntegrationInstanceBasic
      */
     environmentId?: number;
     /**
      * The id of an integration instance.
-     * @type {number}
-     * @memberof IntegrationInstanceBasic
      */
     readonly id?: number;
     /**
      * The last execution date.
-     * @type {Date}
-     * @memberof IntegrationInstanceBasic
      */
     readonly lastExecutionDate?: Date;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof IntegrationInstanceBasic
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof IntegrationInstanceBasic
      */
     readonly lastModifiedDate?: Date;
     /**
      * Th id of an integration instance configuration.
-     * @type {number}
-     * @memberof IntegrationInstanceBasic
      */
     integrationInstanceConfigurationId?: number;
 }
@@ -108,13 +86,13 @@ export function IntegrationInstanceBasicFromJSONTyped(json: any, ignoreDiscrimin
         'connectionId': json['connectionId'],
         'connectedUserId': json['connectedUserId'] == null ? undefined : json['connectedUserId'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
-        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'integrationInstanceConfigurationId': json['integrationInstanceConfigurationId'] == null ? undefined : json['integrationInstanceConfigurationId'],
     };
 }

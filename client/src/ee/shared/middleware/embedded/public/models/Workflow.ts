@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface Workflow {
     /**
      * The description of a workflow.
-     * @type {string}
-     * @memberof Workflow
      */
     description?: string;
     /**
      * The definition of a workflow.
-     * @type {string}
-     * @memberof Workflow
      */
     definition?: string;
     /**
      * The label of a workflow.
-     * @type {string}
-     * @memberof Workflow
      */
     label?: string;
     /**
      * The reference code of a workflow.
-     * @type {string}
-     * @memberof Workflow
      */
     workflowUuid?: string;
 }

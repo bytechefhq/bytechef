@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface DeleteClusterElementParameter200Response {
     /**
      * Key-value map of metadata.
-     * @type {{ [key: string]: any; }}
-     * @memberof DeleteClusterElementParameter200Response
      */
     metadata?: { [key: string]: any; };
     /**
      * Key-value map of parameters.
-     * @type {{ [key: string]: any; }}
-     * @memberof DeleteClusterElementParameter200Response
      */
     parameters?: { [key: string]: any; };
     /**
      * Key-value map of display condition rules.
-     * @type {{ [key: string]: boolean; }}
-     * @memberof DeleteClusterElementParameter200Response
      */
     displayConditions?: { [key: string]: boolean; };
     /**
      * 
-     * @type {Array<string>}
-     * @memberof DeleteClusterElementParameter200Response
      */
     missingRequiredProperties?: Array<string>;
     /**
      * The updated workflow version.
-     * @type {number}
-     * @memberof DeleteClusterElementParameter200Response
      */
     version?: number;
 }
