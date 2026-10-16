@@ -156,8 +156,12 @@ class _InputDefinitionRequired(TypedDict):
 
 class InputDefinition(_InputDefinitionRequired, total=False):
     """A workflow input. At run time it arrives in ``context.input()`` under its own name. ``type`` defaults to
-    ``STRING``."""
+    ``STRING``. ``componentName``, ``componentVersion`` and ``groupName`` together point at a component's declared
+    input, for example Slack's ``channel``, so the input offers that input's options."""
 
+    componentName: str
+    componentVersion: int
+    groupName: str
     label: str
     required: bool
     type: InputType
