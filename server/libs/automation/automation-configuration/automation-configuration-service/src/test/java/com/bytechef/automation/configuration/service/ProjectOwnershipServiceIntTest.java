@@ -17,26 +17,35 @@
 package com.bytechef.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.config.TestOwnerContributors;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -179,6 +188,97 @@ public class ProjectOwnershipServiceIntTest {
     @Test
     public void testGetOwnedProjectIdsWithEmptyIdsReturnsEmpty() {
         assertThat(projectOwnershipService.getOwnedProjectIds(List.of(), ProjectOwner.EMBEDDED_CATALOG)).isEmpty();
+    }
+
+    @Test
+    public void testLogOwnersWithoutContributorNamesTheUnclaimedOwners() {
+        ListAppender<ILoggingEvent> appender = attachAppender();
+
+        try {
+            new ProjectOwnershipServiceImpl(
+                jdbcClient, List.of(deploymentOwnerContributor(ProjectDeploymentOwner.EMBEDDED)),
+                List.of(projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER))).logOwnersWithoutContributor();
+
+            assertThat(appender.list).extracting(ILoggingEvent::getLevel, ILoggingEvent::getFormattedMessage)
+                .containsExactly(
+                    tuple(
+                        Level.INFO,
+                        "Project owners without a contributor, whose rows are not hidden: [EMBEDDED_CATALOG]; " +
+                            "project deployment owners: [API_COLLECTION, A2A_SERVER, MCP_SERVER]"));
+        } finally {
+            detachAppender(appender);
+        }
+    }
+
+    @Test
+    public void testLogOwnersWithoutContributorLogsNothingWhenEveryOwnerHasOne() {
+        ListAppender<ILoggingEvent> appender = attachAppender();
+
+        try {
+            List<ProjectDeploymentOwnerContributor> projectDeploymentOwnerContributors = Arrays
+                .stream(ProjectDeploymentOwner.values())
+                .map(ProjectOwnershipServiceIntTest::deploymentOwnerContributor)
+                .toList();
+            List<ProjectOwnerContributor> projectOwnerContributors = Arrays.stream(ProjectOwner.values())
+                .map(ProjectOwnershipServiceIntTest::projectOwnerContributor)
+                .toList();
+
+            new ProjectOwnershipServiceImpl(jdbcClient, projectDeploymentOwnerContributors, projectOwnerContributors)
+                .logOwnersWithoutContributor();
+
+            assertThat(appender.list).isEmpty();
+        } finally {
+            detachAppender(appender);
+        }
+    }
+
+    private static ListAppender<ILoggingEvent> attachAppender() {
+        Logger logger = (Logger) LoggerFactory.getLogger(ProjectOwnershipServiceImpl.class);
+
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+
+        appender.start();
+        logger.addAppender(appender);
+
+        return appender;
+    }
+
+    private static void detachAppender(ListAppender<ILoggingEvent> appender) {
+        Logger logger = (Logger) LoggerFactory.getLogger(ProjectOwnershipServiceImpl.class);
+
+        logger.detachAppender(appender);
+    }
+
+    private static ProjectDeploymentOwnerContributor deploymentOwnerContributor(
+        ProjectDeploymentOwner projectDeploymentOwner) {
+
+        return new ProjectDeploymentOwnerContributor() {
+
+            @Override
+            public ProjectDeploymentOwner getProjectDeploymentOwner() {
+                return projectDeploymentOwner;
+            }
+
+            @Override
+            public String getProjectDeploymentClaimCondition(String projectDeploymentIdColumn) {
+                return "1 = 0";
+            }
+        };
+    }
+
+    private static ProjectOwnerContributor projectOwnerContributor(ProjectOwner projectOwner) {
+        return new ProjectOwnerContributor() {
+
+            @Override
+            public ProjectOwner getProjectOwner() {
+                return projectOwner;
+            }
+
+            @Override
+            public String getProjectClaimCondition(String projectIdColumn) {
+                return "1 = 0";
+            }
+        };
     }
 
     private long saveProject(String name) {

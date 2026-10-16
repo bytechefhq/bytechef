@@ -20,10 +20,16 @@ import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class ProjectOwnershipServiceImpl implements ProjectOwnershipService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectOwnershipServiceImpl.class);
 
     private static final int CHUNK_SIZE = 1000;
     private static final String MATCH_EVERYTHING = "1 = 1";
@@ -50,6 +58,32 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService {
         this.jdbcClient = jdbcClient;
         this.projectDeploymentOwnerContributors = List.copyOf(projectDeploymentOwnerContributors);
         this.projectOwnerContributors = List.copyOf(projectOwnerContributors);
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void logOwnersWithoutContributor() {
+        Set<ProjectOwner> contributedProjectOwners = projectOwnerContributors.stream()
+            .map(ProjectOwnerContributor::getProjectOwner)
+            .collect(Collectors.toSet());
+        Set<ProjectDeploymentOwner> contributedProjectDeploymentOwners = projectDeploymentOwnerContributors.stream()
+            .map(ProjectDeploymentOwnerContributor::getProjectDeploymentOwner)
+            .collect(Collectors.toSet());
+
+        List<ProjectOwner> projectOwnersWithoutContributor = Arrays.stream(ProjectOwner.values())
+            .filter(projectOwner -> !contributedProjectOwners.contains(projectOwner))
+            .toList();
+        List<ProjectDeploymentOwner> projectDeploymentOwnersWithoutContributor =
+            Arrays.stream(ProjectDeploymentOwner.values())
+                .filter(projectDeploymentOwner -> !contributedProjectDeploymentOwners.contains(projectDeploymentOwner))
+                .toList();
+
+        if (projectOwnersWithoutContributor.isEmpty() && projectDeploymentOwnersWithoutContributor.isEmpty()) {
+            return;
+        }
+
+        logger.info(
+            "Project owners without a contributor, whose rows are not hidden: {}; project deployment owners: {}",
+            projectOwnersWithoutContributor, projectDeploymentOwnersWithoutContributor);
     }
 
     @Override
