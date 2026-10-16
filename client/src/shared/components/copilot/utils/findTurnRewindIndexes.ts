@@ -39,12 +39,6 @@ function findUserMessageIndexFromEnd(messages: readonly RoleMessageI[], userMess
     return -1;
 }
 
-/**
- * Resolves the user message that starts the turn containing the UI message at `fromIndex`, both in the UI messages
- * and in the agent transcript. One turn can render as several assistant messages and the agent keeps its own
- * assistant and tool messages, so the two lists are matched by user message, counted from the end: after a restored
- * conversation the agent only holds the latest turns.
- */
 export function findTurnRewindIndexes(
     messages: readonly RoleMessageI[],
     agentMessages: readonly RoleMessageI[],
