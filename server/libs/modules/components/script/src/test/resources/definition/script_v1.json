@@ -1548,7 +1548,7 @@
     "properties": [ {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "function perform(input, context) {\n    // input holds the values defined in the Input panel (top right of this editor).\n    //\n    // Reach another component's action through the context:\n    // const response = context.component.httpClient.get(\n    //     {uri: \"https://api.example.com/items\"}, \"my-connection\");\n\n    return null;\n}",
+      "defaultValue": "function perform(input, context) {\n    // input.item holds the item being processed.\n    //\n    // Reach another component's action through the context:\n    // const response = context.component.httpClient.get(\n    //     {uri: \"https://api.example.com/items\"});\n\n    return null;\n}",
       "description": "Custom JavaScript code to process items. The item is available as 'item' parameter.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1586,7 +1586,7 @@
     "properties": [ {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context):\n    # input holds the values defined in the Input panel (top right of this editor).\n    #\n    # Reach another component's action through the context:\n    # response = context.component.httpClient.get(\n    #     {\"uri\": \"https://api.example.com/items\"}, \"my-connection\")\n\n    return None",
+      "defaultValue": "def perform(input, context):\n    # input.item holds the item being processed.\n    #\n    # Reach another component's action through the context:\n    # response = context.component.httpClient.get(\n    #     {\"uri\": \"https://api.example.com/items\"})\n\n    return None",
       "description": "Custom Python code to process items. The item is available as 'item' parameter.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1624,7 +1624,7 @@
     "properties": [ {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context)\n  # input holds the values defined in the Input panel (top right of this editor).\n  #\n  # Reach another component's action through the context:\n  # response = context.component.httpClient.get(\n  #   { \"uri\" => \"https://api.example.com/items\" }, \"my-connection\")\n\n  return nil\nend",
+      "defaultValue": "def perform(input, context)\n  # input.item holds the item being processed.\n  #\n  # Reach another component's action through the context:\n  # response = context.component.httpClient.get(\n  #   { \"uri\" => \"https://api.example.com/items\" })\n\n  return nil\nend",
       "description": "Custom Ruby code to process items. The item is available as 'item' parameter.",
       "displayCondition": null,
       "exampleValue": null,
