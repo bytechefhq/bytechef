@@ -71,10 +71,6 @@ public interface ProjectWorkflowService {
 
     List<ProjectWorkflow> getWorkflowProjectWorkflows(List<String> workflowIds);
 
-    /**
-     * Returns the project workflows of every project version that carry the given workflow uuid, or an empty list when
-     * the value is not a uuid.
-     */
     List<ProjectWorkflow> getWorkflowUuidProjectWorkflows(String workflowUuid);
 
     void publishWorkflow(long projectId, int oldProjectVersion, String oldWorkflowId, ProjectWorkflow projectWorkflow);
