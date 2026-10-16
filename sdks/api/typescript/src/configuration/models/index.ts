@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AuthorizationType.js';
+export * from './AutomationComponentInputOptionsRequest.js';
 export * from './AutomationProjectCodeWorkflow.js';
 export * from './AutomationProjectCodeWorkflowDeployResult.js';
 export * from './AutomationProjectCodeWorkflowTemplate.js';
