@@ -20,8 +20,6 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,7 +63,13 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
 
     @Override
     @PreAuthorize("hasEmbeddedScope('CONNECTED_USER_VIEW')")
-    public List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationWorkflowUuids) {
+    public List<ConnectedUserWorkflowReferenceDTO> getReferences(
+        Set<String> automationWorkflowUuids, Environment environment) {
+
+        if (!permissionService.hasEmbeddedScope(CONNECTED_USER_VIEW, environment)) {
+            return List.of();
+        }
+
         List<ConnectedUserProjectWorkflow> references =
             connectedUserProjectWorkflowRepository.findAllByAutomationWorkflowUuidIn(automationWorkflowUuids);
 
@@ -99,32 +103,17 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
             .stream()
             .collect(Collectors.toMap(ProjectWorkflow::getId, ProjectWorkflow::getWorkflowId));
 
-        Map<Environment, Boolean> canViewByEnvironment = new HashMap<>();
-        List<ConnectedUserWorkflowReferenceDTO> referenceDTOs = new ArrayList<>();
+        return references.stream()
+            .filter(reference -> {
+                ConnectedUserProject connectedUserProject = connectedUserProjectMap.get(
+                    reference.getConnectedUserProjectId());
 
-        for (ConnectedUserProjectWorkflow reference : references) {
-            ConnectedUser connectedUser = getConnectedUser(reference, connectedUserProjectMap, connectedUserMap);
+                ConnectedUser connectedUser = connectedUserMap.get(connectedUserProject.getConnectedUserId());
 
-            boolean canView = canViewByEnvironment.computeIfAbsent(
-                connectedUser.getEnvironment(),
-                environment -> permissionService.hasEmbeddedScope(CONNECTED_USER_VIEW, environment));
-
-            if (canView) {
-                referenceDTOs.add(toDTO(reference, connectedUserProjectMap, connectedUserMap, workflowIds));
-            }
-        }
-
-        return referenceDTOs;
-    }
-
-    private static ConnectedUser getConnectedUser(
-        ConnectedUserProjectWorkflow reference, Map<Long, ConnectedUserProject> connectedUserProjectMap,
-        Map<Long, ConnectedUser> connectedUserMap) {
-
-        ConnectedUserProject connectedUserProject = connectedUserProjectMap.get(
-            reference.getConnectedUserProjectId());
-
-        return connectedUserMap.get(connectedUserProject.getConnectedUserId());
+                return connectedUser.getEnvironment() == environment;
+            })
+            .map(reference -> toDTO(reference, connectedUserProjectMap, connectedUserMap, workflowIds))
+            .toList();
     }
 
     private ConnectedUserWorkflowReferenceDTO toDTO(
