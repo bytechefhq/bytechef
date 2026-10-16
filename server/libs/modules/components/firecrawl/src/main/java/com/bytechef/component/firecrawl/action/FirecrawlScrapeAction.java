@@ -266,6 +266,7 @@ public class FirecrawlScrapeAction {
                                         string("description"),
                                         string("language"),
                                         string("sourceURL"),
+                                        string("scrapeId"),
                                         string("keywords"),
                                         integer("statusCode"),
                                         string("error")),
