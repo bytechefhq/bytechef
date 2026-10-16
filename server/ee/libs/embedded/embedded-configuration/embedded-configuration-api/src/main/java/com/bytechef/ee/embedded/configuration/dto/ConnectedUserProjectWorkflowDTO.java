@@ -72,6 +72,13 @@ public record ConnectedUserProjectWorkflowDTO(
             attentionReason, null);
     }
 
+    public ConnectedUserProjectWorkflowDTO withAttentionReason(@Nullable String attentionReason) {
+        return new ConnectedUserProjectWorkflowDTO(
+            id, connectedUserId, enabled, lastExecutionDate, projectId, workflow, workflowUuid, workflowVersion, kind,
+            automationWorkflowUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues,
+            attentionReason, staticWebhookUrl);
+    }
+
     /**
      * @param staticWebhookUrl the url that starts the workflow through its static webhook trigger, {@code null} if it
      *                         has none

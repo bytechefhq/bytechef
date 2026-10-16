@@ -56,6 +56,7 @@ class ConnectedUserReferenceDeploymentManager {
     private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserService connectedUserService;
     private final ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver;
+    private final ConnectedUserWorkflowValidator connectedUserWorkflowValidator;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -68,13 +69,15 @@ class ConnectedUserReferenceDeploymentManager {
         ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
         ConnectedUserService connectedUserService,
         ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver,
-        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
+        ConnectedUserWorkflowValidator connectedUserWorkflowValidator, ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
         this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.connectedUserService = connectedUserService;
         this.connectedUserWorkflowConnectionResolver = connectedUserWorkflowConnectionResolver;
+        this.connectedUserWorkflowValidator = connectedUserWorkflowValidator;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
@@ -249,10 +252,13 @@ class ConnectedUserReferenceDeploymentManager {
 
         String missingInputName = findMissingRequiredInput(workflowId, inputs);
 
-        boolean enabled = enable && resolved.isComplete() && missingInputName == null;
+        int workflowErrorCount = enable ? getWorkflowErrorCount(connectedUserId, workflowId) : 0;
+
+        boolean enabled = enable && resolved.isComplete() && missingInputName == null && workflowErrorCount == 0;
 
         return new ReferenceResolution(
-            new RowSpec(resolved, enabled, null), resolved.firstMissingComponentName(), missingInputName);
+            new RowSpec(resolved, enabled, null), resolved.firstMissingComponentName(), missingInputName,
+            workflowErrorCount);
     }
 
     public void updateInputs(long projectDeploymentId, String automationWorkflowUuid, Map<String, ?> inputs) {
@@ -310,6 +316,12 @@ class ConnectedUserReferenceDeploymentManager {
 
     private static String getDeploymentName(String externalUserId, Environment environment) {
         return MARKER + externalUserId + "__" + environment.name();
+    }
+
+    private int getWorkflowErrorCount(long connectedUserId, String workflowId) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        return connectedUserWorkflowValidator.getErrorCount(workflowId, connectedUser.getEnvironment());
     }
 
     private Map<String, ProjectDeploymentWorkflow> getRowsByAutomationWorkflowUuid(long projectDeploymentId) {
@@ -386,7 +398,8 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     public record ReferenceResolution(
-        RowSpec rowSpec, @Nullable String missingComponentName, @Nullable String missingInputName) {
+        RowSpec rowSpec, @Nullable String missingComponentName, @Nullable String missingInputName,
+        int workflowErrorCount) {
     }
 
     @SuppressFBWarnings("EI")

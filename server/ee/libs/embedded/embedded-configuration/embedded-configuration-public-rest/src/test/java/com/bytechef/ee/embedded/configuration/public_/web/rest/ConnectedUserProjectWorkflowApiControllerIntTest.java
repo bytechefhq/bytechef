@@ -30,6 +30,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflo
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowTemplateNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledException;
+import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
@@ -529,6 +530,24 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .expectBody()
             .jsonPath("$.missingInputName")
             .isEqualTo("channel");
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testEnableInvalidWorkflowReturns409WithTheErrorCount() {
+        doThrow(new InvalidWorkflowException(WORKFLOW_UUID, 2))
+            .when(connectedUserProjectFacade)
+            .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any());
+
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isEqualTo(409)
+            .expectBody()
+            .jsonPath("$.invalidWorkflowErrorCount")
+            .isEqualTo(2);
     }
 
     @Test

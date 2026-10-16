@@ -33,20 +33,23 @@ import org.springframework.stereotype.Component;
 class ConnectedUserReferenceAttentionResolver {
 
     static final String INPUT_REQUIRED_PREFIX = "INPUT_REQUIRED:";
+    static final String INVALID_WORKFLOW_PREFIX = "INVALID_WORKFLOW:";
     static final String MISSING_CONNECTION_PREFIX = "MISSING_CONNECTION:";
     static final String UPDATE_PENDING = "UPDATE_PENDING";
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserReferenceAttentionResolver.class);
 
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
+    private final ConnectedUserWorkflowValidator connectedUserWorkflowValidator;
     private final WorkflowConnectionSlot workflowConnectionSlot;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserReferenceAttentionResolver(
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
-        WorkflowConnectionSlot workflowConnectionSlot) {
+        ConnectedUserWorkflowValidator connectedUserWorkflowValidator, WorkflowConnectionSlot workflowConnectionSlot) {
 
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
+        this.connectedUserWorkflowValidator = connectedUserWorkflowValidator;
         this.workflowConnectionSlot = workflowConnectionSlot;
     }
 
@@ -123,7 +126,11 @@ class ConnectedUserReferenceAttentionResolver {
         String missingInputName = connectedUserReferenceDeploymentManager.findMissingRequiredInput(
             workflowId.get(), projectDeploymentWorkflow.getInputs());
 
-        return missingInputName == null ? null : INPUT_REQUIRED_PREFIX + missingInputName;
+        if (missingInputName != null) {
+            return INPUT_REQUIRED_PREFIX + missingInputName;
+        }
+
+        return connectedUserWorkflowValidator.getAttentionReason(workflowId.get(), projectDeployment.getEnvironment());
     }
 
     @SuppressFBWarnings("EI")
