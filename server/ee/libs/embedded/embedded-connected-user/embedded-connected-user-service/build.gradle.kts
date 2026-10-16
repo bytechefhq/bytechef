@@ -9,4 +9,6 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
 
     testImplementation("org.mockito:mockito-core")
+
+    testRuntimeOnly("com.h2database:h2")
 }
