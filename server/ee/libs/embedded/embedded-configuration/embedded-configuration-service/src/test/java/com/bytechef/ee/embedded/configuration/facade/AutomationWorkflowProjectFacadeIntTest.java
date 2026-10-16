@@ -81,6 +81,7 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
@@ -1242,6 +1243,42 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         assertThat(hubspotTrigger.connectionRequired()).isTrue();
         assertThat(hubspotTrigger.integrationId()).isEqualTo(integrationId);
+    }
+
+    @Test
+    void testPublishedTemplateInputCarriesItsComponentInputReference() {
+        long projectId = automationWorkflowProjectFacade.createProject(
+            "Slack channel digest", "", null, List.of(), null, null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            projectId,
+            """
+                {
+                    "label": "Slack channel digest",
+                    "inputs": [
+                        {
+                            "name": "channel",
+                            "label": "Channel",
+                            "type": "string",
+                            "required": true,
+                            "componentName": "slack",
+                            "componentVersion": 1,
+                            "groupName": "channel"
+                        },
+                        {"name": "greeting", "label": "Greeting", "type": "string"}
+                    ],
+                    "tasks": []
+                }
+                """,
+            null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        List<ConnectedUserWorkflowTemplateDTO.Input> inputs = getPublishedTemplate(projectId, workflowUuid).inputs();
+
+        assertThat(inputs)
+            .extracting(ConnectedUserWorkflowTemplateDTO.Input::componentReference)
+            .containsExactly(new WorkflowInput.ComponentInputReference("slack", 1, "channel"), null);
     }
 
     private void stubSlackComponentDefinition() {
