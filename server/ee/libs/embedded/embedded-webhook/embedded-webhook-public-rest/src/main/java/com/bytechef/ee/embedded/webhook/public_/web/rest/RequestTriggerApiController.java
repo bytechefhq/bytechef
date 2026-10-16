@@ -46,6 +46,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -156,8 +158,14 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
+        Optional<String> requestTriggerName = findRequestTriggerName(workflow);
+
+        if (requestTriggerName.isEmpty()) {
+            return noRequestTrigger(workflowUuid);
+        }
+
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.EMBEDDED, integrationInstance.getId(), workflowUuid, findRequestTriggerName(workflow));
+            PlatformType.EMBEDDED, integrationInstance.getId(), workflowUuid, requestTriggerName.get());
 
         return dispatch(workflowExecutionId);
     }
@@ -214,8 +222,14 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         Workflow workflow = workflowService.getWorkflow(
             projectWorkflowService.getLastPublishedWorkflowId(automationWorkflowUuid));
 
+        Optional<String> requestTriggerName = findRequestTriggerName(workflow);
+
+        if (requestTriggerName.isEmpty()) {
+            return noRequestTrigger(automationWorkflowUuid);
+        }
+
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, projectDeploymentId, automationWorkflowUuid, findRequestTriggerName(workflow));
+            PlatformType.AUTOMATION, projectDeploymentId, automationWorkflowUuid, requestTriggerName.get());
 
         return dispatch(workflowExecutionId);
     }
@@ -239,9 +253,15 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
 
         Workflow workflow = workflowService.getWorkflow(resolved.workflowId());
 
+        Optional<String> requestTriggerName = findRequestTriggerName(workflow);
+
+        if (requestTriggerName.isEmpty()) {
+            return noRequestTrigger(resolved.workflowUuid());
+        }
+
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, resolved.projectDeploymentId(), resolved.workflowUuid(),
-            findRequestTriggerName(workflow));
+            requestTriggerName.get());
 
         return dispatch(workflowExecutionId);
     }
@@ -282,7 +302,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         }
     }
 
-    private static String findRequestTriggerName(Workflow workflow) {
+    private static Optional<String> findRequestTriggerName(Workflow workflow) {
         return WorkflowTrigger.of(workflow)
             .stream()
             .map(workflowTrigger -> {
@@ -295,7 +315,18 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
                 return null;
             })
             .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(null);
+            .findFirst();
+    }
+
+    /**
+     * A workflow that only a component trigger (for example a Gmail poll) starts has nothing to call here.
+     */
+    private static ResponseEntity<Object> noRequestTrigger(String workflowUuid) {
+        return ResponseEntity.badRequest()
+            .body(
+                ProblemDetail.forStatusAndDetail(
+                    HttpStatus.BAD_REQUEST,
+                    "Workflow %s has no request trigger, so it cannot be called; it runs when its own trigger fires"
+                        .formatted(workflowUuid)));
     }
 }
