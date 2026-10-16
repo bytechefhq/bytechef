@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import ComboBox from './ComboBox';
 import {comboBoxItemsMock} from './ComboBox.mock';
@@ -67,5 +67,22 @@ describe('ComboBox', async () => {
         await waitFor(() => {
             expect(screen.queryAllByRole('option')).toHaveLength(0);
         });
+    });
+
+    it('should report the search and leave the filtering to the caller when onSearchChange is set', async () => {
+        const onSearchChange = vi.fn();
+
+        render(<ComboBox items={duplicateNameItems} name="Test" onSearchChange={onSearchChange} />);
+
+        await userEvent.click(screen.getByRole('combobox'));
+
+        await userEvent.type(screen.getByPlaceholderText('Search...'), 'beta');
+
+        expect(onSearchChange).toHaveBeenLastCalledWith('beta');
+        expect(screen.getAllByRole('option')).toHaveLength(3);
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onSearchChange).toHaveBeenLastCalledWith('');
     });
 });
