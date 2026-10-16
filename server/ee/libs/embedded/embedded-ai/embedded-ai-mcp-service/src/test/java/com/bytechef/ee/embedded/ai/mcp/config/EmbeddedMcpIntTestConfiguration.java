@@ -13,6 +13,7 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.ee.embedded.ai.mcp.event.McpToolBeforeDeleteEventListener;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolServiceImpl;
+import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionImpl;
 import com.bytechef.encryption.EncryptionKey;
@@ -40,7 +41,8 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Import({
-    EncryptionImpl.class, JacksonConfiguration.class, LiquibaseConfiguration.class,
+    EmbeddedOwnerContributorConfiguration.class, EncryptionImpl.class, JacksonConfiguration.class,
+    LiquibaseConfiguration.class,
     McpIntegrationInstanceToolServiceImpl.class, McpToolBeforeDeleteEventListener.class, McpToolServiceImpl.class,
     PostgreSQLContainerConfiguration.class
 })

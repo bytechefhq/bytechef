@@ -17,7 +17,6 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
  */
 public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeploymentRepository {
 
+    private static final String A2A_SERVER_NAME_PREFIX = "__A2A_SERVER__";
     private static final String API_COLLECTION_NAME_PREFIX = "__API_COLLECTION__";
     private static final String MCP_SERVER_NAME_PREFIX = "__MCP_SERVER__";
 
@@ -68,11 +68,10 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
                     ProjectDeploymentOwner.MCP_SERVER),
                 "project_deployment.id"));
 
-        // __MCP_SERVER__% matches McpServer.MCP_SERVER_NAME_PREFIX in platform-mcp-api
         conditions.add(
             "(NOT " + startsWith("project_deployment.name", API_COLLECTION_NAME_PREFIX) + " AND NOT " +
                 startsWith("project_deployment.name", MCP_SERVER_NAME_PREFIX) + " AND NOT " +
-                startsWith("project_deployment.name", SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX) + ")");
+                startsWith("project_deployment.name", A2A_SERVER_NAME_PREFIX) + ")");
 
         if (embedded != null) {
             if (embedded) {

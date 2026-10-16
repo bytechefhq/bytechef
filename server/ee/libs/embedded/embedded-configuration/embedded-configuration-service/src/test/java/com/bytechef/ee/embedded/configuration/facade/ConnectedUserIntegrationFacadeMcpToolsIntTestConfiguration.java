@@ -18,6 +18,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.encryption.EncryptionImpl;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -48,7 +49,8 @@ import tools.jackson.databind.ObjectMapper;
  */
 @EnableAutoConfiguration
 @Import({
-    EncryptionImpl.class, JacksonConfiguration.class, LiquibaseConfiguration.class, McpComponentServiceImpl.class,
+    EmbeddedOwnerContributorConfiguration.class, EncryptionImpl.class, JacksonConfiguration.class,
+    LiquibaseConfiguration.class, McpComponentServiceImpl.class,
     McpServerServiceImpl.class, McpToolServiceImpl.class
 })
 @Configuration

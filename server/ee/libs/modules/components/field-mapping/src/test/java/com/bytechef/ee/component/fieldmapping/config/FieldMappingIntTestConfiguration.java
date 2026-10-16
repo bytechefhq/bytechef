@@ -11,6 +11,7 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConve
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowServiceImpl;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionImpl;
@@ -38,7 +39,8 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Import({
-    EncryptionImpl.class, IntegrationInstanceWorkflowServiceImpl.class, LiquibaseConfiguration.class,
+    EmbeddedOwnerContributorConfiguration.class, EncryptionImpl.class, IntegrationInstanceWorkflowServiceImpl.class,
+    LiquibaseConfiguration.class,
     PostgreSQLContainerConfiguration.class, WorkflowTestConfigurationServiceImpl.class
 })
 @TestConfiguration(proxyBeanMethods = false)

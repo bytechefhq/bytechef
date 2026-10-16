@@ -26,7 +26,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableAutoConfiguration
 @EnableMethodSecurity
 @Import({
-    CurrentUserResolver.class, PermissionServiceImpl.class, SigningKeyFacadeImpl.class, SigningKeyServiceImpl.class
+    EmbeddedOwnerContributorsTestConfiguration.class, CurrentUserResolver.class, PermissionServiceImpl.class,
+    SigningKeyFacadeImpl.class, SigningKeyServiceImpl.class
 })
 @Configuration
 public class EmbeddedSecurityIntTestConfiguration {
