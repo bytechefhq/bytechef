@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFa
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -195,6 +196,42 @@ class AutomationWorkflowProjectApiControllerIntTest {
             .isEqualTo(true)
             .jsonPath("$[0].workflowTemplates[0].components[1].name")
             .isEqualTo("slack");
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testGetFrontendProjectsExposesTheComponentInputReferenceOfATemplateInput() {
+        ConnectedUserWorkflowTemplateDTO workflowDTO = new ConnectedUserWorkflowTemplateDTO(
+            WORKFLOW_UUID, "Slack digest", null, null, List.of(), List.of(),
+            List.of(
+                new ConnectedUserWorkflowTemplateDTO.Input(
+                    "channel", "Channel", "string", true,
+                    new WorkflowInput.ComponentInputReference("slack", 1, "channel")),
+                new ConnectedUserWorkflowTemplateDTO.Input("greeting", "Greeting", "string", false)),
+            null);
+
+        AutomationWorkflowProjectDTO projectDTO = new AutomationWorkflowProjectDTO(
+            PROJECT_ID, "Slack Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, false, true);
+
+        when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
+            .thenReturn(List.of(projectDTO));
+
+        webTestClient
+            .get()
+            .uri("/v1/automation/projects")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$[0].workflowTemplates[0].inputs[0].componentReference.componentName")
+            .isEqualTo("slack")
+            .jsonPath("$[0].workflowTemplates[0].inputs[0].componentReference.componentVersion")
+            .isEqualTo(1)
+            .jsonPath("$[0].workflowTemplates[0].inputs[0].componentReference.groupName")
+            .isEqualTo("channel")
+            .jsonPath("$[0].workflowTemplates[0].inputs[1].componentReference")
+            .doesNotExist();
     }
 
     @Test
