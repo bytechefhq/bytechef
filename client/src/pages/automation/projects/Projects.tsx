@@ -14,6 +14,7 @@ import loadProject from '@/pages/automation/project/loadProject';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
@@ -49,6 +50,7 @@ const Projects = () => {
     const [searchParams] = useSearchParams();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+    const {captureProjectImported, captureProjectWorkflowImported} = useAnalytics();
 
     const {alignOffset, buttonGroupRef, dropdownMenuTriggerRef, handleOpenChange} = useButtonGroupDropdownAlign();
 
@@ -56,6 +58,9 @@ const Projects = () => {
 
     const importProjectMutation = useImportProjectMutation({
         onSuccess: () => {
+            captureProjectImported();
+            captureProjectWorkflowImported();
+
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             toast('Project is imported.');
