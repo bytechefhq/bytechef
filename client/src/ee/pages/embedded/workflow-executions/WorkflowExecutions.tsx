@@ -9,17 +9,23 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
-import {getWorkflowExecutionsFilters} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsFilters';
-import {Integration} from '@/ee/shared/middleware/embedded/configuration';
+import {
+    getIntegrationInstanceConfigurationIntegrationName,
+    getWorkflowExecutionsFilters,
+} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsFilters';
+import {Integration, IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
+import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecution as EmbeddedWorkflowExecution,
     WorkflowExecutionFromJSON as EmbeddedWorkflowExecutionFromJSON,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
+import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {
     useGetIntegrationInstanceConfigurationQuery,
     useGetIntegrationInstanceConfigurationsQuery,
 } from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -79,7 +85,7 @@ const ConnectedUserLabel = ({project}: {project: ConnectedUserProjectType}) => (
 
 const IntegrationLabel = ({integration}: {integration: Integration}) => (
     <div className="flex items-center">
-        <span className="mr-1">{integration.componentName}</span>
+        <span className="mr-1">{integration.name}</span>
 
         <span className="text-xs text-content-neutral-secondary">
             {integration?.tags?.map((tag) => tag.name).join(', ')}
@@ -144,6 +150,11 @@ export const WorkflowExecutions = () => {
 
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false}, filtersInteracted);
 
+    const {data: connectedUsersPage} = useGetConnectedUsersQuery(
+        {environmentId: currentEnvironmentId, integrationId: filterIntegrationId},
+        !filterAutomations
+    );
+
     const {
         connectedUserProjects,
         refetchWorkflowExecutions,
@@ -164,12 +175,9 @@ export const WorkflowExecutions = () => {
         workflowId: filterWorkflowId,
     });
 
-    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-    const {data: workflows} = useGetIntegrationVersionWorkflowsQuery(
+    const {data: integrationVersions} = useGetIntegrationVersionsQuery(
         filterIntegrationId!,
-        integrationInstanceConfiguration?.integrationVersion!,
-        false,
-        !!integrationInstanceConfiguration
+        !!filterIntegrationId && !integrationInstanceConfiguration
     );
 
     const automationWorkflows = useMemo(() => {
@@ -188,8 +196,37 @@ export const WorkflowExecutions = () => {
         return [...workflowsById.values()];
     }, [connectedUserProjects, filterConnectedUserId]);
 
+    const workflowsIntegrationId = filterIntegrationId || integrationInstanceConfiguration?.integrationId;
+
+    const workflowsIntegrationVersion = useMemo(() => {
+        if (integrationInstanceConfiguration?.integrationVersion) {
+            return integrationInstanceConfiguration.integrationVersion;
+        }
+
+        const publishedIntegrationVersions =
+            integrationVersions
+                ?.filter(
+                    (integrationVersion) =>
+                        integrationVersion.status === IntegrationStatus.Published &&
+                        integrationVersion.version !== undefined
+                )
+                .map((integrationVersion) => integrationVersion.version!) ?? [];
+
+        return publishedIntegrationVersions.length > 0 ? Math.max(...publishedIntegrationVersions) : undefined;
+    }, [integrationInstanceConfiguration, integrationVersions]);
+
+    const {data: workflows} = useGetIntegrationVersionWorkflowsQuery(
+        workflowsIntegrationId!,
+        workflowsIntegrationVersion!,
+        false,
+        !!workflowsIntegrationId && !!workflowsIntegrationVersion
+    );
+
+    const connectedUsers = connectedUsersPage?.content as ConnectedUser[] | undefined;
+
     const emptyListMessage =
         !filterStatus &&
+        !filterConnectedUserId &&
         !filterIntegrationId &&
         !filterWorkflowId &&
         !filterStartDate &&
@@ -211,6 +248,7 @@ export const WorkflowExecutions = () => {
                 automations: filterAutomations,
                 connectedUserId: filterConnectedUserId,
                 connectedUserProjects,
+                connectedUsers,
                 endDate: filterEndDate,
                 integrationId: filterIntegrationId,
                 integrationInstanceConfiguration,
@@ -227,6 +265,7 @@ export const WorkflowExecutions = () => {
         [
             automationWorkflows,
             connectedUserProjects,
+            connectedUsers,
             filterAutomations,
             filterConnectedUserId,
             filterEndDate,
@@ -584,10 +623,10 @@ export const WorkflowExecutions = () => {
                                         label: (
                                             <span className="flex items-center">
                                                 <span className="mr-1">
-                                                    {
-                                                        (integrationInstanceConfiguration.integration as Integration)
-                                                            ?.componentName
-                                                    }
+                                                    {getIntegrationInstanceConfigurationIntegrationName(
+                                                        integrationInstanceConfiguration,
+                                                        integrations
+                                                    )}
                                                 </span>
 
                                                 <span className="text-xs text-content-neutral-secondary">
@@ -603,6 +642,25 @@ export const WorkflowExecutions = () => {
                                 onChange={handleIntegrationInstanceConfigurationChange}
                                 onOpen={() => setFiltersInteracted(true)}
                                 value={filterIntegrationInstanceConfigurationId}
+                            />
+                        </div>
+                    )}
+
+                    {!filterAutomations && (
+                        <div className="flex flex-col space-y-2">
+                            <Label>Connected User</Label>
+
+                            <ComboBox
+                                emptyMessage={!connectedUsers ? 'Loading...' : 'No item found.'}
+                                items={[
+                                    ANY_FILTER_OPTION,
+                                    ...(connectedUsers?.map((connectedUser) => ({
+                                        label: `User ${connectedUser.externalId}`,
+                                        value: connectedUser.id,
+                                    })) ?? []),
+                                ]}
+                                onChange={handleConnectedUserChange}
+                                value={filterConnectedUserId}
                             />
                         </div>
                     )}
