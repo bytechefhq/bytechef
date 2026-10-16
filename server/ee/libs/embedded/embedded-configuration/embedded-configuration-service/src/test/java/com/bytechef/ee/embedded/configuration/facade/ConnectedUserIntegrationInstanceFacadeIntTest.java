@@ -36,6 +36,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
@@ -64,6 +65,7 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
@@ -132,6 +134,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class ConnectedUserIntegrationInstanceFacadeIntTest {
 
     private static final long CONNECTION_ID = 42L;
+    private static final long GITHUB_CONNECTION_ID = 77L;
 
     private static final String WORKFLOW_DEFINITION = """
         {"label":"Sync contacts","inputs":[],"triggers":[],"tasks":[]}
@@ -142,6 +145,9 @@ class ConnectedUserIntegrationInstanceFacadeIntTest {
 
     @Autowired
     private ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private ConnectedUserService connectedUserService;
@@ -247,6 +253,48 @@ class ConnectedUserIntegrationInstanceFacadeIntTest {
 
         verify(componentDefinitionFacade).executeWorkflowInputOptions(
             eq("slack"), eq(1), eq("channel"), eq("channelId"), any(), any(), any(), eq(CONNECTION_ID));
+    }
+
+    @Test
+    void testGetComponentInputOptionsOfAnotherComponentUseTheConnectionTheAdministratorPicked() {
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationWorkflowId);
+
+        integrationInstanceConfigurationWorkflow.setConnections(
+            List.of(new IntegrationInstanceConfigurationWorkflowConnection(GITHUB_CONNECTION_ID, "github", "post")));
+
+        integrationInstanceConfigurationWorkflowService.update(integrationInstanceConfigurationWorkflow);
+
+        Connection githubConnection = mock(Connection.class);
+
+        when(githubConnection.getId()).thenReturn(GITHUB_CONNECTION_ID);
+        when(githubConnection.getComponentName()).thenReturn("github");
+        when(connectionService.getConnections(List.of(GITHUB_CONNECTION_ID))).thenReturn(List.of(githubConnection));
+
+        Option option = mock(Option.class);
+
+        when(componentDefinitionFacade.executeWorkflowInputOptions(
+            anyString(), anyInt(), anyString(), anyString(), any(), any(), any(), anyLong()))
+                .thenReturn(List.of(option));
+
+        List<Option> options = connectedUserIntegrationInstanceFacade.getComponentInputOptions(
+            ownerExternalUserId, integrationInstanceId, "github", 1, "repository", "repository", Map.of(), null);
+
+        assertThat(options).containsExactly(option);
+
+        verify(componentDefinitionFacade).executeWorkflowInputOptions(
+            eq("github"), eq(1), eq("repository"), eq("repository"), any(), any(), any(), eq(GITHUB_CONNECTION_ID));
+    }
+
+    @Test
+    void testGetComponentInputOptionsOfAnotherComponentAreEmptyWhileNoConnectionIsPicked() {
+        List<Option> options = connectedUserIntegrationInstanceFacade.getComponentInputOptions(
+            ownerExternalUserId, integrationInstanceId, "github", 1, "repository", "repository", Map.of(), null);
+
+        assertThat(options).isEmpty();
+
+        verifyNoInteractions(componentDefinitionFacade);
     }
 
     @Test
