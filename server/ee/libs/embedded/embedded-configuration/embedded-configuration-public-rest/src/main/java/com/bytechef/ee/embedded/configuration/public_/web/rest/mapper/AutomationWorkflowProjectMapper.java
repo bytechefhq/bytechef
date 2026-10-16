@@ -13,6 +13,11 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.Emb
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectComponentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowTemplateModel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -33,7 +38,32 @@ public interface AutomationWorkflowProjectMapper
 
     AutomationWorkflowProjectComponentModel toComponentModel(ConnectedUserWorkflowTemplateDTO.Component component);
 
+    @Mapping(target = "components", expression = "java(toComponentModels(workflowTemplateDTO))")
     @Mapping(target = "id", source = "workflowUuid")
     AutomationWorkflowProjectWorkflowTemplateModel toWorkflowTemplateModel(
         ConnectedUserWorkflowTemplateDTO workflowTemplateDTO);
+
+    default List<AutomationWorkflowProjectComponentModel> toComponentModels(
+        ConnectedUserWorkflowTemplateDTO workflowTemplateDTO) {
+
+        Map<String, ConnectedUserWorkflowTemplateDTO.Component> componentsByName = new LinkedHashMap<>();
+
+        for (List<ConnectedUserWorkflowTemplateDTO.Component> components : Arrays.asList(
+            workflowTemplateDTO.triggers(), workflowTemplateDTO.components())) {
+
+            for (ConnectedUserWorkflowTemplateDTO.Component component : components == null
+                ? List.<ConnectedUserWorkflowTemplateDTO.Component>of() : components) {
+
+                componentsByName.putIfAbsent(component.name(), component);
+            }
+        }
+
+        List<AutomationWorkflowProjectComponentModel> componentModels = new ArrayList<>();
+
+        for (ConnectedUserWorkflowTemplateDTO.Component component : componentsByName.values()) {
+            componentModels.add(toComponentModel(component));
+        }
+
+        return componentModels;
+    }
 }

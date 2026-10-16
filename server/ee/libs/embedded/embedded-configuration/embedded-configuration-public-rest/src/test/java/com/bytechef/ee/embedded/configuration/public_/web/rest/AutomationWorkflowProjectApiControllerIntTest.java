@@ -114,6 +114,42 @@ class AutomationWorkflowProjectApiControllerIntTest {
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
+    void testGetFrontendProjectsListTheTriggerComponentsOfATemplateFirstAndOnce() {
+        ConnectedUserWorkflowTemplateDTO.Component gmailComponent =
+            new ConnectedUserWorkflowTemplateDTO.Component("gmail", "Gmail", "gmail-icon-svg", true, 7L);
+        ConnectedUserWorkflowTemplateDTO.Component slackComponent =
+            new ConnectedUserWorkflowTemplateDTO.Component("slack", "Slack", "slack-icon-svg", true, 8L);
+
+        ConnectedUserWorkflowTemplateDTO workflowDTO = new ConnectedUserWorkflowTemplateDTO(
+            WORKFLOW_UUID, "Notify Slack", null, null, List.of(gmailComponent),
+            List.of(slackComponent, gmailComponent), List.of(), null);
+
+        AutomationWorkflowProjectDTO projectDTO = new AutomationWorkflowProjectDTO(
+            PROJECT_ID, "Slack Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, true);
+
+        when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
+            .thenReturn(List.of(projectDTO));
+
+        webTestClient
+            .get()
+            .uri("/v1/automation/projects")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$[0].workflowTemplates[0].components.length()")
+            .isEqualTo(2)
+            .jsonPath("$[0].workflowTemplates[0].components[0].name")
+            .isEqualTo("gmail")
+            .jsonPath("$[0].workflowTemplates[0].components[0].connectionRequired")
+            .isEqualTo(true)
+            .jsonPath("$[0].workflowTemplates[0].components[1].name")
+            .isEqualTo("slack");
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
     void testGetFrontendProjectsReturnsEmptyList() {
         when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of());
