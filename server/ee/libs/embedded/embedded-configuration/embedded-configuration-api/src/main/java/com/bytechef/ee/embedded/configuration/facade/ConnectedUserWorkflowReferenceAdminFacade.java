@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Set;
 
@@ -17,5 +18,5 @@ import java.util.Set;
  * @author Ivica Cardic
  */
 public interface ConnectedUserWorkflowReferenceAdminFacade {
-    List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationWorkflowUuids);
+    List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationWorkflowUuids, Environment environment);
 }
