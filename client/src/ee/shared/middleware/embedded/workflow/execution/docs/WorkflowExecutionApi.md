@@ -149,7 +149,7 @@ No authorization required
 
 ## getWorkflowExecutionsPage
 
-> Page getWorkflowExecutionsPage(environmentId, jobStatus, jobStartDate, jobEndDate, integrationId, integrationInstanceConfigurationId, workflowId, pageNumber)
+> Page getWorkflowExecutionsPage(environmentId, jobStatus, jobStartDate, jobEndDate, integrationId, integrationInstanceConfigurationId, connectedUserId, workflowId, pageNumber)
 
 Get Integration workflow executions
 
@@ -181,6 +181,8 @@ async function example() {
     integrationId: 789,
     // number | The id of a Integration instance configuration. (optional)
     integrationInstanceConfigurationId: 789,
+    // number | The id of a connected user. (optional)
+    connectedUserId: 789,
     // string | The id of a workflow. (optional)
     workflowId: workflowId_example,
     // number | The number of the page to return. (optional)
@@ -210,6 +212,7 @@ example().catch(console.error);
 | **jobEndDate** | `Date` | The end date of a job. | [Optional] [Defaults to `undefined`] |
 | **integrationId** | `number` | The id of a Integration. | [Optional] [Defaults to `undefined`] |
 | **integrationInstanceConfigurationId** | `number` | The id of a Integration instance configuration. | [Optional] [Defaults to `undefined`] |
+| **connectedUserId** | `number` | The id of a connected user. | [Optional] [Defaults to `undefined`] |
 | **workflowId** | `string` | The id of a workflow. | [Optional] [Defaults to `undefined`] |
 | **pageNumber** | `number` | The number of the page to return. | [Optional] [Defaults to `0`] |
 
