@@ -143,6 +143,30 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
         return projects;
     }
 
+    @Override
+    public List<Long> findProjectIdsByNameIgnoreCaseExcludingOwned(String name, long workspaceId) {
+        String query = "SELECT project.id FROM project WHERE LOWER(project.name) = LOWER(?) AND " +
+            "project.workspace_id = ? AND " +
+            projectOwnershipService.getExcludeProjectsCondition(EnumSet.allOf(ProjectOwner.class), "project.id");
+
+        return jdbcClient.sql(query)
+            .param(name)
+            .param(workspaceId)
+            .query(Long.class)
+            .list();
+    }
+
+    @Override
+    public List<Long> findProjectIdsByWorkspaceIdExcludingOwned(long workspaceId) {
+        String query = "SELECT project.id FROM project WHERE project.workspace_id = ? AND " +
+            projectOwnershipService.getExcludeProjectsCondition(EnumSet.allOf(ProjectOwner.class), "project.id");
+
+        return jdbcClient.sql(query)
+            .param(workspaceId)
+            .query(Long.class)
+            .list();
+    }
+
     private record ProjectVersion(int version, int status, Instant publishedDate, String description) {
     }
 }

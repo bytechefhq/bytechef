@@ -60,11 +60,6 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public Optional<Project> fetchProject(String name) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Optional<Project> fetchProject(String name, long workspaceId) {
         throw new UnsupportedOperationException();
     }

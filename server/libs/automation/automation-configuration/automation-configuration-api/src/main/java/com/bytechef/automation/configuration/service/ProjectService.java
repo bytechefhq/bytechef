@@ -37,8 +37,6 @@ public interface ProjectService {
 
     Optional<Project> fetchProject(long id);
 
-    Optional<Project> fetchProject(String name);
-
     Optional<Project> fetchProject(String name, long workspaceId);
 
     Project getProjectDeploymentProject(long projectDeploymentId);

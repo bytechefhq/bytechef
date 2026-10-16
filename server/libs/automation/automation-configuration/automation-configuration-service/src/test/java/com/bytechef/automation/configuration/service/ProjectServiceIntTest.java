@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -49,6 +50,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 /**
  * @author Ivica Cardic
@@ -256,41 +258,144 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    public void testFetchProjectByNameAndWorkspaceId() {
-        Workspace secondWorkspace = workspaceRepository.save(new Workspace("test2"));
+    public void testGetProjectsExcludesOwnedProjectsEvenWhenTheyMatchEveryListFilter() {
+        Tag tag = tagRepository.save(new Tag("tag1"));
 
-        Project projectInWorkspace1 = projectService.create(
+        Project ownedProject = getProject();
+
+        ownedProject.setTags(List.of(tag));
+
+        ownedProject = projectRepository.save(ownedProject);
+
+        testOwnerContributors.addCatalogId(ownedProject.getId());
+
+        assertThat(
+            projectService.getProjects(null, category.getId(), null, tag.getId(), Status.DRAFT, workspace.getId()))
+                .isEmpty();
+
+        testOwnerContributors.clear();
+
+        assertThat(
+            projectService.getProjects(null, category.getId(), null, tag.getId(), Status.DRAFT, workspace.getId()))
+                .extracting(Project::getId)
+                .containsExactly(ownedProject.getId());
+    }
+
+    @Test
+    public void testGetProjectsHidesProjectsByOwnershipRegardlessOfLegacyPrefixedNames() {
+        Project ownedProject = projectRepository.save(
             Project.builder()
-                .name("__EMBEDDED_TEMPLATES__")
+                .name("__EMBEDDED__legacy")
+                .workspaceId(workspace.getId())
+                .build());
+        Project unownedProject = projectRepository.save(
+            Project.builder()
+                .name("__EMBEDDED__legacy")
                 .workspaceId(workspace.getId())
                 .build());
 
-        Project projectInWorkspace2 = projectService.create(
+        testOwnerContributors.addCatalogId(ownedProject.getId());
+
+        assertThat(projectService.getProjects(null, null, null, null, null, workspace.getId()))
+            .extracting(Project::getId)
+            .containsExactly(unownedProject.getId());
+    }
+
+    @Test
+    public void testGetWorkspaceProjectIdsExcludesEmbeddedOwnedProjects() {
+        Project regularProject = projectRepository.save(
             Project.builder()
-                .name("__EMBEDDED_TEMPLATES__")
-                .workspaceId(secondWorkspace.getId())
+                .name("Regular Project")
+                .workspaceId(workspace.getId())
                 .build());
 
-        // workspace isolation: each workspace returns its own project
-        assertThat(projectService.fetchProject("__EMBEDDED_TEMPLATES__", workspace.getId()))
+        Project catalogProject = projectRepository.save(
+            Project.builder()
+                .name("Catalog")
+                .workspaceId(workspace.getId())
+                .build());
+
+        Project connectedUserProject = projectRepository.save(
+            Project.builder()
+                .name("ext")
+                .workspaceId(workspace.getId())
+                .build());
+
+        testOwnerContributors.addCatalogId(catalogProject.getId());
+        testOwnerContributors.addConnectedUserId(connectedUserProject.getId());
+
+        assertThat(projectService.getWorkspaceProjectIds(workspace.getId()))
+            .containsExactly(regularProject.getId());
+    }
+
+    @Test
+    public void testFetchProjectByNameIgnoresOwnedProjects() {
+        Project catalogProject = projectRepository.save(
+            Project.builder()
+                .name("Sales")
+                .workspaceId(workspace.getId())
+                .build());
+
+        testOwnerContributors.addCatalogId(catalogProject.getId());
+
+        assertThat(projectService.fetchProject("sales", workspace.getId())).isEmpty();
+    }
+
+    @Test
+    public void testFetchProjectByNameReturnsTheUnownedProjectWhenAnOwnedOneSharesItsName() {
+        Project catalogProject = projectRepository.save(
+            Project.builder()
+                .name("Sales")
+                .workspaceId(workspace.getId())
+                .build());
+
+        Project regularProject = projectRepository.save(
+            Project.builder()
+                .name("Sales")
+                .workspaceId(workspace.getId())
+                .build());
+
+        testOwnerContributors.addCatalogId(catalogProject.getId());
+
+        assertThat(projectService.fetchProject("SALES", workspace.getId()))
             .isPresent()
             .map(Project::getId)
-            .hasValue(projectInWorkspace1.getId());
+            .hasValue(regularProject.getId());
+    }
 
-        assertThat(projectService.fetchProject("__EMBEDDED_TEMPLATES__", secondWorkspace.getId()))
-            .isPresent()
+    @Test
+    public void testFetchProjectByNameNamesTheProjectAndWorkspaceWhenSeveralProjectsMatch() {
+        projectRepository.save(
+            Project.builder()
+                .name("Sales")
+                .workspaceId(workspace.getId())
+                .build());
+        projectRepository.save(
+            Project.builder()
+                .name("sales")
+                .workspaceId(workspace.getId())
+                .build());
+
+        assertThatThrownBy(() -> projectService.fetchProject("SALES", workspace.getId()))
+            .isInstanceOf(IncorrectResultSizeDataAccessException.class)
+            .hasMessageContaining("'SALES'")
+            .hasMessageContaining("workspace " + workspace.getId());
+    }
+
+    @Test
+    public void testFetchProjectByNameLooksOnlyInTheGivenWorkspace() {
+        Workspace otherWorkspace = workspaceRepository.save(new Workspace("other"));
+
+        Project otherWorkspaceProject = projectRepository.save(
+            Project.builder()
+                .name("Sales")
+                .workspaceId(otherWorkspace.getId())
+                .build());
+
+        assertThat(projectService.fetchProject("Sales", workspace.getId())).isEmpty();
+        assertThat(projectService.fetchProject("Sales", otherWorkspace.getId()))
             .map(Project::getId)
-            .hasValue(projectInWorkspace2.getId());
-
-        // case-insensitive lookup
-        assertThat(projectService.fetchProject("__embedded_templates__", workspace.getId()))
-            .isPresent()
-            .map(Project::getId)
-            .hasValue(projectInWorkspace1.getId());
-
-        // non-existent name returns empty
-        assertThat(projectService.fetchProject("__NOPE__", workspace.getId()))
-            .isEmpty();
+            .hasValue(otherWorkspaceProject.getId());
     }
 
     @Test
