@@ -334,8 +334,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
 
     /**
      * An embedded job's principal is the integration instance that ran it, one per connected user, so a filter by
-     * instance configuration is resolved to that configuration's instances, and a filter by connected user to that
-     * user's instances among them.
+     * instance configuration is resolved to that configuration's instances.
      */
     private List<Long> resolveIntegrationInstanceIds(
         @Nullable Long environmentId, @Nullable Long integrationInstanceConfigurationId,
