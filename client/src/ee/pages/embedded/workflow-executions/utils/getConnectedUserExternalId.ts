@@ -7,9 +7,9 @@ export function getConnectedUserExternalId(deploymentName?: string): string | un
         return undefined;
     }
 
-    const withoutPrefix = deploymentName.startsWith(EMBEDDED_DEPLOYMENT_PREFIX)
-        ? deploymentName.substring(EMBEDDED_DEPLOYMENT_PREFIX.length)
-        : deploymentName;
+    if (!deploymentName.startsWith(EMBEDDED_DEPLOYMENT_PREFIX)) {
+        return deploymentName;
+    }
 
-    return withoutPrefix.replace(ENVIRONMENT_SUFFIX_PATTERN, '');
+    return deploymentName.substring(EMBEDDED_DEPLOYMENT_PREFIX.length).replace(ENVIRONMENT_SUFFIX_PATTERN, '');
 }
