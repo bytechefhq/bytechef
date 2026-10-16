@@ -209,11 +209,11 @@ public class JobSyncExecutor {
             event -> handleCoordinatorErrorEvent((ErrorEvent) event, taskExecutionErrorEventListener));
 
         JobExecutor jobExecutor = new JobExecutor(
-            contextService, evaluator, taskDispatcherChain, taskExecutionService, taskFileStorage, workflowService);
+            contextService, evaluator, coordinatorEventPublisher, jobService, taskDispatcherChain, taskExecutionService,
+            taskFileStorage, workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService, evaluator, coordinatorEventPublisher, jobExecutor, jobService, taskExecutionService,
-            taskFileStorage, workflowService);
+            contextService, jobExecutor, jobService, taskExecutionService, taskFileStorage, workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
@@ -860,15 +860,17 @@ public class JobSyncExecutor {
     }
 
     private void waitForJobCompletion(long jobId, @Nullable Duration timeout) {
+        CountDownLatch latch = jobCompletionLatches.computeIfAbsent(getKey(jobId), id -> new CountDownLatch(1));
+
         Job job = jobService.getJob(jobId);
 
         if (job.getStatus() == Job.Status.COMPLETED || job.getStatus() == Job.Status.FAILED ||
             job.getStatus() == Job.Status.STOPPED) {
 
+            jobCompletionLatches.remove(getKey(jobId));
+
             return;
         }
-
-        CountDownLatch latch = jobCompletionLatches.computeIfAbsent(getKey(jobId), id -> new CountDownLatch(1));
 
         try {
             Optional<TaskExecution> lastTaskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId);

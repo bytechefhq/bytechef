@@ -1,0 +1,8 @@
+---
+label: "Loop With Empty Iteratee"
+tasks:
+- name: "loop_1"
+  type: "loop/v1"
+  parameters:
+    items: "=range(1,3)"
+    iteratee: []

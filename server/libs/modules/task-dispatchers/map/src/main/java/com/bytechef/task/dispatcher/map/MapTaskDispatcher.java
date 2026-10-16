@@ -27,6 +27,7 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 import tools.jackson.core.type.TypeReference;
 
@@ -88,12 +90,20 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
             .stream()
             .map(WorkflowTask::new)
             .toList();
+
+        if (!items.isEmpty()) {
+            Validate.isTrue(
+                !iterateeWorkflowTasks.isEmpty() ||
+                    WorkflowTaskUtils.isEmptiedByDisabledTasks(taskExecution.getWorkflowTask(), ITERATEE),
+                "'iteratee' must contain at least one task");
+        }
+
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (items.isEmpty()) {
+        if (items.isEmpty() || iterateeWorkflowTasks.isEmpty()) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);

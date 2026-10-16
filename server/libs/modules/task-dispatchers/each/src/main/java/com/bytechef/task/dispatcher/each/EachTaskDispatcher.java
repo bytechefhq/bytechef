@@ -25,6 +25,7 @@ import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConst
 
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -84,9 +85,11 @@ public class EachTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
 
     @Override
     public void doDispatch(TaskExecution taskExecution) {
-        Map<String, ?> workflowMap = MapUtils.getRequired(
-            taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {});
-        WorkflowTask iteratee = new WorkflowTask(workflowMap);
+        Map<String, ?> workflowMap =
+            WorkflowTaskUtils.isEmptiedByDisabledTasks(taskExecution.getWorkflowTask(), ITERATEE)
+                ? MapUtils.get(taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {})
+                : MapUtils.getRequired(
+                    taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {});
         List<Object> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
 
         taskExecution.setStartDate(Instant.now());
@@ -94,13 +97,15 @@ public class EachTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        if (items.isEmpty()) {
+        if (workflowMap == null || items.isEmpty()) {
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
+            WorkflowTask iteratee = new WorkflowTask(workflowMap);
+
             counterService.set(Validate.notNull(taskExecution.getId(), "id"), items.size());
 
             for (int i = 0; i < items.size(); i++) {

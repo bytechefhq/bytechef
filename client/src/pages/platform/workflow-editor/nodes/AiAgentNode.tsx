@@ -19,6 +19,7 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import {extractClusterElementIcons} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import useDisabledTaskNames from '../hooks/useDisabledTaskNames';
 import useNodeClickHandler from '../hooks/useNodeClick';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
@@ -32,6 +33,8 @@ import handleDeleteTask from '../utils/handleDeleteTask';
 import pasteNode from '../utils/pasteNode';
 import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
+import {toggleNodeDisabled} from '../utils/toggleNodeDisabled';
+import DisabledNodeBadge from './DisabledNodeBadge';
 import styles from './NodeTypes.module.css';
 
 const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
@@ -67,6 +70,8 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const queryClient = useQueryClient();
     const {cancelWorkflowQueries, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+
+    const disabledTaskNames = useDisabledTaskNames();
 
     const memoizedIconsList = useMemo(() => {
         if (!data.clusterElements || Array.isArray(data.clusterElements)) {
@@ -165,6 +170,14 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     }, [handleDeleteNodeClick, saveNodeToClipboard, data]);
 
     const handleDelete = useCallback(() => handleDeleteNodeClick(data), [data, handleDeleteNodeClick]);
+
+    const handleToggleDisabledClick = useCallback(() => {
+        toggleNodeDisabled({
+            queryClient,
+            updateWorkflowMutation: updateWorkflowMutation!,
+            workflowNodeName: data.workflowNodeName,
+        });
+    }, [data.workflowNodeName, queryClient, updateWorkflowMutation]);
 
     const handlePasteNode = useCallback(() => {
         pasteNode({
@@ -283,6 +296,8 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const isHorizontal = layoutDirection === 'LR';
 
+    const isEffectivelyDisabled = Boolean(data.disabled) || disabledTaskNames.has(data.workflowNodeName);
+
     const nodeMenuTrigger = (
         <WorkflowNodeDropdownMenu
             canPaste={canPaste}
@@ -297,9 +312,11 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             onRename={handleStartRename}
             onResetPosition={handleResetPosition}
             onSwitch={handleSwitch}
+            onToggleDisabled={handleToggleDisabledClick}
             showCopyAction
             showCutAction
             showDeleteAction
+            showDisableAction
             showInfoAction
             showRenameAction
             trigger={
@@ -328,9 +345,11 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             onRename={handleStartRename}
             onResetPosition={handleResetPosition}
             onSwitch={handleSwitch}
+            onToggleDisabled={handleToggleDisabledClick}
             showCopyAction
             showCutAction
             showDeleteAction
+            showDisableAction
             showInfoAction
             showRenameAction
         >
@@ -338,7 +357,8 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 className={twMerge(
                     'group relative flex min-w-60 cursor-pointer items-center justify-center',
                     !isHorizontal && 'justify-start',
-                    !hasIcons && 'min-w-0'
+                    !hasIcons && 'min-w-0',
+                    isEffectivelyDisabled && 'opacity-50 grayscale'
                 )}
                 data-nodetype="clusterRoot"
                 key={id}
@@ -508,9 +528,16 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             />
                         </div>
                     ) : (
-                        <span className={twMerge('w-full truncate font-semibold', isHorizontal && 'text-center')}>
-                            {nodeLabel}
-                        </span>
+                        <div
+                            className={twMerge(
+                                'flex w-full items-center gap-1',
+                                isHorizontal && 'justify-center text-center'
+                            )}
+                        >
+                            <span className="truncate font-semibold">{nodeLabel}</span>
+
+                            {data.disabled && <DisabledNodeBadge />}
+                        </div>
                     )}
 
                     {data.operationName && (

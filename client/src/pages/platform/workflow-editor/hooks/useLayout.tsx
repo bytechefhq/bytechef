@@ -46,6 +46,7 @@ import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
 import {getElkLayoutElements} from '../utils/elkLayoutUtils';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
+import {getEffectivelyDisabledTaskNames} from '../utils/getEffectivelyDisabledTaskNames';
 import isElkLayoutSupported from '../utils/isElkLayoutSupported';
 import {createLayoutRetryState, onLayoutFailure, onLayoutSuccess} from '../utils/layoutRetryController';
 import {
@@ -200,6 +201,8 @@ export default function useLayout({
 
     const tasks = storeTasks || readOnlyWorkflow?.tasks;
     const triggers = storeTriggers || readOnlyWorkflow?.triggers;
+
+    const disabledTaskNames = useMemo(() => getEffectivelyDisabledTaskNames(tasks ?? []), [tasks]);
 
     const {clearCanvas, setEdges, setNodes, setSavedPositionCrossAxisShift} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -767,8 +770,15 @@ export default function useLayout({
         if (readOnlyWorkflow) {
             layoutNodes = allNodes.map((node) => {
                 if (node.type === 'workflow' || node.type === 'clusterRoot') {
+                    const nodeData = node.data as NodeDataType;
+
                     return {
                         ...node,
+                        data: {
+                            ...nodeData,
+                            isEffectivelyDisabled:
+                                Boolean(nodeData.disabled) || disabledTaskNames.has(nodeData.workflowNodeName),
+                        },
                         type: 'readonly',
                     };
                 }
