@@ -13,6 +13,12 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.Emb
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectComponentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowTemplateModel;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -33,7 +39,26 @@ public interface AutomationWorkflowProjectMapper
 
     AutomationWorkflowProjectComponentModel toComponentModel(ConnectedUserWorkflowTemplateDTO.Component component);
 
+    @Mapping(target = "components", expression = "java(toComponentModels(workflowTemplateDTO))")
     @Mapping(target = "id", source = "workflowUuid")
     AutomationWorkflowProjectWorkflowTemplateModel toWorkflowTemplateModel(
         ConnectedUserWorkflowTemplateDTO workflowTemplateDTO);
+
+    default List<AutomationWorkflowProjectComponentModel> toComponentModels(
+        ConnectedUserWorkflowTemplateDTO workflowTemplateDTO) {
+
+        Map<String, ConnectedUserWorkflowTemplateDTO.Component> componentsByName = Stream
+            .of(workflowTemplateDTO.triggers(), workflowTemplateDTO.components())
+            .filter(Objects::nonNull)
+            .flatMap(List::stream)
+            .collect(
+                Collectors.toMap(
+                    ConnectedUserWorkflowTemplateDTO.Component::name, component -> component,
+                    (firstComponent, secondComponent) -> firstComponent, LinkedHashMap::new));
+
+        return componentsByName.values()
+            .stream()
+            .map(this::toComponentModel)
+            .toList();
+    }
 }
