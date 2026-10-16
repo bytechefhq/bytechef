@@ -17,6 +17,7 @@ import com.bytechef.embedded.integration.definition.IntegrationDefinition;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotSandboxSettings;
 import com.bytechef.workflow.definition.ConnectionRequirement;
+import com.bytechef.workflow.definition.Input;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import com.bytechef.workflow.definition.WorkflowTaskDefinition;
@@ -26,6 +27,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import org.graalvm.polyglot.PolyglotException;
 import org.junit.jupiter.api.AfterEach;
@@ -517,6 +519,70 @@ class IntegrationHandlerPolyglotEngineTest {
             .apply(new RecordingTaskContext(null, Map.of(), Map.of("message", "hi")));
 
         assertEquals("hi", result);
+    }
+
+    @Test
+    void testLoadsAnInputThatReferencesAComponentInput() {
+        String source = """
+            def post(context):
+                return context.input("channel")
+
+
+            integration = {
+                "componentName": "googleMail",
+                "componentVersion": 1,
+                "workflows": [{
+                    "name": "notify",
+                    "inputs": [
+                        {"name": "channel", "componentName": "slack", "componentVersion": 1, "groupName": "channel"},
+                        {"name": "note"},
+                    ],
+                    "tasks": [{"name": "post", "perform": post}],
+                }],
+            }
+
+            integration
+            """;
+
+        WorkflowDefinition workflowDefinition = IntegrationHandlerPolyglotEngine.load("python", source)
+            .getDefinition()
+            .getWorkflows()
+            .orElseThrow()
+            .getFirst();
+
+        List<? extends Input> inputs = workflowDefinition.getInputs()
+            .orElseThrow();
+
+        assertEquals(
+            Optional.of(new Input.ComponentInputReference("slack", 1, "channel")), inputs.getFirst()
+                .getComponentInput());
+        assertEquals(Optional.empty(), inputs.get(1)
+            .getComponentInput());
+    }
+
+    @Test
+    void testRefusesAnInputWithAPartialComponentInputReference() {
+        String source = """
+            ({
+                componentName: 'googleMail',
+                componentVersion: 1,
+                workflows: [{
+                    name: 'notify',
+                    inputs: [{name: 'channel', componentName: 'slack'}],
+                    tasks: [{name: 'post', perform: () => 'ok'}]
+                }]
+            })
+            """;
+
+        Exception exception = assertThrows(
+            Exception.class, () -> IntegrationHandlerPolyglotEngine.load("js", source)
+                .getDefinition()
+                .getWorkflows());
+
+        assertTrue(
+            String.valueOf(exception.getMessage())
+                .contains("componentName, componentVersion and groupName together"),
+            exception.getMessage());
     }
 
     private static TaskDefinition loadSingleTask(String languageId, String source) {
