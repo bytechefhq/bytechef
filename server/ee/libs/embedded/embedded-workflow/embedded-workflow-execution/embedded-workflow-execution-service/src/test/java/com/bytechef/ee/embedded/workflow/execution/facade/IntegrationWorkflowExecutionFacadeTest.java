@@ -201,7 +201,7 @@ class IntegrationWorkflowExecutionFacadeTest {
             .thenReturn(List.of(integrationInstanceConfiguration));
 
         Page<WorkflowExecutionDTO> workflowExecutionPage = facade.getWorkflowExecutions(
-            0L, null, null, null, null, null, null, 0);
+            0L, null, null, null, null, null, null, null, 0);
 
         assertThat(workflowExecutionPage.getContent())
             .singleElement()
@@ -229,10 +229,68 @@ class IntegrationWorkflowExecutionFacadeTest {
         when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), eq(true), eq(0)))
             .thenReturn(Page.empty());
 
-        facade.getWorkflowExecutions(null, null, null, null, null, 1051L, null, 0);
+        facade.getWorkflowExecutions(null, null, null, null, null, 1051L, null, null, 0);
 
         verify(principalJobService).getJobIds(
             null, null, null, List.of(1050L), PlatformType.EMBEDDED, List.of("published-workflow"), true, 0);
+    }
+
+    @Test
+    void testGetWorkflowExecutionsFiltersByInstancesOfTheConnectedUser() {
+        IntegrationInstance connectedUserIntegrationInstance = new IntegrationInstance();
+
+        connectedUserIntegrationInstance.setConnectedUserId(7L);
+        connectedUserIntegrationInstance.setId(1050L);
+        connectedUserIntegrationInstance.setIntegrationInstanceConfigurationId(1051L);
+
+        IntegrationInstance otherConnectedUserIntegrationInstance = new IntegrationInstance();
+
+        otherConnectedUserIntegrationInstance.setConnectedUserId(8L);
+        otherConnectedUserIntegrationInstance.setId(1060L);
+        otherConnectedUserIntegrationInstance.setIntegrationInstanceConfigurationId(1051L);
+
+        List<IntegrationWorkflowDTO> integrationWorkflowDTOs = List.of(integrationWorkflowDTO("published-workflow"));
+
+        when(integrationWorkflowFacade.getIntegrationWorkflows())
+            .thenReturn(integrationWorkflowDTOs);
+        when(integrationInstanceService.getIntegrationInstanceConfigurationIntegrationInstances(List.of(1051L)))
+            .thenReturn(List.of(connectedUserIntegrationInstance, otherConnectedUserIntegrationInstance));
+        when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), eq(true), eq(0)))
+            .thenReturn(Page.empty());
+
+        facade.getWorkflowExecutions(null, null, null, null, null, 1051L, 7L, null, 0);
+
+        verify(principalJobService).getJobIds(
+            null, null, null, List.of(1050L), PlatformType.EMBEDDED, List.of("published-workflow"), true, 0);
+    }
+
+    @Test
+    void testGetWorkflowExecutionsReturnsEmptyPageWhenTheConnectedUserHasNoInstances() {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setId(1051L);
+
+        IntegrationInstance otherConnectedUserIntegrationInstance = new IntegrationInstance();
+
+        otherConnectedUserIntegrationInstance.setConnectedUserId(8L);
+        otherConnectedUserIntegrationInstance.setId(1060L);
+        otherConnectedUserIntegrationInstance.setIntegrationInstanceConfigurationId(1051L);
+
+        List<IntegrationWorkflowDTO> integrationWorkflowDTOs = List.of(integrationWorkflowDTO("published-workflow"));
+
+        when(integrationWorkflowFacade.getIntegrationWorkflows())
+            .thenReturn(integrationWorkflowDTOs);
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(null, null, null))
+            .thenReturn(List.of(integrationInstanceConfiguration));
+        when(integrationInstanceService.getIntegrationInstanceConfigurationIntegrationInstances(List.of(1051L)))
+            .thenReturn(List.of(otherConnectedUserIntegrationInstance));
+
+        Page<WorkflowExecutionDTO> workflowExecutionPage = facade.getWorkflowExecutions(
+            null, null, null, null, null, null, 7L, null, 0);
+
+        assertThat(workflowExecutionPage.getContent()).isEmpty();
+
+        verify(principalJobService, never()).getJobIds(any(), any(), any(), any(), any(), any(), eq(true), eq(0));
     }
 
     @Test
@@ -263,7 +321,7 @@ class IntegrationWorkflowExecutionFacadeTest {
         when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), eq(true), eq(0)))
             .thenReturn(Page.empty());
 
-        facade.getWorkflowExecutions(null, null, null, null, null, null, "draft-workflow", 0);
+        facade.getWorkflowExecutions(null, null, null, null, null, null, null, "draft-workflow", 0);
 
         verify(principalJobService).getJobIds(
             null, null, null, List.of(1050L), PlatformType.EMBEDDED, List.of("published-workflow", "draft-workflow"),

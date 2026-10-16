@@ -25,6 +25,6 @@ public interface IntegrationWorkflowExecutionFacade {
     TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId);
 
     Page<WorkflowExecutionDTO> getWorkflowExecutions(
-        Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long projectId,
-        Long integrationInstanceConfigurationId, String workflowId, int pageNumber);
+        Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long integrationId,
+        Long integrationInstanceConfigurationId, Long connectedUserId, String workflowId, int pageNumber);
 }

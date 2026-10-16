@@ -107,7 +107,7 @@ class IntegrationWorkflowExecutionFacadeIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
             () -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
-                null, null, null, null, null, null, null, 0))
+                null, null, null, null, null, null, null, null, 0))
                     .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(jobService, principalJobService, taskExecutionService);

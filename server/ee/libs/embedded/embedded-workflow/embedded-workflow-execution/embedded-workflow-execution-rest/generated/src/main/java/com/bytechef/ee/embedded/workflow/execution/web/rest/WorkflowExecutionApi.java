@@ -140,6 +140,7 @@ public interface WorkflowExecutionApi {
      * @param jobEndDate The end date of a job. (optional)
      * @param integrationId The id of a Integration. (optional)
      * @param integrationInstanceConfigurationId The id of a Integration instance configuration. (optional)
+     * @param connectedUserId The id of a connected user. (optional)
      * @param workflowId The id of a workflow. (optional)
      * @param pageNumber The number of the page to return. (optional, default to 0)
      * @return The page of workflow executions. (status code 200)
@@ -167,6 +168,7 @@ public interface WorkflowExecutionApi {
         @Parameter(name = "jobEndDate", description = "The end date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobEndDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime jobEndDate,
         @Parameter(name = "integrationId", description = "The id of a Integration.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "integrationId", required = false) @Nullable Long integrationId,
         @Parameter(name = "integrationInstanceConfigurationId", description = "The id of a Integration instance configuration.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "integrationInstanceConfigurationId", required = false) @Nullable Long integrationInstanceConfigurationId,
+        @Parameter(name = "connectedUserId", description = "The id of a connected user.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectedUserId", required = false) @Nullable Long connectedUserId,
         @Parameter(name = "workflowId", description = "The id of a workflow.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "workflowId", required = false) @Nullable String workflowId,
         @Parameter(name = "pageNumber", description = "The number of the page to return.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber
     ) {

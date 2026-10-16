@@ -64,6 +64,13 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
         - name: "workflowId"
           description: "The id of a workflow."
           in: "query"
