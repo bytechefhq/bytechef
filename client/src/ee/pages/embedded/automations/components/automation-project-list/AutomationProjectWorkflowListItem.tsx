@@ -1,17 +1,11 @@
-import Button from '@/components/Button/Button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/DropdownMenu/DropdownMenu';
+import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowListRowDropdownMenu from '@/shared/components/workflow/WorkflowListRowDropdownMenu';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {AutomationProjectsQuery, useDuplicateAutomationProjectWorkflowMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {CopyIcon, EllipsisVerticalIcon, PencilIcon} from 'lucide-react';
+import {CopyIcon} from 'lucide-react';
 import {MouseEvent, useMemo} from 'react';
 import {toast} from 'sonner';
 
@@ -139,30 +133,7 @@ const AutomationProjectWorkflowListItem = ({
                 )}
 
                 {codeWorkflowProject ? (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                aria-label="Workflow Actions"
-                                icon={<EllipsisVerticalIcon />}
-                                onClick={(event) => event.stopPropagation()}
-                                size="icon"
-                                variant="ghost"
-                            />
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                aria-label="Edit Workflow"
-                                icon={<PencilIcon />}
-                                label="Edit"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-
-                                    onEditWorkflow(workflow);
-                                }}
-                            />
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div aria-hidden className="size-9 shrink-0" />
                 ) : (
                     <WorkflowListRowDropdownMenu
                         exportUrl={`/api/automation/internal/workflows/${workflow.workflowId}/export`}
