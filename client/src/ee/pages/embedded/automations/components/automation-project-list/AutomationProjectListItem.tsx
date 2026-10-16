@@ -41,7 +41,7 @@ import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
 import isEditableCodeLanguage from '../../utils/isEditableCodeLanguage';
-import CodeWorkflowReferencesDialog from '../CodeWorkflowReferencesDialog';
+import CodeWorkflowReferencesSheet from '../CodeWorkflowReferencesSheet';
 
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
 type EmbeddedTagType = AutomationProjectTagsQuery['automationProjectTags'][number];
@@ -427,7 +427,7 @@ const AutomationProjectListItem = ({
             />
 
             {showReferencesDialog && (
-                <CodeWorkflowReferencesDialog
+                <CodeWorkflowReferencesSheet
                     onClose={() => setShowReferencesDialog(false)}
                     projectName={project.name}
                     workflowTemplates={project.workflowTemplates}
