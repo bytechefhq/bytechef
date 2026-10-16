@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
+import com.bytechef.automation.configuration.config.TestOwnerContributors;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -62,12 +63,17 @@ public class ProjectServiceIntTest {
     private TagRepository tagRepository;
 
     @Autowired
+    private TestOwnerContributors testOwnerContributors;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     private Workspace workspace;
 
     @BeforeEach
     public void beforeEach() {
+        testOwnerContributors.clear();
+
         category = categoryRepository.save(new Category("name"));
         workspace = workspaceRepository.save(new Workspace("test"));
     }
@@ -147,63 +153,74 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    public void testGetProjectsExcludesEmbeddedMarkerProjects() {
+    public void testGetProjectsExcludesEmbeddedOwnedProjects() {
         projectRepository.save(
             Project.builder()
                 .name("Regular Project")
                 .workspaceId(workspace.getId())
                 .build());
 
-        projectRepository.save(
+        Project catalogProject = projectRepository.save(
             Project.builder()
-                .name("__EMBEDDED_AUTOMATION__Catalog")
+                .name("Catalog")
                 .workspaceId(workspace.getId())
                 .build());
+
+        Project connectedUserProject = projectRepository.save(
+            Project.builder()
+                .name("ext")
+                .workspaceId(workspace.getId())
+                .build());
+
+        projectRepository.save(
+            Project.builder()
+                .name("abEMBEDDEDcd x")
+                .workspaceId(workspace.getId())
+                .build());
+
+        testOwnerContributors.addCatalogId(catalogProject.getId());
+        testOwnerContributors.addConnectedUserId(connectedUserProject.getId());
 
         List<Project> projects = projectService.getProjects(null, null, null, null, null, workspace.getId());
 
         assertThat(projects)
             .extracting(Project::getName)
-            .contains("Regular Project")
-            .doesNotContain("__EMBEDDED_AUTOMATION__Catalog");
+            .containsExactlyInAnyOrder("Regular Project", "abEMBEDDEDcd x");
     }
 
     @Test
-    public void testFetchProjectByNameAndWorkspaceId() {
-        Workspace secondWorkspace = workspaceRepository.save(new Workspace("test2"));
-
-        Project projectInWorkspace1 = projectService.create(
+    public void testFetchProjectByNameIgnoresOwnedProjects() {
+        Project catalogProject = projectRepository.save(
             Project.builder()
-                .name("__EMBEDDED_TEMPLATES__")
+                .name("Sales")
                 .workspaceId(workspace.getId())
                 .build());
 
-        Project projectInWorkspace2 = projectService.create(
+        testOwnerContributors.addCatalogId(catalogProject.getId());
+
+        assertThat(projectService.fetchProject("sales")).isEmpty();
+    }
+
+    @Test
+    public void testFetchProjectByNameReturnsTheUnownedProjectWhenAnOwnedOneSharesItsName() {
+        Project catalogProject = projectRepository.save(
             Project.builder()
-                .name("__EMBEDDED_TEMPLATES__")
-                .workspaceId(secondWorkspace.getId())
+                .name("Sales")
+                .workspaceId(workspace.getId())
                 .build());
 
-        // workspace isolation: each workspace returns its own project
-        assertThat(projectService.fetchProject("__EMBEDDED_TEMPLATES__", workspace.getId()))
+        Project regularProject = projectRepository.save(
+            Project.builder()
+                .name("Sales")
+                .workspaceId(workspace.getId())
+                .build());
+
+        testOwnerContributors.addCatalogId(catalogProject.getId());
+
+        assertThat(projectService.fetchProject("SALES"))
             .isPresent()
             .map(Project::getId)
-            .hasValue(projectInWorkspace1.getId());
-
-        assertThat(projectService.fetchProject("__EMBEDDED_TEMPLATES__", secondWorkspace.getId()))
-            .isPresent()
-            .map(Project::getId)
-            .hasValue(projectInWorkspace2.getId());
-
-        // case-insensitive lookup
-        assertThat(projectService.fetchProject("__embedded_templates__", workspace.getId()))
-            .isPresent()
-            .map(Project::getId)
-            .hasValue(projectInWorkspace1.getId());
-
-        // non-existent name returns empty
-        assertThat(projectService.fetchProject("__NOPE__", workspace.getId()))
-            .isEmpty();
+            .hasValue(regularProject.getId());
     }
 
     @Test

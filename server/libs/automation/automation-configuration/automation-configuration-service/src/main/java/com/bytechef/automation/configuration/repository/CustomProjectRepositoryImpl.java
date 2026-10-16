@@ -17,8 +17,11 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
@@ -28,9 +31,11 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 public class CustomProjectRepositoryImpl implements CustomProjectRepository {
 
     private final JdbcClient jdbcClient;
+    private final ProjectOwnershipService projectOwnershipService;
 
-    public CustomProjectRepositoryImpl(JdbcClient jdbcClient) {
+    public CustomProjectRepositoryImpl(JdbcClient jdbcClient, ProjectOwnershipService projectOwnershipService) {
         this.jdbcClient = jdbcClient;
+        this.projectOwnershipService = projectOwnershipService;
     }
 
     @Override
@@ -60,7 +65,8 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
             query += "JOIN project_tag ON project.id = project_tag.project_id ";
         }
 
-        query += "WHERE project.name NOT LIKE '__EMBEDDED__%' ";
+        query += "WHERE " + projectOwnershipService.getExcludeProjectsCondition(
+            EnumSet.allOf(ProjectOwner.class), "project.id") + " ";
 
         if (apiCollections != null) {
             if (apiCollections) {
@@ -74,44 +80,34 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
             query += "AND project.id NOT IN (SELECT project_deployment.project_id FROM project_deployment) ";
         }
 
-        if (workspaceId != null || categoryId != null || tagId != null || status != null) {
-            query += "AND ";
-        }
+        List<String> filters = new ArrayList<>();
 
         if (workspaceId != null) {
             arguments.add(workspaceId);
 
-            query += "workspace_id = ? ";
+            filters.add("workspace_id = ?");
         }
 
         if (categoryId != null) {
             arguments.add(categoryId);
 
-            if (workspaceId != null) {
-                query += "AND ";
-            }
-
-            query += "category_id = ? ";
+            filters.add("category_id = ?");
         }
 
         if (tagId != null) {
             arguments.add(tagId);
 
-            if (workspaceId != null || categoryId != null) {
-                query += "AND ";
-            }
-
-            query += "tag_id = ? ";
+            filters.add("tag_id = ?");
         }
 
         if (status != null) {
             arguments.add(status);
 
-            if (workspaceId != null || categoryId != null || tagId != null) {
-                query += "AND ";
-            }
+            filters.add("project_version.status = ?");
+        }
 
-            query += "project_version.status = ? ";
+        for (String filter : filters) {
+            query += "AND " + filter + " ";
         }
 
         query += "ORDER BY lower_name ASC";
@@ -145,6 +141,17 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
         }
 
         return projects;
+    }
+
+    @Override
+    public List<Long> findProjectIdsByNameIgnoreCaseExcludingOwned(String name) {
+        String query = "SELECT project.id FROM project WHERE LOWER(project.name) = LOWER(?) AND " +
+            projectOwnershipService.getExcludeProjectsCondition(EnumSet.allOf(ProjectOwner.class), "project.id");
+
+        return jdbcClient.sql(query)
+            .param(name)
+            .query(Long.class)
+            .list();
     }
 
     private record ProjectVersion(int version, int status, Instant publishedDate, String description) {

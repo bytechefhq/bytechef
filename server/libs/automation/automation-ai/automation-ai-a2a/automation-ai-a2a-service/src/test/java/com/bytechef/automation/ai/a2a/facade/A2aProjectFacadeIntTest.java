@@ -52,7 +52,6 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
@@ -559,7 +558,7 @@ class A2aProjectFacadeIntTest {
                 .hasValueSatisfying(projectDeployment -> {
                     assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
                     assertThat(projectDeployment.getName()).startsWith(
-                        SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX);
+                        "__A2A_SERVER__");
                 });
         }
 

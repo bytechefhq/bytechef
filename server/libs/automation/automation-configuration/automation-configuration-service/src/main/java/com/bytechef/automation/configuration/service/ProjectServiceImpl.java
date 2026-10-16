@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,13 +79,17 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Project> fetchProject(String name) {
-        return projectRepository.findByNameIgnoreCase(name);
-    }
+        List<Long> projectIds = projectRepository.findProjectIdsByNameIgnoreCaseExcludingOwned(name);
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Project> fetchProject(String name, long workspaceId) {
-        return projectRepository.findByNameIgnoreCaseAndWorkspaceId(name, workspaceId);
+        if (projectIds.size() > 1) {
+            throw new IncorrectResultSizeDataAccessException(1, projectIds.size());
+        }
+
+        if (projectIds.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return projectRepository.findById(projectIds.getFirst());
     }
 
     @Override

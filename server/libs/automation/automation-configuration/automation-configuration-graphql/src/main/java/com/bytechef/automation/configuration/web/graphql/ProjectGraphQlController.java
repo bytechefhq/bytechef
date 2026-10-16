@@ -18,10 +18,10 @@ package com.bytechef.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.category.domain.Category;
@@ -29,8 +29,10 @@ import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
@@ -107,9 +109,16 @@ public class ProjectGraphQlController {
 
     @QueryMapping(name = "projects")
     public List<Project> projects() {
-        return projectService.getProjects()
-            .stream()
-            .filter(project -> !SystemProjects.isSystemProject(project))
+        List<Project> projects = projectService.getProjects();
+
+        Set<Long> embeddedProjectIds = projectFacade.getOwnedProjectIds(
+            projects.stream()
+                .map(Project::getId)
+                .toList(),
+            EnumSet.allOf(ProjectOwner.class));
+
+        return projects.stream()
+            .filter(project -> !embeddedProjectIds.contains(project.getId()))
             .toList();
     }
 

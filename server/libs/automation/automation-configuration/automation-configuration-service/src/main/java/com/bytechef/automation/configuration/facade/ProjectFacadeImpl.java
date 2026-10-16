@@ -23,15 +23,16 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.ComponentDefinitionTuple;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.WorkflowInfo;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
@@ -56,10 +57,12 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -83,6 +86,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final CategoryService categoryService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
     private final PreBuiltTemplateService preBuiltTemplateService;
+    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
@@ -101,7 +105,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
         ApplicationProperties applicationProperties, CategoryService categoryService,
         ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
         ProjectWorkflowService projectWorkflowService,
-        ProjectDeploymentService projectDeploymentService, ProjectService projectService,
+        ProjectDeploymentService projectDeploymentService, ProjectOwnershipService projectOwnershipService,
+        ProjectService projectService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
         SharedTemplateFileStorage sharedTemplateFileStorage, SharedTemplateService sharedTemplateService,
         TagService tagService, WorkflowService workflowService,
@@ -113,6 +118,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.preBuiltTemplateService = preBuiltTemplateService;
         this.projectWorkflowService = projectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
+        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
@@ -247,6 +253,17 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Project project = projectService.getProject(id);
 
         return toProjectDTO(project);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, ProjectOwner projectOwner) {
+        return projectOwnershipService.getOwnedProjectIds(projectIds, projectOwner);
+    }
+
+    @Override
+    public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners) {
+        return projectOwnershipService.getOwnedProjectIds(projectIds, projectOwners);
     }
 
     @Override
@@ -564,7 +581,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private List<Long> getVisibleWorkspaceProjectIds(long workspaceId) {
         return projectService.getProjects(null, null, null, null, null, workspaceId)
             .stream()
-            .filter(project -> !SystemProjects.isSystemProject(project))
             .map(Project::getId)
             .toList();
     }
@@ -576,7 +592,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         List<Project> projects = projectService
             .getProjects(apiCollections, categoryId, projectDeployments, tagId, status, workspaceId)
             .stream()
-            .filter(project -> !SystemProjects.isSystemProject(project))
             .toList();
 
         if (includeAllFields) {
