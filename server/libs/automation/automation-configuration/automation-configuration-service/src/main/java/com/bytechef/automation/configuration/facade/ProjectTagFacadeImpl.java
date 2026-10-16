@@ -47,7 +47,7 @@ public class ProjectTagFacadeImpl implements ProjectTagFacade {
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getProjectTags() {
-        List<Project> projects = projectService.getProjects();
+        List<Project> projects = projectService.getProjects(null, null, null, null, null, null);
 
         return tagService.getTags(CollectionUtils.flatMap(projects, Project::getTagIds));
     }
