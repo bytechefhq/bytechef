@@ -60,7 +60,6 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.evaluator.Evaluator;
-import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -314,7 +313,7 @@ class ProjectCodeWorkflowFacadeIntTest {
     }
 
     @Test
-    void testSaveWithEnableRefusesCreationWhenAWorkflowNeedsAConnectionBound() {
+    void testSaveWithEnableLeavesAWorkflowThatNeedsAConnectionDisabled() {
         authenticate(AuthorityConstants.ADMIN);
 
         stubPublishOfNewProject();
@@ -328,63 +327,18 @@ class ProjectCodeWorkflowFacadeIntTest {
         when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
             .thenReturn(List.of(new ComponentConnection("slack", 1, "slack_1", "slack", true)));
 
-        assertThatThrownBy(
-            () -> projectCodeWorkflowFacade.save(
-                WORKSPACE_ID, projectBytes(), Language.JAVASCRIPT, Environment.STAGING, true))
-                    .isInstanceOf(ConfigurationException.class)
-                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
-                        .isEqualTo(101));
+        projectCodeWorkflowFacade.save(WORKSPACE_ID, projectBytes(), Language.JAVASCRIPT, Environment.STAGING, true);
 
-        verify(projectDeploymentService, never()).updateEnabled(anyLong(), anyBoolean());
+        verify(projectDeploymentService).create(any(ProjectDeployment.class));
+        verify(projectDeploymentWorkflowService, never()).updateEnabled(PROJECT_DEPLOYMENT_WORKFLOW_ID, true);
+        verify(projectDeploymentService).updateEnabled(PROJECT_DEPLOYMENT_ID, true);
     }
 
     @Test
     void testSaveWithEnableMovesTheExistingDeploymentToThePublishedVersion() {
         authenticate(AuthorityConstants.ADMIN);
 
-        Project project = newProject();
-
-        project.publish(null);
-
-        when(projectService.fetchProject(PROJECT_NAME)).thenReturn(Optional.of(project));
-        when(projectService.update(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(projectService.getProject(PROJECT_ID)).thenAnswer(invocation -> publishedProject(2));
-
-        stubCodeWorkflowContainer();
-
-        UUID carriedWorkflowUuid = UUID.randomUUID();
-
-        when(projectWorkflowService.getProjectWorkflows(PROJECT_ID))
-            .thenReturn(
-                List.of(
-                    new ProjectWorkflow(PROJECT_ID, 1, "wf-old", carriedWorkflowUuid),
-                    new ProjectWorkflow(PROJECT_ID, 2, "wf-1", carriedWorkflowUuid),
-                    new ProjectWorkflow(PROJECT_ID, 2, "wf-2", UUID.randomUUID())));
-        when(projectWorkflowService.getProjectWorkflows(PROJECT_ID, 2))
-            .thenReturn(
-                List.of(
-                    new ProjectWorkflow(PROJECT_ID, 2, "wf-1", carriedWorkflowUuid),
-                    new ProjectWorkflow(PROJECT_ID, 2, "wf-2", UUID.randomUUID())));
-        when(projectWorkflowService.getProjectWorkflowUuid(PROJECT_DEPLOYMENT_ID, "wf-old"))
-            .thenReturn(carriedWorkflowUuid.toString());
-
-        when(projectDeploymentService.fetchProjectDeployment(PROJECT_ID, Environment.STAGING))
-            .thenAnswer(invocation -> Optional.of(existingProjectDeployment()));
-        when(projectDeploymentService.getProjectDeploymentId(PROJECT_ID, Environment.STAGING))
-            .thenReturn(PROJECT_DEPLOYMENT_ID);
-        when(projectDeploymentService.getProjectDeployment(PROJECT_DEPLOYMENT_ID))
-            .thenAnswer(invocation -> existingProjectDeployment());
-        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(PROJECT_DEPLOYMENT_ID))
-            .thenAnswer(invocation -> {
-                ProjectDeploymentWorkflow carriedProjectDeploymentWorkflow = projectDeploymentWorkflow(
-                    21L, "wf-old", true);
-
-                carriedProjectDeploymentWorkflow.setInputs(Map.of("channel", "general"));
-
-                return List.of(carriedProjectDeploymentWorkflow);
-            });
-        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, "wf-2"))
-            .thenReturn(projectDeploymentWorkflow(22L, "wf-2", false));
+        stubMoveToVersionTwo();
 
         projectCodeWorkflowFacade.save(WORKSPACE_ID, projectBytes(), Language.JAVASCRIPT, Environment.STAGING, true);
 
@@ -416,6 +370,26 @@ class ProjectCodeWorkflowFacadeIntTest {
         assertThat(carriedInputs.get("channel")).isEqualTo("general");
 
         verify(projectDeploymentWorkflowService, never()).delete(21L);
+    }
+
+    @Test
+    void testSaveWithEnableLeavesANewWorkflowThatNeedsAConnectionDisabledWhenMoving() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        stubMoveToVersionTwo();
+
+        when(workflowService.getWorkflow("wf-2"))
+            .thenReturn(
+                new Workflow(
+                    "wf-2", "{\"tasks\":[{\"name\":\"slack_1\",\"type\":\"slack/v1/sendMessage\"}]}",
+                    Workflow.Format.JSON));
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenReturn(List.of(new ComponentConnection("slack", 1, "slack_1", "slack", true)));
+
+        projectCodeWorkflowFacade.save(WORKSPACE_ID, projectBytes(), Language.JAVASCRIPT, Environment.STAGING, true);
+
+        verify(projectDeploymentWorkflowService, never()).updateEnabled(22L, true);
+        verify(projectDeploymentService).updateEnabled(PROJECT_DEPLOYMENT_ID, true);
     }
 
     @Test
@@ -632,6 +606,52 @@ class ProjectCodeWorkflowFacadeIntTest {
             .thenAnswer(invocation -> existingProjectDeployment());
         when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, "wf-1"))
             .thenReturn(projectDeploymentWorkflow(PROJECT_DEPLOYMENT_WORKFLOW_ID, "wf-1", false));
+    }
+
+    private void stubMoveToVersionTwo() {
+        Project project = newProject();
+
+        project.publish(null);
+
+        when(projectService.fetchProject(PROJECT_NAME)).thenReturn(Optional.of(project));
+        when(projectService.update(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(projectService.getProject(PROJECT_ID)).thenAnswer(invocation -> publishedProject(2));
+
+        stubCodeWorkflowContainer();
+
+        UUID carriedWorkflowUuid = UUID.randomUUID();
+
+        when(projectWorkflowService.getProjectWorkflows(PROJECT_ID))
+            .thenReturn(
+                List.of(
+                    new ProjectWorkflow(PROJECT_ID, 1, "wf-old", carriedWorkflowUuid),
+                    new ProjectWorkflow(PROJECT_ID, 2, "wf-1", carriedWorkflowUuid),
+                    new ProjectWorkflow(PROJECT_ID, 2, "wf-2", UUID.randomUUID())));
+        when(projectWorkflowService.getProjectWorkflows(PROJECT_ID, 2))
+            .thenReturn(
+                List.of(
+                    new ProjectWorkflow(PROJECT_ID, 2, "wf-1", carriedWorkflowUuid),
+                    new ProjectWorkflow(PROJECT_ID, 2, "wf-2", UUID.randomUUID())));
+        when(projectWorkflowService.getProjectWorkflowUuid(PROJECT_DEPLOYMENT_ID, "wf-old"))
+            .thenReturn(carriedWorkflowUuid.toString());
+
+        when(projectDeploymentService.fetchProjectDeployment(PROJECT_ID, Environment.STAGING))
+            .thenAnswer(invocation -> Optional.of(existingProjectDeployment()));
+        when(projectDeploymentService.getProjectDeploymentId(PROJECT_ID, Environment.STAGING))
+            .thenReturn(PROJECT_DEPLOYMENT_ID);
+        when(projectDeploymentService.getProjectDeployment(PROJECT_DEPLOYMENT_ID))
+            .thenAnswer(invocation -> existingProjectDeployment());
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(PROJECT_DEPLOYMENT_ID))
+            .thenAnswer(invocation -> {
+                ProjectDeploymentWorkflow carriedProjectDeploymentWorkflow = projectDeploymentWorkflow(
+                    21L, "wf-old", true);
+
+                carriedProjectDeploymentWorkflow.setInputs(Map.of("channel", "general"));
+
+                return List.of(carriedProjectDeploymentWorkflow);
+            });
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, "wf-2"))
+            .thenReturn(projectDeploymentWorkflow(22L, "wf-2", false));
     }
 
     private void stubPublishOfNewProject() {
