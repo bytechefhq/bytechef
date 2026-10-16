@@ -352,12 +352,12 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         assertThat(developmentDeploymentId).isNotEqualTo(productionDeploymentId);
         assertThat(projectDeploymentService.getProjectDeployment(productionDeploymentId))
             .satisfies(projectDeployment -> {
-                assertThat(projectDeployment.getName()).isEqualTo("__EMBEDDED__" + externalUserId + "__PRODUCTION");
+                assertThat(projectDeployment.getName()).isEqualTo(externalUserId);
                 assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
             });
         assertThat(projectDeploymentService.getProjectDeployment(developmentDeploymentId))
             .satisfies(projectDeployment -> {
-                assertThat(projectDeployment.getName()).isEqualTo("__EMBEDDED__" + externalUserId + "__DEVELOPMENT");
+                assertThat(projectDeployment.getName()).isEqualTo(externalUserId);
                 assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.DEVELOPMENT);
             });
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
@@ -423,7 +423,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     }
 
     @Test
-    void testGetOrCreateDeploymentDoesNotAdoptADeploymentThatOnlyMatchesByName() {
+    void testGetOrCreateDeploymentDoesNotAdoptALegacyNamedDeploymentThatOnlyMatchesByName() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Name Only Deployment");
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -487,7 +487,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         assertThat(projectDeployment.getProjectVersion()).isEqualTo(3);
         assertThat(projectDeployment.getProjectId()).isEqualTo(automationWorkflowProjectId);
         assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
-        assertThat(projectDeployment.getName()).isEqualTo("__EMBEDDED__" + externalUserId + "__PRODUCTION");
+        assertThat(projectDeployment.getName()).isEqualTo(externalUserId);
         assertThat(projectDeployment.isEnabled()).isTrue();
     }
 
