@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ApprovalForm")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.308008+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.874518+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ApprovalFormModel {
 
   private @Nullable Long environmentId;
@@ -34,7 +34,6 @@ public class ApprovalFormModel {
 
   private @Nullable String formTitle;
 
-  @Valid
   private List<@Valid ApprovalFormInputModel> inputs = new ArrayList<>();
 
   public ApprovalFormModel environmentId(@Nullable Long environmentId) {
@@ -117,7 +116,7 @@ public class ApprovalFormModel {
    * Get inputs
    * @return inputs
    */
-  @Valid 
+  
   @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public List<@Valid ApprovalFormInputModel> getInputs() {

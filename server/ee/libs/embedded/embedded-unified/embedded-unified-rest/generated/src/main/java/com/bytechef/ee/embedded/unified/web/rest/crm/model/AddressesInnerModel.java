@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("addresses_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:34.742723+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:08:48.999333+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class AddressesInnerModel {
 
   /**
@@ -127,8 +127,8 @@ public class AddressesInnerModel {
    * Get city
    * @return city
    */
-  @NotNull 
-  @Schema(name = "city", example = "San Francisco", requiredMode = Schema.RequiredMode.REQUIRED)
+  /* @Present */ 
+  @Schema(name = "city", example = "San Francisco", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
   @JsonProperty("city")
   public JsonNullable<String> getCity() {
     return city;
@@ -148,8 +148,8 @@ public class AddressesInnerModel {
    * Get country
    * @return country
    */
-  @NotNull 
-  @Schema(name = "country", example = "USA", requiredMode = Schema.RequiredMode.REQUIRED)
+  /* @Present */ 
+  @Schema(name = "country", example = "USA", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
   @JsonProperty("country")
   public JsonNullable<String> getCountry() {
     return country;
@@ -169,8 +169,8 @@ public class AddressesInnerModel {
    * Get postalCode
    * @return postalCode
    */
-  @NotNull 
-  @Schema(name = "postalCode", example = "94107", requiredMode = Schema.RequiredMode.REQUIRED)
+  /* @Present */ 
+  @Schema(name = "postalCode", example = "94107", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
   @JsonProperty("postalCode")
   public JsonNullable<String> getPostalCode() {
     return postalCode;
@@ -190,8 +190,8 @@ public class AddressesInnerModel {
    * Get state
    * @return state
    */
-  @NotNull 
-  @Schema(name = "state", example = "CA", requiredMode = Schema.RequiredMode.REQUIRED)
+  /* @Present */ 
+  @Schema(name = "state", example = "CA", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
   @JsonProperty("state")
   public JsonNullable<String> getState() {
     return state;
@@ -211,8 +211,8 @@ public class AddressesInnerModel {
    * Get street1
    * @return street1
    */
-  @NotNull 
-  @Schema(name = "street1", example = "525 Brannan", requiredMode = Schema.RequiredMode.REQUIRED)
+  /* @Present */ 
+  @Schema(name = "street1", example = "525 Brannan", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
   @JsonProperty("street1")
   public JsonNullable<String> getStreet1() {
     return street1;
@@ -232,8 +232,8 @@ public class AddressesInnerModel {
    * Get street2
    * @return street2
    */
-  @NotNull 
-  @Schema(name = "street2", requiredMode = Schema.RequiredMode.REQUIRED)
+  /* @Present */ 
+  @Schema(name = "street2", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
   @JsonProperty("street2")
   public JsonNullable<String> getStreet2() {
     return street2;

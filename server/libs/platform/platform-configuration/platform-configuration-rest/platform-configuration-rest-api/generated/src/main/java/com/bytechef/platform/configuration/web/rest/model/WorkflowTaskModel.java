@@ -28,40 +28,33 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowTaskModel {
 
   private Boolean clusterRoot = false;
 
-  @Valid
   private Map<String, Object> clusterElements = new HashMap<>();
 
-  @Valid
   private List<@Valid ComponentConnectionModel> connections = new ArrayList<>();
 
   private @Nullable String description;
 
-  @Valid
   private List<@Valid WorkflowTaskModel> finalize = new ArrayList<>();
 
   private @Nullable String label;
 
   private @Nullable Integer maxRetries;
 
-  @Valid
   private Map<String, Object> metadata = new HashMap<>();
 
   private String name;
 
   private @Nullable String node;
 
-  @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
-  @Valid
   private List<@Valid WorkflowTaskModel> post = new ArrayList<>();
 
-  @Valid
   private List<@Valid WorkflowTaskModel> pre = new ArrayList<>();
 
   private @Nullable String timeout;
@@ -147,7 +140,7 @@ public class WorkflowTaskModel {
    * Get connections
    * @return connections
    */
-  @Valid 
+  
   @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
   public List<@Valid ComponentConnectionModel> getConnections() {
@@ -197,7 +190,7 @@ public class WorkflowTaskModel {
    * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
    * @return finalize
    */
-  @Valid 
+  
   @Schema(name = "finalize", description = "The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("finalize")
   public List<@Valid WorkflowTaskModel> getFinalize() {
@@ -368,7 +361,7 @@ public class WorkflowTaskModel {
    * The (optional) list of tasks that are to be executed after the successful execution of a task.
    * @return post
    */
-  @Valid 
+  
   @Schema(name = "post", description = "The (optional) list of tasks that are to be executed after the successful execution of a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("post")
   public List<@Valid WorkflowTaskModel> getPost() {
@@ -397,7 +390,7 @@ public class WorkflowTaskModel {
    * The (optional) list of tasks that are to be executed prior to a task.
    * @return pre
    */
-  @Valid 
+  
   @Schema(name = "pre", description = "The (optional) list of tasks that are to be executed prior to a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("pre")
   public List<@Valid WorkflowTaskModel> getPre() {

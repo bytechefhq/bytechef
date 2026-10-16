@@ -26,19 +26,15 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("deleteClusterElementParameter_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class DeleteClusterElementParameter200ResponseModel {
 
-  @Valid
   private Map<String, Object> metadata = new HashMap<>();
 
-  @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
-  @Valid
   private Map<String, Boolean> displayConditions = new HashMap<>();
 
-  @Valid
   private List<String> missingRequiredProperties = new ArrayList<>();
 
   private @Nullable Integer version;

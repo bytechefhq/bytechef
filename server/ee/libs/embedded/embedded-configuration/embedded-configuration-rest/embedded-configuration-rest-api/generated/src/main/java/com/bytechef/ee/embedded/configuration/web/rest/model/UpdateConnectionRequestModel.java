@@ -26,14 +26,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "UpdateConnectionRequest", description = "Contains all connection parameters that can be updated.")
 @JsonTypeName("UpdateConnectionRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.705345+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class UpdateConnectionRequestModel {
 
   private String name;
 
   private @Nullable Boolean shared;
 
-  @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
   private @Nullable Integer version;
@@ -109,7 +108,7 @@ public class UpdateConnectionRequestModel {
    * Get tags
    * @return tags
    */
-  @NotNull @Valid 
+  @NotNull 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("tags")
   public List<@Valid TagModel> getTags() {

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("phones_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:34.742723+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:08:48.999333+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class PhonesInnerModel {
 
   private JsonNullable<String> phoneNumber = JsonNullable.<String>undefined();
@@ -89,8 +89,8 @@ public class PhonesInnerModel {
    * Get phoneNumber
    * @return phoneNumber
    */
-  @NotNull 
-  @Schema(name = "phoneNumber", example = "+14151234567", requiredMode = Schema.RequiredMode.REQUIRED)
+  /* @Present */ 
+  @Schema(name = "phoneNumber", example = "+14151234567", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
   @JsonProperty("phoneNumber")
   public JsonNullable<String> getPhoneNumber() {
     return phoneNumber;
