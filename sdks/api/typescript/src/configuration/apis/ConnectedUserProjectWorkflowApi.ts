@@ -14,6 +14,11 @@
 
 import * as runtime from '../runtime.js';
 import {
+    type AutomationComponentInputOptionsRequest,
+    AutomationComponentInputOptionsRequestFromJSON,
+    AutomationComponentInputOptionsRequestToJSON,
+} from '../models/AutomationComponentInputOptionsRequest.js';
+import {
     type CodeWorkflowNotCopyableError,
     CodeWorkflowNotCopyableErrorFromJSON,
     CodeWorkflowNotCopyableErrorToJSON,
@@ -53,6 +58,11 @@ import {
     EnvironmentFromJSON,
     EnvironmentToJSON,
 } from '../models/Environment.js';
+import {
+    type Option,
+    OptionFromJSON,
+    OptionToJSON,
+} from '../models/Option.js';
 import {
     type ProvisionFrontendWorkflowReference409Response,
     ProvisionFrontendWorkflowReference409ResponseFromJSON,
@@ -260,6 +270,17 @@ export interface EnableProjectWorkflowRequest {
      * The workflow uuid.
      */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
+    xEnvironment?: Environment;
+}
+
+export interface GetFrontendAutomationComponentInputOptionsRequest {
+    /**
+     * 
+     */
+    automationComponentInputOptionsRequest: AutomationComponentInputOptionsRequest;
     /**
      * The environment.
      */
@@ -1440,6 +1461,67 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
      */
     async enableProjectWorkflow(requestParameters: EnableProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnableConnectedUserWorkflowResponse> {
         const response = await this.enableProjectWorkflowRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getFrontendAutomationComponentInputOptions without sending the request
+     */
+    async getFrontendAutomationComponentInputOptionsRequestOpts(requestParameters: GetFrontendAutomationComponentInputOptionsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['automationComponentInputOptionsRequest'] == null) {
+            throw new runtime.RequiredError(
+                'automationComponentInputOptionsRequest',
+                'Required parameter "automationComponentInputOptionsRequest" was null or undefined when calling getFrontendAutomationComponentInputOptions().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters['xEnvironment'] != null) {
+            headerParameters['X-Environment'] = String(requestParameters['xEnvironment']);
+        }
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/automation/component-input-options`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AutomationComponentInputOptionsRequestToJSON(requestParameters['automationComponentInputOptionsRequest']),
+        };
+    }
+
+    /**
+     * Resolve the dynamic option values of a component input group property with one of the authenticated connected user\'s own connections.
+     * Get component input options with a connection
+     */
+    async getFrontendAutomationComponentInputOptionsRaw(requestParameters: GetFrontendAutomationComponentInputOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Option>>> {
+        const requestOptions = await this.getFrontendAutomationComponentInputOptionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OptionFromJSON));
+    }
+
+    /**
+     * Resolve the dynamic option values of a component input group property with one of the authenticated connected user\'s own connections.
+     * Get component input options with a connection
+     */
+    async getFrontendAutomationComponentInputOptions(requestParameters: GetFrontendAutomationComponentInputOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Option>> {
+        const response = await this.getFrontendAutomationComponentInputOptionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

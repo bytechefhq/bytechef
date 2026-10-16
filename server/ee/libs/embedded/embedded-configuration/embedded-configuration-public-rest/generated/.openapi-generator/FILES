@@ -11,6 +11,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/Integratio
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/IntegrationInstanceApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/IntegrationInstanceWorkflowApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AuthorizationTypeModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AutomationComponentInputOptionsRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AutomationProjectCodeWorkflowDeployResultModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AutomationProjectCodeWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AutomationProjectCodeWorkflowTemplateModel.java
