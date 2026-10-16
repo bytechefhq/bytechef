@@ -46,8 +46,21 @@ vi.mock('@/ee/pages/embedded/workflow-executions/components/workflow-execution-s
 }));
 
 const connectedUserProjects = [
-    {connectedUser: {externalId: 'user-7', id: 7}, projectId: 11},
-    {connectedUser: {externalId: 'user-8', id: 8}, projectId: 12},
+    {
+        connectedUser: {externalId: 'user-7', id: 7},
+        connectedUserProjectWorkflows: [
+            {workflow: {id: 'copy-workflow', label: 'Copied workflow'}, workflowUuid: 'copy-uuid'},
+            {workflow: {id: 'reference-uuid', label: 'Referenced workflow'}, workflowUuid: 'reference-uuid'},
+        ],
+        projectId: 11,
+    },
+    {
+        connectedUser: {externalId: 'user-8', id: 8},
+        connectedUserProjectWorkflows: [
+            {workflow: {id: 'reference-uuid', label: 'Referenced workflow'}, workflowUuid: 'reference-uuid'},
+        ],
+        projectId: 12,
+    },
 ];
 
 let currentSearch = '';
@@ -189,5 +202,41 @@ describe('WorkflowExecutions', () => {
         act(() => environmentChangeCallback?.());
 
         await expectConnectedUserKeptInTheUrl();
+    });
+
+    it('lists the connected users workflows once each in the automations workflow filter', async () => {
+        renderWorkflowExecutions('automations=1');
+
+        await userEvent.click(getFilterComboBox('Workflow'));
+
+        expect(await screen.findByRole('option', {name: 'Copied workflow'})).toBeInTheDocument();
+        expect(screen.getAllByRole('option', {name: 'Referenced workflow'})).toHaveLength(1);
+    });
+
+    it('lists only the workflows of the picked connected user in the automations workflow filter', async () => {
+        renderWorkflowExecutions('automations=1&connectedUserId=8');
+
+        await userEvent.click(getFilterComboBox('Workflow'));
+
+        expect(await screen.findByRole('option', {name: 'Referenced workflow'})).toBeInTheDocument();
+        expect(screen.queryByRole('option', {name: 'Copied workflow'})).not.toBeInTheDocument();
+    });
+
+    it('sends the picked workflow to the automation executions query', async () => {
+        renderWorkflowExecutions('automations=1');
+
+        await pickFilterOption('Workflow', 'Referenced workflow');
+
+        await waitFor(() => {
+            expect(lastWorkflowExecutionsRequest()).toEqual(expect.objectContaining({workflowId: 'reference-uuid'}));
+        });
+    });
+
+    it('does not offer the automation workflows for integrations', async () => {
+        renderWorkflowExecutions('automations=0');
+
+        await userEvent.click(getFilterComboBox('Workflow'));
+
+        expect(screen.queryByRole('option', {name: 'Copied workflow'})).not.toBeInTheDocument();
     });
 });

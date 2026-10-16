@@ -66,10 +66,10 @@ export const getWorkflowExecutionsFilters = ({
                 selectedIntegrationInstanceConfiguration?.integration?.componentName ||
                 String(integrationInstanceConfigurationId);
         }
+    }
 
-        if (workflowId) {
-            workflowLabel = workflows?.find((workflow) => workflow.id === workflowId)?.label || workflowId;
-        }
+    if (workflowId) {
+        workflowLabel = workflows?.find((workflow) => workflow.id === workflowId)?.label || workflowId;
     }
 
     return [
