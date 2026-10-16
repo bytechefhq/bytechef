@@ -607,10 +607,6 @@ class IntegrationHandlerPolyglotEngine {
         return outputDefinitions;
     }
 
-    /**
-     * Reads the optional {@code componentName}, {@code componentVersion} and {@code groupName} keys of an input. All
-     * three are needed to point at a component input, so a partial reference fails the deploy instead of being dropped.
-     */
     private static Input.ComponentInputReference toComponentInputReference(Map<?, ?> input) {
         Object componentName = input.get("componentName");
         Object componentVersion = input.get("componentVersion");
