@@ -39,6 +39,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDT
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
+import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
@@ -104,6 +105,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver;
     private final ConnectedUserService connectedUserService;
+    private final ConnectedUserWorkflowValidator connectedUserWorkflowValidator;
     private final ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver;
     private final ConnectionService connectionService;
     private final @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator;
@@ -135,7 +137,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver,
-        ConnectedUserService connectedUserService,
+        ConnectedUserService connectedUserService, ConnectedUserWorkflowValidator connectedUserWorkflowValidator,
         ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver,
         ConnectionService connectionService,
         @Lazy @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator, EnvironmentService environmentService,
@@ -157,6 +159,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectedUserReferenceAttentionResolver = connectedUserReferenceAttentionResolver;
         this.connectedUserService = connectedUserService;
+        this.connectedUserWorkflowValidator = connectedUserWorkflowValidator;
         this.connectedUserWorkflowWebhookUrlResolver = connectedUserWorkflowWebhookUrlResolver;
         this.connectionService = connectionService;
         this.copilotWorkflowGenerator = copilotWorkflowGenerator;
@@ -368,6 +371,14 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                     "Workflow with workflowUuid '%s' does not exist".formatted(workflowUuid),
                     WorkflowErrorType.WORKFLOW_NOT_FOUND);
             });
+
+        if (enable) {
+            int workflowErrorCount = connectedUserWorkflowValidator.getErrorCount(workflowId, environment);
+
+            if (workflowErrorCount > 0) {
+                throw new InvalidWorkflowException(workflowUuid, workflowErrorCount);
+            }
+        }
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(
             connectedUserProject.getProjectId(), workflowId, enable, environment);
@@ -690,9 +701,13 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                     toInputs(workflow),
                     fetchInputValues(connectedUserProject.getProjectId(), latestProjectWorkflow, environment));
 
-                return connectedUserProjectWorkflowDTO.withStaticWebhookUrl(
-                    connectedUserWorkflowWebhookUrlResolver.resolve(
-                        projectDeploymentId, latestProjectWorkflow.getUuidAsString()));
+                return connectedUserProjectWorkflowDTO
+                    .withAttentionReason(
+                        getCopyAttentionReason(projectDeploymentId, latestProjectWorkflow.getUuidAsString(),
+                            environment))
+                    .withStaticWebhookUrl(
+                        connectedUserWorkflowWebhookUrlResolver.resolve(
+                            projectDeploymentId, latestProjectWorkflow.getUuidAsString()));
             })
             .toList();
 
@@ -700,6 +715,18 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         return Stream.concat(copies.stream(), references.stream())
             .toList();
+    }
+
+    private @Nullable String getCopyAttentionReason(
+        @Nullable Long projectDeploymentId, @Nullable String workflowUuid, Environment environment) {
+
+        if (projectDeploymentId == null || workflowUuid == null) {
+            return null;
+        }
+
+        return projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid)
+            .map(workflowId -> connectedUserWorkflowValidator.getAttentionReason(workflowId, environment))
+            .orElse(null);
     }
 
     private Map<UUID, Workflow> getPublishedWorkflows(Project project) {
