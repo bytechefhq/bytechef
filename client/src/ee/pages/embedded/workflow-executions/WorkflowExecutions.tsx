@@ -20,7 +20,7 @@ import {
     WorkflowExecution as EmbeddedWorkflowExecution,
     WorkflowExecutionFromJSON as EmbeddedWorkflowExecutionFromJSON,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
-import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {useGetConnectedUserQuery, useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {
     useGetIntegrationInstanceConfigurationQuery,
     useGetIntegrationInstanceConfigurationsQuery,
@@ -45,6 +45,7 @@ import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
+import {useDebouncedCallback} from 'use-debounce';
 
 import EmbeddedWorkflowExecutionsTable from './components/EmbeddedWorkflowExecutionsTable';
 import EmbeddedWorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
@@ -99,6 +100,7 @@ export const WorkflowExecutions = () => {
 
     const [searchParams] = useSearchParams();
 
+    const [connectedUserSearch, setConnectedUserSearch] = useState<string>('');
     const [filterAutomations, setFilterAutomations] = useState<number>(
         searchParams.get('automations') ? +searchParams.get('automations')! : 0
     );
@@ -137,6 +139,11 @@ export const WorkflowExecutions = () => {
 
     const navigate = useNavigate();
 
+    const debouncedSetConnectedUserSearch = useDebouncedCallback(
+        (search: string) => setConnectedUserSearch(search),
+        300
+    );
+
     const {data: integrationInstanceConfiguration} = useGetIntegrationInstanceConfigurationQuery(
         filterIntegrationInstanceConfigurationId!,
         !!filterIntegrationInstanceConfigurationId
@@ -154,8 +161,17 @@ export const WorkflowExecutions = () => {
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false}, filtersInteracted);
 
     const {data: connectedUsersPage} = useGetConnectedUsersQuery(
-        {environmentId: currentEnvironmentId, integrationId: filterIntegrationId},
+        {
+            environmentId: currentEnvironmentId,
+            integrationId: filterIntegrationId,
+            ...(connectedUserSearch ? {search: connectedUserSearch} : {}),
+        },
         !filterAutomations
+    );
+
+    const {data: selectedConnectedUser} = useGetConnectedUserQuery(
+        filterConnectedUserId!,
+        !!filterConnectedUserId && !filterAutomations
     );
 
     const {
@@ -210,7 +226,18 @@ export const WorkflowExecutions = () => {
         !!workflowsIntegrationId && !!workflowsIntegrationVersion
     );
 
-    const connectedUsers = connectedUsersPage?.content as ConnectedUser[] | undefined;
+    const connectedUsers = useMemo(() => {
+        const connectedUsersPageContent = connectedUsersPage?.content as ConnectedUser[] | undefined;
+
+        if (
+            !selectedConnectedUser ||
+            connectedUsersPageContent?.some((connectedUser) => connectedUser.id === selectedConnectedUser.id)
+        ) {
+            return connectedUsersPageContent;
+        }
+
+        return [selectedConnectedUser, ...(connectedUsersPageContent ?? [])];
+    }, [connectedUsersPage, selectedConnectedUser]);
 
     const emptyListMessage =
         !filterStatus &&
@@ -325,6 +352,16 @@ export const WorkflowExecutions = () => {
             undefined,
             connectedUserId
         );
+    };
+
+    const handleConnectedUserSearchChange = (search: string) => {
+        if (search) {
+            debouncedSetConnectedUserSearch(search);
+        } else {
+            debouncedSetConnectedUserSearch.cancel();
+
+            setConnectedUserSearch('');
+        }
     };
 
     const handleEndDateChange = (date?: Date) => {
@@ -682,6 +719,7 @@ export const WorkflowExecutions = () => {
                                     })) ?? []),
                                 ]}
                                 onChange={handleConnectedUserChange}
+                                onSearchChange={handleConnectedUserSearchChange}
                                 value={filterConnectedUserId}
                             />
                         </div>
