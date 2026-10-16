@@ -42,6 +42,8 @@ public interface ConnectUserProjectWorkflowMapper
     WorkflowModel map(WorkflowDTO workflowDTO);
 
     @Mapping(target = "componentReference", ignore = true)
+    @Mapping(target = "internalOnly", ignore = true)
+    @Mapping(target = "objectName", ignore = true)
     WorkflowInputModel map(Workflow.Input input);
 
     @AfterMapping
