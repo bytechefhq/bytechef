@@ -18,7 +18,6 @@ import pasteNode from '../utils/pasteNode';
 import AddBranchChip from './AddBranchChip';
 import BinaryCaseLabel from './BinaryCaseLabel';
 import BranchCaseLabel from './BranchCaseLabel';
-import GraphNodeLabel from './GraphNodeLabel';
 import styles from './WorkflowEdge.module.css';
 import computeBinaryCaseLabel from './computeBinaryCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
@@ -122,7 +121,6 @@ export default function WorkflowEdge({
     });
 
     const caseKey = (targetNode?.data as NodeDataType)?.branchData?.caseKey;
-    const graphNodeIndex = (targetNode?.data as NodeDataType)?.graphData?.nodeIndex;
 
     const binaryCaseLabel = computeBinaryCaseLabel({
         layoutDirection,
@@ -255,18 +253,6 @@ export default function WorkflowEdge({
             )}
 
             {binaryCaseLabel && <BinaryCaseLabel edgeId={id} label={binaryCaseLabel} />}
-
-            {typeof graphNodeIndex === 'number' && isSourceTaskDispatcherTopGhostNode && (
-                <GraphNodeLabel
-                    edgeId={id}
-                    layoutDirection={layoutDirection}
-                    nodeIndex={graphNodeIndex}
-                    sourceX={sourceX}
-                    sourceY={sourceY}
-                    targetX={targetX}
-                    targetY={targetY}
-                />
-            )}
 
             {addBranchPlaceholderId && (
                 <AddBranchChip
