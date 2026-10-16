@@ -39,19 +39,19 @@ class WorkflowExecutionApiControllerTest {
         mock(ConversionService.class), projectWorkflowExecutionFacade);
 
     @Test
-    void testGetWorkflowExecutionsPagePassesTheProjectVersionToTheFacade() {
+    void testGetWorkflowExecutionsPagePassesTheConnectedUserAndProjectVersionToTheFacade() {
         Page<WorkflowExecutionDTO> workflowExecutionPage = Page.empty();
 
         when(projectWorkflowExecutionFacade.getWorkflowExecutions(
-            null, null, null, null, null, null, 9L, "workflow-1", 2, 1L, 0))
+            null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0))
                 .thenReturn(workflowExecutionPage);
 
         ResponseEntity<Page> responseEntity = workflowExecutionApiController.getWorkflowExecutionsPage(
-            1L, null, null, null, null, null, null, 9L, "workflow-1", 2, 0);
+            1L, null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 0);
 
         assertSame(workflowExecutionPage, responseEntity.getBody());
 
         verify(projectWorkflowExecutionFacade).getWorkflowExecutions(
-            null, null, null, null, null, null, 9L, "workflow-1", 2, 1L, 0);
+            null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0);
     }
 }
