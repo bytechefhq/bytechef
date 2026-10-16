@@ -29,6 +29,7 @@ const ConnectDialogOpener = ({
     const {openDialog} = useConnectDialog({
         baseUrl,
         connectionOnly: true,
+        newConnection: true,
         environment,
         integrationId: String(integrationId),
         jwtToken,
