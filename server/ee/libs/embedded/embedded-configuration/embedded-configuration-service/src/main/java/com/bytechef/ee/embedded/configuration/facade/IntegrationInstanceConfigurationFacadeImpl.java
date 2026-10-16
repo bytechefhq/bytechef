@@ -1431,29 +1431,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
 
-    /**
-     * The required connections an administrator sets in the instance configuration: those of the workflow's triggers
-     * and tasks, except the integration's own component, which runs on the connected user's integration connection.
-     */
     private List<ComponentConnection> getRequiredAdminComponentConnections(Integration integration, String workflowId) {
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        return CollectionUtils.concat(
-            WorkflowTrigger.of(workflow)
-                .stream()
-                .flatMap(workflowTrigger -> CollectionUtils.stream(
-                    componentConnectionFacade.getComponentConnections(workflowTrigger)))
-                .toList(),
-            workflow.getTasks(true)
-                .stream()
-                .flatMap(workflowTask -> CollectionUtils.stream(
-                    componentConnectionFacade.getComponentConnections(workflowTask)))
-                .toList())
-            .stream()
-            .filter(ComponentConnection::required)
-            .filter(componentConnection -> !Objects.equals(
-                componentConnection.componentName(), integration.getComponentName()))
-            .toList();
+        return getRequiredComponentConnections(workflowService.getWorkflow(workflowId), integration);
     }
 
     private IntegrationInstanceConfigurationWorkflow doEnableIntegrationInstanceConfigurationWorkflow(
