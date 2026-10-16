@@ -30,6 +30,7 @@ const IntegrationInstanceConfigurationDialogBasicStepTagsSelect = ({
                     ...tag,
                 };
             })}
+            placeholder="Select or type to create tags..."
         />
     ) : (
         <>Loading...</>
