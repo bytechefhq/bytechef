@@ -18,6 +18,7 @@ All URIs are relative to */api/embedded/v1*
 | [**disableProjectWorkflow**](ConnectedUserProjectWorkflowApi.md#disableprojectworkflow) | **DELETE** /{externalUserId}/automation/workflows/{workflowUuid}/enable | Disable a workflow |
 | [**enableFrontendProjectWorkflow**](ConnectedUserProjectWorkflowApi.md#enablefrontendprojectworkflow) | **POST** /automation/workflows/{workflowUuid}/enable | Enable a workflow |
 | [**enableProjectWorkflow**](ConnectedUserProjectWorkflowApi.md#enableprojectworkflow) | **POST** /{externalUserId}/automation/workflows/{workflowUuid}/enable | Enable a workflow |
+| [**getFrontendAutomationComponentInputOptions**](ConnectedUserProjectWorkflowApi.md#getfrontendautomationcomponentinputoptions) | **POST** /automation/component-input-options | Get component input options with a connection |
 | [**getFrontendProjectWorkflow**](ConnectedUserProjectWorkflowApi.md#getfrontendprojectworkflow) | **GET** /automation/workflows/{workflowUuid} | Get a workflow by workflow reference code |
 | [**getFrontendProjectWorkflows**](ConnectedUserProjectWorkflowApi.md#getfrontendprojectworkflows) | **GET** /automation/workflows | Get automation workflows for particular external user |
 | [**getProjectWorkflow**](ConnectedUserProjectWorkflowApi.md#getprojectworkflow) | **GET** /{externalUserId}/automation/workflows/{workflowUuid} | Get a workflow by workflow reference code |
@@ -1096,6 +1097,81 @@ example().catch(console.error);
 |-------------|-------------|------------------|
 | **200** | Successful operation. |  -  |
 | **409** | A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getFrontendAutomationComponentInputOptions
+
+> Array&lt;Option&gt; getFrontendAutomationComponentInputOptions(automationComponentInputOptionsRequest, xEnvironment)
+
+Get component input options with a connection
+
+Resolve the dynamic option values of a component input group property with one of the authenticated connected user\&#39;s own connections.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ConnectedUserProjectWorkflowApi,
+} from '';
+import type { GetFrontendAutomationComponentInputOptionsRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: jwtBearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new ConnectedUserProjectWorkflowApi(config);
+
+  const body = {
+    // AutomationComponentInputOptionsRequest
+    automationComponentInputOptionsRequest: ...,
+    // Environment | The environment. (optional)
+    xEnvironment: ...,
+  } satisfies GetFrontendAutomationComponentInputOptionsRequest;
+
+  try {
+    const data = await api.getFrontendAutomationComponentInputOptions(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **automationComponentInputOptionsRequest** | [AutomationComponentInputOptionsRequest](AutomationComponentInputOptionsRequest.md) |  | |
+| **xEnvironment** | `Environment` | The environment. | [Optional] [Defaults to `undefined`] [Enum: DEVELOPMENT, STAGING, PRODUCTION] |
+
+### Return type
+
+[**Array&lt;Option&gt;**](Option.md)
+
+### Authorization
+
+[jwtBearerAuth](../README.md#jwtBearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The list of resolved options; empty when the connection is not one of the connected user\&#39;s connections for the component. |  -  |
+| **401** | Access token is missing or invalid |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

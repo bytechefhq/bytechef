@@ -5,6 +5,7 @@
  */
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationComponentInputOptionsRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CodeWorkflowNotCopyableErrorModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowFromPromptRequestModel;
@@ -14,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnableConne
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnableFrontendProjectWorkflow409ResponseModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import org.springframework.lang.Nullable;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ProvisionFrontendWorkflowReference409ResponseModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ProvisionWorkflowReferenceRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
@@ -654,6 +656,55 @@ public interface ConnectedUserProjectWorkflowApi {
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"invalidWorkflowErrorCount\" : 0 }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_FRONTEND_AUTOMATION_COMPONENT_INPUT_OPTIONS = "/automation/component-input-options";
+    /**
+     * POST /automation/component-input-options : Get component input options with a connection
+     * Resolve the dynamic option values of a component input group property with one of the authenticated connected user&#39;s own connections.
+     *
+     * @param automationComponentInputOptionsRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The list of resolved options; empty when the connection is not one of the connected user&#39;s connections for the component. (status code 200)
+     *         or Access token is missing or invalid (status code 401)
+     */
+    @Operation(
+        operationId = "getFrontendAutomationComponentInputOptions",
+        summary = "Get component input options with a connection",
+        description = "Resolve the dynamic option values of a component input group property with one of the authenticated connected user's own connections.",
+        tags = { "connected-user-project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of resolved options; empty when the connection is not one of the connected user's connections for the component.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = OptionModel.class)))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = ConnectedUserProjectWorkflowApi.PATH_GET_FRONTEND_AUTOMATION_COMPONENT_INPUT_OPTIONS,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<List<OptionModel>> getFrontendAutomationComponentInputOptions(
+        @Parameter(name = "AutomationComponentInputOptionsRequestModel", description = "", required = true) @Valid @RequestBody AutomationComponentInputOptionsRequestModel automationComponentInputOptionsRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"label\" : \"label\", \"value\" : \"value\" }, { \"label\" : \"label\", \"value\" : \"value\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

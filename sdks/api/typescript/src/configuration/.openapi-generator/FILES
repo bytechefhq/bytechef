@@ -9,6 +9,7 @@ apis/IntegrationInstanceApi.ts
 apis/IntegrationInstanceWorkflowApi.ts
 apis/index.ts
 docs/AuthorizationType.md
+docs/AutomationComponentInputOptionsRequest.md
 docs/AutomationProject.md
 docs/AutomationProjectApi.md
 docs/AutomationProjectCodeWorkflow.md
@@ -71,6 +72,7 @@ docs/UpdateWorkflowInputsRequest.md
 docs/Workflow.md
 index.ts
 models/AuthorizationType.ts
+models/AutomationComponentInputOptionsRequest.ts
 models/AutomationProject.ts
 models/AutomationProjectCodeWorkflow.ts
 models/AutomationProjectCodeWorkflowDeployResult.ts
