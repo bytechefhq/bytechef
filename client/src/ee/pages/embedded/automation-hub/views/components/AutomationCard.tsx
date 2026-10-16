@@ -1,6 +1,6 @@
 import AlertDialog from '@/components/AlertDialog';
 import {Badge} from '@/components/ui/badge';
-import {Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {SetAutomationEnabledRequestI} from '@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations';
 import {describeAttentionReason} from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
 import {canOpenInBuilder, useBuilderAccess} from '@/ee/pages/embedded/automation-hub/utils/builderAccess';
@@ -110,21 +110,21 @@ const AutomationCard = ({
                 </CardAction>
             </CardHeader>
 
-            {!!automation.components?.length && (
-                <CardContent className="flex items-center -space-x-2 px-3">
-                    {automation.components.map((component) => (
-                        <div
-                            className="flex size-9 shrink-0 items-center justify-center rounded-full border bg-background p-1.5"
-                            key={`component-${component.name}`}
-                            title={component.title || component.name}
-                        >
-                            {component.icon && <InlineSVG className="size-5 flex-none" src={component.icon} />}
-                        </div>
-                    ))}
-                </CardContent>
-            )}
-
             <CardFooter className="mt-auto justify-end px-3">
+                {!!automation.components?.length && (
+                    <div className="mr-auto flex items-center -space-x-2">
+                        {automation.components.map((component) => (
+                            <div
+                                className="flex size-9 shrink-0 items-center justify-center rounded-full border bg-background p-1.5"
+                                key={`component-${component.name}`}
+                                title={component.title || component.name}
+                            >
+                                {component.icon && <InlineSVG className="size-5 flex-none" src={component.icon} />}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 <AutomationStatusButton automation={automation} label={label} onEnabledChange={handleEnabledChange} />
 
                 {inputsDialogOpen && (
