@@ -78,7 +78,8 @@ activation dialog's Connect is in use.
 
 - `connectionOnly: true` + `onConnected(integrationInstanceId, connectionId)`: closes once the integration instance
   exists instead of continuing to the workflows view. An existing instance with valid credentials is handed back at
-  once; one with invalid credentials is reconnected first.
+  once; one with invalid credentials is reconnected first. Add `newConnection: true` to always show the form and
+  create another instance, so the user can connect a second account; the activation dialog's **Connect** does this.
 - `reauthorizeConnectionId` + `onReauthorized(connectionId)`: shows the connection form for an existing connection
   and posts to `/connections/{id}/reauthorize`.
 

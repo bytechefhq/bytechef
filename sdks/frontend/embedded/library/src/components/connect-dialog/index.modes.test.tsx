@@ -84,6 +84,47 @@ describe('useConnectDialog connection-only mode', () => {
         expect(renderMock.mock.calls.every((call) => call[0].props.isOpen === false)).toBe(true);
     });
 
+    it('shows the form for another account when asked for a new connection, and reports the one it creates', async () => {
+        const fetchMock = vi
+            .fn()
+            .mockResolvedValueOnce(jsonResponse(slackIntegration([{connectionId: 70, id: 7}])))
+            .mockResolvedValueOnce(jsonResponse(43))
+            .mockResolvedValueOnce(
+                jsonResponse(
+                    slackIntegration([
+                        {connectionId: 70, id: 7},
+                        {connectionId: 430, id: 43},
+                    ])
+                )
+            );
+
+        global.fetch = fetchMock;
+
+        const onConnected = vi.fn();
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                connectionOnly: true,
+                integrationId: '12',
+                jwtToken: 'ey',
+                newConnection: true,
+                onConnected,
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        expect(onConnected).not.toHaveBeenCalled();
+        expect(lastRenderedProps(renderMock).isOpen).toBe(true);
+        expect(lastRenderedProps(renderMock).title).toBeUndefined();
+
+        await act(async () => triggerOAuth2Code('abc'));
+
+        expect(fetchMock.mock.calls[1][0]).toBe('https://api.example.com/api/embedded/v1/integrations/12/instances');
+        expect(onConnected).toHaveBeenCalledWith(43, 430);
+    });
+
     it('creates an instance, reports its connection id and closes instead of showing workflows', async () => {
         const fetchMock = vi
             .fn()
