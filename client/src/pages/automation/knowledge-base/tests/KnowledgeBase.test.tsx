@@ -30,7 +30,7 @@ vi.mock('@/components/PageLoader', () => ({
 }));
 
 vi.mock('../components/KnowledgeBaseHeader', () => ({
-    default: ({knowledgeBaseName}: {knowledgeBaseName?: string; onBackClick: () => void}) => (
+    default: ({knowledgeBaseName}: {knowledgeBaseName?: string}) => (
         <header data-testid="knowledge-base-header">{knowledgeBaseName || 'Loading...'}</header>
     ),
 }));
@@ -98,7 +98,6 @@ const mockKnowledgeBase = {
 const defaultMockReturn = {
     documents: mockKnowledgeBase.documents,
     error: null,
-    handleBackClick: vi.fn(),
     isLoading: false,
     knowledgeBase: mockKnowledgeBase,
     knowledgeBaseId: 'kb-1',
