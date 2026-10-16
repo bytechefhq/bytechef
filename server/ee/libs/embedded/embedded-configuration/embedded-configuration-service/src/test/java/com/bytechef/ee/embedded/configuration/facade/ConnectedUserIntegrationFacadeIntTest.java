@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -67,6 +68,8 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -89,6 +92,7 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -179,6 +183,7 @@ class ConnectedUserIntegrationFacadeIntTest {
     private String disabledWorkflowId;
     private String enabledWorkflowId;
     private String enabledWorkflowUuid;
+    private long integrationId;
     private long integrationInstanceId;
     private String otherExternalUserId;
     private String ownerExternalUserId;
@@ -199,6 +204,8 @@ class ConnectedUserIntegrationFacadeIntTest {
         integration.setName("Slack " + UUID.randomUUID());
 
         integration = integrationService.create(integration);
+
+        integrationId = integration.getId();
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
@@ -593,6 +600,135 @@ class ConnectedUserIntegrationFacadeIntTest {
                 .stream()
                 .map(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
                 .toList();
+        }
+    }
+
+    @Nested
+    class ConnectionName {
+
+        @Autowired
+        private ComponentDefinitionService componentDefinitionService;
+
+        @Autowired
+        private ConnectionFacade connectionFacade;
+
+        @Autowired
+        private ConnectionService connectionService;
+
+        private final Map<Long, String> connectionNamesById = new HashMap<>();
+
+        private long nextConnectionId = 1000L;
+
+        @BeforeEach
+        void beforeEach() {
+            ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+            when(componentDefinition.getConnection()).thenReturn(mock(ConnectionDefinition.class));
+            when(componentDefinitionService.getComponentDefinition(anyString(), any()))
+                .thenReturn(componentDefinition);
+
+            when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED)))
+                .thenAnswer(invocation -> {
+                    ConnectionDTO connectionDTO = invocation.getArgument(0);
+
+                    long connectionId = nextConnectionId++;
+
+                    connectionNamesById.put(connectionId, connectionDTO.name());
+
+                    return connectionId;
+                });
+
+            when(connectionService.getConnections(anyList()))
+                .thenAnswer(invocation -> {
+                    List<Long> connectionIds = invocation.getArgument(0);
+
+                    return connectionIds.stream()
+                        .filter(connectionNamesById::containsKey)
+                        .map(connectionId -> createConnection(connectionId, connectionNamesById.get(connectionId)))
+                        .toList();
+                });
+        }
+
+        @Test
+        void testFirstConnectionKeepsTheConfigurationName() {
+            String externalUserId = createConnectedUser();
+
+            assertThat(connect(externalUserId)).isEqualTo("Slack");
+        }
+
+        @Test
+        void testSecondConnectionGetsTheNextNumber() {
+            String externalUserId = createConnectedUser();
+
+            assertThat(connect(externalUserId)).isEqualTo("Slack");
+            assertThat(connect(externalUserId)).isEqualTo("Slack 2");
+        }
+
+        @Test
+        void testNextConnectionTakesTheLowestFreeNumber() {
+            String externalUserId = createConnectedUser();
+
+            assertThat(connect(externalUserId)).isEqualTo("Slack");
+            assertThat(connect(externalUserId)).isEqualTo("Slack 2");
+            assertThat(connect(externalUserId)).isEqualTo("Slack 3");
+
+            deleteConnection(externalUserId, "Slack 2");
+
+            assertThat(connect(externalUserId)).isEqualTo("Slack 2");
+        }
+
+        @Test
+        void testAnotherConnectedUsersConnectionsDoNotAffectTheNumbering() {
+            String otherExternalUserId = createConnectedUser();
+
+            connect(otherExternalUserId);
+            connect(otherExternalUserId);
+
+            String externalUserId = createConnectedUser();
+
+            assertThat(connect(externalUserId)).isEqualTo("Slack");
+            assertThat(connect(externalUserId)).isEqualTo("Slack 2");
+        }
+
+        private String connect(String externalUserId) {
+            IntegrationInstance integrationInstance = connectedUserIntegrationFacade.createIntegrationInstance(
+                externalUserId, integrationId, Map.of(), Environment.PRODUCTION);
+
+            return connectionNamesById.get(integrationInstance.getConnectionId());
+        }
+
+        private Connection createConnection(long connectionId, String name) {
+            Connection connection = new Connection();
+
+            connection.setId(connectionId);
+            connection.setName(name);
+
+            return connection;
+        }
+
+        private String createConnectedUser() {
+            String externalUserId = "connection-name-user-" + UUID.randomUUID();
+
+            connectedUserService.createConnectedUser(externalUserId, Environment.PRODUCTION);
+
+            return externalUserId;
+        }
+
+        private void deleteConnection(String externalUserId, String name) {
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                externalUserId, Environment.PRODUCTION);
+
+            IntegrationInstance integrationInstance = integrationInstanceService
+                .getIntegrationInstances(connectedUser.getId(), "slack", Environment.PRODUCTION)
+                .stream()
+                .filter(curIntegrationInstance -> Objects.equals(
+                    connectionNamesById.get(curIntegrationInstance.getConnectionId()), name))
+                .findFirst()
+                .orElseThrow();
+
+            integrationInstanceService.delete(integrationInstance.getId());
+
+            connectionNamesById.remove(integrationInstance.getConnectionId());
         }
     }
 }
