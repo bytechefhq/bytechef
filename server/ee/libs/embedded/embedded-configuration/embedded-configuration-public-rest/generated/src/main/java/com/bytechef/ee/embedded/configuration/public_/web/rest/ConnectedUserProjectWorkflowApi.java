@@ -8,6 +8,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowFromPromptRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.DisableFrontendProjectWorkflow409ResponseModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnableFrontendProjectWorkflow409ResponseModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.MissingConnectionErrorModel;
@@ -44,7 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T18:03:20.887089+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Connected User Project Workflow Public API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -443,7 +444,7 @@ public interface ConnectedUserProjectWorkflowApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation."),
             @ApiResponse(responseCode = "409", description = "A required connection could not be auto-wired, or a required workflow input has no value.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = EnableFrontendProjectWorkflow409ResponseModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = DisableFrontendProjectWorkflow409ResponseModel.class))
             })
         },
         security = {
@@ -492,7 +493,7 @@ public interface ConnectedUserProjectWorkflowApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation."),
             @ApiResponse(responseCode = "409", description = "A required connection could not be auto-wired, or a required workflow input has no value.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = EnableFrontendProjectWorkflow409ResponseModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = DisableFrontendProjectWorkflow409ResponseModel.class))
             })
         },
         security = {
@@ -531,7 +532,7 @@ public interface ConnectedUserProjectWorkflowApi {
      * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
-     *         or A required connection could not be auto-wired, or a required workflow input has no value. (status code 409)
+     *         or A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors. (status code 409)
      */
     @Operation(
         operationId = "enableFrontendProjectWorkflow",
@@ -540,7 +541,7 @@ public interface ConnectedUserProjectWorkflowApi {
         tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation."),
-            @ApiResponse(responseCode = "409", description = "A required connection could not be auto-wired, or a required workflow input has no value.", content = {
+            @ApiResponse(responseCode = "409", description = "A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = EnableFrontendProjectWorkflow409ResponseModel.class))
             })
         },
@@ -560,7 +561,7 @@ public interface ConnectedUserProjectWorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"missingConnectionComponentName\" : \"missingConnectionComponentName\" }";
+                    String exampleString = "{ \"invalidWorkflowErrorCount\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -580,7 +581,7 @@ public interface ConnectedUserProjectWorkflowApi {
      * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
-     *         or A required connection could not be auto-wired, or a required workflow input has no value. (status code 409)
+     *         or A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors. (status code 409)
      */
     @Operation(
         operationId = "enableProjectWorkflow",
@@ -589,7 +590,7 @@ public interface ConnectedUserProjectWorkflowApi {
         tags = { "connected-user-project-workflow" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation."),
-            @ApiResponse(responseCode = "409", description = "A required connection could not be auto-wired, or a required workflow input has no value.", content = {
+            @ApiResponse(responseCode = "409", description = "A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = EnableFrontendProjectWorkflow409ResponseModel.class))
             })
         },
@@ -610,7 +611,7 @@ public interface ConnectedUserProjectWorkflowApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"missingConnectionComponentName\" : \"missingConnectionComponentName\" }";
+                    String exampleString = "{ \"invalidWorkflowErrorCount\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
