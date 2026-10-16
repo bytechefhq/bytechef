@@ -1,7 +1,9 @@
+import {describeWorkflowErrors} from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
 import {ResponseError} from '@/ee/shared/middleware/embedded/public';
 import {toast} from 'sonner';
 
 interface AutomationConflictBodyI {
+    invalidWorkflowErrorCount?: number;
     missingConnectionComponentName?: string;
     missingInputName?: string;
 }
@@ -54,6 +56,14 @@ export const reportSetEnabledError = async (
         toast.error(title, {description: `The "${conflictBody.missingInputName}" setting needs a value first.`});
 
         onMissingInput?.(conflictBody.missingInputName);
+
+        return;
+    }
+
+    if (conflictBody?.invalidWorkflowErrorCount) {
+        toast.error(title, {
+            description: `Fix ${describeWorkflowErrors(conflictBody.invalidWorkflowErrorCount)} in this workflow first, then enable it again.`,
+        });
 
         return;
     }

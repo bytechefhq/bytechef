@@ -413,6 +413,47 @@ describe('AutomationsView', () => {
             expect(deleteAutomationMutateMock).not.toHaveBeenCalled();
         });
 
+        it('will not let an automation whose workflow has errors be enabled, says why and keeps Customize', async () => {
+            const user = userEvent.setup();
+
+            useGetAutomationsQueryMock.mockReturnValue({
+                data: [{...blankAutomation, attentionReason: 'INVALID_WORKFLOW:2', enabled: false}],
+                error: null,
+                isLoading: false,
+            });
+
+            renderView();
+
+            const card = templateCard('Weekly digest');
+            const statusButton = within(card).getByRole('button', {name: 'Enable Weekly digest'});
+
+            expect(statusButton).toBeDisabled();
+            expect(statusButton).toHaveAttribute('title', 'Fix the 2 errors in this workflow to turn it on');
+            expect(within(card).getByText('Needs attention')).toBeInTheDocument();
+            expect(within(card).getByText('Fix the 2 errors in this workflow to turn it on')).toBeInTheDocument();
+
+            await user.click(within(card).getByRole('button', {name: 'Weekly digest actions'}));
+            await user.click(screen.getByRole('menuitem', {name: /customize/i}));
+
+            expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/blank-uuid');
+        });
+
+        it('still lets a running automation whose workflow has errors be disabled', async () => {
+            const user = userEvent.setup();
+
+            useGetAutomationsQueryMock.mockReturnValue({
+                data: [{...blankAutomation, attentionReason: 'INVALID_WORKFLOW:1', enabled: true}],
+                error: null,
+                isLoading: false,
+            });
+
+            renderView();
+
+            await user.click(screen.getByRole('button', {name: 'Disable Weekly digest'}));
+
+            expect(setEnabledMutateMock).toHaveBeenCalledWith({enabled: false, workflowUuid: 'blank-uuid'});
+        });
+
         it('shows a derived attention reason on a reference and keeps its toggle enabled', () => {
             useGetAutomationsQueryMock.mockReturnValue({
                 data: [
@@ -883,6 +924,27 @@ describe('AutomationsView', () => {
             expect(toastErrorMock).toHaveBeenCalledWith('Could not enable "Sync leads"', {
                 description: 'The "sheetName" setting needs a value first.',
             });
+        });
+
+        it('explains an invalid workflow when the server refuses to enable an automation', async () => {
+            const user = userEvent.setup();
+
+            setEnabledMutateMock.mockRejectedValueOnce(conflictError({invalidWorkflowErrorCount: 1}));
+
+            useGetAutomationsQueryMock.mockReturnValue({
+                data: [{...blankAutomation, enabled: false}],
+                isLoading: false,
+            });
+
+            renderView();
+
+            await user.click(screen.getByRole('button', {name: 'Enable Weekly digest'}));
+
+            await waitFor(() =>
+                expect(toastErrorMock).toHaveBeenCalledWith('Could not enable "Weekly digest"', {
+                    description: 'Fix the error in this workflow first, then enable it again.',
+                })
+            );
         });
 
         it('leaves a non-conflict failure to the global error toast', async () => {
