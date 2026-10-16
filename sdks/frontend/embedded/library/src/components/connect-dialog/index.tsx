@@ -70,6 +70,7 @@ interface UseConnectDialogBaseProps {
 
 interface FullModePropsI {
     connectionOnly?: false;
+    newConnection?: never;
     onConnected?: never;
     onReauthorized?: never;
     reauthorizeConnectionId?: never;
@@ -77,6 +78,7 @@ interface FullModePropsI {
 
 interface ConnectionOnlyModePropsI {
     connectionOnly: true;
+    newConnection?: boolean;
     onConnected?: (integrationInstanceId: number, connectionId: number | undefined) => void;
     onReauthorized?: never;
     reauthorizeConnectionId?: never;
@@ -84,6 +86,7 @@ interface ConnectionOnlyModePropsI {
 
 interface ReauthorizeModePropsI {
     connectionOnly?: false;
+    newConnection?: never;
     onConnected?: never;
     onReauthorized?: (connectionId: number) => void;
     reauthorizeConnectionId: number;
@@ -101,6 +104,7 @@ export default function useConnectDialog({
     jwtToken,
     mapObjectFields,
     mode,
+    newConnection,
     onClose,
     onConnected,
     onReauthorized,
@@ -683,7 +687,7 @@ export default function useConnectDialog({
                     (instance) => instance.connectionId !== undefined
                 );
 
-                if (existingInstance && existingInstance.credentialStatus !== 'INVALID') {
+                if (existingInstance && existingInstance.credentialStatus !== 'INVALID' && !newConnection) {
                     setIsOpen(false);
 
                     try {
@@ -697,7 +701,9 @@ export default function useConnectDialog({
                     return;
                 }
 
-                setReauthorizingInstance(existingInstance);
+                setReauthorizingInstance(
+                    existingInstance?.credentialStatus === 'INVALID' ? existingInstance : undefined
+                );
                 setCurrentIntegrationInstanceId(undefined);
                 setWorkflowsView(false);
                 setIntegration(integrationData);

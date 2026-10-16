@@ -56,7 +56,6 @@ const respond = (status: number, body: unknown) => ({
 
 let connections: Array<{componentName: string; id: number; name: string}> = [];
 let connectionsStatus = 200;
-let slackIntegrationInstances: Array<{connectionId?: number; credentialStatus: string; id: number}> = [];
 let deprovisionStatus = 200;
 let provisionGate: Promise<void> | undefined;
 let enableResponse: {body: unknown; status: number} = {body: {}, status: 200};
@@ -72,10 +71,6 @@ const installFetch = () => {
 
         if (url.endsWith('/automation/projects')) {
             return respond(200, projects);
-        }
-
-        if (url.endsWith('/integrations/5') && method === 'GET') {
-            return respond(200, {id: 5, integrationInstances: slackIntegrationInstances});
         }
 
         if (url.includes('/components/slack/connections')) {
@@ -125,7 +120,6 @@ describe('ActivationDialog', () => {
         calls.length = 0;
         connections = [];
         connectionsStatus = 200;
-        slackIntegrationInstances = [];
         deprovisionStatus = 200;
         provisionGate = undefined;
         enableResponse = {body: {}, status: 200};
@@ -592,9 +586,8 @@ describe('ActivationDialog', () => {
             expect(await within(row).findByRole('button', {name: 'Connect'})).toBeInTheDocument();
         });
 
-        it('is hidden once the user has a working connection through the integration', async () => {
+        it('stays offered once the user has a working connection, to add another account', async () => {
             connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
-            slackIntegrationInstances = [{connectionId: 9, credentialStatus: 'VALID', id: 3}];
 
             renderDialog({workflowTemplateId: 'wf-slack'});
 
@@ -602,20 +595,21 @@ describe('ActivationDialog', () => {
 
             await within(row).findByRole('option', {name: 'Team Slack'});
 
-            await waitFor(() => expect(within(row).queryByRole('button', {name: 'Connect'})).not.toBeInTheDocument());
+            expect(within(row).getByRole('button', {name: 'Connect'})).toBeInTheDocument();
         });
 
-        it('stays offered when the integration connection needs to be reauthorized', async () => {
-            connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
-            slackIntegrationInstances = [{connectionId: 9, credentialStatus: 'INVALID', id: 3}];
-
+        it('asks the connect dialog for a new connection', async () => {
             renderDialog({workflowTemplateId: 'wf-slack'});
 
             const row = await screen.findByTestId('connect-row-slack');
 
-            await waitFor(() => expect(calls.some((call) => call.url.endsWith('/integrations/5'))).toBe(true));
+            await userEvent.click(await within(row).findByRole('button', {name: 'Connect'}));
 
-            expect(within(row).getByRole('button', {name: 'Connect'})).toBeInTheDocument();
+            await waitFor(() =>
+                expect(useConnectDialogMock).toHaveBeenCalledWith(
+                    expect.objectContaining({connectionOnly: true, newConnection: true})
+                )
+            );
         });
     });
 });
