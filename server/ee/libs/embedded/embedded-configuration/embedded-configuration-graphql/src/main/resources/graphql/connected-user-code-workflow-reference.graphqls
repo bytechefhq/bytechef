@@ -8,5 +8,7 @@ type ConnectedUserCodeWorkflowReference {
 }
 
 extend type Query {
-    connectedUserCodeWorkflowReferences(automationUuids: [ID!]!): [ConnectedUserCodeWorkflowReference!]!
+    connectedUserCodeWorkflowReferences(
+        automationUuids: [ID!]!, environmentId: ID!
+    ): [ConnectedUserCodeWorkflowReference!]!
 }
