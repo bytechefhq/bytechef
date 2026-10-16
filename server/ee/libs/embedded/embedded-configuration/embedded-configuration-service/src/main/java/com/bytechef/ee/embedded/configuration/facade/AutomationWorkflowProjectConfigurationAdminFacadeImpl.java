@@ -1245,7 +1245,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .map(ProjectWorkflow::getUuidAsString)
             .collect(Collectors.toSet());
 
-        return getAssignedUsersReferences(configuration, workflowUuids)
+        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids, environment)
             .stream()
             .filter(reference -> reference.workflowId() != null)
             .collect(
