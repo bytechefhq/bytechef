@@ -103,8 +103,8 @@ public class ApiPlatformResponseToApiRequestAction {
 
         return switch (inputParameters.get(RESPONSE_TYPE, ResponseType.class)) {
             case SUCCESS -> WebhookResponse.json(response);
-            case INTERNAL_ERROR -> WebhookResponse.json(response, HttpStatus.BAD_REQUEST);
-            case INVALID_INPUT -> WebhookResponse.json(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            case INTERNAL_ERROR -> WebhookResponse.json(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            case INVALID_INPUT -> WebhookResponse.json(response, HttpStatus.BAD_REQUEST);
             case FORBIDDEN -> WebhookResponse.json(response, HttpStatus.FORBIDDEN);
             default ->
                 throw new IllegalStateException("Unexpected value: " + inputParameters.getInteger(RESPONSE_TYPE));
