@@ -107,46 +107,50 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                     </Tooltip>
                 )}
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label="Workflow Actions"
-                            icon={<EllipsisVerticalIcon />}
-                            onClick={(event) => event.stopPropagation()}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="end">
-                        {canEditWorkflow && (
-                            <DropdownMenuItem
-                                aria-label="Edit Workflow"
-                                icon={<PencilIcon />}
-                                label="Edit"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-
-                                    onEditWorkflow(workflow);
-                                }}
+                {codeWorkflowProject ? (
+                    <div aria-hidden className="size-9 shrink-0" />
+                ) : (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Workflow Actions"
+                                icon={<EllipsisVerticalIcon />}
+                                onClick={(event) => event.stopPropagation()}
+                                size="icon"
+                                variant="ghost"
                             />
-                        )}
+                        </DropdownMenuTrigger>
 
-                        {canDeleteWorkflow && !codeWorkflowProject && (
-                            <DropdownMenuItem
-                                aria-label="Delete Workflow"
-                                icon={<Trash2Icon />}
-                                label="Delete"
-                                onClick={(event) => {
-                                    event.stopPropagation();
+                        <DropdownMenuContent align="end">
+                            {canEditWorkflow && (
+                                <DropdownMenuItem
+                                    aria-label="Edit Workflow"
+                                    icon={<PencilIcon />}
+                                    label="Edit"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
 
-                                    onDeleteWorkflow(workflow.workflowUuid);
-                                }}
-                                variant="destructive"
-                            />
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                        onEditWorkflow(workflow);
+                                    }}
+                                />
+                            )}
+
+                            {canDeleteWorkflow && (
+                                <DropdownMenuItem
+                                    aria-label="Delete Workflow"
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+
+                                        onDeleteWorkflow(workflow.workflowUuid);
+                                    }}
+                                    variant="destructive"
+                                />
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
         </li>
     );

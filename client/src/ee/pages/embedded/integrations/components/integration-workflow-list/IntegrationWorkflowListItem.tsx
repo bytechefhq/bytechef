@@ -171,7 +171,9 @@ const IntegrationWorkflowListItem = ({
                     <TooltipContent>Last Modified Date</TooltipContent>
                 </Tooltip>
 
-                {!integration.codeWorkflow && (
+                {integration.codeWorkflow ? (
+                    <div aria-hidden className="size-9 shrink-0" />
+                ) : (
                     <WorkflowListRowDropdownMenu
                         exportUrl={`/api/embedded/internal/workflows/${workflow.id}/export`}
                         onDeleteClick={canDeleteWorkflow ? () => setShowDeleteDialog(true) : undefined}
