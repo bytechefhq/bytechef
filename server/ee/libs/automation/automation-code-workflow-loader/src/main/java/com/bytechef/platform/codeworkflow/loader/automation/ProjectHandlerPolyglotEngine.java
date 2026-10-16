@@ -565,7 +565,7 @@ class ProjectHandlerPolyglotEngine {
                 new PolyglotInput(
                     (String) input.get("name"), (String) input.get("label"),
                     input.get("type") == null ? "STRING" : String.valueOf(input.get("type")),
-                    Boolean.TRUE.equals(required)));
+                    Boolean.TRUE.equals(required), toComponentInputReference(input)));
         }
 
         return inputDefinitions;
@@ -590,8 +590,39 @@ class ProjectHandlerPolyglotEngine {
         return outputDefinitions;
     }
 
+    /**
+     * Reads the optional {@code componentName}, {@code componentVersion} and {@code groupName} keys of an input. All
+     * three are needed to point at a component input, so a partial reference fails the deploy instead of being dropped.
+     */
+    private static Input.ComponentInputReference toComponentInputReference(Map<?, ?> input) {
+        Object componentName = input.get("componentName");
+        Object componentVersion = input.get("componentVersion");
+        Object groupName = input.get("groupName");
+
+        if (componentName == null && componentVersion == null && groupName == null) {
+            return null;
+        }
+
+        if (!(componentName instanceof String) || !(componentVersion instanceof Number number) ||
+            !(groupName instanceof String)) {
+
+            throw new IllegalArgumentException(
+                ("Input %s must set componentName, componentVersion and groupName together to use a component " +
+                    "input").formatted(input.get("name")));
+        }
+
+        return new Input.ComponentInputReference((String) componentName, number.intValue(), (String) groupName);
+    }
+
     @SuppressFBWarnings("EI")
-    private record PolyglotInput(String name, String label, String type, boolean required) implements Input {
+    private record PolyglotInput(
+        String name, String label, String type, boolean required, Input.ComponentInputReference componentInput)
+        implements Input {
+
+        @Override
+        public Optional<ComponentInputReference> getComponentInput() {
+            return Optional.ofNullable(componentInput);
+        }
 
         @Override
         public String getLabel() {
