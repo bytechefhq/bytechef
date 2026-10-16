@@ -4,6 +4,7 @@ import {HubBuilderContext} from '@/ee/pages/embedded/automation-hub/hubBuilderCo
 import OutputPanelButton from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/PublishPopover';
 import WorkflowActionsButton from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/WorkflowActionsButton';
+import WorkflowBuilderSettingsMenu from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/WorkflowBuilderSettingsMenu';
 import {useWorkflowBuilderHeader} from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/hooks/useWorkflowBuilderHeader';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -12,11 +13,15 @@ import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {onlineManager, useIsFetching, useQueryClient} from '@tanstack/react-query';
-import {ArrowLeftIcon, EditIcon} from 'lucide-react';
-import {RefObject, useContext} from 'react';
+import {onlineManager, useIsMutating, useQueryClient} from '@tanstack/react-query';
+import {ArrowLeftIcon} from 'lucide-react';
+import {RefObject, useContext, useSyncExternalStore} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useShallow} from 'zustand/react/shallow';
+
+const getOnlineStatus = () => onlineManager.isOnline();
+
+const subscribeToOnlineStatus = (onOnlineStatusChange: () => void) => onlineManager.subscribe(onOnlineStatusChange);
 
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
@@ -46,7 +51,8 @@ const WorkflowBuilderHeader = ({
 
     const queryClient = useQueryClient();
 
-    const isFetching = useIsFetching();
+    const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
+    const isSaving = useIsMutating();
     const {
         handlePublishProjectSubmit,
         handleRunClick,
@@ -60,8 +66,6 @@ const WorkflowBuilderHeader = ({
     });
 
     const hubBuilderContext = useContext(HubBuilderContext);
-
-    const isOnline = onlineManager.isOnline();
 
     // if (!project) {
     //     return <WorkflowBuilderSkeleton />;
@@ -85,7 +89,13 @@ const WorkflowBuilderHeader = ({
 
                 <Badge label={`V${(workflowVersion ?? 0) + 1} DRAFT`} styleType="outline-outline" weight="semibold" />
 
-                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
+                {(isSaving > 0 || !isOnline) && (
+                    <LoadingIndicator
+                        className="size-6 rounded-full hover:bg-surface-neutral-secondary-hover"
+                        isFetching={isSaving}
+                        isOnline={isOnline}
+                    />
+                )}
             </div>
 
             <div className="flex items-center gap-1">
@@ -104,14 +114,7 @@ const WorkflowBuilderHeader = ({
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                <Button
-                    aria-label="Edit workflow"
-                    className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
-                    icon={<EditIcon />}
-                    onClick={() => setShowEditWorkflowDialog(true)}
-                    size="icon"
-                    variant="ghost"
-                />
+                <WorkflowBuilderSettingsMenu onEditWorkflowClick={() => setShowEditWorkflowDialog(true)} />
             </div>
 
             {showEditWorkflowDialog && (
