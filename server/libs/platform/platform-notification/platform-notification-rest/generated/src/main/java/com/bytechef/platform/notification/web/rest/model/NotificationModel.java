@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Notification", description = "A Notification definition.")
 @JsonTypeName("Notification")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.149400+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:20.553010+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class NotificationModel {
 
   private @Nullable Long id;
@@ -85,13 +85,10 @@ public class NotificationModel {
 
   private TypeEnum type;
 
-  @Valid
   private Map<String, Object> settings = new HashMap<>();
 
-  @Valid
   private List<@Valid NotificationEventModel> notificationEvents = new ArrayList<>();
 
-  @Valid
   private List<Long> notificationEventIds = new ArrayList<>();
 
   private @Nullable Integer version;
@@ -302,7 +299,7 @@ public class NotificationModel {
    * List of events for which notification will be triggered
    * @return notificationEvents
    */
-  @Valid 
+  
   @Schema(name = "notificationEvents", accessMode = Schema.AccessMode.READ_ONLY, description = "List of events for which notification will be triggered", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("notificationEvents")
   public List<@Valid NotificationEventModel> getNotificationEvents() {

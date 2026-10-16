@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("TriggerForm")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:32.315554+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.962843+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TriggerFormModel {
 
   private @Nullable String buttonLabel;
@@ -44,7 +44,6 @@ public class TriggerFormModel {
 
   private @Nullable Boolean useWorkflowTimezone;
 
-  @Valid
   private List<@Valid TriggerFormInputModel> inputs = new ArrayList<>();
 
   public TriggerFormModel buttonLabel(@Nullable String buttonLabel) {
@@ -232,7 +231,7 @@ public class TriggerFormModel {
    * Get inputs
    * @return inputs
    */
-  @Valid 
+  
   @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public List<@Valid TriggerFormInputModel> getInputs() {

@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.705345+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationInstanceConfigurationModel {
 
   private @Nullable String createdBy;
@@ -63,21 +63,16 @@ public class IntegrationInstanceConfigurationModel {
 
   private @Nullable AuthorizationTypeModel authorizationType;
 
-  @Valid
   private Map<String, Object> connectionAuthorizationParameters = new HashMap<>();
 
-  @Valid
   private Map<String, Object> connectionConnectionParameters = new HashMap<>();
 
-  @Valid
   private Map<String, Object> connectionParameters = new HashMap<>();
 
   private @Nullable IntegrationBasicModel integration;
 
-  @Valid
   private List<@Valid IntegrationInstanceConfigurationWorkflowModel> integrationInstanceConfigurationWorkflows = new ArrayList<>();
 
-  @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
   private @Nullable Integer version;
@@ -470,7 +465,7 @@ public class IntegrationInstanceConfigurationModel {
    * The array of integration instance configuration workflows.
    * @return integrationInstanceConfigurationWorkflows
    */
-  @Valid 
+  
   @Schema(name = "integrationInstanceConfigurationWorkflows", description = "The array of integration instance configuration workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integrationInstanceConfigurationWorkflows")
   public List<@Valid IntegrationInstanceConfigurationWorkflowModel> getIntegrationInstanceConfigurationWorkflows() {
@@ -499,7 +494,7 @@ public class IntegrationInstanceConfigurationModel {
    * The array of tags.
    * @return tags
    */
-  @Valid 
+  
   @Schema(name = "tags", description = "The array of tags.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
   public List<@Valid TagModel> getTags() {

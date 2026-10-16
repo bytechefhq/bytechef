@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.308008+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.874518+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -51,7 +51,6 @@ public class TaskExecutionModel {
 
   private @Nullable String id;
 
-  @Valid
   private Map<String, Object> input = new HashMap<>();
 
   private String jobId;
@@ -133,10 +132,8 @@ public class TaskExecutionModel {
 
   private @Nullable String type;
 
-  @Valid
   private List<@Valid TaskExecutionModel> children = new ArrayList<>();
 
-  @Valid
   private List<List<@Valid TaskExecutionModel>> iterations = new ArrayList<>();
 
   private @Nullable JobModel childJob;
@@ -726,7 +723,7 @@ public class TaskExecutionModel {
    * Get children
    * @return children
    */
-  @Valid 
+  
   @Schema(name = "children", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("children")
   public List<@Valid TaskExecutionModel> getChildren() {
@@ -755,7 +752,7 @@ public class TaskExecutionModel {
    * Get iterations
    * @return iterations
    */
-  @Valid 
+  
   @Schema(name = "iterations", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("iterations")
   public List<List<@Valid TaskExecutionModel>> getIterations() {
