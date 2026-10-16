@@ -62,15 +62,17 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     @Override
     public ResponseEntity<Page> getWorkflowExecutionsPage(
         Long environmentId, String jobStatus, OffsetDateTime jobStartDate, OffsetDateTime jobEndDate,
-        Long projectId, Long integrationInstanceConfigurationId, String workflowId, Integer pageNumber) {
+        Long integrationId, Long integrationInstanceConfigurationId, Long connectedUserId, String workflowId,
+        Integer pageNumber) {
 
         return ResponseEntity.ok(
             integrationWorkflowExecutionFacade
                 .getWorkflowExecutions(
                     environmentId, jobStatus == null ? null : Status.valueOf(jobStatus),
                     jobStartDate == null ? null : jobStartDate.toInstant(),
-                    jobEndDate == null ? null : jobEndDate.toInstant(), projectId, integrationInstanceConfigurationId,
-                    workflowId, pageNumber)
+                    jobEndDate == null ? null : jobEndDate.toInstant(), integrationId,
+                    integrationInstanceConfigurationId,
+                    connectedUserId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(
                     workflowExecutionDTO, WorkflowExecutionBasicModel.class)));
     }
