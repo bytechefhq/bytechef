@@ -125,30 +125,32 @@ const AutomationProjectWorkflowListItem = ({
                     </Tooltip>
                 )}
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label="Workflow Actions"
-                            icon={<EllipsisVerticalIcon />}
-                            onClick={(event) => event.stopPropagation()}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </DropdownMenuTrigger>
+                {codeWorkflowProject ? (
+                    <div aria-hidden className="size-9 shrink-0" />
+                ) : (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Workflow Actions"
+                                icon={<EllipsisVerticalIcon />}
+                                onClick={(event) => event.stopPropagation()}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            aria-label="Edit Workflow"
-                            icon={<PencilIcon />}
-                            label="Edit"
-                            onClick={(event) => {
-                                event.stopPropagation();
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                aria-label="Edit Workflow"
+                                icon={<PencilIcon />}
+                                label="Edit"
+                                onClick={(event) => {
+                                    event.stopPropagation();
 
-                                onEditWorkflow(workflow);
-                            }}
-                        />
+                                    onEditWorkflow(workflow);
+                                }}
+                            />
 
-                        {!codeWorkflowProject && (
                             <DropdownMenuItem
                                 aria-label="Delete Workflow"
                                 icon={<Trash2Icon />}
@@ -160,9 +162,9 @@ const AutomationProjectWorkflowListItem = ({
                                 }}
                                 variant="destructive"
                             />
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
         </li>
     );
