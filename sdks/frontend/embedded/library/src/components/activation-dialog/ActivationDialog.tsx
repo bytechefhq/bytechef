@@ -163,6 +163,7 @@ interface ConnectRowProps {
     component: TemplateComponentType;
     connectionCreationAllowed: boolean;
     connections: ConnectionType[];
+    connectionsLoaded: boolean;
     highlighted: boolean;
     loadFailed: boolean;
     onConnect: () => void;
@@ -175,6 +176,7 @@ const ConnectRow = ({
     component,
     connectionCreationAllowed,
     connections,
+    connectionsLoaded,
     highlighted,
     loadFailed,
     onConnect,
@@ -231,6 +233,12 @@ const ConnectRow = ({
                 </div>
             ) : (
                 <p className={styles.notice}>{title} isn't set up yet — ask your administrator.</p>
+            )}
+
+            {available && connectionsLoaded && !loadFailed && !connectionCreationAllowed && connections.length === 0 && (
+                <p className={styles.notice}>
+                    No {title} accounts yet. Connect {title} from your integrations first.
+                </p>
             )}
 
             {available && loadFailed && (
@@ -742,6 +750,7 @@ const ActivationBody = ({
                                 component={component}
                                 connectionCreationAllowed={connectionCreationAllowed}
                                 connections={connectionsByComponent[component.name] ?? []}
+                                connectionsLoaded={connectionsByComponent[component.name] !== undefined}
                                 highlighted={state.highlightedComponent === component.name}
                                 key={component.name}
                                 loadFailed={connectionLoadFailures[component.name] === true}
