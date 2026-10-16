@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,6 +34,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
@@ -133,7 +135,12 @@ public class AutomationWorkflowProjectFacadeIntTestConfiguration {
 
     @Bean
     WorkflowValidatorFacade workflowValidatorFacade() {
-        return mock(WorkflowValidatorFacade.class);
+        WorkflowValidatorFacade workflowValidatorFacade = mock(WorkflowValidatorFacade.class);
+
+        when(workflowValidatorFacade.validateWorkflow(anyString(), anyLong()))
+            .thenReturn(new WorkflowValidationResult(List.of(), List.of()));
+
+        return workflowValidatorFacade;
     }
 
     @Bean
