@@ -60,6 +60,11 @@ public class RemoteConnectedUserProjectServiceClient implements ConnectedUserPro
     }
 
     @Override
+    public List<ConnectedUserProject> getConnectedUserConnectedUserProjects(long connectedUserId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ConnectedUserProject getConnectedUserConnectedUserProject(Long connectedUserid) {
         throw new UnsupportedOperationException();
     }

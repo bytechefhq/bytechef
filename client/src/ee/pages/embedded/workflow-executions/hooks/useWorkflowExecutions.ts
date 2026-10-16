@@ -13,6 +13,7 @@ import {useCallback, useEffect, useState} from 'react';
 export const useWorkflowExecutions = (
     automations: number,
     request: {
+        connectedUserId?: number;
         environmentId?: number;
         id: number;
         jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
@@ -21,7 +22,6 @@ export const useWorkflowExecutions = (
         integrationId?: number;
         integrationInstanceConfigurationId?: number;
         pageNumber?: number;
-        projectId?: number;
         workflowId?: string;
     }
 ) => {
@@ -70,6 +70,7 @@ export const useWorkflowExecutions = (
         automations,
         queryClient,
         refetchToken,
+        request.connectedUserId,
         request.environmentId,
         request.integrationId,
         request.integrationInstanceConfigurationId,
@@ -77,7 +78,6 @@ export const useWorkflowExecutions = (
         request.jobStartDate,
         request.jobStatus,
         request.pageNumber,
-        request.projectId,
         request.workflowId,
     ]);
 

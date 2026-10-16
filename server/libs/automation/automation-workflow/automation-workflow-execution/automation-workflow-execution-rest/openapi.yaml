@@ -100,6 +100,13 @@ paths:
         schema:
           type: "integer"
           format: "int64"
+      - name: "connectedUserId"
+        description: "The id of a connected user. Restricts embedded executions to those of the connected user's automation workflows, copied into the connected user's project or referenced from a catalog project."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int64"
       - name: "workflowId"
         description: "The id of a workflow. Executions of every version of the workflow are matched unless projectVersion is set."
         in: "query"
