@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProjectOwnershipServiceImpl implements ProjectOwnershipService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectOwnershipServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectOwnershipServiceImpl.class);
 
     private static final int CHUNK_SIZE = 1000;
     private static final String MATCH_EVERYTHING = "1 = 1";
@@ -79,7 +79,7 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService {
             return;
         }
 
-        logger.info(
+        log.info(
             "Project owners without a contributor, whose rows are not hidden: {}; project deployment owners: {}",
             projectOwnersWithoutContributor, projectDeploymentOwnersWithoutContributor);
     }
