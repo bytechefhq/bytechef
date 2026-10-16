@@ -212,6 +212,32 @@ public final class PolyglotValues {
         }
     }
 
+    public static Object copyToGuestMemberAndHashMap(Map<String, ?> map, String languageId) {
+        Map<String, Object> proxyMap = new HashMap<>();
+
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            Object value = entry.getValue();
+
+            if (value instanceof Map<?, ?> nestedMap) {
+                proxyMap.put(entry.getKey(), copyToGuestMemberAndHashMap(toStringKeyMap(nestedMap), languageId));
+            } else {
+                proxyMap.put(entry.getKey(), copyToGuestValue(value, languageId));
+            }
+        }
+
+        return new MemberAndHashMapProxy(proxyMap);
+    }
+
+    private static Map<String, Object> toStringKeyMap(Map<?, ?> map) {
+        Map<String, Object> stringKeyMap = new HashMap<>();
+
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            stringKeyMap.put((String) entry.getKey(), entry.getValue());
+        }
+
+        return stringKeyMap;
+    }
+
     private static Object toGuestMap(Map<String, Object> proxyMap, String languageId) {
         if (HASH_ACCESS_LANGUAGE_IDS.contains(languageId)) {
             return new MemberAndHashMapProxy(proxyMap);
