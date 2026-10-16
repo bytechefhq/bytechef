@@ -114,11 +114,6 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
             List.copyOf(lookupDependsOnValues.keySet()), searchText, connectionId.get());
     }
 
-    /**
-     * The connection that loads a component input's options. The integration's own component runs on the connected
-     * user's instance connection; any other component (Slack in a Gmail integration) on the connection an administrator
-     * picked for it in the instance configuration, and has no options until one is picked.
-     */
     private Optional<Long> findComponentConnectionId(IntegrationInstance integrationInstance, String componentName) {
         long integrationInstanceId = Objects.requireNonNull(integrationInstance.getId());
 
