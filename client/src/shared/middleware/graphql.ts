@@ -1381,6 +1381,7 @@ export type PublishAutomationProjectMutation = { publishAutomationProject: boole
 
 export type ConnectedUserCodeWorkflowReferencesQueryVariables = Exact<{
   automationUuids: Array<string | number> | string | number;
+  environmentId: string | number;
 }>;
 
 
@@ -7473,8 +7474,11 @@ export const usePublishAutomationProjectMutation = <
     )};
 
 export const ConnectedUserCodeWorkflowReferencesDocument = new TypedDocumentString(`
-    query connectedUserCodeWorkflowReferences($automationUuids: [ID!]!) {
-  connectedUserCodeWorkflowReferences(automationUuids: $automationUuids) {
+    query connectedUserCodeWorkflowReferences($automationUuids: [ID!]!, $environmentId: ID!) {
+  connectedUserCodeWorkflowReferences(
+    automationUuids: $automationUuids
+    environmentId: $environmentId
+  ) {
     automationUuid
     externalUserId
     environment
