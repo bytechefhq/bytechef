@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -67,6 +68,7 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -355,6 +357,9 @@ class ConnectedUserIntegrationFacadeIntTest {
         private ConnectionDefinitionService connectionDefinitionService;
 
         @Autowired
+        private ConnectionService connectionService;
+
+        @Autowired
         private McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
 
         @Autowired
@@ -454,6 +459,34 @@ class ConnectedUserIntegrationFacadeIntTest {
                 .containsExactly(mcpIntegrationWorkflow.getUuidAsString());
 
             assertThat(getVisibleWorkflowUuids(externalUserId, integrationId)).containsExactly(visibleWorkflowUuid);
+        }
+
+        @Test
+        void testIntegrationListsOnlyItsOwnInstancesWhenAnotherIntegrationSharesTheComponent() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long connectedIntegrationId = createIntegrationRow(null);
+            long connectedIntegrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+                connectedIntegrationId);
+            long otherIntegrationId = createIntegration(null);
+
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                externalUserId, Environment.PRODUCTION);
+
+            IntegrationInstance integrationInstance = integrationInstanceService.create(
+                connectedUser.getId(), CONNECTION_ID, connectedIntegrationInstanceConfigurationId);
+
+            Connection connection = mock(Connection.class);
+
+            when(connection.getId()).thenReturn(CONNECTION_ID);
+            when(connectionService.getConnections(anyList())).thenReturn(List.of(connection));
+
+            assertThat(getConnectedUserIntegration(externalUserId, connectedIntegrationId).integrationInstances())
+                .extracting(ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance::integrationInstance)
+                .extracting(IntegrationInstance::getId)
+                .containsExactly(integrationInstance.getId());
+            assertThat(getConnectedUserIntegration(externalUserId, otherIntegrationId).integrationInstances())
+                .isEmpty();
         }
 
         private IntegrationWorkflow addWorkflow(
