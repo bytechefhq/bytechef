@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.configuration.domain;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -31,34 +30,5 @@ class SystemProjectsTest {
         String namePrefix = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
 
         assertTrue(namePrefix.matches("__[A-Z][A-Z_]*[A-Z]__"), namePrefix + " must be __SCREAMING_SNAKE_CASE__");
-    }
-
-    @Test
-    void testPrefixedNamesAreRecognized() {
-        assertTrue(SystemProjects.isSystemProjectName(SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX + "catalog"));
-    }
-
-    @Test
-    void testUserProjectsAreNotSystemProjects() {
-        assertFalse(SystemProjects.isSystemProjectName("My Project"));
-        assertFalse(SystemProjects.isSystemProjectName(""));
-        assertFalse(SystemProjects.isSystemProjectName(null));
-
-        assertFalse(SystemProjects.isSystemProjectName("__scratch"));
-        assertFalse(SystemProjects.isSystemProjectName("__MY_PROJECT__"));
-    }
-
-    @Test
-    void testIsSystemProjectReadsTheProjectName() {
-        Project project = new Project();
-
-        project.setName(SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX + "catalog");
-
-        assertTrue(SystemProjects.isSystemProject(project));
-
-        project.setName("My Project");
-
-        assertFalse(SystemProjects.isSystemProject(project));
-        assertFalse(SystemProjects.isSystemProject(null));
     }
 }

@@ -165,7 +165,7 @@ public class ProjectGraphQlControllerIntTest {
         List<Project> mockProjects = List.of(
             createMockProject(1L, "Project 1"),
             createMockProject(2L, "Project 2"));
-        when(projectService.getProjects()).thenReturn(mockProjects);
+        when(projectService.getProjects(null, null, null, null, null, null)).thenReturn(mockProjects);
 
         // When & Then
         this.graphQlTester
@@ -319,7 +319,7 @@ public class ProjectGraphQlControllerIntTest {
             createMockTag(2L, "Tag 2"),
             createMockTag(3L, "Tag 3"));
 
-        when(projectService.getProjects()).thenReturn(mockProjects);
+        when(projectService.getProjects(null, null, null, null, null, null)).thenReturn(mockProjects);
         when(tagService.getTags(any())).thenReturn(mockTags);
 
         // When & Then

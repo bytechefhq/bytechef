@@ -34,6 +34,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
@@ -293,6 +294,7 @@ class ClusterElementToolsTest {
         return new ClusterElementTools(
             componentDefinitionService, projectWorkflowFacade,
             new ScopedProjectGuard(
-                projectService, projectWorkflowService, scopedConnectionGuard, workspaceScopeResolver));
+                mock(ProjectOwnershipService.class), projectService, projectWorkflowService, scopedConnectionGuard,
+                workspaceScopeResolver));
     }
 }
