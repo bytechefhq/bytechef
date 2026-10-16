@@ -244,131 +244,139 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             workflowIds.addAll(workspaceWorkflowIds);
         }
 
-        Page<WorkflowExecutionDTO> workflowExecutionPage;
-
         if (workflowIds.isEmpty()) {
-            workflowExecutionPage = Page.empty();
+            return Page.empty();
+        }
+
+        List<Long> projectDeploymentIds = getProjectDeploymentIds(
+            embedded, environmentId, projectDeploymentId, embeddedProjectDeployments);
+
+        if (projectDeploymentIds.isEmpty()) {
+            return Page.empty();
+        }
+
+        Page<WorkflowExecutionRowDTO> rowsPage = workflowExecutionRowService.getWorkflowExecutionRows(
+            jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, PlatformType.AUTOMATION, workflowIds,
+            true, getFailedTriggerWorkflowExecutionIds(jobStatus, projectDeploymentIds, workflowIds),
+            pageNumber);
+
+        return toWorkflowExecutionPage(rowsPage, projectId);
+    }
+
+    private List<Long> getProjectDeploymentIds(
+        Boolean embedded, Long environmentId, Long projectDeploymentId,
+        @Nullable List<ProjectDeployment> embeddedProjectDeployments) {
+
+        if (projectDeploymentId != null) {
+            return List.of(projectDeploymentId);
+        }
+
+        if (embeddedProjectDeployments != null) {
+            return CollectionUtils.map(embeddedProjectDeployments, ProjectDeployment::getId);
+        }
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
+        return projectDeploymentService.getProjectDeployments(embedded, environment, null, null, null)
+            .stream()
+            .map(ProjectDeployment::getId)
+            .toList();
+    }
+
+    private Page<WorkflowExecutionDTO> toWorkflowExecutionPage(
+        Page<WorkflowExecutionRowDTO> rowsPage, Long projectId) {
+
+        List<Long> jobIds = rowsPage.getContent()
+            .stream()
+            .filter(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB)
+            .map(WorkflowExecutionRowDTO::id)
+            .toList();
+
+        List<Job> jobs = jobService.getJobs(jobIds);
+
+        Map<Long, Job> jobMap = jobs.stream()
+            .collect(Collectors.toMap(
+                job -> Validate.notNull(job.getId(), "id"), Function.identity()));
+
+        List<Project> projects = new ArrayList<>();
+
+        if (projectId == null) {
+            projects.addAll(projectService.getProjects());
         } else {
-            List<Long> projectDeploymentIds = new ArrayList<>();
+            projects.add(projectService.getProject(projectId));
+        }
 
-            if (projectDeploymentId != null) {
-                projectDeploymentIds.add(projectDeploymentId);
-            } else if (embeddedProjectDeployments != null) {
-                projectDeploymentIds.addAll(CollectionUtils.map(embeddedProjectDeployments, ProjectDeployment::getId));
-            } else {
-                Environment environment =
-                    environmentId == null ? null : environmentService.getEnvironment(environmentId);
+        List<Workflow> workflows = workflowService.getWorkflows(
+            CollectionUtils.map(jobs, Job::getWorkflowId));
 
-                projectDeploymentIds.addAll(
-                    projectDeploymentService.getProjectDeployments(embedded, environment, null, null, null)
-                        .stream()
-                        .map(ProjectDeployment::getId)
-                        .toList());
-            }
+        List<Long> projectIds = projects.stream()
+            .map(project -> Validate.notNull(project.getId(), "id"))
+            .toList();
 
-            if (projectDeploymentIds.isEmpty()) {
-                workflowExecutionPage = Page.empty();
-            } else {
-                Page<WorkflowExecutionRowDTO> rowsPage = workflowExecutionRowService.getWorkflowExecutionRows(
-                    jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, PlatformType.AUTOMATION, workflowIds,
-                    true, getFailedTriggerWorkflowExecutionIds(jobStatus, projectDeploymentIds, workflowIds),
-                    pageNumber);
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(projectIds);
 
-                List<Long> jobIds = rowsPage.getContent()
-                    .stream()
-                    .filter(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB)
-                    .map(WorkflowExecutionRowDTO::id)
-                    .toList();
+        Map<Long, List<String>> projectWorkflowIdsMap = projectWorkflows.stream()
+            .collect(Collectors.groupingBy(
+                ProjectWorkflow::getProjectId,
+                Collectors.mapping(ProjectWorkflow::getWorkflowId, Collectors.toList())));
 
-                List<Job> jobs = jobService.getJobs(jobIds);
+        Map<String, Integer> workflowProjectVersionMap = projectWorkflows.stream()
+            .collect(Collectors.toMap(
+                ProjectWorkflow::getWorkflowId, ProjectWorkflow::getProjectVersion,
+                (firstProjectVersion, otherProjectVersion) -> firstProjectVersion));
 
-                Map<Long, Job> jobMap = jobs.stream()
-                    .collect(Collectors.toMap(
-                        job -> Validate.notNull(job.getId(), "id"), Function.identity()));
+        List<PrincipalJob> principalJobs =
+            principalJobService.getPrincipalJobs(jobIds, PlatformType.AUTOMATION);
 
-                List<Project> projects = new ArrayList<>();
+        Map<Long, Long> jobToPrincipalMap = principalJobs.stream()
+            .collect(Collectors.toMap(PrincipalJob::getJobId, PrincipalJob::getPrincipalId));
 
-                if (projectId == null) {
-                    projects.addAll(projectService.getProjects());
-                } else {
-                    projects.add(projectService.getProject(projectId));
-                }
+        List<Long> principalIds = principalJobs.stream()
+            .map(PrincipalJob::getPrincipalId)
+            .distinct()
+            .toList();
 
-                List<Workflow> workflows = workflowService.getWorkflows(
-                    CollectionUtils.map(jobs, Job::getWorkflowId));
+        Map<Long, ProjectDeployment> projectDeploymentMap =
+            projectDeploymentService.getProjectDeployments(principalIds)
+                .stream()
+                .collect(Collectors.toMap(
+                    deployment -> Validate.notNull(deployment.getId(), "id"), Function.identity()));
 
-                List<Long> projectIds = projects.stream()
-                    .map(project -> Validate.notNull(project.getId(), "id"))
-                    .toList();
+        List<TriggerExecution> triggerExecutions =
+            triggerExecutionService.getJobTriggerExecutions(jobIds);
 
-                List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(projectIds);
+        Map<Long, TriggerExecution> triggerExecutionByJobIdMap = new HashMap<>();
 
-                Map<Long, List<String>> projectWorkflowIdsMap = projectWorkflows.stream()
-                    .collect(Collectors.groupingBy(
-                        ProjectWorkflow::getProjectId,
-                        Collectors.mapping(ProjectWorkflow::getWorkflowId, Collectors.toList())));
-
-                Map<String, Integer> workflowProjectVersionMap = projectWorkflows.stream()
-                    .collect(Collectors.toMap(
-                        ProjectWorkflow::getWorkflowId, ProjectWorkflow::getProjectVersion,
-                        (firstProjectVersion, otherProjectVersion) -> firstProjectVersion));
-
-                List<PrincipalJob> principalJobs =
-                    principalJobService.getPrincipalJobs(jobIds, PlatformType.AUTOMATION);
-
-                Map<Long, Long> jobToPrincipalMap = principalJobs.stream()
-                    .collect(Collectors.toMap(PrincipalJob::getJobId, PrincipalJob::getPrincipalId));
-
-                List<Long> principalIds = principalJobs.stream()
-                    .map(PrincipalJob::getPrincipalId)
-                    .distinct()
-                    .toList();
-
-                Map<Long, ProjectDeployment> projectDeploymentMap =
-                    projectDeploymentService.getProjectDeployments(principalIds)
-                        .stream()
-                        .collect(Collectors.toMap(
-                            deployment -> Validate.notNull(deployment.getId(), "id"), Function.identity()));
-
-                List<TriggerExecution> triggerExecutions =
-                    triggerExecutionService.getJobTriggerExecutions(jobIds);
-
-                Map<Long, TriggerExecution> triggerExecutionByJobIdMap = new HashMap<>();
-
-                for (TriggerExecution triggerExecution : triggerExecutions) {
-                    for (Long triggerJobId : triggerExecution.getJobIds()) {
-                        triggerExecutionByJobIdMap.putIfAbsent(triggerJobId, triggerExecution);
-                    }
-                }
-
-                Map<Long, WorkflowExecutionDTO> jobWorkflowExecutionDTOMap = buildWorkflowExecutionDTOs(
-                    jobIds, jobMap, workflows, projects, projectWorkflowIdsMap, workflowProjectVersionMap,
-                    jobToPrincipalMap, projectDeploymentMap, triggerExecutionByJobIdMap)
-                        .stream()
-                        .collect(Collectors.toMap(WorkflowExecutionDTO::id, Function.identity()));
-
-                Map<Long, WorkflowExecutionDTO> triggerWorkflowExecutionDTOMap = buildTriggerWorkflowExecutionDTOs(
-                    triggerExecutionService.getTriggerExecutions(
-                        rowsPage.getContent()
-                            .stream()
-                            .filter(row -> row.kind() == WorkflowExecutionRowDTO.Kind.TRIGGER_EXECUTION)
-                            .map(WorkflowExecutionRowDTO::id)
-                            .toList()));
-
-                List<WorkflowExecutionDTO> workflowExecutionDTOs = rowsPage.getContent()
-                    .stream()
-                    .map(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB
-                        ? jobWorkflowExecutionDTOMap.get(row.id())
-                        : triggerWorkflowExecutionDTOMap.get(row.id()))
-                    .filter(Objects::nonNull)
-                    .toList();
-
-                workflowExecutionPage = new PageImpl<>(
-                    workflowExecutionDTOs, rowsPage.getPageable(), rowsPage.getTotalElements());
+        for (TriggerExecution triggerExecution : triggerExecutions) {
+            for (Long triggerJobId : triggerExecution.getJobIds()) {
+                triggerExecutionByJobIdMap.putIfAbsent(triggerJobId, triggerExecution);
             }
         }
 
-        return workflowExecutionPage;
+        Map<Long, WorkflowExecutionDTO> jobWorkflowExecutionDTOMap = buildWorkflowExecutionDTOs(
+            jobIds, jobMap, workflows, projects, projectWorkflowIdsMap, workflowProjectVersionMap,
+            jobToPrincipalMap, projectDeploymentMap, triggerExecutionByJobIdMap)
+                .stream()
+                .collect(Collectors.toMap(WorkflowExecutionDTO::id, Function.identity()));
+
+        Map<Long, WorkflowExecutionDTO> triggerWorkflowExecutionDTOMap = buildTriggerWorkflowExecutionDTOs(
+            triggerExecutionService.getTriggerExecutions(
+                rowsPage.getContent()
+                    .stream()
+                    .filter(row -> row.kind() == WorkflowExecutionRowDTO.Kind.TRIGGER_EXECUTION)
+                    .map(WorkflowExecutionRowDTO::id)
+                    .toList()));
+
+        List<WorkflowExecutionDTO> workflowExecutionDTOs = rowsPage.getContent()
+            .stream()
+            .map(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB
+                ? jobWorkflowExecutionDTOMap.get(row.id())
+                : triggerWorkflowExecutionDTOMap.get(row.id()))
+            .filter(Objects::nonNull)
+            .toList();
+
+        return new PageImpl<>(
+            workflowExecutionDTOs, rowsPage.getPageable(), rowsPage.getTotalElements());
     }
 
     private List<String> getProjectDeploymentWorkflowIds(List<ProjectDeployment> projectDeployments) {
