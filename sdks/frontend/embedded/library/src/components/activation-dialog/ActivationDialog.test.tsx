@@ -44,6 +44,32 @@ const templates = [
         inputs: [],
         label: 'Provided connection only',
     },
+    {
+        components: [{connectionRequired: true, integrationId: 5, name: 'slack', title: 'Slack'}],
+        id: 'wf-slack-channel',
+        inputs: [
+            {
+                componentReference: {componentName: 'slack', componentVersion: 1, groupName: 'channel'},
+                label: 'Channel',
+                name: 'channel',
+                required: true,
+            },
+        ],
+        label: 'Slack digest',
+    },
+    {
+        components: [],
+        id: 'wf-unconnected-channel',
+        inputs: [
+            {
+                componentReference: {componentName: 'slack', componentVersion: 1, groupName: 'channel'},
+                label: 'Channel',
+                name: 'channel',
+                required: true,
+            },
+        ],
+        label: 'Unconnected digest',
+    },
     {components: [], id: 'wf-code', inputs: [], kind: 'REFERENCE', label: 'Code workflow'},
     {components: [], id: 'wf-hidden', inputs: [], label: 'Hidden from the hub'},
 ];
@@ -66,6 +92,7 @@ let connectionsStatus = 200;
 let deprovisionStatus = 200;
 let provisionGate: Promise<void> | undefined;
 let enableResponse: {body: unknown; status: number} = {body: {}, status: 200};
+let componentInputOptionsByConnectionId: Record<number, Array<{label: string; value: string}>> = {};
 let provisionResponse: {body: unknown; status: number} = {body: {}, status: 200};
 let workflowsResponse: {body: unknown; status: number} = {body: [], status: 200};
 let copyResponse: {body: unknown; status: number} = {body: 'wf-copy', status: 200};
@@ -108,6 +135,12 @@ const installFetch = () => {
             return respond(enableResponse.status, enableResponse.body);
         }
 
+        if (url.endsWith('/automation/component-input-options') && method === 'POST') {
+            const {connectionId} = JSON.parse(init?.body as string) as {connectionId: number};
+
+            return respond(200, componentInputOptionsByConnectionId[connectionId] ?? []);
+        }
+
         if (url.endsWith('/copy') && method === 'POST') {
             return respond(copyResponse.status, copyResponse.body);
         }
@@ -139,6 +172,7 @@ describe('ActivationDialog', () => {
         provisionResponse = {body: {}, status: 200};
         workflowsResponse = {body: [], status: 200};
         copyResponse = {body: 'wf-copy', status: 200};
+        componentInputOptionsByConnectionId = {};
         installFetch();
         useConnectDialogMock.mockReturnValue({closeDialog: vi.fn(), openDialog: openConnectDialogMock});
         vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -696,6 +730,102 @@ describe('ActivationDialog', () => {
                     expect.objectContaining({connectionOnly: true, newConnection: true})
                 )
             );
+        });
+    });
+
+    describe('an input that references a component input', () => {
+        const optionCalls = () =>
+            calls.filter((call) => call.url.endsWith('/automation/component-input-options') && call.method === 'POST');
+
+        const pickSlackConnection = async (connectionId: string) => {
+            const row = await screen.findByTestId('connect-row-slack');
+
+            await within(row).findByRole('option', {name: 'Team Slack'});
+
+            await userEvent.selectOptions(within(row).getByRole('combobox'), connectionId);
+        };
+
+        beforeEach(() => {
+            connections = [
+                {componentName: 'slack', id: 9, name: 'Team Slack'},
+                {componentName: 'slack', id: 10, name: 'Other Slack'},
+            ];
+            componentInputOptionsByConnectionId = {
+                9: [
+                    {label: '#general', value: 'C1'},
+                    {label: '#random', value: 'C2'},
+                ],
+                10: [{label: '#other', value: 'C9'}],
+            };
+        });
+
+        it('loads its options with the connection picked for the component and provisions the chosen value', async () => {
+            const onActivated = vi.fn();
+
+            renderDialog({onActivated, workflowTemplateId: 'wf-slack-channel'});
+
+            await pickSlackConnection('9');
+            await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+
+            const select = screen.getByLabelText(/Channel/);
+
+            await within(select).findByRole('option', {name: '#random'});
+
+            expect(JSON.parse(optionCalls()[0].body!)).toEqual({
+                componentName: 'slack',
+                componentVersion: 1,
+                connectionId: 9,
+                groupName: 'channel',
+                lookupDependsOnValues: {},
+                propertyName: 'channel',
+            });
+            expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+
+            await userEvent.selectOptions(select, 'C2');
+            await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+            await userEvent.click(screen.getByRole('button', {name: 'Activate'}));
+
+            await waitFor(() => expect(onActivated).toHaveBeenCalledWith('wf-slack-channel'));
+
+            const provision = calls.find(
+                (call) => call.url.endsWith('/workflow-templates/wf-slack-channel/provision') && call.method === 'POST'
+            );
+
+            expect(JSON.parse(provision!.body!)).toEqual({connections: {slack: 9}, inputs: {channel: 'C2'}});
+        });
+
+        it('reloads its options and clears its value when another connection is picked', async () => {
+            renderDialog({workflowTemplateId: 'wf-slack-channel'});
+
+            await pickSlackConnection('9');
+            await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+
+            await within(screen.getByLabelText(/Channel/)).findByRole('option', {name: '#general'});
+
+            await userEvent.selectOptions(screen.getByLabelText(/Channel/), 'C1');
+            await userEvent.click(screen.getByRole('button', {name: 'Back'}));
+            await pickSlackConnection('10');
+            await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+
+            const select = screen.getByLabelText(/Channel/);
+
+            await within(select).findByRole('option', {name: '#other'});
+
+            expect(within(select).queryByRole('option', {name: '#general'})).not.toBeInTheDocument();
+            expect(JSON.parse(optionCalls()[optionCalls().length - 1].body!).connectionId).toBe(10);
+            expect(select).toHaveValue('');
+            expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+        });
+
+        it('stays disabled with a hint until a connection for the component is picked', async () => {
+            renderDialog({workflowTemplateId: 'wf-unconnected-channel'});
+
+            const select = await screen.findByLabelText(/Channel/);
+
+            expect(select).toBeDisabled();
+            expect(screen.getByText('Pick a slack connection first')).toBeInTheDocument();
+            expect(optionCalls()).toHaveLength(0);
+            expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
         });
     });
 });

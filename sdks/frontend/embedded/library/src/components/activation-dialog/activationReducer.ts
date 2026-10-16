@@ -68,6 +68,18 @@ export function hasEditableInputs(inputs: TemplateInputType[]): boolean {
     return inputs.some((input) => !input.provided);
 }
 
+function withoutComponentInputValues(state: ActivationStateI, componentName: string): Record<string, unknown> {
+    const inputValues = {...state.inputValues};
+
+    for (const input of state.inputs) {
+        if (input.componentReference?.componentName === componentName) {
+            delete inputValues[input.name];
+        }
+    }
+
+    return inputValues;
+}
+
 function getFirstStep(requiredComponents: string[], inputs: TemplateInputType[]): ActivationStepType {
     if (requiredComponents.length > 0) {
         return 'connect';
@@ -137,6 +149,10 @@ export function activationReducer(state: ActivationStateI, action: ActivationAct
             return {
                 ...state,
                 highlightedComponent,
+                inputValues:
+                    state.selections[action.componentName] === action.connectionId
+                        ? state.inputValues
+                        : withoutComponentInputValues(state, action.componentName),
                 selections: {...state.selections, [action.componentName]: action.connectionId},
             };
         }
