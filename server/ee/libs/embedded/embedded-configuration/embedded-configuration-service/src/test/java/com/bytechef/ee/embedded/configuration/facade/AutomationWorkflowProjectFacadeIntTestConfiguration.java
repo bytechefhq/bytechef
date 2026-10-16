@@ -16,6 +16,10 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
+import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.encryption.EncryptionKey;
@@ -36,6 +40,7 @@ import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
@@ -47,6 +52,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
  * @version ee
@@ -93,6 +99,19 @@ public class AutomationWorkflowProjectFacadeIntTestConfiguration {
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    ProjectOwnershipService projectOwnershipService(
+        JdbcClient jdbcClient,
+        ObjectProvider<ProjectDeploymentOwnerContributor> projectDeploymentOwnerContributorProvider,
+        ObjectProvider<ProjectOwnerContributor> projectOwnerContributorProvider) {
+
+        return new ProjectOwnershipServiceImpl(
+            jdbcClient, projectDeploymentOwnerContributorProvider.orderedStream()
+                .toList(),
+            projectOwnerContributorProvider.orderedStream()
+                .toList());
     }
 
     @Bean

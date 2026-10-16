@@ -32,7 +32,6 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -69,6 +68,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class A2aProjectFacadeImpl implements A2aProjectFacade {
+
+    private static final String A2A_SERVER_NAME_PREFIX = "__A2A_SERVER__";
 
     private final A2aProjectService a2aProjectService;
     private final A2aProjectWorkflowService a2aProjectWorkflowService;
@@ -134,7 +135,7 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
-        projectDeployment.setName(SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX + projectId + "_v" + projectVersion);
+        projectDeployment.setName(A2A_SERVER_NAME_PREFIX + projectId + "_v" + projectVersion);
         projectDeployment.setProjectId(projectId);
         projectDeployment.setProjectVersion(projectVersion);
         projectDeployment.setEnvironment(a2aServer.getEnvironment());
