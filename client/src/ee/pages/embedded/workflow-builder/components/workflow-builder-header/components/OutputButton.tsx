@@ -7,7 +7,7 @@ const OutputButton = ({onShowOutputClick}: {onShowOutputClick: () => void}) => {
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
+                    className="hover:bg-surface-neutral-secondary-hover [&_svg]:size-5"
                     icon={<SquareChevronRightIcon />}
                     onClick={onShowOutputClick}
                     size="icon"
