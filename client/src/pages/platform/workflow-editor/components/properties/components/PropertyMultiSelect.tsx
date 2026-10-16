@@ -17,6 +17,7 @@ import {useShallow} from 'zustand/shallow';
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
+import {resolveMainClusterRootName} from '../../../utils/resolveClusterRootId';
 import PropertyInputTypeSwitch from './PropertyInputTypeSwitch';
 
 interface PropertyMultiSelectProps {
@@ -94,6 +95,8 @@ const PropertyMultiSelect = ({
         [currentEnvironmentId, lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
     );
 
+    const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
+
     const clusterElementQueryOptions: {
         loadDependencyValueKey: string;
         request: GetClusterElementNodeOptionsRequest;
@@ -107,7 +110,7 @@ const PropertyMultiSelect = ({
                 id: workflowId,
                 lookupDependsOnPaths,
                 propertyName: path!,
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
+                workflowNodeName: mainClusterRootName || '',
             },
         }),
         [
@@ -118,7 +121,7 @@ const PropertyMultiSelect = ({
             workflowId,
             lookupDependsOnPaths,
             path,
-            rootClusterElementNodeData?.workflowNodeName,
+            mainClusterRootName,
         ]
     );
 

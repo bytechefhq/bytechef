@@ -25,6 +25,7 @@ import {useShallow} from 'zustand/shallow';
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
+import {resolveMainClusterRootName} from '../../../utils/resolveClusterRootId';
 import PropertyInputTypeSwitch from './PropertyInputTypeSwitch';
 import PropertyInput from './property-input/PropertyInput';
 
@@ -180,6 +181,8 @@ const PropertyComboBox = ({
         ]
     );
 
+    const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
+
     const clusterElementQueryOptions: {
         loadDependencyValueKey: string;
         request: GetClusterElementNodeOptionsRequest;
@@ -195,7 +198,7 @@ const PropertyComboBox = ({
                 id: workflowId,
                 lookupDependsOnPaths,
                 propertyName: path!,
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
+                workflowNodeName: mainClusterRootName || '',
             },
         }),
         [
@@ -207,7 +210,7 @@ const PropertyComboBox = ({
             workflowId,
             lookupDependsOnPaths,
             path,
-            rootClusterElementNodeData?.workflowNodeName,
+            mainClusterRootName,
         ]
     );
 

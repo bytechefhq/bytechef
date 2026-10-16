@@ -10,6 +10,7 @@ import updateClusterElementsPositions from './updateClusterElementsPositions';
 
 interface SaveClusterElementNodesPositionProps {
     clickedNodeName?: string;
+    clusterRootName?: string;
     movedClusterElementId?: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
@@ -17,6 +18,7 @@ interface SaveClusterElementNodesPositionProps {
 
 export default function saveClusterElementNodesPosition({
     clickedNodeName,
+    clusterRootName,
     movedClusterElementId,
     updateWorkflowMutation,
     workflow,
@@ -24,23 +26,35 @@ export default function saveClusterElementNodesPosition({
     const {nodes: clusterElementNodes, setIsPositionSaving} = useClusterElementsDataStore.getState();
     const {rootClusterElementNodeData, setRootClusterElementNodeData} = useWorkflowEditorStore.getState();
 
-    if (!workflow.definition || !rootClusterElementNodeData) {
-        console.error('Workflow definition or root cluster element node data not found');
+    const mainClusterRootName = clusterRootName ?? rootClusterElementNodeData?.workflowNodeName;
+
+    if (!workflow.definition || !mainClusterRootName) {
+        console.error('Workflow definition or cluster root not found');
 
         return;
     }
 
     const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-    const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-        ? getTask({
-              tasks: workflowDefinitionTasks,
-              workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-          })
-        : undefined;
+    const mainClusterRootTask = getTask({
+        tasks: workflowDefinitionTasks,
+        workflowNodeName: mainClusterRootName,
+    });
 
     if (!mainClusterRootTask || !mainClusterRootTask.clusterElements) {
         console.error('Main cluster root task or cluster elements not found');
+
+        return;
+    }
+
+    const storedRootClusterElementNodeData =
+        rootClusterElementNodeData?.workflowNodeName === mainClusterRootName ? rootClusterElementNodeData : undefined;
+
+    const mainClusterRootComponentName =
+        mainClusterRootTask.type?.split('/')[0] || storedRootClusterElementNodeData?.componentName;
+
+    if (!mainClusterRootComponentName) {
+        console.error('Main cluster root component not found');
 
         return;
     }
@@ -74,17 +88,19 @@ export default function saveClusterElementNodesPosition({
             clusterElements: updatedClusterElements,
         };
 
-        setRootClusterElementNodeData({
-            ...rootClusterElementNodeData,
-            clusterElements: updatedClusterElements,
-        } as typeof rootClusterElementNodeData);
+        if (storedRootClusterElementNodeData) {
+            setRootClusterElementNodeData({
+                ...storedRootClusterElementNodeData,
+                clusterElements: updatedClusterElements,
+            });
+        }
 
         // Save updated data but reset the position saving flag even when there are errors
         saveWorkflowDefinition({
             nodeData: {
                 ...updatedNodeData,
-                componentName: rootClusterElementNodeData.componentName,
-                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                componentName: mainClusterRootComponentName,
+                workflowNodeName: mainClusterRootName,
             },
             updateWorkflowMutation,
         })
@@ -105,16 +121,18 @@ export default function saveClusterElementNodesPosition({
             clusterElements: clusterElementPositionRemovalResult,
         };
 
-        setRootClusterElementNodeData({
-            ...rootClusterElementNodeData,
-            clusterElements: clusterElementPositionRemovalResult,
-        } as typeof rootClusterElementNodeData);
+        if (storedRootClusterElementNodeData) {
+            setRootClusterElementNodeData({
+                ...storedRootClusterElementNodeData,
+                clusterElements: clusterElementPositionRemovalResult,
+            });
+        }
 
         saveWorkflowDefinition({
             nodeData: {
                 ...updatedNodeData,
-                componentName: rootClusterElementNodeData.componentName,
-                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                componentName: mainClusterRootComponentName,
+                workflowNodeName: mainClusterRootName,
             },
             updateWorkflowMutation,
         });

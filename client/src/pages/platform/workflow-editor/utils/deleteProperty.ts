@@ -10,6 +10,7 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {decodePath} from './encodingUtils';
+import {resolveMainClusterRootName} from './resolveClusterRootId';
 import {enqueueWorkflowMutation} from './workflowMutationQueue';
 
 export default function deleteProperty(
@@ -30,6 +31,7 @@ export default function deleteProperty(
 ) {
     const currentNode = useWorkflowNodeDetailsPanelStore.getState().currentNode;
     const rootClusterElementNodeData = useWorkflowEditorStore.getState().rootClusterElementNodeData;
+    const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
 
     const decodedPath = decodePath(path);
 
@@ -57,7 +59,7 @@ export default function deleteProperty(
                     },
                     environmentId: environmentStore.getState().currentEnvironmentId,
                     id: workflowId,
-                    workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
+                    workflowNodeName: mainClusterRootName || '',
                 },
                 {
                     onError: (error) => {
@@ -91,7 +93,7 @@ export default function deleteProperty(
         return;
     }
 
-    const nodeWorkflowNodeName = rootClusterElementNodeData?.workflowNodeName || currentNode?.workflowNodeName || '';
+    const nodeWorkflowNodeName = mainClusterRootName || currentNode?.workflowNodeName || '';
 
     enqueueWorkflowMutation(() =>
         deleteWorkflowNodeParameterMutation.mutateAsync(

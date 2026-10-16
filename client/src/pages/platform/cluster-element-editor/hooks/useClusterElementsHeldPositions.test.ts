@@ -1,0 +1,175 @@
+import {act, renderHook} from '@testing-library/react';
+import {Node} from '@xyflow/react';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+
+import useClusterElementsViewModeStore from '../../workflow-editor/stores/useClusterElementsViewModeStore';
+import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowEditorStore, {WorkflowEditorI} from '../../workflow-editor/stores/useWorkflowEditorStore';
+import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
+import useClusterElementsLayout from './useClusterElementsLayout';
+
+const {getClusterElementsLayoutElementsMock} = vi.hoisted(() => ({
+    getClusterElementsLayoutElementsMock: vi.fn(),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/utils/layoutUtils', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/pages/platform/workflow-editor/utils/layoutUtils')>()),
+    getClusterElementsLayoutElements: getClusterElementsLayoutElementsMock,
+}));
+
+const {createClusterElementsNodesMock} = vi.hoisted(() => ({
+    createClusterElementsNodesMock: vi.fn(),
+}));
+
+vi.mock('@/pages/platform/cluster-element-editor/utils/createClusterElementsNodes', () => ({
+    default: createClusterElementsNodesMock,
+}));
+
+vi.mock('@/pages/platform/cluster-element-editor/utils/createClusterElementsEdges', () => ({
+    default: () => [],
+}));
+
+vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
+    ComponentDefinitionKeys: {componentDefinition: () => ['componentDefinition']},
+    useGetComponentDefinitionQuery: () => ({data: undefined}),
+}));
+
+vi.mock('@tanstack/react-query', () => ({
+    useQueryClient: () => ({query: vi.fn().mockResolvedValue({clusterElementTypes: []})}),
+}));
+
+const ROOT_NODE_NAME = 'aiAgent_1';
+
+const clusterElementNode = (name: string, label: string): Node => ({
+    data: {label},
+    id: name,
+    parentId: ROOT_NODE_NAME,
+    position: {x: 0, y: 0},
+    type: 'workflow',
+});
+
+const MODEL_ELEMENT = {name: 'anthropic_1', type: 'anthropic/v1/model'};
+const ADDED_ELEMENT = {name: 'activeCampaign_2', type: 'anthropic/v1/memory'};
+
+const buildWorkflowDefinition = (revision: number, clusterElements: Record<string, unknown> = {model: MODEL_ELEMENT}) =>
+    JSON.stringify({
+        tasks: [{clusterElements, name: ROOT_NODE_NAME, revision}],
+    });
+
+const setWorkflowDefinition = (revision: number, clusterElements?: Record<string, unknown>) => {
+    useWorkflowDataStore.setState({
+        workflow: {definition: buildWorkflowDefinition(revision, clusterElements), id: 'workflow-1'},
+    } as Parameters<typeof useWorkflowDataStore.setState>[0]);
+};
+
+const handPlacedNodes = (): Array<Node> => [
+    {data: {label: 'root'}, id: ROOT_NODE_NAME, position: {x: 900, y: 900}, type: 'workflow'},
+    {...clusterElementNode('anthropic_1', 'stale'), position: {x: 700, y: 700}},
+];
+
+describe('useClusterElementsLayout', () => {
+    beforeEach(() => {
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
+
+        getClusterElementsLayoutElementsMock.mockReset();
+        getClusterElementsLayoutElementsMock.mockImplementation(({nodes}: {nodes: Array<Node>}) => ({
+            edges: [],
+            nodes: nodes.map((node) => ({...node, position: {x: 0, y: 0}})),
+        }));
+
+        createClusterElementsNodesMock.mockReset();
+        createClusterElementsNodesMock.mockReturnValue([clusterElementNode('anthropic_1', 'fresh')]);
+
+        useClusterElementsDataStore.getState().reset();
+        useClusterElementsDataStore.setState({nodes: handPlacedNodes()});
+
+        useWorkflowEditorStore.setState({
+            clusterRootComponentDefinitions: {
+                [ROOT_NODE_NAME]: {
+                    clusterElement: false,
+                    clusterRoot: true,
+                    connectionRequired: false,
+                    name: 'aiAgent',
+                    version: 1,
+                },
+            },
+            nestedClusterRootsComponentDefinitions: {
+                anthropic: {
+                    actionClusterElementTypes: {},
+                    clusterElementClusterElementTypes: {},
+                    clusterElementTypes: [],
+                },
+            },
+            rootClusterElementNodeData: {
+                componentName: 'aiAgent',
+                name: ROOT_NODE_NAME,
+                operationName: 'chat',
+                type: 'aiAgent/v1',
+                workflowNodeName: ROOT_NODE_NAME,
+            },
+        } as Partial<WorkflowEditorI>);
+
+        setWorkflowDefinition(1);
+    });
+
+    it('lays out the canvas when nodes are locked', () => {
+        renderHook(() => useClusterElementsLayout());
+
+        expect(getClusterElementsLayoutElementsMock).toHaveBeenCalled();
+        expect(useClusterElementsDataStore.getState().nodes.map((node) => node.position)).toEqual([
+            {x: 0, y: 0},
+            {x: 0, y: 0},
+        ]);
+    });
+
+    it('keeps hand-placed positions when nodes are unlocked and the node set is unchanged', () => {
+        useClusterElementsDataStore.setState({nodesLocked: false});
+
+        const {rerender} = renderHook(() => useClusterElementsLayout());
+
+        act(() => setWorkflowDefinition(2));
+        rerender();
+
+        expect(getClusterElementsLayoutElementsMock).not.toHaveBeenCalled();
+
+        const {nodes} = useClusterElementsDataStore.getState();
+
+        expect(nodes.map((node) => node.position)).toEqual([
+            {x: 900, y: 900},
+            {x: 700, y: 700},
+        ]);
+        expect(nodes[1].data.label).toBe('fresh');
+        expect(nodes[0].data.workflowNodeName).toBe(ROOT_NODE_NAME);
+    });
+
+    it('lays out the canvas when unlocked and an element is added', () => {
+        useClusterElementsDataStore.setState({nodesLocked: false});
+
+        const {rerender} = renderHook(() => useClusterElementsLayout());
+
+        createClusterElementsNodesMock.mockReturnValue([
+            clusterElementNode('anthropic_1', 'fresh'),
+            clusterElementNode('activeCampaign_2', 'added'),
+        ]);
+
+        act(() => setWorkflowDefinition(2, {memory: ADDED_ELEMENT, model: MODEL_ELEMENT}));
+        rerender();
+
+        expect(getClusterElementsLayoutElementsMock).toHaveBeenCalled();
+    });
+
+    it('lays out the canvas when unlocked and a layout reset is requested', () => {
+        useClusterElementsDataStore.setState({nodesLocked: false});
+
+        const {rerender} = renderHook(() => useClusterElementsLayout());
+
+        act(() => useClusterElementsDataStore.getState().incrementLayoutResetCounter());
+        rerender();
+
+        expect(getClusterElementsLayoutElementsMock).toHaveBeenCalled();
+        expect(useClusterElementsDataStore.getState().nodes.map((node) => node.position)).toEqual([
+            {x: 0, y: 0},
+            {x: 0, y: 0},
+        ]);
+    });
+});

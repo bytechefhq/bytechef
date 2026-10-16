@@ -6,6 +6,7 @@ import {Label} from '@/components/ui/label';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import invalidateWorkflowValidation from '@/pages/platform/workflow-editor/utils/invalidateWorkflowValidation';
+import {resolveMainClusterRootName} from '@/pages/platform/workflow-editor/utils/resolveClusterRootId';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
@@ -78,6 +79,9 @@ const ConnectionTabConnectionSelect = ({
         }))
     );
 
+    const testConfigurationWorkflowNodeName =
+        resolveMainClusterRootName(currentNode, rootClusterElementNodeData) || workflowNodeName;
+
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
     const {componentName, componentVersion, key, required} = componentConnection;
@@ -135,7 +139,7 @@ const ConnectionTabConnectionSelect = ({
                     environmentId: currentEnvironmentId,
                     workflowConnectionKey,
                     workflowId,
-                    workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
+                    workflowNodeName: testConfigurationWorkflowNodeName,
                 },
                 {
                     onError: () => {
@@ -184,10 +188,9 @@ const ConnectionTabConnectionSelect = ({
             ConnectionKeys,
             currentEnvironmentId,
             queryClient,
-            rootClusterElementNodeData?.workflowNodeName,
+            testConfigurationWorkflowNodeName,
             saveWorkflowTestConfigurationConnectionMutation,
             workflowId,
-            workflowNodeName,
         ]
     );
 
@@ -207,7 +210,7 @@ const ConnectionTabConnectionSelect = ({
                     environmentId: currentEnvironmentId,
                     workflowConnectionKey,
                     workflowId,
-                    workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
+                    workflowNodeName: testConfigurationWorkflowNodeName,
                 },
                 {
                     onSuccess: () => {
@@ -241,10 +244,9 @@ const ConnectionTabConnectionSelect = ({
             currentNode,
             deleteWorkflowTestConfigurationConnectionMutation,
             queryClient,
-            rootClusterElementNodeData?.workflowNodeName,
+            testConfigurationWorkflowNodeName,
             setCurrentNode,
             workflowId,
-            workflowNodeName,
         ]
     );
 

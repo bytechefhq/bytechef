@@ -4,7 +4,9 @@ import './WorkflowEditorLayout.css';
 
 import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
+import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
+import useClusterElementsViewMode from '@/pages/platform/workflow-editor/hooks/useClusterElementsViewMode';
 import useDelayedUnmount from '@/pages/platform/workflow-editor/hooks/useDelayedUnmount';
 import useWorkflowEditorLayout from '@/pages/platform/workflow-editor/hooks/useWorkflowEditorLayout';
 import useWorkflowIssues from '@/pages/platform/workflow-editor/hooks/useWorkflowIssues';
@@ -23,7 +25,7 @@ import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCop
 import {ISSUES_SIDEBAR_EXIT_DURATION} from '@/shared/constants';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {Suspense, lazy, useEffect, useState} from 'react';
+import {Suspense, lazy, useCallback, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
@@ -42,6 +44,10 @@ import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
 import {clearAllWorkflowMutations} from './utils/workflowMutationGuard';
 
+const AiAgentTestingPanel = lazy(
+    () =>
+        import('@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel')
+);
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
 const WorkflowIssuesSidebar = lazy(() => import('./components/WorkflowIssuesSidebar'));
@@ -76,6 +82,7 @@ const WorkflowEditorLayout = ({
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const clusterElementsViewMode = useClusterElementsViewMode();
     const issuesSidebarOpen = useWorkflowIssuesStore((state) => state.issuesSidebarOpen);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
@@ -100,6 +107,12 @@ const WorkflowEditorLayout = ({
         }))
     );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
+    const {setTestingPanelOpen, testingPanelOpen} = useClusterElementsCanvasDialogStore(
+        useShallow((state) => ({
+            setTestingPanelOpen: state.setTestingPanelOpen,
+            testingPanelOpen: state.testingPanelOpen,
+        }))
+    );
 
     const {
         componentDefinitions,
@@ -127,6 +140,10 @@ const WorkflowEditorLayout = ({
 
     const queryClient = useQueryClient();
     const {projectId, projectWorkflowId} = useParams();
+
+    const handleClosePlayground = useCallback(() => {
+        setTestingPanelOpen(false);
+    }, [setTestingPanelOpen]);
 
     const {mounted: rightSidebarMounted, visible: rightSidebarVisible} = useDelayedUnmount(rightSidebarOpen);
     const {mounted: issuesSidebarMounted, visible: issuesSidebarVisible} = useDelayedUnmount(
@@ -177,6 +194,11 @@ const WorkflowEditorLayout = ({
             useWorkflowIssuesStore.getState().reset();
         };
     }, []);
+
+    const showRootLevelDetailsPanel =
+        !!currentNode?.type &&
+        !clusterElementsCanvasOpen &&
+        (clusterElementsViewMode === 'box' || !isMainRootClusterElement);
 
     return (
         <ReactFlowProvider>
@@ -245,7 +267,7 @@ const WorkflowEditorLayout = ({
                 )}
             </div>
 
-            {currentNode?.type && !isMainRootClusterElement && !clusterElementsCanvasOpen && (
+            {showRootLevelDetailsPanel && (
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation!}
@@ -265,7 +287,25 @@ const WorkflowEditorLayout = ({
 
             {workflow.id && <WorkflowTestChatPanel />}
 
-            {currentNode?.type && !isMainRootClusterElement && !clusterElementsCanvasOpen && dataPillPanelOpen && (
+            {clusterElementsViewMode === 'box' && testingPanelOpen && !clusterElementsCanvasOpen && (
+                <Suspense fallback={null}>
+                    <div
+                        className={twMerge(
+                            'absolute top-[15px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-surface-main',
+                            copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]'
+                        )}
+                    >
+                        <AiAgentTestingPanel
+                            contentClassName="rounded-none bg-transparent"
+                            headerClassName="p-4"
+                            onClose={handleClosePlayground}
+                            skipIntro
+                        />
+                    </div>
+                </Suspense>
+            )}
+
+            {showRootLevelDetailsPanel && dataPillPanelOpen && (
                 <Suspense fallback={<DataPillPanelSkeleton />}>
                     <DataPillPanel
                         loading={isWorkflowNodeOutputsPending}

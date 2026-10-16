@@ -8,6 +8,7 @@ import {NodeDataType} from '@/shared/types';
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+import useClusterElementsViewModeStore from '../../../stores/useClusterElementsViewModeStore';
 import useClusterElementsCanvasDialog from '../useClusterElementsCanvasDialog';
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
@@ -54,6 +55,8 @@ function renderDialogHook() {
 
 describe('useClusterElementsCanvasDialog', () => {
     beforeEach(() => {
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
+
         localStorage.clear();
 
         useAiAgentEvalsStore.setState({evalsPanelOpen: false});

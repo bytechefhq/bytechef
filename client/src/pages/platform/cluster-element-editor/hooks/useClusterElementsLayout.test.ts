@@ -6,7 +6,7 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {ReactNode, createElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
+import useClusterElementsViewModeStore from '../../workflow-editor/stores/useClusterElementsViewModeStore';
 
 const {componentDefinitionsByName} = vi.hoisted(() => {
     const aiAgentDefinition = {
@@ -59,6 +59,7 @@ vi.mock('@/shared/middleware/platform/configuration', () => ({
     },
 }));
 
+import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 import useClusterElementsLayout from './useClusterElementsLayout';
 
 const getWorkflowDefinition = (chatMemoryType: string, chatMemoryName: string) =>
@@ -92,6 +93,8 @@ describe('useClusterElementsLayout', () => {
     };
 
     beforeEach(() => {
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
+
         pendingAnimationFrameCallbacks = [];
 
         vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {

@@ -8,19 +8,14 @@ const useWorkflowEditorLayout = () => {
     const workflowId = useWorkflowDataStore((state) => state.workflow.id);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
-    const {
-        setClusterElementsCanvasOpen,
-        setMainClusterRootComponentDefinition,
-        setNestedClusterRootsComponentDefinitions,
-        setRootClusterElementNodeData,
-    } = useWorkflowEditorStore(
-        useShallow((state) => ({
-            setClusterElementsCanvasOpen: state.setClusterElementsCanvasOpen,
-            setMainClusterRootComponentDefinition: state.setMainClusterRootComponentDefinition,
-            setNestedClusterRootsComponentDefinitions: state.setNestedClusterRootsComponentDefinitions,
-            setRootClusterElementNodeData: state.setRootClusterElementNodeData,
-        }))
-    );
+    const {setClusterElementsCanvasOpen, setNestedClusterRootsComponentDefinitions, setRootClusterElementNodeData} =
+        useWorkflowEditorStore(
+            useShallow((state) => ({
+                setClusterElementsCanvasOpen: state.setClusterElementsCanvasOpen,
+                setNestedClusterRootsComponentDefinitions: state.setNestedClusterRootsComponentDefinitions,
+                setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+            }))
+        );
 
     const isMainRootClusterElement = useMemo(
         () => currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot,
@@ -33,16 +28,10 @@ const useWorkflowEditorLayout = () => {
 
             if (!open) {
                 setRootClusterElementNodeData(undefined);
-                setMainClusterRootComponentDefinition(undefined);
                 setNestedClusterRootsComponentDefinitions({});
             }
         },
-        [
-            setClusterElementsCanvasOpen,
-            setMainClusterRootComponentDefinition,
-            setNestedClusterRootsComponentDefinitions,
-            setRootClusterElementNodeData,
-        ]
+        [setClusterElementsCanvasOpen, setNestedClusterRootsComponentDefinitions, setRootClusterElementNodeData]
     );
 
     useEffect(() => {

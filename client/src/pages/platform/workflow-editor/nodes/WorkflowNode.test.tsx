@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {NodeDataType} from '@/shared/types';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen} from '@testing-library/react';
@@ -10,15 +11,20 @@ import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../utils/canvasDrag
 import WorkflowNode from './WorkflowNode';
 
 // Mutable slice of the editor store so each test can toggle which node is being renamed.
-const {directionStoreState, editorStoreState, popoverMenuMock} = vi.hoisted(() => ({
+const {directionStoreState, editorStoreState, popoverMenuMock, recordedContextMenuProps} = vi.hoisted(() => ({
     directionStoreState: {layoutDirection: 'TB'},
     editorStoreState: {renamingNodeName: undefined as string | undefined},
     popoverMenuMock: vi.fn(),
+    recordedContextMenuProps: {value: undefined as Record<string, unknown> | undefined},
 }));
 
 // Render the context menu as a passthrough so the node content (and its rename input) is asserted directly.
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu', () => ({
-    default: ({children}: {children: ReactNode}) => <div>{children}</div>,
+    default: ({children, ...contextMenuProps}: {children: ReactNode}) => {
+        recordedContextMenuProps.value = contextMenuProps;
+
+        return <div>{children}</div>;
+    },
 }));
 
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodeDropdownMenu', () => ({
@@ -90,9 +96,9 @@ vi.mock('../stores/useWorkflowEditorStore', () => ({
     default: (selector: (state: Record<string, unknown>) => unknown) =>
         selector({
             clusterElementsCanvasOpen: true,
+            clusterRootComponentDefinitions: {},
             copiedNode: undefined,
             copiedWorkflowId: undefined,
-            mainClusterRootComponentDefinition: undefined,
             nestedClusterRootsComponentDefinitions: {},
             renamingNodeName: editorStoreState.renamingNodeName,
             rootClusterElementNodeData: undefined,
@@ -130,9 +136,11 @@ function renderNode(data: NodeDataType = NESTED_CLUSTER_ROOT_DATA, id = 'approva
 
     return render(
         <QueryClientProvider client={queryClient}>
-            <ReactFlowProvider>
-                <WorkflowNode data={data} id={id} />
-            </ReactFlowProvider>
+            <TooltipProvider>
+                <ReactFlowProvider>
+                    <WorkflowNode data={data} id={id} />
+                </ReactFlowProvider>
+            </TooltipProvider>
         </QueryClientProvider>
     );
 }
@@ -245,5 +253,56 @@ describe('WorkflowNode', () => {
 
         expect(screen.queryByText('TRUE')).not.toBeInTheDocument();
         expect(screen.queryByText('FALSE')).not.toBeInTheDocument();
+    });
+    describe('main root cluster element', () => {
+        const MAIN_ROOT_DATA = {
+            clusterRoot: true,
+            componentName: 'aiAgent',
+            label: 'AI Agent',
+            name: 'aiAgent_1',
+            operationName: 'chat',
+            version: 1,
+            workflowNodeName: 'aiAgent_1',
+        } as unknown as NodeDataType;
+
+        it('carries the node menu when drawn as a box on the main canvas', () => {
+            recordedContextMenuProps.value = undefined;
+
+            renderNode(
+                {
+                    ...MAIN_ROOT_DATA,
+                    clusterFrame: {clusterRootId: 'aiAgent_1', contentOrigin: {x: 32, y: 40}, height: 320, width: 640},
+                } as NodeDataType,
+                'aiAgent_1'
+            );
+
+            expect(recordedContextMenuProps.value).toBeDefined();
+        });
+
+        it('carries no node menu inside the dialog, whose chrome owns those actions', () => {
+            recordedContextMenuProps.value = undefined;
+
+            renderNode(MAIN_ROOT_DATA, 'aiAgent_1');
+
+            expect(recordedContextMenuProps.value).toBeUndefined();
+        });
+    });
+});
+
+describe('WorkflowNode reset position action', () => {
+    it('offers the reset position action on a box-mode cluster root that carries a saved position', () => {
+        renderNode(
+            {
+                clusterFrame: {contentOrigin: {x: 0, y: 0}, height: 300, width: 600},
+                clusterRoot: true,
+                componentName: 'aiAgent',
+                metadata: {ui: {nodePosition: {x: 10, y: 20}}},
+                name: 'aiAgent_1',
+                workflowNodeName: 'aiAgent_1',
+            } as unknown as NodeDataType,
+            'aiAgent_1'
+        );
+
+        expect(recordedContextMenuProps.value?.hasSavedPosition).toBe(true);
     });
 });

@@ -209,6 +209,12 @@ export type NodeDataType = {
     eachData?: EachDataType;
     forkJoinId?: string;
     forkJoinData?: ForkJoinDataType;
+    clusterFrame?: {
+        clusterRootId: string;
+        contentOrigin: {x: number; y: number};
+        height: number;
+        width: number;
+    };
     icon?: ReactNode;
     isNestedClusterRoot?: boolean;
     label?: string;
@@ -247,6 +253,7 @@ export type NodeDataType = {
     terminateData?: TerminateDataType;
     terminateId?: string;
     title?: string;
+    topLevelClusterRootId?: string;
     trigger?: boolean;
     type?: string;
     triggerType?: TriggerType;

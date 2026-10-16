@@ -21,11 +21,15 @@ import {
 import {QueryClient, useQueryClient} from '@tanstack/react-query';
 import {Edge, Node} from '@xyflow/react';
 
+import {convertNameToSnakeCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import addClusterElementToClusterRoot from '../utils/addClusterElementToClusterRoot';
 import calculateNodeInsertIndex from '../utils/calculateNodeInsertIndex';
 import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
+import {resolveClusterRootId} from '../utils/resolveClusterRootId';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 
@@ -194,6 +198,7 @@ export default function useHandleDrop({
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
     (droppedNode: ClickedDefinitionType, targetTriggerName: string) => void,
     (droppedNode: ClickedDefinitionType) => void,
+    (targetNode: Node, droppedNode: ClickedDefinitionType) => Promise<void>,
 ] {
     const {captureComponentUsed} = useAnalytics();
     const {updateWorkflowMutation} = useWorkflowEditor();
@@ -275,10 +280,78 @@ export default function useHandleDrop({
         });
     }
 
+    async function handleDropOnClusterElementPlaceholder(targetNode: Node, droppedNode: ClickedDefinitionType) {
+        const {clusterElementType, multipleClusterElementsNode} = targetNode.data as NodeDataType;
+        const {nodes, workflow} = useWorkflowDataStore.getState();
+
+        const sourceNodeId = targetNode.id.split('-')[0];
+        const sourceNode = nodes.find((node) => node.id === sourceNodeId);
+        const clusterRootId = sourceNode ? resolveClusterRootId(sourceNode.data as NodeDataType) : undefined;
+
+        const clusterRootComponentDefinition = clusterRootId
+            ? useWorkflowEditorStore.getState().clusterRootComponentDefinitions[clusterRootId]
+            : undefined;
+
+        if (!clusterElementType || !clusterRootId || !clusterRootComponentDefinition) {
+            console.error(`Cannot resolve the cluster root of the placeholder ${targetNode.id}`);
+
+            return;
+        }
+
+        const getComponentDefinitionRequest = {
+            componentName: droppedNode.name!,
+            componentVersion: droppedNode.version!,
+        };
+
+        const componentDefinition = await queryClient.query({
+            queryFn: () => new ComponentDefinitionApi().getComponentDefinition(getComponentDefinitionRequest),
+            queryKey: ComponentDefinitionKeys.componentDefinition(getComponentDefinitionRequest),
+            staleTime: DEFINITION_STALE_TIME,
+        });
+
+        const clusterElementTypeName = convertNameToSnakeCase(clusterElementType);
+
+        const matchingClusterElements =
+            componentDefinition.clusterElements?.filter(
+                (clusterElement) => clusterElement.type === clusterElementTypeName
+            ) ?? [];
+
+        if (matchingClusterElements.length === 0) {
+            return;
+        }
+
+        if (matchingClusterElements.length > 1) {
+            useWorkflowEditorStore
+                .getState()
+                .setPendingClusterElementDrop({componentDefinition, placeholderId: targetNode.id});
+
+            return;
+        }
+
+        const [matchingClusterElement] = matchingClusterElements;
+
+        captureComponentUsed(componentDefinition.name, undefined, matchingClusterElement.name);
+
+        await addClusterElementToClusterRoot({
+            clusterElementName: matchingClusterElement.name,
+            clusterElementType,
+            clusterRootComponentDefinition,
+            clusterRootId,
+            componentDefinition,
+            isMultipleElements: !!multipleClusterElementsNode,
+            label: droppedNode.title,
+            queryClient,
+            sourceNodeId,
+            updateWorkflowMutation: updateWorkflowMutation!,
+            workflow,
+        });
+    }
+
     return [
         handleDropOnPlaceholderNode,
         handleDropOnWorkflowEdge,
         handleDropOnTriggerNode,
         handleDropOnTriggerPlaceholder,
+        handleDropOnClusterElementPlaceholder,
     ];
 }

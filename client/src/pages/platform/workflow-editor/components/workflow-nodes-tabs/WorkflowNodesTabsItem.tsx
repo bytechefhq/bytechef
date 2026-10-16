@@ -8,7 +8,11 @@ import {HTMLAttributes, MouseEvent, useEffect, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
-import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../../utils/canvasDragData';
+import {
+    CANVAS_DRAG_DATA_TYPE,
+    TRIGGER_DRAG_DATA_TYPE,
+    getClusterElementTypeDragDataType,
+} from '../../utils/canvasDragData';
 
 interface DragEventI<T = Element> extends MouseEvent<T, DragEventInit> {
     dataTransfer: DataTransfer;
@@ -44,6 +48,14 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
 
         if (node.trigger) {
             event.dataTransfer.setData(TRIGGER_DRAG_DATA_TYPE, nodeName);
+        }
+
+        const clusterElementsCount = 'clusterElementsCount' in node ? node.clusterElementsCount : undefined;
+
+        for (const [clusterElementTypeName, count] of Object.entries(clusterElementsCount ?? {})) {
+            if (count > 0) {
+                event.dataTransfer.setData(getClusterElementTypeDragDataType(clusterElementTypeName), nodeName);
+            }
         }
 
         event.dataTransfer.effectAllowed = 'move';

@@ -19,6 +19,7 @@ import {
     encodePath,
     safeResolvePath,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {resolveMainClusterRootName} from '@/pages/platform/workflow-editor/utils/resolveClusterRootId';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {
@@ -444,21 +445,29 @@ export const useProperty = ({
             return undefined;
         }
 
+        const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
+
+        if (!mainClusterRootName) {
+            return undefined;
+        }
+
         const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-        const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-            ? getTask({
-                  tasks: workflowDefinitionTasks,
-                  workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-              })
-            : undefined;
+        const mainClusterRootTask = getTask({
+            tasks: workflowDefinitionTasks,
+            workflowNodeName: mainClusterRootName,
+        });
 
         if (mainClusterRootTask?.clusterElements) {
             return getClusterElementByName(mainClusterRootTask.clusterElements, currentNodeName);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         currentNodeClusterElementType,
         currentNodeName,
+        currentNode?.clusterRoot,
+        currentNode?.parentClusterRootId,
+        currentNode?.topLevelClusterRootId,
         workflow.definition,
         rootClusterElementNodeData?.workflowNodeName,
     ]);
