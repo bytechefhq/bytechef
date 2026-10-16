@@ -192,7 +192,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         ScriptTools scriptTools = mock(ScriptTools.class);
 
         ChatClient beanClient = copilotConfiguration.workflowEditorBuildSubAgentChatClient(
-            chatModel, projectTools, projectWorkflowTools, taskTools, scriptTools);
+            chatModel, projectTools, projectWorkflowTools, taskTools, scriptTools,
+            new ByteArrayResource("sub agent prompt".getBytes(StandardCharsets.UTF_8)));
 
         IntelligentToolChatClientFactory factory =
             copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(beanClient);
