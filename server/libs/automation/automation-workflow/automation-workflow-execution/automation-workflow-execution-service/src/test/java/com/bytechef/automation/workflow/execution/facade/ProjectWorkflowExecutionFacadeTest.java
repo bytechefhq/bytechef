@@ -46,6 +46,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -69,6 +70,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.data.domain.Page;
 
 /**
@@ -104,7 +106,9 @@ public class ProjectWorkflowExecutionFacadeTest {
         workflowExecutionRowService = mock(WorkflowExecutionRowService.class);
 
         facade = new ProjectWorkflowExecutionFacadeImpl(
-            componentDefinitionService, contextService, evaluator, mock(EnvironmentService.class),
+            componentDefinitionService,
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
+            contextService, evaluator, mock(EnvironmentService.class),
             workflowExecutionRowService, jobService, mock(PrincipalJobService.class), projectFacade,
             projectDeploymentService, mock(ProjectService.class), projectWorkflowService,
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,

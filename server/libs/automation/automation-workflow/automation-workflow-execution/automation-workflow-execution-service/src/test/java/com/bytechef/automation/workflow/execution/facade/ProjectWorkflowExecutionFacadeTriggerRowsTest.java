@@ -45,6 +45,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -73,6 +74,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -116,7 +118,9 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
             .thenReturn(componentDefinition);
 
         facade = new ProjectWorkflowExecutionFacadeImpl(
-            componentDefinitionService, mock(ContextService.class), mock(Evaluator.class),
+            componentDefinitionService,
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
+            mock(ContextService.class), mock(Evaluator.class),
             mock(EnvironmentService.class), workflowExecutionRowService, jobService,
             mock(PrincipalJobService.class), mock(ProjectFacade.class), projectDeploymentService, projectService,
             projectWorkflowService, mock(TaskDispatcherDefinitionService.class), mock(TaskExecutionService.class),
