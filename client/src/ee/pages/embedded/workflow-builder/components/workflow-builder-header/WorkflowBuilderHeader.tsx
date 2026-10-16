@@ -13,11 +13,15 @@ import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {onlineManager, useIsFetching, useQueryClient} from '@tanstack/react-query';
+import {onlineManager, useIsMutating, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeftIcon} from 'lucide-react';
-import {RefObject, useContext} from 'react';
+import {RefObject, useContext, useSyncExternalStore} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useShallow} from 'zustand/react/shallow';
+
+const getOnlineStatus = () => onlineManager.isOnline();
+
+const subscribeToOnlineStatus = (onOnlineStatusChange: () => void) => onlineManager.subscribe(onOnlineStatusChange);
 
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
@@ -47,7 +51,8 @@ const WorkflowBuilderHeader = ({
 
     const queryClient = useQueryClient();
 
-    const isFetching = useIsFetching();
+    const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
+    const isSaving = useIsMutating();
     const {
         handlePublishProjectSubmit,
         handleRunClick,
@@ -61,8 +66,6 @@ const WorkflowBuilderHeader = ({
     });
 
     const hubBuilderContext = useContext(HubBuilderContext);
-
-    const isOnline = onlineManager.isOnline();
 
     // if (!project) {
     //     return <WorkflowBuilderSkeleton />;
@@ -86,10 +89,10 @@ const WorkflowBuilderHeader = ({
 
                 <Badge label={`V${(workflowVersion ?? 0) + 1} DRAFT`} styleType="outline-outline" weight="semibold" />
 
-                {(!!isFetching || !isOnline) && (
+                {(isSaving > 0 || !isOnline) && (
                     <LoadingIndicator
-                        className="hover:bg-surface-neutral-secondary-hover"
-                        isFetching={isFetching}
+                        className="size-6 rounded-full hover:bg-surface-neutral-secondary-hover"
+                        isFetching={isSaving}
                         isOnline={isOnline}
                     />
                 )}

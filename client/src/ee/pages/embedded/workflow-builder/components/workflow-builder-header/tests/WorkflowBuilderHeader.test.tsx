@@ -2,14 +2,13 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import WorkflowBuilderHeader from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/WorkflowBuilderHeader';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen, waitFor} from '@testing-library/react';
+import {QueryClient, QueryClientProvider, onlineManager} from '@tanstack/react-query';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {isFetchingMock, isOnlineMock} = vi.hoisted(() => ({
-    isFetchingMock: vi.fn(),
-    isOnlineMock: vi.fn(),
+const {isMutatingMock} = vi.hoisted(() => ({
+    isMutatingMock: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-query', async (importOriginal) => {
@@ -17,8 +16,7 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
 
     return {
         ...actual,
-        onlineManager: {...actual.onlineManager, isOnline: isOnlineMock},
-        useIsFetching: isFetchingMock,
+        useIsMutating: isMutatingMock,
     };
 });
 
@@ -71,11 +69,14 @@ describe('WorkflowBuilderHeader', () => {
 
         useWorkflowEditorStore.setState({showEditWorkflowDialog: false});
 
-        isFetchingMock.mockReturnValue(0);
-        isOnlineMock.mockReturnValue(true);
+        isMutatingMock.mockReturnValue(0);
+
+        onlineManager.setOnline(true);
     });
 
     afterEach(() => {
+        onlineManager.setOnline(true);
+
         vi.clearAllMocks();
     });
 
@@ -86,20 +87,30 @@ describe('WorkflowBuilderHeader', () => {
         expect(screen.queryByLabelText('Loading indicator')).not.toBeInTheDocument();
     });
 
-    it('shows the status indicator while saving', () => {
-        isFetchingMock.mockReturnValue(1);
+    it('shows the status indicator while a mutation is saving', () => {
+        isMutatingMock.mockReturnValue(1);
 
         renderHeader();
 
         expect(screen.getByLabelText('Loading indicator')).toBeInTheDocument();
     });
 
-    it('shows the status indicator while offline', () => {
-        isOnlineMock.mockReturnValue(false);
-
+    it('shows the status indicator as soon as the app goes offline', () => {
         renderHeader();
 
+        expect(screen.queryByLabelText('Loading indicator')).not.toBeInTheDocument();
+
+        act(() => {
+            onlineManager.setOnline(false);
+        });
+
         expect(screen.getByLabelText('Loading indicator')).toBeInTheDocument();
+
+        act(() => {
+            onlineManager.setOnline(true);
+        });
+
+        expect(screen.queryByLabelText('Loading indicator')).not.toBeInTheDocument();
     });
 
     it('opens the workflow edit dialog from the settings menu', async () => {
