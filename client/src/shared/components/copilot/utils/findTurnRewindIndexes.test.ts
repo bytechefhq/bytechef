@@ -6,10 +6,8 @@ const user = {role: 'user'};
 const assistant = {role: 'assistant'};
 const tool = {role: 'tool'};
 
-// UI: one turn with text, tool cards and text rendered as three assistant messages.
 const messages = [user, assistant, user, assistant, assistant, assistant];
 
-// Agent transcript for the same conversation: its own assistant and tool messages.
 const agentMessages = [user, assistant, user, assistant, tool, tool, assistant];
 
 describe('findTurnRewindIndexes', () => {
