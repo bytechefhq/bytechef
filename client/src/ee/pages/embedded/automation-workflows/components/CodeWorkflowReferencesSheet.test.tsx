@@ -1,7 +1,7 @@
 import {render, resetAll, screen} from '@/shared/util/test-utils';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import CodeWorkflowReferencesDialog from './CodeWorkflowReferencesDialog';
+import CodeWorkflowReferencesSheet from './CodeWorkflowReferencesSheet';
 
 const hoisted = vi.hoisted(() => ({
     mockOnClose: vi.fn(),
@@ -27,7 +27,7 @@ const workflowTemplates = [{label: 'My Workflow', workflowUuid: 'uuid-1'}];
 
 const renderDialog = () =>
     render(
-        <CodeWorkflowReferencesDialog
+        <CodeWorkflowReferencesSheet
             onClose={hoisted.mockOnClose}
             projectName="My Project"
             workflowTemplates={workflowTemplates}
@@ -38,7 +38,7 @@ afterEach(() => {
     resetAll();
 });
 
-describe('CodeWorkflowReferencesDialog', () => {
+describe('CodeWorkflowReferencesSheet', () => {
     it('shows a loading indicator while the references query is pending', () => {
         hoisted.mockUseConnectedUserCodeWorkflowReferencesQuery.mockReturnValue({
             data: undefined,
@@ -116,5 +116,6 @@ describe('CodeWorkflowReferencesDialog', () => {
         expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
         expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
         expect(screen.getByText(/this list is read-only/i)).toBeInTheDocument();
+        expect(document.querySelector('[data-slot="sheet-content"]')).toBeInTheDocument();
     });
 });
