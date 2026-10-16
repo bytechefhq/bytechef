@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T18:03:20.887089+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class ConnectedUserProjectWorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -452,11 +452,11 @@ public class ConnectedUserProjectWorkflowModel {
   }
 
   /**
-   * Why a REFERENCE needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or UPDATE_PENDING. Null when healthy or for COPY rows.
+   * Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy.
    * @return attentionReason
    */
   
-  @Schema(name = "attentionReason", description = "Why a REFERENCE needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or UPDATE_PENDING. Null when healthy or for COPY rows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "attentionReason", description = "Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("attentionReason")
   public @Nullable String getAttentionReason() {
     return attentionReason;

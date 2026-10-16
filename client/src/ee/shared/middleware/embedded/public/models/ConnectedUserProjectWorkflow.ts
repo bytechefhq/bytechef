@@ -125,7 +125,7 @@ export interface ConnectedUserProjectWorkflow {
      */
     inputValues?: { [key: string]: any; };
     /**
-     * Why a REFERENCE needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or UPDATE_PENDING. Null when healthy or for COPY rows.
+     * Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy.
      * @type {string}
      * @memberof ConnectedUserProjectWorkflow
      */

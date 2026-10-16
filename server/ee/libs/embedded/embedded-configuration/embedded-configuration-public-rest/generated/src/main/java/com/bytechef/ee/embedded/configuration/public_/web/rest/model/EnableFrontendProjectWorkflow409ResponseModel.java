@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InvalidWorkflowErrorModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.MissingConnectionErrorModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.MissingInputErrorModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,6 +22,6 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T18:03:20.887089+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public interface EnableFrontendProjectWorkflow409ResponseModel {
 }
