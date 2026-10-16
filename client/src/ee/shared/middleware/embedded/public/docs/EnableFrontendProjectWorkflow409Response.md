@@ -6,6 +6,7 @@
 
 Name | Type
 ------------ | -------------
+`invalidWorkflowErrorCount` | number
 `missingConnectionComponentName` | string
 `missingInputName` | string
 
@@ -16,6 +17,7 @@ import type { EnableFrontendProjectWorkflow409Response } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "invalidWorkflowErrorCount": null,
   "missingConnectionComponentName": null,
   "missingInputName": null,
 } satisfies EnableFrontendProjectWorkflow409Response
