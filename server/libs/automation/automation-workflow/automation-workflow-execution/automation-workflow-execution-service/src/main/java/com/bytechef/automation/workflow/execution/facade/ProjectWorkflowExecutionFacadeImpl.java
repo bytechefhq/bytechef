@@ -576,14 +576,31 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return projectWorkflowService.getWorkflowProjectWorkflows(List.of(workflowId))
             .stream()
             .findFirst()
-            .map(projectWorkflow -> projectWorkflowService
-                .getProjectWorkflows(projectWorkflow.getProjectId(), projectWorkflow.getUuidAsString())
-                .stream()
-                .filter(versionProjectWorkflow -> projectVersion == null ||
-                    projectVersion.equals(versionProjectWorkflow.getProjectVersion()))
-                .map(ProjectWorkflow::getWorkflowId)
-                .toList())
-            .orElseGet(() -> List.of(workflowId));
+            .map(projectWorkflow -> filterProjectVersionWorkflowIds(
+                projectWorkflowService.getProjectWorkflows(
+                    projectWorkflow.getProjectId(), projectWorkflow.getUuidAsString()),
+                projectVersion))
+            .orElseGet(() -> getWorkflowUuidWorkflowIds(workflowId, projectVersion));
+    }
+
+    private List<String> getWorkflowUuidWorkflowIds(String workflowUuid, Integer projectVersion) {
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getWorkflowUuidProjectWorkflows(workflowUuid);
+
+        if (projectWorkflows.isEmpty()) {
+            return List.of(workflowUuid);
+        }
+
+        return filterProjectVersionWorkflowIds(projectWorkflows, projectVersion);
+    }
+
+    private static List<String> filterProjectVersionWorkflowIds(
+        List<ProjectWorkflow> projectWorkflows, Integer projectVersion) {
+
+        return projectWorkflows.stream()
+            .filter(projectWorkflow -> projectVersion == null ||
+                projectVersion.equals(projectWorkflow.getProjectVersion()))
+            .map(ProjectWorkflow::getWorkflowId)
+            .toList();
     }
 
     private DefinitionResult getDefinition(String type, Map<String, DefinitionResult> definitionResultCache) {
