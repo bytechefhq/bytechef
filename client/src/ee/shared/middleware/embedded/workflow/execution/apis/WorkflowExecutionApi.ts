@@ -45,6 +45,7 @@ export interface GetWorkflowExecutionsPageRequest {
     jobEndDate?: Date;
     integrationId?: number;
     integrationInstanceConfigurationId?: number;
+    connectedUserId?: number;
     workflowId?: string;
     pageNumber?: number;
 }
@@ -184,6 +185,10 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 
         if (requestParameters['integrationInstanceConfigurationId'] != null) {
             queryParameters['integrationInstanceConfigurationId'] = requestParameters['integrationInstanceConfigurationId'];
+        }
+
+        if (requestParameters['connectedUserId'] != null) {
+            queryParameters['connectedUserId'] = requestParameters['connectedUserId'];
         }
 
         if (requestParameters['workflowId'] != null) {
