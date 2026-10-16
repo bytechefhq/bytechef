@@ -468,7 +468,7 @@ describe('AutomationWorkflowProjectList', () => {
             expect(screen.queryByRole('menuitem', {name: /import workflow/i})).not.toBeInTheDocument();
         });
 
-        it('does not offer Delete Workflow on the workflow rows of a code project', async () => {
+        it('shows no workflow actions menu on the workflow rows of a code project', async () => {
             const user = userEvent.setup();
 
             const projects = [
@@ -483,11 +483,10 @@ describe('AutomationWorkflowProjectList', () => {
             renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
 
             await user.click(screen.getByText('1 workflow'));
-            await user.click(await screen.findByRole('button', {name: 'Workflow Actions'}));
 
-            await screen.findByRole('menuitem', {name: 'Edit Workflow'});
+            await screen.findByText(workflowTemplate.label);
 
-            expect(screen.queryByRole('menuitem', {name: 'Delete Workflow'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Workflow Actions'})).not.toBeInTheDocument();
         });
 
         it('still offers workflow creation and import on a visual project', async () => {
