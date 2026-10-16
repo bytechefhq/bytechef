@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 /**
  * Contains configurations and connections required for the execution of project workflows.
  * @export
@@ -21,74 +21,50 @@ import { mapValues } from '../runtime';
 export interface ProjectDeploymentBasic {
     /**
      * The created by.
-     * @type {string}
-     * @memberof ProjectDeploymentBasic
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof ProjectDeploymentBasic
      */
     readonly createdDate?: Date;
     /**
      * The description of a project deployment.
-     * @type {string}
-     * @memberof ProjectDeploymentBasic
      */
     description?: string;
     /**
      * If a project deployment is enabled or not.
-     * @type {boolean}
-     * @memberof ProjectDeploymentBasic
      */
     enabled?: boolean;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof ProjectDeploymentBasic
      */
     environmentId?: number;
     /**
      * The id of a project deployment.
-     * @type {number}
-     * @memberof ProjectDeploymentBasic
      */
     readonly id?: number;
     /**
      * The last execution date.
-     * @type {Date}
-     * @memberof ProjectDeploymentBasic
      */
     readonly lastExecutionDate?: Date;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof ProjectDeploymentBasic
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof ProjectDeploymentBasic
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of a project deployment.
-     * @type {string}
-     * @memberof ProjectDeploymentBasic
      */
     name: string;
     /**
      * The id of a project.
-     * @type {number}
-     * @memberof ProjectDeploymentBasic
      */
     projectId?: number;
     /**
      * The version of a project.
-     * @type {number}
-     * @memberof ProjectDeploymentBasic
      */
     projectVersion?: number;
 }
@@ -112,14 +88,14 @@ export function ProjectDeploymentBasicFromJSONTyped(json: any, ignoreDiscriminat
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
-        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
         'projectId': json['projectId'] == null ? undefined : json['projectId'],
         'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],

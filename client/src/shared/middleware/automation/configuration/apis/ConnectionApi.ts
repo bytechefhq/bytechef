@@ -25,27 +25,57 @@ import {
 } from '../models/UpdateConnectionRequest';
 
 export interface CreateConnectionRequest {
+    /**
+     * 
+     */
     connection: Connection;
 }
 
 export interface DeleteConnectionRequest {
+    /**
+     * The id of a connection.
+     */
     id: number;
 }
 
 export interface GetConnectionRequest {
+    /**
+     * The id of a connection.
+     */
     id: number;
 }
 
 export interface GetWorkspaceConnectionsRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
+    /**
+     * The component name used for filtering connections.
+     */
     componentName?: string;
+    /**
+     * The connection version.
+     */
     connectionVersion?: number;
+    /**
+     * The id of an environment.
+     */
     environmentId?: number;
+    /**
+     * The tag id of used for filtering connections.
+     */
     tagId?: number;
 }
 
 export interface UpdateConnectionOperationRequest {
+    /**
+     * The id of a connection.
+     */
     id: number;
+    /**
+     * 
+     */
     updateConnectionRequest: UpdateConnectionRequest;
 }
 

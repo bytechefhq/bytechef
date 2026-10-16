@@ -25,37 +25,79 @@ import {
 } from '../models/UpdateConnectionRequest';
 
 export interface CreateConnectedUserConnectionRequest {
+    /**
+     * The id of a connected user.
+     */
     connectedUserId: number;
+    /**
+     * 
+     */
     connection: Connection;
 }
 
 export interface CreateConnectionRequest {
+    /**
+     * 
+     */
     connection: Connection;
 }
 
 export interface DeleteConnectionRequest {
+    /**
+     * The id of a connection.
+     */
     id: number;
 }
 
 export interface GetConnectedUserConnectionsRequest {
+    /**
+     * The id of a connected user.
+     */
     connectedUserId: number;
+    /**
+     * The component name.
+     */
     componentName: string;
+    /**
+     * The list of allowed connection ids.
+     */
     connectionIds?: Array<number>;
 }
 
 export interface GetConnectionRequest {
+    /**
+     * The id of a connection.
+     */
     id: number;
 }
 
 export interface GetConnectionsRequest {
+    /**
+     * The component name used for filtering connections.
+     */
     componentName?: string;
+    /**
+     * The connection version.
+     */
     connectionVersion?: number;
+    /**
+     * The environment id.
+     */
     environmentId?: number;
+    /**
+     * The tag id of used for filtering connections.
+     */
     tagId?: number;
 }
 
 export interface UpdateConnectionOperationRequest {
+    /**
+     * The id of a connection.
+     */
     id: number;
+    /**
+     * 
+     */
     updateConnectionRequest: UpdateConnectionRequest;
 }
 

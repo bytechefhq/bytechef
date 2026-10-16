@@ -70,181 +70,448 @@ import {
 } from '../models/UpdateWorkflowInputsRequest';
 
 export interface CopyFrontendWorkflowTemplateRequest {
+    /**
+     * The workflow template uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface CopyWorkflowTemplateRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow template uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface CreateFrontendProjectWorkflowOperationRequest {
+    /**
+     * 
+     */
     createFrontendProjectWorkflowRequest: CreateFrontendProjectWorkflowRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface CreateFrontendProjectWorkflowFromPromptOperationRequest {
+    /**
+     * 
+     */
     createFrontendProjectWorkflowFromPromptRequest: CreateFrontendProjectWorkflowFromPromptRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface CreateProjectWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * 
+     */
     createFrontendProjectWorkflowRequest: CreateFrontendProjectWorkflowRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface CreateProjectWorkflowFromPromptRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * 
+     */
     createFrontendProjectWorkflowFromPromptRequest: CreateFrontendProjectWorkflowFromPromptRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface DeleteFrontendProjectWorkflowRequest {
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface DeleteProjectWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface DeprovisionFrontendWorkflowReferenceRequest {
+    /**
+     * The workflow template uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface DeprovisionWorkflowReferenceRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow template uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface DisableFrontendProjectWorkflowRequest {
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface DisableProjectWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface EnableFrontendProjectWorkflowRequest {
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface EnableProjectWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetFrontendProjectWorkflowRequest {
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetFrontendProjectWorkflowsRequest {
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetProjectWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetProjectWorkflowsRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface ProvisionFrontendWorkflowReferenceRequest {
+    /**
+     * The workflow template uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
+    /**
+     * 
+     */
     provisionWorkflowReferenceRequest?: ProvisionWorkflowReferenceRequest;
 }
 
 export interface ProvisionWorkflowReferenceOperationRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow template uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
+    /**
+     * 
+     */
     provisionWorkflowReferenceRequest?: ProvisionWorkflowReferenceRequest;
 }
 
 export interface PublishFrontendProjectWorkflowOperationRequest {
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     publishFrontendProjectWorkflowRequest: PublishFrontendProjectWorkflowRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface PublishProjectWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     publishFrontendProjectWorkflowRequest: PublishFrontendProjectWorkflowRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface UpdateFrontendProjectWorkflowRequest {
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     createFrontendProjectWorkflowRequest: CreateFrontendProjectWorkflowRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface UpdateFrontendProjectWorkflowFromPromptRequest {
+    /**
+     * The uuid of the workflow to update.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     createFrontendProjectWorkflowFromPromptRequest: CreateFrontendProjectWorkflowFromPromptRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface UpdateFrontendProjectWorkflowInputsRequest {
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     updateWorkflowInputsRequest: UpdateWorkflowInputsRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface UpdateFrontendWorkflowConfigurationConnectionOperationRequest {
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * The action/trigger name defined in the workflow.
+     */
     workflowNodeName: string;
+    /**
+     * The name of a workflow connection key.
+     */
     workflowConnectionKey: string;
+    /**
+     * 
+     */
     updateFrontendWorkflowConfigurationConnectionRequest: UpdateFrontendWorkflowConfigurationConnectionRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface UpdateProjectWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     createFrontendProjectWorkflowRequest: CreateFrontendProjectWorkflowRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface UpdateProjectWorkflowFromPromptRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The uuid of the workflow to update.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     createFrontendProjectWorkflowFromPromptRequest: CreateFrontendProjectWorkflowFromPromptRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface UpdateProjectWorkflowInputsRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     updateWorkflowInputsRequest: UpdateWorkflowInputsRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface UpdateWorkflowConfigurationConnectionRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * The action/trigger name defined in the workflow.
+     */
     workflowNodeName: string;
+    /**
+     * The name of a workflow connection key.
+     */
     workflowConnectionKey: string;
+    /**
+     * 
+     */
     updateFrontendWorkflowConfigurationConnectionRequest: UpdateFrontendWorkflowConfigurationConnectionRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 

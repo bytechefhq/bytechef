@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface GetClusterElementParameterDisplayConditions200Response {
     /**
      * 
-     * @type {{ [key: string]: boolean; }}
-     * @memberof GetClusterElementParameterDisplayConditions200Response
      */
     displayConditions?: { [key: string]: boolean; };
     /**
      * 
-     * @type {Array<string>}
-     * @memberof GetClusterElementParameterDisplayConditions200Response
      */
     missingRequiredProperties?: Array<string>;
 }

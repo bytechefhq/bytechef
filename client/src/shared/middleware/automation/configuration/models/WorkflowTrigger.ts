@@ -29,50 +29,34 @@ import {
 export interface WorkflowTrigger {
     /**
      * 
-     * @type {Array<ComponentConnection>}
-     * @memberof WorkflowTrigger
      */
     readonly connections?: Array<ComponentConnection>;
     /**
      * The description of the task.
-     * @type {string}
-     * @memberof WorkflowTrigger
      */
     description?: string;
     /**
      * The human-readable description of the task.
-     * @type {string}
-     * @memberof WorkflowTrigger
      */
     label?: string;
     /**
      * Key-value map of metadata.
-     * @type {{ [key: string]: any; }}
-     * @memberof WorkflowTrigger
      */
     metadata?: { [key: string]: any; };
     /**
      * The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
-     * @type {string}
-     * @memberof WorkflowTrigger
      */
     name: string;
     /**
      * Key-value map of task parameters.
-     * @type {{ [key: string]: any; }}
-     * @memberof WorkflowTrigger
      */
     parameters?: { [key: string]: any; };
     /**
      * The timeout expression which describes when a trigger should be deemed as timed-out.
-     * @type {string}
-     * @memberof WorkflowTrigger
      */
     timeout?: string;
     /**
      * The type of the trigger.
-     * @type {string}
-     * @memberof WorkflowTrigger
      */
     type: string;
 }

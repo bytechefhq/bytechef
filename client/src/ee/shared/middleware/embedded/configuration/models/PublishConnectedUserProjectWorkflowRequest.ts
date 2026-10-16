@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface PublishConnectedUserProjectWorkflowRequest {
     /**
      * The description of a connected user project workflow version.
-     * @type {string}
-     * @memberof PublishConnectedUserProjectWorkflowRequest
      */
     description?: string;
 }

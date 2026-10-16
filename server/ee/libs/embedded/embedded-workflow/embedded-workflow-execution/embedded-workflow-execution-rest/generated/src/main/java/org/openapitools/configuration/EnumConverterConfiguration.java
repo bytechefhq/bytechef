@@ -7,6 +7,8 @@ import java.util.UUID;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.IntegrationStatusModel;
 
+import jakarta.annotation.Generated;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -18,6 +20,7 @@ import org.springframework.core.convert.converter.Converter;
  * correct conversion if the OpenAPI specification is using an `enumPropertyNaming` other than
  * `original` or the specification has an integer enum.
  */
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.601272+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Configuration(value = "org.openapitools.configuration.enumConverterConfiguration")
 public class EnumConverterConfiguration {
 

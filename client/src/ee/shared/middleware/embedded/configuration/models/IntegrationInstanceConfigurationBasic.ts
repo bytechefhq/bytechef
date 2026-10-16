@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { AuthorizationType } from './AuthorizationType';
 import {
     AuthorizationTypeFromJSON,
@@ -29,74 +29,50 @@ import {
 export interface IntegrationInstanceConfigurationBasic {
     /**
      * The created by.
-     * @type {string}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     readonly createdDate?: Date;
     /**
      * The description of an integration configuration.
-     * @type {string}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     description?: string;
     /**
      * If an integration instance configuration is enabled or not.
-     * @type {boolean}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     enabled?: boolean;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     environmentId?: number;
     /**
      * The id of an integration instance configuration.
-     * @type {number}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     readonly id?: number;
     /**
      * Th id of an integration.
-     * @type {number}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     integrationId?: number;
     /**
      * The version of an integration.
-     * @type {number}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     integrationVersion?: number;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of an integration instance configuration.
-     * @type {string}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     name: string;
     /**
      * 
-     * @type {AuthorizationType}
-     * @memberof IntegrationInstanceConfigurationBasic
      */
     authorizationType?: AuthorizationType;
 }
@@ -122,7 +98,7 @@ export function IntegrationInstanceConfigurationBasicFromJSONTyped(json: any, ig
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
@@ -130,7 +106,7 @@ export function IntegrationInstanceConfigurationBasicFromJSONTyped(json: any, ig
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
         'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
         'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
     };

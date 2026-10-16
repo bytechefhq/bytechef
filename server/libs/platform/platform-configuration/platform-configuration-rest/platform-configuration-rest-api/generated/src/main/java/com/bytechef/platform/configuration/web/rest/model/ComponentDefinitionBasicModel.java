@@ -28,17 +28,15 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ComponentDefinitionBasicModel {
 
   private @Nullable Integer actionsCount;
 
-  @Valid
   private Map<String, Integer> clusterElementsCount = new HashMap<>();
 
   private @Nullable Boolean clusterRoot;
 
-  @Valid
   private List<@Valid ComponentCategoryModel> componentCategories = new ArrayList<>();
 
   private @Nullable String description;
@@ -155,7 +153,7 @@ public class ComponentDefinitionBasicModel {
    * The list of categories the component belongs to.
    * @return componentCategories
    */
-  @Valid 
+  
   @Schema(name = "componentCategories", description = "The list of categories the component belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentCategories")
   public List<@Valid ComponentCategoryModel> getComponentCategories() {

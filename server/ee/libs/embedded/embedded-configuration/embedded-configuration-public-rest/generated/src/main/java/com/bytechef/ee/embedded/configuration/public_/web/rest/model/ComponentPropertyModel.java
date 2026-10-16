@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentProperty", description = "A resolved component input property the SDK renders.")
 @JsonTypeName("ComponentProperty")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ComponentPropertyModel {
 
   private String name;
@@ -41,12 +41,10 @@ public class ComponentPropertyModel {
 
   private @Nullable Boolean required;
 
-  @Valid
   private List<@Valid OptionModel> options = new ArrayList<>();
 
   private @Nullable Boolean dynamicOptions;
 
-  @Valid
   private List<String> optionsLookupDependsOn = new ArrayList<>();
 
   public ComponentPropertyModel() {
@@ -183,7 +181,7 @@ public class ComponentPropertyModel {
    * Get options
    * @return options
    */
-  @Valid 
+  
   @Schema(name = "options", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("options")
   public List<@Valid OptionModel> getOptions() {

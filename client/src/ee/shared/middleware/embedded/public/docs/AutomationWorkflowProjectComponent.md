@@ -10,6 +10,8 @@ Name | Type
 `name` | string
 `title` | string
 `icon` | string
+`connectionRequired` | boolean
+`integrationId` | number
 
 ## Example
 
@@ -21,6 +23,8 @@ const example = {
   "name": null,
   "title": null,
   "icon": null,
+  "connectionRequired": null,
+  "integrationId": null,
 } satisfies AutomationWorkflowProjectComponent
 
 console.log(example)

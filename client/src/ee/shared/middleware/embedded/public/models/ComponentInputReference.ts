@@ -29,26 +29,18 @@ import {
 export interface ComponentInputReference {
     /**
      * The name of the referenced component.
-     * @type {string}
-     * @memberof ComponentInputReference
      */
     componentName: string;
     /**
      * The version of the referenced component.
-     * @type {number}
-     * @memberof ComponentInputReference
      */
     componentVersion: number;
     /**
      * The name of the referenced component input group.
-     * @type {string}
-     * @memberof ComponentInputReference
      */
     groupName: string;
     /**
      * 
-     * @type {ComponentPropertyGroup}
-     * @memberof ComponentInputReference
      */
     group?: ComponentPropertyGroup;
 }

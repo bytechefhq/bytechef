@@ -25,15 +25,36 @@ import {
 } from '../models/ClusterElementDefinitionBasic';
 
 export interface GetComponentClusterElementDefinitionRequest {
+    /**
+     * The name of a component.
+     */
     componentName: string;
+    /**
+     * The version of a component.
+     */
     componentVersion: number;
+    /**
+     * The name of a cluster element to get.
+     */
     clusterElementName: string;
+    /**
+     * The type of the cluster element (e.g. PROCESSOR, TOOLS, SOURCE, DESTINATION).
+     */
     clusterElementType?: string;
 }
 
 export interface GetRootComponentClusterElementDefinitionsRequest {
+    /**
+     * The name of a root component.
+     */
     rootComponentName: string;
+    /**
+     * The version of a root component.
+     */
     rootComponentVersion: number;
+    /**
+     * The name of a cluster elements to get.
+     */
     clusterElementType: string;
 }
 

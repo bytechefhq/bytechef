@@ -20,6 +20,9 @@ import {
 } from '../models/ApprovalForm';
 
 export interface GetApprovalFormRequest {
+    /**
+     * The id of an approval form.
+     */
     id: string;
 }
 

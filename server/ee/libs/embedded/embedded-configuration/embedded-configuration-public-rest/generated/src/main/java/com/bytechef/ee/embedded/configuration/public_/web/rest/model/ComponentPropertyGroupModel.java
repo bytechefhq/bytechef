@@ -26,14 +26,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentPropertyGroup", description = "A resolved component property group rendered as one compound input.")
 @JsonTypeName("ComponentPropertyGroup")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ComponentPropertyGroupModel {
 
   private String name;
 
   private @Nullable String label;
 
-  @Valid
   private List<@Valid ComponentPropertyModel> properties = new ArrayList<>();
 
   public ComponentPropertyGroupModel() {
@@ -106,7 +105,7 @@ public class ComponentPropertyGroupModel {
    * Get properties
    * @return properties
    */
-  @Valid 
+  
   @Schema(name = "properties", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
   public List<@Valid ComponentPropertyModel> getProperties() {

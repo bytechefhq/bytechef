@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface OAuth2Properties {
     /**
      * The redirect URI used for OAuth2 callback URL.
-     * @type {string}
-     * @memberof OAuth2Properties
      */
     readonly redirectUri?: string;
     /**
      * The list of predefined OAuth2 apps.
-     * @type {Array<string>}
-     * @memberof OAuth2Properties
      */
     readonly predefinedApps?: Array<string>;
 }

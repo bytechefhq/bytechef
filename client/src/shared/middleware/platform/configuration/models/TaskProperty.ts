@@ -36,8 +36,6 @@ import {
 export interface TaskProperty extends Property {
     /**
      * The task name.
-     * @type {string}
-     * @memberof TaskProperty
      */
     name?: string;
 }

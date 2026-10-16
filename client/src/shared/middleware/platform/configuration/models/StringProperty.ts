@@ -57,56 +57,38 @@ import {
 export interface StringProperty extends ValueProperty {
     /**
      * The language id used together with CODE_EDITOR control type.
-     * @type {string}
-     * @memberof StringProperty
      */
     languageId?: string;
     /**
      * The property default value.
-     * @type {string}
-     * @memberof StringProperty
      */
     defaultValue?: string;
     /**
      * The property sample value.
-     * @type {string}
-     * @memberof StringProperty
      */
     exampleValue?: string;
     /**
      * The maximum string length.
-     * @type {number}
-     * @memberof StringProperty
      */
     maxLength?: number;
     /**
      * The minimum string length.
-     * @type {number}
-     * @memberof StringProperty
      */
     minLength?: number;
     /**
      * The regular expression pattern for validation.
-     * @type {string}
-     * @memberof StringProperty
      */
     regex?: string;
     /**
      * The list of valid property options.
-     * @type {Array<Option>}
-     * @memberof StringProperty
      */
     options?: Array<Option>;
     /**
      * 
-     * @type {OptionsDataSource}
-     * @memberof StringProperty
      */
     optionsDataSource?: OptionsDataSource;
     /**
      * If the property options should be loaded dynamically.
-     * @type {boolean}
-     * @memberof StringProperty
      */
     optionsLoadedDynamically?: boolean;
 }

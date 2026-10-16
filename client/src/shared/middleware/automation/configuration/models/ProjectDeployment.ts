@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
@@ -36,98 +36,66 @@ import {
 export interface ProjectDeployment {
     /**
      * The created by.
-     * @type {string}
-     * @memberof ProjectDeployment
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof ProjectDeployment
      */
     readonly createdDate?: Date;
     /**
      * The description of a project deployment.
-     * @type {string}
-     * @memberof ProjectDeployment
      */
     description?: string;
     /**
      * If a project deployment is enabled or not.
-     * @type {boolean}
-     * @memberof ProjectDeployment
      */
     enabled?: boolean;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof ProjectDeployment
      */
     environmentId?: number;
     /**
      * The id of a project deployment.
-     * @type {number}
-     * @memberof ProjectDeployment
      */
     readonly id?: number;
     /**
      * The last execution date.
-     * @type {Date}
-     * @memberof ProjectDeployment
      */
     readonly lastExecutionDate?: Date;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof ProjectDeployment
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof ProjectDeployment
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of a project deployment.
-     * @type {string}
-     * @memberof ProjectDeployment
      */
     name: string;
     /**
      * The id of a project.
-     * @type {number}
-     * @memberof ProjectDeployment
      */
     projectId?: number;
     /**
      * The version of a project.
-     * @type {number}
-     * @memberof ProjectDeployment
      */
     projectVersion?: number;
     /**
      * 
-     * @type {object}
-     * @memberof ProjectDeployment
      */
     readonly project?: object;
     /**
      * 
-     * @type {Array<ProjectDeploymentWorkflow>}
-     * @memberof ProjectDeployment
      */
     projectDeploymentWorkflows?: Array<ProjectDeploymentWorkflow>;
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof ProjectDeployment
      */
     tags?: Array<Tag>;
     /**
      * 
-     * @type {number}
-     * @memberof ProjectDeployment
      */
     version?: number;
 }
@@ -151,14 +119,14 @@ export function ProjectDeploymentFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
-        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
         'projectId': json['projectId'] == null ? undefined : json['projectId'],
         'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],

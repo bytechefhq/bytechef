@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface ProjectDeploymentWorkflowConnection {
     /**
      * The connection id
-     * @type {number}
-     * @memberof ProjectDeploymentWorkflowConnection
      */
     connectionId: number;
     /**
      * The connection key under which a connection is defined in a workflow definition.
-     * @type {string}
-     * @memberof ProjectDeploymentWorkflowConnection
      */
     workflowConnectionKey: string;
     /**
      * The action/trigger name to which a connection belongs.
-     * @type {string}
-     * @memberof ProjectDeploymentWorkflowConnection
      */
     workflowNodeName: string;
 }

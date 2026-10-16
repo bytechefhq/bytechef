@@ -29,68 +29,46 @@ import {
 export interface ClusterElementDefinitionBasic {
     /**
      * The component name.
-     * @type {string}
-     * @memberof ClusterElementDefinitionBasic
      */
     componentName: string;
     /**
      * The component version.
-     * @type {number}
-     * @memberof ClusterElementDefinitionBasic
      */
     componentVersion: number;
     /**
      * The cluster element description.
-     * @type {string}
-     * @memberof ClusterElementDefinitionBasic
      */
     description?: string;
     /**
      * 
-     * @type {Help}
-     * @memberof ClusterElementDefinitionBasic
      */
     help?: Help;
     /**
      * The cluster element name.
-     * @type {string}
-     * @memberof ClusterElementDefinitionBasic
      */
     name: string;
     /**
      * The component icon.
-     * @type {string}
-     * @memberof ClusterElementDefinitionBasic
      */
     icon?: string;
     /**
      * Does action defines output.
-     * @type {boolean}
-     * @memberof ClusterElementDefinitionBasic
      */
     outputDefined: boolean;
     /**
      * Does action defines output function.
-     * @type {boolean}
-     * @memberof ClusterElementDefinitionBasic
      */
     outputFunctionDefined?: boolean;
     /**
      * Does action defines output schema.
-     * @type {boolean}
-     * @memberof ClusterElementDefinitionBasic
      */
     outputSchemaDefined?: boolean;
     /**
      * The cluster element title.
-     * @type {string}
-     * @memberof ClusterElementDefinitionBasic
      */
     title?: string;
     /**
      * The cluster element type.
-     * @type {string}
-     * @memberof ClusterElementDefinitionBasic
      */
     type: string;
 }

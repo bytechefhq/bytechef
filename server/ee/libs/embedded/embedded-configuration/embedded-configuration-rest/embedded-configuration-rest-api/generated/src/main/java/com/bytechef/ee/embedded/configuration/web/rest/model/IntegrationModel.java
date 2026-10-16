@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.705345+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationModel {
 
   private String componentName;
@@ -67,10 +67,8 @@ public class IntegrationModel {
 
   private @Nullable CategoryModel category;
 
-  @Valid
   private List<Long> integrationWorkflowIds = new ArrayList<>();
 
-  @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
   private @Nullable Integer version;
@@ -448,7 +446,7 @@ public class IntegrationModel {
    * Get tags
    * @return tags
    */
-  @Valid 
+  
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
   public List<@Valid TagModel> getTags() {

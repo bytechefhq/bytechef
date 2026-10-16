@@ -30,48 +30,114 @@ import {
 } from '../models/UpdateFrontendIntegrationInstanceWorkflowRequest';
 
 export interface DisableFrontendIntegrationInstanceWorkflowRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
 }
 
 export interface DisableIntegrationInstanceWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
 }
 
 export interface EnableFrontendIntegrationInstanceWorkflowRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
 }
 
 export interface EnableIntegrationInstanceWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
 }
 
 export interface GetComponentInputOptionsRequest {
+    /**
+     * The external id of a connected user.
+     */
     externalUserId: string;
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * 
+     */
     componentInputOptionsRequest: ComponentInputOptionsRequest;
 }
 
 export interface GetFrontendComponentInputOptionsRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * 
+     */
     componentInputOptionsRequest: ComponentInputOptionsRequest;
 }
 
 export interface UpdateFrontendIntegrationInstanceWorkflowOperationRequest {
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     updateFrontendIntegrationInstanceWorkflowRequest: UpdateFrontendIntegrationInstanceWorkflowRequest;
 }
 
 export interface UpdateIntegrationInstanceWorkflowRequest {
+    /**
+     * The external user id.
+     */
     externalUserId: string;
+    /**
+     * The id of an integration instance.
+     */
     id: number;
+    /**
+     * The workflow reference of the workflow to delete.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     updateFrontendIntegrationInstanceWorkflowRequest: UpdateFrontendIntegrationInstanceWorkflowRequest;
 }
 

@@ -25,10 +25,9 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeAction_400_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.392269+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.307721+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ExecuteAction400ResponseModel {
 
-  @Valid
   private List<@Valid ErrorsInnerModel> errors = new ArrayList<>();
 
   public ExecuteAction400ResponseModel errors(List<@Valid ErrorsInnerModel> errors) {
@@ -48,7 +47,7 @@ public class ExecuteAction400ResponseModel {
    * Get errors
    * @return errors
    */
-  @Valid 
+  
   @Schema(name = "errors", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("errors")
   public List<@Valid ErrorsInnerModel> getErrors() {

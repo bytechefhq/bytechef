@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface ConnectionDefinitionBasic {
     /**
      * The description used from the connection's component.
-     * @type {string}
-     * @memberof ConnectionDefinitionBasic
      */
     componentDescription?: string;
     /**
      * The component name used from the connection's component.
-     * @type {string}
-     * @memberof ConnectionDefinitionBasic
      */
     componentName: string;
     /**
      * The title used from the connection's component
-     * @type {string}
-     * @memberof ConnectionDefinitionBasic
      */
     componentTitle?: string;
     /**
      * The version of a connection.
-     * @type {number}
-     * @memberof ConnectionDefinitionBasic
      */
     version: number;
 }

@@ -20,15 +20,27 @@ import {
 } from '../models/Notification';
 
 export interface CreateNotificationRequest {
+    /**
+     * 
+     */
     notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'>;
 }
 
 export interface DeleteNotificationRequest {
+    /**
+     * The id of a notification.
+     */
     notificationId: number;
 }
 
 export interface UpdateNotificationRequest {
+    /**
+     * The id of a notification.
+     */
     notificationId: number;
+    /**
+     * 
+     */
     notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'>;
 }
 

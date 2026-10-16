@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface OptionsDataSource {
     /**
      * The list of property names on which value change the property options should load/reload.
-     * @type {Array<string>}
-     * @memberof OptionsDataSource
      */
     optionsLookupDependsOn?: Array<string>;
 }

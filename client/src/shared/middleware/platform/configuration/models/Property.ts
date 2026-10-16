@@ -42,56 +42,38 @@ import { type TimeProperty, TimePropertyFromJSONTyped, TimePropertyToJSON, TimeP
 export interface Property {
     /**
      * If the property should be grouped under advanced options.
-     * @type {boolean}
-     * @memberof Property
      */
     advancedOption?: boolean;
     /**
      * The property description.
-     * @type {string}
-     * @memberof Property
      */
     description?: string;
     /**
      * Defines rules when the property should be shown or hidden.
-     * @type {string}
-     * @memberof Property
      */
     displayCondition?: string;
     /**
      * Defines if the property can contain expressions or only constant values. Defaults to true.
-     * @type {boolean}
-     * @memberof Property
      */
     expressionEnabled?: boolean;
     /**
      * If the property should be visible or not.
-     * @type {boolean}
-     * @memberof Property
      */
     hidden?: boolean;
     /**
      * Key-value map of metadata.
-     * @type {{ [key: string]: any; }}
-     * @memberof Property
      */
     metadata?: { [key: string]: any; };
     /**
      * The property name.
-     * @type {string}
-     * @memberof Property
      */
     name?: string;
     /**
      * If the property is required or not.
-     * @type {boolean}
-     * @memberof Property
      */
     required?: boolean;
     /**
      * 
-     * @type {PropertyType}
-     * @memberof Property
      */
     type: PropertyType;
 }

@@ -30,19 +30,43 @@ import {
 } from '../models/PublishConnectedUserProjectWorkflowRequest';
 
 export interface EnableConnectedUserProjectWorkflowRequest {
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * Enable/disable the project deployment.
+     */
     enable: boolean;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface GetConnectedUserProjectWorkflowRequest {
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 
 export interface PublishConnectedUserProjectWorkflowOperationRequest {
+    /**
+     * The workflow uuid.
+     */
     workflowUuid: string;
+    /**
+     * 
+     */
     publishConnectedUserProjectWorkflowRequest: PublishConnectedUserProjectWorkflowRequest;
+    /**
+     * The environment.
+     */
     xEnvironment?: Environment;
 }
 

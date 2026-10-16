@@ -29,8 +29,6 @@ import {
 export interface CreateFrontendIntegrationInstanceRequest {
     /**
      * 
-     * @type {CreateFrontendIntegrationInstanceRequestConnection}
-     * @memberof CreateFrontendIntegrationInstanceRequest
      */
     connection: CreateFrontendIntegrationInstanceRequestConnection;
 }

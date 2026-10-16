@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { NotificationEvent } from './NotificationEvent';
 import {
     NotificationEventFromJSON,
@@ -29,68 +29,46 @@ import {
 export interface Notification {
     /**
      * Notification Id
-     * @type {number}
-     * @memberof Notification
      */
     readonly id?: number;
     /**
      * The created by.
-     * @type {string}
-     * @memberof Notification
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof Notification
      */
     readonly createdDate?: Date;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof Notification
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof Notification
      */
     readonly lastModifiedDate?: Date;
     /**
      * Notification name
-     * @type {string}
-     * @memberof Notification
      */
     name: string;
     /**
      * Type of the notification
-     * @type {NotificationTypeEnum}
-     * @memberof Notification
      */
     type: NotificationTypeEnum;
     /**
      * Notification type related settings
-     * @type {{ [key: string]: object; }}
-     * @memberof Notification
      */
     settings: { [key: string]: object; };
     /**
      * List of events for which notification will be triggered
-     * @type {Array<NotificationEvent>}
-     * @memberof Notification
      */
     readonly notificationEvents?: Array<NotificationEvent>;
     /**
      * List of event ids for which notification will be triggered
-     * @type {Array<number>}
-     * @memberof Notification
      */
     notificationEventIds?: Array<number>;
     /**
      * 
-     * @type {number}
-     * @memberof Notification
      */
     version?: number;
 }
@@ -101,7 +79,7 @@ export interface Notification {
  */
 export const NotificationTypeEnum = {
     Email: 'EMAIL',
-    Webhook: 'WEBHOOK'
+    Webhook: 'WEBHOOK',
 } as const;
 export type NotificationTypeEnum = typeof NotificationTypeEnum[keyof typeof NotificationTypeEnum];
 
@@ -128,9 +106,9 @@ export function NotificationFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'id': json['id'] == null ? undefined : json['id'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
         'type': json['type'],
         'settings': json['settings'],

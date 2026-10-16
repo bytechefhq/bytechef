@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface McpIntegrationInstanceTool {
     /**
      * If an MCP tool is enabled or not.
-     * @type {boolean}
-     * @memberof McpIntegrationInstanceTool
      */
     enabled: boolean;
     /**
      * The id of an MCP tool.
-     * @type {number}
-     * @memberof McpIntegrationInstanceTool
      */
     mcpToolId: number;
 }

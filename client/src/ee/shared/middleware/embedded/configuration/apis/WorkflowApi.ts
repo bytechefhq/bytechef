@@ -20,29 +20,56 @@ import {
 } from '../models/Workflow';
 
 export interface DeleteWorkflowRequest {
+    /**
+     * The id of the workflow to delete.
+     */
     id: string;
 }
 
 export interface GetIntegrationVersionWorkflowsRequest {
+    /**
+     * The id of a integration.
+     */
     id: number;
+    /**
+     * The version of a integration.
+     */
     integrationVersion: number;
+    /**
+     * Use for including all fields or just basic ones.
+     */
     includeAllFields?: boolean;
 }
 
 export interface GetIntegrationWorkflowRequest {
+    /**
+     * The id of an integration workflow.
+     */
     integrationWorkflowId: number;
 }
 
 export interface GetIntegrationWorkflowsRequest {
+    /**
+     * The id of an integration.
+     */
     id: number;
 }
 
 export interface GetWorkflowRequest {
+    /**
+     * The id of the workflow to get.
+     */
     id: string;
 }
 
 export interface UpdateWorkflowRequest {
+    /**
+     * The id of the workflow to update.
+     */
     id: string;
+    /**
+     * 
+     */
     workflow: Workflow;
 }
 

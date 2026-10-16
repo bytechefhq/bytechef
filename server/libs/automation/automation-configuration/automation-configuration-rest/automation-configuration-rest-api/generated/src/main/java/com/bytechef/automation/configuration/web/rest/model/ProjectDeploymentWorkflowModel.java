@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectDeploymentWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:32.834141+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:22.372603+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ProjectDeploymentWorkflowModel {
 
   private @Nullable String createdBy;
@@ -39,10 +39,8 @@ public class ProjectDeploymentWorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime createdDate;
 
-  @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
-  @Valid
   private List<@Valid ProjectDeploymentWorkflowConnectionModel> connections = new ArrayList<>();
 
   private @Nullable Boolean enabled;
@@ -198,7 +196,7 @@ public class ProjectDeploymentWorkflowModel {
    * The connections used by a project deployment.
    * @return connections
    */
-  @Valid 
+  
   @Schema(name = "connections", description = "The connections used by a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
   public List<@Valid ProjectDeploymentWorkflowConnectionModel> getConnections() {

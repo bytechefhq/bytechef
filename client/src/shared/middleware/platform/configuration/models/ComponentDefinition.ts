@@ -85,122 +85,82 @@ import {
 export interface ComponentDefinition {
     /**
      * The list of cluster element types per action.
-     * @type {{ [key: string]: Array<string>; }}
-     * @memberof ComponentDefinition
      */
     actionClusterElementTypes?: { [key: string]: Array<string>; };
     /**
      * The list of all available actions the component can perform.
-     * @type {Array<ActionDefinitionBasic>}
-     * @memberof ComponentDefinition
      */
     actions?: Array<ActionDefinitionBasic>;
     /**
      * Is the component cluster element.
-     * @type {boolean}
-     * @memberof ComponentDefinition
      */
     clusterElement: boolean;
     /**
      * The list of cluster element types per root cluster element.
-     * @type {{ [key: string]: Array<string>; }}
-     * @memberof ComponentDefinition
      */
     clusterElementClusterElementTypes?: { [key: string]: Array<string>; };
     /**
      * The list of all available cluster elements the component can perform.
-     * @type {Array<ClusterElementDefinitionBasic>}
-     * @memberof ComponentDefinition
      */
     clusterElements?: Array<ClusterElementDefinitionBasic>;
     /**
      * The list of cluster element types.
-     * @type {Array<ClusterElementType>}
-     * @memberof ComponentDefinition
      */
     clusterElementTypes?: Array<ClusterElementType>;
     /**
      * Is the component cluster root.
-     * @type {boolean}
-     * @memberof ComponentDefinition
      */
     clusterRoot: boolean;
     /**
      * The list of categories the component belongs to.
-     * @type {Array<ComponentCategory>}
-     * @memberof ComponentDefinition
      */
     componentCategories?: Array<ComponentCategory>;
     /**
      * 
-     * @type {ConnectionDefinitionBasic}
-     * @memberof ComponentDefinition
      */
     connection?: ConnectionDefinitionBasic;
     /**
      * If connection is required or not if it is defined.
-     * @type {boolean}
-     * @memberof ComponentDefinition
      */
     connectionRequired: boolean;
     /**
      * The description.
-     * @type {string}
-     * @memberof ComponentDefinition
      */
     description?: string;
     /**
      * The icon.
-     * @type {string}
-     * @memberof ComponentDefinition
      */
     icon?: string;
     /**
      * The name.
-     * @type {string}
-     * @memberof ComponentDefinition
      */
     name: string;
     /**
      * 
-     * @type {Resources}
-     * @memberof ComponentDefinition
      */
     resources?: Resources;
     /**
      * Tags for categorization.
-     * @type {Array<string>}
-     * @memberof ComponentDefinition
      */
     tags?: Array<string>;
     /**
      * The title
-     * @type {string}
-     * @memberof ComponentDefinition
      */
     title?: string;
     /**
      * The list of all available triggers the component can perform.
-     * @type {Array<TriggerDefinitionBasic>}
-     * @memberof ComponentDefinition
      */
     triggers?: Array<TriggerDefinitionBasic>;
     /**
      * 
-     * @type {UnifiedApiCategory}
-     * @memberof ComponentDefinition
      */
     unifiedApiCategory?: UnifiedApiCategory;
     /**
      * The version of a component.
-     * @type {number}
-     * @memberof ComponentDefinition
      */
     version: number;
     /**
      * The component's selectable workflow inputs, each a property group (a lone property is a group with one property).
-     * @type {Array<PropertyGroup>}
-     * @memberof ComponentDefinition
      */
     inputs?: Array<PropertyGroup>;
 }

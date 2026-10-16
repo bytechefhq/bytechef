@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskDispatcherDefinitionModel {
 
   private @Nullable String description;
@@ -42,12 +42,10 @@ public class TaskDispatcherDefinitionModel {
 
   private @Nullable Boolean outputSchemaDefined;
 
-  @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
 
   private @Nullable ResourcesModel resources;
 
-  @Valid
   private List<@Valid PropertyModel> taskProperties = new ArrayList<>();
 
   private @Nullable String title;
@@ -212,7 +210,7 @@ public class TaskDispatcherDefinitionModel {
    * The list of task dispatcher properties.
    * @return properties
    */
-  @Valid 
+  
   @Schema(name = "properties", description = "The list of task dispatcher properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
   public List<@Valid PropertyModel> getProperties() {
@@ -262,7 +260,7 @@ public class TaskDispatcherDefinitionModel {
    * Properties used to define tasks to be dispatched.
    * @return taskProperties
    */
-  @Valid 
+  
   @Schema(name = "taskProperties", description = "Properties used to define tasks to be dispatched.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskProperties")
   public List<@Valid PropertyModel> getTaskProperties() {

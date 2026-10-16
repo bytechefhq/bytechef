@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowModel implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
   private @Nullable String createdBy;
@@ -51,7 +51,6 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
 
   private @Nullable String id;
 
-  @Valid
   private List<@Valid WorkflowInputModel> inputs = new ArrayList<>();
 
   private @Nullable Integer inputsCount;
@@ -63,7 +62,6 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastModifiedDate;
 
-  @Valid
   private List<@Valid WorkflowOutputModel> outputs = new ArrayList<>();
 
   /**
@@ -109,16 +107,12 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
 
   private @Nullable Integer maxRetries;
 
-  @Valid
   private List<String> workflowTaskComponentNames = new ArrayList<>();
 
-  @Valid
   private List<String> workflowTriggerComponentNames = new ArrayList<>();
 
-  @Valid
   private List<@Valid WorkflowTaskModel> tasks = new ArrayList<>();
 
-  @Valid
   private List<@Valid WorkflowTriggerModel> triggers = new ArrayList<>();
 
   private @Nullable Integer version;
@@ -287,7 +281,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The workflow's expected list of inputs.
    * @return inputs
    */
-  @Valid 
+  
   @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public List<@Valid WorkflowInputModel> getInputs() {
@@ -400,7 +394,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The workflow's list of expected outputs.
    * @return outputs
    */
-  @Valid 
+  
   @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's list of expected outputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputs")
   public List<@Valid WorkflowOutputModel> getOutputs() {
@@ -529,7 +523,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The steps that make up the workflow.
    * @return tasks
    */
-  @Valid 
+  
   @Schema(name = "tasks", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tasks")
   public List<@Valid WorkflowTaskModel> getTasks() {
@@ -558,7 +552,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * The steps that make up the workflow.
    * @return triggers
    */
-  @Valid 
+  
   @Schema(name = "triggers", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggers")
   public List<@Valid WorkflowTriggerModel> getTriggers() {

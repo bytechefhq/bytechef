@@ -30,39 +30,78 @@ import {
 } from '../models/Workflow';
 
 export interface CreateProjectWorkflowRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * 
+     */
     workflow: Workflow;
 }
 
 export interface DeleteWorkflowRequest {
+    /**
+     * The id of the workflow to delete.
+     */
     id: string;
 }
 
 export interface DuplicateWorkflowRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * The id of a workflow.
+     */
     workflowId: string;
 }
 
 export interface GetProjectVersionWorkflowsRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * The version of a project.
+     */
     projectVersion: number;
+    /**
+     * Use for including all fields or just basic ones.
+     */
     includeAllFields?: boolean;
 }
 
 export interface GetProjectWorkflowRequest {
+    /**
+     * The id of a project workflow.
+     */
     projectWorkflowId: number;
 }
 
 export interface GetProjectWorkflowsRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
 }
 
 export interface GetWorkflowRequest {
+    /**
+     * The id of the workflow to get.
+     */
     id: string;
 }
 
 export interface UpdateWorkflowRequest {
+    /**
+     * The id of the workflow to update.
+     */
     id: string;
+    /**
+     * 
+     */
     workflow: Workflow;
 }
 

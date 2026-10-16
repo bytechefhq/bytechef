@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.308008+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.874518+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class JobModel {
 
   private @Nullable String createdBy;
@@ -50,7 +50,6 @@ public class JobModel {
 
   private @Nullable String id;
 
-  @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
   private @Nullable String label;
@@ -60,10 +59,8 @@ public class JobModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastModifiedDate;
 
-  @Valid
   private Map<String, Object> metadata = new HashMap<>();
 
-  @Valid
   private Map<String, Object> outputs = new HashMap<>();
 
   private @Nullable Long parentTaskExecutionId;
@@ -116,10 +113,8 @@ public class JobModel {
 
   private StatusEnum status;
 
-  @Valid
   private List<@Valid TaskExecutionModel> taskExecutions = new ArrayList<>();
 
-  @Valid
   private List<@Valid WebhookModel> webhooks = new ArrayList<>();
 
   private @Nullable String workflowId;
@@ -514,7 +509,7 @@ public class JobModel {
    * Get taskExecutions
    * @return taskExecutions
    */
-  @Valid 
+  
   @Schema(name = "taskExecutions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskExecutions")
   public List<@Valid TaskExecutionModel> getTaskExecutions() {
@@ -543,7 +538,7 @@ public class JobModel {
    * The list of the webhooks configured.
    * @return webhooks
    */
-  @Valid 
+  
   @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of the webhooks configured.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("webhooks")
   public List<@Valid WebhookModel> getWebhooks() {

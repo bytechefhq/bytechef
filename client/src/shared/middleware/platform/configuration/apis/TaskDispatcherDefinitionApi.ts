@@ -25,11 +25,20 @@ import {
 } from '../models/TaskDispatcherDefinitionBasic';
 
 export interface GetTaskDispatcherDefinitionRequest {
+    /**
+     * The name of a task dispatcher to get.
+     */
     taskDispatcherName: string;
+    /**
+     * The version of a task dispatcher to get.
+     */
     taskDispatcherVersion: number;
 }
 
 export interface GetTaskDispatcherDefinitionVersionsRequest {
+    /**
+     * The name of a task dispatcher.
+     */
     taskDispatcherName: string;
 }
 

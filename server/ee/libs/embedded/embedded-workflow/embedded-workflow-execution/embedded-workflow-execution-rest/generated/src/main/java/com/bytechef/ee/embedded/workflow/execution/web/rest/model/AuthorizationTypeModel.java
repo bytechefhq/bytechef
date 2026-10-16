@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The authorization type.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.656661+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.601272+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public enum AuthorizationTypeModel {
   
   API_KEY("API_KEY"),

@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface OAuth2 {
     /**
      * 
-     * @type {string}
-     * @memberof OAuth2
      */
     authorizationUrl?: string;
     /**
      * 
-     * @type {{ [key: string]: string; }}
-     * @memberof OAuth2
      */
     extraQueryParameters?: { [key: string]: string; };
     /**
      * 
-     * @type {string}
-     * @memberof OAuth2
      */
     clientId?: string;
     /**
      * The redirect URI used for OAuth2 callback URL.
-     * @type {string}
-     * @memberof OAuth2
      */
     redirectUri?: string;
     /**
      * 
-     * @type {{ [key: string]: string; }}
-     * @memberof OAuth2
      */
     scopes?: { [key: string]: string; };
 }

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.542345+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.534439+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ApiCollectionModel {
 
   private @Nullable Integer collectionVersion;
@@ -45,7 +45,6 @@ public class ApiCollectionModel {
 
   private Boolean enabled = false;
 
-  @Valid
   private List<@Valid ApiCollectionEndpointModel> endpoints = new ArrayList<>();
 
   private @Nullable Long environmentId;
@@ -69,7 +68,6 @@ public class ApiCollectionModel {
 
   private Integer projectVersion;
 
-  @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
   private Long workspaceId;
@@ -235,7 +233,7 @@ public class ApiCollectionModel {
    * Get endpoints
    * @return endpoints
    */
-  @Valid 
+  
   @Schema(name = "endpoints", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endpoints")
   public List<@Valid ApiCollectionEndpointModel> getEndpoints() {
@@ -474,7 +472,7 @@ public class ApiCollectionModel {
    * Get tags
    * @return tags
    */
-  @Valid 
+  
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
   public List<@Valid TagModel> getTags() {

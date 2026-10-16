@@ -37,29 +37,23 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ComponentDefinitionModel {
 
-  @Valid
   private Map<String, List<String>> actionClusterElementTypes = new HashMap<>();
 
-  @Valid
   private List<@Valid ActionDefinitionBasicModel> actions = new ArrayList<>();
 
   private Boolean clusterElement;
 
-  @Valid
   private Map<String, List<String>> clusterElementClusterElementTypes = new HashMap<>();
 
-  @Valid
   private List<@Valid ClusterElementDefinitionBasicModel> clusterElements = new ArrayList<>();
 
-  @Valid
   private List<@Valid ClusterElementTypeModel> clusterElementTypes = new ArrayList<>();
 
   private Boolean clusterRoot;
 
-  @Valid
   private List<@Valid ComponentCategoryModel> componentCategories = new ArrayList<>();
 
   private @Nullable ConnectionDefinitionBasicModel connection;
@@ -74,19 +68,16 @@ public class ComponentDefinitionModel {
 
   private @Nullable ResourcesModel resources;
 
-  @Valid
   private List<String> tags = new ArrayList<>();
 
   private @Nullable String title;
 
-  @Valid
   private List<@Valid TriggerDefinitionBasicModel> triggers = new ArrayList<>();
 
   private @Nullable UnifiedApiCategoryModel unifiedApiCategory;
 
   private Integer version;
 
-  @Valid
   private List<@Valid PropertyGroupModel> inputs = new ArrayList<>();
 
   public ComponentDefinitionModel() {
@@ -121,7 +112,7 @@ public class ComponentDefinitionModel {
    * The list of cluster element types per action.
    * @return actionClusterElementTypes
    */
-  @Valid 
+  
   @Schema(name = "actionClusterElementTypes", description = "The list of cluster element types per action.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actionClusterElementTypes")
   public Map<String, List<String>> getActionClusterElementTypes() {
@@ -150,7 +141,7 @@ public class ComponentDefinitionModel {
    * The list of all available actions the component can perform.
    * @return actions
    */
-  @Valid 
+  
   @Schema(name = "actions", description = "The list of all available actions the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actions")
   public List<@Valid ActionDefinitionBasicModel> getActions() {
@@ -200,7 +191,7 @@ public class ComponentDefinitionModel {
    * The list of cluster element types per root cluster element.
    * @return clusterElementClusterElementTypes
    */
-  @Valid 
+  
   @Schema(name = "clusterElementClusterElementTypes", description = "The list of cluster element types per root cluster element.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("clusterElementClusterElementTypes")
   public Map<String, List<String>> getClusterElementClusterElementTypes() {
@@ -229,7 +220,7 @@ public class ComponentDefinitionModel {
    * The list of all available cluster elements the component can perform.
    * @return clusterElements
    */
-  @Valid 
+  
   @Schema(name = "clusterElements", description = "The list of all available cluster elements the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("clusterElements")
   public List<@Valid ClusterElementDefinitionBasicModel> getClusterElements() {
@@ -258,7 +249,7 @@ public class ComponentDefinitionModel {
    * The list of cluster element types.
    * @return clusterElementTypes
    */
-  @Valid 
+  
   @Schema(name = "clusterElementTypes", description = "The list of cluster element types.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("clusterElementTypes")
   public List<@Valid ClusterElementTypeModel> getClusterElementTypes() {
@@ -308,7 +299,7 @@ public class ComponentDefinitionModel {
    * The list of categories the component belongs to.
    * @return componentCategories
    */
-  @Valid 
+  
   @Schema(name = "componentCategories", description = "The list of categories the component belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentCategories")
   public List<@Valid ComponentCategoryModel> getComponentCategories() {
@@ -513,7 +504,7 @@ public class ComponentDefinitionModel {
    * The list of all available triggers the component can perform.
    * @return triggers
    */
-  @Valid 
+  
   @Schema(name = "triggers", description = "The list of all available triggers the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggers")
   public List<@Valid TriggerDefinitionBasicModel> getTriggers() {
@@ -584,7 +575,7 @@ public class ComponentDefinitionModel {
    * The component's selectable workflow inputs, each a property group (a lone property is a group with one property).
    * @return inputs
    */
-  @Valid 
+  
   @Schema(name = "inputs", description = "The component's selectable workflow inputs, each a property group (a lone property is a group with one property).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public List<@Valid PropertyGroupModel> getInputs() {

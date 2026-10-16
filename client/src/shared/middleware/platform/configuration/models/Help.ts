@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface Help {
     /**
      * The help text
-     * @type {string}
-     * @memberof Help
      */
     body: string;
     /**
      * The url to additional documentation
-     * @type {string}
-     * @memberof Help
      */
     learnMoreUrl?: string;
 }

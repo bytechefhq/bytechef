@@ -25,7 +25,13 @@ import {
 } from '../models/UpdateTagsRequest';
 
 export interface UpdateApiCollectionTagsRequest {
+    /**
+     * The id of an API collection.
+     */
     id: number;
+    /**
+     * 
+     */
     updateTagsRequest: UpdateTagsRequest;
 }
 
