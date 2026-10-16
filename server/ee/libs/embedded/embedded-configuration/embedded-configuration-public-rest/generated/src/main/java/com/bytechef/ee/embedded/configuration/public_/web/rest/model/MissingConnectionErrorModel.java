@@ -22,8 +22,8 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "MissingConnectionError", description = "Returned when a required connection could not be auto-wired for an automation workflow template reference.")
 @JsonTypeName("MissingConnectionError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public class MissingConnectionErrorModel implements EnableFrontendProjectWorkflow409ResponseModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-18T21:40:19.187161+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+public class MissingConnectionErrorModel implements DisableFrontendProjectWorkflow409ResponseModel, EnableFrontendProjectWorkflow409ResponseModel {
 
   private @Nullable String missingConnectionComponentName;
 
