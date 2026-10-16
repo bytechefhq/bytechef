@@ -31,13 +31,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
  */
-@Service
 @Transactional(readOnly = true)
 public class ProjectOwnershipServiceImpl implements ProjectOwnershipService {
 
