@@ -1019,4 +1019,37 @@ describe('ActivationDialog', () => {
             expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
         });
     });
+
+    describe('an empty account list', () => {
+        it('tells the user where to connect when creating connections is turned off', async () => {
+            renderDialog({connectionCreationAllowed: false, workflowTemplateId: 'wf-slack-channel'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            expect(
+                await within(row).findByText('No Slack accounts yet. Connect Slack from your integrations first.')
+            ).toBeInTheDocument();
+        });
+
+        it('offers Connect instead of the hint when creating connections is allowed', async () => {
+            renderDialog({workflowTemplateId: 'wf-slack-channel'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            expect(await within(row).findByRole('button', {name: 'Connect'})).toBeInTheDocument();
+            expect(within(row).queryByText(/No Slack accounts yet/)).not.toBeInTheDocument();
+        });
+
+        it('shows no hint while the user has accounts', async () => {
+            connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
+
+            renderDialog({connectionCreationAllowed: false, workflowTemplateId: 'wf-slack-channel'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            await within(row).findByRole('option', {name: 'Team Slack'});
+
+            expect(within(row).queryByText(/No Slack accounts yet/)).not.toBeInTheDocument();
+        });
+    });
 });
