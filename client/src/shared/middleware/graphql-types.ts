@@ -1267,6 +1267,16 @@ export type ConnectedUserAutomationProjectConfiguration = {
   projectId: Scalars['ID']['output'];
 };
 
+export type ConnectedUserCatalogWorkflowCopy = {
+  __typename?: 'ConnectedUserCatalogWorkflowCopy';
+  connectedUserEmail?: Maybe<Scalars['String']['output']>;
+  connectedUserName?: Maybe<Scalars['String']['output']>;
+  copiedFromWorkflowUuid: Scalars['ID']['output'];
+  enabled: Scalars['Boolean']['output'];
+  externalUserId: Scalars['String']['output'];
+  workflowUuid: Scalars['ID']['output'];
+};
+
 export type ConnectedUserCodeWorkflowReference = {
   __typename?: 'ConnectedUserCodeWorkflowReference';
   automationUuid: Scalars['ID']['output'];
@@ -4315,6 +4325,10 @@ export type Query = {
   authorities: Array<Scalars['String']['output']>;
   automationProjectCategories: Array<AutomationProjectCategory>;
   automationWorkflowProjectCodeWorkflowSource: AutomationWorkflowProjectCodeWorkflowSource;
+  automationProjectConfigurationConnectedUsers: Array<AutomationProjectConfigurationConnectedUser>;
+  automationProjectConfigurationDeleteImpact: AutomationProjectConfigurationDeleteImpact;
+  automationProjectConfigurationMoveImpact: AutomationProjectConfigurationMoveImpact;
+  automationProjectConfigurationUpgradeImpact: AutomationProjectConfigurationMoveImpact;
   automationProjectConfigurationVersionImpact: AutomationProjectConfigurationVersionImpact;
   automationProjectConfigurationWorkflowInputOptions: Array<AutomationProjectConfigurationInputOption>;
   automationProjectConfigurationWorkflowProvidableValues: AutomationProjectConfigurationWorkflowProvidableValues;
@@ -4350,6 +4364,7 @@ export type Query = {
    */
   componentRules: Array<ComponentRule>;
   connectedUser?: Maybe<ConnectedUser>;
+  connectedUserCatalogWorkflowCopies: Array<ConnectedUserCatalogWorkflowCopy>;
   connectedUserCodeWorkflowReferences: Array<ConnectedUserCodeWorkflowReference>;
   connectedUserMcpServers: Array<ConnectedUserMcpServer>;
   connectedUserProjects: Array<ConnectedUserProject>;
@@ -4384,6 +4399,8 @@ export type Query = {
   identityProvider?: Maybe<IdentityProviderType>;
   identityProviders: Array<Maybe<IdentityProviderType>>;
   integrationCodeWorkflowSource: Scalars['String']['output'];
+  integrationVersionWorkflowChange: VersionWorkflowChange;
+  integrationVersionWorkflowChanges: VersionWorkflowChanges;
   integrationWorkflows: Array<IntegrationWorkflow>;
   integrationWorkflowsByIntegrationId: Array<IntegrationWorkflow>;
   jobFileLogs: LogPage;
@@ -4740,6 +4757,29 @@ export type QueryAutomationWorkflowProjectCodeWorkflowSourceArgs = {
 };
 
 
+export type QueryAutomationProjectConfigurationConnectedUsersArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationProjectConfigurationDeleteImpactArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationProjectConfigurationMoveImpactArgs = {
+  connectedUserIds: Array<Scalars['ID']['input']>;
+  sourceId: Scalars['ID']['input'];
+  targetId: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationProjectConfigurationUpgradeImpactArgs = {
+  connectedUserIds: Array<Scalars['ID']['input']>;
+  targetId: Scalars['ID']['input'];
+};
+
+
 export type QueryAutomationProjectConfigurationVersionImpactArgs = {
   id: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
@@ -4919,6 +4959,12 @@ export type QueryConnectedUserArgs = {
 };
 
 
+export type QueryConnectedUserCatalogWorkflowCopiesArgs = {
+  automationUuids: Array<Scalars['ID']['input']>;
+  environmentId: Scalars['ID']['input'];
+};
+
+
 export type QueryConnectedUserCodeWorkflowReferencesArgs = {
   automationUuids: Array<Scalars['ID']['input']>;
   environmentId: Scalars['ID']['input'];
@@ -5082,6 +5128,19 @@ export type QueryIdentityProviderArgs = {
 
 export type QueryIntegrationCodeWorkflowSourceArgs = {
   integrationId: Scalars['ID']['input'];
+};
+
+
+export type QueryIntegrationVersionWorkflowChangeArgs = {
+  integrationId: Scalars['ID']['input'];
+  integrationVersion: Scalars['Int']['input'];
+  workflowUuid: Scalars['String']['input'];
+};
+
+
+export type QueryIntegrationVersionWorkflowChangesArgs = {
+  integrationId: Scalars['ID']['input'];
+  integrationVersion: Scalars['Int']['input'];
 };
 
 
