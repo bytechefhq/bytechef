@@ -1775,6 +1775,14 @@ export type PublishAutomationWorkflowProjectMutationVariables = Exact<{
 
 export type PublishAutomationWorkflowProjectMutation = { publishAutomationWorkflowProject: boolean };
 
+export type ConnectedUserCatalogWorkflowCopiesQueryVariables = Exact<{
+  automationWorkflowUuids: Array<string | number> | string | number;
+  environmentId: string | number;
+}>;
+
+
+export type ConnectedUserCatalogWorkflowCopiesQuery = { connectedUserCatalogWorkflowCopies: Array<{ copiedFromWorkflowUuid: string, workflowUuid: string, externalUserId: string, connectedUserName: string | null, connectedUserEmail: string | null, enabled: boolean }> };
+
 export type ConnectedUserCodeWorkflowReferencesQueryVariables = Exact<{
   automationWorkflowUuids: Array<string | number> | string | number;
   environmentId: string | number;
@@ -9233,6 +9241,38 @@ export const usePublishAutomationWorkflowProjectMutation = <
       {
     mutationKey: ['publishAutomationWorkflowProject'],
     mutationFn: (variables?: PublishAutomationWorkflowProjectMutationVariables) => fetcher<PublishAutomationWorkflowProjectMutation, PublishAutomationWorkflowProjectMutationVariables>(PublishAutomationWorkflowProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ConnectedUserCatalogWorkflowCopiesDocument = new TypedDocumentString(`
+    query connectedUserCatalogWorkflowCopies($automationWorkflowUuids: [ID!]!, $environmentId: ID!) {
+  connectedUserCatalogWorkflowCopies(
+    automationWorkflowUuids: $automationWorkflowUuids
+    environmentId: $environmentId
+  ) {
+    copiedFromWorkflowUuid
+    workflowUuid
+    externalUserId
+    connectedUserName
+    connectedUserEmail
+    enabled
+  }
+}
+    `);
+
+export const useConnectedUserCatalogWorkflowCopiesQuery = <
+      TData = ConnectedUserCatalogWorkflowCopiesQuery,
+      TError = unknown
+    >(
+      variables: ConnectedUserCatalogWorkflowCopiesQueryVariables,
+      options?: Omit<UseQueryOptions<ConnectedUserCatalogWorkflowCopiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectedUserCatalogWorkflowCopiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ConnectedUserCatalogWorkflowCopiesQuery, TError, TData>(
+      {
+    queryKey: ['connectedUserCatalogWorkflowCopies', variables],
+    queryFn: fetcher<ConnectedUserCatalogWorkflowCopiesQuery, ConnectedUserCatalogWorkflowCopiesQueryVariables>(ConnectedUserCatalogWorkflowCopiesDocument, variables),
     ...options
   }
     )};
