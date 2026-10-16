@@ -77,6 +77,22 @@ public class MultiTenantPgVectorLoader implements InitializingBean {
         validateIdentifier(schemaName);
         validateIdentifier(tableName);
 
+        if (!properties.isRemoveExistingVectorStoreTable() && relationExists(schemaName, tableName)) {
+            if (log.isDebugEnabled()) {
+                log.debug("PgVectorStore table {}.{} already exists for tenant {}", schemaName, tableName, tenantId);
+            }
+
+            if (properties.getIndexType() != PgVectorStore.PgIndexType.NONE &&
+                !relationExists(schemaName, getIndexName())) {
+
+                log.info("Creating missing PgVectorStore index for table: {} in schema: {}", tableName, schemaName);
+
+                createIndex(schemaName);
+            }
+
+            return;
+        }
+
         log.info("Initializing PgVectorStore schema for table: {} in schema: {}", tableName, schemaName);
 
         jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS vector SCHEMA public");
@@ -103,22 +119,37 @@ public class MultiTenantPgVectorLoader implements InitializingBean {
         jdbcTemplate.execute(createTableSql);
 
         if (properties.getIndexType() != PgVectorStore.PgIndexType.NONE) {
-            String indexName = tableName + "_embedding_idx";
-            String indexType = properties.getIndexType()
-                .name()
-                .toLowerCase();
-            String distanceType = properties.getDistanceType().index;
-
-            String createIndexSql = "CREATE INDEX IF NOT EXISTS " + indexName +
-                " ON " + schemaName + "." + tableName +
-                " USING " + indexType + " (embedding public." + distanceType + ")";
-
-            jdbcTemplate.execute(createIndexSql);
+            createIndex(schemaName);
         }
 
         if (log.isDebugEnabled()) {
             log.debug("Initialized PgVectorStore schema for tenant {}", tenantId);
         }
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private void createIndex(String schemaName) {
+        String indexType = properties.getIndexType()
+            .name()
+            .toLowerCase();
+        String distanceType = properties.getDistanceType().index;
+
+        String createIndexSql = "CREATE INDEX IF NOT EXISTS " + getIndexName() +
+            " ON " + schemaName + "." + tableName +
+            " USING " + indexType + " (embedding public." + distanceType + ")";
+
+        jdbcTemplate.execute(createIndexSql);
+    }
+
+    private String getIndexName() {
+        return tableName + "_embedding_idx";
+    }
+
+    private boolean relationExists(String schemaName, String relationName) {
+        Boolean exists = jdbcTemplate.queryForObject(
+            "SELECT to_regclass(?) IS NOT NULL", Boolean.class, schemaName + "." + relationName);
+
+        return Boolean.TRUE.equals(exists);
     }
 
     private void validateIdentifier(String identifier) {
