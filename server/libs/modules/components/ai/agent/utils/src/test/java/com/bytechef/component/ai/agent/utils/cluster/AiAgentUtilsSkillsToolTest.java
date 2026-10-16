@@ -174,7 +174,7 @@ class AiAgentUtilsSkillsToolTest {
 
         when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(1L));
         when(aiSkillFacade.getAiSkillDownload(1L)).thenReturn(zipBytes);
-        when(polyglotEngine.execute(eq("js"), any(Parameters.class), eq(Map.of()), eq(context)))
+        when(polyglotEngine.execute(eq("js"), any(Parameters.class), eq(Map.of()), eq(false), eq(context)))
             .thenReturn(Map.of());
 
         ToolCallback scriptToolCallback = Arrays.stream(invokeApply().getToolCallbacks())
@@ -196,7 +196,8 @@ class AiAgentUtilsSkillsToolTest {
 
         ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
-        verify(polyglotEngine).execute(eq("js"), parametersArgumentCaptor.capture(), eq(Map.of()), eq(context));
+        verify(polyglotEngine).execute(eq("js"), parametersArgumentCaptor.capture(), eq(Map.of()), eq(false),
+            eq(context));
 
         Parameters scriptParameters = parametersArgumentCaptor.getValue();
 

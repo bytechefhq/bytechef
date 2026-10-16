@@ -254,7 +254,8 @@ public class AiAgentUtilsSkillsTool implements AiAgentUtilsClusterElementContrib
                         "script", scriptContent,
                         ScriptConstants.INPUT, scriptInput != null ? scriptInput : Map.of()));
 
-                return polyglotEngine.execute(languageId, scriptParams, componentConnections, jobContextAware);
+                return polyglotEngine.execute(
+                    languageId, scriptParams, componentConnections, false, jobContextAware);
             })
             .inputType(Map.class)
             .inputSchema(SCRIPT_TOOL_INPUT_SCHEMA)
