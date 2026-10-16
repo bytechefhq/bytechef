@@ -24,9 +24,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 /**
- * Adds the integration's own connection to every code task of an integration code workflow that does not declare one,
- * so a task can call the integration's component without declaring the connection and without naming it.
- *
  * @version ee
  *
  * @author Ivica Cardic
