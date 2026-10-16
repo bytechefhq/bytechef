@@ -24,6 +24,11 @@ import {
     DuplicateWorkflow200ResponseToJSON,
 } from '../models/DuplicateWorkflow200Response';
 import {
+    type ProjectVersion,
+    ProjectVersionFromJSON,
+    ProjectVersionToJSON,
+} from '../models/ProjectVersion';
+import {
     type Workflow,
     WorkflowFromJSON,
     WorkflowToJSON,
@@ -80,6 +85,11 @@ export interface GetProjectWorkflowRequest {
     projectWorkflowId: number;
 }
 
+export interface GetProjectWorkflowVersionsRequest {
+    id: number;
+    workflowUuid: string;
+}
+
 export interface GetProjectWorkflowsRequest {
     /**
      * The id of a project.
@@ -92,6 +102,12 @@ export interface GetWorkflowRequest {
      * The id of the workflow to get.
      */
     id: string;
+}
+
+export interface RestoreProjectVersionWorkflowRequest {
+    id: number;
+    projectVersion: number;
+    workflowUuid: string;
 }
 
 export interface UpdateWorkflowRequest {
@@ -375,6 +391,61 @@ export class WorkflowApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for getProjectWorkflowVersions without sending the request
+     */
+    async getProjectWorkflowVersionsRequestOpts(requestParameters: GetProjectWorkflowVersionsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getProjectWorkflowVersions().'
+            );
+        }
+
+        if (requestParameters['workflowUuid'] == null) {
+            throw new runtime.RequiredError(
+                'workflowUuid',
+                'Required parameter "workflowUuid" was null or undefined when calling getProjectWorkflowVersions().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/projects/{id}/workflows/{workflowUuid}/versions`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowUuid}', encodeURIComponent(String(requestParameters['workflowUuid'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get published project versions that contain a workflow.
+     * Get published project versions that contain a workflow.
+     */
+    async getProjectWorkflowVersionsRaw(requestParameters: GetProjectWorkflowVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectVersion>>> {
+        const requestOptions = await this.getProjectWorkflowVersionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectVersionFromJSON));
+    }
+
+    /**
+     * Get published project versions that contain a workflow.
+     * Get published project versions that contain a workflow.
+     */
+    async getProjectWorkflowVersions(requestParameters: GetProjectWorkflowVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectVersion>> {
+        const response = await this.getProjectWorkflowVersionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for getProjectWorkflows without sending the request
      */
     async getProjectWorkflowsRequestOpts(requestParameters: GetProjectWorkflowsRequest): Promise<runtime.RequestOpts> {
@@ -505,6 +576,68 @@ export class WorkflowApi extends runtime.BaseAPI {
     async getWorkflows(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Workflow>> {
         const response = await this.getWorkflowsRaw(initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for restoreProjectVersionWorkflow without sending the request
+     */
+    async restoreProjectVersionWorkflowRequestOpts(requestParameters: RestoreProjectVersionWorkflowRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling restoreProjectVersionWorkflow().'
+            );
+        }
+
+        if (requestParameters['projectVersion'] == null) {
+            throw new runtime.RequiredError(
+                'projectVersion',
+                'Required parameter "projectVersion" was null or undefined when calling restoreProjectVersionWorkflow().'
+            );
+        }
+
+        if (requestParameters['workflowUuid'] == null) {
+            throw new runtime.RequiredError(
+                'workflowUuid',
+                'Required parameter "workflowUuid" was null or undefined when calling restoreProjectVersionWorkflow().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/projects/{id}/versions/{projectVersion}/workflows/{workflowUuid}/restore`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{projectVersion}', encodeURIComponent(String(requestParameters['projectVersion'])));
+        urlPath = urlPath.replace('{workflowUuid}', encodeURIComponent(String(requestParameters['workflowUuid'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Loads a workflow of a published project version into the draft.
+     * Loads a workflow of a published project version into the draft.
+     */
+    async restoreProjectVersionWorkflowRaw(requestParameters: RestoreProjectVersionWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.restoreProjectVersionWorkflowRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Loads a workflow of a published project version into the draft.
+     * Loads a workflow of a published project version into the draft.
+     */
+    async restoreProjectVersionWorkflow(requestParameters: RestoreProjectVersionWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.restoreProjectVersionWorkflowRaw(requestParameters, initOverrides);
     }
 
     /**

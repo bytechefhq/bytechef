@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import LoadWorkflowVersionDialog from '@/pages/automation/project/components/LoadWorkflowVersionDialog';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
@@ -45,6 +46,7 @@ const SettingsMenu = ({
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
+    const [showLoadWorkflowVersionDialog, setShowLoadWorkflowVersionDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
     const [showProjectShareDialog, setShowProjectShareDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
@@ -140,6 +142,7 @@ const SettingsMenu = ({
                                 onShareWorkflow={() => setShowWorkflowShareDialog(true)}
                                 onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
                                 onShowEditWorkflowDialog={() => setShowEditWorkflowDialog(true)}
+                                onShowLoadWorkflowVersionDialog={() => setShowLoadWorkflowVersionDialog(true)}
                                 workflowId={workflow.id!}
                             />
                         </TabsContent>
@@ -227,6 +230,14 @@ const SettingsMenu = ({
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
+                />
+            )}
+
+            {showLoadWorkflowVersionDialog && workflow.workflowUuid && (
+                <LoadWorkflowVersionDialog
+                    onClose={() => setShowLoadWorkflowVersionDialog(false)}
+                    projectId={project.id!}
+                    workflowUuid={workflow.workflowUuid}
                 />
             )}
 
