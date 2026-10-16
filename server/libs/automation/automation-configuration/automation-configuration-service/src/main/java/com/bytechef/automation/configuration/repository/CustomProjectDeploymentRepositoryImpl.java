@@ -18,7 +18,10 @@ package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.SystemProjects;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
@@ -28,13 +31,16 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeploymentRepository {
 
     private static final String API_COLLECTION_NAME_PREFIX = "__API_COLLECTION__";
-    private static final String EMBEDDED_NAME_PREFIX = "__EMBEDDED__";
     private static final String MCP_SERVER_NAME_PREFIX = "__MCP_SERVER__";
 
     private final JdbcClient jdbcClient;
+    private final ProjectOwnershipService projectOwnershipService;
 
-    public CustomProjectDeploymentRepositoryImpl(JdbcClient jdbcClient) {
+    public CustomProjectDeploymentRepositoryImpl(
+        JdbcClient jdbcClient, ProjectOwnershipService projectOwnershipService) {
+
         this.jdbcClient = jdbcClient;
+        this.projectOwnershipService = projectOwnershipService;
     }
 
     @Override
@@ -53,64 +59,58 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
                 "JOIN project_deployment_tag ON project_deployment.id = project_deployment_tag.project_deployment_id ";
         }
 
+        List<String> conditions = new ArrayList<>();
+
+        conditions.add(
+            projectOwnershipService.getExcludeProjectDeploymentsCondition(
+                EnumSet.of(
+                    ProjectDeploymentOwner.API_COLLECTION, ProjectDeploymentOwner.A2A_SERVER,
+                    ProjectDeploymentOwner.MCP_SERVER),
+                "project_deployment.id"));
+
+        // __MCP_SERVER__% matches McpServer.MCP_SERVER_NAME_PREFIX in platform-mcp-api
+        conditions.add(
+            "(NOT " + startsWith("project_deployment.name", API_COLLECTION_NAME_PREFIX) + " AND NOT " +
+                startsWith("project_deployment.name", MCP_SERVER_NAME_PREFIX) + " AND NOT " +
+                startsWith("project_deployment.name", SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX) + ")");
+
         if (embedded != null) {
-            query += "WHERE ";
-
             if (embedded) {
-                query += startsWith("project_deployment.name", EMBEDDED_NAME_PREFIX) + " ";
+                conditions.add(
+                    projectOwnershipService.getSelectProjectDeploymentsCondition(
+                        ProjectDeploymentOwner.EMBEDDED, "project_deployment.id"));
             } else {
-                query += "NOT " + startsWith("project_deployment.name", EMBEDDED_NAME_PREFIX) + " ";
-            }
-        }
-
-        if (environment != null || projectId != null || tagId != null || workspaceId != null) {
-            if (embedded == null) {
-                query += "WHERE ";
-            } else {
-                query += "AND ";
+                conditions.add(
+                    projectOwnershipService.getExcludeProjectDeploymentsCondition(
+                        EnumSet.of(ProjectDeploymentOwner.EMBEDDED), "project_deployment.id"));
             }
         }
 
         if (workspaceId != null) {
             arguments.add(workspaceId);
 
-            query += "workspace_id = ? ";
+            conditions.add("workspace_id = ?");
         }
 
         if (environment != null) {
             arguments.add(environment);
 
-            if (workspaceId != null) {
-                query += "AND ";
-            }
-
-            query += "environment = ? ";
+            conditions.add("environment = ?");
         }
 
         if (projectId != null) {
             arguments.add(projectId);
 
-            if (workspaceId != null || environment != null) {
-                query += "AND ";
-            }
-
-            query += "project_id = ? ";
+            conditions.add("project_id = ?");
         }
 
         if (tagId != null) {
             arguments.add(tagId);
 
-            if (workspaceId != null || environment != null || projectId != null) {
-                query += "AND ";
-            }
-
-            query += "tag_id = ? ";
+            conditions.add("tag_id = ?");
         }
 
-        // __MCP_SERVER__% matches McpServer.MCP_SERVER_NAME_PREFIX in platform-mcp-api
-        query += "AND (NOT " + startsWith("project_deployment.name", API_COLLECTION_NAME_PREFIX) + " AND NOT " +
-            startsWith("project_deployment.name", MCP_SERVER_NAME_PREFIX) + " AND NOT " +
-            startsWith("project_deployment.name", SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX) + ") ";
+        query += "WHERE " + String.join(" AND ", conditions) + " ";
 
         query += "ORDER BY LOWER(project_deployment.name) ASC, project_deployment.project_version ASC, " +
             "project_deployment.environment ASC";
