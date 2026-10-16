@@ -242,7 +242,7 @@ export function CopilotRuntimeProvider({
             editedIndex
         );
 
-        if (!turnRewindIndexes || turnRewindIndexes.userMessageIndex !== editedIndex) {
+        if (turnRewindIndexes?.userMessageIndex !== editedIndex) {
             toast.error('Could not resolve edited message');
 
             return;
