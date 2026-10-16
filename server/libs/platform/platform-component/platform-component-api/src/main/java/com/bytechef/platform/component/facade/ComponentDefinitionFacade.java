@@ -20,6 +20,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -31,6 +32,8 @@ public interface ComponentDefinitionFacade {
         String componentName, int componentVersion, String groupName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         @Nullable Long connectionId);
+
+    Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version);
 
     ComponentDefinition getComponentDefinition(String name, @Nullable Integer version);
 
