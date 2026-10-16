@@ -47,6 +47,17 @@ public class TestOwnerContributors {
         connectedUserIds.add(projectId);
     }
 
+    public void addDeploymentId(ProjectDeploymentOwner projectDeploymentOwner, long projectDeploymentId) {
+        Set<Long> projectDeploymentIds = switch (projectDeploymentOwner) {
+            case API_COLLECTION -> apiCollectionIds;
+            case A2A_SERVER -> a2aServerIds;
+            case EMBEDDED -> embeddedIds;
+            case MCP_SERVER -> mcpServerIds;
+        };
+
+        projectDeploymentIds.add(projectDeploymentId);
+    }
+
     public void clear() {
         catalogIds.clear();
         connectedUserIds.clear();

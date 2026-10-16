@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
+import com.bytechef.automation.configuration.config.TestOwnerContributors;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -62,12 +63,17 @@ public class ProjectServiceIntTest {
     private TagRepository tagRepository;
 
     @Autowired
+    private TestOwnerContributors testOwnerContributors;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     private Workspace workspace;
 
     @BeforeEach
     public void beforeEach() {
+        testOwnerContributors.clear();
+
         category = categoryRepository.save(new Category("name"));
         workspace = workspaceRepository.save(new Workspace("test"));
     }
@@ -147,25 +153,39 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    public void testGetProjectsExcludesEmbeddedMarkerProjects() {
+    public void testGetProjectsExcludesEmbeddedOwnedProjects() {
         projectRepository.save(
             Project.builder()
                 .name("Regular Project")
                 .workspaceId(workspace.getId())
                 .build());
 
-        projectRepository.save(
+        Project catalogProject = projectRepository.save(
             Project.builder()
-                .name("__EMBEDDED_AUTOMATION__Catalog")
+                .name("Catalog")
                 .workspaceId(workspace.getId())
                 .build());
+
+        Project connectedUserProject = projectRepository.save(
+            Project.builder()
+                .name("ext")
+                .workspaceId(workspace.getId())
+                .build());
+
+        projectRepository.save(
+            Project.builder()
+                .name("abEMBEDDEDcd x")
+                .workspaceId(workspace.getId())
+                .build());
+
+        testOwnerContributors.addCatalogId(catalogProject.getId());
+        testOwnerContributors.addConnectedUserId(connectedUserProject.getId());
 
         List<Project> projects = projectService.getProjects(null, null, null, null, null, workspace.getId());
 
         assertThat(projects)
             .extracting(Project::getName)
-            .contains("Regular Project")
-            .doesNotContain("__EMBEDDED_AUTOMATION__Catalog");
+            .containsExactlyInAnyOrder("Regular Project", "abEMBEDDEDcd x");
     }
 
     @Test

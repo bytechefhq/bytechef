@@ -20,9 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
+import com.bytechef.automation.configuration.config.TestOwnerContributors;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -51,10 +53,15 @@ public class ProjectDeploymentRepositoryIntTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    @Autowired
+    private TestOwnerContributors testOwnerContributors;
+
     private Workspace workspace;
 
     @BeforeEach
     public void beforeEach() {
+        testOwnerContributors.clear();
+
         workspace = workspaceRepository.save(new Workspace("test"));
     }
 
@@ -88,24 +95,43 @@ public class ProjectDeploymentRepositoryIntTest {
         }
 
         @Test
-        public void testEmbeddedDeploymentPrefixIsMatchedLiterally() {
-            Project catalogProject = projectRepository.save(getProject("__EMBEDDED_AUTOMATION__Catalog"));
-            Project connectedUserProject = projectRepository.save(getProject("__EMBEDDED__ext"));
+        public void testEmbeddedFilterSelectsEmbeddedOwnedDeployments() {
+            Project catalogProject = projectRepository.save(getProject("Catalog"));
+            Project connectedUserProject = projectRepository.save(getProject("ext"));
             Project project = projectRepository.save(getProject("project"));
 
-            saveProjectDeployment("__EMBEDDED__ext__DEVELOPMENT", catalogProject);
-            saveProjectDeployment("__EMBEDDED__ext", connectedUserProject);
+            ProjectDeployment referenceDeployment = saveProjectDeployment("ref", catalogProject);
+            ProjectDeployment connectedUserDeployment = saveProjectDeployment("user", connectedUserProject);
+
             saveProjectDeployment("deployment", project);
             saveProjectDeployment("xxEMBEDDEDyyext", project);
+
+            testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.EMBEDDED, referenceDeployment.getId());
+            testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.EMBEDDED, connectedUserDeployment.getId());
 
             assertThat(
                 projectDeploymentRepository.findAllProjectDeployments(true, null, null, null, workspace.getId()))
                     .extracting(ProjectDeployment::getName)
-                    .containsExactly("__EMBEDDED__ext", "__EMBEDDED__ext__DEVELOPMENT");
+                    .containsExactly("ref", "user");
             assertThat(
                 projectDeploymentRepository.findAllProjectDeployments(false, null, null, null, workspace.getId()))
                     .extracting(ProjectDeployment::getName)
                     .containsExactly("deployment", "xxEMBEDDEDyyext");
+        }
+
+        @Test
+        public void testFindAllProjectDeploymentsWithoutAnyFilterExcludesOwnedDeployments() {
+            Project project = projectRepository.save(getProject("project"));
+
+            ProjectDeployment mcpDeployment = saveProjectDeployment("mcp", project);
+
+            saveProjectDeployment("plain", project);
+
+            testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.MCP_SERVER, mcpDeployment.getId());
+
+            assertThat(projectDeploymentRepository.findAllProjectDeployments(null, null, null, null, null))
+                .extracting(ProjectDeployment::getName)
+                .containsExactly("plain");
         }
     }
 
@@ -116,7 +142,7 @@ public class ProjectDeploymentRepositoryIntTest {
             .build();
     }
 
-    private void saveProjectDeployment(String name, Project project) {
+    private ProjectDeployment saveProjectDeployment(String name, Project project) {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
@@ -124,6 +150,6 @@ public class ProjectDeploymentRepositoryIntTest {
         projectDeployment.setProjectId(project.getId());
         projectDeployment.setProjectVersion(1);
 
-        projectDeploymentRepository.save(projectDeployment);
+        return projectDeploymentRepository.save(projectDeployment);
     }
 }
