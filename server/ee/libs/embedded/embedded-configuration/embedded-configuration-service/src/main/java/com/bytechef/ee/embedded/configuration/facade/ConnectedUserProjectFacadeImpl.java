@@ -100,6 +100,8 @@ import org.springframework.transaction.annotation.Transactional;
 @SkipAutomationAuthorization
 public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacade {
 
+    private static final String NEW_WORKFLOW_LABEL = "New Workflow";
+
     private final AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -678,6 +680,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             projectWorkflow.getWorkflowId(), connectedUserProject.getProjectId(), environment.ordinal(), prompt,
             systemPrompt, allowedComponentNames);
 
+        nameUnnamedWorkflowFromPrompt(projectWorkflow.getWorkflowId(), prompt);
+
         return workflowUuid;
     }
 
@@ -1049,6 +1053,22 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         definitionMap.put("tasks", List.of());
 
         return JsonUtils.write(definitionMap);
+    }
+
+    private void nameUnnamedWorkflowFromPrompt(String workflowId, String prompt) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        String label = workflow.getLabel();
+
+        if (StringUtils.isNotBlank(label) && !Objects.equals(label, NEW_WORKFLOW_LABEL)) {
+            return;
+        }
+
+        Map<String, Object> definitionMap = new LinkedHashMap<>(JsonUtils.readMap(workflow.getDefinition()));
+
+        definitionMap.put("label", toWorkflowLabel(prompt));
+
+        workflowService.update(workflowId, JsonUtils.write(definitionMap), workflow.getVersion());
     }
 
     private static String toWorkflowLabel(String prompt) {
