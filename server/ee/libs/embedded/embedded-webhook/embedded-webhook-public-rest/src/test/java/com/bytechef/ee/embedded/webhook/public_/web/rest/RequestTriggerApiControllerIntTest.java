@@ -134,6 +134,32 @@ class RequestTriggerApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "user-1")
+    void testIntegrationWorkflowWithoutARequestTriggerIsRefusedWithAMessageNamingTheProblem() {
+        stubConnectedUser("user-1", 1L);
+        stubIntegrationWorkflow();
+
+        when(workflowService.getWorkflow("integration-wf-1"))
+            .thenReturn(
+                new Workflow(
+                    "{\"label\":\"Summarize\",\"triggers\":[{\"name\":\"newEmail\","
+                        + "\"type\":\"googleMail/v1/newEmailPolling\"}],\"tasks\":[]}",
+                    Workflow.Format.JSON));
+
+        webTestClient
+            .post()
+            .uri(WORKFLOW_PATH, "uuid-1")
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectBody(String.class)
+            .value(body -> Assertions.assertTrue(
+                body.contains("has no request trigger"), () -> "unexpected body: " + body));
+
+        verifyNoInteractions(webhookWorkflowExecutor);
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
     void testAutomationBridgeUnsupportedOperationExceptionReturnsNotFoundAndIsLoggedOnceAcrossTwoCalls() {
         stubConnectedUser("user-1", 1L);
 
