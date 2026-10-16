@@ -2926,6 +2926,8 @@ components:
         required:
           description: "Whether a value must be supplied."
           type: "boolean"
+        componentReference:
+          $ref: "#/components/schemas/ComponentInputReference"
         provided:
           description: "Whether the configuration provides the value of this input, so the connected user cannot set\
             \ it. The value itself is not returned."
