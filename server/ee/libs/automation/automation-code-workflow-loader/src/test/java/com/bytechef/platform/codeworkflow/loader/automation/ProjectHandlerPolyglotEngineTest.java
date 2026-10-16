@@ -36,6 +36,7 @@ import java.security.ProtectionDomain;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -133,30 +134,31 @@ class ProjectHandlerPolyglotEngineTest {
         )
         """;
 
-    private static final String SCRIPT_TASK_RUNNER_JAVASCRIPT_SOURCE = """
-        ({
-            name: 'test-project',
-            workflows: [
-                {
-                    name: 'my-workflow',
-                    tasks: [
-                        {
-                            name: 'my-task',
-                            perform: (context) => {
-                                const result = context.component.script.python({
-                                    script: "def perform(input, context):\\n    return {'doubled': input['value'] * 2}\\n",
-                                    input: {value: 21},
-                                    taskRunner: {type: 'process'}
-                                });
+    private static final String SCRIPT_TASK_RUNNER_JAVASCRIPT_SOURCE =
+        """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'my-task',
+                                perform: (context) => {
+                                    const result = context.component.script.python({
+                                        script: "def perform(input, context):\\n    return {'doubled': input['value'] * 2}\\n",
+                                        input: {value: 21},
+                                        taskRunner: {type: 'process'}
+                                    });
 
-                                return result.vars.doubled;
+                                    return result.vars.doubled;
+                                }
                             }
-                        }
-                    ]
-                }
-            ]
-        })
-        """;
+                        ]
+                    }
+                ]
+            })
+            """;
 
     private static final String SCRIPT_TASK_RUNNER_PYTHON_SOURCE = """
         def double(context):
@@ -700,6 +702,32 @@ class ProjectHandlerPolyglotEngineTest {
 
         assertTrue(taskDefinition.getConnections()
             .isEmpty());
+    }
+
+    @Test
+    void testLoadParsesAnInputThatReferencesAComponentInput() {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        inputs: [{name: 'channel', componentName: 'slack', componentVersion: 1, groupName: 'channel'}],
+                        tasks: [{name: 'post', perform: () => 'c'}]
+                    }
+                ]
+            })
+            """;
+
+        Input input = ProjectHandlerPolyglotEngine.load("js", source)
+            .getDefinition()
+            .getWorkflows()
+            .getFirst()
+            .getInputs()
+            .orElseThrow()
+            .getFirst();
+
+        assertEquals(Optional.of(new Input.ComponentInputReference("slack", 1, "channel")), input.getComponentInput());
     }
 
     @Test
