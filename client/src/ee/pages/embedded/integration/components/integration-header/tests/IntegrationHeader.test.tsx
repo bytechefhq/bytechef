@@ -34,7 +34,7 @@ vi.mock('@/ee/pages/embedded/integration/components/integration-header/component
     default: ({itemSelect}: {itemSelect: React.ReactNode}) => <nav>{itemSelect}</nav>,
 }));
 
-vi.mock('@/ee/pages/embedded/integration/components/integration-header/components/WorkflowActionsButton', () => ({
+vi.mock('@/pages/platform/workflow-editor/components/WorkflowActionsButton', () => ({
     default: () => <button>Test</button>,
 }));
 
