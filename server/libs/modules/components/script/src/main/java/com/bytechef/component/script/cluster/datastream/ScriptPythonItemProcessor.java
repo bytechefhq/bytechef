@@ -45,11 +45,11 @@ public class ScriptPythonItemProcessor {
                         .defaultValue(
                             """
                                 def perform(input, context):
-                                    # input holds the values defined in the Input panel (top right of this editor).
+                                    # input.item holds the item being processed.
                                     #
                                     # Reach another component's action through the context:
                                     # response = context.component.httpClient.get(
-                                    #     {"uri": "https://api.example.com/items"}, "my-connection")
+                                    #     {"uri": "https://api.example.com/items"})
 
                                     return None""")
                         .required(true)),
