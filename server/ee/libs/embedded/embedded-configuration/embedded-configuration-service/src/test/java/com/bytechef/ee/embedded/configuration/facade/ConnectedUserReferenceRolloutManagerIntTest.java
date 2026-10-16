@@ -1733,7 +1733,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testRollOutLeavesAMarkerDeploymentWithoutAConnectedUserReferenceDeploymentRelationAlone() {
+    void testRollOutLeavesALegacyNamedMarkerDeploymentWithoutAConnectedUserReferenceDeploymentRelationAlone() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Marker Without Relation");
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -1754,7 +1754,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testDeleteReferenceDeploymentsLeavesMarkerDeploymentsWithoutARelationAndAdminDeploymentsAlone() {
+    void testDeleteReferenceDeploymentsLeavesLegacyNamedMarkerDeploymentsWithoutARelationAndAdminDeploymentsAlone() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Marker Deployment");
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -1793,7 +1793,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testRollOutDeploymentIfBehindReturnsFalseForAMarkerDeploymentWithoutReferences() {
+    void testRollOutDeploymentIfBehindReturnsFalseForALegacyNamedMarkerDeploymentWithoutReferences() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Lazy Marker");
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
