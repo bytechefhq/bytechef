@@ -30,6 +30,7 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -155,6 +156,24 @@ public class ProjectOwnershipServiceIntTest {
                     .isEqualTo(Set.of(catalogProjectId, connectedUserProjectId));
         assertThat(
             projectOwnershipService.getOwnedProjectIds(List.of(catalogProjectId), Set.of())).isEmpty();
+    }
+
+    @Test
+    public void testGetOwnedProjectIdsHandlesMoreIdsThanOneChunk() {
+        long ownedProjectId = saveProject("p1");
+
+        testOwnerContributors.addCatalogId(ownedProjectId);
+
+        List<Long> projectIds = new ArrayList<>();
+
+        for (long projectId = ownedProjectId + 1; projectId <= ownedProjectId + 2499; projectId++) {
+            projectIds.add(projectId);
+        }
+
+        projectIds.add(1500, ownedProjectId);
+
+        assertThat(projectOwnershipService.getOwnedProjectIds(projectIds, ProjectOwner.EMBEDDED_CATALOG))
+            .isEqualTo(Set.of(ownedProjectId));
     }
 
     @Test

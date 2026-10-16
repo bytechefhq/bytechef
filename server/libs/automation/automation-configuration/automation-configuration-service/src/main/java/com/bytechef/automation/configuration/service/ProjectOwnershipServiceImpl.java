@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProjectOwnershipServiceImpl implements ProjectOwnershipService {
 
+    private static final int CHUNK_SIZE = 1000;
     private static final String MATCH_EVERYTHING = "1 = 1";
     private static final String MATCH_NOTHING = "1 = 0";
 
@@ -109,13 +110,28 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService {
             return Set.of();
         }
 
-        return new HashSet<>(
-            jdbcClient
-                .sql("SELECT project.id FROM project WHERE project.id IN (:ids) AND (" +
-                    String.join(" OR ", conditions) + ")")
-                .param("ids", projectIds)
-                .query(Long.class)
-                .list());
+        String query = "SELECT project.id FROM project WHERE project.id IN (:ids) AND (" +
+            String.join(" OR ", conditions) + ")";
+
+        Set<Long> ownedProjectIds = new HashSet<>();
+
+        List<Long> distinctProjectIds = projectIds.stream()
+            .distinct()
+            .toList();
+
+        for (int fromIndex = 0; fromIndex < distinctProjectIds.size(); fromIndex += CHUNK_SIZE) {
+            List<Long> projectIdsChunk = distinctProjectIds.subList(
+                fromIndex, Math.min(fromIndex + CHUNK_SIZE, distinctProjectIds.size()));
+
+            ownedProjectIds.addAll(
+                jdbcClient
+                    .sql(query)
+                    .param("ids", projectIdsChunk)
+                    .query(Long.class)
+                    .list());
+        }
+
+        return ownedProjectIds;
     }
 
     private static String exclude(List<String> conditions) {
