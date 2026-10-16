@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -111,6 +112,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -864,6 +866,60 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                         .isEqualTo(getWorkflowId(automationWorkflowProjectId, 2, workflowUuid));
                     assertThat(row.isEnabled()).isTrue();
                 });
+    }
+
+    @Test
+    void testRollOutLogsAnOptimisticLockingFailureAtWarnAndOtherFailuresAtError() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Failure Log Levels");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        String concurrentExternalUserId = createConnectedUser();
+        String failingExternalUserId = createConnectedUser();
+
+        ConnectedUserProjectWorkflow concurrentReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            concurrentExternalUserId, workflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow failingReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            failingExternalUserId, workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        ConnectedUser concurrentConnectedUser = connectedUserService.getConnectedUser(
+            concurrentExternalUserId, Environment.PRODUCTION);
+        ConnectedUser failingConnectedUser = connectedUserService.getConnectedUser(
+            failingExternalUserId, Environment.PRODUCTION);
+
+        when(connectedUserConnectionFacade.getConnections(concurrentConnectedUser.getId(), "slack", List.of()))
+            .thenThrow(new IllegalStateException(
+                "Failed to execute DbAction", new OptimisticLockingFailureException("Row was updated concurrently")));
+        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+            .thenThrow(new IllegalStateException("Connection lookup failed"));
+
+        ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
+
+        try {
+            connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+
+            assertThat(appender.list)
+                .extracting(ILoggingEvent::getLevel, ILoggingEvent::getFormattedMessage)
+                .containsExactlyInAnyOrder(
+                    tuple(
+                        Level.WARN,
+                        ("Rolling out automation workflow project id=%d to deployment id=%d lost a concurrent update; "
+                            +
+                            "it will converge on the next publish or enable")
+                                .formatted(automationWorkflowProjectId, concurrentReference.getProjectDeploymentId())),
+                    tuple(
+                        Level.ERROR,
+                        "Rolling out automation workflow project id=%d to deployment id=%d failed"
+                            .formatted(automationWorkflowProjectId, failingReference.getProjectDeploymentId())));
+        } finally {
+            detachAppenderFromRolloutManagerLogger(appender);
+        }
     }
 
     @Test
