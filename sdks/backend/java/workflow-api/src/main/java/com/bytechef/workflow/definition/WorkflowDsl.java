@@ -193,10 +193,6 @@ public class WorkflowDsl {
             this.name = name;
         }
 
-        /**
-         * Takes the input's options from the input group {@code groupName} of the component {@code componentName} at
-         * {@code componentVersion}, for example {@code component("slack", 1, "channel")}.
-         */
         public ModifiableInput component(String componentName, int componentVersion, String groupName) {
             this.componentInput = new ComponentInputReference(componentName, componentVersion, groupName);
 

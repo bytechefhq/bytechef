@@ -14,6 +14,9 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -43,6 +46,8 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.Authorization;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
@@ -104,6 +109,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         AuthorizationType.OAUTH2_AUTHORIZATION_CODE, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE,
         AuthorizationType.OAUTH2_IMPLICIT_CODE);
 
+    private static final Logger log = LoggerFactory.getLogger(IntegrationInstanceConfigurationFacadeImpl.class);
+
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
@@ -131,7 +138,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
-        ConnectionService connectionService, EnvironmentService environmentService,
+        ConnectionService connectionService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
+        EnvironmentService environmentService, PlatformTransactionManager platformTransactionManager,
         PrincipalJobFacade principalJobFacade,
         PrincipalJobService principalJobService, JobFacade jobFacade,
         IntegrationInstanceConfigurationDTOAssembler integrationInstanceConfigurationDTOAssembler,
@@ -1365,29 +1373,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
 
-    /**
-     * The required connections an administrator sets in the instance configuration: those of the workflow's triggers
-     * and tasks, except the integration's own component, which runs on the connected user's integration connection.
-     */
     private List<ComponentConnection> getRequiredAdminComponentConnections(Integration integration, String workflowId) {
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        return CollectionUtils.concat(
-            WorkflowTrigger.of(workflow)
-                .stream()
-                .flatMap(workflowTrigger -> CollectionUtils.stream(
-                    componentConnectionFacade.getComponentConnections(workflowTrigger)))
-                .toList(),
-            workflow.getTasks(true)
-                .stream()
-                .flatMap(workflowTask -> CollectionUtils.stream(
-                    componentConnectionFacade.getComponentConnections(workflowTask)))
-                .toList())
-            .stream()
-            .filter(ComponentConnection::required)
-            .filter(componentConnection -> !Objects.equals(
-                componentConnection.componentName(), integration.getComponentName()))
-            .toList();
+        return getRequiredComponentConnections(workflowService.getWorkflow(workflowId), integration);
     }
 
     private IntegrationInstanceConfigurationWorkflow doEnableIntegrationInstanceConfigurationWorkflow(
