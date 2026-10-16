@@ -5,14 +5,14 @@ interface IntegrationInstanceConfigurationOptionI {
 
 interface WorkflowExecutionsFiltersParamsI {
     automations: number;
-    connectedUserProjects?: Array<{connectedUser: {externalId: string}; projectId: number | string}>;
+    connectedUserId?: number;
+    connectedUserProjects?: Array<{connectedUser: {externalId: string; id: number | string}}>;
     endDate?: Date;
     integrationId?: number;
     integrationInstanceConfiguration?: IntegrationInstanceConfigurationOptionI;
     integrationInstanceConfigurationId?: number;
     integrationInstanceConfigurations?: IntegrationInstanceConfigurationOptionI[];
     integrations?: Array<{componentName?: string; id?: number}>;
-    projectId?: number;
     startDate?: Date;
     status?: string;
     workflowId?: string;
@@ -21,6 +21,7 @@ interface WorkflowExecutionsFiltersParamsI {
 
 export const getWorkflowExecutionsFilters = ({
     automations,
+    connectedUserId,
     connectedUserProjects,
     endDate,
     integrationId,
@@ -28,7 +29,6 @@ export const getWorkflowExecutionsFilters = ({
     integrationInstanceConfigurationId,
     integrationInstanceConfigurations,
     integrations,
-    projectId,
     startDate,
     status,
     workflowId,
@@ -40,14 +40,14 @@ export const getWorkflowExecutionsFilters = ({
     let workflowLabel: string | undefined;
 
     if (automations) {
-        if (projectId) {
+        if (connectedUserId) {
             const connectedUserProject = connectedUserProjects?.find(
-                (connectedUserProject) => +connectedUserProject.projectId === projectId
+                (connectedUserProject) => +connectedUserProject.connectedUser.id === connectedUserId
             );
 
             connectedUserLabel = connectedUserProject
                 ? `User ${connectedUserProject.connectedUser.externalId}`
-                : String(projectId);
+                : String(connectedUserId);
         }
     } else {
         if (integrationId) {
