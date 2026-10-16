@@ -1,4 +1,4 @@
-import {act, renderHook} from '@testing-library/react';
+import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useKnowledgeBase from '../useKnowledgeBase';
@@ -19,13 +19,11 @@ const hoisted = vi.hoisted(() => {
                 overlap: 200,
             },
         },
-        navigate: vi.fn(),
         paramId: 'kb-1',
     };
 });
 
 vi.mock('react-router-dom', () => ({
-    useNavigate: vi.fn(() => hoisted.navigate),
     useParams: vi.fn(() => ({id: hoisted.paramId})),
 }));
 
@@ -129,18 +127,6 @@ describe('useKnowledgeBase', () => {
             const {result} = renderHook(() => useKnowledgeBase());
 
             expect(result.current.documents).toEqual([]);
-        });
-    });
-
-    describe('handleBackClick', () => {
-        it('navigates to knowledge bases list', () => {
-            const {result} = renderHook(() => useKnowledgeBase());
-
-            act(() => {
-                result.current.handleBackClick();
-            });
-
-            expect(hoisted.navigate).toHaveBeenCalledWith('/automation/knowledge-bases');
         });
     });
 
