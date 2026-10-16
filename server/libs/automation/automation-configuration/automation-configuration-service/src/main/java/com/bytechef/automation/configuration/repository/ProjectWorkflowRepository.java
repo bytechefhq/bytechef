@@ -39,6 +39,8 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
 
     List<ProjectWorkflow> findAllByProjectIdAndUuid(Long projectId, UUID uuid);
 
+    List<ProjectWorkflow> findAllByUuid(UUID uuid);
+
     List<ProjectWorkflow> findAllByProjectIdIn(List<Long> projectIds);
 
     List<ProjectWorkflow> findAllByWorkflowIdIn(List<String> workflowIds);

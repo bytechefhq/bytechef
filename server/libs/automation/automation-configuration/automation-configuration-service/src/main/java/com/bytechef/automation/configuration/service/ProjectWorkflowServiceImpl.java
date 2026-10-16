@@ -183,6 +183,19 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public List<ProjectWorkflow> getWorkflowUuidProjectWorkflows(String workflowUuid) {
+        UUID uuid;
+
+        try {
+            uuid = UUID.fromString(workflowUuid);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return List.of();
+        }
+
+        return projectWorkflowRepository.findAllByUuid(uuid);
+    }
+
+    @Override
     public void delete(long projectId, int projectVersion, String workflowId) {
         projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowId(projectId, projectVersion, workflowId)
             .ifPresent(projectWorkflow -> projectWorkflowRepository.deleteById(projectWorkflow.getId()));
