@@ -1,5 +1,7 @@
-import {PropsWithChildren, ReactNode} from 'react';
+import {PropsWithChildren, ReactNode, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+
+import LeftSidebarToggleContext, {useLeftSidebarToggle} from './LeftSidebarToggleContext';
 
 interface SidebarContentLayoutProps {
     className?: string;
@@ -42,7 +44,7 @@ const LayoutContainer = ({
     leftSidebarBody,
     leftSidebarClass,
     leftSidebarHeader,
-    leftSidebarOpen = true,
+    leftSidebarOpen,
     leftSidebarWidth = '64',
     rightSidebarBody,
     rightSidebarClass,
@@ -54,63 +56,104 @@ const LayoutContainer = ({
     rightToolbarOpen = false,
     topHeader,
 }: PropsWithChildren<SidebarContentLayoutProps>) => {
+    // Uncontrolled by default so the header's toggle works on any page with a sidebar without that page
+    // owning the state. A page that passes leftSidebarOpen keeps full control.
+    const [uncontrolledLeftSidebarOpen, setUncontrolledLeftSidebarOpen] = useState(true);
+
+    const parentLeftSidebarToggle = useLeftSidebarToggle();
+
+    const isLeftSidebarControlled = leftSidebarOpen !== undefined;
+    const leftSidebarIsOpen = isLeftSidebarControlled ? leftSidebarOpen : uncontrolledLeftSidebarOpen;
+
+    const [leftAsideMounted, setLeftAsideMounted] = useState(leftSidebarIsOpen);
+
+    const ownLeftSidebarToggle = useMemo(
+        () => ({
+            hasLeftSidebar: !!leftSidebarBody && !isLeftSidebarControlled,
+            leftSidebarOpen: leftSidebarIsOpen,
+            toggleLeftSidebar: () => setUncontrolledLeftSidebarOpen((open) => !open),
+        }),
+        [isLeftSidebarControlled, leftSidebarBody, leftSidebarIsOpen]
+    );
+
+    // A LayoutContainer with no sidebar of its own must not shadow an outer one's toggle: every Settings page
+    // renders into the Settings layout's Outlet with its own sidebar-less LayoutContainer.
+    const leftSidebarToggle = leftSidebarBody ? ownLeftSidebarToggle : parentLeftSidebarToggle;
+
+    // Keep the left sidebar mounted for 300ms after it closes so it can slide out before unmounting.
+    useEffect(() => {
+        if (leftSidebarIsOpen) {
+            setLeftAsideMounted(true);
+
+            return;
+        }
+
+        const timerId = setTimeout(() => setLeftAsideMounted(false), 300);
+
+        return () => clearTimeout(timerId);
+    }, [leftSidebarIsOpen]);
+
     return (
-        <div className={twMerge('size-full overflow-auto', className)}>
-            {leftSidebarOpen && (
-                <aside
+        <LeftSidebarToggleContext.Provider value={leftSidebarToggle}>
+            <div className={twMerge('size-full overflow-auto', className)}>
+                {leftAsideMounted && (
+                    <aside
+                        className={twMerge(
+                            'hidden border-r border-r-border/50 bg-muted/50 lg:flex lg:flex-col',
+                            'lg:fixed lg:inset-y-0',
+                            'transition-transform duration-300 ease-in-out',
+                            leftSidebarIsOpen ? 'lg:translate-x-0' : 'lg:-translate-x-full',
+                            leftSidebarClass,
+                            leftSidebarWidths[leftSidebarWidth][0]
+                        )}
+                    >
+                        <nav className="flex h-full flex-col">
+                            {leftSidebarHeader}
+
+                            <div className="size-full overflow-y-auto px-2 pb-4">{leftSidebarBody}</div>
+                        </nav>
+                    </aside>
+                )}
+
+                <div
                     className={twMerge(
-                        'hidden border-r border-r-border/50 bg-muted/50 lg:flex lg:flex-col',
-                        'lg:fixed lg:inset-y-0',
-                        leftSidebarClass,
-                        leftSidebarWidths[leftSidebarWidth][0]
+                        'size-full transition-[padding] duration-300 ease-in-out',
+                        topHeader && 'flex flex-col',
+                        leftSidebarIsOpen && leftSidebarWidths[leftSidebarWidth][1]
                     )}
                 >
-                    <nav className="flex h-full flex-col">
-                        {leftSidebarHeader}
+                    {topHeader}
 
-                        <div className="size-full overflow-y-auto px-2 pb-4">{leftSidebarBody}</div>
-                    </nav>
-                </aside>
-            )}
+                    <div className="flex size-full">
+                        <main className="flex size-full flex-col">
+                            {header}
 
-            <div
-                className={twMerge(
-                    'size-full',
-                    topHeader && 'flex flex-col',
-                    leftSidebarOpen && leftSidebarWidths[leftSidebarWidth][1]
-                )}
-            >
-                {topHeader}
+                            <div className="flex flex-1 overflow-y-auto">{children}</div>
 
-                <div className="flex size-full">
-                    <main className="flex size-full flex-col">
-                        {header}
+                            {footer}
+                        </main>
 
-                        <div className="flex flex-1 overflow-y-auto">{children}</div>
+                        {rightSidebarOpen && !!rightSidebarBody && (
+                            <aside className={twMerge('hidden lg:flex lg:shrink-0', rightSidebarClass)}>
+                                <div className={twMerge('flex', rightSidebarWidths[rightSidebarWidth])}>
+                                    <div className="flex h-full flex-1 flex-col">
+                                        {rightSidebarHeader}
 
-                        {footer}
-                    </main>
-
-                    {rightSidebarOpen && !!rightSidebarBody && (
-                        <aside className={twMerge('hidden lg:flex lg:shrink-0', rightSidebarClass)}>
-                            <div className={twMerge('flex', rightSidebarWidths[rightSidebarWidth])}>
-                                <div className="flex h-full flex-1 flex-col">
-                                    {rightSidebarHeader}
-
-                                    {rightSidebarBody}
+                                        {rightSidebarBody}
+                                    </div>
                                 </div>
-                            </div>
-                        </aside>
-                    )}
+                            </aside>
+                        )}
 
-                    {rightToolbarOpen && !!rightToolbarBody && (
-                        <aside className={twMerge('hidden lg:flex lg:shrink-0', rightToolbarClass)}>
-                            <div className="flex flex-1 flex-col overflow-y-auto">{rightToolbarBody}</div>
-                        </aside>
-                    )}
+                        {rightToolbarOpen && !!rightToolbarBody && (
+                            <aside className={twMerge('hidden lg:flex lg:shrink-0', rightToolbarClass)}>
+                                <div className="flex flex-1 flex-col overflow-y-auto">{rightToolbarBody}</div>
+                            </aside>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </LeftSidebarToggleContext.Provider>
     );
 };
 

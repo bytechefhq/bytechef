@@ -1,7 +1,15 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import DataTables from '../DataTables';
+
+const renderDataTables = () =>
+    render(
+        <TooltipProvider>
+            <DataTables />
+        </TooltipProvider>
+    );
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -71,7 +79,7 @@ describe('DataTables', () => {
                 tables: [],
             });
 
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.queryByTestId('data-table-list')).not.toBeInTheDocument();
         });
@@ -84,7 +92,7 @@ describe('DataTables', () => {
                 error: new Error('Failed to fetch tables'),
             });
 
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.getByText('Some error occurred.')).toBeInTheDocument();
         });
@@ -92,32 +100,32 @@ describe('DataTables', () => {
 
     describe('data table list', () => {
         it('should render page title', () => {
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.getByText('Data Tables')).toBeInTheDocument();
         });
 
         it('should render DataTableList component', () => {
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.getByTestId('data-table-list')).toBeInTheDocument();
         });
 
         it('should render tables', () => {
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.getByText('Table1')).toBeInTheDocument();
             expect(screen.getByText('Table2')).toBeInTheDocument();
         });
 
         it('should render CreateDataTableDialog trigger', () => {
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.getByTestId('create-dialog-trigger')).toBeInTheDocument();
         });
 
         it('should render left sidebar nav', () => {
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.getByTestId('left-sidebar-nav')).toBeInTheDocument();
         });
@@ -127,7 +135,7 @@ describe('DataTables', () => {
         it('should render empty state when no tables', () => {
             hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn, filteredTables: [], tables: []});
 
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.getByText('No Data Tables')).toBeInTheDocument();
             expect(screen.getByText('Get started by creating a new data table.')).toBeInTheDocument();
@@ -136,7 +144,7 @@ describe('DataTables', () => {
         it('should render empty state with tag filter message', () => {
             hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn, filteredTables: [], tagId: 1});
 
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.getByText('No Matching Tables')).toBeInTheDocument();
             expect(screen.getByText('No data tables match the selected tag.')).toBeInTheDocument();
