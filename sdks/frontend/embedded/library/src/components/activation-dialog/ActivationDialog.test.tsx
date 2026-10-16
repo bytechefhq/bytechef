@@ -56,6 +56,7 @@ const respond = (status: number, body: unknown) => ({
 
 let connections: Array<{componentName: string; id: number; name: string}> = [];
 let connectionsStatus = 200;
+let slackIntegrationInstances: Array<{connectionId?: number; credentialStatus: string; id: number}> = [];
 let deprovisionStatus = 200;
 let provisionGate: Promise<void> | undefined;
 let enableResponse: {body: unknown; status: number} = {body: {}, status: 200};
@@ -71,6 +72,10 @@ const installFetch = () => {
 
         if (url.endsWith('/automation/projects')) {
             return respond(200, projects);
+        }
+
+        if (url.endsWith('/integrations/5') && method === 'GET') {
+            return respond(200, {id: 5, integrationInstances: slackIntegrationInstances});
         }
 
         if (url.includes('/components/slack/connections')) {
@@ -120,6 +125,7 @@ describe('ActivationDialog', () => {
         calls.length = 0;
         connections = [];
         connectionsStatus = 200;
+        slackIntegrationInstances = [];
         deprovisionStatus = 200;
         provisionGate = undefined;
         enableResponse = {body: {}, status: 200};
@@ -203,8 +209,9 @@ describe('ActivationDialog', () => {
         connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
 
         const onActivated = vi.fn();
+        const onClose = vi.fn();
 
-        renderDialog({onActivated});
+        renderDialog({onActivated, onClose});
 
         const row = await screen.findByTestId('connect-row-slack');
 
@@ -226,7 +233,8 @@ describe('ActivationDialog', () => {
         expect(JSON.parse(provision!.body!)).toEqual({connections: {slack: 9}, inputs: {channel: '#general'}});
         expect(enable!.body).toBeUndefined();
         expect(calls.indexOf(provision!)).toBeLessThan(calls.indexOf(enable!));
-        expect(screen.getByRole('button', {name: 'Done'})).toBeInTheDocument();
+        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(screen.queryByRole('button', {name: 'Done'})).not.toBeInTheDocument();
     });
 
     it('returns to Connect and highlights the component the server reports missing, after deprovisioning', async () => {
@@ -348,11 +356,13 @@ describe('ActivationDialog', () => {
             throw new Error('host bug');
         });
 
-        renderDialog({onActivated, workflowTemplateId: 'wf-plain'});
+        const onClose = vi.fn();
+
+        renderDialog({onActivated, onClose, workflowTemplateId: 'wf-plain'});
 
         await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
 
-        expect(await screen.findByRole('button', {name: 'Done'})).toBeInTheDocument();
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
         expect(onActivated).toHaveBeenCalledWith('wf-plain');
         expect(calls.some(isDeprovision)).toBe(false);
         expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -365,7 +375,9 @@ describe('ActivationDialog', () => {
             releaseProvision = resolve;
         });
 
-        renderDialog({workflowTemplateId: 'wf-plain'});
+        const onClose = vi.fn();
+
+        renderDialog({onClose, workflowTemplateId: 'wf-plain'});
 
         const activateButton = await screen.findByRole('button', {name: 'Activate'});
 
@@ -377,7 +389,7 @@ describe('ActivationDialog', () => {
 
         await act(async () => releaseProvision());
 
-        expect(await screen.findByRole('button', {name: 'Done'})).toBeInTheDocument();
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
         expect(calls.filter((call) => call.url.endsWith('/provision') && call.method === 'POST')).toHaveLength(1);
     });
 
@@ -570,5 +582,40 @@ describe('ActivationDialog', () => {
         const footer = await screen.findByRole('contentinfo');
 
         expect(within(footer).getByText(/Powered by/)).toBeInTheDocument();
+    });
+    describe('Connect', () => {
+        it('is offered while the user has not connected the integration', async () => {
+            renderDialog({workflowTemplateId: 'wf-slack'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            expect(await within(row).findByRole('button', {name: 'Connect'})).toBeInTheDocument();
+        });
+
+        it('is hidden once the user has a working connection through the integration', async () => {
+            connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
+            slackIntegrationInstances = [{connectionId: 9, credentialStatus: 'VALID', id: 3}];
+
+            renderDialog({workflowTemplateId: 'wf-slack'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            await within(row).findByRole('option', {name: 'Team Slack'});
+
+            await waitFor(() => expect(within(row).queryByRole('button', {name: 'Connect'})).not.toBeInTheDocument());
+        });
+
+        it('stays offered when the integration connection needs to be reauthorized', async () => {
+            connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
+            slackIntegrationInstances = [{connectionId: 9, credentialStatus: 'INVALID', id: 3}];
+
+            renderDialog({workflowTemplateId: 'wf-slack'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            await waitFor(() => expect(calls.some((call) => call.url.endsWith('/integrations/5'))).toBe(true));
+
+            expect(within(row).getByRole('button', {name: 'Connect'})).toBeInTheDocument();
+        });
     });
 });
