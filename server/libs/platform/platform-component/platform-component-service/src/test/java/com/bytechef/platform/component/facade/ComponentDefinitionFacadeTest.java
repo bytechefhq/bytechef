@@ -156,6 +156,8 @@ class ComponentDefinitionFacadeTest {
                 .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
             assertThatThrownBy(() -> securedFacade.getComponentDefinition("slack", 1))
                 .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+            assertThatThrownBy(() -> securedFacade.fetchComponentDefinition("slack", null))
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
 
             verify(componentDefinitionService, never()).getComponentDefinitions();
         }

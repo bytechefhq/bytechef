@@ -18,7 +18,7 @@ package com.bytechef.platform.ai.tool.util;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -36,7 +36,8 @@ import org.springframework.ai.chat.model.ToolContext;
 
 /**
  * Applies the per-run component allow-list carried in a Spring AI {@link ToolContext}. A run without the allow-list is
- * unrestricted.
+ * unrestricted. A workflow definition is rejected only for referenced components that are outside the list and require
+ * a connection.
  *
  * @author Ivica Cardic
  */
@@ -103,7 +104,7 @@ public final class AllowedComponentNamesUtils {
 
     public static List<String> getDisallowedComponentNames(
         @Nullable String definition, @Nullable ToolContext toolContext,
-        ComponentDefinitionService componentDefinitionService) {
+        ComponentDefinitionFacade componentDefinitionFacade) {
 
         Set<String> allowedComponentNames = getAllowedComponentNames(toolContext);
 
@@ -128,22 +129,22 @@ public final class AllowedComponentNamesUtils {
 
         collectReferencedComponentNames(definitionObject, referencedComponentNames);
 
+        referencedComponentNames.removeAll(allowedComponentNames);
+
+        if (referencedComponentNames.isEmpty()) {
+            return List.of();
+        }
+
         List<String> disallowedComponentNames = new ArrayList<>();
 
         for (String componentName : referencedComponentNames) {
-            if (allowedComponentNames.contains(componentName)) {
-                continue;
-            }
-
             Optional<ComponentDefinition> componentDefinitionOptional =
-                componentDefinitionService.fetchComponentDefinition(componentName, null);
+                componentDefinitionFacade.fetchComponentDefinition(componentName, null);
 
-            if (componentDefinitionOptional.isPresent()) {
-                ComponentDefinition componentDefinition = componentDefinitionOptional.get();
+            if (componentDefinitionOptional.map(ComponentDefinition::isConnectionRequired)
+                .orElse(false)) {
 
-                if (componentDefinition.isConnectionRequired()) {
-                    disallowedComponentNames.add(componentName);
-                }
+                disallowedComponentNames.add(componentName);
             }
         }
 

@@ -31,7 +31,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -79,7 +79,7 @@ public class ProjectWorkflowTools {
     private static final String PERSISTED_WORKFLOW_CAPTURE_KEY = "bytechef.workflowEditor.persistedWorkflows";
     private static final String DEFAULT_WORKFLOW_NAME = "Workflow";
 
-    private final ComponentDefinitionService componentDefinitionService;
+    private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ProjectFacade projectFacade;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ScopedProjectGuard scopedProjectGuard;
@@ -88,12 +88,12 @@ public class ProjectWorkflowTools {
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowTools(
-        ComponentDefinitionService componentDefinitionService, ProjectFacade projectFacade,
+        ComponentDefinitionFacade componentDefinitionFacade, ProjectFacade projectFacade,
         ProjectWorkflowFacade projectWorkflowFacade, ScopedProjectGuard scopedProjectGuard,
         WorkspaceConnectionFacade workspaceConnectionFacade,
         WorkspaceFacade workspaceFacade) {
 
-        this.componentDefinitionService = componentDefinitionService;
+        this.componentDefinitionFacade = componentDefinitionFacade;
         this.projectFacade = projectFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.scopedProjectGuard = scopedProjectGuard;
@@ -102,7 +102,7 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
+        description = "Get comprehensive information about a specific workflow. Returns detailed workflow information including id, name, description, version, definition, project workflow id, created date, last modified date.")
     public WorkflowInfo getWorkflow(
         @ToolParam(description = "The ID of the workflow to retrieve") String workflowId, ToolContext toolContext) {
 
@@ -163,7 +163,7 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Full-text search across the workflows of a workspace's projects. Returns a list of workflows matching the search query in name or description. An empty list means nothing matched; a project outside the workspace, or an invocation whose workspace cannot be resolved, is reported as an error instead.")
+        description = "Full-text search across the workflows of a workspace's projects. Returns a list of workflows matching the search query in name or description. An empty list means nothing matched; a project outside the workspace, or an invocation whose workspace cannot be resolved, is reported as an error instead. In an embedded chat confined to one project, only that project is searched, workspaceId is ignored, and any other projectId is an error.")
     public List<WorkflowInfo> searchWorkflows(
         @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
         @ToolParam(required = false, description = "The ID of the project") Long projectId,
@@ -442,7 +442,7 @@ public class ProjectWorkflowTools {
         ProjectWorkflowErrorType projectWorkflowErrorType) {
 
         List<String> disallowedComponentNames = AllowedComponentNamesUtils.getDisallowedComponentNames(
-            definition, toolContext, componentDefinitionService);
+            definition, toolContext, componentDefinitionFacade);
 
         if (!disallowedComponentNames.isEmpty()) {
             throw new ExecutionException(
