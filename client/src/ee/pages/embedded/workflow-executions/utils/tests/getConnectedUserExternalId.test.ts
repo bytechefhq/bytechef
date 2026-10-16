@@ -18,6 +18,14 @@ describe('getConnectedUserExternalId', () => {
         expect(getConnectedUserExternalId('__EMBEDDED__acme__user')).toBe('acme__user');
     });
 
+    it('keeps a plain external id ending in an environment suffix', () => {
+        expect(getConnectedUserExternalId('acme__PRODUCTION')).toBe('acme__PRODUCTION');
+    });
+
+    it('returns a plain external id unchanged', () => {
+        expect(getConnectedUserExternalId('acme')).toBe('acme');
+    });
+
     it('returns undefined when the name is missing', () => {
         expect(getConnectedUserExternalId(undefined)).toBeUndefined();
         expect(getConnectedUserExternalId('')).toBeUndefined();
