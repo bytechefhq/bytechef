@@ -575,10 +575,13 @@ public class CopilotConfiguration {
     @Bean
     ChatClient workflowEditorBuildSubAgentChatClient(
         ChatModel chatModel, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools,
-        ScriptTools scriptTools) {
+        ScriptTools scriptTools,
+        @Value("classpath:prompt_workflow_editor_build_sub_agent.txt") Resource promptWorkflowEditorBuildSubAgentResource) {
 
         return ChatClient.builder(chatModel)
-            .defaultSystem(getSystemPrompt(promptWorkflowEditorBuildResource))
+            .defaultSystem(
+                getSystemPrompt(promptWorkflowEditorBuildResource) + "\n\n" +
+                    getSystemPrompt(promptWorkflowEditorBuildSubAgentResource))
             .defaultTools(
                 projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
                 workflowInstructionTools)

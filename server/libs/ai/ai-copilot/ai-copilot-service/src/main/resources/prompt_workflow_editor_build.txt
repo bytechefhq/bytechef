@@ -59,14 +59,9 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
    whole workflow. After creating, call `getWorkflow(workflowId)` and confirm the persisted
    definition actually contains the intended trigger + tasks; only then treat it as built.
 
-   REQUIRED — report the ids back: whenever you CREATE or EDIT a workflow, END your response with the
-   workflow's identifiers on their own line, in exactly this form, so the calling agent can open it and
-   attach it as an artifact to the task:
-   `workflowId: <id> | projectId: <id> | projectWorkflowId: <id>`
-   Take `projectId` from the project you created/used, and `workflowId` + `projectWorkflowId` from the
-   `createProjectWorkflow` result (or `getWorkflow` for an edit). Use the REAL ids — never invent or omit
-   any of the three. Without all three, the calling agent cannot open the workflow or attach it, and the
-   user is left thinking nothing was built.
+   Do NOT put internal identifiers (workflowId, projectId, projectWorkflowId, connection ids, node
+   ids) in your reply — the user reads it in the chat and cannot use them. Refer to the workflow by its
+   label and to steps by their titles.
 
 ## Interactive input — use the pickers instead of guessing
 
