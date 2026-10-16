@@ -18,8 +18,9 @@ export const useGetConnectedUserQuery = (id: number, enabled?: boolean) =>
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetConnectedUsersQuery = (request: GetConnectedUsersRequest) =>
+export const useGetConnectedUsersQuery = (request: GetConnectedUsersRequest, enabled?: boolean) =>
     useQuery<Page, Error>({
         queryKey: ConnectedUserKeys.filteredConnectedUsers(request),
         queryFn: () => new ConnectedUserApi().getConnectedUsers(request),
+        enabled: enabled === undefined ? true : enabled,
     });

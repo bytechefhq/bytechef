@@ -200,7 +200,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
-        Long integrationId, Long integrationInstanceConfigurationId, String workflowId, int pageNumber) {
+        Long integrationId, Long integrationInstanceConfigurationId, Long connectedUserId, String workflowId,
+        int pageNumber) {
 
         List<String> workflowIds = resolveWorkflowIds(workflowId, integrationId);
 
@@ -208,7 +209,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             return Page.empty();
         } else {
             List<Long> integrationInstanceIds = resolveIntegrationInstanceIds(
-                environmentId, integrationInstanceConfigurationId);
+                environmentId, integrationInstanceConfigurationId, connectedUserId);
 
             if (integrationInstanceIds.isEmpty()) {
                 return Page.empty();
@@ -336,7 +337,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
      * instance configuration is resolved to that configuration's instances.
      */
     private List<Long> resolveIntegrationInstanceIds(
-        @Nullable Long environmentId, @Nullable Long integrationInstanceConfigurationId) {
+        @Nullable Long environmentId, @Nullable Long integrationInstanceConfigurationId,
+        @Nullable Long connectedUserId) {
 
         List<Long> integrationInstanceConfigurationIds;
 
@@ -352,10 +354,13 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                 .toList();
         }
 
-        return CollectionUtils.map(
-            integrationInstanceService.getIntegrationInstanceConfigurationIntegrationInstances(
-                integrationInstanceConfigurationIds),
-            IntegrationInstance::getId);
+        return integrationInstanceService
+            .getIntegrationInstanceConfigurationIntegrationInstances(integrationInstanceConfigurationIds)
+            .stream()
+            .filter(integrationInstance -> connectedUserId == null ||
+                Objects.equals(integrationInstance.getConnectedUserId(), connectedUserId))
+            .map(IntegrationInstance::getId)
+            .toList();
     }
 
     private List<WorkflowExecutionDTO> buildWorkflowExecutionDTOs(

@@ -9,17 +9,23 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
-import {getWorkflowExecutionsFilters} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsFilters';
-import {Integration} from '@/ee/shared/middleware/embedded/configuration';
+import {
+    getIntegrationInstanceConfigurationIntegrationName,
+    getWorkflowExecutionsFilters,
+} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsFilters';
+import {Integration, IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
+import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecution as EmbeddedWorkflowExecution,
     WorkflowExecutionFromJSON as EmbeddedWorkflowExecutionFromJSON,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
+import {useGetConnectedUserQuery, useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {
     useGetIntegrationInstanceConfigurationQuery,
     useGetIntegrationInstanceConfigurationsQuery,
 } from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -39,6 +45,7 @@ import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
+import {useDebouncedCallback} from 'use-debounce';
 
 import EmbeddedWorkflowExecutionsTable from './components/EmbeddedWorkflowExecutionsTable';
 import EmbeddedWorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
@@ -79,7 +86,7 @@ const ConnectedUserLabel = ({project}: {project: ConnectedUserProjectType}) => (
 
 const IntegrationLabel = ({integration}: {integration: Integration}) => (
     <div className="flex items-center">
-        <span className="mr-1">{integration.componentName}</span>
+        <span className="mr-1">{integration.name}</span>
 
         <span className="text-xs text-content-neutral-secondary">
             {integration?.tags?.map((tag) => tag.name).join(', ')}
@@ -93,8 +100,12 @@ export const WorkflowExecutions = () => {
 
     const [searchParams] = useSearchParams();
 
+    const [connectedUserSearch, setConnectedUserSearch] = useState<string>('');
     const [filterAutomations, setFilterAutomations] = useState<number>(
         searchParams.get('automations') ? +searchParams.get('automations')! : 0
+    );
+    const [filterConnectedUserId, setFilterConnectedUserId] = useState<number | undefined>(
+        searchParams.get('connectedUserId') ? +searchParams.get('connectedUserId')! : undefined
     );
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
         searchParams.get('endDate') ? new Date(+searchParams.get('endDate')!) : undefined
@@ -128,6 +139,11 @@ export const WorkflowExecutions = () => {
 
     const navigate = useNavigate();
 
+    const debouncedSetConnectedUserSearch = useDebouncedCallback(
+        (search: string) => setConnectedUserSearch(search),
+        300
+    );
+
     const {data: integrationInstanceConfiguration} = useGetIntegrationInstanceConfigurationQuery(
         filterIntegrationInstanceConfigurationId!,
         !!filterIntegrationInstanceConfigurationId
@@ -144,6 +160,20 @@ export const WorkflowExecutions = () => {
 
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false}, filtersInteracted);
 
+    const {data: connectedUsersPage} = useGetConnectedUsersQuery(
+        {
+            environmentId: currentEnvironmentId,
+            integrationId: filterIntegrationId,
+            ...(connectedUserSearch ? {search: connectedUserSearch} : {}),
+        },
+        !filterAutomations
+    );
+
+    const {data: selectedConnectedUser} = useGetConnectedUserQuery(
+        filterConnectedUserId!,
+        !!filterConnectedUserId && !filterAutomations
+    );
+
     const {
         connectedUserProjects,
         refetchWorkflowExecutions,
@@ -152,6 +182,7 @@ export const WorkflowExecutions = () => {
         workflowExecutionsIsFetching,
         workflowExecutionsIsLoading,
     } = useWorkflowExecutions(filterAutomations, {
+        connectedUserId: filterConnectedUserId,
         environmentId: currentEnvironmentId,
         id: currentWorkspaceId!,
         integrationId: filterIntegrationId,
@@ -164,16 +195,53 @@ export const WorkflowExecutions = () => {
         workflowId: filterWorkflowId,
     });
 
-    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-    const {data: workflows} = useGetIntegrationVersionWorkflowsQuery(
+    const {data: integrationVersions} = useGetIntegrationVersionsQuery(
         filterIntegrationId!,
-        integrationInstanceConfiguration?.integrationVersion!,
-        false,
-        !!integrationInstanceConfiguration
+        !!filterIntegrationId && !integrationInstanceConfiguration
     );
+
+    const workflowsIntegrationId = filterIntegrationId || integrationInstanceConfiguration?.integrationId;
+
+    const workflowsIntegrationVersion = useMemo(() => {
+        if (integrationInstanceConfiguration?.integrationVersion) {
+            return integrationInstanceConfiguration.integrationVersion;
+        }
+
+        const publishedIntegrationVersions =
+            integrationVersions
+                ?.filter(
+                    (integrationVersion) =>
+                        integrationVersion.status === IntegrationStatus.Published &&
+                        integrationVersion.version !== undefined
+                )
+                .map((integrationVersion) => integrationVersion.version!) ?? [];
+
+        return publishedIntegrationVersions.length > 0 ? Math.max(...publishedIntegrationVersions) : undefined;
+    }, [integrationInstanceConfiguration, integrationVersions]);
+
+    const {data: workflows} = useGetIntegrationVersionWorkflowsQuery(
+        workflowsIntegrationId!,
+        workflowsIntegrationVersion!,
+        false,
+        !!workflowsIntegrationId && !!workflowsIntegrationVersion
+    );
+
+    const connectedUsers = useMemo(() => {
+        const connectedUsersPageContent = connectedUsersPage?.content as ConnectedUser[] | undefined;
+
+        if (
+            !selectedConnectedUser ||
+            connectedUsersPageContent?.some((connectedUser) => connectedUser.id === selectedConnectedUser.id)
+        ) {
+            return connectedUsersPageContent;
+        }
+
+        return [selectedConnectedUser, ...(connectedUsersPageContent ?? [])];
+    }, [connectedUsersPage, selectedConnectedUser]);
 
     const emptyListMessage =
         !filterStatus &&
+        !filterConnectedUserId &&
         !filterIntegrationId &&
         !filterWorkflowId &&
         !filterStartDate &&
@@ -193,7 +261,9 @@ export const WorkflowExecutions = () => {
         () =>
             getWorkflowExecutionsFilters({
                 automations: filterAutomations,
+                connectedUserId: filterConnectedUserId,
                 connectedUserProjects,
+                connectedUsers,
                 endDate: filterEndDate,
                 integrationId: filterIntegrationId,
                 integrationInstanceConfiguration,
@@ -208,7 +278,9 @@ export const WorkflowExecutions = () => {
             }),
         [
             connectedUserProjects,
+            connectedUsers,
             filterAutomations,
+            filterConnectedUserId,
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
@@ -232,10 +304,11 @@ export const WorkflowExecutions = () => {
         integrationInstanceConfigurationId?: number,
         projectId?: number,
         workflowId?: string,
-        pageNumber?: number
+        pageNumber?: number,
+        connectedUserId?: number
     ) {
         navigate(
-            `/embedded/executions?automations=${automations ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&projectId=${projectId ? projectId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/embedded/executions?automations=${automations ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&projectId=${projectId ? projectId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}&connectedUserId=${connectedUserId ? connectedUserId : ''}`
         );
     }
 
@@ -252,8 +325,43 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            undefined
+            undefined,
+            filterConnectedUserId
         );
+    };
+
+    const handleConnectedUserChange = (item?: ComboBoxItemType) => {
+        let connectedUserId;
+
+        if (item?.value) {
+            connectedUserId = Number(item.value);
+        }
+
+        setFilterConnectedUserId(connectedUserId);
+        setFilterPageNumber(undefined);
+
+        filter(
+            filterAutomations,
+            filterStatus,
+            filterStartDate,
+            filterEndDate,
+            filterIntegrationId,
+            filterIntegrationInstanceConfigurationId,
+            filterProjectId,
+            filterWorkflowId,
+            undefined,
+            connectedUserId
+        );
+    };
+
+    const handleConnectedUserSearchChange = (search: string) => {
+        if (search) {
+            debouncedSetConnectedUserSearch(search);
+        } else {
+            debouncedSetConnectedUserSearch.cancel();
+
+            setConnectedUserSearch('');
+        }
     };
 
     const handleEndDateChange = (date?: Date) => {
@@ -273,7 +381,8 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            undefined
+            undefined,
+            filterConnectedUserId
         );
     };
 
@@ -296,7 +405,8 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            undefined
+            undefined,
+            filterConnectedUserId
         );
     };
 
@@ -319,7 +429,8 @@ export const WorkflowExecutions = () => {
             integrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            undefined
+            undefined,
+            filterConnectedUserId
         );
     };
 
@@ -335,7 +446,8 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            pageNumber
+            pageNumber,
+            filterConnectedUserId
         );
     };
 
@@ -356,7 +468,8 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            undefined
+            undefined,
+            filterConnectedUserId
         );
     };
 
@@ -379,7 +492,8 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            undefined
+            undefined,
+            filterConnectedUserId
         );
     };
 
@@ -402,7 +516,8 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             projectId,
             filterWorkflowId,
-            undefined
+            undefined,
+            filterConnectedUserId
         );
     };
 
@@ -425,11 +540,13 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             workflowId,
-            undefined
+            undefined,
+            filterConnectedUserId
         );
     };
 
     useOnEnvironmentChange(() => {
+        setFilterConnectedUserId(undefined);
         setFilterIntegrationInstanceConfigurationId(undefined);
         setFilterPageNumber(undefined);
         setFilterWorkflowId(undefined);
@@ -442,6 +559,7 @@ export const WorkflowExecutions = () => {
             filterIntegrationId,
             undefined,
             filterProjectId,
+            undefined,
             undefined,
             undefined
         );
@@ -564,10 +682,10 @@ export const WorkflowExecutions = () => {
                                         label: (
                                             <span className="flex items-center">
                                                 <span className="mr-1">
-                                                    {
-                                                        (integrationInstanceConfiguration.integration as Integration)
-                                                            ?.componentName
-                                                    }
+                                                    {getIntegrationInstanceConfigurationIntegrationName(
+                                                        integrationInstanceConfiguration,
+                                                        integrations
+                                                    )}
                                                 </span>
 
                                                 <span className="text-xs text-content-neutral-secondary">
@@ -583,6 +701,26 @@ export const WorkflowExecutions = () => {
                                 onChange={handleIntegrationInstanceConfigurationChange}
                                 onOpen={() => setFiltersInteracted(true)}
                                 value={filterIntegrationInstanceConfigurationId}
+                            />
+                        </div>
+                    )}
+
+                    {!filterAutomations && (
+                        <div className="flex flex-col space-y-2">
+                            <Label>Connected User</Label>
+
+                            <ComboBox
+                                emptyMessage={!connectedUsers ? 'Loading...' : 'No item found.'}
+                                items={[
+                                    ANY_FILTER_OPTION,
+                                    ...(connectedUsers?.map((connectedUser) => ({
+                                        label: `User ${connectedUser.externalId}`,
+                                        value: connectedUser.id,
+                                    })) ?? []),
+                                ]}
+                                onChange={handleConnectedUserChange}
+                                onSearchChange={handleConnectedUserSearchChange}
+                                value={filterConnectedUserId}
                             />
                         </div>
                     )}

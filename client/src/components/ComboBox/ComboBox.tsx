@@ -25,6 +25,7 @@ export interface ComboBoxProps {
     onBlur?: FocusEventHandler;
     onChange?: (item?: ComboBoxItemType) => void;
     onOpen?: () => void;
+    onSearchChange?: (search: string) => void;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any;
 }
@@ -69,6 +70,7 @@ const ComboBox: FC<ComboBoxProps> = ({
     onBlur,
     onChange,
     onOpen,
+    onSearchChange,
     value,
 }: ComboBoxProps) => {
     const [open, setOpen] = useState(false);
@@ -79,13 +81,17 @@ const ComboBox: FC<ComboBoxProps> = ({
         if (isOpen && onOpen) {
             onOpen();
         }
+
+        if (!isOpen && onSearchChange) {
+            onSearchChange('');
+        }
     };
 
     const commandItems = items.map((comboBoxItem) => (
         <ComboBoxCommandItem
             key={comboBoxItem.value}
             onSelect={() => {
-                setOpen(false);
+                handleOpenChange(false);
 
                 if (onChange) {
                     onChange(comboBoxItem);
@@ -134,8 +140,12 @@ const ComboBox: FC<ComboBoxProps> = ({
                     align="start"
                     className="z-50 w-72 min-w-combo-box-popper-anchor-width rounded-md border bg-popover p-0 text-popover-foreground shadow-md outline-hidden data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
                 >
-                    <Command filter={filterByKeywords}>
-                        <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
+                    <Command filter={filterByKeywords} shouldFilter={!onSearchChange}>
+                        <CommandInput
+                            className="h-9 border-none ring-0"
+                            onValueChange={onSearchChange}
+                            placeholder="Search..."
+                        />
 
                         <CommandList>
                             <CommandEmpty>{emptyMessage ?? 'No item found.'}</CommandEmpty>
