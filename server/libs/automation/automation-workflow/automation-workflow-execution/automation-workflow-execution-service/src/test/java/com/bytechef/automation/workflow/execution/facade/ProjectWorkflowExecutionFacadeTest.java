@@ -325,6 +325,35 @@ public class ProjectWorkflowExecutionFacadeTest {
         }
 
         @Test
+        @SuppressWarnings("unchecked")
+        public void testEmbeddedWorkflowFilterByReferenceWorkflowUuidCoversEveryCatalogVersion() {
+            String referenceWorkflowUuid = UUID.randomUUID()
+                .toString();
+
+            when(projectWorkflowService.getWorkflowProjectWorkflows(List.of(referenceWorkflowUuid)))
+                .thenReturn(List.of());
+            when(projectWorkflowService.getWorkflowUuidProjectWorkflows(referenceWorkflowUuid))
+                .thenReturn(
+                    List.of(
+                        new ProjectWorkflow(
+                            CATALOG_PROJECT_ID, 1, CATALOG_WORKFLOW_ID, UUID.fromString(referenceWorkflowUuid)),
+                        new ProjectWorkflow(
+                            CATALOG_PROJECT_ID, 2, "catalog-workflow-v2", UUID.fromString(referenceWorkflowUuid))));
+
+            facade.getWorkflowExecutions(
+                true, null, null, null, null, null, null, referenceWorkflowUuid, null, WORKSPACE_ID, 0);
+
+            ArgumentCaptor<List<String>> workflowIdsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+
+            verify(workflowExecutionRowService).getWorkflowExecutionRows(
+                any(), any(), any(), eq(List.of(REFERENCE_DEPLOYMENT_ID, OTHER_WORKSPACE_DEPLOYMENT_ID)),
+                eq(PlatformType.AUTOMATION), workflowIdsArgumentCaptor.capture(), anyBoolean(), anyList(), anyInt());
+
+            assertThat(workflowIdsArgumentCaptor.getValue()).containsExactly(
+                CATALOG_WORKFLOW_ID, "catalog-workflow-v2");
+        }
+
+        @Test
         public void testNotEmbeddedDoesNotLookUpEmbeddedDeploymentProjects() {
             facade.getWorkflowExecutions(false, null, null, null, null, null, null, null, null, WORKSPACE_ID, 0);
 
