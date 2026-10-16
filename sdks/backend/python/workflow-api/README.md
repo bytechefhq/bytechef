@@ -49,6 +49,7 @@ The file's last expression, `project`, is what ByteChef loads.
 | `ProjectDefinition` | An automation code project or an embedded catalog code project, identified by `name` |
 | `IntegrationDefinition` | An embedded code integration, identified by `componentName` and `componentVersion` |
 | `WorkflowDefinition` | A workflow: `inputs`, `outputs`, `triggers` and `tasks` |
+| `InputDefinition` | A workflow input; `componentName`, `componentVersion` and `groupName` take its options from a component's declared input, such as Slack's `channel` |
 | `TaskDefinition`, `ParallelTaskDefinition`, `ForkJoinTaskDefinition` | A task, and the two task groups |
 | `TaskContext` | The `context` passed to `perform`: `component`, `connection`, `input`, `log`, `parameters` |
 | `ConnectionRequirement`, `ClusterElement` | A task's declared connections, and cluster elements composed at a call site |
