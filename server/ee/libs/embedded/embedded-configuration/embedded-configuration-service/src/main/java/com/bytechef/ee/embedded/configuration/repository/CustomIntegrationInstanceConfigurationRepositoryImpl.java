@@ -26,6 +26,8 @@ import tools.jackson.databind.ObjectMapper;
 public class CustomIntegrationInstanceConfigurationRepositoryImpl
     implements CustomIntegrationInstanceConfigurationRepository {
 
+    private static final String LEGACY_MCP_SERVER_NAME_PREFIX = "__MCP_SERVER__";
+
     private final EncryptedStringToMapWrapperConverter encryptedStringToMapWrapperConverter;
     private final JdbcClient jdbcClient;
 
@@ -55,6 +57,9 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
         }
 
         List<String> conditions = new ArrayList<>();
+
+        conditions.add(
+            "NOT " + startsWith("integration_instance_configuration.name", LEGACY_MCP_SERVER_NAME_PREFIX));
 
         if (environment != null) {
             arguments.add(environment);
@@ -118,5 +123,13 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
         }
 
         return integrationInstanceConfigurations;
+    }
+
+    private static String startsWith(String column, String prefix) {
+        String escapedPrefix = prefix.replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
+
+        return column + " LIKE '" + escapedPrefix + "%' ESCAPE '\\'";
     }
 }

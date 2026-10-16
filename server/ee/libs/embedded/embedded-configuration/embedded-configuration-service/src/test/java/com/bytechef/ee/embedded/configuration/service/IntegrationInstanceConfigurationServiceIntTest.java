@@ -84,6 +84,30 @@ class IntegrationInstanceConfigurationServiceIntTest {
             .containsExactlyInAnyOrder(plainConfiguration.getId(), linkedConfiguration.getId());
     }
 
+    @Test
+    void testGetIntegrationInstanceConfigurationsExcludesLegacyMcpServerNamedConfigurations() {
+        Integration integration = new Integration();
+
+        integration.setComponentName("componentName");
+        integration.setName("integration");
+
+        integration = integrationService.create(integration);
+
+        long integrationId = Objects.requireNonNull(integration.getId());
+
+        IntegrationInstanceConfiguration plainConfiguration = createIntegrationInstanceConfiguration(
+            integrationId, "plain");
+
+        createIntegrationInstanceConfiguration(integrationId, "__MCP_SERVER__1_v1");
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(null, null, null);
+
+        assertThat(integrationInstanceConfigurations)
+            .extracting(IntegrationInstanceConfiguration::getId)
+            .containsExactly(plainConfiguration.getId());
+    }
+
     private IntegrationInstanceConfiguration createIntegrationInstanceConfiguration(long integrationId, String name) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
