@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @version ee
@@ -29,6 +30,8 @@ public interface ConnectedUserProjectWorkflowService {
         long connectedUserProjectId, String copiedFromWorkflowUuid);
 
     List<ConnectedUserProjectWorkflow> getCopiedConnectedUserProjectWorkflows(String copiedFromWorkflowUuid);
+
+    List<ConnectedUserProjectWorkflow> getCopiedConnectedUserProjectWorkflows(Set<String> copiedFromWorkflowUuids);
 
     ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(long id);
 

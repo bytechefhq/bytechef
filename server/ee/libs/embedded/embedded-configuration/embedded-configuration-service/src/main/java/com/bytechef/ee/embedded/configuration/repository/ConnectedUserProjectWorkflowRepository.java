@@ -66,4 +66,12 @@ public interface ConnectedUserProjectWorkflowRepository extends ListCrudReposito
         """)
     List<ConnectedUserProjectWorkflow> findAllByAutomationWorkflowUuidIn(
         @Param("automationWorkflowUuids") Set<String> automationWorkflowUuids);
+
+    @Query("""
+        SELECT cupw.*
+        FROM connected_user_project_workflow cupw
+        WHERE cupw.copied_from_workflow_uuid IN (:copiedFromWorkflowUuids)
+        """)
+    List<ConnectedUserProjectWorkflow> findAllByCopiedFromWorkflowUuidIn(
+        @Param("copiedFromWorkflowUuids") Set<String> copiedFromWorkflowUuids);
 }
