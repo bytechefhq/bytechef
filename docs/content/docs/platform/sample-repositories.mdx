@@ -17,13 +17,17 @@ Each sample has a local check that evaluates the file the way the server does an
 | **Embedded catalog code project** | [bytechef-embedded-automation-sample-code-workflow-java](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-java) | [bytechef-embedded-automation-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-javascript) | [bytechef-embedded-automation-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-python) |
 | **Embedded code integration** | [bytechef-embedded-integration-sample-code-workflow-java](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-java) | [bytechef-embedded-integration-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript) | [bytechef-embedded-integration-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-python) |
 
-- **Automation project** - a project with one workflow that takes a `name` input and returns a greeting. Deployed to
-  Automation → Projects. See [Code Workflows](/platform/automation/build/workflows/code-workflows).
-- **Embedded catalog code project** - a catalog project whose `greetOnRequest` workflow has a Request trigger, run by
-  reference for your connected users. See
+Each sample includes a workflow started by the Gmail **New Email** trigger, one that calls the Gmail **Search Email**
+action, and `notifySlackOnNewEmail`, which posts each new email to Slack through a declared `slack` connection and
+picks its channel from Slack's own `channel` input.
+
+- **Automation project** - a project deployed to Automation → Projects; it also has a workflow that takes a `name` input
+  and returns a greeting. See [Code Workflows](/platform/automation/build/workflows/code-workflows).
+- **Embedded catalog code project** - a catalog project run by reference for your connected users; its
+  `greetOnRequest` workflow has a Request trigger. See
   [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows).
-- **Embedded code integration** - an integration built on the HTTP Client component with an `echoMessage` workflow.
-  See [Code Integrations](/platform/embedded/build/code-integrations).
+- **Embedded code integration** - an integration built on the Gmail component, so its Gmail calls need no declared
+  connection. See [Code Integrations](/platform/embedded/build/code-integrations).
 
 ## Custom components
 

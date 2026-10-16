@@ -54,7 +54,10 @@ creating a second one with a name already in use is refused.
 | Python | [bytechef-embedded-automation-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-python) |
 
 Each one has a `greetOnRequest` workflow with a Request trigger, so it can be called through the sync endpoint as
-soon as a connected user holds a reference to it.
+soon as a connected user holds a reference to it. The others run on the connected user's own connections, which
+provisioning binds: `summarizeNewEmail` on a Gmail trigger, `fetchRecentEmails` through a declared `gmail` connection,
+and `notifySlackOnNewEmail` through a declared `slack` connection, with a `channel` input that provisioning stores from
+the request's `inputs`.
 
 ## Editing in ByteChef
 

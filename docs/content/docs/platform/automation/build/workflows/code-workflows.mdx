@@ -286,6 +286,40 @@ WorkflowDsl.workflow("orders")
 embedded, `FIELD_MAPPING`) and `required`. At run time each arrives in `context.input()` under its own name, in the
 same namespace as the task outputs - so an input and a task cannot share a name.
 
+An input can also take its options from an input a component declares, so whoever fills it in picks from a list
+instead of typing - Slack's `channel`, for example, lists the workspace's channels. Set `componentName`,
+`componentVersion` and `groupName` together; a partial reference fails the deploy:
+
+```javascript tab="JavaScript"
+inputs: [
+    {
+        name: "channel", label: "Slack Channel", type: "STRING", required: true,
+        componentName: "slack", componentVersion: 1, groupName: "channel"
+    }
+]
+```
+
+```python tab="Python"
+"inputs": [
+    {
+        "name": "channel",
+        "label": "Slack Channel",
+        "type": "STRING",
+        "required": True,
+        "componentName": "slack",
+        "componentVersion": 1,
+        "groupName": "channel",
+    }
+]
+```
+
+```java tab="Java"
+.inputs(input("channel").label("Slack Channel").component("slack", 1, "channel").required(true))
+```
+
+The deployment dialog and an embedded integration's instance configuration and connect dialog list the options, loaded
+through the connection picked for that component.
+
 **Outputs** are evaluated when the workflow completes and become its result - the body a synchronous caller receives,
 and what a workflow-execution read reports for an asynchronous run. An entry names either a `task`, whose output
 becomes the value, or a literal or `${...}` expression `value`. Prefer `task` for a task output: a task name here is
@@ -440,6 +474,11 @@ wherever the platform asks you to wire connections - the **Test Configuration** 
 deployment's connection step - so each environment picks its own credentials, exactly like a visual workflow's nodes.
 A `connectionName` that was never declared and wired cannot resolve, so the call fails at run time.
 `componentVersion` is optional and pins to the component's latest version at save time.
+
+In an [embedded code integration](/platform/embedded/build/code-integrations#connections), a call to the integration's
+own component needs neither: ByteChef declares that connection on every code task under the component's name, so
+`context.component.googleMail.searchEmail({maxResults: 10})` works without a connection name. Declare only connections
+to other components.
 
 ## Calling an AI agent
 
