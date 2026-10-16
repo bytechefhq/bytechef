@@ -4,11 +4,11 @@ import IntegrationSkeleton from '@/ee/pages/embedded/integration/components/inte
 import LeftSidebarButton from '@/ee/pages/embedded/integration/components/integration-header/components/LeftSidebarButton';
 import OutputPanelButton from '@/ee/pages/embedded/integration/components/integration-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/integration/components/integration-header/components/PublishPopover';
-import WorkflowActionsButton from '@/ee/pages/embedded/integration/components/integration-header/components/WorkflowActionsButton';
 import SettingsMenu from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/SettingsMenu';
 import {useIntegrationHeader} from '@/ee/pages/embedded/integration/components/integration-header/hooks/useIntegrationHeader';
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';

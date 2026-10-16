@@ -5,7 +5,6 @@ import AutomationWorkflowProjectVersionHistorySheet from '@/ee/pages/embedded/au
 import LeftSidebarButton from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/LeftSidebarButton';
 import OutputButton from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/PublishPopover';
-import WorkflowActionsButton from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/WorkflowActionsButton';
 import {useAutomationWorkflowEditorHeader} from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/hooks/useAutomationWorkflowEditorHeader';
 import {useAutomationWorkflowEditorSidebarStore} from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/stores/useAutomationWorkflowEditorSidebarStore';
 import {useCreateAutomationWorkflowProjectWorkflow} from '@/ee/pages/embedded/automation-workflow/hooks/useCreateAutomationWorkflowProjectWorkflow';
@@ -17,6 +16,7 @@ import AutomationWorkflowProjectDialog, {
 } from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-dialog/AutomationWorkflowProjectDialog';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
+import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';

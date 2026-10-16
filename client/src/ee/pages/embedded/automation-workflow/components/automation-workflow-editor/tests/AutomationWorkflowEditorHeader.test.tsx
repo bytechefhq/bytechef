@@ -79,12 +79,9 @@ vi.mock(
     })
 );
 
-vi.mock(
-    '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/WorkflowActionsButton',
-    () => ({
-        default: () => <button>Test</button>,
-    })
-);
+vi.mock('@/pages/platform/workflow-editor/components/WorkflowActionsButton', () => ({
+    default: () => <button>Test</button>,
+}));
 
 vi.mock(
     '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/PublishPopover',

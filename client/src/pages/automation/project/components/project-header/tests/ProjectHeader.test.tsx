@@ -33,7 +33,7 @@ vi.mock('@/pages/automation/project/components/project-header/components/Project
     default: ({itemSelect}: {itemSelect: React.ReactNode}) => <nav>{itemSelect}</nav>,
 }));
 
-vi.mock('@/pages/automation/project/components/project-header/components/WorkflowActionsButton', () => ({
+vi.mock('@/pages/platform/workflow-editor/components/WorkflowActionsButton', () => ({
     default: () => <button>Test</button>,
 }));
 

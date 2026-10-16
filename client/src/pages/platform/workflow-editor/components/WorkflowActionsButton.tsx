@@ -3,7 +3,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import RunDisabledReasons from '@/pages/platform/workflow-editor/components/RunDisabledReasons';
 import {MessageCircleMoreIcon, PlayIcon, SquareIcon} from 'lucide-react';
 
-interface IntegrationHeaderWorkflowActionsButtonProps {
+interface WorkflowActionsButtonProps {
     chatTrigger: boolean;
     onRunClick: () => void;
     onStopClick: () => void;
@@ -17,7 +17,7 @@ const WorkflowActionsButton = ({
     onStopClick,
     runDisabled,
     workflowIsRunning,
-}: IntegrationHeaderWorkflowActionsButtonProps) => (
+}: WorkflowActionsButtonProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
             <div className="mx-2 w-20">
