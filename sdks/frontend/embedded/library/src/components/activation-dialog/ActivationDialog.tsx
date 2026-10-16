@@ -143,6 +143,7 @@ interface ConnectRowProps {
     component: TemplateComponentType;
     connectionCreationAllowed: boolean;
     connections: ConnectionType[];
+    connectionsLoaded: boolean;
     highlighted: boolean;
     integrationConnected: boolean;
     loadFailed: boolean;
@@ -156,6 +157,7 @@ const ConnectRow = ({
     component,
     connectionCreationAllowed,
     connections,
+    connectionsLoaded,
     highlighted,
     integrationConnected,
     loadFailed,
@@ -166,6 +168,7 @@ const ConnectRow = ({
 }: ConnectRowProps) => {
     const title = component.title || component.name;
     const available = component.integrationId !== null && component.integrationId !== undefined;
+    const connectShown = connectionCreationAllowed && !integrationConnected;
 
     return (
         <div
@@ -199,7 +202,7 @@ const ConnectRow = ({
                         ))}
                     </select>
 
-                    {connectionCreationAllowed && !integrationConnected && (
+                    {connectShown && (
                         <button className={dialogStyles.buttonSecondary} onClick={onConnect} type="button">
                             Connect
                         </button>
@@ -207,6 +210,12 @@ const ConnectRow = ({
                 </div>
             ) : (
                 <p className={styles.notice}>{title} isn't set up yet — ask your administrator.</p>
+            )}
+
+            {available && connectionsLoaded && !loadFailed && !connectShown && connections.length === 0 && (
+                <p className={styles.notice}>
+                    No {title} accounts yet. Connect {title} from your integrations first.
+                </p>
             )}
 
             {available && loadFailed && (
@@ -575,6 +584,7 @@ const ActivationBody = ({
                                 component={component}
                                 connectionCreationAllowed={connectionCreationAllowed}
                                 connections={connectionsByComponent[component.name] ?? []}
+                                connectionsLoaded={connectionsByComponent[component.name] !== undefined}
                                 highlighted={state.highlightedComponent === component.name}
                                 integrationConnected={connectedIntegrationComponents[component.name] === true}
                                 key={component.name}
