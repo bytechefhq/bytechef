@@ -311,6 +311,14 @@ const CANDIDATE_TOKEN_GROUPS = {
  * `--surface-*` token. With no remaining row for any of the four written classes, the entries would trip
  * `findStaleResolutions` on every future invocation, so they are removed rather than left to redirect
  * nothing.
+ *
+ * `text-white` is gone as of the pages migration (dark-mode Phase 3): its last two in-scope call sites
+ * (the check glyph inside the filled `bg-green-500` step badge in
+ * `UploadKnowledgeBaseDocumentDialog.tsx` and `CreateKnowledgeBaseDialog.tsx`) were migrated to
+ * `--content-onsurface-primary`, which is what the entry already resolved them to: foreground on a filled
+ * surface. The `VoiceModeLayout.tsx` site exception the entry carried has no file to apply to here. With no
+ * remaining row for the written class, the entry would trip `findStaleResolutions` on every future
+ * invocation, so it is removed rather than left to redirect nothing.
  */
 const MANUAL_RESOLUTIONS = {
     'bg-black/80': {
@@ -363,11 +371,6 @@ const MANUAL_RESOLUTIONS = {
     },
     'text-red-800': {
         crossFamilyNote: 'Rejected. Status and method badge text on a `bg-red-100` chip. Same shape as text-green-800.',
-    },
-    'text-white': {
-        family: 'content',
-        reason: 'Foreground on a filled surface; `--content-onsurface-primary` is the token minted for exactly this. SITE EXCEPTION: the 3 occurrences in `VoiceModeLayout.tsx` sit on the deliberately dark stage and stay literal with the rest of that file.',
-        set: 'A',
     },
     'text-yellow-600': {
         crossFamilyNote:

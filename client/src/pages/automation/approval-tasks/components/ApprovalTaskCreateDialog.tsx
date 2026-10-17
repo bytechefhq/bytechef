@@ -99,14 +99,14 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                                         <SelectContent>
                                             <SelectItem value="open">
                                                 <span className="flex items-center gap-2">
-                                                    <CircleIcon className="size-3 text-gray-400" />
+                                                    <CircleIcon className="size-3 text-content-neutral-tertiary" />
                                                     Open
                                                 </span>
                                             </SelectItem>
 
                                             <SelectItem value="in-progress">
                                                 <span className="flex items-center gap-2">
-                                                    <ClockIcon className="size-3 text-blue-600" />
+                                                    <ClockIcon className="size-3 text-content-brand-primary" />
                                                     In Progress
                                                 </span>
                                             </SelectItem>
@@ -128,7 +128,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                                         <SelectContent>
                                             <SelectItem value="high">
                                                 <Badge
-                                                    className="border-red-200 bg-red-100 text-red-800"
+                                                    className="border-red-200 bg-surface-destructive-secondary text-red-800"
                                                     label="High"
                                                     styleType="outline-outline"
                                                 />
@@ -144,7 +144,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
 
                                             <SelectItem value="low">
                                                 <Badge
-                                                    className="border-green-200 bg-green-100 text-green-800"
+                                                    className="border-green-200 bg-surface-success-secondary text-green-800"
                                                     label="Low"
                                                     styleType="outline-outline"
                                                 />
