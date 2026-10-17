@@ -33,8 +33,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,6 +47,7 @@ import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
+import com.bytechef.platform.workflow.execution.facade.ApprovalInputException;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -51,6 +56,7 @@ import jakarta.servlet.AsyncListener;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -63,6 +69,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -73,7 +80,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * @author Ivica Cardic
@@ -266,7 +272,7 @@ class JobResumeControllerIntTest {
             .when(jobResumeFacade)
             .resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class));
 
-        assertThatThrownBy(() -> jobResumeController.resumeStreaming(RESUME_ID, Map.of()))
+        assertThatThrownBy(() -> jobResumeController.resumeStreaming(RESUME_ID, Map.of(), HttpMethod.POST))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("Resume failed");
 
@@ -292,7 +298,8 @@ class JobResumeControllerIntTest {
             .when(jobResumeFacade)
             .resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class));
 
-        ResponseEntity<SseEmitter> responseEntity = jobResumeController.resumeStreaming(RESUME_ID, null);
+        ResponseEntity<?> responseEntity =
+            jobResumeController.resumeStreaming(RESUME_ID, null, HttpMethod.POST);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -364,6 +371,67 @@ class JobResumeControllerIntTest {
     }
 
     @Test
+    void testGetOfAnApprovalResumeLinkDoesNotResolveTheApproval() throws Exception {
+        when(jobResumeFacade.isApprovalResumeId(RESUME_ID)).thenReturn(true);
+
+        mockMvc.perform(get("/job/resume/" + RESUME_ID))
+            .andExpect(status().isMethodNotAllowed())
+            .andExpect(header().string(HttpHeaders.ALLOW, "POST"));
+
+        mockMvc.perform(
+            get("/job/resume/" + RESUME_ID)
+                .header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE))
+            .andExpect(status().isMethodNotAllowed());
+
+        verify(jobResumeFacade, never()).resumeJob(any(), any());
+        verify(jobResumeFacade, never()).resumeJobStreaming(any(), anyMap(), any(LongConsumer.class));
+    }
+
+    @Test
+    void testHeadOfAResumeLinkNeverResumesTheJob() throws Exception {
+        when(jobResumeFacade.isApprovalResumeId(RESUME_ID)).thenReturn(true);
+
+        mockMvc.perform(head("/job/resume/" + RESUME_ID))
+            .andExpect(status().isMethodNotAllowed())
+            .andExpect(header().string(HttpHeaders.ALLOW, "POST"));
+
+        when(jobResumeFacade.isApprovalResumeId(RESUME_ID)).thenReturn(false);
+
+        mockMvc.perform(head("/job/resume/" + RESUME_ID))
+            .andExpect(status().isMethodNotAllowed());
+
+        verify(jobResumeFacade, never()).resumeJob(any(), any());
+        verify(jobResumeFacade, never()).resumeJobStreaming(any(), anyMap(), any(LongConsumer.class));
+    }
+
+    @Test
+    void testGetOfAWaitResumeLinkResumesTheJob() throws Exception {
+        when(jobResumeFacade.isApprovalResumeId(RESUME_ID)).thenReturn(false);
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), any()))
+            .thenReturn(JobResumeOutcome.OK);
+
+        mockMvc.perform(get("/job/resume/" + RESUME_ID))
+            .andExpect(status().isNoContent());
+
+        verify(jobResumeFacade).resumeJob(eq(RESUME_ID), any());
+    }
+
+    @Test
+    void testPostOfAnApprovalResumeLinkDoesNotCheckForAnApproval() throws Exception {
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), anyMap()))
+            .thenReturn(JobResumeOutcome.OK);
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"approved\":true}"))
+            .andExpect(status().isNoContent());
+
+        verify(jobResumeFacade, never()).isApprovalResumeId(any());
+    }
+
+    @Test
     void testResumeRetriesUntilTheJobIsSuspended() throws Exception {
         when(jobResumeFacade.resumeJob(eq(RESUME_ID), anyMap()))
             .thenReturn(JobResumeOutcome.NOT_YET_SUSPENDED, JobResumeOutcome.NOT_YET_SUSPENDED, JobResumeOutcome.OK);
@@ -430,6 +498,39 @@ class JobResumeControllerIntTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("{}"))
             .andExpect(status().isUnprocessableContent());
+    }
+
+    @Test
+    void testResumeOfAnApprovalWithInvalidInputsReturnsBadRequestWithTheProblems() throws Exception {
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), anyMap()))
+            .thenThrow(new ApprovalInputException(List.of("'Reason' is required", "'Amount' must be a number")));
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"approved\":true}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(
+                jsonPath("$.detail").value(
+                    "The approval form is incomplete: 'Reason' is required; 'Amount' must be a number."))
+            .andExpect(jsonPath("$.errors[0]").value("'Reason' is required"));
+    }
+
+    @Test
+    void testResumeStreamingOfAnApprovalWithInvalidInputsReturnsBadRequest() throws Exception {
+        when(jobResumeFacade.resumeJobStreaming(eq(RESUME_ID), anyMap(), any(LongConsumer.class)))
+            .thenThrow(new ApprovalInputException(List.of("'Reason' is required")));
+
+        mockMvc
+            .perform(
+                post("/job/resume/" + RESUME_ID)
+                    .header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"approved\":true}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(request().asyncNotStarted());
     }
 
     @Test
