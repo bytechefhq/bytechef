@@ -19,6 +19,8 @@ package com.bytechef.automation.ai.mcp.server.security.web.config;
 import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpAuthenticationRequiredResolver;
 import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpServerSecretVerifier;
 import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -44,25 +46,30 @@ public class AutomationMcpServerApiKeySecurityConfigurerContributor implements S
     private final EnvironmentService environmentService;
     private final McpServerService mcpServerService;
     private final UserService userService;
+    private final WorkspaceApiKeyService workspaceApiKeyService;
+    private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public AutomationMcpServerApiKeySecurityConfigurerContributor(
         ApiKeyService apiKeyService, AuthorityService authorityService, EnvironmentService environmentService,
-        McpServerService mcpServerService,
-        UserService userService) {
+        McpServerService mcpServerService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
+        WorkspaceMcpServerService workspaceMcpServerService) {
 
         this.apiKeyService = apiKeyService;
         this.authorityService = authorityService;
         this.environmentService = environmentService;
         this.mcpServerService = mcpServerService;
         this.userService = userService;
+        this.workspaceApiKeyService = workspaceApiKeyService;
+        this.workspaceMcpServerService = workspaceMcpServerService;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
         return (T) new AutomationMcpServerSecurityConfigurer(
-            apiKeyService, authorityService, environmentService, mcpServerService, userService);
+            apiKeyService, authorityService, environmentService, mcpServerService, userService, workspaceApiKeyService,
+            workspaceMcpServerService);
     }
 
     @Bean

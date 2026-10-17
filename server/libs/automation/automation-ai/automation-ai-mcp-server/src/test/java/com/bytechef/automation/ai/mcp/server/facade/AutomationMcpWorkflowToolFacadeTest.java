@@ -138,7 +138,7 @@ class AutomationMcpWorkflowToolFacadeTest {
         projectDeploymentWorkflow.setWorkflowId("workflow-1");
 
         when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(1L)).thenReturn(projectDeploymentWorkflow);
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.empty());
 
         WorkflowTrigger workflowTrigger = new WorkflowTrigger(
             Map.of("name", "trigger_1", "parameters", Map.of(), "type", "workflow/v1/newWorkflowCall"));

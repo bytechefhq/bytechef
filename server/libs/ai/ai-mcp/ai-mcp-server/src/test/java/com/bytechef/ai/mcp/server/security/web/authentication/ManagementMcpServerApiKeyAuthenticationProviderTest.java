@@ -99,12 +99,13 @@ class ManagementMcpServerApiKeyAuthenticationProviderTest {
     }
 
     @Test
-    void testAuthenticateWithEnvironmentMismatchFails() {
+    void testAuthenticateAcceptsAnAdminApiKeyInAnyEnvironment() {
         mockApiKey(null, Environment.PRODUCTION);
 
-        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
-            () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(
-                getUnauthenticatedToken(Environment.STAGING, "server-secret")));
+        Authentication authentication = managementMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.STAGING, "server-secret"));
+
+        assertThat(authentication.isAuthenticated()).isTrue();
     }
 
     @Test
@@ -146,16 +147,16 @@ class ManagementMcpServerApiKeyAuthenticationProviderTest {
     }
 
     @Test
-    void testCanonicalPathRequiresManagementServerProperty() {
+    void testCanonicalPathDoesNotRequireTheManagementServerProperty() {
         mockApiKey(null, Environment.PRODUCTION);
 
         when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(Optional.empty());
 
-        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
-            () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(
-                getUnauthenticatedToken(Environment.PRODUCTION, null)));
+        Authentication authentication = managementMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.PRODUCTION, null));
 
-        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+        assertThat(authentication.isAuthenticated()).isTrue();
+        verify(apiKeyService).updateLastUsedDate(7L);
     }
 
     @Test

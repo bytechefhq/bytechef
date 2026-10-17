@@ -36,7 +36,7 @@ class McpServerOwnershipResolverTest {
 
     @Test
     void testResolvesWorkspace() {
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.of(42L));
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.of(42L));
 
         assertThat(resolver.resolveOwner(1L)
             .workspaceId()).hasValue(42L);
@@ -44,7 +44,7 @@ class McpServerOwnershipResolverTest {
 
     @Test
     void testUnknownIsUnknown() {
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(99L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(99L)).thenReturn(Optional.empty());
 
         assertThat(resolver.resolveOwner(99L)
             .workspaceId()).isEmpty();

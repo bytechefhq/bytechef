@@ -61,13 +61,15 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
             throw new BadCredentialsException("Authorization credentials do not exist");
         }
 
-        Property property = propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null)
-            .orElseThrow(() -> new BadCredentialsException("MCP server is not configured"));
-
         String mcpServerSecretKey = mcpApiKeyCredentials.getMcpServerSecretKey();
 
-        if (mcpServerSecretKey != null && !isMcpServerSecretKeyEqual(property.get("secretKey"), mcpServerSecretKey)) {
-            throw new BadCredentialsException("Invalid MCP server secret key");
+        if (mcpServerSecretKey != null) {
+            Property property = propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null)
+                .orElseThrow(() -> new BadCredentialsException("Invalid MCP server secret key"));
+
+            if (!isMcpServerSecretKeyEqual(property.get("secretKey"), mcpServerSecretKey)) {
+                throw new BadCredentialsException("Invalid MCP server secret key");
+            }
         }
 
         String secretKey = mcpApiKeyCredentials.getSecret();
@@ -83,10 +85,6 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
         }
 
         if (mcpApiKeyEntity.getType() != null) {
-            throw new BadCredentialsException("Invalid API key");
-        }
-
-        if (mcpApiKeyEntity.getEnvironment() != mcpApiKeyCredentials.getEnvironment()) {
             throw new BadCredentialsException("Invalid API key");
         }
 

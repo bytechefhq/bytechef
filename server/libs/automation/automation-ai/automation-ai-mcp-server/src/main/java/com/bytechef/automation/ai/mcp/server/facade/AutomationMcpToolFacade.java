@@ -254,7 +254,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         String toolName, String componentName, int componentVersion, String clusterElementName,
         Map<String, ?> parameters, @Nullable Long connectionId, long mcpServerId, long mcpToolId) {
 
-        Long workspaceId = workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServerId)
+        Long workspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId)
             .orElse(null);
 
         return request -> {
@@ -297,7 +297,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         String toolName, ProjectDeploymentWorkflow projectDeploymentWorkflow, String triggerName,
         Map<String, ?> workflowParameters, long mcpServerId) {
 
-        Long workspaceId = workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServerId)
+        Long workspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId)
             .orElse(null);
         long projectDeploymentWorkflowId = Objects.requireNonNull(projectDeploymentWorkflow.getId());
 

@@ -221,6 +221,7 @@ class EmbeddedMcpServerSecurityConfigurerIntTest {
         private void mockMcpServer(boolean authenticationRequired) {
             McpServer mcpServer = mock(McpServer.class);
 
+            when(mcpServer.getEnvironment()).thenReturn(Environment.PRODUCTION);
             when(mcpServer.getType()).thenReturn(PlatformType.EMBEDDED);
             when(mcpServer.isEnabled()).thenReturn(true);
             when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
