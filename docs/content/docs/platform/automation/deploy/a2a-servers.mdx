@@ -37,8 +37,9 @@ A new server is enabled straight away; switch it off or on with the toggle on it
 environment selected in the application sidebar when you create it (Development, Staging, or Production), and keeps
 it - so you can expose a different agent per environment. The list shows the servers of the selected environment.
 
-Creating, editing and deleting servers, and changing their skills, requires the `ADMIN` role. The secret key - and so
-the URLs on the server's **Connect** tab - is visible to tenant admins only.
+Creating, editing and deleting servers, and changing their skills, requires the editor role in the server's workspace
+(or tenant admin). The secret key - and so the URLs on the server's **Connect** tab - is visible to the same users;
+viewers see the servers but not their URLs.
 
 A server exposes nothing until you add a project to it.
 
@@ -123,13 +124,19 @@ request URL otherwise.
 
 ## Authentication
 
+Every A2A server belongs to a workspace, like an MCP server. Workspace members see the servers of their workspace, and editors (and tenant administrators) create, change and delete them and see their URL.
+
 The secret key in the URL identifies the server and the tenant that owns it. On top of that:
 
 - **Require authentication on** (default): every request - the agent card included - must present a ByteChef
-  workspace **API key** as a `Bearer` token in the `Authorization` header. The key must be an Automation key whose
-  environment matches the server's environment, and its user must be active. Other requests are rejected with `401`.
+  workspace **API key** as a `Bearer` token in the `Authorization` header. The key must be an Automation key of the
+  server's workspace whose environment matches the server's environment, and its user must be active. Other requests
+  are rejected with `401`.
 - **Require authentication off**: the secret-key URL is sufficient and no API key is needed; an API key that is sent
   is ignored. Use this only for low-risk agents or short-lived testing.
+
+In both modes a request may name an environment in the `X-ENVIRONMENT` header, but it must be the server's own;
+another one is rejected with `401`.
 
 A disabled server, or an unknown secret key, answers every request with `401`.
 
