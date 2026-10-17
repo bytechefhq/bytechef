@@ -8,6 +8,8 @@ export const COMPLETION_LANGUAGES = ['javascript', 'python', 'ruby', 'json', 'ya
 
 type MonacoType = typeof import('monaco-editor');
 
+const IDENTIFIER_BEFORE_CURSOR = /[A-Za-z_$][\w$]*$/;
+
 let completionProvidersRegistered = false;
 
 function toCompletionItemKind(monaco: MonacoType, kind: CompletionItemDraftType['kind']): languages.CompletionItemKind {
@@ -47,17 +49,19 @@ export function buildCompletionProvider(monaco: MonacoType): languages.Completio
                         ? await getWorkflowDefinitionCompletions({context, cursorOffset, source})
                         : await getScriptCompletions({context, cursorOffset, source});
 
-                const word = model.getWordUntilPosition(position);
+                const linePrefix = model.getLineContent(position.lineNumber).slice(0, position.column - 1);
+                const identifierLength = IDENTIFIER_BEFORE_CURSOR.exec(linePrefix)?.[0].length ?? 0;
 
                 const range = {
-                    endColumn: word.endColumn,
+                    endColumn: position.column,
                     endLineNumber: position.lineNumber,
-                    startColumn: word.startColumn,
+                    startColumn: position.column - identifierLength,
                     startLineNumber: position.lineNumber,
                 };
 
                 return {
                     suggestions: drafts.map((draft) => ({
+                        command: draft.retrigger ? {id: 'editor.action.triggerSuggest', title: 'Suggest'} : undefined,
                         detail: draft.detail,
                         documentation: draft.documentation,
                         filterText: draft.filterText,
