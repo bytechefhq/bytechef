@@ -55,4 +55,16 @@ public class RemoteConnectionServiceController {
     public ResponseEntity<List<Connection>> getConnections(@PathVariable PlatformType type) {
         return ResponseEntity.ok(connectionService.getConnections(type));
     }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/get-connections/{componentName}/{version}/{type}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<Connection>> getConnections(
+        @PathVariable String componentName, @PathVariable int version, @PathVariable PlatformType type) {
+
+        return ResponseEntity.ok(connectionService.getConnections(componentName, version, type));
+    }
 }

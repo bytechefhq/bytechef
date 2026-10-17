@@ -32,6 +32,7 @@ public class TelegramConstants {
 
     public static final String BOT_TOKEN = "botToken";
     public static final String CHAT_ID = "chat_id";
+    public static final String WEBHOOK_SECRET_TOKEN = "webhookSecretToken";
     public static final String DIRECT_MESSAGES_TOPIC_ID = "direct_messages_topic_id";
     public static final String DOCUMENT = "document";
     public static final String MEDIA_TYPE = "mediaType";

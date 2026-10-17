@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.webhook.web.rest;
+package com.bytechef.platform.webhook.web.rest.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.webhook.web.rest.ApprovalResolutionLookup.Resolution;
+import com.bytechef.platform.webhook.web.rest.handler.ApprovalResolutionLookup.Resolution;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import java.util.Map;
 import java.util.Optional;
