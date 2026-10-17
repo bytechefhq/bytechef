@@ -107,10 +107,12 @@ const AccountProfileMfa = () => {
 
                 {mfaState === 'enabled' && (
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3">
+                        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-surface-success-secondary p-3">
                             <ShieldCheckIcon className="size-4 text-green-600" />
 
-                            <p className="text-sm text-green-700">Two-factor authentication is enabled.</p>
+                            <p className="text-sm text-content-success-primary">
+                                Two-factor authentication is enabled.
+                            </p>
                         </div>
 
                         <Button
