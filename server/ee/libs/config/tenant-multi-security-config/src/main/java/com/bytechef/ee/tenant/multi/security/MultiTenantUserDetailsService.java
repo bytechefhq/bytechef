@@ -21,6 +21,7 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.web.authentication.TenantUser;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -71,10 +72,12 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
                 throw new UsernameNotFoundException("User with email " + login + " was not found in the database");
             }
 
+            String tenantId = tenantIds.getFirst();
+
             return TenantContext.callWithTenantId(
-                tenantIds.getFirst(),
+                tenantId,
                 () -> getUserService().fetchUserByEmail(login)
-                    .map(user -> createSpringSecurityUser(login, user))
+                    .map(user -> createSpringSecurityUser(login, user, tenantId))
                     .orElseThrow(() -> new UsernameNotFoundException(
                         "User with email " + login + " was not found in the database")));
         }
@@ -87,16 +90,17 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
             throw new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database");
         }
 
+        String tenantId = tenantIds.getFirst();
+
         return TenantContext.callWithTenantId(
-            tenantIds.getFirst(),
+            tenantId,
             () -> getUserService().fetchUserByLogin(lowercaseLogin)
-                .map(user -> createSpringSecurityUser(lowercaseLogin, user))
+                .map(user -> createSpringSecurityUser(lowercaseLogin, user, tenantId))
                 .orElseThrow(
                     () -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database")));
     }
 
-    private org.springframework.security.core.userdetails.User createSpringSecurityUser(
-        String lowercaseLogin, User user) {
+    private TenantUser createSpringSecurityUser(String lowercaseLogin, User user, String tenantId) {
 
         if (!user.isActivated()) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
@@ -110,8 +114,7 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
             .map(SimpleGrantedAuthority::new)
             .toList();
 
-        return new org.springframework.security.core.userdetails.User(
-            user.getLogin(), user.getPassword(), grantedAuthorities);
+        return new TenantUser(user.getLogin(), user.getPassword(), grantedAuthorities, tenantId);
     }
 
     @Override

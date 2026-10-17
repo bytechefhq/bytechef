@@ -22,6 +22,7 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.security.config.RememberMeKey;
+import com.bytechef.security.web.authentication.TenantUser;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
@@ -183,13 +184,21 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
         log.debug("Creating new persistent login for user {}", login);
 
+        boolean multiTenantEnabled = tenantService.isMultiTenantEnabled();
+
+        String tenantId = multiTenantEnabled
+            ? fetchAuthenticatedTenantId(request, successfulAuthentication, login).orElse(null) : null;
+
+        if (multiTenantEnabled && tenantId == null) {
+            log.warn("Skipping the persistent login for user {}: its tenant could not be determined", login);
+
+            return;
+        }
+
         Optional<User> optionalUser;
 
-        if (tenantService.isMultiTenantEnabled()) {
-            List<String> tenantIds = tenantService.getTenantIdsByUserLogin(login);
-
-            optionalUser = TenantContext.callWithTenantId(
-                tenantIds.getFirst(), () -> getUserService().fetchUserByLogin(login));
+        if (multiTenantEnabled) {
+            optionalUser = TenantContext.callWithTenantId(tenantId, () -> getUserService().fetchUserByLogin(login));
         } else {
             optionalUser = getUserService().fetchUserByLogin(login);
         }
@@ -211,10 +220,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
             .orElseThrow(() -> new UsernameNotFoundException("User " + login + " was not found in the database"));
 
         try {
-            if (tenantService.isMultiTenantEnabled()) {
-                List<String> tenantIds = tenantService.getTenantIdsByUserLogin(login);
-
-                TenantContext.runWithTenantId(tenantIds.getFirst(), () -> {
+            if (multiTenantEnabled) {
+                TenantContext.runWithTenantId(tenantId, () -> {
                     persistentTokenService.save(token);
 
                     addCookie(token, TenantContext.getCurrentTenantId(), request, response);
@@ -346,6 +353,28 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         }
 
         return userService;
+    }
+
+    private Optional<String> fetchAuthenticatedTenantId(
+        HttpServletRequest request, Authentication authentication, String login) {
+
+        if (authentication.getPrincipal() instanceof TenantUser tenantUser) {
+            return Optional.of(tenantUser.getTenantId());
+        }
+
+        HttpSession session = request.getSession(false);
+
+        if (session != null && session.getAttribute(TenantConstants.CURRENT_TENANT_ID) instanceof String tenantId) {
+            return Optional.of(tenantId);
+        }
+
+        List<String> tenantIds = tenantService.getTenantIdsByUserLogin(login);
+
+        if (tenantIds.size() == 1) {
+            return Optional.of(tenantIds.getFirst());
+        }
+
+        return Optional.empty();
     }
 
     private record UpgradedRememberMeToken(String[] upgradedToken, String userLogin) implements Serializable {
