@@ -33,6 +33,7 @@ public class SlackConstants {
 
     public static final String CHANNEL = "channel";
     public static final String CHALLENGE = "challenge";
+    public static final String SIGNING_SECRET = "signingSecret";
     public static final String ERROR = "error";
     public static final String ID = "id";
     public static final String NAME = "name";
