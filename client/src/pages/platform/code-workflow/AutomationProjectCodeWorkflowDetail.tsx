@@ -45,6 +45,7 @@ const AutomationProjectCodeWorkflowDetail = ({
 
     return (
         <CodeWorkflowSourceEditor
+            embedded
             error={sourceError}
             headerless={headerless}
             isLoading={sourceLoading}

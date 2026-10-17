@@ -1,8 +1,10 @@
+import {ConnectionDeclarationType} from '@/shared/components/monaco/completion/completionTypes';
 import {ScriptTestExecution} from '@/shared/middleware/graphql';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface PropertyCodeEditorStateI {
+    componentConnections: ConnectionDeclarationType[];
     conversationToken: string | null;
     copilotPanelOpen: boolean;
     dirty: boolean;
@@ -10,6 +12,7 @@ interface PropertyCodeEditorStateI {
     inputParameters: Record<string, unknown> | undefined;
     rightPanelOpen: boolean;
     saving: boolean;
+    scriptInput: Record<string, unknown>;
     scriptIsRunning: boolean;
     scriptTestExecution: ScriptTestExecution | undefined;
 }
@@ -17,12 +20,14 @@ interface PropertyCodeEditorStateI {
 interface PropertyCodeEditorActionsI {
     reset: () => void;
     setConversationToken: (token: string | null) => void;
+    setComponentConnections: (componentConnections: ConnectionDeclarationType[]) => void;
     setCopilotPanelOpen: (open: boolean) => void;
     setDirty: (dirty: boolean) => void;
     setEditorValue: (value: string | undefined) => void;
     setInputParameters: (inputParameters: Record<string, unknown> | undefined) => void;
     setRightPanelOpen: (open: boolean) => void;
     setSaving: (saving: boolean) => void;
+    setScriptInput: (scriptInput: Record<string, unknown>) => void;
     setScriptIsRunning: (running: boolean) => void;
     setScriptTestExecution: (execution: ScriptTestExecution | undefined) => void;
 }
@@ -30,6 +35,7 @@ interface PropertyCodeEditorActionsI {
 type PropertyCodeEditorStoreType = PropertyCodeEditorActionsI & PropertyCodeEditorStateI;
 
 const initialState: PropertyCodeEditorStateI = {
+    componentConnections: [],
     conversationToken: null,
     copilotPanelOpen: false,
     dirty: false,
@@ -37,6 +43,7 @@ const initialState: PropertyCodeEditorStateI = {
     inputParameters: undefined,
     rightPanelOpen: true,
     saving: false,
+    scriptInput: {},
     scriptIsRunning: false,
     scriptTestExecution: undefined,
 };
@@ -46,6 +53,7 @@ export const usePropertyCodeEditorDialogStore = create<PropertyCodeEditorStoreTy
         (set) => ({
             ...initialState,
             reset: () => set(initialState),
+            setComponentConnections: (componentConnections) => set({componentConnections}),
             setConversationToken: (token) => set({conversationToken: token}),
             setCopilotPanelOpen: (open) => set({copilotPanelOpen: open}),
             setDirty: (dirty) => set({dirty}),
@@ -53,6 +61,7 @@ export const usePropertyCodeEditorDialogStore = create<PropertyCodeEditorStoreTy
             setInputParameters: (inputParameters) => set({inputParameters}),
             setRightPanelOpen: (open) => set({rightPanelOpen: open}),
             setSaving: (saving) => set({saving}),
+            setScriptInput: (scriptInput) => set({scriptInput}),
             setScriptIsRunning: (running) => set({scriptIsRunning: running}),
             setScriptTestExecution: (execution) => set({scriptTestExecution: execution}),
         }),
