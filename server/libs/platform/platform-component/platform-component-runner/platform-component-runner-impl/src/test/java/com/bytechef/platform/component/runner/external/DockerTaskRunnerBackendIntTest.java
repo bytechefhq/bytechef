@@ -254,12 +254,13 @@ class DockerTaskRunnerBackendIntTest {
     }
 
     @Test
-    void testADeclaredConnectionReachesTheContainerAndIsMasked() {
+    void testTheConnectionsFileReachesTheContainerAndIsMasked() {
         TaskRunnerRequest request = new TaskRunnerRequest(
             "shell", null,
             List.of(
-                "test \"$BYTECHEF_CONNECTION_SLACK_TOKEN\" = 'xoxb-123456' && echo matched",
-                "echo \"token=$BYTECHEF_CONNECTION_SLACK_TOKEN\""),
+                "grep -q 'xoxb-123456' \"$BYTECHEF_CONNECTIONS_FILE\" && echo matched",
+                "echo \"file=$(cat \"$BYTECHEF_CONNECTIONS_FILE\")\"",
+                "echo \"[${BYTECHEF_CONNECTION_SLACK_TOKEN:-}]\""),
             Map.of(), Map.of(), Map.of(), List.of(), ParametersFactory.create(Map.of()),
             ParametersFactory.create(Map.of("image", IMAGE)), TIMEOUT,
             Map.of("slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null)),
@@ -268,7 +269,8 @@ class DockerTaskRunnerBackendIntTest {
         TaskRunnerResult taskRunnerResult = taskRunner().run(request);
 
         assertThat(taskRunnerResult.stdout()).contains("matched")
-            .contains("token=******")
+            .contains("file=******")
+            .contains("[]")
             .doesNotContain("xoxb-123456");
     }
 

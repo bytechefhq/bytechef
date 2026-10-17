@@ -19,6 +19,7 @@ package com.bytechef.platform.component.runner.external;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.ENTRYPOINT;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.HOST;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.TASK_RUNNER;
+import static com.bytechef.platform.component.runner.external.TaskRunnerBootstrap.CONNECTIONS_FILE_VARIABLE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
@@ -158,14 +159,17 @@ public class RemoteTaskRunner implements TaskRunner {
     public TaskRunnerResult run(TaskRunnerRequest request) {
         validate(request);
 
-        TaskRunnerConnectionEnvironment connectionEnvironment = TaskRunnerConnectionEnvironment.of(
-            request, applicationProperties);
+        TaskRunnerConnections taskRunnerConnections = TaskRunnerConnections.of(request, applicationProperties);
 
         try (TaskRunnerWorkingDirectory workingDirectory = TaskRunnerWorkingDirectory.create(request);
             CapturingLogSink logSink = new CapturingLogSink(
-                getType(), limits().getMaxLogBytes(), connectionEnvironment.secretMasker())) {
+                getType(), limits().getMaxLogBytes(), taskRunnerConnections.secretMasker())) {
 
-            return run(request, workingDirectory, logSink, connectionEnvironment.variables());
+            if (taskRunnerConnections.enabled()) {
+                workingDirectory.writeConnectionsFile(taskRunnerConnections.connections());
+            }
+
+            return run(request, workingDirectory, logSink, taskRunnerConnections.enabled());
         } catch (IOException exception) {
             throw new UncheckedIOException(exception);
         } catch (InterruptedException exception) {
@@ -179,7 +183,7 @@ public class RemoteTaskRunner implements TaskRunner {
 
     private TaskRunnerResult run(
         TaskRunnerRequest request, TaskRunnerWorkingDirectory workingDirectory, CapturingLogSink logSink,
-        Map<String, String> connectionVariables) throws IOException, InterruptedException {
+        boolean connectionsFileWritten) throws IOException, InterruptedException {
 
         String type = getType();
 
@@ -208,7 +212,7 @@ public class RemoteTaskRunner implements TaskRunner {
 
         RemoteJobSpec spec = new RemoteJobSpec(
             resolvedKey.key(), languageId, sourceFileName, resolveInterpreter(request),
-            environment(request, backend.getRemoteWorkingDirectory(), connectionVariables),
+            environment(request, backend.getRemoteWorkingDirectory(), connectionsFileWritten),
             backend.getRemoteWorkingDirectory(),
             settings.pullPolicy(), request.runnerParameters());
 
@@ -445,7 +449,7 @@ public class RemoteTaskRunner implements TaskRunner {
     }
 
     private static Map<String, String> environment(
-        TaskRunnerRequest request, String remoteWorkingDirectory, Map<String, String> connectionVariables) {
+        TaskRunnerRequest request, String remoteWorkingDirectory, boolean connectionsFileWritten) {
 
         String directory = remoteWorkingDirectory.length() > 1 && remoteWorkingDirectory.endsWith("/")
             ? remoteWorkingDirectory.substring(0, remoteWorkingDirectory.length() - 1)
@@ -454,11 +458,17 @@ public class RemoteTaskRunner implements TaskRunner {
         Map<String, String> environment = new LinkedHashMap<>();
 
         environment.put("HOME", directory);
-        environment.putAll(connectionVariables);
         environment.putAll(request.env());
         environment.put("BYTECHEF_WORKING_DIR", directory);
         environment.put("BYTECHEF_INPUT_FILE", directory + "/" + RemoteJobSpec.INPUT_FILE_NAME);
         environment.put("BYTECHEF_OUTPUT_DIR", directory + "/" + RemoteJobSpec.OUTPUT_DIRECTORY_NAME);
+
+        if (connectionsFileWritten) {
+            environment.put(
+                CONNECTIONS_FILE_VARIABLE, directory + "/" + TaskRunnerWorkingDirectory.CONNECTIONS_FILE_NAME);
+        } else {
+            environment.remove(CONNECTIONS_FILE_VARIABLE);
+        }
 
         return environment;
     }

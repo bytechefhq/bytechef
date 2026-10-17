@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.ComponentConnection;
@@ -457,7 +458,7 @@ class RemoteTaskRunnerTest {
     }
 
     @Test
-    void testTheSpecCarriesTheConnectionVariablesBeforeTheAuthorsAndTheContractVariables() {
+    void testTheSpecCarriesTheConnectionsFileAndNoConnectionVariables() {
         FakeBackend backend = new FakeBackend();
 
         Map<String, ComponentConnection> connections = Map.of(
@@ -468,14 +469,18 @@ class RemoteTaskRunnerTest {
 
         Map<String, String> environment = backend.submittedSpec.environment();
 
-        assertThat(environment).containsEntry("BYTECHEF_CONNECTION_SLACK_TOKEN", "xoxb-123456")
-            .containsKey("BYTECHEF_CONNECTION_SLACK")
-            .doesNotContainKey("BYTECHEF_CONNECTION_TASKRUNNER")
+        assertThat(environment).containsEntry("BYTECHEF_CONNECTIONS_FILE", "/work/connections.json")
             .containsEntry("BYTECHEF_INPUT_FILE", "/work/input.json");
+        assertThat(environment.keySet()).noneMatch(name -> name.startsWith("BYTECHEF_CONNECTION_"));
+        assertThat(environment.values()).noneMatch(value -> value.contains("xoxb-123456"));
+        assertThat(backend.submittedEntries).contains("connections.json")
+            .doesNotContain("output/connections.json");
+        assertThat(JsonUtils.readMap(backend.submittedFiles.get("connections.json")))
+            .isEqualTo(Map.of("slack", Map.of("token", "xoxb-123456")));
     }
 
     @Test
-    void testTheAuthorsEnvironmentOverridesAnInjectedVariableInTheSpec() {
+    void testTheAuthorsEnvironmentCannotRedirectTheConnectionsFileInTheSpec() {
         FakeBackend backend = new FakeBackend();
 
         ActionContextAware actionContext = mock(ActionContextAware.class);
@@ -484,7 +489,7 @@ class RemoteTaskRunnerTest {
         when(actionContext.getJobId()).thenReturn(100L);
 
         TaskRunnerRequest request = new TaskRunnerRequest(
-            "python", SCRIPT, List.of(), Map.of(), Map.of("BYTECHEF_CONNECTION_SLACK_TOKEN", "from-the-author"),
+            "python", SCRIPT, List.of(), Map.of(), Map.of("BYTECHEF_CONNECTIONS_FILE", "/elsewhere.json"),
             Map.of(), List.of(), ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of()), null,
             Map.of("slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null)),
             actionContext);
@@ -492,7 +497,20 @@ class RemoteTaskRunnerTest {
         injectingRunner(backend).run(request);
 
         assertThat(backend.submittedSpec.environment())
-            .containsEntry("BYTECHEF_CONNECTION_SLACK_TOKEN", "from-the-author");
+            .containsEntry("BYTECHEF_CONNECTIONS_FILE", "/work/connections.json");
+    }
+
+    @Test
+    void testTheSwitchOffShipsNoConnectionsFile() {
+        FakeBackend backend = new FakeBackend();
+
+        runner(backend).run(request(Map.of(), 7L, Map.of(
+            "slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null))));
+
+        assertThat(backend.submittedSpec.environment()).doesNotContainKey("BYTECHEF_CONNECTIONS_FILE");
+        assertThat(backend.submittedSpec.environment()
+            .keySet()).noneMatch(name -> name.startsWith("BYTECHEF_CONNECTION_"));
+        assertThat(backend.submittedEntries).doesNotContain("connections.json");
     }
 
     @Test
@@ -592,6 +610,7 @@ class RemoteTaskRunnerTest {
         private @Nullable String existingKey;
         private @Nullable RemoteJobSpec submittedSpec;
         private List<String> submittedEntries = List.of();
+        private Map<String, String> submittedFiles = Map.of();
         private @Nullable RemoteJobHandle awaitedHandle;
         private @Nullable Duration completionBudget;
         private @Nullable TaskRunnerConnection connection;
@@ -653,7 +672,10 @@ class RemoteTaskRunnerTest {
 
             lastContext = context;
             submittedSpec = spec;
-            submittedEntries = ContainerArchiveTest.entryNames(inputArchive);
+            byte[] archive = inputArchive.readAllBytes();
+
+            submittedEntries = ContainerArchiveTest.entryNames(new ByteArrayInputStream(archive));
+            submittedFiles = ContainerArchiveTest.entryContents(new ByteArrayInputStream(archive));
 
             return new RemoteJobHandle("job-1");
         }

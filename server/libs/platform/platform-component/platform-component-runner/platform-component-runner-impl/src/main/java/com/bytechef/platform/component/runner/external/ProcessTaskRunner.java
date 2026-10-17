@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.INHERIT_ENVIRONMENT;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.INTERPRETER;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.PROCESS;
+import static com.bytechef.platform.component.runner.external.TaskRunnerBootstrap.CONNECTIONS_FILE_VARIABLE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.config.ApplicationProperties;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -151,10 +153,15 @@ public class ProcessTaskRunner implements TaskRunner {
     private TaskRunnerResult run(TaskRunnerRequest request, TaskRunnerWorkingDirectory workingDirectory)
         throws IOException, InterruptedException {
 
-        TaskRunnerConnectionEnvironment connectionEnvironment = TaskRunnerConnectionEnvironment.of(
-            request, applicationProperties);
+        TaskRunnerConnections taskRunnerConnections = TaskRunnerConnections.of(request, applicationProperties);
 
-        SecretMasker secretMasker = connectionEnvironment.secretMasker();
+        SecretMasker secretMasker = taskRunnerConnections.secretMasker();
+
+        Path connectionsFilePath = null;
+
+        if (taskRunnerConnections.enabled()) {
+            connectionsFilePath = workingDirectory.writeConnectionsFile(taskRunnerConnections.connections());
+        }
 
         String languageId = request.languageId();
         String script = request.script();
@@ -173,7 +180,7 @@ public class ProcessTaskRunner implements TaskRunner {
             workingDirectory.getPath()
                 .toFile());
 
-        applyEnvironment(processBuilder, request, workingDirectory, connectionEnvironment.variables());
+        applyEnvironment(processBuilder, request, workingDirectory, connectionsFilePath);
 
         Process process = processBuilder.start();
 
@@ -265,7 +272,7 @@ public class ProcessTaskRunner implements TaskRunner {
 
     private static void applyEnvironment(
         ProcessBuilder processBuilder, TaskRunnerRequest request, TaskRunnerWorkingDirectory workingDirectory,
-        Map<String, String> connectionVariables) {
+        @Nullable Path connectionsFilePath) {
 
         Map<String, String> environment = processBuilder.environment();
 
@@ -285,9 +292,14 @@ public class ProcessTaskRunner implements TaskRunner {
                     .toString());
         }
 
-        environment.putAll(connectionVariables);
         environment.putAll(request.env());
         environment.putAll(workingDirectory.getEnvironment());
+
+        if (connectionsFilePath == null) {
+            environment.remove(CONNECTIONS_FILE_VARIABLE);
+        } else {
+            environment.put(CONNECTIONS_FILE_VARIABLE, connectionsFilePath.toString());
+        }
     }
 
     private static void closeStandardInput(Process process) {
