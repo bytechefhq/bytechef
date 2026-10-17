@@ -9,15 +9,18 @@ package com.bytechef.ee.tenant.multi.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
+import com.bytechef.security.web.authentication.TenantUser;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -119,6 +122,40 @@ class MultiTenantAuthenticationSuccessHandlerTest {
 
         assertThat(SecurityContextHolder.getContext()
             .getAuthentication()).isNull();
+    }
+
+    @Test
+    void testSessionGetsTheTenantThePasswordWasCheckedAgainst() {
+        when(tenantService.getTenantIdsByUserEmail(anyString())).thenReturn(List.of("000004"));
+
+        TenantUser tenantUser = new TenantUser(
+            "jane@example.com", String.valueOf(UUID.randomUUID()), List.of(), "000003");
+
+        Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(
+            tenantUser, null, tenantUser.getAuthorities());
+
+        MockHttpServletRequest request = createLoginRequest("jane@example.com");
+
+        multiTenantAuthenticationSuccessHandler.onAuthenticationSuccess(
+            request, new MockHttpServletResponse(), authentication);
+
+        assertThat(request.getSession()
+            .getAttribute(TenantConstants.CURRENT_TENANT_ID)).isEqualTo("000003");
+    }
+
+    @Test
+    void testSignInWithLoginInSeveralTenantsIsRejected() {
+        when(tenantService.getTenantIdsByUserLogin("jane")).thenReturn(List.of("000002", "000003"));
+
+        MockHttpServletRequest request = createLoginRequest("jane");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        multiTenantAuthenticationSuccessHandler.onAuthenticationSuccess(
+            request, response, createAuthentication("jane"));
+
+        assertThat(response.getStatus()).isEqualTo(401);
+
+        verify(rememberMeServices).loginFail(request, response);
     }
 
     private static Authentication createAuthentication(String login) {

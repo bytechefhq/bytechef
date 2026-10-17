@@ -15,4 +15,5 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation("org.springframework:spring-test")
 }
