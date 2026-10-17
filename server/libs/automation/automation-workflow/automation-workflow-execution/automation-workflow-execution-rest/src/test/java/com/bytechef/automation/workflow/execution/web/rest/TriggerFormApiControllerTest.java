@@ -19,6 +19,7 @@ package com.bytechef.automation.workflow.execution.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -28,8 +29,8 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.web.rest.model.TriggerFormModel;
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
@@ -77,7 +78,7 @@ class TriggerFormApiControllerTest {
         });
         when(workflowService.getWorkflow("workflow-1")).thenReturn(
             new Workflow("workflow-1", DEFINITION, Workflow.Format.JSON));
-        when(conversionService.convert(any(Map.class), any())).thenReturn(triggerFormModel);
+        when(conversionService.convert(any(Map.class), eq(TriggerFormModel.class))).thenReturn(triggerFormModel);
 
         ResponseEntity<TriggerFormModel> responseEntity = triggerFormApiController.getTriggerForm(
             encodeId("000003"));
