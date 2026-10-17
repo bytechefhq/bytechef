@@ -117,14 +117,14 @@ class AwsBatchJobFactoryTest {
     }
 
     @Test
-    void testConnectionVariablesReachOnlyTheMainContainer() throws Exception {
+    void testTaskEnvironmentVariablesReachOnlyTheMainContainer() throws Exception {
         Map<String, TaskContainerProperties> containers = containers(
-            definition(Map.of(), Map.of("BYTECHEF_CONNECTION_SLACK_TOKEN", "xoxb-123456")));
+            definition(Map.of(), Map.of("SLACK_TOKEN", "xoxb-123456")));
 
-        assertThat(environment(containers.get("main"))).containsEntry("BYTECHEF_CONNECTION_SLACK_TOKEN", "xoxb-123456");
-        assertThat(environment(containers.get("bytechef-init"))).doesNotContainKey("BYTECHEF_CONNECTION_SLACK_TOKEN");
+        assertThat(environment(containers.get("main"))).containsEntry("SLACK_TOKEN", "xoxb-123456");
+        assertThat(environment(containers.get("bytechef-init"))).doesNotContainKey("SLACK_TOKEN");
         assertThat(environment(containers.get("bytechef-output")))
-            .doesNotContainKey("BYTECHEF_CONNECTION_SLACK_TOKEN");
+            .doesNotContainKey("SLACK_TOKEN");
     }
 
     @Test
