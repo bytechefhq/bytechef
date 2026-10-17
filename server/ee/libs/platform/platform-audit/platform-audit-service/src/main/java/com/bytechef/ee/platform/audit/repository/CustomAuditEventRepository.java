@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.audit.AuditEvent;
@@ -41,6 +42,11 @@ public class CustomAuditEventRepository implements AuditEventRepository {
      * Should be the same as in Liquibase migration.
      */
     protected static final int EVENT_DATA_COLUMN_MAX_LENGTH = 255;
+
+    /**
+     * Should be the same as in Liquibase migration.
+     */
+    protected static final int PRINCIPAL_COLUMN_MAX_LENGTH = 256;
 
     private final PersistenceAuditEventRepository persistenceAuditEventRepository;
 
@@ -82,7 +88,7 @@ public class CustomAuditEventRepository implements AuditEventRepository {
 
             persistentAuditEvent.setEventDate(LocalDateTimeUtils.toLocalDateTime(event.getTimestamp()));
             persistentAuditEvent.setEventType(event.getType());
-            persistentAuditEvent.setPrincipal(event.getPrincipal());
+            persistentAuditEvent.setPrincipal(StringUtils.truncate(event.getPrincipal(), PRINCIPAL_COLUMN_MAX_LENGTH));
 
             Map<String, String> eventData = auditEventConverter.convertDataToStrings(event.getData());
 
