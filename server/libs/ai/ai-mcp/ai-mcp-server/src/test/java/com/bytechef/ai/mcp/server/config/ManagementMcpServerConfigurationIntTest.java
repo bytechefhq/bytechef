@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
-import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
+import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
@@ -51,7 +51,7 @@ class ManagementMcpServerConfigurationIntTest {
     private final ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
         .withBean(ComponentTools.class, () -> mock(ComponentTools.class))
         .withBean(ProjectTools.class, () -> mock(ProjectTools.class))
-        .withBean(ProjectWorkflowTools.class, () -> mock(ProjectWorkflowTools.class))
+        .withBean(ProjectWorkflowLifecycleTools.class, () -> mock(ProjectWorkflowLifecycleTools.class))
         .withBean(TaskTools.class, () -> mock(TaskTools.class))
         .withBean(TaskDispatcherTools.class, () -> mock(TaskDispatcherTools.class))
         .withBean(ScriptTools.class, () -> mock(ScriptTools.class))
@@ -110,6 +110,44 @@ class ManagementMcpServerConfigurationIntTest {
 
                 assertThat(toolNames).contains("buildWorkflow");
             });
+    }
+
+    @Test
+    void testToolCallbackProviderExposesLifecycleToolsWithoutUpdateWorkflow() {
+        applicationContextRunner.run(context -> {
+            assertThat(context).hasNotFailed();
+
+            ManagementMcpServerConfiguration configuration = context.getBean(ManagementMcpServerConfiguration.class);
+
+            List<String> toolNames = Arrays.stream(configuration.toolCallbackProvider()
+                .getToolCallbacks())
+                .map(toolCallback -> toolCallback.getToolDefinition()
+                    .name())
+                .toList();
+
+            assertThat(toolNames)
+                .contains("createProjectWorkflow", "deleteWorkflow", "saveWorkflowTestConnection")
+                .doesNotContain("updateWorkflow");
+        });
+    }
+
+    @Test
+    void testCreateProjectWorkflowTakesNameNotDefinition() {
+        applicationContextRunner.run(context -> {
+            assertThat(context).hasNotFailed();
+
+            ManagementMcpServerConfiguration configuration = context.getBean(ManagementMcpServerConfiguration.class);
+
+            ToolDefinition toolDefinition = Arrays.stream(configuration.toolCallbackProvider()
+                .getToolCallbacks())
+                .map(ToolCallback::getToolDefinition)
+                .filter(definition -> "createProjectWorkflow".equals(definition.name()))
+                .findFirst()
+                .orElseThrow();
+
+            assertThat(toolDefinition.inputSchema()).contains("\"name\"");
+            assertThat(toolDefinition.inputSchema()).doesNotContain("definition");
+        });
     }
 
     @Test
