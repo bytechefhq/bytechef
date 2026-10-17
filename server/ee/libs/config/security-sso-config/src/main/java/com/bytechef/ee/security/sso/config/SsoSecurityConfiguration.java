@@ -59,13 +59,13 @@ class SsoSecurityConfiguration {
     @Bean
     OAuth2LoginCustomizer ssoOAuth2LoginCustomizer(
         CustomOAuth2UserService customOAuth2UserService, CustomOidcUserService customOidcUserService,
-        RememberMeServices rememberMeServices, TenantService tenantService) {
+        RememberMeServices rememberMeServices, TenantService tenantService, UserService userService) {
 
         return http -> http.oauth2Login(oauth2 -> oauth2
             .userInfoEndpoint(endpoint -> endpoint
                 .userService(customOAuth2UserService)
                 .oidcUserService(customOidcUserService))
-            .successHandler(new SsoOAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService))
+            .successHandler(new SsoOAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService, userService))
             .failureHandler(new SsoOAuth2AuthenticationFailureHandler()));
     }
 

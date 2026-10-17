@@ -8,6 +8,7 @@
 package com.bytechef.ee.tenant.multi.security.web.authentication;
 
 import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
+import com.bytechef.security.web.authentication.TenantUser;
 import com.bytechef.security.web.authentication.TwoFactorAuthentication;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -58,9 +60,9 @@ public final class MultiTenantAuthenticationSuccessHandler implements Authentica
         UserDetails userDetails = (UserDetails) Objects.requireNonNull(
             authentication.getPrincipal(), "principal is required");
 
-        List<String> tenantIds = getTenantIds(request, userDetails);
+        String tenantId = getTenantId(request, userDetails);
 
-        if (tenantIds.isEmpty()) {
+        if (tenantId == null) {
             rememberMeServices.loginFail(request, response);
 
             SecurityContextHolder.clearContext();
@@ -78,7 +80,7 @@ public final class MultiTenantAuthenticationSuccessHandler implements Authentica
 
         HttpSession session = request.getSession();
 
-        session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantIds.getFirst());
+        session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantId);
 
         TwoFactorAuthenticationCustomizer twoFactorAuthenticationCustomizer =
             twoFactorAuthenticationCustomizerProvider.getIfAvailable();
@@ -96,6 +98,20 @@ public final class MultiTenantAuthenticationSuccessHandler implements Authentica
         } else {
             response.setStatus(HttpStatus.OK.value());
         }
+    }
+
+    private @Nullable String getTenantId(HttpServletRequest request, UserDetails userDetails) {
+        if (userDetails instanceof TenantUser tenantUser) {
+            return tenantUser.getTenantId();
+        }
+
+        List<String> tenantIds = getTenantIds(request, userDetails);
+
+        if (tenantIds.size() != 1) {
+            return null;
+        }
+
+        return tenantIds.getFirst();
     }
 
     private List<String> getTenantIds(HttpServletRequest request, UserDetails userDetails) {
