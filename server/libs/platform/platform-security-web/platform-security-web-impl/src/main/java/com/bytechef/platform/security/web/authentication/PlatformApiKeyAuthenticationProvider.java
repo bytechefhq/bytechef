@@ -59,8 +59,7 @@ public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvi
         ApiKey apiKey;
 
         try {
-            apiKey = apiKeyService.getApiKey(
-                platformApiKeyAuthenticationToken.getSecretKey(), platformApiKeyAuthenticationToken.getEnvironmentId());
+            apiKey = apiKeyService.getApiKey(platformApiKeyAuthenticationToken.getSecretKey());
         } catch (IllegalArgumentException e) {
             throw new BadCredentialsException("Unknown API secret key", e);
         }

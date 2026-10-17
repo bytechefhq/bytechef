@@ -220,7 +220,7 @@ public class AutomationMcpServerConfiguration {
                     toolSpecification, mcpToolFacade, mcpServer.getId()))
             .forEach(tools::add);
 
-        workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServer.getId())
+        workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServer.getId())
             .ifPresent(workspaceId -> workspaceToolProviders.orderedStream()
                 .flatMap(provider -> CollectionUtils.stream(provider.getFunctionToolCallbacks(workspaceId)))
                 .map(McpToolUtils::toAsyncToolSpecification)
