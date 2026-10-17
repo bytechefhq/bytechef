@@ -17,7 +17,11 @@
 package com.bytechef.ee.tenant.multi.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.user.domain.User;
@@ -33,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * @author Ivica Cardic
@@ -80,6 +85,28 @@ class MultiTenantUserDetailsServiceTest {
         assertThat(userDetails).isInstanceOf(TenantUser.class);
         assertThat(((TenantUser) userDetails).getTenantId()).isEqualTo(TENANT_ID);
         assertThat(userDetails.getUsername()).isEqualTo(LOGIN);
+    }
+
+    @Test
+    void testLoadUserByEmailMatchingSeveralTenantsIsRejected() {
+        when(tenantService.getTenantIdsByUserEmail(EMAIL)).thenReturn(List.of(TENANT_ID, "000004"));
+        when(userService.fetchUserByEmail(EMAIL)).thenAnswer(invocation -> createUser());
+
+        assertThatThrownBy(() -> multiTenantUserDetailsService.loadUserByUsername(EMAIL))
+            .isInstanceOf(UsernameNotFoundException.class);
+
+        verify(userService, never()).fetchUserByEmail(anyString());
+    }
+
+    @Test
+    void testLoadUserByLoginMatchingSeveralTenantsIsRejected() {
+        when(tenantService.getTenantIdsByUserLogin(LOGIN)).thenReturn(List.of(TENANT_ID, "000004"));
+        when(userService.fetchUserByLogin(LOGIN)).thenAnswer(invocation -> createUser());
+
+        assertThatThrownBy(() -> multiTenantUserDetailsService.loadUserByUsername(LOGIN))
+            .isInstanceOf(UsernameNotFoundException.class);
+
+        verify(userService, never()).fetchUserByLogin(anyString());
     }
 
     private static Optional<User> createUser() {

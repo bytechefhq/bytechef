@@ -8,6 +8,7 @@
 package com.bytechef.ee.tenant.multi.security.web.authentication;
 
 import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
+import com.bytechef.security.web.authentication.TenantUser;
 import com.bytechef.security.web.authentication.TwoFactorAuthentication;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
@@ -52,11 +53,12 @@ public final class MultiTenantAuthenticationSuccessHandler implements Authentica
         UserDetails userDetails = (UserDetails) Objects.requireNonNull(
             authentication.getPrincipal(), "principal is required");
 
-        List<String> tenantIds = tenantService.getTenantIdsByUserEmail(userDetails.getUsername());
+        String tenantId = userDetails instanceof TenantUser tenantUser
+            ? tenantUser.getTenantId() : getSingleTenantId(userDetails.getUsername());
 
         HttpSession session = request.getSession();
 
-        session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantIds.getFirst());
+        session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantId);
 
         TwoFactorAuthenticationCustomizer twoFactorAuthenticationCustomizer =
             twoFactorAuthenticationCustomizerProvider.getIfAvailable();
@@ -74,5 +76,15 @@ public final class MultiTenantAuthenticationSuccessHandler implements Authentica
         } else {
             response.setStatus(HttpStatus.OK.value());
         }
+    }
+
+    private String getSingleTenantId(String username) {
+        List<String> tenantIds = tenantService.getTenantIdsByUserEmail(username);
+
+        if (tenantIds.size() != 1) {
+            throw new IllegalStateException("The tenant of user " + username + " could not be determined");
+        }
+
+        return tenantIds.getFirst();
     }
 }

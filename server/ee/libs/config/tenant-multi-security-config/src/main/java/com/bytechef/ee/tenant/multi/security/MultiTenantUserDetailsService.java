@@ -66,13 +66,7 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
         EmailValidator emailValidator = EmailValidator.getInstance();
 
         if (emailValidator.isValid(login)) {
-            List<String> tenantIds = tenantService.getTenantIdsByUserEmail(login);
-
-            if (tenantIds.isEmpty()) {
-                throw new UsernameNotFoundException("User with email " + login + " was not found in the database");
-            }
-
-            String tenantId = tenantIds.getFirst();
+            String tenantId = getSingleTenantId(tenantService.getTenantIdsByUserEmail(login), login);
 
             return TenantContext.callWithTenantId(
                 tenantId,
@@ -84,13 +78,7 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
 
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
 
-        List<String> tenantIds = tenantService.getTenantIdsByUserLogin(lowercaseLogin);
-
-        if (tenantIds.isEmpty()) {
-            throw new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database");
-        }
-
-        String tenantId = tenantIds.getFirst();
+        String tenantId = getSingleTenantId(tenantService.getTenantIdsByUserLogin(lowercaseLogin), lowercaseLogin);
 
         return TenantContext.callWithTenantId(
             tenantId,
@@ -98,6 +86,20 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
                 .map(user -> createSpringSecurityUser(lowercaseLogin, user, tenantId))
                 .orElseThrow(
                     () -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database")));
+    }
+
+    private static String getSingleTenantId(List<String> tenantIds, String login) {
+        if (tenantIds.isEmpty()) {
+            throw new UsernameNotFoundException("User " + login + " was not found in the database");
+        }
+
+        if (tenantIds.size() > 1) {
+            log.warn("Refusing the sign-in of {}: it matches users in {} tenants", login, tenantIds.size());
+
+            throw new UsernameNotFoundException("User " + login + " matches users in more than one tenant");
+        }
+
+        return tenantIds.getFirst();
     }
 
     private TenantUser createSpringSecurityUser(String lowercaseLogin, User user, String tenantId) {
