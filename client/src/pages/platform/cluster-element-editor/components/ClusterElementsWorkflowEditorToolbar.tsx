@@ -48,7 +48,7 @@ const ClusterElementsWorkflowEditorToolbar = ({onResetLayout}: ClusterElementsWo
                         />
                     </TooltipTrigger>
 
-                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-ontooltip" side="top">
                         Zoom in
                     </TooltipContent>
                 </Tooltip>
@@ -64,7 +64,7 @@ const ClusterElementsWorkflowEditorToolbar = ({onResetLayout}: ClusterElementsWo
                         />
                     </TooltipTrigger>
 
-                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-ontooltip" side="top">
                         Zoom out
                     </TooltipContent>
                 </Tooltip>
@@ -80,7 +80,7 @@ const ClusterElementsWorkflowEditorToolbar = ({onResetLayout}: ClusterElementsWo
                         />
                     </TooltipTrigger>
 
-                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-ontooltip" side="top">
                         Fit to screen
                     </TooltipContent>
                 </Tooltip>
@@ -96,7 +96,7 @@ const ClusterElementsWorkflowEditorToolbar = ({onResetLayout}: ClusterElementsWo
                         />
                     </TooltipTrigger>
 
-                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-ontooltip" side="top">
                         Reset layout
                     </TooltipContent>
                 </Tooltip>
@@ -112,7 +112,7 @@ const ClusterElementsWorkflowEditorToolbar = ({onResetLayout}: ClusterElementsWo
                         />
                     </TooltipTrigger>
 
-                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                    <TooltipContent className="rounded-lg bg-surface-tooltip text-content-ontooltip" side="top">
                         {nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
                     </TooltipContent>
                 </Tooltip>

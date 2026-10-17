@@ -25,14 +25,14 @@ const DataPillPanelBodyInputsItem = () => {
 
     return (
         <>
-            <AccordionTrigger className="group flex w-full items-center justify-between border-border/50 bg-surface-main p-4 group-data-[state=closed]:border-b">
+            <AccordionTrigger className="group flex w-full items-center justify-between border-border/50 bg-surface-main p-4 group-data-[state=closed]:border-b dark:bg-popover">
                 <div className="flex items-center space-x-4">
                     <FormInputIcon className="size-5" />
 
                     <span className="text-sm">Inputs</span>
                 </div>
 
-                <ChevronDownIcon className="size-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
+                <ChevronDownIcon className="size-5 text-content-neutral-tertiary transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
 
             <AccordionContent className="size-full space-y-2 border-b border-b-border/50 px-4 pb-4">

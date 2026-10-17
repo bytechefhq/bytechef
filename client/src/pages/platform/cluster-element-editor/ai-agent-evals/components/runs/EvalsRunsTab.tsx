@@ -27,8 +27,8 @@ const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
     if (selectedTestId == null) {
         return (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
-                <div className="flex size-12 items-center justify-center rounded-full bg-blue-100">
-                    <PlayCircleIcon className="size-6 text-blue-600" />
+                <div className="flex size-12 items-center justify-center rounded-full bg-surface-brand-secondary">
+                    <PlayCircleIcon className="size-6 text-content-brand-primary" />
                 </div>
 
                 <h3 className="text-sm font-semibold">No tests yet</h3>
@@ -43,7 +43,7 @@ const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
     if (runsLoading) {
         return (
             <div className="flex flex-1 items-center justify-center py-12">
-                <Loader2Icon className="size-5 animate-spin text-gray-400" />
+                <Loader2Icon className="size-5 animate-spin text-content-neutral-tertiary" />
             </div>
         );
     }

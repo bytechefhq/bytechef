@@ -31,7 +31,7 @@ const PropertyDropdownMenu = ({id = 0, menuItems, trigger}: PropertyDropdownMenu
             {trigger ? (
                 trigger
             ) : (
-                <div className="flex h-8 w-7 cursor-pointer items-center justify-center rounded hover:bg-gray-100">
+                <div className="flex h-8 w-7 cursor-pointer items-center justify-center rounded hover:bg-surface-neutral-secondary">
                     <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                 </div>
             )}
@@ -39,7 +39,7 @@ const PropertyDropdownMenu = ({id = 0, menuItems, trigger}: PropertyDropdownMenu
 
         <DropdownMenuContent
             align="end"
-            className="data-[side=bottom]:animate-slide-down data-[side=top]:animate-slide-up z-50 rounded-lg border border-gray-50 bg-white p-1.5 shadow-md"
+            className="data-[side=bottom]:animate-slide-down data-[side=top]:animate-slide-up z-50 rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-primary p-1.5 shadow-md"
             id={id.toString()}
         >
             {menuItems.map((menuItem, i) => {
@@ -48,12 +48,13 @@ const PropertyDropdownMenu = ({id = 0, menuItems, trigger}: PropertyDropdownMenu
                 return (
                     <div key={`menu-item-${label || 'separator'}-${i}`}>
                         {separator ? (
-                            <DropdownMenuSeparator className="my-1 h-px bg-gray-200" />
+                            <DropdownMenuSeparator className="my-1 h-px bg-stroke-neutral-secondary" />
                         ) : (
                             <DropdownMenuItem
                                 className={twMerge(
-                                    'flex cursor-default items-center rounded-md px-4 py-2 text-sm text-gray-700 outline-hidden select-none hover:cursor-pointer hover:bg-gray-50',
-                                    danger && 'text-destructive hover:bg-red-600 hover:text-white'
+                                    'flex cursor-default items-center rounded-md px-4 py-2 text-sm text-content-neutral-primary outline-hidden select-none hover:cursor-pointer hover:bg-surface-neutral-secondary',
+                                    danger &&
+                                        'text-destructive hover:bg-surface-destructive-primary hover:text-content-onsurface-primary'
                                 )}
                                 onClick={(event) => {
                                     if (onClick) {

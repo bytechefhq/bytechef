@@ -128,7 +128,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
     return (
         <>
             <div
-                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-destructive-foreground"
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleApiCollectionListItemClick(event)}
             >
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
@@ -152,7 +152,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
                                 <CollapsibleTrigger
-                                    className="group mr-4 flex text-xs font-semibold text-gray-700"
+                                    className="group mr-4 flex text-xs font-semibold text-content-neutral-secondary"
                                     ref={endpointsCollapsibleTriggerRef}
                                 >
                                     <span className="mr-1">

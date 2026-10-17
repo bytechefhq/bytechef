@@ -14,6 +14,7 @@ import {buildUnavailableDataPillHoverTitle} from '@/pages/platform/workflow-edit
 import {NodeViewWrapper} from '@tiptap/react';
 import {XIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
+import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -125,14 +126,14 @@ function PropertyMentionNodeView({HTMLAttributes, deleteNode, editor, node, upda
 
     const dataPillChipClassName = twMerge(
         PROPERTY_MENTION_CHIP_CLASS,
-        'relative inline-flex items-center gap-0.5 rounded-full bg-muted px-2',
+        'relative inline-flex items-center gap-0.5 rounded-full bg-muted px-2 dark:bg-surface-neutral-tertiary',
         controlType !== 'RICH_TEXT' && controlType !== 'TEXT_AREA' && controlType !== 'FORMULA_MODE' && 'text-sm',
-        isUnavailable && 'rounded-l-full rounded-r-none bg-transparent pr-1 pl-2'
+        isUnavailable && 'rounded-l-full rounded-r-none bg-transparent pr-1 pl-2 dark:bg-transparent'
     );
 
     const dataPillChip = (
         <span className={dataPillChipClassName}>
-            <img alt="Dynamic Value Icon" className="absolute size-4" draggable={false} src={iconSource} />
+            <InlineSVG aria-hidden className="absolute size-4" src={iconSource} />
 
             <span className={twMerge(PROPERTY_MENTION_LABEL_CLASS, 'ml-5')}>
                 {dataPillLabelParts.map((dataPillLabelPart, partIndex) =>

@@ -79,7 +79,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                     <div className={twMerge([label && 'mt-1', leadingIcon && 'relative'])}>
                         <div className={twMerge(leadingIcon && 'relative flex w-full rounded-md')}>
                             {leadingIcon && (
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-input bg-gray-100 px-3">
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-input bg-surface-neutral-secondary px-3">
                                     {leadingIcon}
                                 </div>
                             )}

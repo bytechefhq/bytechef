@@ -61,6 +61,25 @@ export const useJsonViewLoaded = () => {
     return loaded;
 };
 
+const THEME = {
+    base00: 'transparent',
+    base01: 'hsl(var(--surface-neutral-secondary))',
+    base02: 'hsl(var(--surface-neutral-secondary))',
+    base03: 'hsl(var(--content-neutral-tertiary))',
+    base04: 'hsl(var(--content-neutral-tertiary))',
+    base05: 'hsl(var(--content-neutral-secondary))',
+    base06: 'hsl(var(--content-neutral-primary))',
+    base07: 'hsl(var(--content-neutral-primary))',
+    base08: 'hsl(var(--content-destructive))',
+    base09: 'hsl(var(--content-warning))',
+    base0A: 'hsl(var(--content-destructive))',
+    base0B: 'hsl(var(--content-success))',
+    base0C: 'hsl(var(--content-brand-primary))',
+    base0D: 'hsl(var(--content-neutral-secondary))',
+    base0E: 'hsl(var(--content-brand-primary))',
+    base0F: 'hsl(var(--content-success))',
+};
+
 const exceedsCharBudget = (src: unknown, limit: number): boolean => {
     let remaining = limit;
 
@@ -172,6 +191,7 @@ const JsonView = ({
             sortKeys={sortKeys}
             src={src}
             style={style}
+            theme={THEME}
         />
     );
 };

@@ -66,7 +66,7 @@ const WorkflowInputsSheetContent = ({
                 {workflow.inputs?.length === 0 && (
                     <div className="flex h-full flex-col justify-center">
                         <div className="flex flex-col items-center space-y-2 self-center align-middle">
-                            <SlidersIcon className="size-24 text-gray-300" />
+                            <SlidersIcon className="size-24 text-content-neutral-tertiary" />
 
                             <h2 className="text-sm font-semibold">No inputs</h2>
 

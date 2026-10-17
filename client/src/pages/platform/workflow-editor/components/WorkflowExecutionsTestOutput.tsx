@@ -77,7 +77,7 @@ const WorkflowExecutionsTestOutput = ({
                 {job ? (
                     <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
                 ) : (
-                    <span className="flex h-12 w-full items-center gap-x-3 px-3 text-sm uppercase">Test Output</span>
+                    <span className="flex w-full items-center gap-x-3 px-3 py-4 text-sm uppercase">Test Output</span>
                 )}
 
                 {onCloseClick && (
@@ -91,7 +91,7 @@ const WorkflowExecutionsTestOutput = ({
                 <div className="absolute inset-0 overflow-y-auto">
                     {workflowIsRunning && (
                         <div className="flex size-full items-center justify-center gap-x-1 p-3">
-                            <span className="flex animate-spin text-gray-400">
+                            <span className="flex animate-spin text-content-neutral-tertiary">
                                 <RefreshCwIcon className="size-5" />
                             </span>
 

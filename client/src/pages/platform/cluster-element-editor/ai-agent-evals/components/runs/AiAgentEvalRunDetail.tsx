@@ -27,7 +27,7 @@ const AiAgentEvalRunDetail = ({onBack, run, summary}: AiAgentEvalRunDetailProps)
 
                 <Button label="All Runs" onClick={onBack} size="sm" variant="ghost" />
 
-                <span className="text-sm text-gray-400">/</span>
+                <span className="text-sm text-content-neutral-tertiary">/</span>
 
                 <span className="text-sm font-semibold">{run.name}</span>
 

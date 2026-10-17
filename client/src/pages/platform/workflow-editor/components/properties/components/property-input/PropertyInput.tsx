@@ -138,7 +138,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                                 className={twMerge(
                                     'pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-r-0 border-stroke-neutral-secondary bg-surface-neutral-secondary px-3',
                                     trailingAction && 'border-y-0 border-l-0',
-                                    error && 'text-rose-900 placeholder-stroke-destructive-secondary',
+                                    error && 'text-content-destructive placeholder-stroke-destructive-secondary',
                                     error && !isFocused && 'border-stroke-destructive-secondary'
                                 )}
                             >
@@ -149,10 +149,10 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         {inputOverlay || (
                             <Input
                                 className={twMerge(
-                                    'bg-white shadow-none outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden',
+                                    'bg-surface-neutral-primary shadow-none outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden',
                                     error &&
-                                        'border-stroke-destructive-secondary pr-10 text-rose-900 placeholder-stroke-destructive-secondary ring-stroke-destructive-secondary focus-visible:ring-stroke-destructive-secondary',
-                                    disabled && 'bg-gray-100 text-content-neutral-secondary',
+                                        'border-stroke-destructive-secondary pr-10 text-content-destructive placeholder-stroke-destructive-secondary ring-stroke-destructive-secondary focus-visible:ring-stroke-destructive-secondary',
+                                    disabled && 'bg-surface-neutral-secondary text-content-neutral-secondary',
                                     leadingIcon && 'pl-property-input-position leading-relaxed',
                                     trailingAction &&
                                         'h-full flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0',

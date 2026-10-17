@@ -102,7 +102,10 @@ const Sessions = () => {
                         </Table>
                     </div>
                 ) : (
-                    <EmptyList icon={<ShellIcon className="size-24 text-gray-300" />} title="No active sessions" />
+                    <EmptyList
+                        icon={<ShellIcon className="size-24 text-stroke-neutral-tertiary" />}
+                        title="No active sessions"
+                    />
                 )}
             </PageLoader>
         </LayoutContainer>

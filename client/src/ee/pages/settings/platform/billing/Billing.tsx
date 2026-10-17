@@ -181,14 +181,14 @@ const Billing = () => {
         >
             {subscriptionError ? (
                 <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
-                    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                    <div className="rounded-lg border border-stroke-destructive-secondary bg-surface-destructive-secondary px-4 py-3 text-sm text-content-destructive">
                         Unable to load subscription. Please refresh the page or contact support if the problem persists.
                     </div>
                 </div>
             ) : (
                 <div className="w-full space-y-4 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                     {isCheckoutSuccess && (!subscription || isTrialSubscription) && (
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                        <div className="rounded-lg border border-stroke-brand-secondary bg-surface-brand-secondary px-4 py-3 text-sm text-content-brand-primary">
                             {pollAttempts >= MAX_POLL_ATTEMPTS
                                 ? "It's taking longer than expected. Please refresh the page."
                                 : 'Activating your subscription, please wait…'}
@@ -196,7 +196,7 @@ const Billing = () => {
                     )}
 
                     {isCancelPolling && (
-                        <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+                        <div className="rounded-lg border border-stroke-warning-secondary bg-surface-warning-secondary px-4 py-3 text-sm text-content-warning-primary">
                             {pollAttempts >= MAX_POLL_ATTEMPTS
                                 ? "It's taking longer than expected. Please refresh the page."
                                 : 'Scheduling cancellation, please wait…'}
@@ -204,7 +204,7 @@ const Billing = () => {
                     )}
 
                     {isReactivatePending && (
-                        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                        <div className="rounded-lg border border-stroke-success-secondary bg-surface-success-secondary px-4 py-3 text-sm text-content-success-primary">
                             {pollAttempts >= MAX_POLL_ATTEMPTS
                                 ? "It's taking longer than expected. Please refresh the page."
                                 : 'Reactivating your subscription, please wait…'}
@@ -212,7 +212,7 @@ const Billing = () => {
                     )}
 
                     {isUpgradePending && (
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                        <div className="rounded-lg border border-stroke-brand-secondary bg-surface-brand-secondary px-4 py-3 text-sm text-content-brand-primary">
                             {pollAttempts >= MAX_POLL_ATTEMPTS
                                 ? "It's taking longer than expected. Please refresh the page."
                                 : 'Upgrading your plan, please wait…'}
