@@ -23,6 +23,12 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => {
     return {useEnvironmentStore: (selector: (currentState: typeof state) => unknown) => selector(state)};
 });
 
+vi.mock('@/pages/automation/stores/useWorkspaceStore', () => {
+    const state = {currentWorkspaceId: 7};
+
+    return {useWorkspaceStore: (selector: (currentState: typeof state) => unknown) => selector(state)};
+});
+
 const renderDialog = (a2aServer?: A2aServer) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
@@ -119,6 +125,7 @@ describe('A2aServerDialog', () => {
                 description: '',
                 environmentId: '2',
                 name: 'Second agent',
+                workspaceId: '7',
             },
         });
     });
