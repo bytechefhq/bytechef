@@ -24,6 +24,7 @@ import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
+import com.bytechef.platform.user.event.UserDeletedEvent;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.exception.InvalidPasswordException;
@@ -50,6 +51,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -68,6 +70,7 @@ public class UserServiceImpl implements UserService {
 
     private static final EmailValidator EMAIL_VALIDATOR = EmailValidator.getInstance();
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final AuthorityRepository authorityRepository;
     private final CacheManager cacheManager;
     private final PasswordEncoder passwordEncoder;
@@ -77,9 +80,11 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     public UserServiceImpl(
-        AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
-        PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
+        ApplicationEventPublisher applicationEventPublisher, AuthorityRepository authorityRepository,
+        CacheManager cacheManager, PasswordEncoder passwordEncoder, PersistentTokenRepository persistentTokenRepository,
+        UserRepository userRepository) {
 
+        this.applicationEventPublisher = applicationEventPublisher;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
         this.passwordEncoder = passwordEncoder;
@@ -223,6 +228,12 @@ public class UserServiceImpl implements UserService {
     public void delete(String login) {
         userRepository.findByLogin(login)
             .ifPresent(user -> {
+                long userId = user.getId();
+
+                persistentTokenRepository.deleteAll(persistentTokenRepository.findAllByUserId(userId));
+
+                applicationEventPublisher.publishEvent(new UserDeletedEvent(userId));
+
                 userRepository.delete(user);
 
                 this.clearUserCaches(user);
