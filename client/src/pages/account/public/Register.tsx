@@ -26,7 +26,7 @@ const passwordContainsUppercaseMessage = 'At least 1 uppercase';
 
 const formSchema = z
     .object({
-        email: z.string().min(5, {message: 'Email is required'}).max(254),
+        email: z.string().min(5, {message: 'Email is required'}).max(50),
         password: z.string(),
     })
     .superRefine(({password}, checkPasswordComplexity) => {
