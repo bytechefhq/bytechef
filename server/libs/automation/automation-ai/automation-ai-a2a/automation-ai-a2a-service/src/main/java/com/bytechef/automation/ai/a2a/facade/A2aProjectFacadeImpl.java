@@ -108,7 +108,8 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT') and " +
+        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public A2aProject createA2aProject(
         long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
@@ -116,7 +117,8 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT') and " +
+        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public A2aProject createA2aProject(
         long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
         List<WorkflowConfigurationDTO> workflowConfigurations) {
@@ -127,6 +129,7 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
         A2aServer a2aServer = a2aServerService.getA2aServer(a2aServerId);
 
+        validateSameWorkspace(projectService.getProject(projectId), a2aServer);
         validateProjectNotAttached(a2aServerId, projectId);
 
         Map<String, WorkflowDeploymentSettings> workflowDeploymentSettingsMap = resolveWorkflowDeploymentSettings(
@@ -156,7 +159,7 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
     public List<ProjectWorkflow> getA2aEligibleProjectVersionWorkflows(long projectId, int projectVersion) {
         return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
             .stream()
@@ -166,7 +169,7 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasPermission(#a2aProjectId, 'A2aProject', 'A2A_EDIT')")
     public void deleteA2aProject(long a2aProjectId) {
         A2aProject a2aProject = a2aProjectService.fetchA2aProject(a2aProjectId)
             .orElseThrow(() -> new IllegalArgumentException("A2aProject not found: " + a2aProjectId));
@@ -175,13 +178,13 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasPermission(#a2aProjectId, 'A2aProject', 'A2A_EDIT')")
     public A2aProject updateA2aProject(long a2aProjectId, List<String> selectedWorkflowIds) {
         return updateA2aProject(a2aProjectId, selectedWorkflowIds, List.of());
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasPermission(#a2aProjectId, 'A2aProject', 'A2A_EDIT')")
     public A2aProject updateA2aProject(
         long a2aProjectId, List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations) {
 
@@ -505,5 +508,33 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
     private record WorkflowDeploymentSettings(
         List<ProjectDeploymentWorkflowConnection> connections, Map<String, Object> inputs) {
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_VIEW')")
+    public List<A2aProject> getA2aServerA2aProjects(long a2aServerId) {
+        return a2aProjectService.getA2aServerA2aProjects(a2aServerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'A2A_VIEW')")
+    public List<A2aProject> getWorkspaceA2aProjects(long workspaceId) {
+        return a2aServerService.getWorkspaceA2aServers(workspaceId)
+            .stream()
+            .flatMap(a2aServer -> a2aProjectService.getA2aServerA2aProjects(a2aServer.getId())
+                .stream())
+            .toList();
+    }
+
+    private static void validateSameWorkspace(Project project, A2aServer a2aServer) {
+        Long projectWorkspaceId = project.getWorkspaceId();
+
+        if (projectWorkspaceId == null || !projectWorkspaceId.equals(a2aServer.getWorkspaceId())) {
+            throw new IllegalArgumentException(
+                "Project " + project.getId() + " and A2A server " + a2aServer.getId() +
+                    " are not in the same workspace");
+        }
     }
 }

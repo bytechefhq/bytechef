@@ -14,6 +14,7 @@ import com.bytechef.automation.configuration.security.constant.PermissionScopeTy
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
@@ -123,7 +124,7 @@ class PermissionScopeRegistryTest {
     class ShippedCatalog {
 
         private static final Pattern HAS_PERMISSION_PATTERN = Pattern.compile(
-            "hasPermission\\([^)]*,\\s*'[A-Za-z]+'\\s*,\\s*'([A-Z][A-Z0-9_]{2,})'\\s*\\)");
+            "hasPermission\\([^)]*,\\s*'[A-Za-z0-9]+'\\s*,\\s*'([A-Z][A-Z0-9_]{2,})'\\s*\\)");
 
         private static final Pattern PROGRAMMATIC_SCOPE_CHECK_PATTERN = Pattern.compile(
             "\\.(?:hasWorkspaceScope|hasWorkspaceScopeForProject|hasResourceScope)\\(([^)]*)\\)");
@@ -132,7 +133,8 @@ class PermissionScopeRegistryTest {
 
         private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
             List.<PermissionScopeProvider>of(
-                new DeploymentPermissionScopeProvider(), new McpPermissionScopeProvider(),
+                new A2aPermissionScopeProvider(), new DeploymentPermissionScopeProvider(),
+                new McpPermissionScopeProvider(),
                 new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider()));
 
         @Test
