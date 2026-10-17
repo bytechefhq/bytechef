@@ -1,4 +1,5 @@
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import {registerCompletionProviders} from '@/shared/components/monaco/completion/registerCompletionProviders';
 import useIsDarkMode from '@/shared/hooks/useIsDarkMode';
 import {MONACO_DARK_THEME, MONACO_LIGHT_THEME, defineMonacoDarkTheme} from '@/shared/util/monacoTheme-utils';
 import Editor, {type Monaco, loader} from '@monaco-editor/react';
@@ -46,6 +47,8 @@ async function ensureMonacoConfigured(): Promise<void> {
     loader.config({monaco});
 
     defineMonacoDarkTheme(monaco, false);
+
+    registerCompletionProviders(monaco);
 
     monacoInstance = monaco;
     monacoConfigured = true;
