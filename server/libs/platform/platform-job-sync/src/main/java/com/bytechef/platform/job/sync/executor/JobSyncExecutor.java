@@ -617,7 +617,8 @@ public class JobSyncExecutor {
 
             notifyJobStatusListeners(jobId, jobStatusEvent);
 
-            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED) {
+            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED
+                || status == Job.Status.CANCELLED) {
                 CountDownLatch latch = jobCompletionLatches.get(getKey(jobId));
 
                 if (latch != null) {
@@ -1013,7 +1014,8 @@ public class JobSyncExecutor {
     private static boolean isTerminal(Job job) {
         Job.Status status = job.getStatus();
 
-        return status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED;
+        return status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED ||
+            status == Job.Status.CANCELLED;
     }
 
     @FunctionalInterface

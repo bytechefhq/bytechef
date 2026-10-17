@@ -68,7 +68,9 @@ public class AgentSubflowResumeListener implements ApplicationEventListener {
 
         Job.Status status = jobStatusApplicationEvent.getStatus();
 
-        if (status != Job.Status.COMPLETED && status != Job.Status.FAILED && status != Job.Status.STOPPED) {
+        if (status != Job.Status.COMPLETED && status != Job.Status.FAILED && status != Job.Status.CANCELLED &&
+            status != Job.Status.STOPPED) {
+
             return;
         }
 
@@ -94,7 +96,8 @@ public class AgentSubflowResumeListener implements ApplicationEventListener {
             case FAILED -> new SubflowOutcome.Failed(
                 "Sub-workflow '%s' failed: %s".formatted(describeSubflow(subflowJob), getErrorMessage(subflowJob)));
             default -> new SubflowOutcome.Failed(
-                "Sub-workflow '%s' was stopped before it finished".formatted(describeSubflow(subflowJob)));
+                "Sub-workflow '%s' was %s before it finished".formatted(
+                    describeSubflow(subflowJob), status == Job.Status.CANCELLED ? "cancelled" : "stopped"));
         };
 
         if (agentJobResumer.resume(agentJobId, agentJobResumeId, subflowOutcome) && log.isDebugEnabled()) {
