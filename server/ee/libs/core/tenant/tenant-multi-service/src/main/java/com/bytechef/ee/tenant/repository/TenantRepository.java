@@ -24,14 +24,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -43,6 +47,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TenantRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(TenantRepository.class);
+
+    /**
+     * PostgreSQL undefined_table and invalid_schema_name.
+     */
+    private static final Set<String> NOT_READY_SQL_STATES = Set.of("42P01", "3F000");
     private static final Pattern TENANT_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
     private final DataSource dataSource;
@@ -267,32 +277,20 @@ public class TenantRepository {
     protected List<String[]> findTenantIdsByQueryWithParam(
         Function<String, String> queryTemplate, String parameter, int columns) {
 
-        List<String[]> rows = new ArrayList<>();
         List<String> tenantIds = findTenantIds();
 
         if (tenantIds.isEmpty()) {
             return Collections.emptyList();
         }
 
+        List<String[]> rows = new ArrayList<>();
+
         try (Connection connection = dataSource.getConnection()) {
             for (String tenantId : tenantIds) {
                 String query = queryTemplate.apply(tenantId);
 
-                try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                    preparedStatement.setString(1, parameter);
-
-                    try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                        while (resultSet.next()) {
-                            String[] row = new String[columns];
-
-                            for (int i = 1; i <= columns; i++) {
-                                row[i - 1] = resultSet.getString(i);
-                            }
-
-                            rows.add(row);
-                        }
-                    }
-                }
+                executeTenantQuery(
+                    connection, tenantId, () -> addRows(connection, query, parameter, columns, rows));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -351,6 +349,63 @@ public class TenantRepository {
         return rows;
     }
 
+    /**
+     * See {@link #findTenantIdsByQueryWithParam} for why the SQL_INJECTION_JDBC suppression is safe.
+     */
+    @SuppressFBWarnings("SQL_INJECTION_JDBC")
+    private static void addRows(
+        Connection connection, String query, String parameter, int columns, List<String[]> rows) throws SQLException {
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, parameter);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String[] row = new String[columns];
+
+                    for (int i = 1; i <= columns; i++) {
+                        row[i - 1] = resultSet.getString(i);
+                    }
+
+                    rows.add(row);
+                }
+            }
+        }
+    }
+
+    /**
+     * Runs one tenant's part of a cross-tenant lookup. A schema is listed as soon as {@code CREATE SCHEMA} runs, before
+     * its changelog has created the tables, and can disappear while it is deleted, so a schema whose table or schema is
+     * missing is skipped instead of failing the lookup for every tenant.
+     */
+    private static void executeTenantQuery(Connection connection, String tenantId, TenantQuery tenantQuery)
+        throws SQLException {
+
+        Savepoint savepoint = connection.getAutoCommit() ? null : connection.setSavepoint();
+
+        try {
+            tenantQuery.execute();
+        } catch (SQLException sqlException) {
+            if (!NOT_READY_SQL_STATES.contains(sqlException.getSQLState())) {
+                throw sqlException;
+            }
+
+            if (savepoint != null) {
+                connection.rollback(savepoint);
+            }
+
+            log.warn(
+                "Skipping tenant {} in a cross-tenant lookup; its schema is not provisioned: {}", tenantId,
+                sqlException.getMessage());
+
+            return;
+        }
+
+        if (savepoint != null) {
+            connection.releaseSavepoint(savepoint);
+        }
+    }
+
     private static String getTenantId(String schemaName) {
         if (schemaName == null) {
             return "000000";
@@ -372,5 +427,11 @@ public class TenantRepository {
             throw new IllegalArgumentException(
                 "Invalid tenant ID. Must contain only alphanumeric characters, underscores, and hyphens.");
         }
+    }
+
+    @FunctionalInterface
+    private interface TenantQuery {
+
+        void execute() throws SQLException;
     }
 }

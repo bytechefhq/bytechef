@@ -16,9 +16,23 @@
 
 package com.bytechef.ee.tenant.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.sql.Statement;
+import java.util.List;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +42,7 @@ import org.junit.jupiter.api.Test;
  */
 class TenantRepositoryTest {
 
+    private final Connection connection = mock(Connection.class);
     private TenantRepository tenantRepository;
 
     @BeforeEach
@@ -145,9 +160,113 @@ class TenantRepositoryTest {
     }
 
     @Test
+    void testFindTenantIdsByUserEmailSkipsASchemaWhoseChangelogHasNotCreatedTheUserTable() throws SQLException {
+        mockTenantSchemas(true);
+        mockUserQuery("bytechef_000001", "000001");
+        mockFailingUserQuery("bytechef_000002", new SQLException("relation does not exist", "42P01"));
+        mockUserQuery("bytechef_000003", "000003");
+
+        List<String> tenantIds = createTenantRepository().findTenantIdsByUserEmail("user@localhost.com");
+
+        assertThat(tenantIds).containsExactly("000001", "000003");
+        verify(connection, never()).setSavepoint();
+    }
+
+    @Test
+    void testFindTenantIdsByUserLoginSkipsASchemaDroppedDuringTheLookup() throws SQLException {
+        mockTenantSchemas(true);
+        mockUserQuery("bytechef_000001", "000001");
+        mockFailingUserQuery("bytechef_000002", new SQLException("schema does not exist", "3F000"));
+        mockUserQuery("bytechef_000003", "000003");
+
+        List<String> tenantIds = createTenantRepository().findTenantIdsByUserLogin("user");
+
+        assertThat(tenantIds).containsExactly("000001", "000003");
+    }
+
+    @Test
+    void testFindTenantIdsByUserEmailRollsBackToASavepointInATransaction() throws SQLException {
+        Savepoint savepoint = mock(Savepoint.class);
+
+        when(connection.setSavepoint()).thenReturn(savepoint);
+
+        mockTenantSchemas(false);
+        mockUserQuery("bytechef_000001", "000001");
+        mockFailingUserQuery("bytechef_000002", new SQLException("relation does not exist", "42P01"));
+        mockUserQuery("bytechef_000003", "000003");
+
+        List<String> tenantIds = createTenantRepository().findTenantIdsByUserEmail("user@localhost.com");
+
+        assertThat(tenantIds).containsExactly("000001", "000003");
+        verify(connection).rollback(savepoint);
+    }
+
+    @Test
+    void testFindTenantIdsByUserEmailFailsOnAnyOtherError() throws SQLException {
+        mockTenantSchemas(true);
+        mockUserQuery("bytechef_000001", "000001");
+        mockFailingUserQuery("bytechef_000002", new SQLException("connection lost", "08006"));
+        mockUserQuery("bytechef_000003", "000003");
+
+        TenantRepository repository = createTenantRepository();
+
+        assertThatThrownBy(() -> repository.findTenantIdsByUserEmail("user@localhost.com"))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("connection lost");
+    }
+
+    @Test
     void testDeleteTenantWithNull() {
         assertThatThrownBy(() -> tenantRepository.deleteTenant(null))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Invalid tenant ID");
+    }
+
+    private TenantRepository createTenantRepository() throws SQLException {
+        DataSource dataSource = mock(DataSource.class);
+
+        when(dataSource.getConnection()).thenReturn(connection);
+
+        return new TenantRepository(dataSource);
+    }
+
+    @SuppressFBWarnings({
+        "ODR_OPEN_DATABASE_RESOURCE", "OBL_UNSATISFIED_OBLIGATION", "SQL_INJECTION_JDBC"
+    })
+    @SuppressWarnings("PMD.CheckResultSet")
+    private void mockFailingUserQuery(String schema, SQLException sqlException) throws SQLException {
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+
+        when(connection.prepareStatement(contains(schema + ".user"))).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenThrow(sqlException);
+    }
+
+    @SuppressFBWarnings({
+        "ODR_OPEN_DATABASE_RESOURCE", "OBL_UNSATISFIED_OBLIGATION", "SQL_INJECTION_JDBC"
+    })
+    @SuppressWarnings("PMD.CheckResultSet")
+    private void mockTenantSchemas(boolean autoCommit) throws SQLException {
+        Statement statement = mock(Statement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(connection.createStatement()).thenReturn(statement);
+        when(connection.getAutoCommit()).thenReturn(autoCommit);
+        when(statement.executeQuery(anyString())).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true, true, true, false);
+        when(resultSet.getString(1)).thenReturn("bytechef_000001", "bytechef_000002", "bytechef_000003");
+    }
+
+    @SuppressFBWarnings({
+        "ODR_OPEN_DATABASE_RESOURCE", "OBL_UNSATISFIED_OBLIGATION", "SQL_INJECTION_JDBC"
+    })
+    @SuppressWarnings("PMD.CheckResultSet")
+    private void mockUserQuery(String schema, String tenantId) throws SQLException {
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(connection.prepareStatement(contains(schema + ".user"))).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getString(1)).thenReturn(tenantId);
     }
 }
