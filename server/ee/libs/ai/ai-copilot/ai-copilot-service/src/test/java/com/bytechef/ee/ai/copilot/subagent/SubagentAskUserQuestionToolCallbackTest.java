@@ -11,9 +11,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
+import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
@@ -192,5 +196,74 @@ class SubagentAskUserQuestionToolCallbackTest {
             .as("the summary is the only thing that reaches the follow-up call on every surface, so the specialist"
                 + " must be told to put what matters into it")
             .contains("put anything the follow-up needs into that summary");
+    }
+
+    @Test
+    void testPlainAskCallbackRejectsAQuestionMentioningAnUnresolvedLookupProperty() {
+        AskUserQuestionToolCallback plainCallback = new AskUserQuestionToolCallback(ToolStateVisibilityMetrics.NOOP);
+
+        String result = plainCallback.call(questionMentioning("channel"), toolContextWithUnresolvedLookup("channel"));
+
+        assertThat(result).contains("selectPropertyOption");
+    }
+
+    @Test
+    void testSpecialistAskIgnoresTheLookupPropertyTracker() {
+        ToolContext toolContext = toolContextWithUnresolvedLookup("channel");
+
+        SubagentAskUserQuestionToolCallback toolCallback = new SubagentAskUserQuestionToolCallback();
+
+        SubagentAskChannel.runWithChannel(() -> {
+            String result = toolCallback.call(questionMentioning("channel"), toolContext);
+
+            assertThat(result).doesNotContain("selectPropertyOption");
+            assertThat(SubagentAskChannel.pending()).isNotNull();
+
+            return null;
+        });
+    }
+
+    @Test
+    void testSpecialistAskLeavesTheCallersToolContextUntouched() {
+        ToolContext toolContext = toolContextWithUnresolvedLookup("channel");
+
+        SubagentAskUserQuestionToolCallback toolCallback = new SubagentAskUserQuestionToolCallback();
+
+        SubagentAskChannel.runWithChannel(() -> toolCallback.call(questionMentioning("channel"), toolContext));
+
+        assertThat(toolContext.getContext()).containsKey(
+            LookupPropertyTracker.TOOL_CONTEXT_LOOKUP_PROPERTY_TRACKER_KEY);
+    }
+
+    private static ToolContext toolContextWithUnresolvedLookup(String propertyName) {
+        Map<String, Object> context = new HashMap<>();
+
+        LookupPropertyTracker.install(context);
+
+        ToolContext toolContext = new ToolContext(context);
+
+        LookupPropertyTracker.record(
+            toolContext, "getTaskProperties", "{}",
+            "{\"" + propertyName +
+                "\": { \"value\": \"string (required)\", \"lookupRequired\": true, \"lookupDependsOn\": [] }}");
+
+        return toolContext;
+    }
+
+    private static String questionMentioning(String propertyName) {
+        return """
+            {
+                "questions": [
+                    {
+                        "question": "Which Slack %s should the standup reminder be posted to?",
+                        "header": "Channel",
+                        "multiSelect": false,
+                        "options": [
+                            {"label": "#standup", "description": "Standup channel"},
+                            {"label": "#general", "description": "General channel"}
+                        ]
+                    }
+                ]
+            }""".replace("%s", propertyName);
     }
 }
