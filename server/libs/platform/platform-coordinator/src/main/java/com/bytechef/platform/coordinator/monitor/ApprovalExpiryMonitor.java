@@ -37,6 +37,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,7 @@ public class ApprovalExpiryMonitor {
     }
 
     @Scheduled(initialDelayString = "PT5M", fixedDelayString = "PT15M")
+    @SchedulerLock(name = "approvalExpiryMonitor", lockAtLeastFor = "PT5M", lockAtMostFor = "PT1H")
     public void sweepExpiredApprovals() {
         registerPendingGaugeIfNeeded();
 
