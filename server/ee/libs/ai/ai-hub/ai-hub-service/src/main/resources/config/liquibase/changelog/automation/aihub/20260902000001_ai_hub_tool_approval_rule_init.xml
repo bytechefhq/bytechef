@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Per-workspace rules that require or exempt a catalog tool or component action from the AI Hub tool
+        approval gate. A null component_name means the rule applies to every component; the COALESCE in the
+        unique index below is what makes that null collapse correctly instead of always being distinct.
+    -->
+    <changeSet id="20260902000001" author="Ivica Cardic">
+        <createTable tableName="ai_hub_tool_approval_rule">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tool_kind" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_name" type="VARCHAR(255)"/>
+            <column name="tool_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mode" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_ai_hub_tool_approval_rule ON ai_hub_tool_approval_rule
+                (workspace_id, tool_kind, COALESCE(component_name, ''), tool_name)
+        </sql>
+
+        <createIndex tableName="ai_hub_tool_approval_rule" indexName="idx_ai_hub_tool_approval_rule_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
