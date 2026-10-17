@@ -1,0 +1,58 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.tenant.util;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * Validates tenant ids before they are used to switch the tenant context or to derive a database schema name.
+ *
+ * @author Ivica Cardic
+ */
+public final class TenantIdValidator {
+
+    private static final int MAX_LENGTH = 63;
+    private static final Pattern TENANT_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
+
+    private TenantIdValidator() {
+    }
+
+    public static boolean isValid(@Nullable String tenantId) {
+        if (tenantId == null || tenantId.length() > MAX_LENGTH) {
+            return false;
+        }
+
+        Matcher matcher = TENANT_ID_PATTERN.matcher(tenantId);
+
+        return matcher.matches();
+    }
+
+    /**
+     * @throws IllegalArgumentException if the tenant id is null, too long, or contains characters other than letters,
+     *                                  digits, underscores and hyphens
+     */
+    public static String validate(@Nullable String tenantId) {
+        if (!isValid(tenantId)) {
+            throw new IllegalArgumentException(
+                "Invalid tenant ID. Must contain only alphanumeric characters, underscores, and hyphens.");
+        }
+
+        return tenantId;
+    }
+}
