@@ -26,6 +26,8 @@ spring:
 
 bytechef:
   ai:
+    hub:
+      enabled: true
     vectorstore:
       pgvector:
         url: jdbc:postgresql://localhost:5433/bytechef_vectorstore
