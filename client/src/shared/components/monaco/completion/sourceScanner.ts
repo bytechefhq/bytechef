@@ -64,7 +64,7 @@ function skipString(source: string, startIndex: number, language: ScriptLanguage
     return source.length;
 }
 
-function skipComment(source: string, startIndex: number, language: ScriptLanguageType): number | undefined {
+export function skipComment(source: string, startIndex: number, language: ScriptLanguageType): number | undefined {
     const isLineComment = language === 'javascript' ? source.startsWith('//', startIndex) : source[startIndex] === '#';
 
     if (isLineComment) {
