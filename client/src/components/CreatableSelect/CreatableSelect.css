@@ -38,6 +38,14 @@
     @apply text-content-neutral-primary!;
 }
 
+.dark .react-select__control {
+    @apply bg-surface-neutral-secondary!;
+}
+
+.dark .react-select__menu {
+    @apply bg-popover!;
+}
+
 .react-select__option {
     @apply bg-transparent!;
     @apply text-content-neutral-primary!;

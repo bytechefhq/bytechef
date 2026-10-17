@@ -97,7 +97,9 @@ const ApiConnectorWizardEndpointSelectionStep = () => {
                 </div>
             </ScrollArea>
 
-            {noneSelected && <p className="text-sm text-red-500">Please select at least one endpoint to continue.</p>}
+            {noneSelected && (
+                <p className="text-sm text-content-destructive">Please select at least one endpoint to continue.</p>
+            )}
         </div>
     );
 };

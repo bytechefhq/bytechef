@@ -96,8 +96,8 @@ export function createSingleElementsNode({
             connections: [],
             icon: (
                 <InlineSVG
-                    className="size-9 flex-none text-gray-900"
-                    loader={<ComponentIcon className="size-9 flex-none text-gray-900" />}
+                    className="size-9 flex-none text-content-neutral-primary"
+                    loader={<ComponentIcon className="size-9 flex-none text-content-neutral-primary" />}
                     src={iconUrl as string}
                 />
             ),
@@ -161,8 +161,8 @@ export function createMultipleElementsNode({
             connections: [],
             icon: (
                 <InlineSVG
-                    className="size-9 flex-none text-gray-900"
-                    loader={<ComponentIcon className="size-9 flex-none text-gray-900" />}
+                    className="size-9 flex-none text-content-neutral-primary"
+                    loader={<ComponentIcon className="size-9 flex-none text-content-neutral-primary" />}
                     src={iconUrl as string}
                 />
             ),

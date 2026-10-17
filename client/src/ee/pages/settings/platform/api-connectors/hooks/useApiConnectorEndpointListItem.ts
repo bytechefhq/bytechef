@@ -48,7 +48,7 @@ const useApiConnectorEndpointListItem = ({
             case 'PATCH':
                 return {
                     icon: createElement(FolderSyncIcon, {className: iconClassName}),
-                    textColor: 'text-orange-700',
+                    textColor: 'text-orange-700 dark:text-orange-400',
                 };
             case 'DELETE':
                 return {

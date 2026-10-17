@@ -146,7 +146,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
 
                                                     {selectedFile.status === 'error' && (
                                                         <div className="flex items-center space-x-2">
-                                                            <span className="text-xs text-red-500">
+                                                            <span className="text-xs text-content-destructive">
                                                                 {selectedFile.statusMessage || 'Error'}
                                                             </span>
                                                         </div>

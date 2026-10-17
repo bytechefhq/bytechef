@@ -527,7 +527,7 @@ const ConnectionDialog = ({
                                                 <div className="relative flex grow items-stretch focus-within:z-10">
                                                     <Input
                                                         {...field}
-                                                        className="rounded-r-none bg-surface-neutral-primary text-gray-700"
+                                                        className="rounded-r-none bg-surface-neutral-primary text-content-neutral-secondary"
                                                         readOnly
                                                         value={connection?.id}
                                                     />
@@ -799,7 +799,7 @@ const ConnectionDialog = ({
 
                             {!oAuth2AuthorizationParametersLoading && wizardStep === 'oauth_step' && (
                                 <>
-                                    <Alert className="border-blue-50 bg-surface-brand-secondary text-blue-700">
+                                    <Alert className="border-surface-brand-secondary bg-surface-brand-secondary text-content-brand-primary">
                                         <RocketIcon className="size-4" />
 
                                         <AlertTitle>Heads up!</AlertTitle>

@@ -319,6 +319,18 @@ const CANDIDATE_TOKEN_GROUPS = {
  * surface. The `VoiceModeLayout.tsx` site exception the entry carried has no file to apply to here. With no
  * remaining row for the written class, the entry would trip `findStaleResolutions` on every future
  * invocation, so it is removed rather than left to redirect nothing.
+ *
+ * `dark:text-black`, `text-blue-700`, `text-green-800`, `text-red-800` and `text-yellow-600` are gone as of
+ * the app-wide repaint: the vendored `CreatableSelect.css` rule the first one guarded was replaced by that
+ * file's own dark-mode block, the HTTP-method identity maps in `httpMethod-utils.ts` and
+ * `endpointEditor-utils.ts` moved onto `--content-success-primary` / `--content-destructive` together with
+ * their chips, and the log-level badge in `WorkflowExecutionLogsContent.tsx` moved onto
+ * `--content-warning-primary`. The `SyncSourceStatusBadge.tsx` and CadencePicker call sites two of the
+ * reasons were authored against do not exist in this tree, and `text-blue-700`'s remaining occurrences all
+ * sit inside `cluster-element-editor`, which `collectPaletteClasses` excludes, so none of the five matches
+ * anything in scope. With no remaining row for any of them, the entries would trip `findStaleResolutions`
+ * on every future invocation, so they are removed rather than left to redirect nothing. The editor slice
+ * migrates on its own schedule and needs no entry here when it does.
  */
 const MANUAL_RESOLUTIONS = {
     'bg-black/80': {
@@ -353,28 +365,9 @@ const MANUAL_RESOLUTIONS = {
         reason: '`Appearance.tsx` theme preview swatch (the Dark card backdrop). Must stay literal.',
         set: 'E',
     },
-    'dark:text-black': {
-        reason: 'A `@apply dark:text-black` rule in the vendored `CreatableSelect.css`. Already a hand-rolled dark override on third-party markup; it belongs to whoever owns that vendored widget.',
-        set: 'E',
-    },
-    'text-blue-700': {
-        crossFamilyNote:
-            'Rejected. Text inside `bg-blue-50` alerts and the selected CadencePicker card. Body text on a filled chip.',
-    },
-    'text-green-800': {
-        crossFamilyNote:
-            'Rejected. Status and HTTP-method badge text on a `bg-green-100` chip (`SyncSourceStatusBadge.tsx`, `httpMethod-utils.ts`, `endpointEditor-utils.ts`). Badge text is text. The only clean stroke match is `--stroke-success-primary-active`, a pressed-border state, so crossing here would be wrong on both axes.',
-    },
     'text-orange-700': {
         crossFamilyNote:
             'Rejected. HTTP-method labels in the API-connector and API-collection endpoint lists. Text, and the clean stroke match is a hover state.',
-    },
-    'text-red-800': {
-        crossFamilyNote: 'Rejected. Status and method badge text on a `bg-red-100` chip. Same shape as text-green-800.',
-    },
-    'text-yellow-600': {
-        crossFamilyNote:
-            'Rejected. Log-level badge text on a `bg-yellow-100` chip in `WorkflowExecutionLogsContent.tsx`.',
     },
 };
 
@@ -450,7 +443,7 @@ const EXCEPTION_SITES = [
                 expect: [
                     'getHttpMethodBadgeColor',
                     'case HttpMethod.Patch:',
-                    "return 'text-orange-700';",
+                    "return 'text-orange-700 dark:text-orange-400';",
                 ],
                 start: 7,
             },
@@ -465,7 +458,7 @@ const EXCEPTION_SITES = [
                 expect: [
                     'const httpMethodStyles',
                     "case 'PATCH':",
-                    "textColor: 'text-orange-700',",
+                    "textColor: 'text-orange-700 dark:text-orange-400',",
                 ],
                 start: 29,
             },
@@ -480,7 +473,7 @@ const EXCEPTION_SITES = [
                 expect: [
                     'const httpMethodStyles',
                     "case 'PATCH':",
-                    "textColor: 'text-orange-700',",
+                    "textColor: 'text-orange-700 dark:text-orange-400',",
                 ],
                 start: 106,
             },

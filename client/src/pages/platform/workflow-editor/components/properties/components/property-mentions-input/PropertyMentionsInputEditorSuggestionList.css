@@ -1,7 +1,8 @@
 @reference '../../../../../../../styles/index.css';
 
 .property-mentions-suggestion-menu {
-    @apply bg-background;
+    @apply bg-popover;
+    @apply text-popover-foreground;
     @apply border;
     @apply rounded-md;
     @apply shadow-md;
@@ -22,6 +23,11 @@
      * "none". Without this the popup is inert: it neither scrolls nor accepts clicks.
      */
     @apply pointer-events-auto;
+
+    .dark & {
+        border-color: hsl(var(--surface-neutral-tertiary));
+        box-shadow: 0 10px 24px -6px rgb(0 0 0 / 0.6);
+    }
 
     button {
         @apply items-center;

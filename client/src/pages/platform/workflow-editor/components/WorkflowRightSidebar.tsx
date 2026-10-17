@@ -145,7 +145,10 @@ const WorkflowRightSidebar = ({
                         <TooltipTrigger asChild>
                             <Button
                                 aria-label={item.name}
-                                className={twMerge(isActive && activeItemStyling)}
+                                className={twMerge(
+                                    'text-content-neutral-subtle hover:text-content-neutral-primary',
+                                    isActive && activeItemStyling
+                                )}
                                 icon={item.icon}
                                 key={item.name}
                                 onClick={item.onClick}

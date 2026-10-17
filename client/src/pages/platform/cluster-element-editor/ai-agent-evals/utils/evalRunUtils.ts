@@ -8,10 +8,14 @@ export const RUN_STATUS_LABELS: Record<AiAgentEvalRunStatus, string> = {
 };
 
 export const RUN_STATUS_COLORS: Record<AiAgentEvalRunStatus, string> = {
-    [AiAgentEvalRunStatus.Completed]: 'border-green-200 bg-green-50 text-green-700',
-    [AiAgentEvalRunStatus.Failed]: 'border-red-200 bg-red-50 text-red-700',
-    [AiAgentEvalRunStatus.Pending]: 'border-gray-200 bg-gray-50 text-gray-600',
-    [AiAgentEvalRunStatus.Running]: 'border-yellow-200 bg-yellow-50 text-yellow-700',
+    [AiAgentEvalRunStatus.Completed]:
+        'border-stroke-success-secondary bg-surface-success-secondary text-content-success',
+    [AiAgentEvalRunStatus.Failed]:
+        'border-stroke-destructive-secondary bg-surface-destructive-secondary text-content-destructive',
+    [AiAgentEvalRunStatus.Pending]:
+        'border-stroke-neutral-secondary bg-surface-neutral-secondary text-content-neutral-secondary',
+    [AiAgentEvalRunStatus.Running]:
+        'border-stroke-warning-secondary bg-surface-warning-secondary text-content-warning-primary',
 };
 
 export function formatRunDate(epochMillis: number | null | undefined): string {

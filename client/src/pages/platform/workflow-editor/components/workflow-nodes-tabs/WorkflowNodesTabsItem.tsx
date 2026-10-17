@@ -100,7 +100,7 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
     return (
         <li
             className={twMerge(
-                'flex h-16 cursor-pointer items-center rounded-md border-2 border-transparent bg-white px-2 py-1 hover:border-blue-200',
+                'flex h-16 cursor-pointer items-center rounded-md border-2 border-transparent bg-white px-2 py-1 hover:border-stroke-brand-secondary',
                 selected && 'border-blue-500 hover:bg-white'
             )}
             draggable={draggable}

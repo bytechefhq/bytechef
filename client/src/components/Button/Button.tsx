@@ -62,7 +62,7 @@ const variants: Record<VariantType, string> = {
     destructive:
         'bg-surface-destructive-primary hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active text-content-onsurface-primary',
     destructiveGhost:
-        'bg-transparent hover:bg-surface-destructive-secondary-hover opacity-50 text-content-destructive-primary active:bg-surface-destructive-secondary-active hover:opacity-100',
+        'bg-transparent hover:bg-surface-destructive-secondary-hover text-content-destructive-primary active:bg-surface-destructive-secondary-active',
     destructiveOutline:
         'bg-transparent border border-stroke-onsurface-primary/70 text-content-onsurface-primary hover:border-stroke-onsurface-primary hover:bg-transparent',
     outline:
