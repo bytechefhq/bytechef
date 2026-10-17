@@ -48,6 +48,53 @@
     color: hsl(var(--destructive-foreground)) !important;
 }
 
+@layer components {
+    .dark [data-slot='tooltip-content'] {
+        background-color: hsl(var(--popover)) !important;
+        color: hsl(var(--popover-foreground)) !important;
+        border: 1px solid hsl(var(--surface-neutral-tertiary)) !important;
+    }
+
+    .dark
+        :is(
+            [data-slot='context-menu-content'],
+            [data-slot='context-menu-sub-content'],
+            [data-slot='dropdown-menu-content'],
+            [data-slot='dropdown-menu-sub-content'],
+            [data-slot='hover-card-content'],
+            [data-slot='popover-content'],
+            [data-slot='select-content']
+        ) {
+        border-color: hsl(var(--surface-neutral-tertiary)) !important;
+    }
+
+    .dark
+        :is(
+            [data-slot='context-menu-content'],
+            [data-slot='context-menu-sub-content'],
+            [data-slot='dropdown-menu-content'],
+            [data-slot='dropdown-menu-sub-content'],
+            [data-slot='select-content']
+        ) {
+        box-shadow: 0 10px 24px -6px rgb(0 0 0 / 0.6) !important;
+    }
+
+    .dark
+        :is(
+            [data-slot='command-separator'],
+            [data-slot='context-menu-separator'],
+            [data-slot='dropdown-menu-separator'],
+            [data-slot='select-separator']
+        ) {
+        background-color: color-mix(in srgb, hsl(var(--border)) 50%, hsl(var(--surface-neutral-tertiary))) !important;
+    }
+
+    .dark [data-slot='tooltip-content'] svg.fill-foreground {
+        background-color: hsl(var(--popover)) !important;
+        fill: hsl(var(--popover)) !important;
+    }
+}
+
 @utility heading-tertiary {
     @apply font-semibold text-muted-foreground uppercase;
 }
@@ -85,10 +132,12 @@
         --content-neutral-primary: 229 84% 5%;
         --content-neutral-secondary: 215 19% 35%;
         --content-neutral-secondary-hover: 215 19% 35%;
+        --content-neutral-subtle: 229 84% 5%;
         --content-neutral-tertiary: 215 20% 65%;
         --content-onbrand: 0 0% 100%;
         --content-onsurface-primary: 0 0% 100%;
         --content-onsurface-secondary: 215 20% 65%;
+        --content-ontooltip: 0 0% 100%;
         --content-onwarning: 229 84% 5%;
         --content-success-primary: 142 72% 29%;
         --content-success: 142 72% 29%;
@@ -144,7 +193,7 @@
         --stroke-map-tertiary: 272 72% 47%;
         --stroke-neutral-primary: 210 40% 96%;
         --stroke-neutral-secondary: 214 32% 91%;
-        --stroke-neutral-tertiary: 213, 27%, 84%;
+        --stroke-neutral-tertiary: 213 27% 84%;
         --stroke-onsurface-primary: 0 0% 100%;
         --stroke-onsurface-primary-hover: 0 0% 100%;
         --stroke-parallel-primary: 85 85% 35%;
@@ -160,7 +209,7 @@
         --stroke-warning-primary: 45 93% 47%;
         --stroke-warning-primary-hover: 41 96% 40%;
         --stroke-warning-primary-active: 35 92% 33%;
-        --stroke-warning-secondary: 44, 70%, 82%;
+        --stroke-warning-secondary: 44 70% 82%;
         --success: 142 76% 36%;
         --success-foreground: 142 77% 73%;
         --surface-brand-primary: 217 91% 40%;
@@ -239,9 +288,9 @@
 
         --accent: 240 4% 18%;
         --accent-foreground: 240 9% 94%;
-        --background: 240 6% 10%;
+        --background: 240 6% 13%;
         --border: 240 4% 18%;
-        --card: 240 6% 10%;
+        --card: 240 6% 13%;
         --card-foreground: 240 9% 94%;
         --chart-1: 220 70% 50%;
         --chart-2: 160 60% 45%;
@@ -253,17 +302,19 @@
         --content-brand-primary-active: 217 61% 90%;
         --content-brand-secondary: 217 91% 40%;
         --content-canvas_dot: 240 4% 26%;
-        --content-destructive: 0 84% 60%;
-        --content-destructive-primary: 0 84% 60%;
-        --content-destructive-primary-hover: 0 84% 67%;
+        --content-destructive: 0 91% 71%;
+        --content-destructive-primary: 0 91% 71%;
+        --content-destructive-primary-hover: 0 94% 82%;
         --content-disabled: 0 0% 64%;
         --content-neutral-primary: 240 9% 94%;
         --content-neutral-secondary: 240 2% 60%;
         --content-neutral-secondary-hover: 240 3% 77%;
+        --content-neutral-subtle: 240 3% 77%;
         --content-neutral-tertiary: 240 2% 60%;
         --content-onbrand: 0 0% 100%;
         --content-onsurface-primary: 240 9% 94%;
         --content-onsurface-secondary: 240 3% 77%;
+        --content-ontooltip: 240 6% 10%;
         --content-onwarning: 229 84% 5%;
         --content-success: 142 71% 45%;
         --content-success-primary: 142 71% 45%;
@@ -272,10 +323,10 @@
         --destructive: 0 72% 51%;
         --destructive-foreground: 210 20% 98%;
         --foreground: 240 9% 94%;
-        --input: 240 4% 18%;
+        --input: 240 4% 27%;
         --muted: 240 4% 18%;
         --muted-foreground: 240 2% 60%;
-        --popover: 240 6% 12%;
+        --popover: 240 6% 15%;
         --popover-foreground: 240 9% 94%;
         --primary: 240 9% 94%;
         --primary-foreground: 240 6% 10%;
@@ -335,15 +386,15 @@
         --stroke-warning-primary-hover: 48 96% 53%;
         --stroke-warning-primary-active: 48 96% 53%;
         --stroke-warning-secondary: 45 80% 30%;
-        --success: 142, 69%, 58%;
-        --success-foreground: 144, 61%, 20%;
+        --success: 142 69% 58%;
+        --success-foreground: 144 61% 20%;
         --surface-brand-primary: 217 91% 48%;
         --surface-brand-primary-hover: 217 91% 55%;
         --surface-brand-primary-active: 217 91% 60%;
         --surface-brand-primary-disabled: 217 91% 48% / 50%;
-        --surface-brand-secondary: 217 91% 22%;
-        --surface-brand-secondary-hover: 217 91% 28%;
-        --surface-brand-tertiary: 217 91% 22%;
+        --surface-brand-secondary: 217 45% 20%;
+        --surface-brand-secondary-hover: 217 45% 25%;
+        --surface-brand-tertiary: 217 45% 20%;
         --surface-destructive-primary: 0 72% 51%;
         --surface-destructive-primary-hover: 0 72% 51%;
         --surface-destructive-primary-active: 0 72% 51%;
@@ -352,8 +403,8 @@
         --surface-destructive-secondary-active: 0 63% 25%;
         --surface-disabled: 0 0% 83%;
         --surface-main: 240 6% 10%;
-        --surface-neutral-primary: 240 6% 10%;
-        --surface-neutral-primary-hover: 240 5% 14%;
+        --surface-neutral-primary: 240 6% 13%;
+        --surface-neutral-primary-hover: 240 5% 16%;
         --surface-neutral-primary-active: 240 4% 18%;
         --surface-neutral-secondary: 240 4% 18%;
         --surface-neutral-secondary-hover: 240 4% 24%;
@@ -372,6 +423,7 @@
         --surface-warning-secondary: 45 80% 16%;
         --surface-warning-secondary-hover: 45 80% 22%;
         --surface-warning-secondary-active: 45 80% 28%;
+        --sidebar-foreground: 240 3% 77%;
         --rdg-color-scheme: dark;
     }
 
@@ -414,10 +466,56 @@
         --sidebar-border: 217 38% 28%;
     }
 
-    .dark .react-flow__node svg:not([fill]),
     .dark
-        .react-flow__node
-        :is(svg, svg *):is(
+        svg:not([fill], [role='img']):not(
+            :has(
+                [fill='#fff' i],
+                [fill='#ffffff' i],
+                [fill='white' i],
+                [fill='#f9f9f9' i],
+                [fill='#fafafa' i],
+                [fill='#fbfbfb' i],
+                [stroke='#fff' i],
+                [stroke='#ffffff' i],
+                [stroke='white' i],
+                [style*='fill: rgb(255, 255, 255)'],
+                [style*='stroke: rgb(255, 255, 255)']
+            )
+        ),
+    .dark
+        :is(
+            svg:not(
+                :has(
+                    [fill='#fff' i],
+                    [fill='#ffffff' i],
+                    [fill='white' i],
+                    [fill='#f9f9f9' i],
+                    [fill='#fafafa' i],
+                    [fill='#fbfbfb' i],
+                    [stroke='#fff' i],
+                    [stroke='#ffffff' i],
+                    [stroke='white' i],
+                    [style*='fill: rgb(255, 255, 255)'],
+                    [style*='stroke: rgb(255, 255, 255)']
+                )
+            ),
+            svg:not(
+                    :has(
+                        [fill='#fff' i],
+                        [fill='#ffffff' i],
+                        [fill='white' i],
+                        [fill='#f9f9f9' i],
+                        [fill='#fafafa' i],
+                        [fill='#fbfbfb' i],
+                        [stroke='#fff' i],
+                        [stroke='#ffffff' i],
+                        [stroke='white' i],
+                        [style*='fill: rgb(255, 255, 255)'],
+                        [style*='stroke: rgb(255, 255, 255)']
+                    )
+                )
+                *
+        ):is(
             [fill='black' i],
             [fill='#000' i],
             [fill='#000000' i],
@@ -444,12 +542,43 @@
             [fill='#474747' i],
             [fill='#4c4c4c' i]
         ) {
-        fill: hsl(var(--content-neutral-primary));
+        fill: hsl(var(--content-neutral-subtle));
     }
 
     .dark
-        .react-flow__node
-        :is(svg, svg *):is(
+        :is(
+            svg:not(
+                :has(
+                    [fill='#fff' i],
+                    [fill='#ffffff' i],
+                    [fill='white' i],
+                    [fill='#f9f9f9' i],
+                    [fill='#fafafa' i],
+                    [fill='#fbfbfb' i],
+                    [stroke='#fff' i],
+                    [stroke='#ffffff' i],
+                    [stroke='white' i],
+                    [style*='fill: rgb(255, 255, 255)'],
+                    [style*='stroke: rgb(255, 255, 255)']
+                )
+            ),
+            svg:not(
+                    :has(
+                        [fill='#fff' i],
+                        [fill='#ffffff' i],
+                        [fill='white' i],
+                        [fill='#f9f9f9' i],
+                        [fill='#fafafa' i],
+                        [fill='#fbfbfb' i],
+                        [stroke='#fff' i],
+                        [stroke='#ffffff' i],
+                        [stroke='white' i],
+                        [style*='fill: rgb(255, 255, 255)'],
+                        [style*='stroke: rgb(255, 255, 255)']
+                    )
+                )
+                *
+        ):is(
             [stroke='black' i],
             [stroke='#000' i],
             [stroke='#000000' i],
@@ -457,18 +586,47 @@
             [stroke='#33363f' i],
             [stroke='#374151' i]
         ) {
-        stroke: hsl(var(--content-neutral-primary));
+        stroke: hsl(var(--content-neutral-subtle));
     }
 
     .dark
-        .react-flow__node
-        svg
+        svg:not(
+            :has(
+                [fill='#fff' i],
+                [fill='#ffffff' i],
+                [fill='white' i],
+                [fill='#f9f9f9' i],
+                [fill='#fafafa' i],
+                [fill='#fbfbfb' i],
+                [stroke='#fff' i],
+                [stroke='#ffffff' i],
+                [stroke='white' i],
+                [style*='fill: rgb(255, 255, 255)'],
+                [style*='stroke: rgb(255, 255, 255)']
+            )
+        )
         :is([style*='fill: rgb(0, 0, 0)'], [style*='fill: rgb(24, 24, 24)'], [style*='fill: rgb(40, 42, 54)']) {
-        fill: hsl(var(--content-neutral-primary)) !important;
+        fill: hsl(var(--content-neutral-subtle)) !important;
     }
 
-    .dark .react-flow__node svg [style*='stroke: rgb(0, 0, 0)'] {
-        stroke: hsl(var(--content-neutral-primary)) !important;
+    .dark
+        svg:not(
+            :has(
+                [fill='#fff' i],
+                [fill='#ffffff' i],
+                [fill='white' i],
+                [fill='#f9f9f9' i],
+                [fill='#fafafa' i],
+                [fill='#fbfbfb' i],
+                [stroke='#fff' i],
+                [stroke='#ffffff' i],
+                [stroke='white' i],
+                [style*='fill: rgb(255, 255, 255)'],
+                [style*='stroke: rgb(255, 255, 255)']
+            )
+        )
+        [style*='stroke: rgb(0, 0, 0)'] {
+        stroke: hsl(var(--content-neutral-subtle)) !important;
     }
 
     * {
@@ -547,7 +705,9 @@
     line-height: 1.5rem !important;
 }
 
-.aui-thread-root .aui-composer-root {
+.aui-thread-root .aui-composer-root,
+.aui-cc-thread-root .aui-composer-root {
+    background-color: hsl(var(--background));
     box-shadow: none;
 }
 
