@@ -133,21 +133,21 @@ The object is expressed in each language's natural shape:
 
 ### The action perform contract
 
-Each action's `perform` is invoked as `perform(inputParameters, connectionParameters, context)`:
+Each action's `perform` is invoked as `perform(input, connection, context)`:
 
-- `inputParameters` - the values the workflow configured for the action's declared `properties` (`[{name, type, label, required, ...}]`, the same property shape the connection uses). An action with no declared properties receives an empty map.
-- `connectionParameters` - the parameters of the connection selected for the component, empty when none is configured.
+- `input` - the values the workflow configured for the action's declared `properties` (`[{name, type, label, required, ...}]`, the same property shape the connection uses). An action with no declared properties receives an empty map.
+- `connection` - the parameters of the connection selected for the component, empty when none is configured.
 - `context` - two capabilities: `context.http(request)` executes an HTTP call through the platform's HTTP client, and `context.log(level, message)` writes to the task's execution log. `http` takes a single request object and returns `{ statusCode, headers, body }`.
 
 ```javascript
-perform: function (inputParameters, connectionParameters, context) {
+perform: function (input, connection, context) {
     const response = context.http({
         method: "GET",
-        url: "https://api.example.com/items/" + inputParameters.itemId,
-        headers: {"Authorization": "Bearer " + connectionParameters.accessToken}
+        url: "https://api.example.com/items/" + input.itemId,
+        headers: {"Authorization": "Bearer " + connection.accessToken}
     });
 
-    context.log("info", "fetched item " + inputParameters.itemId);
+    context.log("info", "fetched item " + input.itemId);
 
     return response.body;
 }
@@ -206,7 +206,7 @@ Without an output declaration an action publishes no schema, so downstream steps
         ]
     },
     sampleOutput: {id: "42", name: "Widget"},
-    perform: function (inputParameters, connectionParameters, context) { /* ... */ }
+    perform: function (input, connection, context) { /* ... */ }
 }
 ```
 
@@ -218,7 +218,7 @@ A property's `options` can be a static list or a **function** evaluated when the
 {
     name: "region",
     type: "STRING",
-    options: function (inputParameters, connectionParameters, searchText) {
+    options: function (input, connection, searchText) {
         return [
             {label: "Europe", value: "eu"},
             {label: "United States", value: "us"}
@@ -241,7 +241,7 @@ A tool is an action - same properties, output, and perform - so an action opts i
     tool: true,
     properties: [{name: "email", type: "STRING", required: true}],
     output: {type: "OBJECT", properties: [{name: "id", type: "STRING"}]},
-    perform: function (inputParameters, connectionParameters, context) { /* ... */ }
+    perform: function (input, connection, context) { /* ... */ }
 }
 ```
 
@@ -257,7 +257,7 @@ triggers: [
         type: "POLLING",
         properties: [{name: "folder", type: "STRING"}],
         output: {type: "OBJECT", properties: [{name: "id", type: "STRING"}]},
-        poll: function (inputParameters, connectionParameters, closureParameters) {
+        poll: function (input, connection, closureParameters) {
             const since = closureParameters.cursor ?? 0;
 
             // fetch what changed since `since` …
@@ -280,7 +280,7 @@ triggers: [
         name: "onPush",
         title: "On Push",
         type: "STATIC_WEBHOOK",
-        webhookRequest: function (inputParameters, connectionParameters, request) {
+        webhookRequest: function (input, connection, request) {
             return {event: request.body.event, sender: request.headers["x-sender"]};
         }
     }
@@ -296,14 +296,14 @@ A `DYNAMIC_WEBHOOK` trigger registers itself with the provider. Add `webhookEnab
 ```javascript
 {
     name: "onPush", type: "DYNAMIC_WEBHOOK",
-    webhookEnable: function (inputParameters, connectionParameters, args) {
+    webhookEnable: function (input, connection, args) {
         // args.webhookUrl is the URL the platform minted for this workflow
         return {subscriptionId: "..."};          // kept and handed back later
     },
-    webhookDisable: function (inputParameters, connectionParameters, args) {
+    webhookDisable: function (input, connection, args) {
         // args carries whatever webhookEnable returned
     },
-    webhookRequest: function (inputParameters, connectionParameters, request) { /* ... */ }
+    webhookRequest: function (input, connection, request) { /* ... */ }
 }
 ```
 
@@ -313,7 +313,7 @@ Whatever `webhookEnable` returns is retained by the platform and passed back to 
 
 ### Declaring a connection
 
-The optional `connection` member declares the component's connection the same way built-in components do - the Connections page can then create connections of this type, the workflow editor offers wiring, and `perform` receives the values as `connectionParameters`:
+The optional `connection` member declares the component's connection the same way built-in components do - the Connections page can then create connections of this type, the workflow editor offers wiring, and `perform` receives the selected connection's values as its `connection` argument:
 
 ```javascript
 connection: {
@@ -338,12 +338,12 @@ All authorization types are supported: `API_KEY`, `BEARER_TOKEN`, `BASIC_AUTH`, 
 `authorizationUrl`, `tokenUrl`, and `refreshUrl` accept either a string constant or a function of the connection parameters, for region- or tenant-dependent endpoints:
 
 ```javascript
-tokenUrl: function (connectionParameters) {
-    return "https://" + connectionParameters.region + ".example.com/oauth/token";
+tokenUrl: function (connection) {
+    return "https://" + connection.region + ".example.com/oauth/token";
 }
 ```
 
-An authorization may also declare `apply: function (connectionParameters) { return {headers: {...}, queryParameters: {...}}; }` to override how credentials decorate outgoing requests. A custom `apply` runs on **every** request the connection makes, so it is an opt-in cost.
+An authorization may also declare `apply: function (connection) { return {headers: {...}, queryParameters: {...}}; }` to override how credentials decorate outgoing requests. A custom `apply` runs on **every** request the connection makes, so it is an opt-in cost.
 
 Connection-level `properties` attach to each declared authorization, or to an implicit `CUSTOM` authorization when none is declared.
 
