@@ -23,7 +23,7 @@ export function RightSidebar({
                             <div className="my-2 w-8/12 border-b" key={`right-sidebar-separator-${index}`} />
                         ) : (
                             <button
-                                className="flex items-center rounded-lg p-3 hover:text-blue-600 [&_svg]:size-5"
+                                className="flex items-center rounded-lg p-3 hover:text-content-brand-primary [&_svg]:size-5"
                                 key={item.name}
                                 onClick={item.onClick}
                             >
