@@ -86,6 +86,9 @@ public final class A2aServer {
     @Version
     private int version;
 
+    @Column("workspace_id")
+    private Long workspaceId;
+
     public A2aServer() {
     }
 
@@ -168,6 +171,10 @@ public final class A2aServer {
         return version;
     }
 
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public boolean isAuthenticationRequired() {
         return authenticationRequired;
     }
@@ -214,6 +221,10 @@ public final class A2aServer {
         this.version = version;
     }
 
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public String toString() {
         return "A2aServer{" +
@@ -225,6 +236,7 @@ public final class A2aServer {
             ", authenticationRequired=" + authenticationRequired +
             ", uuid=" + uuid +
             ", version=" + version +
+            ", workspaceId=" + workspaceId +
             '}';
     }
 }

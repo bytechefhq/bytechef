@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
-import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
+import com.bytechef.automation.ai.a2a.facade.A2aProjectWorkflowFacade;
 import com.bytechef.automation.ai.a2a.web.graphql.config.AutomationA2aGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.ai.a2a.web.graphql.config.AutomationA2aGraphQlTestConfiguration;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -57,7 +57,7 @@ import org.springframework.test.context.ContextConfiguration;
 class A2aProjectWorkflowGraphQlControllerIntTest {
 
     @Autowired
-    private A2aProjectWorkflowService a2aProjectWorkflowService;
+    private A2aProjectWorkflowFacade a2aProjectWorkflowFacade;
 
     @Autowired
     private GraphQlTester graphQlTester;
@@ -83,7 +83,7 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
         Workflow workflow = mock(Workflow.class);
 
         when(workflow.getLabel()).thenReturn("Summarizer");
-        when(a2aProjectWorkflowService.getA2aProjectA2aProjectWorkflows(11L)).thenReturn(List.of(a2aProjectWorkflow));
+        when(a2aProjectWorkflowFacade.getA2aProjectA2aProjectWorkflows(11L)).thenReturn(List.of(a2aProjectWorkflow));
         when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(201L)).thenReturn(projectDeploymentWorkflow);
         when(workflowService.getWorkflow("wf-1")).thenReturn(workflow);
 
@@ -115,7 +115,7 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
             .path("a2aProjectWorkflowsByA2aProjectId[0].skillDescription")
             .valueIsNull();
 
-        verify(a2aProjectWorkflowService).getA2aProjectA2aProjectWorkflows(11L);
+        verify(a2aProjectWorkflowFacade).getA2aProjectA2aProjectWorkflows(11L);
     }
 
     @Test
@@ -125,7 +125,7 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
 
         a2aProjectWorkflow.setId(902L);
 
-        when(a2aProjectWorkflowService.getA2aProjectA2aProjectWorkflows(11L)).thenReturn(List.of(a2aProjectWorkflow));
+        when(a2aProjectWorkflowFacade.getA2aProjectA2aProjectWorkflows(11L)).thenReturn(List.of(a2aProjectWorkflow));
 
         graphQlTester
             .document("""
@@ -168,7 +168,7 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
             .path("a2aProjectWorkflowsByA2aProjectId")
             .valueIsNull();
 
-        verifyNoInteractions(a2aProjectWorkflowService);
+        verifyNoInteractions(a2aProjectWorkflowFacade);
     }
 
     @Test
@@ -177,7 +177,8 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
 
         updatedA2aProjectWorkflow.setSkillName("Summarize");
 
-        when(a2aProjectWorkflowService.updateSkill(901L, "Summarize", null)).thenReturn(updatedA2aProjectWorkflow);
+        when(a2aProjectWorkflowFacade.updateA2aProjectWorkflowSkill(901L, "Summarize", null))
+            .thenReturn(updatedA2aProjectWorkflow);
 
         graphQlTester
             .document("""
@@ -196,7 +197,7 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("Summarize");
 
-        verify(a2aProjectWorkflowService).updateSkill(901L, "Summarize", null);
+        verify(a2aProjectWorkflowFacade).updateA2aProjectWorkflowSkill(901L, "Summarize", null);
     }
 
     @Test
@@ -205,7 +206,8 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
 
         disabledA2aProjectWorkflow.setEnabled(false);
 
-        when(a2aProjectWorkflowService.updateEnabled(901L, false)).thenReturn(disabledA2aProjectWorkflow);
+        when(a2aProjectWorkflowFacade.updateA2aProjectWorkflowEnabled(901L, false))
+            .thenReturn(disabledA2aProjectWorkflow);
 
         graphQlTester
             .document("""
@@ -224,14 +226,15 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(false);
 
-        verify(a2aProjectWorkflowService).updateEnabled(901L, false);
+        verify(a2aProjectWorkflowFacade).updateA2aProjectWorkflowEnabled(901L, false);
     }
 
     @Test
     void testUpdateA2aProjectWorkflowEnabledReEnablesTheWorkflow() {
         A2aProjectWorkflow enabledA2aProjectWorkflow = createA2aProjectWorkflow(901L, 11L, 201L);
 
-        when(a2aProjectWorkflowService.updateEnabled(901L, true)).thenReturn(enabledA2aProjectWorkflow);
+        when(a2aProjectWorkflowFacade.updateA2aProjectWorkflowEnabled(901L, true))
+            .thenReturn(enabledA2aProjectWorkflow);
 
         graphQlTester
             .document("""
@@ -246,7 +249,7 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(a2aProjectWorkflowService).updateEnabled(901L, true);
+        verify(a2aProjectWorkflowFacade).updateA2aProjectWorkflowEnabled(901L, true);
     }
 
     private static A2aProjectWorkflow createA2aProjectWorkflow(
