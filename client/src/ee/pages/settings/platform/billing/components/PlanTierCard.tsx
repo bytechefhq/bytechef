@@ -28,13 +28,13 @@ const PlanTierCard = ({
     <div
         className={twMerge(
             'flex w-72 flex-col gap-2 overflow-hidden rounded-2xl border p-2',
-            highlighted ? 'border-[#b3c9ed] bg-[#e6eef9]' : 'border-slate-200 bg-white'
+            highlighted ? 'border-[#b3c9ed] bg-[#e6eef9]' : 'border-stroke-neutral-secondary bg-surface-neutral-primary'
         )}
     >
         <div
             className={twMerge(
                 'flex h-36 flex-col justify-center gap-1 rounded-xl px-4 py-8',
-                highlighted ? 'bg-white' : 'bg-slate-100'
+                highlighted ? 'bg-surface-neutral-primary' : 'bg-slate-100'
             )}
         >
             <span className="text-xl font-bold">{name}</span>
@@ -62,7 +62,7 @@ const PlanTierCard = ({
             />
         </div>
 
-        <hr className="border-slate-200" />
+        <hr className="border-stroke-neutral-secondary" />
 
         <ul className="flex flex-1 flex-col gap-3 px-4 py-5">
             {features.map((feature) => (

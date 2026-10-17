@@ -56,7 +56,7 @@ const ApiConnectorWizardEndpointSelectionStep = () => {
 
                                     return (
                                         <div
-                                            className="flex items-start gap-3 rounded-md border p-3 hover:bg-gray-50"
+                                            className="flex items-start gap-3 rounded-md border p-3 hover:bg-surface-neutral-primary-hover"
                                             key={endpoint.id}
                                         >
                                             <Checkbox
