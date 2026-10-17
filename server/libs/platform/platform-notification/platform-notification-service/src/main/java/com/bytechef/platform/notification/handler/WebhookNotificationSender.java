@@ -16,16 +16,26 @@
 
 package com.bytechef.platform.notification.handler;
 
+import com.bytechef.platform.notification.delivery.WebhookDeliveryRequest;
+import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
 import com.bytechef.platform.notification.domain.Notification;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-
 @Component
 public class WebhookNotificationSender implements NotificationSender<WebhookNotificationHandler> {
 
+    private final WebhookNotificationClient webhookNotificationClient;
+
+    public WebhookNotificationSender(WebhookNotificationClient webhookNotificationClient) {
+        this.webhookNotificationClient = webhookNotificationClient;
+    }
+
+    @Override
     public Notification.Type getType() {
         return Notification.Type.WEBHOOK;
     }
@@ -35,5 +45,20 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
         Notification notification, WebhookNotificationHandler webhookNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
+        Map<String, Object> settings = notification.getSettings();
+
+        String url = (String) settings.get("webhook");
+
+        if (url == null || url.isBlank()) {
+            throw new IllegalStateException(
+                "Notification " + notification.getId() + " has no webhook URL configured");
+        }
+
+        String secret = (String) settings.get("webhookSecret");
+
+        webhookNotificationClient.deliver(
+            new WebhookDeliveryRequest(
+                url, "job.status", webhookNotificationHandler.getPayload(notificationHandlerContext), Map.of(),
+                secret));
     }
 }

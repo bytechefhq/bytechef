@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
+ * @author Ivica Cardic
  */
 @Component
 public class EmailNotificationSender implements NotificationSender<EmailNotificationHandler> {
@@ -33,6 +34,7 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
         this.mailService = mailService;
     }
 
+    @Override
     public Notification.Type getType() {
         return Notification.Type.EMAIL;
     }
@@ -44,8 +46,16 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
 
         Map<String, Object> settings = notification.getSettings();
 
+        String email = (String) settings.get("email");
+
+        if (email == null || email.isBlank()) {
+            throw new IllegalStateException(
+                "Notification " + notification.getId() + " has no email address configured");
+        }
+
         mailService.sendEmail(
-            (String) settings.get("email"), emailNotificationHandler.getSubject(notificationHandlerContext),
-            emailNotificationHandler.getContent(notificationHandlerContext), false, emailNotificationHandler.isHtml());
+            email, emailNotificationHandler.getSubject(notificationHandlerContext),
+            emailNotificationHandler.getContent(notificationHandlerContext), false,
+            emailNotificationHandler.isHtml());
     }
 }

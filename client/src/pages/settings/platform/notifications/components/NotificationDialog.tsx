@@ -151,6 +151,15 @@ const NotificationDialog = ({
                                                                 {NotificationTypeEnum.Webhook.toString()}
                                                             </SelectItem>
                                                         )}
+
+                                                        {ff_1132 && (
+                                                            <SelectItem
+                                                                key={NotificationTypeEnum.Slack.toString()}
+                                                                value={NotificationTypeEnum.Slack.toString()}
+                                                            >
+                                                                {NotificationTypeEnum.Slack.toString()}
+                                                            </SelectItem>
+                                                        )}
                                                     </SelectContent>
                                                 </Select>
                                             </FormControl>
@@ -173,6 +182,28 @@ const NotificationDialog = ({
                                                         autoComplete="email"
                                                         onChange={(e) => field.onChange(e.target.value)}
                                                         type="email"
+                                                        value={(field.value as string) || ''}
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+
+                                {notificationType === NotificationTypeEnum.Slack && (
+                                    <FormField
+                                        control={control}
+                                        name="settings.slackWebhookUrl"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Slack Webhook URL</FormLabel>
+
+                                                <FormControl>
+                                                    <Input
+                                                        onChange={(event) => field.onChange(event.target.value)}
+                                                        placeholder="https://hooks.slack.com/services/..."
                                                         value={(field.value as string) || ''}
                                                     />
                                                 </FormControl>
