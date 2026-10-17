@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.token;
 
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -27,6 +28,8 @@ public interface ApprovalTokens {
     String toSignedToken(String innerToken, Duration ttl);
 
     Optional<String> toSignedTokenIfConfigured(String innerToken);
+
+    Optional<String> toSignedTokenIfConfigured(String innerToken, Duration ttl);
 
     Optional<String> parseSignedToken(String token);
 
@@ -46,5 +49,19 @@ public interface ApprovalTokens {
         }
 
         return Optional.ofNullable(token);
+    }
+
+    default Optional<JobResumeId> resolveJobResumeId(String token) {
+        Optional<String> innerTokenOptional = resolveInnerToken(token);
+
+        if (innerTokenOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(JobResumeId.parse(innerTokenOptional.get()));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return Optional.empty();
+        }
     }
 }
