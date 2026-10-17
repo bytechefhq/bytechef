@@ -47,7 +47,6 @@ import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -476,7 +475,9 @@ public class KubernetesTaskRunnerBackend implements RemoteTaskRunnerBackend {
         KubernetesOperations.ExecResult untar;
 
         try {
-            Files.copy(inputArchive, archivePath, StandardCopyOption.REPLACE_EXISTING);
+            try (OutputStream archiveOutputStream = Files.newOutputStream(archivePath)) {
+                inputArchive.transferTo(archiveOutputStream);
+            }
 
             long archiveSize = Files.size(archivePath);
 

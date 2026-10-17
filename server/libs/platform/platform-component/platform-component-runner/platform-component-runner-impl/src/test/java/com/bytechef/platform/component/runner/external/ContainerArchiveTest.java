@@ -25,6 +25,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -32,8 +34,10 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -55,6 +59,30 @@ class ContainerArchiveTest {
     void restoreTheDefaultCeilings() {
         useByteCeiling(ContainerArchive.DEFAULT_MAX_EXTRACTED_BYTES);
         useEntryCeiling(ContainerArchive.DEFAULT_MAX_EXTRACTED_ENTRIES);
+    }
+
+    @Test
+    void testToTarSpoolsTheArchiveIntoAnOwnerOnlyTempFile() throws IOException {
+        assumeTrue(FileSystems.getDefault()
+            .supportedFileAttributeViews()
+            .contains("posix"));
+
+        Path sourcePath = Files.createDirectories(tempDirPath.resolve("source"));
+
+        Files.writeString(sourcePath.resolve("connections.json"), "{\"secret\":\"s\"}", StandardCharsets.UTF_8);
+
+        Set<Path> existingArchivePaths = listArchiveTempFiles();
+
+        try (InputStream inputStream = ContainerArchive.toTar(sourcePath)) {
+            Set<Path> archivePaths = listArchiveTempFiles();
+
+            archivePaths.removeAll(existingArchivePaths);
+
+            assertThat(archivePaths).hasSize(1);
+            assertThat(PosixFilePermissions.toString(Files.getPosixFilePermissions(archivePaths.iterator()
+                .next()))).isEqualTo("rw-------");
+            assertThat(inputStream.readAllBytes()).isNotEmpty();
+        }
     }
 
     @Test
@@ -486,6 +514,20 @@ class ContainerArchiveTest {
         }
 
         return entries;
+    }
+
+    private static Set<Path> listArchiveTempFiles() throws IOException {
+        Set<Path> archivePaths = new HashSet<>();
+
+        try (DirectoryStream<Path> paths = Files.newDirectoryStream(
+            Path.of(System.getProperty("java.io.tmpdir")), "bytechef-archive-*")) {
+
+            for (Path path : paths) {
+                archivePaths.add(path);
+            }
+        }
+
+        return archivePaths;
     }
 
     private static boolean restrictPermissions(Path path, String permissions) {
