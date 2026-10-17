@@ -55,10 +55,34 @@ describe('findPerformScope', () => {
         expect(findPerformScope(source, source.length, 'javascript')).toBeUndefined();
     });
 
-    it('prefers the innermost function', () => {
+    it('maps the outermost function when no root is given', () => {
+        const source = 'function perform(input, context) {\n  const f = (row) => {\n    ro';
+
+        expect(findPerformScope(source, source.length, 'javascript')).toMatchObject({
+            contextName: 'context',
+            inputName: 'input',
+        });
+    });
+
+    it('returns undefined for a root bound by an inner callback', () => {
         const source = 'function perform(input, context) {\n  const f = (row) => {\n    row.';
 
-        expect(findPerformScope(source, source.length, 'javascript')).toMatchObject({contextName: 'row'});
+        expect(findPerformScope(source, source.length, 'javascript', 'row')).toBeUndefined();
+    });
+
+    it('maps the perform for a root it binds from inside a callback', () => {
+        const source = 'function perform(input, context) {\n  input.rows.map((row) => {\n    context.';
+
+        expect(findPerformScope(source, source.length, 'javascript', 'context')).toMatchObject({
+            contextName: 'context',
+            inputName: 'input',
+        });
+    });
+
+    it('returns undefined for a root no enclosing function binds', () => {
+        const source = 'function perform(input, context) {\n  other.';
+
+        expect(findPerformScope(source, source.length, 'javascript', 'other')).toBeUndefined();
     });
 
     it('maps a Python def by indentation', () => {

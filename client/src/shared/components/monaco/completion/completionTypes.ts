@@ -2,6 +2,7 @@ import type {EvaluatorFunctionDefinition} from '@/shared/middleware/graphql';
 import type {
     ComponentDefinition,
     ComponentDefinitionBasic,
+    ConnectionDefinition,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 
@@ -15,6 +16,10 @@ export type ConnectionDeclarationType = {
 
 export type ComponentCatalogType = {
     components: ComponentDefinitionBasic[];
+    getConnectionDefinition(
+        componentName: string,
+        componentVersion?: number
+    ): Promise<ConnectionDefinition | undefined>;
     getDefinition(componentName: string, componentVersion?: number): Promise<ComponentDefinition | undefined>;
 };
 
